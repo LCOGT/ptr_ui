@@ -1,0 +1,19 @@
+{
+    "ptrmockenv": {
+        "awscloudformation": {
+            "AuthRoleName": "ptr-mock-20190228115057-authRole",
+            "UnauthRoleArn": "arn:aws:iam::306389350997:role/ptr-mock-20190228115057-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::306389350997:role/ptr-mock-20190228115057-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "ptr-mock-20190228115057-deployment",
+            "UnauthRoleName": "ptr-mock-20190228115057-unauthRole",
+            "StackName": "ptr-mock-20190228115057",
+            "StackId": "arn:aws:cloudformation:us-west-2:306389350997:stack/ptr-mock-20190228115057/2a8b7f80-3b92-11e9-9d0f-02a485342252"
+        },
+        "categories": {
+            "auth": {
+                "cognito69779ad2": {}
+            }
+        }
+    }
+}
