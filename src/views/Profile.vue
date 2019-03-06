@@ -6,13 +6,13 @@
 
 <script>
 export default {
-    name: 'Profile', 
-    methods: {
-        getUsername() {
-            let user = this.$store.getters.user
-            return user.username
-        }
+  name: 'Profile',
+  methods: {
+    getUsername () {
+      let user = this.$store.getters.user
+      return user.username
     }
+  }
 }
 </script>
 

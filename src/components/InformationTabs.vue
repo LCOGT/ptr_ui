@@ -10,7 +10,7 @@
                     </template>
                     <div> sky chart </div>
                 </b-tab-item>
-                
+
                 <b-tab-item>
                     <template slot="header">
                         <b-icon pack="fas" icon="cloud-moon-rain"></b-icon>
@@ -40,15 +40,14 @@
     </span>
 </template>
 
-
 <script>
 export default {
-    name: 'InformationTabs',
-    data() {
-            return {
-                activeTab: 0,
-            }
-        }
+  name: 'InformationTabs',
+  data () {
+    return {
+      activeTab: 0
+    }
+  }
 }
 </script>
 

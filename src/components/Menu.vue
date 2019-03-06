@@ -57,36 +57,36 @@
 </template>
 
 <script>
-import { Auth } from 'aws-amplify';
+import { Auth } from 'aws-amplify'
 export default {
-    name: 'Menu',
-    mounted() {
-        let navbar = document.querySelector('.navbar-burger');
-        navbar.addEventListener('click', function() {
-            let target = navbar.dataset.target;
-            let $target = document.getElementById(target);
-            navbar.classList.toggle('is-active');
-            $target.classList.toggle('is-active');
-        });
-    },
-    methods: {
-        signOut() {
-            Auth.signOut({ global: true })
-                .then(data => {
-                    console.log(data)
-                    this.$store.commit('setUser', '')
-                    })
-                .catch(err => console.log(err));
-        },
-    },
-    computed: {
-        isLoggedIn() {
-            return (this.$store.getters.user == '') ? false : true;
-        },
-        username() {
-            return(this.$store.getters.user.username);
-        }
+  name: 'Menu',
+  mounted () {
+    let navbar = document.querySelector('.navbar-burger')
+    navbar.addEventListener('click', function () {
+      let target = navbar.dataset.target
+      let $target = document.getElementById(target)
+      navbar.classList.toggle('is-active')
+      $target.classList.toggle('is-active')
+    })
+  },
+  methods: {
+    signOut () {
+      Auth.signOut({ global: true })
+        .then(data => {
+          console.log(data)
+          this.$store.commit('setUser', '')
+        })
+        .catch(err => console.log(err))
     }
+  },
+  computed: {
+    isLoggedIn () {
+      return this.$store.getters.user != ''
+    },
+    username () {
+      return (this.$store.getters.user.username)
+    }
+  }
 
 }
 </script>

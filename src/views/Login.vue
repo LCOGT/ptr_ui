@@ -6,26 +6,25 @@
             <b-field label="Username"
                 :type="{ 'is-danger': showError }"
                 >
-                <b-input 
-                value="" 
+                <b-input
+                value=""
                 v-model="input.username"
                 v-on:keyup.native.enter="login()"></b-input>
             </b-field>
 
-            <b-field 
-                label="Password" 
+            <b-field
+                label="Password"
                 :type="{ 'is-danger': showError }"
                 :message="[
                     { 'Username or password is incorrect': showError }
                 ]">
-                <b-input 
-                value="" 
-                type="password" 
+                <b-input
+                value=""
+                type="password"
                 v-model="input.password"
                 v-on:keyup.native.enter="login()">
                 </b-input>
             </b-field>
-
 
             <button class="button is-primary" type="submit" value="Log In" v-on:click="login()">Log In</button>
 
@@ -36,33 +35,33 @@
 </template>
 
 <script>
-import { Auth } from 'aws-amplify';
+import { Auth } from 'aws-amplify'
 export default {
-    name: 'Login',
-    data() {
-        return {
-            input: {
-                username: "",
-                password: "",
-            },
-            showError:false,
-        }
-    },
-    methods: {
-        login() {
-            if (this.input.username != "" && this.input.password != "") {
-                Auth.signIn({username: this.input.username, password: this.input.password})
-                    .then(user => {
-                        this.$store.commit('setUser', user);
-                        this.$router.go(-1);
-                    })
-                .catch(err => {
-                    console.log(err)
-                    this.showError = true
-                });
-            }
-        },
+  name: 'Login',
+  data () {
+    return {
+      input: {
+        username: '',
+        password: ''
+      },
+      showError: false
     }
+  },
+  methods: {
+    login () {
+      if (this.input.username != '' && this.input.password != '') {
+        Auth.signIn({ username: this.input.username, password: this.input.password })
+          .then(user => {
+            this.$store.commit('setUser', user)
+            this.$router.go(-1)
+          })
+          .catch(err => {
+            console.log(err)
+            this.showError = true
+          })
+      }
+    }
+  }
 }
 </script>
 

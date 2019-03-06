@@ -1,7 +1,7 @@
 var test1 = {
-    hello: function(){console.log("hello world");}
+  hello: function () { console.log('hello world') }
 }
 
-console.log('outside test1');
+console.log('outside test1')
 
-export default test1;
+export default test1

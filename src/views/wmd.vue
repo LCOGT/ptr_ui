@@ -14,12 +14,12 @@ import StatusBar from '@/components/StatusBar'
 import SideControls from '@/components/SideControls'
 
 export default {
-    name: 'wmd',
-    components: {
-        InformationTabs,
-        StatusBar,
-        SideControls
-    }
+  name: 'wmd',
+  components: {
+    InformationTabs,
+    SideControls,
+    StatusBar
+  },
 }
 </script>
 

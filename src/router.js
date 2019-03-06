@@ -1,7 +1,7 @@
 // src/router.js
 
 import Vue from 'vue'
-import VueRouter from 'vue-router';
+import VueRouter from 'vue-router'
 
 import Home from './views/Home.vue'
 import About from './views/About.vue'
@@ -27,7 +27,8 @@ const router = new VueRouter({
     { path: '/test', name: 'test', component: Test },
     { path: '/profile', name: 'profile', meta: { requiresAuth: true }, component: Profile },
     { path: '*', redirect: '/' },
-    { path: '/about', name: 'about',
+    { path: '/about',
+      name: 'about',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.

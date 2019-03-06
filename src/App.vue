@@ -15,11 +15,11 @@ export default {
   components: {
     Menu,
     components
-  },
+  }
 
   // Obsolete by vue-createPersistedState
 
-  //mounted() {
+  // mounted() {
   //  // Check for login credentials
   //  Auth.currentAuthenticatedUser()
   //    .then(user => {
@@ -27,7 +27,7 @@ export default {
   //        this.$store.commit('setUser', user);
   //        })
   //    .catch(err => console.log(err));
-  //}
+  // }
 }
 </script>
 
