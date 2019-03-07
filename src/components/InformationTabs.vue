@@ -1,7 +1,7 @@
 <template>
     <span>
         <div class='information-tabs'>
-            <b-tabs expanded v-model="activeTab" size="is-medium" position="is-centered">
+            <b-tabs v-model="activeTab" size="is-small" >
 
                 <b-tab-item>
                     <template slot="header">

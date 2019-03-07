@@ -15,19 +15,17 @@ export default {
   components: {
     Menu,
     components
+  },
+  data() {
+    return {
+      mobile: window.innerWidth <= 768,
+    }
+  },
+  created() {
+    addEventListener('resize', () => {
+      this.mobile = innerWidth <= 768;
+    })
   }
-
-  // Obsolete by vue-createPersistedState
-
-  // mounted() {
-  //  // Check for login credentials
-  //  Auth.currentAuthenticatedUser()
-  //    .then(user => {
-  //        console.log('user',user);
-  //        this.$store.commit('setUser', user);
-  //        })
-  //    .catch(err => console.log(err));
-  // }
 }
 </script>
 

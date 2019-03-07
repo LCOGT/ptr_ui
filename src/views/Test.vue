@@ -6,20 +6,19 @@
         <button class="button" v-on:click="signOut">sign out</button>
         <button class="button" v-on:click="signIn">sign in as timbeccue</button>
         <button class="button" v-on:click="getUser">getUser</button>
+        <button class="button" v-on:click="testAPI">testAPI</button>
+        <button class="button" v-on:click="testRestrictedAPI">testRestrictedAPI</button>
     </div>
 </template>
 
 <script>
 import { Auth } from 'aws-amplify'
 import { AmplifyEventBus } from 'aws-amplify-vue'
+import { mapGetters } from 'vuex'
+import axios from 'axios';
 
 export default {
   name: 'Test',
-  data: function () {
-    return {
-      isTimLoggedIn: ''
-    }
-  },
   methods: {
     authenticate () {
       Auth.currentAuthenticatedUser({
@@ -41,7 +40,7 @@ export default {
       Auth.signOut({ global: true })
         .then(data => {
           console.log(data)
-          this.$store.commit('setUser', '')
+          this.$store.commit('auth/setUser', '')
         })
         .catch(err => console.log(err))
     },
@@ -49,25 +48,34 @@ export default {
       Auth.signIn({ username: 'timbeccue', password: 'Password1!' })
         .then(user => {
           console.log(user)
-          this.$store.commit('setUser', user)
+          this.$store.commit('auth/setUser', user)
         })
         .catch(err => console.log(err))
     },
     getUser () {
-      let user = this.$store.getters.user
-      console.log('user: ', user)
-      console.log('username: ', user.username)
+      console.log('user: ', this.user)
+      console.log('username: ',this.username)
+    },
+    testAPI () {
+      let headers = { 'Authorization': this.user }
+      axios
+        .get('http://localhost:5000/api/test', {headers: headers })
+        .then(response => console.log(response))
+    },
+    testRestrictedAPI () {
+      let headers = { 'Authorization': this.token }
+      axios
+        .get('http://localhost:5000/api/loginrequired', {headers: headers })
+        .then(response => console.log(response))
     }
   },
-  watch: {
-    setIsTimLoggedIn () {
-      Auth.currentUserInfo()
-        .then(user => {
-          console.log(user)
-          if (user == null) { this.isTimLoggedIn = false; console.log('is null') } else { this.isTimLoggedIn = true }
-        })
-        .catch(err => console.log(err))
-    }
+  computed: {
+    ...mapGetters('auth', {
+      user: 'user',
+      username: 'username',
+      isLoggedIn: 'isLoggedIn',
+      token: 'getToken'
+    }),
   },
   mounted () {
     AmplifyEventBus.$on('authState', info => {

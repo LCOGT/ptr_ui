@@ -41,7 +41,7 @@ export default router
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.getters.user === '') {
+    if (!store.getters['auth/isLoggedIn']) {
       next({
         path: '/login',
         query: {

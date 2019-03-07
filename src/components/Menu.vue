@@ -58,6 +58,8 @@
 
 <script>
 import { Auth } from 'aws-amplify'
+import { mapGetters, mapState } from 'vuex'
+
 export default {
   name: 'Menu',
   mounted () {
@@ -74,18 +76,17 @@ export default {
       Auth.signOut({ global: true })
         .then(data => {
           console.log(data)
-          this.$store.commit('setUser', '')
+          this.$store.commit('auth/setUser', '')
+          this.$router.go() // reload to redirect if user is on auth-required page.
         })
         .catch(err => console.log(err))
     }
   },
   computed: {
-    isLoggedIn () {
-      return this.$store.getters.user != ''
-    },
-    username () {
-      return (this.$store.getters.user.username)
-    }
+    ...mapGetters('auth', {
+      username: 'username',
+      isLoggedIn: 'isLoggedIn'
+    }),
   }
 
 }

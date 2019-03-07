@@ -52,7 +52,7 @@ export default {
       if (this.input.username != '' && this.input.password != '') {
         Auth.signIn({ username: this.input.username, password: this.input.password })
           .then(user => {
-            this.$store.commit('setUser', user)
+            this.$store.commit('auth/setUser', user)
             this.$router.go(-1)
           })
           .catch(err => {
