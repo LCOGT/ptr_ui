@@ -1,14 +1,26 @@
 <template>
 <div id="side-controls" v-bind:style="{ width: width}">
-    <p class='toggle-open-button' v-if="!isMobile" v-on:click="isOpen = !isOpen">{{ isOpen ? '>' : '<' }}</p>
+    <p class='toggle-open-button' v-if="!isMobile" v-on:click="isOpen = !isOpen">{{ isOpen ? 'controls >' : '<' }}</p>
+    <div class="top-block"><strong></strong></div>
+    <div class="scrollBox">
+      <div class="scrollBox-camera"> </div>
+      <focus />
+      <rotate />
+      
 
+    </div>
 </div>
 </template>
 
 <script>
-import Sidebar from '@/components/Sidebar.vue'
+import Focus from '@/components/ControlPanel/Focus'
+import Rotate from '@/components/ControlPanel/Rotate'
 export default {
-  name: 'SideControls',
+  name: 'ControlPanel',
+  components: {
+    Focus,
+    Rotate
+  },
   data () {
     return {
       isOpen: true,
@@ -32,13 +44,12 @@ export default {
 
 <style scoped>
 #side-controls {
-    background-color: #ddd;
+    background-color: #202020;
     height: 100vh;
     transition: width 0.3s;
 }
-
 .toggle-open-button {
-  background-color: red;
+  background-color: #444;
   height: 70px;
   line-height: 70px;
   text-align: center;
@@ -48,4 +59,10 @@ export default {
   font-size: 48px;
   cursor: pointer;
 }
+
+.scrollBox-camera {
+  width: 100%;
+  background-color: #333;
+}
+
 </style>

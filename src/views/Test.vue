@@ -1,13 +1,16 @@
 <template>
-    <div>
+    <div class="buttons">
         <button class="button" v-on:click="authenticate">authenticate</button>
         <button class="button" v-on:click="currentSession">current session</button>
         <button class="button" v-on:click="currentUserInfo">current user info</button>
+        <hr>
         <button class="button" v-on:click="signOut">sign out</button>
         <button class="button" v-on:click="signIn">sign in as timbeccue</button>
-        <button class="button" v-on:click="getUser">getUser</button>
+        <hr>
         <button class="button" v-on:click="testAPI">testAPI</button>
+        <button class="button" v-on:click="postTestAPI">postTestAPI</button>
         <button class="button" v-on:click="testRestrictedAPI">testRestrictedAPI</button>
+        <button class="button" v-on:click="testPostRestrictedAPI">testPostRestrictedAPI</button>
     </div>
 </template>
 
@@ -52,20 +55,28 @@ export default {
         })
         .catch(err => console.log(err))
     },
-    getUser () {
-      console.log('user: ', this.user)
-      console.log('username: ',this.username)
-    },
     testAPI () {
       let headers = { 'Authorization': this.user }
       axios
         .get('http://localhost:5000/api/test', {headers: headers })
         .then(response => console.log(response))
     },
+    postTestAPI () {
+      let headers = { "Authorization": this.user }
+      axios
+        .post('http://localhost:5000/api/test', {headers: headers })
+        .then(response => console.log(response))
+    },
     testRestrictedAPI () {
       let headers = { 'Authorization': this.token }
       axios
         .get('http://localhost:5000/api/loginrequired', {headers: headers })
+        .then(response => console.log(response))
+    },
+    testPostRestrictedAPI () {
+      let headers = { "Authorization": this.token }
+      axios
+        .post('http://localhost:5000/api/loginrequired', {data: "restrictedPostData"}, {"headers": headers })
         .then(response => console.log(response))
     }
   },
@@ -86,4 +97,10 @@ export default {
 </script>
 
 <style scoped>
+.buttons {
+  padding: 5em;
+  display: flex;
+  flex-direction:column;
+  align-items:baseline;
+}
 </style>

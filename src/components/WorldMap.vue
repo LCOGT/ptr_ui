@@ -21,7 +21,7 @@ export default {
     const element = document.getElementById(this.mapName)
     const options = {
       zoom: 2.5,
-      center: new google.maps.LatLng(34, 0),
+      center: new google.maps.LatLng(0, 0),
       styles: [
         {
           'featureType': 'poi',

@@ -2,7 +2,7 @@
     <div>
         <div class="columns is-gapless">
             <information-tabs class="column"></information-tabs>
-            <side-controls class="column is-one-third"></side-controls>
+            <control-panel class="column is-one-third"></control-panel>
         </div>
         <status-bar></status-bar>
     </div>
@@ -11,14 +11,14 @@
 <script>
 import InformationTabs from '@/components/InformationTabs'
 import StatusBar from '@/components/StatusBar'
-import SideControls from '@/components/SideControls'
+import ControlPanel from '@/components/ControlPanel'
 
 export default {
   name: 'wmd',
   components: {
     InformationTabs,
-    SideControls,
-    StatusBar
+    ControlPanel,
+    StatusBar,
   },
 }
 </script>

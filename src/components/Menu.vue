@@ -2,10 +2,8 @@
     <nav class="navbar is-dark is-fixed-top" role="navigation" aria-label="main navigation">
 
         <div class="navbar-brand">
-            <router-link class="navbar-item" to="/">
-                <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
-            </router-link>
-            <router-link class=navbar-item to="/">photon ranch</router-link>
+            <div style="padding-left: 50px"></div>
+            <router-link class=navbar-item to="/">ptr</router-link>
 
             <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
                 <span aria-hidden="true"></span>
@@ -16,12 +14,11 @@
 
         <div id="navbarBasicExample" class="navbar-menu">
             <div class="navbar-start">
-            <router-link class="navbar-item" to="/"> Home </router-link>
 
-            <router-link class="navbar-item" to="/test"> Test </router-link>
+            <router-link class="navbar-item" to="/test"> test </router-link>
 
             <div class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link"> Sites </a>
+                <a class="navbar-link"> sites </a>
 
                 <div class="navbar-dropdown">
                     <router-link class="navbar-item" to="/site/wmd"> Santa Barbara - WMD  </router-link>

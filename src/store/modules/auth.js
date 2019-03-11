@@ -23,9 +23,9 @@ const actions = {}
 
 // mutations
 const mutations = {
-    setUser (state, user) {
+    setUser(state, user) {
         state.user = user
-    } 
+    }
 }
 
 export default {

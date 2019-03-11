@@ -12,6 +12,7 @@ import wmd from './views/wmd.vue'
 import Test from './views/Test.vue'
 
 import store from './store'
+import { Auth } from 'aws-amplify'
 
 Vue.use(VueRouter)
 
@@ -40,6 +41,15 @@ const router = new VueRouter({
 export default router
 
 router.beforeEach((to, from, next) => {
+
+  // Update vuex state to reflect if user is logged in.
+  Auth.currentAuthenticatedUser()
+    .then(user => {
+      store.commit('auth/setUser', user)
+    })
+    .catch(err => console.log(err));
+
+  // Redirect to login page if user is not logged in.
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!store.getters['auth/isLoggedIn']) {
       next({

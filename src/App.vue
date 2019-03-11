@@ -16,15 +16,8 @@ export default {
     Menu,
     components
   },
-  data() {
-    return {
-      mobile: window.innerWidth <= 768,
-    }
-  },
   created() {
-    addEventListener('resize', () => {
-      this.mobile = innerWidth <= 768;
-    })
+    this.$store.dispatch('observatory/streamSSE')
   }
 }
 </script>
