@@ -1,16 +1,29 @@
 <template>
     <div class="focus-panel">
-        <div class="panel-header"> Focus Controls </div>
-        <div class="focus-state"> focus: {{ focus }}</div>
-        <div class="panel-buttons">
-            <div class="buttons has-addons">
-                <command-button :data="commandButtons.focusIn" />
-                <command-button :data="commandButtons.focusOut" />
+        <div class="panel-header" v-on:click="isOpen = !isOpen"> Focus Controls </div>
+        <div class="panel-content" v-if="isOpen">
+            <div class="focus-state"> focus: {{ focus }}</div>
+            <div class="panel-buttons">
+                <div class="buttons has-addons">
+                    <command-button :data="commandButtons.focusIn" />
+                    <command-button :data="commandButtons.focusOut" />
+                </div>
+                <command-button :data="commandButtons.focusHome" />
+                <command-button :data="commandButtons.focusAuto" />
             </div>
-            <command-button :data="commandButtons.focusHome" />
-            <command-button :data="commandButtons.focusAuto" />
+            <div class="panel-inputs">
+                <label class="label">Specify Position: </label>
+                <div class="field has-addons">
+                    <p class="control">
+                        <input v-model="commandButtons.focusPosition.form.position" class="input focus-input" type="text">
+                    </p>
+                    <p class="control">
+                        <command-button :data="commandButtons.focusPosition" class="button is-danger"/>
+                    </p>
+                </div>
+            </div>
+            <br>
         </div>
-        <div class="specific focus"
     </div>
 </template>
 
@@ -24,6 +37,7 @@ export default {
     },
     data () {
         return {
+            isOpen: true,
             commandButtons: {
                 focusIn: {
                     'name': 'in',
@@ -45,6 +59,11 @@ export default {
                     'url': '/commands/focus',
                     'form': {'command': 'auto'}
                 },
+                focusPosition: {
+                    'name': 'focus',
+                    'url': '/commands/focus',
+                    'form': {command: 'value', position: ''}
+                }
             }
         }
     },
@@ -66,6 +85,8 @@ export default {
     background-color: #383838;
     display: flex;
     justify-content: flex-start;
+    border-top: 4px #222 solid;
+    cursor: pointer;
 }
 .focus-state {
     margin-top: 10px;
@@ -82,5 +103,18 @@ export default {
 }
 .panel-buttons * {
     margin-right: 10px;
+}
+.panel-inputs {
+    display: flex;
+    margin: 2em;
+}
+.label {
+    height: 30px;
+    line-height: 30px;
+    padding: 0;
+}
+.focus-input {
+    width: 70px;
+    margin-left: 2em;
 }
 </style>

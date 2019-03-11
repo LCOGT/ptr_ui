@@ -1,7 +1,7 @@
 <template>
     <span>
         <div class='information-tabs'>
-            <b-tabs v-model="activeTab" size="is-small" >
+            <b-tabs v-model="activeTab" size="is-small" type="is-toggle" position="is-centered">
 
                 <b-tab-item>
                     <template slot="header">
@@ -68,12 +68,12 @@ export default {
       buttonData: {
           park: {
               'name': 'Park',
-              'url': '/api/park',
+              'url': '/commands/park',
               'form': {'command': 'park'},
           },
           unpark: {
               'name': 'Unpark',
-              'url': '/command/parking',
+              'url': '/commands/park',
               'form': {'command': 'unpark'},
           },
       }

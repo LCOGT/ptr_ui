@@ -3,7 +3,7 @@
     <p class='toggle-open-button' v-if="!isMobile" v-on:click="isOpen = !isOpen">{{ isOpen ? 'controls >' : '<' }}</p>
     <div class="top-block"><strong></strong></div>
     <div class="scrollBox">
-      <div class="scrollBox-camera"> </div>
+      <camera />
       <focus />
       <rotate />
       
@@ -15,11 +15,13 @@
 <script>
 import Focus from '@/components/ControlPanel/Focus'
 import Rotate from '@/components/ControlPanel/Rotate'
+import Camera from '@/components/ControlPanel/Camera'
 export default {
   name: 'ControlPanel',
   components: {
     Focus,
-    Rotate
+    Rotate,
+    Camera,
   },
   data () {
     return {
@@ -59,10 +61,4 @@ export default {
   font-size: 48px;
   cursor: pointer;
 }
-
-.scrollBox-camera {
-  width: 100%;
-  background-color: #333;
-}
-
 </style>
