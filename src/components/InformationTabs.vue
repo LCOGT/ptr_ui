@@ -1,6 +1,6 @@
 <template>
-    <span>
         <div class='information-tabs'>
+            <br>
             <b-tabs v-model="activeTab" size="is-small" type="is-toggle" position="is-centered">
 
                 <b-tab-item>
@@ -21,7 +21,9 @@
                     <template slot="header">
                         <span class="is-white"> sky chart </span>
                     </template>
-                    <div> sky chart </div>
+                    <div>
+                        <sky-chart /> 
+                    </div>
                 </b-tab-item>
 
                 <b-tab-item>
@@ -48,19 +50,20 @@
 
             </b-tabs>
         </div>
-    </span>
 </template>
 
 <script>
 import DomeCam from '@/components/DomeCam'
 import CommandButton from '@/components/CommandButton'
+import SkyChart from '@/components/celestialmap/SkyChart'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'InformationTabs',
   components: {
       DomeCam,
-      CommandButton
+      CommandButton,
+      SkyChart
   },
   data () {
     return {
@@ -93,6 +96,7 @@ export default {
 <style scoped>
 .information-tabs {
     margin: 2em;
+    padding-top: 4em;
 }
 .button-container {
     display: flex;

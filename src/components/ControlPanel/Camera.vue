@@ -3,31 +3,76 @@
         <div class="panel-header" v-on:click="isOpen = !isOpen"> Camera Controls </div>
 
         <div class="panel-content" v-if="isOpen">
-            <b-field horizontal label="Time" class="field-row">
-                <b-input name="subject" v-model="commandButtons.captureImage.form.time"></b-input>
+
+            <b-field horizontal label="Expose" class="field-row">
+                <b-field>
+                    <b-input name="subject" v-model="commandButtons.captureImage.form.time"></b-input>
+                    <p class="control"> <span class="button is-static">seconds</span> </p>
+                </b-field>
             </b-field>
-            <b-field horizontal label="Count" class="field-row">
-                <b-input name="subject" v-model="commandButtons.captureImage.form.count"></b-input>
+            <b-field horizontal label="Count">
+                <b-field>
+                    <b-input name="subject" v-model="commandButtons.captureImage.form.count"></b-input>
+                    <p class="control"> <span class="button is-static">
+                        {{ 
+                            (commandButtons.captureImage.form.count == 1) 
+                            ? "image&nbsp;&nbsp;&nbsp;&nbsp;" 
+                            : "images&nbsp;&nbsp;" 
+                        }}
+                        </span> </p>
+                </b-field>
             </b-field>
-            <b-field horizontal label="Delay" class="field-row">
-                <b-input name="subject" v-model="commandButtons.captureImage.form.delay"></b-input>
-            </b-field>
+            <!--b-field horizontal label="Delay" class="field-row">
+                <b-field>
+                    <b-input name="subject" v-model="commandButtons.captureImage.form.delay"></b-input>
+                    <p class="control"> <span class="button is-static">seconds</span> </p>
+                </b-field>
+            </b-field-->
             <b-field horizontal label="Hint" class="field-row">
                 <b-input name="subject" v-model="commandButtons.captureImage.form.hint"></b-input>
             </b-field>
             <b-field horizontal label="Filter">
                 <b-select placeholder="Select filter" v-model="commandButtons.captureImage.form.filter">
+                    <option value="LUMINANCE">luminance</option>
                     <option value="RED">red</option>
                     <option value="GREEN">green</option>
                     <option value="BLUE">blue</option>
+                    <option value="LUMINANCE">luminance</option>
+                    <option value="O3">O3</option>
+                    <option value="HA">HA</option>
+                    <option value="S2">S2</option>
+                    <option value="N2">N2</option>
+                    <option value="CONTINUUM">continuum</option>
+                    <option value="LRGB">LRGB</option>
+                    <option value="w">w</option>
+                    <option value="u">u</option>
+                    <option value="g">g</option>
+                    <option value="r">r</option>
+                    <option value="i">i</option>
+                    <option value="zs">zs</option>
+                    <option value="wgri">wgri</option>
+                    <option value="DARK">dark</option>
+                    <option value="AIR">air</option>
                 </b-select>
             </b-field>
-            <b-field horizontal label="Bin">
-                <b-select placeholder="Select bin" v-model="commandButtons.captureImage.form.bin">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="4">4</option>
-                </b-select>
+             <b-field horizontal label="Bin">
+                <b-field>
+                <b-radio-button v-model="commandButtons.captureImage.form.bin"
+                    native-value="1"
+                    type="is-white is-outlined">
+                    1x
+                </b-radio-button>
+                <b-radio-button v-model="commandButtons.captureImage.form.bin"
+                    native-value="2"
+                    type="is-white is-outlined">
+                    2x
+                </b-radio-button>
+                <b-radio-button v-model="commandButtons.captureImage.form.bin"
+                    native-value="4"
+                    type="is-white is-outlined">
+                    4x
+                </b-radio-button>
+                </b-field>
             </b-field>
             <b-field horizontal label="Dither">
                 <b-select placeholder="Select bin" v-model="commandButtons.captureImage.form.dither">
@@ -41,6 +86,9 @@
                     <option value="1">100%</option>
                     <option value="0.707">70.7%</option>
                     <option value="0.5">50%</option>
+                    <option value="0.35">35%</option>
+                    <option value="0.25">25%</option>
+                    <option value="0.125">12.5%</option>
                 </b-select>
             </b-field>
             <b-field horizontal><!-- Label left empty for spacing -->
@@ -48,9 +96,7 @@
                     <command-button :data="commandButtons.captureImage" class="button is-danger"/>
                 </p>
             </b-field>
-
-
-        <br>
+            <br>
         </div>
     </div>
 </template>
@@ -65,7 +111,7 @@ export default {
     },
     data () {
         return {
-            isOpen:true,
+            isOpen: true,
             commandButtons: {
                 captureImage: {
                     'name': 'Capture',
@@ -119,7 +165,6 @@ export default {
 }
 .panel-header {
     padding: 1em;
-    height: 50px;
     background-color: #383838;
     display: flex;
     justify-content: flex-start;

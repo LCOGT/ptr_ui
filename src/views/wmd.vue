@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="columns is-gapless">
+        <div class="page-content columns is-gapless">
             <information-tabs class="column"></information-tabs>
             <control-panel class="column is-one-third"></control-panel>
         </div>
@@ -24,4 +24,8 @@ export default {
 </script>
 
 <style scoped>
+.page-content {
+  max-height: 100%;
+  overflow:hidden;
+}
 </style>

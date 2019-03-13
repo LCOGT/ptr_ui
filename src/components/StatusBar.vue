@@ -1,11 +1,9 @@
 <template>
-<div>
-    <!--nav class="navbar is-fixed-bottom is-dark"></nav-->
-    <footer class="footer">
+    <nav class="navbar is-fixed-bottom is-dark"></nav>
+    <!--footer class="footer">
         <div class="content has-text-centered">
       </div>
-    </footer>
-</div>
+    </footer-->
 
 </template>
 

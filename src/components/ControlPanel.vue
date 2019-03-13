@@ -6,6 +6,8 @@
       <camera />
       <focus />
       <rotate />
+      <br>
+      <div style="height:2000px; font: 96px/1 'Oswald', serif; color: #777; text-align: center; opacity: 0.05;">&Omega;</div>
       
 
     </div>
@@ -47,8 +49,9 @@ export default {
 <style scoped>
 #side-controls {
     background-color: #202020;
-    height: 100vh;
     transition: width 0.3s;
+    height:88vh;
+    overflow-y: scroll;
 }
 .toggle-open-button {
   background-color: #444;

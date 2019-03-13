@@ -4,14 +4,12 @@
         <div class="panel-header" v-on:click="isOpen =! isOpen"> Position Angle Controls </div>
         <div class="panel-content" v-if="isOpen">
             <div class="pa-state">position angle: {{ positionAngle }}&deg;</div>
-
             <div class="panel-buttons">
                 <div class="buttons has-addons">
                     <command-button :data="commandButtons.rotateIn" />
                     <command-button :data="commandButtons.rotateOut" />
                 </div>
             </div>
-
             <div class="panel-inputs">
                 <label class="label">Specify Angle: </label>
                 <div class="field has-addons">
@@ -22,12 +20,9 @@
                         <command-button :data="commandButtons.rotateAngle" class="button is-danger"/>
                     </p>
                 </div>
-
             </div>
-
             <br>
         </div>
-
     </div>
 </template>
 
@@ -75,11 +70,9 @@ export default {
 
 <style scoped>
 .rotator-panel {
-    background-color: #282828;
 }
 .panel-header {
     padding: 1em;
-    height: 50px;
     background-color: #383838;
     display: flex;
     justify-content: flex-start;
@@ -90,7 +83,7 @@ export default {
     margin-top: 10px;
     text-align: center;
     color: #ff9900;
-    background-color: #222;
+    background-color: #181818;
     font: 20px/35px "Courier New", monospace;
 }
 .panel-buttons {

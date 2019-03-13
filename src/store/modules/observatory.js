@@ -9,6 +9,9 @@ const state = {
 // getters
 const getters = {
     mount: state => state.mount,
+    mountRa: state => state.mount.ra,
+    mountDec: state => state.mount.dec,
+
     wx: state => state.weather,
     amb_temp_C: state => state.weather["amb_temp C"],
     wind: state => state.weather["wind k/h"],

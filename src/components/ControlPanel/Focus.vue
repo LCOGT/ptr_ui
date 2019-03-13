@@ -77,11 +77,9 @@ export default {
 
 <style scoped>
 .focus-panel {
-    background-color: #282828;
 }
 .panel-header {
     padding: 1em;
-    height: 50px;
     background-color: #383838;
     display: flex;
     justify-content: flex-start;
@@ -92,7 +90,7 @@ export default {
     margin-top: 10px;
     text-align: center;
     color: #ff9900;
-    background-color: #222;
+    background-color: #181818;
     font: 20px/35px "Courier New", monospace;
 }
 .panel-buttons {
