@@ -1,6 +1,9 @@
 // initial state
 const state = {
-    mount: [],
+    mount: {
+        ra: '--',
+        dec: '--',
+    },
     focus: [],
     rotator: [],
     weather: [],
@@ -9,10 +12,15 @@ const state = {
 // getters
 const getters = {
     mount: state => state.mount,
-    mountRa: state => state.mount.ra,
-    mountDec: state => state.mount.dec,
+    ra: state => state.mount.ra,
+    dec: state => state.mount.dec,
+    alt: state => state.mount.altitude,
+    az: state => state.mount.azimuth,
+    roof: state => state.mount.roof,
+    sidereal: state => state.mount.sidereal,
 
     wx: state => state.weather,
+    wx_time: state => state.weather.timestamp,
     amb_temp_C: state => state.weather["amb_temp C"],
     wind: state => state.weather["wind k/h"],
 

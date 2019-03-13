@@ -14,6 +14,12 @@
                             <div style="width: 10px;"></div>
                             <command-button :data="buttonData.unpark"></command-button>
                         </div>
+
+
+
+
+
+
                     </div>
                 </b-tab-item>
 
@@ -57,13 +63,15 @@ import DomeCam from '@/components/DomeCam'
 import CommandButton from '@/components/CommandButton'
 import SkyChart from '@/components/celestialmap/SkyChart'
 import { mapGetters } from 'vuex'
+import Multiselect from 'vue-multiselect'
 
 export default {
   name: 'InformationTabs',
   components: {
       DomeCam,
       CommandButton,
-      SkyChart
+      SkyChart,
+      Multiselect
   },
   data () {
     return {
@@ -79,7 +87,7 @@ export default {
               'url': '/commands/park',
               'form': {'command': 'unpark'},
           },
-      }
+      },
     }
   },
   computed: {
@@ -92,6 +100,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .information-tabs {

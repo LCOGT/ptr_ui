@@ -2,7 +2,7 @@
     <div class="focus-panel">
         <div class="panel-header" v-on:click="isOpen = !isOpen"> Focus Controls </div>
         <div class="panel-content" v-if="isOpen">
-            <div class="focus-state"> focus: {{ focus }}</div>
+            <div class="focus-state heading"> focus: {{ focus }}</div>
             <div class="panel-buttons">
                 <div class="buttons has-addons">
                     <command-button :data="commandButtons.focusIn" />
@@ -86,12 +86,13 @@ export default {
     border-top: 4px #222 solid;
     cursor: pointer;
 }
-.focus-state {
-    margin-top: 10px;
-    text-align: center;
-    color: #ff9900;
-    background-color: #181818;
-    font: 20px/35px "Courier New", monospace;
+.heading {
+  margin-top: 10px;
+  background-color: #181818;
+  text-align: center;
+  color: #ff9900;
+  font: 1em 'Share Tech Mono', monospace;
+  padding: 10px 0;
 }
 .panel-buttons {
     display: flex;

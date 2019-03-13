@@ -3,7 +3,7 @@
     <div class="rotator-panel">
         <div class="panel-header" v-on:click="isOpen =! isOpen"> Position Angle Controls </div>
         <div class="panel-content" v-if="isOpen">
-            <div class="pa-state">position angle: {{ positionAngle }}&deg;</div>
+            <div class="heading">position angle: {{ positionAngle }}&deg;</div>
             <div class="panel-buttons">
                 <div class="buttons has-addons">
                     <command-button :data="commandButtons.rotateIn" />
@@ -79,12 +79,13 @@ export default {
     border-top: 4px #222 solid;
     cursor: pointer;
 }
-.pa-state {
-    margin-top: 10px;
-    text-align: center;
-    color: #ff9900;
-    background-color: #181818;
-    font: 20px/35px "Courier New", monospace;
+.heading {
+  margin-top: 10px;
+  background-color: #181818;
+  text-align: center;
+  color: #ff9900;
+  font: 1em 'Share Tech Mono', monospace;
+  padding: 10px 0;
 }
 .panel-buttons {
     display: flex;
