@@ -8,27 +8,22 @@
                         <span> site </span>
                     </template>
                     <div> 
-                        <dome-cam />
+                        <dome-cam class="dome-cam" />
                         <div class="button-container">
                             <command-button :data="buttonData.park"></command-button>
                             <div style="width: 10px;"></div>
                             <command-button :data="buttonData.unpark"></command-button>
                         </div>
-
-
-
-
-
-
                     </div>
                 </b-tab-item>
 
                 <b-tab-item>
                     <template slot="header">
-                        <span class="is-white"> sky chart </span>
+                        <span> sky chart </span>
                     </template>
-                    <div>
-                        <sky-chart /> 
+                    <div class="columns">
+                        <sky-chart v-resize:throttle="onResize" class="column skychart-column"/> 
+                        <object-table class="column object-table" />
                     </div>
                 </b-tab-item>
 
@@ -63,7 +58,9 @@ import DomeCam from '@/components/DomeCam'
 import CommandButton from '@/components/CommandButton'
 import SkyChart from '@/components/celestialmap/SkyChart'
 import { mapGetters } from 'vuex'
-import Multiselect from 'vue-multiselect'
+import ObjectTable from '@/components/ObjectTable'
+import Celestial from '@/components/celestialmap/celestial'
+import resize from 'vue-resize-directive'
 
 export default {
   name: 'InformationTabs',
@@ -71,7 +68,10 @@ export default {
       DomeCam,
       CommandButton,
       SkyChart,
-      Multiselect
+      ObjectTable,
+  },
+  directives: {
+      resize,
   },
   data () {
     return {
@@ -90,6 +90,11 @@ export default {
       },
     }
   },
+  methods: {
+      onResize() {
+          Celestial.resize()
+      }
+  },
   computed: {
       ...mapGetters('observatory', {
           wx: 'wx',
@@ -97,7 +102,7 @@ export default {
           wind: 'wind',
 
       })
-  }
+  },
 }
 </script>
 
@@ -106,9 +111,17 @@ export default {
 .information-tabs {
     margin: 2em;
     padding-top: 4em;
+    height: calc(100vh - 160.5px);
+    overflow-y: auto;
 }
 .button-container {
     display: flex;
+}
+.dome-cam {
+    max-width: 50vw;
+}
+.object-table {
+    margin: 2em;
 }
 #weather-table {
     flex: 1 1 auto;

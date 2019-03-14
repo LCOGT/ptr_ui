@@ -1,18 +1,22 @@
 <template>
-    <nav class="navbar is-fixed-bottom is-dark">
+  <div>
+    <nav class="navbar is-fixed-bottom is-dark is-hidden-mobile">
 
       <nav class="level">
 
-        <div class="level-left">
-        <div v-for="status in value">
-          <status-item :data="status" :value="getComputed(status.getter)"/>
-        </div>
+        <div class="level-left" id="sortable-status">
+          <div v-for="status in value">
+            <status-item :data="status" :value="getComputed(status.getter)"/>
+          </div>
+          <span class="spacer"></span>
+          <span class="spacer"></span>
+          <span class="spacer"></span>
         </div>
 
         <div class="level-right">
           <div class="nav-item">
-            <multiselect v-model="value" :options="options" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Pick" label="name" track-by="name" :preselect-first="true">
-              <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">Customize</span></template>
+            <multiselect v-model="value" :options="options" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="search..." label="name" track-by="name" :preselect-first="true">
+              <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">+</span></template>
             </multiselect>
           </div>
         </div>
@@ -24,13 +28,14 @@
         <div class="content has-text-centered">
       </div>
     </footer-->
-
+  </div>
 </template>
 
 <script>
 import Multiselect from 'vue-multiselect'
 import StatusItem from '@/components/StatusItem'
 import { mapGetters } from 'vuex'
+import { Sortable } from '@shopify/draggable'
 
 export default {
   components: {
@@ -80,6 +85,11 @@ export default {
       }
       return getters[key]
     }
+  },
+  mounted () {
+    const sortable = new Sortable(document.getElementById('sortable-status'), {
+      draggable: 'span'
+    });
   }
 }
 </script>
@@ -105,5 +115,11 @@ export default {
 .title {
   color: #ff9900;
   font-family: 'Share Tech Mono', monospace;
+}
+.spacer {
+  padding: 2em 1.5em;
+  margin-right: 1em;
+  width: 100px;
+  height:inherit;
 }
 </style>

@@ -286,14 +286,19 @@ export default {
             this.initializePointer();
             Celestial.redraw();
         },
+        redraw() {
+            Celestial.redraw()
+        },
 
 
     },
     mounted() {
-        this.handleClick();
-        this.initializePointer();
-        this.update_chart();
-        Celestial.display(mapConfigs.config);
+        this.$nextTick(function () {
+            this.handleClick();
+            this.initializePointer();
+            this.update_chart();
+            Celestial.display(mapConfigs.config);
+        })
     },
     computed: {
         ...mapGetters('skyChart', {
@@ -313,4 +318,7 @@ export default {
 </script>
 
 <style scoped>
+#celestial-map {
+    width: 100%;
+}
 </style>

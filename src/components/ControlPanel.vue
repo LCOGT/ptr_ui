@@ -1,13 +1,12 @@
 <template>
 <div id="side-controls" v-bind:style="{ width: width}">
-    <p class='toggle-open-button' v-if="!isMobile" v-on:click="isOpen = !isOpen">{{ isOpen ? 'controls >' : '<' }}</p>
-    <div class="top-block"><strong></strong></div>
+    <p class='toggle-open-button' v-if="!isMobile" v-on:click="isOpen = !isOpen">{{ isOpen ? '>' : '<' }}</p>
     <div class="scrollBox">
       <camera />
       <focus />
       <rotate />
       <br>
-      <div style="height:2000px; font: 96px/1 'Oswald', serif; color: #777; text-align: center; opacity: 0.05;">&Omega;</div>
+      <div style="height:200px; font: 96px/1 'Oswald', serif; color: #777; text-align: center; opacity: 0.05;">&Omega;</div>
       
 
     </div>
@@ -50,8 +49,10 @@ export default {
 #side-controls {
     background-color: #202020;
     transition: width 0.3s;
-    height:88vh;
-    overflow-y: scroll;
+}
+.scrollBox {
+    height: calc(100vh - 160.5px - 70px);
+    overflow-y: auto;
 }
 .toggle-open-button {
   background-color: #444;

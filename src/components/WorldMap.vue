@@ -270,10 +270,9 @@ export default {
 
 <style scoped>
 .google-map {
-    width: 80vw;
-    height: 50vw;
+    width: 100vw;
+    height: 50vh;
     background-color: grey;
-    margin: 20px auto;
     max-height: 90vh;
 }
 </style>

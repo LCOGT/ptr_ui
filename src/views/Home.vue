@@ -1,7 +1,8 @@
-<template>
-  <div class="home">
+<template>  
+  <div>
+    <nav class="level"><div class="level-item title">photon ranch</div></nav>
     <world-map name="google"></world-map>
-    <leaflet-map name="leafmap"></leaflet-map>
+    <!--leaflet-map name="leafmap"></leaflet-map-->
   </div>
 </template>
 
@@ -19,4 +20,8 @@ export default {
 </script>
 
 <style scoped>
+.title {
+  font: 70px 'Share Tech Mono', monospace;
+  margin: 20px;
+}
 </style>

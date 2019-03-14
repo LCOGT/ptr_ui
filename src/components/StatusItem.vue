@@ -1,10 +1,10 @@
 <template>
-    <div class="level-item has-text-centered">
+    <span class="level-item has-text-centered">
         <div class="status">
             <p class="heading"> {{ data.title }} </p>
             <p class="title"> {{ (value == null) ? '--' : value }} </p>
         </div>
-    </div>
+    </span>
 </template>
 
 <script>
@@ -26,6 +26,7 @@ export default {
   background-color: #181818;
   padding: 1em 1.5em;
   min-width: 100px;
+  cursor: grab;
 }
 .heading {
   color: #ff9900;
