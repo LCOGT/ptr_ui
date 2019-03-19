@@ -6,8 +6,8 @@
             <div class="heading">position angle: {{ positionAngle }}&deg;</div>
             <div class="panel-buttons">
                 <div class="buttons has-addons">
-                    <command-button :data="commandButtons.rotateIn" />
-                    <command-button :data="commandButtons.rotateOut" />
+                    <command-button :data="commandButtons.rotateIn" class="is-dark"/>
+                    <command-button :data="commandButtons.rotateOut" class="is-dark"/>
                 </div>
             </div>
             <div class="panel-inputs">

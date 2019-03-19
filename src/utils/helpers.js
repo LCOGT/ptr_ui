@@ -2,7 +2,7 @@
 /* Useful general functions */
 
 var helpers = {
-    siderealTime: function() {
+    siderealTime: function(lon) {
         /* Local Sidereal Time with reference to J2000
         *
         * Equations courtesy of www.stargazing.net/kepler/altaz.html 
@@ -25,11 +25,6 @@ var helpers = {
         var UT;
 
 
-        /* NOTE: Temporary fix. Hardcoded lon val. Should get value from state. */
-        lon = -119;
-
-
-
         // Calculate days since J2000
         today_date = new Date();
         epoch_date = new Date(2000, 0, 1, 12, 0, 0);
@@ -50,6 +45,34 @@ var helpers = {
         lmst = ((100.46 + 0.985647*d + lon + 15*UT) % 360) / 15;
 
         return lmst;
+    },
+    eq2altaz: function (ra, dec, lat, lon ) {
+        // compute hour angle in degrees
+        var sidereal = this.siderealTime(lon)
+        var ha = sidereal - ra;
+        if (ha < 0) ha = ha + 360;
+
+        // convert degrees to radians
+        ha  = ha*Math.PI/180
+        dec = dec*Math.PI/180
+        lat = lat*Math.PI/180
+
+        // compute altitude in radians
+        var sin_alt = Math.sin(dec)*Math.sin(lat) + Math.cos(dec)*Math.cos(lat)*Math.cos(ha);
+        var alt = Math.asin(sin_alt);
+        
+        // compute azimuth in radians
+        // divide by zero error at poles or if alt = 90 deg
+        var cos_az = (Math.sin(dec) - Math.sin(alt)*Math.sin(lat))/(Math.cos(alt)*Math.cos(lat));
+        var az  = Math.acos(cos_az);
+
+        // convert radians to degrees
+        var hrz_altitude = alt*180/Math.PI;
+        var hrz_azimuth  = az*180/Math.PI;
+
+        // choose hemisphere
+        if (Math.sin(ha) > 0) hrz_azimuth = 360 - hrz_azimuth;
+        return [hrz_altitude, hrz_azimuth]
     },
     hour2degree: ra => {
         return ra > 12? (ra - 24) * 15 : ra * 15;

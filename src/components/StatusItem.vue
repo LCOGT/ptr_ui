@@ -2,7 +2,7 @@
     <span class="level-item has-text-centered">
         <div class="status">
             <p class="heading"> {{ data.title }} </p>
-            <p class="title"> {{ (value == null) ? '--' : value }} </p>
+            <p class="title"> {{ ( isNaN(parseFloat(value)) || value == "") ? '--' : value }} </p>
         </div>
     </span>
 </template>
@@ -15,6 +15,8 @@ export default {
         data: Object,
         value: String
     },
+    mounted () {
+    }
 }
 </script>
 

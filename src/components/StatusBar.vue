@@ -6,7 +6,7 @@
 
         <div class="level-left" id="sortable-status">
           <div v-for="status in value">
-            <status-item :data="status" :value="getComputed(status.getter)"/>
+            <status-item :data="status" :value="getComputed(status.title)"/>
           </div>
           <span class="spacer"></span>
           <span class="spacer"></span>
@@ -24,10 +24,6 @@
       </nav>
 
     </nav>
-    <!--footer class="footer">
-        <div class="content has-text-centered">
-      </div>
-    </footer-->
   </div>
 </template>
 
@@ -46,21 +42,21 @@ export default {
   data () {
     return {
       value: [
-        { name: 'Ra (decimal)', title: 'ra', getter: 'ra_decimal'},
-        { name: 'Dec (decimal)', title: 'dec', getter: 'dec_decimal'},
+        { name: 'Ra (decimal)', title: 'ra'},
+        { name: 'Dec (decimal)', title: 'dec'},
         { name: 'Altitude', title: 'alt' },
         { name: 'Azimuth', title: 'az' },
       ],
       options: [  
-        { name: 'Ra (decimal)', title: 'ra', getter: 'ra_decimal'},
-        { name: 'Dec (decimal)', title: 'dec', getter: 'dec_decimal'},
+        { name: 'Ra (decimal)', title: 'ra'},
+        { name: 'Dec (decimal)', title: 'dec'},
         { name: 'Ra (sexagecimal)', title: 'ra_s' },
         { name: 'Dec (sexagecimal)', title: 'dec_s' },
         { name: 'Altitude', title: 'alt' },
         { name: 'Azimuth', title: 'az' },
         { name: 'Telescope', title: 'telescope' },
         { name: 'Roof', title: 'roof' },
-        { name: 'Sidereal Time', title : 'sidereal time' },
+        { name: 'Sidereal Time', title : 'sidereal' },
       ]
     }
   },
@@ -71,7 +67,7 @@ export default {
       alt: 'alt',
       az: 'az', 
       roof: 'roof',
-      sid: 'sidereal',
+      sidereal: 'sidereal',
 
       test: 'wx_time'
     })
@@ -79,8 +75,14 @@ export default {
   methods: {
     getComputed (key) {
       let getters = {
-        ra_decimal: this.ra_decimal,
-        dec_decimal: this.dec_decimal,
+        ra: this.ra_decimal,
+        dec: this.dec_decimal,
+        alt: this.alt,
+        az: this.az,
+        sid: this.sid,
+        telescope: this.telescope,
+        sidereal: this.sidereal,
+
         test: this.test,
       }
       return getters[key]

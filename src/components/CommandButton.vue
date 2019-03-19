@@ -1,5 +1,11 @@
 <template>
-    <a v-on:click="handleClick(data.url, data.form)" class="button is-dark" v-bind:class="{ 'is-loading': isLoading }">{{ data.name }}</a>
+    <a 
+        class="button" 
+        v-on:click="handleClick(data.url, data.form)" 
+        v-bind:class="{ 'is-loading': isLoading }"
+        :disabled="isDisabled"
+        >{{ data.name }}
+    </a>
 </template>
 
 <script>
@@ -8,7 +14,13 @@ import { mapGetters } from 'vuex'
 
 export default {
     name: 'CommandButton',
-    props: ['data'],
+    props: {
+        'data': Object,
+        'isDisabled': {
+            type: Boolean,
+            default: false,
+        },
+    },
     data () {
         return {
             isLoading: false,

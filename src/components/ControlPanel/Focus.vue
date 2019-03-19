@@ -2,14 +2,14 @@
     <div class="focus-panel">
         <div class="panel-header" v-on:click="isOpen = !isOpen"> Focus Controls </div>
         <div class="panel-content" v-if="isOpen">
-            <div class="focus-state heading"> focus: {{ focus }}</div>
+            <div class="focus-state heading"> <p>focus: {{ focus }} </p><p display="inline" style="text-transform: lowercase;">&nbsp;&mu;m</p></div>
             <div class="panel-buttons">
                 <div class="buttons has-addons">
-                    <command-button :data="commandButtons.focusIn" />
-                    <command-button :data="commandButtons.focusOut" />
+                    <command-button :data="commandButtons.focusIn" class="is-dark"/>
+                    <command-button :data="commandButtons.focusOut" class="is-dark"/>
                 </div>
-                <command-button :data="commandButtons.focusHome" />
-                <command-button :data="commandButtons.focusAuto" />
+                <command-button :data="commandButtons.focusHome" class="is-dark"/>
+                <command-button :data="commandButtons.focusAuto" class="is-dark"/>
             </div>
             <div class="panel-inputs">
                 <label class="label">Specify Position: </label>
@@ -76,8 +76,6 @@ export default {
 </script>
 
 <style scoped>
-.focus-panel {
-}
 .panel-header {
     padding: 1em;
     background-color: #383838;
@@ -87,6 +85,8 @@ export default {
     cursor: pointer;
 }
 .heading {
+    display: flex;
+    justify-content: center;
   margin-top: 10px;
   background-color: #181818;
   text-align: center;

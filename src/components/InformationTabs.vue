@@ -3,6 +3,7 @@
             <br>
             <b-tabs v-model="activeTab" size="is-small" type="is-toggle" position="is-centered">
 
+                <!-- Enclosure Camera and Site Info -->
                 <b-tab-item>
                     <template slot="header">
                         <span> site </span>
@@ -17,16 +18,35 @@
                     </div>
                 </b-tab-item>
 
+                <!-- Sky Chart and Object Table -->
                 <b-tab-item>
                     <template slot="header">
                         <span> sky chart </span>
                     </template>
                     <div class="columns">
                         <sky-chart v-resize:throttle="onResize" class="column skychart-column"/> 
-                        <object-table class="column object-table" />
+                        <div class="column">
+                            <nav class="level is-mobile"> 
+                                <div class="left-level" style="display: flex;">
+                                    <span class="level-item" style="padding: 10px;"> <b-field>
+                                        <b-input name="subject" v-model="buttonData.go.form.ra" style="width: 80px;"></b-input>
+                                        <p class="control"> <span class="button is-static">ra</span> </p>
+                                    </b-field> </span>
+                                    <span class="level-item"> <b-field>
+                                        <b-input name="subject" v-model="buttonData.go.form.dec" style="width: 80px;"></b-input>
+                                        <p class="control"> <span class="button is-static">dec</span> </p>
+                                    </b-field> </span>
+                                </div>
+                                <div class="right-level">
+                                    <command-button class="level-item is-danger" style="margin-right: 20px; width: 100px;":data="buttonData.go"></command-button>
+                                </div>
+                            </nav>
+                            <object-table class="object-table" />
+                        </div>
                     </div>
                 </b-tab-item>
 
+                <!-- Weather -->
                 <b-tab-item>
                     <template slot="header">
                         <span> weather </span>
@@ -42,6 +62,7 @@
                     </div>
                 </b-tab-item>
 
+                <!-- Images -->
                 <b-tab-item>
                     <template slot="header">
                     <span> images </span>
@@ -87,6 +108,14 @@ export default {
               'url': '/commands/park',
               'form': {'command': 'unpark'},
           },
+          go: {
+              name: "slew",
+              url: '/commands/slew',
+              form: {
+                  ra: '',
+                  dec: '',
+              },
+          },
       },
     }
   },
@@ -121,6 +150,12 @@ export default {
     max-width: 50vw;
 }
 .object-table {
+    margin: 2em;
+}
+.goto-input {
+    width: 100px;
+}
+.level {
     margin: 2em;
 }
 #weather-table {
