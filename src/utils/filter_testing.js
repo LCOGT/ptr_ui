@@ -199,3 +199,112 @@ button_action_model = {
     ]
         
 }
+
+
+// a list of all devices with details about possible commands and their parameters.
+devices = [
+    {
+        "name": "mount-0",
+        "type": "mount",
+        "commands": {
+            "park": {},
+            "track": {
+                // parameters for track command
+                "ra_rate": {
+                    "type": "float",
+                    "units": "seconds per sidereal second",
+                    "range": [max, min],
+                    "default": 0.0,
+                },
+                "dec_rate": {
+                    "type": "float",
+                    "units": "arcseconds/second",
+                    "range": [max, min],
+                    "default": 0.0,
+                },
+            },
+            "slew": {
+                // parameters for slew command
+                "ra": {
+                    "type": "float",
+                    "units": "hours",
+                    "range": [0, 24],
+                },
+                "dec": {
+                    "type": "float",
+                    "units": "degrees",
+                    "range": [-90, 90],
+                }
+            },
+        },
+        // optional descriptive properties of the device
+        "properties": {
+            "manufacturer": "companyX",
+            "model": "modelname",
+            "year": "2012", 
+            "type": "alt-az",
+        },
+    },
+    {
+        "name": "mount-1",
+        "type": "mount",
+        "commands": {
+            "park": {},
+            "track": {
+                // parameters for track command
+                "ra_rate": {
+                    "type": "float",
+                    "units": "seconds per sidereal second",
+                    "range": [max, min],
+                    "default": 0.0,
+                },
+                "dec_rate": {
+                    "type": "float",
+                    "units": "arcseconds/second",
+                    "range": [max, min],
+                    "default": 0.0,
+                },
+            },
+            "slew": {
+                // parameters for slew command
+                "ra": {
+                    "type": "float",
+                    "units": "hours",
+                    "range": [0, 24],
+                },
+                "dec": {
+                    "type": "float",
+                    "units": "degrees",
+                    "range": [-90, 90],
+                }
+            },
+        },
+        // optional descriptive properties of the device
+        "properties": {
+            "manufacturer": "companyX",
+            "model": "modelname",
+            "year": "2012", 
+            "type": "alt-az",
+        },
+    },
+    {
+        "name": "enclosureLight-0",
+        "type": "light",
+        "commands": {...},
+        "properties": {...},
+    },
+]
+
+device_tree = {
+    // Site-level
+
+    "name": "site",
+    "children": {
+        
+    }
+}
+
+
+
+
+

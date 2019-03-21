@@ -14,6 +14,11 @@
         <button class="button" v-on:click="postTestAPI">postTestAPI</button>
         <button class="button" v-on:click="testRestrictedAPI">testRestrictedAPI</button>
         <button class="button" v-on:click="testPostRestrictedAPI">testPostRestrictedAPI</button>
+        <hr>
+        <button class="button" v-on:click="testLambdaPublic">public lambda</button>
+        <button class="button" v-on:click="testLambdaPrivate">private lambda</button>
+        <button class="button" v-on:click="testLambdaError">error lambda</button>
+        <button class="button" v-on:click="goodbye2">callTestLambdaGoodbye2</button>
     </div>
 
     <div class="column buttons">
@@ -58,7 +63,7 @@
 </template>
 
 <script>
-import { Auth } from 'aws-amplify'
+import { API, Auth } from 'aws-amplify'
 import { AmplifyEventBus } from 'aws-amplify-vue'
 import { mapGetters } from 'vuex'
 import axios from 'axios';
@@ -211,6 +216,8 @@ export default {
       let long = -119
       console.log(helpers.eq2altaz(ra, dec, lat, long))
     },
+    
+    // Helper function: given a geojson object, returns an array with a few useful attributes.
     getObj(obj) {
         return [
           ...obj.geometry.coordinates, 
@@ -220,6 +227,8 @@ export default {
           ...helpers.eq2altaz(obj.geometry.coordinates[0]/15, obj.geometry.coordinates[1], 34, -119)
         ]
     },
+
+    // Prints a table of all the objects stored in 'all_objects.json'.
     printObjectTable() {
       console.log('printing object table')
       console.log(all_objects.features)
@@ -229,23 +238,73 @@ export default {
       }
       console.table(objs)
     },
+
     printTopTenNebula() {
+      // ttn: top ten nebula
       let ttn = []
+
+      // Function to check if an object's type is in the array of nebula types.
       function is_neb(obj) {
         return (mapConfigs.nebula.indexOf(obj.properties.type) > -1)
       }
+
+      // Comparator to return the higher altitude
       function compareAlt(a,b) {
         return b[5] - a[5]
       }
+
+      // For each object, if it's a nebula, put it in the ttn array.
       for (let i=0; i<all_objects.features.length; i++) {
         let obj = all_objects.features[i]
         if (is_neb(obj)) {
           ttn.push(this.getObj(obj))
         } 
       }
-      // Sort by highest altitude
+      // Sort by highest altitude; take the first ten.
       ttn.sort(compareAlt)
       console.table(ttn.slice(0,10))
+    },
+
+    testLambdaPublic() {
+      let url = 'https://ohtk5cazqc.execute-api.us-west-2.amazonaws.com/dev/public'
+      let headers = {"Authorization": this.token}
+      console.log(this.token)
+      axios
+        .get(url, {"headers": headers})
+        .then(response => console.log(response))
+    },
+    testLambdaPrivate() {
+      let url = 'https://ohtk5cazqc.execute-api.us-west-2.amazonaws.com/dev/private'
+      let headers = {"Authorization": this.token }
+      console.log(headers)
+      axios
+        .get(url, {"headers": headers})
+        .then(response => console.log(response))
+    },
+    testLambdaError() {
+      let url = 'https://ohtk5cazqc.execute-api.us-west-2.amazonaws.com/dev/error'
+      let headers = {"Authorization": this.token }
+      console.log(headers)
+      axios
+        .get(url, {"headers": headers})
+        .then(response => console.log(response))
+    },
+
+    goodbye2() {
+      let apiName = 'MyAPIGatewayAPI';
+      let path = '/'; 
+      let myInit = { // OPTIONAL
+          headers: {"Authorization": this.token },
+          response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
+          queryStringParameters: {}
+      }
+      
+      API.post(apiName, path, myInit).then(response => {
+          // Add your code here
+          console.log(response)
+      }).catch(error => {
+          console.log(error.response)
+      });
     }
   },
   computed: {
@@ -253,7 +312,8 @@ export default {
       user: 'user',
       username: 'username',
       isLoggedIn: 'isLoggedIn',
-      token: 'getToken'
+      token: 'getToken',
+      id: 'getId'
     }),
   },
 }
