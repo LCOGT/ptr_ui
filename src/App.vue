@@ -12,6 +12,7 @@ import awsmobile from './aws-exports';
 import { components } from 'aws-amplify-vue'
 
 Amplify.configure({
+  // Auth works without this config section, probably because it was configured in amplify-cli. 
   Auth: {
     identityPoolId: 'us-west-2:b9d6f9e8-202a-4a6f-9487-1e918f945f29',
     region: 'us-west-2',
@@ -21,15 +22,19 @@ Amplify.configure({
   API: {
     endpoints: [
       {
-        name: "MyCustomLambda",
-        endpoint: "https://lambda.us-east-1.amazonaws.com/2015-03-31/functions/yourFuncName/invocations",
-        service: "lambda",
-        region: "us-east-1"
+        name: "LambdaTest",
+        endpoint: "https://ohtk5cazqc.execute-api.us-west-2.amazonaws.com/dev",
+        custom_header: async () => {
+          return { Authorization: (await Auth.currentSession()).idToken.jwtToken }
+        }
       },
       {
-        name: "MyAPIGatewayAPI",
-        endpoint: "https://ohtk5cazqc.execute-api.us-west-2.amazonaws.com/dev/goodbye"
-      }
+        name: "local flask",
+        endpoint: "http://localhost:5000",
+        custom_header: async () => {
+          return { Authorization: (await Auth.currentSession()).idToken.jwtToken }
+        }
+      },
     ]
   }
 });

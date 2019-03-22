@@ -10,15 +10,13 @@
         <button class="button" v-on:click="signOut">sign out</button>
         <button class="button" v-on:click="signIn">sign in as timbeccue</button>
         <hr>
-        <button class="button" v-on:click="testAPI">testAPI</button>
-        <button class="button" v-on:click="postTestAPI">postTestAPI</button>
-        <button class="button" v-on:click="testRestrictedAPI">testRestrictedAPI</button>
-        <button class="button" v-on:click="testPostRestrictedAPI">testPostRestrictedAPI</button>
+        <button class="button" v-on:click="testAPI">public flask</button>
+        <button class="button" v-on:click="testRestrictedAPI">private flask</button>
         <hr>
         <button class="button" v-on:click="testLambdaPublic">public lambda</button>
         <button class="button" v-on:click="testLambdaPrivate">private lambda</button>
-        <button class="button" v-on:click="testLambdaError">error lambda</button>
-        <button class="button" v-on:click="goodbye2">callTestLambdaGoodbye2</button>
+        <button class="button" v-on:click="sqsWrite">sqs write</button>
+        <button class="button" v-on:click="sqsRead">sqs read</button>
     </div>
 
     <div class="column buttons">
@@ -39,8 +37,8 @@
         <command-button :data="buttonData.filterB" :isDisabled="true" />
         </div>
         <hr>
-        <button class="button" v-on:click="printObjectTable">printObjects</button>
-        <button class="button" v-on:click="printTopTenNebula">printTopTenNebula</button>
+        <button class="button" v-on:click="printObjectTable">all objects from json</button>
+        <button class="button" v-on:click="printTopTenNebula">top 10 nebula by alt</button>
     </div>
 
     <div class="column buttons">
@@ -59,6 +57,11 @@
         <div class="title">Misc</div>
         <button class="button" v-on:click="calculations">altaz calcs</button>
     </div>
+    
+    <!--div class="column" style="height: 70vh; overflow-y: scroll; background-color: #222; margin: 5em;">
+      <p>example</p>
+    </div-->
+
   </div>
 </template>
 
@@ -186,28 +189,26 @@ export default {
         .catch(err => console.log(err))
     },
     testAPI () {
-      let headers = { 'Authorization': this.user }
-      axios
-        .get('http://localhost:5000/api/test', {headers: headers })
-        .then(response => console.log(response))
-    },
-    postTestAPI () {
-      let headers = { "Authorization": this.user }
-      axios
-        .post('http://localhost:5000/api/test', {headers: headers })
-        .then(response => console.log(response))
+      let apiName = "local flask"
+      let myInit = {
+        response: true,
+      }
+      API.post(apiName, '/api/test', myInit).then(response => {
+          console.log(response)
+      }).catch(error => {
+          console.log(error.response)
+      });
     },
     testRestrictedAPI () {
-      let headers = { 'Authorization': this.token }
-      axios
-        .get('http://localhost:5000/api/loginrequired', {headers: headers })
-        .then(response => console.log(response))
-    },
-    testPostRestrictedAPI () {
-      let headers = { "Authorization": this.token }
-      axios
-        .post('http://localhost:5000/api/loginrequired', {data: "restrictedPostData"}, {"headers": headers })
-        .then(response => console.log(response))
+      let apiName = "local flask"
+      let myInit = {
+        response: true,
+      }
+      API.post(apiName, '/api/loginrequired', myInit).then(response => {
+          console.log(response)
+      }).catch(error => {
+          console.log(error.response)
+      });
     },
     calculations() {
       let ra = 1
@@ -266,46 +267,45 @@ export default {
     },
 
     testLambdaPublic() {
-      let url = 'https://ohtk5cazqc.execute-api.us-west-2.amazonaws.com/dev/public'
-      let headers = {"Authorization": this.token}
-      console.log(this.token)
-      axios
-        .get(url, {"headers": headers})
-        .then(response => console.log(response))
-    },
-    testLambdaPrivate() {
-      let url = 'https://ohtk5cazqc.execute-api.us-west-2.amazonaws.com/dev/private'
-      let headers = {"Authorization": this.token }
-      console.log(headers)
-      axios
-        .get(url, {"headers": headers})
-        .then(response => console.log(response))
-    },
-    testLambdaError() {
-      let url = 'https://ohtk5cazqc.execute-api.us-west-2.amazonaws.com/dev/error'
-      let headers = {"Authorization": this.token }
-      console.log(headers)
-      axios
-        .get(url, {"headers": headers})
-        .then(response => console.log(response))
-    },
-
-    goodbye2() {
-      let apiName = 'MyAPIGatewayAPI';
-      let path = '/'; 
-      let myInit = { // OPTIONAL
-          headers: {"Authorization": this.token },
-          response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
-          queryStringParameters: {}
+      let apiName = 'LambdaTest';
+      let myInit = {
+        response: true,
       }
       
-      API.post(apiName, path, myInit).then(response => {
+      API.get(apiName, '/public', myInit).then(response => {
           // Add your code here
           console.log(response)
       }).catch(error => {
           console.log(error.response)
       });
-    }
+    },
+    testLambdaPrivate() {
+      let apiName = 'LambdaTest';
+      let myInit = {
+        response: true,
+      }
+      API.get(apiName, '/private', myInit).then(response => {
+          console.log(response)
+      }).catch(error => {
+          console.log(error.response)
+      });
+    },
+    sqsWrite() {
+      let apiName = 'LambdaTest';
+      API.post(apiName, '/sqs_write').then(response => {
+          console.log(response)
+      }).catch(error => {
+          console.log(error.response)
+      });
+    },
+    sqsRead() {
+      let apiName = 'LambdaTest';
+      API.post(apiName, '/sqs_read').then(response => {
+          console.log(response)
+      }).catch(error => {
+          console.log(error.response)
+      });
+    },
   },
   computed: {
     ...mapGetters('auth', {
@@ -313,7 +313,6 @@ export default {
       username: 'username',
       isLoggedIn: 'isLoggedIn',
       token: 'getToken',
-      id: 'getId'
     }),
   },
 }
@@ -321,7 +320,7 @@ export default {
 
 <style scoped>
 .column {
-  padding: 5em;
+  padding: 3em;
   display: flex;
   flex-direction:column;
   align-items:baseline;
