@@ -2,6 +2,7 @@
     <div>
         <div id="celestial-map"></div>
         <div id="celestial-form" style="display:none;"></div>
+        <div id="celestial-date" style="width:0"></div>
    </div> 
 </template>
 
@@ -23,13 +24,14 @@ export default {
         // Handle mouse clicks/moves
         handleClick () {
             let that = this
-            document.querySelector("#celestial-map").addEventListener('mousedown', function (e) {
+            document.getElementById("celestial-map").addEventListener('mousedown', function (e) {
                 var w = this
+                mousemove(e)
                 w.addEventListener("mousemove", mousemove)
                 w.addEventListener("mouseup", mouseup)
 
                 function mousemove(e) {
-                    let dim = this.getBoundingClientRect()
+                    let dim =w.getBoundingClientRect()
                     let cx = e.clientX - dim['x']
                     let cy = e.clientY - dim['y']
                     let eq = Celestial.mapProjection.invert([cx, cy])
@@ -64,6 +66,7 @@ export default {
             return false;
         },
         initializePointer () {
+
 
             var pointers = {
                 "type":"FeatureCollection",
@@ -119,6 +122,8 @@ export default {
         },
 
         update_chart (filter = mapConfigs.default_filter) {
+
+            var that = this;
 
         var nebula = ['Pl','Di','Bn','Dn', 'Sn'];
         var galaxies = ['Cg','Sp','Ba','Ir','El','Ln','Px','Sx'];
@@ -250,8 +255,8 @@ export default {
                 // This retains the crosshairs when redrawing with different filters.
                 // However, crosshairs are updated by themselves so an entire repaint is avoided.
                 Celestial.setStyle(styles.crosshair);
-                var p_coords = ([helpers.hour2degree(this.selectedRa), this.selectedDec]);
-                var t_coords = ([helpers.hour2degree(this.mountRa), this.mountDec]);
+                var p_coords = ([helpers.hour2degree(that.selectedRa), that.selectedDec]);
+                var t_coords = ([helpers.hour2degree(that.mountRa), that.mountDec]);
                 // Limit selectable regions to coordinates on the map with Celestial.clip().
                 if (Celestial.clip(p_coords)) {
                     //Celestial.Canvas.symbol()
@@ -282,7 +287,6 @@ export default {
             }});
         },
         update_pointer() {
-            console.log('updating pointer')
             this.initializePointer();
             Celestial.redraw();
         },
@@ -306,8 +310,8 @@ export default {
             selectedDec: 'selectedDec',
         }),
         ...mapGetters('observatory', {
-            mountRa: 'mountRa',
-            mountDec: 'mountDec',
+            mountRa: 'ra',
+            mountDec: 'dec',
             star_types: 'star_types',
             star_mags: 'star_mags',
             dso_types: 'dso_types',

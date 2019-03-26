@@ -9,7 +9,11 @@ import Register from './views/Register.vue'
 import Login from './views/Login.vue'
 import Profile from './views/Profile.vue'
 import wmd from './views/wmd.vue'
-import Test from './views/Test.vue'
+
+// Pages for testing
+import btns from './views/btns.vue'
+import imgs from './views/imgs.vue'
+import skymap from './views/skymap.vue'
 
 import store from './store'
 import { Auth } from 'aws-amplify'
@@ -25,7 +29,6 @@ const router = new VueRouter({
     { path: '/site/wmd', name: 'wmd', component: wmd },
     { path: '/register', name: 'register', component: Register },
     { path: '/login', name: 'login', component: Login },
-    { path: '/test', name: 'test', component: Test },
     { path: '/profile', name: 'profile', meta: { requiresAuth: true }, component: Profile },
     { path: '*', redirect: '/' },
     { path: '/about',
@@ -34,7 +37,10 @@ const router = new VueRouter({
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
-    }
+    },
+    { path: '/btns', name: 'btns', component: btns},
+    { path: '/imgs', name: 'imgs', component: imgs},
+    { path: '/skymap', name: 'skymap', component: skymap},
   ]
 })
 

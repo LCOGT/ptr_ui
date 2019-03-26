@@ -15,7 +15,9 @@
         <div id="navbarBasicExample" class="navbar-menu">
             <div class="navbar-start">
 
-            <router-link class="navbar-item" to="/test"> test </router-link>
+            <router-link class="navbar-item" to="/btns"> btns </router-link>
+            <router-link class="navbar-item" to="/imgs"> imgs </router-link>
+            <router-link class="navbar-item" to="/skymap"> sky </router-link>
 
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link"> sites </a>

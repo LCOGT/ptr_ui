@@ -3,25 +3,25 @@
 
     <div class="column buttons">
         <div class="title">Auth and API</div>
-        <button class="button" v-on:click="authenticate">authenticate</button>
-        <button class="button" v-on:click="currentSession">current session</button>
-        <button class="button" v-on:click="currentUserInfo">current user info</button>
+        <button class="button" @click="authenticate">authenticate</button>
+        <button class="button" @click="currentSession">current session</button>
+        <button class="button" @click="currentUserInfo">current user info</button>
         <hr>
-        <button class="button" v-on:click="signOut">sign out</button>
-        <button class="button" v-on:click="signIn">sign in as timbeccue</button>
+        <button class="button" @click="signOut">sign out</button>
+        <button class="button" @click="signIn">sign in as timbeccue</button>
         <hr>
-        <button class="button" v-on:click="testAPI">public flask</button>
-        <button class="button" v-on:click="testRestrictedAPI">private flask</button>
+        <button class="button" @click="testAPI">public flask</button>
+        <button class="button" @click="testRestrictedAPI">private flask</button>
         <hr>
-        <button class="button" v-on:click="testLambdaPublic">public lambda</button>
-        <button class="button" v-on:click="testLambdaPrivate">private lambda</button>
-        <button class="button" v-on:click="sqsWrite">sqs write</button>
-        <button class="button" v-on:click="sqsRead">sqs read</button>
+        <button class="button" @click="testLambdaPublic">public lambda</button>
+        <button class="button" @click="testLambdaPrivate">private lambda</button>
+        <button class="button" @click="sqsWrite">sqs write</button>
+        <button class="button" @click="sqsRead">sqs read</button>
     </div>
 
     <div class="column buttons">
         <div class="title">Imaging</div>
-        <button class="button" v-on:click="" disabled>GOTO bright star</button>
+        <button class="button" @click="" disabled>GOTO bright star</button>
         <command-button :data="buttonData.focusAuto" />
         <hr>
         <div class="buttons has-addons">
@@ -37,8 +37,8 @@
         <command-button :data="buttonData.filterB" :isDisabled="true" />
         </div>
         <hr>
-        <button class="button" v-on:click="printObjectTable">all objects from json</button>
-        <button class="button" v-on:click="printTopTenNebula">top 10 nebula by alt</button>
+        <button class="button" @click="printObjectTable">all objects from json</button>
+        <button class="button" @click="printTopTenNebula">top 10 nebula by alt</button>
     </div>
 
     <div class="column buttons">
@@ -55,7 +55,7 @@
 
     <div class="column buttons">
         <div class="title">Misc</div>
-        <button class="button" v-on:click="calculations">altaz calcs</button>
+        <button class="button" @click="calculations">altaz calcs</button>
     </div>
     
     <!--div class="column" style="height: 70vh; overflow-y: scroll; background-color: #222; margin: 5em;">
@@ -76,7 +76,7 @@ import all_objects from '../assets/all_objects.json'
 import mapConfigs from '@/components/celestialmap/mapConfigs'
 
 export default {
-  name: 'Test',
+  name: 'btns',
   components: {
     CommandButton,
   },
