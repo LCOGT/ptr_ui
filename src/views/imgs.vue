@@ -1,7 +1,11 @@
+/**
+ *  This is a page used for testing image display and manipulation. 
+ *
+ */
 <template>
   <div class="columns">
     <div class="column is-full container">
-      <image-view />
+      <image-view/>
     </div>
   </div>
 </template>
@@ -21,7 +25,7 @@ export default {
     }
   },
   methods: {
-  }
+  },
 }
 </script>
 

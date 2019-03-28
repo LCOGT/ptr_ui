@@ -9,7 +9,7 @@ import nite from '@/utils/nite-overlay'
 // import test1 from '@/utils/test';
 
 export default {
-  name: 'WorldMap',
+  name: 'TheWorldMap',
   props: ['name'],
   data: function () {
     return {

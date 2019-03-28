@@ -8,7 +8,10 @@ import About from './views/About.vue'
 import Register from './views/Register.vue'
 import Login from './views/Login.vue'
 import Profile from './views/Profile.vue'
-import wmd from './views/wmd.vue'
+
+// Observatories
+import wmd from './views/sites/wmd.vue'
+import saf from './views/sites/saf.vue'
 
 // Pages for testing
 import btns from './views/btns.vue'
@@ -27,6 +30,7 @@ const router = new VueRouter({
   routes: [
     { path: '/', name: 'home', component: Home },
     { path: '/site/wmd', name: 'wmd', component: wmd },
+    { path: '/site/saf', name: 'saf', component: saf },
     { path: '/register', name: 'register', component: Register },
     { path: '/login', name: 'login', component: Login },
     { path: '/profile', name: 'profile', meta: { requiresAuth: true }, component: Profile },

@@ -60,7 +60,7 @@ import { Auth } from 'aws-amplify'
 import { mapGetters, mapState } from 'vuex'
 
 export default {
-  name: 'Menu',
+  name: 'TheMenu',
   mounted () {
     let navbar = document.querySelector('.navbar-burger')
     navbar.addEventListener('click', function () {

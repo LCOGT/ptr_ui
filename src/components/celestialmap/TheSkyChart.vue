@@ -13,7 +13,7 @@ import helpers from '@/utils/helpers'
 import { mapGetters } from 'vuex'
 
 export default {
-    name: 'SkyChart',
+    name: 'TheSkyChart',
     data () {
         return {
             mapClickedX: -1,

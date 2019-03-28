@@ -1,8 +1,16 @@
+
+/**
+ * This is a page to test simple functions as a proof of concept.
+ * Each button should have a single basic task. 
+ * The goal is to use this page to outline the full capabilities of the site.
+ */
+
 <template>
   <div class="columns">
 
+    <!-- Buttons for AWS integration -->
     <div class="column buttons">
-        <div class="title">Auth and API</div>
+        <div class="title">AWS</div>
         <button class="button" @click="authenticate">authenticate</button>
         <button class="button" @click="currentSession">current session</button>
         <button class="button" @click="currentUserInfo">current user info</button>
@@ -19,9 +27,10 @@
         <button class="button" @click="sqsRead">sqs read</button>
     </div>
 
+    <!-- Buttons for mount and camera controls -->
     <div class="column buttons">
         <div class="title">Imaging</div>
-        <button class="button" @click="" disabled>GOTO bright star</button>
+        <button class="button" disabled>GOTO bright star</button>
         <command-button :data="buttonData.focusAuto" />
         <hr>
         <div class="buttons has-addons">
@@ -41,6 +50,7 @@
         <button class="button" @click="printTopTenNebula">top 10 nebula by alt</button>
     </div>
 
+    <!-- Buttons for site functions -->
     <div class="column buttons">
         <div class="title">Site</div>
         <div class="buttons has-addons"> 
@@ -53,15 +63,12 @@
         </div>
     </div>
 
+    <!-- Miscellaneous buttons go here -->
     <div class="column buttons">
         <div class="title">Misc</div>
         <button class="button" @click="calculations">altaz calcs</button>
     </div>
     
-    <!--div class="column" style="height: 70vh; overflow-y: scroll; background-color: #222; margin: 5em;">
-      <p>example</p>
-    </div-->
-
   </div>
 </template>
 
@@ -82,6 +89,8 @@ export default {
   },
   data () {
     return {
+
+      // Each object in buttonData defines the parameters for a commandButton.
       buttonData: {
           park: {
               'name': 'Park',
@@ -155,31 +164,60 @@ export default {
       }
     }
   },
+
   methods: {
+
+    /**
+     *  AWS Amplify function. 
+     *  Retrieves session information from cognito.
+     */
     authenticate () {
       Auth.currentAuthenticatedUser({
         bypassCache: false
       }).then(user => console.log(user))
         .catch(err => console.log(err))
     },
+
+    /**
+     *  AWS Amplify function.
+     *  Retrieves tokens from cognito for the current authenticated user.
+     */
     currentSession () {
       Auth.currentSession()
         .then(data => console.log(data))
         .catch(err => console.log(err))
     },
+
+    /**
+     * AWS Amplify function.
+     * Retrieves attributes associcated with the current authetnicated user,
+     * such as username, email, annd verification status.
+     */
     currentUserInfo () {
       Auth.currentUserInfo()
         .then(data => console.log(data))
         .catch(err => console.log(err))
     },
+
+    /**
+     * Sign user out of all authenticated devices (global sign out). 
+     */
     signOut () {
       Auth.signOut({ global: true })
         .then(data => {
           console.log(data)
+
+          // Empty the current user from vuex store
           this.$store.commit('auth/setUser', '')
         })
         .catch(err => console.log(err))
     },
+
+    /**
+     * Sign in as timbeccue. 
+     * This is temporary for quick testing, and will be disabled when 
+     * authentication grants access to controls. 
+     */
     signIn () {
       Auth.signIn({ username: 'timbeccue', password: 'Password1!' })
         .then(user => {
@@ -188,6 +226,11 @@ export default {
         })
         .catch(err => console.log(err))
     },
+
+    /**
+     * Send a POST to local flask development server.
+     * No authentication required.
+     */
     testAPI () {
       let apiName = "local flask"
       let myInit = {
@@ -199,6 +242,13 @@ export default {
           console.log(error.response)
       });
     },
+
+    /**
+     * Send a POST to local flask development server that requires authentication.
+     * If user is logged in, the POST request includes their ID JWT.
+     * If the request does not have valid credentials, it should return 401.
+     * 
+     */
     testRestrictedAPI () {
       let apiName = "local flask"
       let myInit = {
@@ -218,7 +268,11 @@ export default {
       console.log(helpers.eq2altaz(ra, dec, lat, long))
     },
     
-    // Helper function: given a geojson object, returns an array with a few useful attributes.
+    /**
+     * Helper function used for printing object tables.
+     * @param {geojson} obj Geojson representing an astronomical object
+     * @return {array} Return condensed object with a few useful values in an array.
+     */
     getObj(obj) {
         return [
           ...obj.geometry.coordinates, 
@@ -229,7 +283,9 @@ export default {
         ]
     },
 
-    // Prints a table of all the objects stored in 'all_objects.json'.
+    /**
+     * Print a table of all objects stored in 'all_objects.json'.
+     */
     printObjectTable() {
       console.log('printing object table')
       console.log(all_objects.features)
@@ -240,6 +296,11 @@ export default {
       console.table(objs)
     },
 
+    /**
+     * Function that ranks objects and returns the top subset.
+     * In this case, find the ten nebula with highest altitude.
+     * Objects referenced from 'all_objects.json'
+     */
     printTopTenNebula() {
       // ttn: top ten nebula
       let ttn = []
@@ -266,23 +327,37 @@ export default {
       console.table(ttn.slice(0,10))
     },
 
+    /**
+     * Call a lambda function and log the output.
+     */
     testLambdaPublic() {
+
+      // Choose the name of the AWS API configured in App.vue.
       let apiName = 'LambdaTest';
+
+      // Configure params for the api call.
       let myInit = {
-        response: true,
+        response: true, // Include entire response, not just body.
       }
       
       API.get(apiName, '/public', myInit).then(response => {
-          // Add your code here
           console.log(response)
       }).catch(error => {
           console.log(error.response)
       });
     },
+
+    /**
+     * Call a lambda function that requires authentication, and log the output.
+     */
     testLambdaPrivate() {
+
+      // Choose the name of the AWS API configured in App.vue.
       let apiName = 'LambdaTest';
+
+      // Configure params for the api call.
       let myInit = {
-        response: true,
+        response: true, // Include entire response, not just body.
       }
       API.get(apiName, '/private', myInit).then(response => {
           console.log(response)
@@ -290,6 +365,10 @@ export default {
           console.log(error.response)
       });
     },
+
+    /**
+     * Call a lambda function that writes the current timestamp to SQS.
+     */
     sqsWrite() {
       let apiName = 'LambdaTest';
       API.post(apiName, '/sqs_write').then(response => {
@@ -298,6 +377,11 @@ export default {
           console.log(error.response)
       });
     },
+
+    /**
+     * Call a lambda function that reads the contents of SQS queue.
+     * This should include values added from `sqsWrite()` defined above.
+     */
     sqsRead() {
       let apiName = 'LambdaTest';
       API.post(apiName, '/sqs_read').then(response => {
@@ -307,6 +391,7 @@ export default {
       });
     },
   },
+
   computed: {
     ...mapGetters('auth', {
       user: 'user',

@@ -9,7 +9,7 @@
                         <span> site </span>
                     </template>
                     <div> 
-                        <dome-cam class="dome-cam" />
+                        <the-dome-cam class="dome-cam" />
                         <div class="button-container">
                             <command-button :data="buttonData.park"></command-button>
                             <div style="width: 10px;"></div>
@@ -24,7 +24,7 @@
                         <span> sky chart </span>
                     </template>
                     <div class="columns">
-                        <sky-chart v-resize:throttle="onResize" class="column skychart-column"/> 
+                        <the-sky-chart v-resize:throttle="onResize" class="column skychart-column"/> 
                         <div class="column">
                             <nav class="level is-mobile"> 
                                 <div class="left-level" style="display: flex;">
@@ -75,9 +75,9 @@
 </template>
 
 <script>
-import DomeCam from '@/components/DomeCam'
+import TheDomeCam from '@/components/TheDomeCam'
 import CommandButton from '@/components/CommandButton'
-import SkyChart from '@/components/celestialmap/SkyChart'
+import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import { mapGetters } from 'vuex'
 import ObjectTable from '@/components/ObjectTable'
 import Celestial from '@/components/celestialmap/celestial'
@@ -86,9 +86,9 @@ import resize from 'vue-resize-directive'
 export default {
   name: 'InformationTabs',
   components: {
-      DomeCam,
+      TheDomeCam,
       CommandButton,
-      SkyChart,
+      TheSkyChart,
       ObjectTable,
   },
   directives: {

@@ -18,7 +18,7 @@ import Focus from '@/components/ControlPanel/Focus'
 import Rotate from '@/components/ControlPanel/Rotate'
 import Camera from '@/components/ControlPanel/Camera'
 export default {
-  name: 'ControlPanel',
+  name: 'TheControlPanel',
   components: {
     Focus,
     Rotate,

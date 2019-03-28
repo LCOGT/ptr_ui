@@ -6,7 +6,7 @@
 
         <div class="level-left" id="sortable-status">
           <div v-for="status in value">
-            <status-item :data="status" :value="getComputed(status.title)"/>
+            <base-status-item :data="status" :value="getComputed(status.title)"/>
           </div>
           <span class="spacer"></span>
           <span class="spacer"></span>
@@ -29,16 +29,16 @@
 
 <script>
 import Multiselect from 'vue-multiselect'
-import StatusItem from '@/components/StatusItem'
+import BaseStatusItem from '@/components/BaseStatusItem'
 import { mapGetters } from 'vuex'
 import { Sortable } from '@shopify/draggable'
 
 export default {
   components: {
     Multiselect,
-    StatusItem,
+    BaseStatusItem,
   },
-  name: 'StatusBar',
+  name: 'TheStatusBar',
   data () {
     return {
       value: [

@@ -10,7 +10,7 @@
 <script>
 
 export default {
-    name: "StatusItem",
+    name: "BaseStatusItem",
     props: {
         data: Object,
         value: String

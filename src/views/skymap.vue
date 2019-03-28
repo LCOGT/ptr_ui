@@ -1,17 +1,17 @@
 
 <template>
     <div class="column is-full container">
-      <sky-chart />
+      <the-sky-chart />
     </div>
 </template>
 
 <script>
-import SkyChart from '@/components/celestialmap/SkyChart'
+import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 
 export default {
   name: 'skymap',
   components: {
-    SkyChart,
+    TheSkyChart,
   },
   data() {
     return {

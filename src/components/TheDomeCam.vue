@@ -5,7 +5,7 @@
 <script>
 
 export default {
-    name: 'DomeCam',
+    name: 'TheDomeCam',
     mounted () {
         var dome_cam_address = '10.15.0.19';
         var BaseURL = "http://"+dome_cam_address+"/";
