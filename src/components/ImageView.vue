@@ -78,7 +78,6 @@ export default {
             var upper_canvas = upper_canvas_class[0]
 
             var startPan = function(event) {
-                console.log(event)
 
                 // No right-click menu
                 event.preventDefault();
