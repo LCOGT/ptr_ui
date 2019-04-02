@@ -67,6 +67,7 @@
     <div class="column buttons">
         <div class="title">Misc</div>
         <button class="button" @click="calculations">altaz calcs</button>
+        <button class="button" @click="testWCS">wcs function</button>
     </div>
     
   </div>
@@ -81,6 +82,8 @@ import helpers from '@/utils/helpers'
 import CommandButton from '@/components/CommandButton'
 import all_objects from '../assets/all_objects.json'
 import mapConfigs from '@/components/celestialmap/mapConfigs'
+
+import wcs from '@/utils/pix2wcs'
 
 export default {
   name: 'btns',
@@ -384,12 +387,20 @@ export default {
      */
     sqsRead() {
       let apiName = 'LambdaTest';
-      API.post(apiName, '/sqs_read').then(response => {
+      API.post(apiName, '/getimage').then(response => {
           console.log(response)
       }).catch(error => {
           console.log(error.response)
       });
     },
+
+    /**
+     * Test a function from pix2wcs.js
+     */
+    testWCS() {
+      console.log(wcs.pix2wcs(10,10))
+    }
+
   },
 
   computed: {

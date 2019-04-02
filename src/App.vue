@@ -26,10 +26,14 @@ Amplify.configure({
     endpoints: [
       {
         name: "LambdaTest",
-        endpoint: "https://ohtk5cazqc.execute-api.us-west-2.amazonaws.com/dev",
+        endpoint: "https://ubkz32a95c.execute-api.us-west-2.amazonaws.com/dev",
         custom_header: async () => {
           return { Authorization: (await Auth.currentSession()).idToken.jwtToken }
         }
+      },
+      {
+        name: "LambdaNoAuth",
+        endpoint: "https://ubkz32a95c.execute-api.us-west-2.amazonaws.com/dev",
       },
       {
         name: "local flask",

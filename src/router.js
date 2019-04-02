@@ -10,8 +10,7 @@ import Login from './views/Login.vue'
 import Profile from './views/Profile.vue'
 
 // Observatories
-import wmd from './views/sites/wmd.vue'
-import saf from './views/sites/saf.vue'
+import Site from './views/Site.vue'
 
 // Pages for testing
 import btns from './views/btns.vue'
@@ -29,22 +28,21 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes: [
     { path: '/', name: 'home', component: Home },
-    { path: '/site/wmd', name: 'wmd', component: wmd },
-    { path: '/site/saf', name: 'saf', component: saf },
     { path: '/register', name: 'register', component: Register },
     { path: '/login', name: 'login', component: Login },
     { path: '/profile', name: 'profile', meta: { requiresAuth: true }, component: Profile },
     { path: '*', redirect: '/' },
-    { path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
-    },
+    { path: '/about', name: 'about', component: About },
     { path: '/btns', name: 'btns', component: btns},
     { path: '/imgs', name: 'imgs', component: imgs},
     { path: '/skymap', name: 'skymap', component: skymap},
+    
+    {
+      path: '/site/:sitecode',
+      name: 'site',
+      component: Site,
+      props: true,
+    }
   ]
 })
 

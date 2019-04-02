@@ -23,10 +23,11 @@
                 <a class="navbar-link"> sites </a>
 
                 <div class="navbar-dropdown">
-                    <router-link class="navbar-item" to="/site/wmd"> Santa Barbara - WMD  </router-link>
-                    <router-link class="navbar-item" to="/site/saf"> Santa Fe - SAF  </router-link>
+                    <template v-for="site in sites">
+                      <router-link class="navbar-item" v-bind:to="'/site/' + site.code"> {{site.name}} </router-link>
+                    </template>
                     <hr class="navbar-divider">
-                    <router-link class="navbar-item" to="/about"> Report an issue </router-link>
+                    <router-link class="navbar-item" to="/about"> About </router-link>
                 </div>
             </div>
             </div>
@@ -58,9 +59,15 @@
 <script>
 import { Auth } from 'aws-amplify'
 import { mapGetters, mapState } from 'vuex'
+import { sites } from '../sites'
 
 export default {
   name: 'TheMenu',
+  data() {
+    return {
+      sites: sites,
+    }
+  },
   mounted () {
     let navbar = document.querySelector('.navbar-burger')
     navbar.addEventListener('click', function () {
