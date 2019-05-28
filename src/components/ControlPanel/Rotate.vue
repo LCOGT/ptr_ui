@@ -14,7 +14,7 @@
                 <label class="label">Specify Angle: </label>
                 <div class="field has-addons">
                     <p class="control">
-                        <input v-model="commandButtons.rotateAngle.form.angle" class="input angle-input" type="text">
+                        <input v-model="commandButtons.rotateAngle.form.required_params.angle" class="input angle-input" type="text">
                     </p>
                     <p class="control">
                         <command-button :data="commandButtons.rotateAngle" class="button is-danger"/>
@@ -34,24 +34,51 @@ export default {
     components: {
         CommandButton
     },
+    props: ['sitecode'],
     data () {
         return {
             isOpen: true,
             commandButtons: {
                 rotateIn: {
-                    'name': 'in',
-                    'url': '/commands/rotate',
-                    'form': {'command': 'in'}
+                    name: 'in',
+                    url: `/${this.sitecode}/mount1/command/`,
+                    http_method: 'POST',
+                    form: {
+                        device: 'rotator_1',
+                        type: 'rotator',
+                        action: 'move_relative',
+                        required_params: {
+                            position: -10,
+                        },
+                        optional_params: {},
+                    }
                 },
                 rotateOut: {
-                    'name': 'out',
-                    'url': '/commands/rotate',
-                    'form': {'command': 'out'}
+                    name: 'out',
+                    url: `/${this.sitecode}/mount1/command/`,
+                    http_method: 'POST',
+                    form: {
+                        device: 'rotator_1',
+                        type: 'rotator',
+                        action: 'move_relative',
+                        required_params: {
+                            position: 10,
+                        },
+                        optional_params: {},
+                    }
                 },
                 rotateAngle: {
                     name: 'rotate',
-                    url: '/commands/rotate',
-                    form: {command: 'angle', angle: 0}
+                    url: `/${this.sitecode}/mount1/command/`,
+                    form: {
+                        device: 'rotator_1',
+                        type: 'rotator',
+                        action: 'move_absolute',
+                        required_params: {
+                            position: 0,
+                        },
+                        optional_params: {},
+                    }
                 },
             },
             angleTextField: '',

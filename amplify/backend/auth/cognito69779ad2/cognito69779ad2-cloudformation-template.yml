@@ -13,30 +13,12 @@ Parameters:
     Type: String
 
     
-  identityPoolName:
-    Type: String
-              
-  allowUnauthenticatedIdentities:
+  resourceName:
     Type: String
             
-  thirdPartyAuth:
+  authSelections:
     Type: String
-          
-  lambdaLogPolicy:
-    Type: String
-            
-  openIdLambdaRoleName:
-    Type: String
-            
-  openIdRolePolicy:
-    Type: String
-            
-  openIdLambdaIAMPolicy:
-    Type: String
-            
-  openIdLogPolicy:
-    Type: String
-            
+                                                    
   userPoolName:
     Type: String
                   
@@ -118,15 +100,33 @@ Parameters:
   userpoolClientSetAttributes:
     Type: String
           
+  identityPoolName:
+    Type: String
+              
+  allowUnauthenticatedIdentities:
+    Type: String
+            
+  thirdPartyAuth:
+    Type: String
+          
+  lambdaLogPolicy:
+    Type: String
+            
+  openIdLambdaRoleName:
+    Type: String
+            
+  openIdRolePolicy:
+    Type: String
+            
+  openIdLambdaIAMPolicy:
+    Type: String
+            
+  openIdLogPolicy:
+    Type: String
+            
   useDefault:
     Type: String
-            
-  resourceName:
-    Type: String
-            
-  authSelections:
-    Type: String
-                                                  
+          
 Conditions:
   ShouldNotCreateEnvResources: !Equals [ !Ref env, NONE ]
 

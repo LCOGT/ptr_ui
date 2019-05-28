@@ -6,16 +6,16 @@
 
             <b-field horizontal label="Expose" class="field-row">
                 <b-field>
-                    <b-input name="subject" v-model="commandButtons.captureImage.form.time"></b-input>
+                    <b-input name="subject" v-model="commandButtons.captureImage.form.required_params.time"></b-input>
                     <p class="control"> <span class="button is-static">seconds</span> </p>
                 </b-field>
             </b-field>
             <b-field horizontal label="Count">
                 <b-field>
-                    <b-input name="subject" v-model="commandButtons.captureImage.form.count"></b-input>
+                    <b-input name="subject" v-model="commandButtons.captureImage.form.optional_params.count"></b-input>
                     <p class="control"> <span class="button is-static">
                         {{ 
-                            (commandButtons.captureImage.form.count == 1) 
+                            (commandButtons.captureImage.form.optional_params.count == 1) 
                             ? "image&nbsp;&nbsp;&nbsp;&nbsp;" 
                             : "images&nbsp;&nbsp;" 
                         }}
@@ -29,10 +29,10 @@
                 </b-field>
             </b-field-->
             <b-field horizontal label="Hint" class="field-row">
-                <b-input name="subject" v-model="commandButtons.captureImage.form.hint"></b-input>
+                <b-input name="subject"></b-input>
             </b-field>
             <b-field horizontal label="Filter">
-                <b-select placeholder="Select filter" v-model="commandButtons.captureImage.form.filter">
+                <b-select placeholder="Select filter" v-model="commandButtons.captureImage.form.optional_params.filter">
                     <option value="LUMINANCE">luminance</option>
                     <option value="RED">red</option>
                     <option value="GREEN">green</option>
@@ -55,19 +55,19 @@
                     <option value="AIR">air</option>
                 </b-select>
             </b-field>
-             <b-field horizontal label="Bin">
+            <b-field horizontal label="Bin">
                 <b-field>
-                <b-radio-button v-model="commandButtons.captureImage.form.bin"
+                <b-radio-button v-model="commandButtons.captureImage.form.optional_params.bin"
                     native-value="1"
                     type="is-white is-outlined">
                     1x
                 </b-radio-button>
-                <b-radio-button v-model="commandButtons.captureImage.form.bin"
+                <b-radio-button v-model="commandButtons.captureImage.form.optional_params.bin"
                     native-value="2"
                     type="is-white is-outlined">
                     2x
                 </b-radio-button>
-                <b-radio-button v-model="commandButtons.captureImage.form.bin"
+                <b-radio-button v-model="commandButtons.captureImage.form.optional_params.bin"
                     native-value="4"
                     type="is-white is-outlined">
                     4x
@@ -75,14 +75,13 @@
                 </b-field>
             </b-field>
             <b-field horizontal label="Dither">
-                <b-select placeholder="Select bin" v-model="commandButtons.captureImage.form.dither">
+                <b-select placeholder="Select dither..." v-model="commandButtons.captureImage.form.optional_params.dither">
                     <option value="off">off</option>
                     <option value="on">on</option>
-                    <option value="random">random</option>
                 </b-select>
             </b-field>
             <b-field horizontal label="Size">
-                <b-select placeholder="Select sensor area to use" default="100%" v-model="commandButtons.captureImage.form.size">
+                <b-select placeholder="Select sensor area to use" default="100%" v-model="commandButtons.captureImage.form.optional_params.size">
                     <option value="1">100%</option>
                     <option value="0.707">70.7%</option>
                     <option value="0.5">50%</option>
@@ -109,52 +108,42 @@ export default {
     components: {
         CommandButton
     },
+    props: ['sitecode'],
+    mounted() {
+        console.log('in mounted')
+        console.log(this.props)
+    },
     data () {
+        console.log('props: '+this.sitecode)
         return {
             isOpen: true,
             commandButtons: {
                 captureImage: {
-                    'name': 'Capture',
-                    'url': '/commands/camera',
+                    name: 'Capture',
+                    url: '/'+this.sitecode+'/mount1/command/',
+                    http_method: 'POST',
                     form: {
-                        time: '5',
-                        count: '1',
-                        delay: '0',
-                        dither: 'off',
-                        hint: '',
-                        filter: 'RED',
-                        bin: '1',
-                        size: '1',
-                        autofocus: 'false',
+                        device: 'camera_1',
+                        type: 'camera',
+                        action: 'expose',
+                        required_params: {
+                            time: '5',
+                        },
+                        optional_params: {
+                            bin: '1',
+                            count: '1',
+                            filter: 'RED',
+                            size: '1',
+                        }
                     }
                 },
-                focusOut: {
-                    'name': 'out',
-                    'url': '/commands/focus',
-                    'form': {'command': 'out'}
-                },
-                focusHome: {
-                    'name': 'home',
-                    'url': '/commands/focus',
-                    'form': {'command': 'home'}
-                },
-                focusAuto: {
-                    'name': 'autofocus',
-                    'url': '/commands/focus',
-                    'form': {'command': 'auto'}
-                },
-                focusValue: {
-                    'name': 'focus',
-                    'url': 'commands/focus',
-                    'form': {command: 'value', position: ''}
-                }
             }
         }
     },
     computed: {
         ...mapGetters('observatory', {
             focus: 'focus'
-        })
+        }),
     }
 }
 </script>

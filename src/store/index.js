@@ -13,7 +13,7 @@ export default new Vuex.Store({
         observatory,
         skyChart
     },
-    // Saves state to localstorage. Needed to remember if user is logged in, but that is handled in the router now.
+    // This commented code: Saves state to localstorage. Needed to remember if user is logged in, but that is handled in the router now.
     //plugins: [createPersistedState({
     //    paths: [ 'auth' ],
     //    reducer: (state) => {

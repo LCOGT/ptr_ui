@@ -35,6 +35,7 @@ export default {
     components: {
         CommandButton
     },
+    props: ['sitecode'],
     data () {
         return {
             isOpen: true,

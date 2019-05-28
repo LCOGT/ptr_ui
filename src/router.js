@@ -16,6 +16,7 @@ import Site from './views/Site.vue'
 import btns from './views/btns.vue'
 import imgs from './views/imgs.vue'
 import skymap from './views/skymap.vue'
+import ctrl from './views/ctrl.vue'
 
 import store from './store'
 import { Auth } from 'aws-amplify'
@@ -36,6 +37,8 @@ const router = new VueRouter({
     { path: '/btns', name: 'btns', component: btns},
     { path: '/imgs', name: 'imgs', component: imgs},
     { path: '/skymap', name: 'skymap', component: skymap},
+    { path: '/ctrl', name: 'ctrl', component:ctrl},
+
     
     {
       path: '/site/:sitecode',

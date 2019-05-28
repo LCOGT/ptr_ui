@@ -6,7 +6,7 @@
                 <p>{{ site }}</p>
                 <the-information-tabs />
             </div>
-            <the-control-panel class="column is-one-third" />
+            <the-control-panel :sitecode="sitecode" class="column is-one-third" />
         </div>
         <the-status-bar />
     </div>
@@ -29,6 +29,7 @@ export default {
   data () {
       return {
           site: {},
+          update_status: '',
       }
   },
   methods: {
@@ -37,10 +38,13 @@ export default {
               if (sites[i].code == this.sitecode) {
                   this.site = sites[i]
                   break
-                  console.table(this.site)
+                  //console.table(this.site)
               }
           }
       },
+      updateStatus() {
+          this.$store.dispatch('observatory/updateStatus')
+      }
   },
   watch: {
       '$route'() {
@@ -49,6 +53,10 @@ export default {
   },
   created() {
       this.initialize()
+      this.update_status = setInterval(this.updateStatus, 2000)
+  },
+  beforeDestroy() {
+      clearInterval(this.update_status)
   }
 }
 </script>

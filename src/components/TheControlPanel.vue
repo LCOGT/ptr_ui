@@ -2,7 +2,7 @@
 <div id="side-controls" v-bind:style="{ width: width}">
     <p class='toggle-open-button' v-if="!isMobile" v-on:click="isOpen = !isOpen">{{ isOpen ? '>' : '<' }}</p>
     <div class="scrollBox">
-      <camera />
+      <camera :sitecode="sitecode"/>
       <focus />
       <rotate />
       <br>
@@ -24,6 +24,7 @@ export default {
     Rotate,
     Camera,
   },
+  props: ['sitecode'],
   data () {
     return {
       isOpen: true,

@@ -41,14 +41,20 @@ export default {
   name: 'TheStatusBar',
   data () {
     return {
+      // 'value' is the list of status items initialized in the status bar.
       value: [
+        // name: links to the twin in the 'options' list (below)
+        // title: tile on status card. Also connects to the getter.
+        { name: 'timestaamp', title: 'timestaamp'},
         { name: 'Ra (decimal)', title: 'ra'},
         { name: 'Dec (decimal)', title: 'dec'},
         { name: 'Altitude', title: 'alt' },
         { name: 'Azimuth', title: 'az' },
       ],
+      // 'options' populates the dropdown that allows custom status panel.
       options: [  
         { name: 'Ra (decimal)', title: 'ra'},
+        { name: 'timestamp', title: 'timestamp'},
         { name: 'Dec (decimal)', title: 'dec'},
         { name: 'Ra (sexagecimal)', title: 'ra_s' },
         { name: 'Dec (sexagecimal)', title: 'dec_s' },
@@ -61,6 +67,9 @@ export default {
     }
   },
   computed: {
+    // mapGetters loads the vuex getter (the value) into the local context
+    // under the key name. 
+    // So foo: 'bar' allows access to the 'bar' getter from 'this.foo'. 
     ...mapGetters('observatory', {
       ra_decimal: 'ra',
       dec_decimal: 'dec',
@@ -68,13 +77,16 @@ export default {
       az: 'az', 
       roof: 'roof',
       sidereal: 'sidereal',
+      timestamp: 'timestamp',
 
       test: 'wx_time'
     })
   },
   methods: {
+    // Function getComputed is used to send status to the BaseStatusItem. 
     getComputed (key) {
       let getters = {
+      // this.<status> is the getter that is loaded using ...mapGetters above.
         ra: this.ra_decimal,
         dec: this.dec_decimal,
         alt: this.alt,
@@ -82,6 +94,7 @@ export default {
         sid: this.sid,
         telescope: this.telescope,
         sidereal: this.sidereal,
+        timestaamp: this.timestamp,
 
         test: this.test,
       }

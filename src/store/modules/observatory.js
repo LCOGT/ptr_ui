@@ -1,3 +1,4 @@
+import { API } from 'aws-amplify'
 
 // Used to initialize state, and to replace stale state anytime the server can't be reached.
 var emptyState = function() {
@@ -48,7 +49,12 @@ var emptyState = function() {
             "time to open": "",
             "wind k/h": "",
             "open_possible": "",
-        }
+        },
+        test: {
+            type: "",
+            parked: "",
+            "timestamp": ""
+        },
     }
 }
 
@@ -86,10 +92,26 @@ const getters = {
         return (state.rotator.pa)
         }
     },
+
+    timestamp: state => parseFloat(state.test.timestamp).toFixed(2),
 }
 
 // actions
 const actions = {
+    updateStatus({ commit }) {
+
+        let apiName = 'ptr-api';
+        let path = '/site1/status/';
+        API.get(apiName, path).then(response => {
+            console.log("retrieved status from observatory store")
+            console.log(response)
+            commit('setTestState', response.content)
+        }).catch(error => {
+            console.log(error)
+        });
+    }
+
+    /*
     streamSSE({ commit }) {
         const es = new EventSource('http://localhost:5000/status/all');
 
@@ -102,8 +124,8 @@ const actions = {
         es.onerror = function(e) {
             commit('setEmptyState')
         }
-
     }
+    */
 }
 
 // mutations
@@ -124,6 +146,10 @@ const mutations = {
         state.focus = empty.focus
         state.rotator = empty.rotator
         state.weather = empty.weather
+        state.test = empty.test
+    },
+    setTestState(state, incoming) {
+        state.test = incoming
     }
 }
 
