@@ -81,7 +81,7 @@ mount_actions = [
     'go', 
     'stop', 
     'home', 
-    'flat-panel', 
+    'flat_panel', 
     'tracking', 
     'park',
 ]

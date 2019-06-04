@@ -52,6 +52,7 @@
                         <span> weather </span>
                     </template>
                     <div>
+                        <a href="http://clearoutside.com/forecast/34.42/-119.70"><img src="http://clearoutside.com/forecast_image_large/34.42/-119.70/forecast.png" /></a>
                         <table id="weather-table">
                             <td id="wx-col1">
                                 <tr><th>amb_temp C</th><td>{{this.temp}}</td></tr>
@@ -139,7 +140,6 @@ export default {
 <style scoped>
 .information-tabs {
     margin: 2em;
-    padding-top: 4em;
     height: calc(100vh - 160.5px);
     overflow-y: auto;
 }

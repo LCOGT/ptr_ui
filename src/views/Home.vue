@@ -24,4 +24,7 @@ export default {
   font: 70px 'Share Tech Mono', monospace;
   margin: 20px;
 }
+html {
+  overflow: hidden;
+}
 </style>

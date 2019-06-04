@@ -1,112 +1,41 @@
 
 
-<template><div class="wrapper">
+<template><div class="page">
 
-  <div class="instrument-selection">
-
-    <!-- Site Selection -->
-    <b-field class="select-device" label="Site">
-        <b-select 
-          placeholder="choose site..." 
-          default="" 
-          v-model="selected_site"
-         >
-          <option 
-            v-for="(site, index) in available_sites" 
-            v-bind:value="site"
-            v-bind:key="`site-${index}`"
-          >
-            {{ site }}
-          </option>
-          <option> dummy_site </option>
-        </b-select>
-    </b-field>
-
-    <!-- Mount Selection -->
-    <b-field class="select-device" label="Mount">
-        <b-select 
-          placeholder="choose mount..." 
-          default="" 
-          v-model="selected_mount"
-        >
-          <option 
-            v-for="(mount, index) in available_mounts" 
-            v-bind:value="mount"
-            v-bind:key="`mount-${index}`"
-          >
-            {{ mount }}
-          </option>
-          <option> dummy_mount </option>
-        </b-select>
-    </b-field>
-
-    <!-- Telescope Selection -->
-    <b-field class="select-device" label="Telescope">
-        <b-select 
-          placeholder="choose telescope..." 
-          default="" 
-          v-model="selected_telescope"
-        >
-          <option 
-            v-for="(ota, index) in available_telescopes" 
-            v-bind:value="ota"
-            v-bind:key="`ota-${index}`"
-          >
-            {{ ota }}
-          </option>
-          <option> dummy_telescope </option>
-        </b-select>
-    </b-field>
-    
-    <!-- Camera Selection -->
-    <b-field class="select-device" label="Camera">
-        <b-select 
-          placeholder="choose camera..." 
-          default="" 
-          v-model="selected_camera"
-        >
-          <option 
-            v-for="(cam, index) in available_cameras" 
-            v-bind:value="cam"
-            v-bind:key="`cam-${index}`"
-          >
-            {{ cam }}
-          </option>
-          <option> dummy_camera </option>
-        </b-select>
-    </b-field>
-
-  <br>
+  <div class="submenu">
   </div>
 
-  <div class="columns">
+  <div class="view">
+    <the-sky-chart />
+  </div>
 
-    <!-- Mount Controls -->
-    <div class="column" style="background: blue;">
-        <div class="title">Slew</div>
+  <div class="controls">
 
-        <b-field horizontal label="Ra">
-          <b-input name="subject" v-model="slew_ra"></b-input>
-        </b-field>
-        <b-field horizontal label="Dec">
-          <b-input name="subject" v-model="slew_dec"></b-input>
-        </b-field>
+    <div class="mount">
+      <div class="title">Slew</div>
 
-        <br>
-        <div class="buttons has-addons">
-          <command-button :data="mount_slew_command" style="width: 50%" />
-          <command-button :data="mount_stop_command" style="width: 50%" />
-        </div>
-        <br>
-        <div class="buttons has-addons">
-        <command-button :data="mount_flat_command" style="width: 50%" />
-        <command-button :data="mount_park_command" style="width: 50%" />
-        </div>
+      <b-field horizontal label="Ra">
+        <b-input name="subject" v-model="slew_ra"></b-input>
+      </b-field>
+      <b-field horizontal label="Dec">
+        <b-input name="subject" v-model="slew_dec"></b-input>
+      </b-field>
 
+      <br>
+      <div class="buttons has-addons">
+        <command-button :data="mount_slew_command" style="width: 50%" />
+        <command-button :data="mount_stop_command" style="width: 50%" />
+      </div>
+      <div class="buttons has-addons">
+      <command-button :data="mount_flat_command" style="width: 50%" />
+      <command-button :data="mount_park_command" style="width: 50%" />
+      </div>
     </div>
 
-    <!-- Buttons for camera controls -->
-    <div class="column is-one-third" style="background: red">
+    <br>
+    <br>
+
+    <div class="camera">
         <div class="title">Camera + Filter</div>
 
         <b-field horizontal label="Expose">
@@ -161,56 +90,8 @@
         <command-button :data="camera_expose_command" style="width: 70%" />
         <command-button :data="camera_cancel_command" style="width: 30%" />
         </div>
-
     </div>
 
-    <!-- Other controls -->
-    <div class="column" style="background: orange">
-        <div class="title">Focus</div>
-          <div class="buttons has-addons">
-          <command-button :data="focus_home_command" style="width: 50%" />
-          <command-button :data="focus_auto_command" style="width: 50%" />
-          </div>
-          <b-field horizontal label="Relative">
-            <b-field>
-              <b-input name="subject" v-model="focus_relative"></b-input>
-              <p class="control"> <command-button :data="focus_relative_command" />  </p>
-            </b-field>
-          </b-field>
-          <b-field horizontal label="Absolute">
-            <b-field>
-              <b-input name="subject" v-model="focus_absolute"></b-input>
-              <p class="control"> <command-button :data="focus_absolute_command" />  </p>
-            </b-field>
-          </b-field>
-          <br>
-        <div class="title">Rotate</div>
-          <command-button :data="rotate_home_command" />
-          <br>
-          <b-field horizontal label="Relative">
-            <b-field>
-              <b-input name="subject" v-model="rotate_relative"></b-input>
-              <p class="control"> <command-button :data="rotate_relative_command" />  </p>
-            </b-field>
-          </b-field>
-          <b-field horizontal label="Absolute">
-            <b-field>
-              <b-input name="subject" v-model="rotate_absolute"></b-input>
-              <p class="control"> <command-button :data="rotate_absolute_command" />  </p>
-            </b-field>
-          </b-field>
-          <br>
-    </div>
-
-    <!-- Verify expected data in this column. -->
-    <div class="column" style="background: green">
-        <div class="title">Info</div>
-        <button class="button" @click="getLastCommand">get prior command</button>
-        <br>
-        <pre><code>{{ JSON.stringify(JSON.parse(prior_command),null,2) }}</code></pre>
-    </div>
-
-    
   </div>
 
 </div></template>
@@ -223,11 +104,13 @@ import axios from 'axios';
 import helpers from '@/utils/helpers'
 import create_commands from '@/utils/create_command'
 import CommandButton from '@/components/CommandButton'
+import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 
 export default {
-  name: 'ctrl',
+  name: 'ux1',
   components: {
     CommandButton,
+    TheSkyChart,
   },
   data () {
     return {
@@ -284,16 +167,12 @@ export default {
   },
   
   methods: {
-    use_cam_cmd() {
-      console.log(this.camera_command)
-    },
     base_command(device_type, action, name, req_params, opt_params) {
 
       let device
       switch (device_type) {
         case 'mount':
           device = this.selected_mount;
-
           break;
         case 'camera': 
           device = this.selected_camera;
@@ -315,7 +194,7 @@ export default {
         http_method: 'POST',
         form: {
           device: device,
-          type: device_type,
+          type: 'mount',
           timestamp: this.timestamp,
           action: action,
           required_params: req_params || {},
@@ -324,21 +203,6 @@ export default {
       }
 
     },
-
-    /**
-     * Get the most recent command sent to the selected site.
-     * Note: this deletes the command from the queue!
-     */
-    getLastCommand() {
-      let apiName = 'ptr-api';
-      API.get(apiName, this.command_url).then(response => {
-        console.log(response)
-        this.prior_command = response
-      }).catch(error => {
-        console.log(error.response)
-      });
-    },
-
   },
 
   computed: {
@@ -463,24 +327,31 @@ export default {
 </script>
 
 <style scoped>
-.panel-content {
-  margin: 2em;
+.page {
+  display: grid;
+  grid-template-columns: 10% 65% 25%;
+  grid-gap: 10px;
 }
-.instrument-selection {
-  margin: 1em;
-  border-bottom: solid grey 1px;
-  display: flex;
-  flex-wrap: wrap;
+.submenu {
+  grid-column: 1;
+  min-height: 50vh;
+  background-color:#999;
 }
-.columns {
-  margin: 1em;
+.view {
+  grid-column: 2;
+  min-height: 50vh;
+  background-color:silver;
 }
-.column {
+.controls {
+  grid-column: 3;
+  min-height: 50vh;
+  background-color:grey;
+}
+
+
+.controls {
   padding: 2em;
   display: flex;
-  flex-direction:column;
-}
-.select-device {
-  padding: 1em;
+  flex-direction: column;
 }
 </style>
