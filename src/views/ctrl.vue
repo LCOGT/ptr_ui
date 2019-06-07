@@ -76,6 +76,60 @@
         </b-select>
     </b-field>
 
+    <!-- Filter Selection -->
+    <b-field class="select-device" label="Filter">
+        <b-select 
+          placeholder="choose filter..." 
+          default="" 
+          v-model="selected_filter"
+        >
+          <option 
+            v-for="(filter, index) in available_filters" 
+            v-bind:value="filter"
+            v-bind:key="`filter-${index}`"
+          >
+            {{ filter }}
+          </option>
+          <option> dummy_filter </option>
+        </b-select>
+    </b-field>
+
+    <!-- Focuser Selection -->
+    <b-field class="select-device" label="Focuser">
+        <b-select 
+          placeholder="choose focuser..." 
+          default="" 
+          v-model="selected_focuser"
+        >
+          <option 
+            v-for="(focuser, index) in available_focusers" 
+            v-bind:value="focuser"
+            v-bind:key="`focuser-${index}`"
+          >
+            {{ focuser }}
+          </option>
+          <option> dummy_camera </option>
+        </b-select>
+    </b-field>
+
+    <!-- Rotator Selection -->
+    <b-field class="select-device" label="Rotator">
+        <b-select 
+          placeholder="choose rotator..." 
+          default="" 
+          v-model="selected_rotator"
+        >
+          <option 
+            v-for="(rotator, index) in available_rotators" 
+            v-bind:value="rotator"
+            v-bind:key="`rotator-${index}`"
+          >
+            {{ rotator }}
+          </option>
+          <option> dummy_camera </option>
+        </b-select>
+    </b-field>
+
   <br>
   </div>
 
@@ -99,8 +153,9 @@
         </div>
         <br>
         <div class="buttons has-addons">
-        <command-button :data="mount_flat_command" style="width: 50%" />
-        <command-button :data="mount_park_command" style="width: 50%" />
+        <command-button :data="mount_flat_command" style="width: 33%" />
+        <command-button :data="mount_park_command" style="width: 34%" />
+        <command-button :data="mount_home_command" style="width: 33%" />
         </div>
 
     </div>
@@ -276,10 +331,13 @@ export default {
 
     // Set the initial devices for convenience.
     if (true) {
-      this.selected_site = 'site4';
+      this.selected_site = 'sim_site';
       this.selected_mount = 'mount1';
-      this.selected_telescope = 't1';
+      this.selected_telescope = 'telescope1';
       this.selected_camera = 'cam1';
+      this.selected_filter = 'filter1';
+      this.selected_focuser = 'focuser1';
+      this.selected_rotator = 'rotator1';
     }
   },
   
@@ -353,9 +411,20 @@ export default {
         return []
       }
     },
+
+    available_devices: function (device_type) {
+      try {
+        return Object.keys(this.config_g[this.selected_site][device_type])
+      }
+      catch(error) {
+        return []
+      }
+    },
+
     available_mounts: function () {
       try {
-        return Object.keys(this.config_g[this.selected_site]['mounts'])
+        return Object.keys(this.config_g[this.selected_site]['mount'])
+        //return this.config_g[this.selected_site]["mount"]
       }
       catch(error) {
         return []
@@ -363,13 +432,7 @@ export default {
     },
     available_telescopes: function () {
       try {
-        return Object.keys(
-          this.config_g
-          [this.selected_site]
-          ['mounts']
-          [this.selected_mount]
-          ['telescopes']
-        ) 
+        return Object.keys(this.config_g[this.selected_site]["telescope"])
       }
       catch(error) {
         return []
@@ -377,20 +440,37 @@ export default {
     },
     available_cameras: function () {
       try {
-        return Object.keys(
-          this.config_g
-          [this.selected_site]
-          ['mounts']
-          [this.selected_mount]
-          ['telescopes']
-          [this.selected_telescope]
-          ['cameras']
-        )
+        return Object.keys(this.config_g[this.selected_site]["camera"])
       }
       catch(error) {
         return []
       }
     },
+    available_filters: function () {
+      try {
+        return Object.keys(this.config_g[this.selected_site]["filter"])
+      }
+      catch(error) {
+        return []
+      }
+    },
+    available_focusers: function () {
+      try {
+        return Object.keys(this.config_g[this.selected_site]["focuser"])
+      }
+      catch(error) {
+        return []
+      }
+    },
+    available_rotators: function () {
+      try {
+        return Object.keys(this.config_g[this.selected_site]["rotator"])
+      }
+      catch(error) {
+        return []
+      }
+    },
+
     camera_expose_command () {
       return this.base_command( 'camera', 'expose', 'expose',
         { time: this.cam_exposure },
@@ -420,27 +500,30 @@ export default {
     mount_park_command () {
       return this.base_command( 'mount', 'park', 'park' )
     },
+    mount_home_command () {
+      return this.base_command( 'mount', 'home', 'home' )
+    },
     mount_flat_command () {
       return this.base_command( 'mount', 'flat-panel', 'flats')
     },
     focus_relative_command () {
-      return this.base_command( 'focus', 'move_relative', 'focus',
+      return this.base_command( 'focuser', 'move_relative', 'focus',
         { position: this.focus_relative, }
       )
     },
     focus_absolute_command () {
-      return this.base_command( 'focus', 'move_absolute', 'focus',
+      return this.base_command( 'focuser', 'move_absolute', 'focus',
         { position: this.focus_absolute, }
       )
     },
     focus_auto_command () {
-      return this.base_command( 'focus', 'auto', 'autofocus' )
+      return this.base_command( 'focuser', 'auto', 'autofocus' )
     },
     focus_home_command () {
-      return this.base_command( 'focus', 'home', 'home' )
+      return this.base_command( 'focuser', 'home', 'home' )
     },
     focus_stop_command () {
-      return this.base_command( 'focus', 'stop', 'stop' )
+      return this.base_command( 'focuser', 'stop', 'stop' )
     },
     filter_home_command () {
       return this.base_command( 'filter', 'home', 'home' )

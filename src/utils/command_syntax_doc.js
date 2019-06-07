@@ -192,7 +192,7 @@ focuser_commands = {
         },
         optional_params: {}
     },
-    stope: {
+    stop: {
         required_params: {},
         optional_params: {},
     },
