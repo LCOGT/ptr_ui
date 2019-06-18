@@ -46,11 +46,10 @@ Amplify.configure({
       {
         name: "ptr-api",
         endpoint: "http://api.photonranch.org",
-        //endpoint: "http://localhost:5000",
         custom_header: async () => {
           return { Authorization: 'Bearer '+(await Auth.currentSession()).accessToken.jwtToken }
         }
-      }
+      },
     ]
   }
 });
@@ -65,7 +64,7 @@ export default {
 
     // Update state information from flask-based server-sent-events stream. 
     //this.$store.dispatch('observatory/streamSSE')
-    this.$store.dispatch('observatory/updateStatus')
+    //this.$store.dispatch('observatory/updateStatus')
 
   }
 }

@@ -71,10 +71,10 @@ export default {
     // under the key name. 
     // So foo: 'bar' allows access to the 'bar' getter from 'this.foo'. 
     ...mapGetters('observatory', {
-      ra_decimal: 'ra',
-      dec_decimal: 'dec',
-      alt: 'alt',
-      az: 'az', 
+      ra_decimal: 'RightAscension',
+      dec_decimal: 'Declination',
+      alt: 'Altitude',
+      az: 'Azimuth', 
       roof: 'roof',
       sidereal: 'sidereal',
       timestamp: 'timestamp',

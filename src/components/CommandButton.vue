@@ -30,6 +30,14 @@ export default {
     methods: {
         handleClick (url, form, http_method) {
 
+            if (this.data.site == ''|| this.data.mount == '') {
+                console.log('No site and/or mount specified for the command. Command has been cancelled.')
+                console.log(`Site: ${this.data.site}`);
+                console.log(`Mount: ${this.data.mount}`);
+                // TODO: add UI notification here.
+                return
+            }
+
             this.isLoading = true
             var vm = this
 

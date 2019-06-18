@@ -5,8 +5,8 @@
   <div class="submenu">
   </div>
 
-  <div class="view">
-    <the-sky-chart />
+  <div class="skychart">
+    <the-sky-chart class="skychart" />
   </div>
 
   <div class="controls">
@@ -337,9 +337,10 @@ export default {
   min-height: 50vh;
   background-color:#999;
 }
-.view {
+.skychart {
   grid-column: 2;
   min-height: 50vh;
+  max-height: 100vh;
   background-color:silver;
 }
 .controls {

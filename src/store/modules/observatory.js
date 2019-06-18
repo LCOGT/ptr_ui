@@ -3,32 +3,20 @@ import { API } from 'aws-amplify'
 // Used to initialize state, and to replace stale state anytime the server can't be reached.
 var emptyState = function() {
     return {
-        mount: {
-            quide_status: "",
-            focus: "",
-            parked: "",
-            ra_rate: "",
-            alias: "",
-            alt: "",
-            ra: "",
-            tracking: "",
-            timestamp: "",
-            az: "",
-            dec: "",
-            enclosure_status: "",
-            tel_sid_time: "",
-            slewing: "",
-            "mnt-1_connected": "",
-            pos_angle: "",
-            dec_rate: "",
-        },
+        mount: {},
+        camera: {},
+        focuser: {},
+        rotator: {},
+        filter: {},
+        enclosure: {},
+
         focus: {
             timestamp: "",
             foc1_connected: "",
             alias: "",
             focus: "",
         },
-        rotator: {
+        rotator1: {
             pa: "",
             timestamp: "",
             alias: "",
@@ -63,11 +51,17 @@ const state = emptyState();
 
 // getters
 const getters = {
-    mount: state => state.mount,
-    ra: state => parseFloat(state.mount.ra).toFixed(2),
-    dec: state => parseFloat(state.mount.dec).toFixed(2),
-    alt: state => parseFloat(state.mount.alt).toFixed(3),
-    az: state => parseFloat(state.mount.az).toFixed(3),
+    mount: state => state.mount || [],
+    camera: state => state.camera,
+    filter: state => state.filter,
+    focuser: state => state.focuser,
+    rotator: state => state.rotator,
+
+    // Old getters below this comment.
+    RightAscension: state => parseFloat(state.mount.RightAscension).toFixed(2),
+    Declination: state => parseFloat(state.mount.Declination).toFixed(2),
+    Altitude: state => parseFloat(state.mount.Altitude).toFixed(3),
+    Azimuth: state => parseFloat(state.mount.Azimuth).toFixed(3),
     roof: state => state.mount.roof,
     sidereal: state => parseFloat(state.mount.tel_sid_time).toFixed(3),
 
@@ -98,41 +92,47 @@ const getters = {
 
 // actions
 const actions = {
-    updateStatus({ commit }) {
+    updateStatus({ commit }, site) {
 
-        let apiName = 'ptr-api';
-        let path = '/site1/status/';
-        API.get(apiName, path).then(response => {
-            console.log("retrieved status from observatory store")
-            console.log(response)
-            commit('setTestState', response.content)
-        }).catch(error => {
-            console.log(error)
-        });
-    }
-
-    /*
-    streamSSE({ commit }) {
-        const es = new EventSource('http://localhost:5000/status/all');
-
-
-        es.onmessage = function(e) {
-            let obj = JSON.parse(e.data);
-            commit('setObservatoryState', obj)
+        // Set empty values if a specific site has not been selected.
+        if (site == '') {
+            commit('setMount', [])
+            commit('setCamera', [])
+            commit('setFilter', [])
+            commit('setFocuser', [])
+            commit('setFilter', [])
+            commit('setRotator', [])
         }
-
-        es.onerror = function(e) {
-            commit('setEmptyState')
+        // Otherwise, refresh the state for the selected site.
+        else {
+            let apiName = 'ptr-api';
+            // 'site' is referencing the item in the device_selection vuex module
+            let path = `/${site}/status/`;
+            console.log(path)
+            API.get(apiName, path).then(response => {
+                //console.log("retrieved status from observatory store")
+                //console.log(response)
+                commit('setMount', response.content.mount)
+                commit('setCamera', response.content.camera)
+                commit('setFilter', response.content.filter)
+                commit('setFocuser', response.content.focuser)
+                commit('setFilter', response.content.filter)
+                commit('setRotator', response.content.rotator)
+                commit('setTestState', response.content)
+            }).catch(error => {
+                console.log(error)
+            });
         }
     }
-    */
 }
 
 // mutations
 const mutations = {
     setMount(state, mount) { state.mount = mount },
-    setFocus(state, focus) { state.focus = focus },
-    setRotator(state, rot) { state.rotator = rot },
+    setCamera(state, camera) { state.camera = camera },
+    setFocuser(state, focuser) { state.focuser = focuser },
+    setFilter(state, filter) { state.filter = filter },
+    setRotator(state, rotator) { state.rotator = rotator },
     setWeather(state, wx ) { state.weather = wx  },
     setObservatoryState(state, incoming) {
         state.mount = incoming['mnt-1']

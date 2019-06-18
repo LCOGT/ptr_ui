@@ -1,7 +1,7 @@
 <template>
         <div class='information-tabs'>
             <br>
-            <b-tabs v-model="activeTab" size="is-small" type="is-toggle" position="is-centered">
+            <b-tabs v-model="activeTab" size="is-small" type="is-toggle">
 
                 <!-- Enclosure Camera and Site Info -->
                 <b-tab-item>
