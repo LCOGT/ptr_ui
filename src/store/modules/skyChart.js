@@ -14,6 +14,7 @@ const state = {
 const getters = {
     selectedRa: () => state.selectedRa,
     selectedDec: () => state.selectedDec,
+
     star_types: () => state.filter.star_types,
     star_mags: () => state.filter.star_mags,
     dso_types: () => state.filter.dso_types,

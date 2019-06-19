@@ -108,7 +108,6 @@ const actions = {
             let apiName = 'ptr-api';
             // 'site' is referencing the item in the device_selection vuex module
             let path = `/${site}/status/`;
-            console.log(path)
             API.get(apiName, path).then(response => {
                 //console.log("retrieved status from observatory store")
                 //console.log(response)

@@ -72,12 +72,15 @@ const getters = {
 
 const actions = {
 
+    /**
+     * This action gets the most recent config from AWS, which applies to all 
+     * observatories in the network. 
+     */
     update_config({ commit }) {
         let apiName = 'ptr-api';
         let path = '/all/config/';
         API.get(apiName, path).then(response => {
-            console.log("Setting Global config:");
-            console.log(response);
+            // Save the config to this vuex module.
             commit('setGlobalConfig', response)
         }).catch(error => {
             console.log(error)

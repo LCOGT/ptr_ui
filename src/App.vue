@@ -11,9 +11,9 @@ import Amplify, { Auth, API } from 'aws-amplify'
 import awsmobile from './aws-exports';
 import { components } from 'aws-amplify-vue'
 
+
 Amplify.configure({
 
-  // Auth works without this config section, probably because it was configured in amplify-cli. 
   Auth: {
     identityPoolId: 'us-west-2:b9d6f9e8-202a-4a6f-9487-1e918f945f29',
     region: 'us-west-2',
@@ -35,13 +35,6 @@ Amplify.configure({
       {
         name: "LambdaNoAuth",
         endpoint: "https://ubkz32a95c.execute-api.us-west-2.amazonaws.com/dev",
-      },
-      {
-        name: "local flask",
-        endpoint: "http://localhost:5000",
-        custom_header: async () => {
-          return { Authorization: 'Bearer '+(await Auth.currentSession()).idToken.jwtToken }
-        }
       },
       {
         name: "ptr-api",
@@ -71,7 +64,4 @@ export default {
 </script>
 
 <style>
-#app {
-  /*height: 100vh;*/
-}
 </style>

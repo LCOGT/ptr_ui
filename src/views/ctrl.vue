@@ -160,6 +160,7 @@
         <command-button :data="mount_park_command" style="width: 34%" />
         <command-button :data="mount_home_command" style="width: 33%" />
         </div>
+        <command-button :data="mount_slew_chart_command" />
 
     </div>
 
@@ -265,7 +266,8 @@
         <div class="title">Info</div>
         <button class="button" @click="getLastCommand">get prior command</button>
         <br>
-        <pre><code>{{ JSON.stringify(JSON.parse(prior_command),null,2) }}</code></pre>
+        <pre><code>{{ prior_command }}</code></pre>
+        
     </div>
 
   </div>
@@ -497,6 +499,11 @@ export default {
       'global_config',
     ]),
 
+    ...mapGetters('skyChart', {
+      chart_selectedRa: 'selectedRa',
+      chart_selectedDec: 'selectedDec',
+    }),
+
     // The `selected_${device}` computed properties are used for two way
     // binding between vuex (device_selection module) and the device 
     // selection inputs. 
@@ -595,6 +602,11 @@ export default {
     mount_slew_command () {
       return this.base_command( 'mount', 'go', 'slew here',
         { ra: this.slew_ra, dec: this.slew_dec, }
+      )
+    },
+    mount_slew_chart_command () {
+      return this.base_command( 'mount', 'go', 'slew to chart position',
+        { ra: this.chart_selectedRa, dec: this.chart_selectedDec, }
       )
     },
     mount_stop_command () {

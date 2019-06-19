@@ -10,10 +10,18 @@ import VueSidebarMenu from 'vue-sidebar-menu'
 
 import Amplify, * as AmplifyModules from 'aws-amplify'
 import { AmplifyPlugin } from 'aws-amplify-vue'
-import awsmobile from './aws-exports'
-Amplify.configure(awsmobile)
-Vue.use(AmplifyPlugin, AmplifyModules)
 
+/** 
+ * This used to be used in Amplify.configure(awsmobile), but that broke the 
+ * api that is configured in App.vue. (Probably two calls to Amplify.configure 
+ * wasn't intended use). For now, I can't find any issues from not using it, 
+ * but I'll keep this note here for reference in case Amplify causes issues in
+ * the future.
+ */
+import awsmobile from './aws-exports'
+
+
+Vue.use(AmplifyPlugin, AmplifyModules)
 Vue.use(Buefy)
 Vue.use(VueSidebarMenu)
 

@@ -125,133 +125,133 @@ export default {
 
             var that = this;
 
-        var nebula = ['Pl','Di','Bn','Dn', 'Sn'];
-        var galaxies = ['Cg','Sp','Ba','Ir','El','Ln','Px','Sx'];
-        var stars = ['Ds', '**', 'star'];
+            var nebula = ['Pl','Di','Bn','Dn', 'Sn'];
+            var galaxies = ['Cg','Sp','Ba','Ir','El','Ln','Px','Sx'];
+            var stars = ['Ds', '**', 'star'];
 
 
-        // Default to normal object symbols on sky chart, or red tones if requested.
-        var styles = mapConfigs.default_object_styles;
-        if (mapConfigs.night_colors_status == "on") {styles = mapConfigs.red_obj_styles; }
-        else if (mapConfigs.night_colors_status != "off") {
-            alert("Could not apply requested sky chart style. Reverting to default.");
-        }
+            // Default to normal object symbols on sky chart, or red tones if requested.
+            var styles = mapConfigs.default_object_styles;
+            if (mapConfigs.night_colors_status == "on") {styles = mapConfigs.red_obj_styles; }
+            else if (mapConfigs.night_colors_status != "off") {
+                alert("Could not apply requested sky chart style. Reverting to default.");
+            }
 
-        Celestial.clear();
-        Celestial.add({type:"json", file:"../data/all_objects.json", callback: function(error,json) {
-            if (error) {return console.warn(error);}
+            Celestial.clear();
+            Celestial.add({type:"json", file:"../data/all_objects.json", callback: function(error,json) {
+                if (error) {return console.warn(error);}
 
-            var sky_objects = Celestial.getData(json, mapConfigs.config.transform);
+                var sky_objects = Celestial.getData(json, mapConfigs.config.transform);
 
-            Celestial.container.selectAll(".custom_objects")
-                .data(sky_objects.features)
-                .enter().append("path")
-                .attr("class", "custom_obj");
-            Celestial.redraw();
-        }, redraw: function() {
-            Celestial.container.selectAll(".custom_obj").each(function (d) {
-                if (Celestial.clip(d.geometry.coordinates)/* && filterChart(d)*/) {
-                //if (true) {
-                    var pt = Celestial.mapProjection(d.geometry.coordinates),
-                        type = d.properties.type,
-                        mag = d.properties.mag,
-                        m = d.properties.messier;
-                        //size = d.properties.size;
+                Celestial.container.selectAll(".custom_objects")
+                    .data(sky_objects.features)
+                    .enter().append("path")
+                    .attr("class", "custom_obj");
+                Celestial.redraw();
+            }, redraw: function() {
+                Celestial.container.selectAll(".custom_obj").each(function (d) {
+                    if (Celestial.clip(d.geometry.coordinates)/* && filterChart(d)*/) {
+                    //if (true) {
+                        var pt = Celestial.mapProjection(d.geometry.coordinates),
+                            type = d.properties.type,
+                            mag = d.properties.mag,
+                            m = d.properties.messier;
+                            //size = d.properties.size;
 
-                    //Celestial.context.fillStyle = "#fff";
-                    if (stars.indexOf(type) !== -1) {
-                        var starstyle = styles.star;
-                        Celestial.setStyle(starstyle)
+                        //Celestial.context.fillStyle = "#fff";
+                        if (stars.indexOf(type) !== -1) {
+                            var starstyle = styles.star;
+                            Celestial.setStyle(starstyle)
 
-                        // Apply spectral star colors unless we're in red mode.
-                        if (d.properties.spectral && styles.name != "red") {
-                            var bv = mapConfigs.spectral_bv[d.properties.spectral.slice(0,2)];
-                            Celestial.context.fillStyle = mapConfigs.bvcolor(bv);
+                            // Apply spectral star colors unless we're in red mode.
+                            if (d.properties.spectral && styles.name != "red") {
+                                var bv = mapConfigs.spectral_bv[d.properties.spectral.slice(0,2)];
+                                Celestial.context.fillStyle = mapConfigs.bvcolor(bv);
+                            }
+                            var r = mapConfigs.starSize(d);
+                            Celestial.context.beginPath();
+                            Celestial.context.arc(pt[0], pt[1], r, 0, 2 * Math.PI);
+                            Celestial.context.closePath();
+                            Celestial.context.fill();
+                            if (mag < 1.5) {
+                                Celestial.setTextStyle(styles.star.namestyle);
+                                Celestial.context.fillText(d.properties.name, pt[0]+r, pt[1]-r);
+                            }
                         }
-                        var r = mapConfigs.starSize(d);
-                        Celestial.context.beginPath();
-                        Celestial.context.arc(pt[0], pt[1], r, 0, 2 * Math.PI);
-                        Celestial.context.closePath();
-                        Celestial.context.fill();
-                        if (mag < 1.5) {
-                            Celestial.setTextStyle(styles.star.namestyle);
-                            Celestial.context.fillText(d.properties.name, pt[0]+r, pt[1]-r);
+                        else if (galaxies.indexOf(type) !== -1) {
+                            styles.galaxy.opacity = Math.pow((3.0/mag),1.5)/2 + 0.5;
+                            Celestial.setStyle(styles.galaxy);
+                            var s = 9;
+                            var r = s / Math.sqrt(3);
+                            Celestial.context.beginPath();
+                            Celestial.context.moveTo(pt[0], pt[1] - r);
+                            Celestial.context.lineTo(pt[0] + r, pt[1] + r);
+                            Celestial.context.lineTo(pt[0] - r, pt[1] + r);
+                            Celestial.context.closePath();
+                            Celestial.context.fill();
+
+                            if (mag < 8) {
+                                Celestial.setTextStyle(styles.galaxy.namestyle);
+                                Celestial.context.fillText('M'+m, pt[0]+r, pt[1]-r);
+                            }
+                        }
+                        else if (nebula.indexOf(type) !== -1) {
+                            styles.nebula.opacity = Math.pow((5.5/mag),2);
+                            Celestial.setStyle(styles.nebula);
+                            var s = 8;
+                            var r = s / 1.5;
+                            Celestial.context.beginPath();
+                            Celestial.context.moveTo(pt[0], pt[1] - r);
+                            Celestial.context.lineTo(pt[0] + r, pt[1]);
+                            Celestial.context.lineTo(pt[0], pt[1] + r);
+                            Celestial.context.lineTo(pt[0] - r, pt[1]);
+                            Celestial.context.closePath();
+                            Celestial.context.fill();
+                            if (mag < 8) {
+                                Celestial.setTextStyle(styles.nebula.namestyle);
+                                Celestial.context.fillText('M'+m, pt[0]+r, pt[1]-r);
+                            }
+                        }
+                        else if (type == 'Gc') {
+                            styles.globular_cluster.opacity = Math.pow((5.5/mag),6);
+                            var s = 8;
+                            var r = s / 1.5;
+                            Celestial.setStyle(styles.globular_cluster);
+                            Celestial.map(d)
+                            Celestial.context.beginPath();
+                            Celestial.context.arc(pt[0], pt[1], 3, 0, 2 * Math.PI);
+                            Celestial.context.closePath();
+                            Celestial.context.stroke();
+                            if (mag < 6) {
+                                Celestial.setTextStyle(styles.globular_cluster.namestyle);
+                                Celestial.context.fillText('M'+m, pt[0]+r, pt[1]-r);
+                            }
+                        }
+                        else if (type == 'Oc') {
+                            styles.open_cluster.opacity = Math.pow((4.5/mag),2)/2 + 0.7;
+                            Celestial.setStyle(styles.open_cluster);
+                            var s = 8;
+                            var r = s / 1.5;
+                            Celestial.map(d)
+                            Celestial.context.beginPath();
+                            Celestial.context.arc(pt[0], pt[1], 3, 0, 2 * Math.PI);
+                            Celestial.context.closePath();
+                            Celestial.context.stroke();
+                            if (mag < 5) {
+                                Celestial.setTextStyle(styles.open_cluster.namestyle);
+                                Celestial.context.fillText('M'+m, pt[0]+r, pt[1]-r);
+                            }
+                        }
+                        else {
+                            Celestial.setStyle(styles.point);
+                            Celestial.map(d)
+                            Celestial.context.beginPath();
+                            Celestial.context.arc(pt[0], pt[1], 5, 0, 2 * Math.PI);
+                            Celestial.context.closePath();
+                            Celestial.context.stroke();
                         }
                     }
-                    else if (galaxies.indexOf(type) !== -1) {
-                        styles.galaxy.opacity = Math.pow((3.0/mag),1.5)/2 + 0.5;
-                        Celestial.setStyle(styles.galaxy);
-                        var s = 9;
-                        var r = s / Math.sqrt(3);
-                        Celestial.context.beginPath();
-                        Celestial.context.moveTo(pt[0], pt[1] - r);
-                        Celestial.context.lineTo(pt[0] + r, pt[1] + r);
-                        Celestial.context.lineTo(pt[0] - r, pt[1] + r);
-                        Celestial.context.closePath();
-                        Celestial.context.fill();
-
-                        if (mag < 8) {
-                            Celestial.setTextStyle(styles.galaxy.namestyle);
-                            Celestial.context.fillText('M'+m, pt[0]+r, pt[1]-r);
-                        }
-                    }
-                    else if (nebula.indexOf(type) !== -1) {
-                        styles.nebula.opacity = Math.pow((5.5/mag),2);
-                        Celestial.setStyle(styles.nebula);
-                        var s = 8;
-                        var r = s / 1.5;
-                        Celestial.context.beginPath();
-                        Celestial.context.moveTo(pt[0], pt[1] - r);
-                        Celestial.context.lineTo(pt[0] + r, pt[1]);
-                        Celestial.context.lineTo(pt[0], pt[1] + r);
-                        Celestial.context.lineTo(pt[0] - r, pt[1]);
-                        Celestial.context.closePath();
-                        Celestial.context.fill();
-                        if (mag < 8) {
-                            Celestial.setTextStyle(styles.nebula.namestyle);
-                            Celestial.context.fillText('M'+m, pt[0]+r, pt[1]-r);
-                        }
-                    }
-                    else if (type == 'Gc') {
-                        styles.globular_cluster.opacity = Math.pow((5.5/mag),6);
-                        var s = 8;
-                        var r = s / 1.5;
-                        Celestial.setStyle(styles.globular_cluster);
-                        Celestial.map(d)
-                        Celestial.context.beginPath();
-                        Celestial.context.arc(pt[0], pt[1], 3, 0, 2 * Math.PI);
-                        Celestial.context.closePath();
-                        Celestial.context.stroke();
-                        if (mag < 6) {
-                            Celestial.setTextStyle(styles.globular_cluster.namestyle);
-                            Celestial.context.fillText('M'+m, pt[0]+r, pt[1]-r);
-                        }
-                    }
-                    else if (type == 'Oc') {
-                        styles.open_cluster.opacity = Math.pow((4.5/mag),2)/2 + 0.7;
-                        Celestial.setStyle(styles.open_cluster);
-                        var s = 8;
-                        var r = s / 1.5;
-                        Celestial.map(d)
-                        Celestial.context.beginPath();
-                        Celestial.context.arc(pt[0], pt[1], 3, 0, 2 * Math.PI);
-                        Celestial.context.closePath();
-                        Celestial.context.stroke();
-                        if (mag < 5) {
-                            Celestial.setTextStyle(styles.open_cluster.namestyle);
-                            Celestial.context.fillText('M'+m, pt[0]+r, pt[1]-r);
-                        }
-                    }
-                    else {
-                        Celestial.setStyle(styles.point);
-                        Celestial.map(d)
-                        Celestial.context.beginPath();
-                        Celestial.context.arc(pt[0], pt[1], 5, 0, 2 * Math.PI);
-                        Celestial.context.closePath();
-                        Celestial.context.stroke();
-                    }
-                }
-            });
+                });
                 // This retains the crosshairs when redrawing with different filters.
                 // However, crosshairs are updated by themselves so an entire repaint is avoided.
                 Celestial.setStyle(styles.crosshair);
@@ -286,10 +286,12 @@ export default {
                 Celestial.context.stroke();
             }});
         },
+
         update_pointer() {
             this.initializePointer();
             Celestial.redraw();
         },
+
         redraw() {
             Celestial.redraw()
         },
@@ -310,13 +312,34 @@ export default {
             selectedDec: 'selectedDec',
         }),
         ...mapGetters('observatory', {
-            mountRa: 'ra',
-            mountDec: 'dec',
+            all_mount_state: 'mount',
+
             star_types: 'star_types',
             star_mags: 'star_mags',
             dso_types: 'dso_types',
             dso_mags: 'dso_mags',
-        })
+        }),
+        ...mapGetters('device_selection', {
+            active_site: 'site',
+            active_mount: 'mount',
+        }),
+
+        mountRa () {
+            try {
+                let ra = this.all_mount_state[this.active_mount].RightAscension
+                return parseFloat(ra)
+            } catch {
+                return -1
+            }
+        }, 
+        mountDec () {
+            try {
+                let dec = this.all_mount_state[this.active_mount].Declination
+                return parseFloat(dec)
+            } catch {
+                return -1
+            }
+        }, 
     }
 }
 </script>

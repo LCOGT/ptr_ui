@@ -17,7 +17,6 @@ export default {
     }
   },
   mounted: function () {
-    console.log(this.mapName)
     const element = document.getElementById(this.mapName)
     const options = {
       zoom: 2.5,
@@ -231,7 +230,7 @@ export default {
     var contentString = '<div id="content">' +
             '<div id="siteNotice" style="width: auto;">' +
             '</div>' +
-            '<img src="https://lco.global/files/galleries/telescopes/sedgwick.jpg" style="width: 200px;"></img>' +
+            '<img src="https://www.independent.com/wp-content/uploads/2016/08/30/20160811_LCOGT_Sedgwick_009.jpg" style="width: 200px;"></img>' +
             '<div id="bodyContent">' +
             '<p>Sedgwick</p>' +
             '</div>' +
