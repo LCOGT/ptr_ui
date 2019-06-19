@@ -3,7 +3,7 @@
 
         <div class="navbar-brand">
             <div style="padding-left: 50px"></div>
-            <router-link class=navbar-item to="/">ptr</router-link>
+            <router-link class="navbar-item menu-title" to="/">photon ranch</router-link>
 
             <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
                 <span aria-hidden="true"></span>
@@ -101,4 +101,11 @@ export default {
 </script>
 
 <style scoped>
+.menu-title {
+  font: 30px 'Share Tech Mono', monospace; 
+  margin-right: 2em;
+}
+nav {
+  height: 5em;
+}
 </style>
