@@ -43,6 +43,7 @@ var emptyState = function() {
             parked: "",
             "timestamp": ""
         },
+        foo: "bar",
     }
 }
 
@@ -57,6 +58,7 @@ const getters = {
     focuser: state => state.focuser,
     rotator: state => state.rotator,
 
+    foo: state => state.foo,
     // Old getters below this comment.
     RightAscension: state => parseFloat(state.mount.RightAscension).toFixed(2),
     Declination: state => parseFloat(state.mount.Declination).toFixed(2),

@@ -4,6 +4,7 @@
         <div class="navbar-brand">
             <div style="padding-left: 50px"></div>
             <router-link class="navbar-item menu-title" to="/">photon ranch</router-link>
+            <div></div>
 
             <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
                 <span aria-hidden="true"></span>

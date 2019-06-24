@@ -39,6 +39,7 @@ Amplify.configure({
       {
         name: "ptr-api",
         endpoint: "http://api.photonranch.org",
+        //endpoint: "http://localhost:5000",
         custom_header: async () => {
           return { Authorization: 'Bearer '+(await Auth.currentSession()).accessToken.jwtToken }
         }

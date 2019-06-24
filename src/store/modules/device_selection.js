@@ -66,6 +66,14 @@ const getters = {
     filter: state => state.selected_filter,
     camera: state => state.selected_camera,
 
+    camera_areas: state => {
+        try {
+            return state.global_config[state.selected_site].camera[state.selected_camera].settings.area
+        } catch {
+            return []
+        }
+    },
+
 
     global_config: state => state.global_config,
 }

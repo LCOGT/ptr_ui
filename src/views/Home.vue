@@ -22,6 +22,7 @@ export default {
 <style scoped>
 .title {
   font: 70px 'Share Tech Mono', monospace;
+  /*font: 70px 'Faster One', cursive;*/
   margin: 20px;
 }
 html {
