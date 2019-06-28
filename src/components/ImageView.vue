@@ -2,7 +2,10 @@
     <div class="columns">
         <div class="column">
             <canvas id="img-canvas" width="716" height="716"> </canvas>
-            <p>ra: {{mouseCoords[0]}}, dec: {{mouseCoords[1]}}</p>
+            <div style="display: flex; justify-content: space-between;">
+                <p>ra: {{mouseCoords[0]}}, dec: {{mouseCoords[1]}}</p>
+                <p> {{latest_image_name}} </p>
+            </div>
         </div>
         <div class="column controls">
             <div class="field">
@@ -35,7 +38,8 @@ export default {
     name: 'ImageView',
     data() {
         return {
-            cur_img: '',
+            latest_image_url: '',
+            latest_image_name: '',
             isSelectable: false,
             canvas: {
                 canvas: '',
@@ -46,15 +50,14 @@ export default {
             mouseCoords: [],
             mouseRa: 0,
             mouseDec: 0,
-            latest_image: '',
         }
     },
     beforeMount() {
         this.getImageURL();
         /*
         API.post('LambdaNoAuth', '/getimage').then(response => {
-            this.cur_img = response.image_url
-            console.log(this.cur_img)
+            this.latest_image_url= response.image_url
+            console.log(this.latest_image_url)
             this.initCanvas()
         }).catch(error => {
             console.log(error.response)
@@ -69,11 +72,12 @@ export default {
          */
         getImageURL() {
             let apiName = 'ptr-api';
-            let url = `/WMD/latest_image/`;
+            let url = `/${this.active_site}/latest_image/`;
 
 
             API.get(apiName, url).then(response => {
-                this.cur_img = response
+                this.latest_image_url= response.url
+                this.latest_image_name= response.filename
                 this.initCanvas()
             }).catch(error => {
                 console.log(error.response)
@@ -87,7 +91,7 @@ export default {
 
             this.canvas.canvas = new fabric.Canvas('img-canvas', canvas_config)
             
-            this.initImage(this.cur_img)
+            this.initImage(this.latest_image_url)
 
             let that = this
             this.canvas.canvas.on('mouse:move', function(e) {
@@ -203,7 +207,7 @@ export default {
         },
         resetImage() {
             this.canvas.canvas.remove(this.canvas.image)
-            this.initImage(this.cur_img)
+            this.initImage(this.latest_image_url)
         },
         resetAll() {
             this.resetImage()

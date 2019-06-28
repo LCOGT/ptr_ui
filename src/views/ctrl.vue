@@ -165,7 +165,7 @@
     </div>
 
     <!-- Buttons for camera controls -->
-    <div class="column is-one-third" style="background:orangered">
+    <div class="column" style="background:orangered">
         <div class="title">Camera + Filter</div>
 
         <b-field horizontal label="Expose">
@@ -175,7 +175,7 @@
             </b-field>
         </b-field>
 
-        <b-field horizontal label="Repeat">
+        <b-field horizontal label="Count">
             <b-field>
                 <b-input name="subject" v-model="cam_repeat"></b-input>
             </b-field>
@@ -198,8 +198,9 @@
         <b-field horizontal label="Area" v-if="camera_areas.length != 0">
             <b-select placeholder="Select chip area" v-model="cam_area" style="width: 100%">
               <option
-                v-for="area in camera_areas"
+                v-for="(area, index) in camera_areas"
                 v-bind:value="area"
+                v-bind:selected="index === 0"
                 >
                 {{ area }}
               </option>
@@ -275,15 +276,17 @@
 
     <!-- Verify expected data in this column. -->
     <div class="column" style="background: orange">
-        <div class="title">Info</div>
-        <button class="button" @click="getLastCommand">get prior command</button>
-        <br>
-        <pre><code>{{ prior_command }}</code></pre>
+        <!--div class="title">Info</div-->
+        <!--button class="button" @click="getLastCommand">get prior command</button-->
+        <!--br-->
+        <!--pre><code>{{ prior_command }}</code></pre-->
 
         <div class="title">Image</div>
         <button class="button" @click="getImageURL">refresh image</button>
         <br>
-        <img v-bind:src="latest_image" style="width: 100%; background-color: grey;"></img>
+        <img v-bind:src="latest_image_url" style="width: 100%; background-color: grey;"></img>
+        <div>Filename:</div>
+        <div>{{latest_image_name}}</div>
         <br>
     </div>
 
@@ -352,10 +355,10 @@ export default {
       slew_ra: '',
       slew_dec: '',
 
-      cam_exposure: '',
-      cam_repeat: '',
+      cam_exposure: '1',
+      cam_repeat: '1',
       cam_filter: '',
-      cam_area: '',
+      cam_area: null,
       cam_bin: '1', 
 
       focus_relative: '',
@@ -368,7 +371,8 @@ export default {
       // This is displayed as the prior command. Updated on button click.
       prior_command: null,
 
-      latest_image: '',
+      latest_image_url: '',
+      latest_image_name: '',
       download_path: '',
       
 
@@ -387,10 +391,10 @@ export default {
 
     // Set the initial devices for convenience.
     if (true) {
-      this.active_site= 'sim_site';
+      this.active_site= 'WMD';
       this.active_enclosure= 'enclosure1';
-      this.active_mount= 'mount1';
-      this.active_telescope= 'telescope1';
+      this.active_mount= 'mnt1';
+      this.active_telescope= 'tel1';
       this.active_camera= 'cam1';
       this.active_filter= 'filter1';
       this.active_focuser= 'focuser1';
@@ -418,7 +422,7 @@ export default {
     },
 
     /**
-     * Get the most recent image and set `latest_image` to a 
+     * Get the most recent image and set `latest_image_url` to a 
      * string url to the image.
      */
     getImageURL() {
@@ -427,7 +431,8 @@ export default {
 
 
       API.get(apiName, url).then(response => {
-        this.latest_image = response
+        this.latest_image_url= response.url
+        this.latest_image_name = response.filename
       }).catch(error => {
         console.log(error.response)
       });
