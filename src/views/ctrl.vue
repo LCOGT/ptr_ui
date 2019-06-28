@@ -281,10 +281,10 @@
         <pre><code>{{ prior_command }}</code></pre>
 
         <div class="title">Image</div>
-        <button class="button" @click="getImageURL">download image</button>
-        <b-input v-model="download_path" placeholder="path (i.e. raw_data/2019/img001.fits)"></b-input>
+        <button class="button" @click="getImageURL">refresh image</button>
         <br>
-        <pre><code>{{ prior_image }}</code></pre>
+        <img v-bind:src="latest_image" style="width: 100%; background-color: grey;"></img>
+        <br>
     </div>
 
   </div>
@@ -368,7 +368,7 @@ export default {
       // This is displayed as the prior command. Updated on button click.
       prior_command: null,
 
-      prior_image: '',
+      latest_image: '',
       download_path: '',
       
 
@@ -418,22 +418,16 @@ export default {
     },
 
     /**
-     * Get the most recent image and set `prior_image` to a 
+     * Get the most recent image and set `latest_image` to a 
      * string url to the image.
      */
     getImageURL() {
       let apiName = 'ptr-api';
-      let url = `/${this.active_site}/download/`;
+      let url = `/${this.active_site}/latest_image/`;
 
-      let params = { 
-        body: { object_name: `${this.download_path}` }
-        };
-      
-      console.log(params)
 
-      API.post(apiName, url, params).then(response => {
-        console.log(response)
-        this.prior_image = response
+      API.get(apiName, url).then(response => {
+        this.latest_image = response
       }).catch(error => {
         console.log(error.response)
       });
@@ -457,6 +451,10 @@ export default {
 
       // Dispatch the vuex action that refreshes the site status. 
       this.$store.dispatch('observatory/updateStatus', the_active_site)
+
+
+      // Refresh the image
+      this.getImageURL()
     },
 
   },

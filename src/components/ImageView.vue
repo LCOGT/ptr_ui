@@ -10,6 +10,7 @@
                     {{ isSelectable ? "Selectable" : "Not Selectable" }}
                 </b-switch>
             </div>
+            <button class="button" @click="getImageURL">refresh image</button>
             <br>
             <button class="button" @click="getAngle">get angle</button>
             <button class="button" @click="getDimensions">get dimensions</button>
@@ -27,6 +28,7 @@
 import { API, Auth } from 'aws-amplify'
 import { fabric } from 'fabric'
 import wcs from '@/utils/pix2wcs'
+import { mapGetters } from 'vuex'
 
 
 export default {
@@ -44,9 +46,12 @@ export default {
             mouseCoords: [],
             mouseRa: 0,
             mouseDec: 0,
+            latest_image: '',
         }
     },
     beforeMount() {
+        this.getImageURL();
+        /*
         API.post('LambdaNoAuth', '/getimage').then(response => {
             this.cur_img = response.image_url
             console.log(this.cur_img)
@@ -55,8 +60,25 @@ export default {
             console.log(error.response)
             console.log('error with getting image url')
         });
+        */
     },
     methods: {
+        /**
+         * Get the most recent image and set `latest_image` to a 
+         * string url to the image.
+         */
+        getImageURL() {
+            let apiName = 'ptr-api';
+            let url = `/WMD/latest_image/`;
+
+
+            API.get(apiName, url).then(response => {
+                this.cur_img = response
+                this.initCanvas()
+            }).catch(error => {
+                console.log(error.response)
+            });
+        },
         initCanvas() {
             var canvas_config = {
                 backgroundColor: '#555'
@@ -197,6 +219,13 @@ export default {
            this.setSelectable()
        }, 
     },
+    computed: {
+
+        active_site: {
+            get() { return this.$store.getters['device_selection/site'] },
+            set(value) { this.$store.commit('device_selection/setActiveSite', value) }
+        },
+    }
 }
 </script>
 
