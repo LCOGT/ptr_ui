@@ -90,11 +90,17 @@ const getters = {
     },
 
     timestamp: state => parseFloat(state.test.timestamp).toFixed(2),
+    testRootState: (state, getters, rootState) => {
+        return rootState.device_selection.foo
+    },
 }
 
 // actions
 const actions = {
-    updateStatus({ commit }, site) {
+    updateStatus({ commit, rootState}) {
+
+        // Get the active site from the device_selection module
+        let site = rootState.device_selection.selected_site;
 
         // Set empty values if a specific site has not been selected.
         if (site == '') {

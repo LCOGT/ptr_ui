@@ -76,6 +76,7 @@ const getters = {
 
 
     global_config: state => state.global_config,
+    foo: () => "bar",
 }
 
 const actions = {

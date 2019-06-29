@@ -3,10 +3,31 @@
         <div class="column">
             <canvas id="img-canvas" width="716" height="716"> </canvas>
             <div style="display: flex; justify-content: space-between;">
-                <p>ra: {{mouseCoords[0]}}, dec: {{mouseCoords[1]}}</p>
+                <!--p>ra: {{mouseCoords[0]}}, dec: {{mouseCoords[1]}}</p-->
+                <p>mouseX: {{mouseX}}, mouseY: {{mouseY}}</p>
                 <p> {{latest_image_name}} </p>
             </div>
         </div>
+
+        <div class="column is-narrow recent_images">
+
+            <div 
+                class="recent_image" 
+                style="display: flex;"
+                v-for="(item, index) in recent_images" 
+                v-bind:key="index"
+            >
+                <img 
+                    style="width: 60px; height: 60px;"
+                    v-bind:src="item.url"
+                    v-bind:title="item.filename"
+                    @click="setActiveImage(item)"
+                >
+                <p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p>
+            </div>
+                
+        </div>
+
         <div class="column controls">
             <div class="field">
                 <b-switch type="is-info" v-model="isSelectable" >
@@ -14,15 +35,15 @@
                 </b-switch>
             </div>
             <button class="button" @click="getImageURL">refresh image</button>
-            <br>
-            <button class="button" @click="getAngle">get angle</button>
-            <button class="button" @click="getDimensions">get dimensions</button>
-            <br>
-            <button class="button" @click="zoomToFillWindow">zoom to fill window</button>
-            <br>
-            <button class="button" @click="resetCanvas">reset canvas</button>
-            <button class="button" @click="resetImage">reset image</button>
-            <button class="button" @click="resetAll">reset</button>
+            <!--br-->
+            <!--button class="button" @click="getAngle">get angle</button-->
+            <!--button class="button" @click="getDimensions">get dimensions</button-->
+            <!--br-->
+            <!--button class="button" @click="zoomToFillWindow">zoom to fill window</button-->
+            <!--br-->
+            <!--button class="button" @click="resetCanvas">reset canvas</button-->
+            <!--button class="button" @click="resetImage">reset image</button-->
+            <!--button class="button" @click="resetAll">reset</button-->
         </div>
     </div>
 </template>
@@ -40,6 +61,10 @@ export default {
         return {
             latest_image_url: '',
             latest_image_name: '',
+
+            // The image that is selected and visible in the main viewer.
+            active_image: '',
+
             isSelectable: false,
             canvas: {
                 canvas: '',
@@ -48,11 +73,15 @@ export default {
                 crosshairY: '',
             },
             mouseCoords: [],
+            mouseX: 0,
+            mouseY: 0,
             mouseRa: 0,
             mouseDec: 0,
         }
     },
     beforeMount() {
+        this.active_site = 'WMD'
+        this.$store.dispatch('images/refresh_latest_images')
         this.getImageURL();
         /*
         API.post('LambdaNoAuth', '/getimage').then(response => {
@@ -66,6 +95,14 @@ export default {
         */
     },
     methods: {
+
+        setActiveImage(image) {
+            this.latest_image_url = image.url
+            this.latest_image_name = image.filename
+            this.active_image = image.filename
+            this.initCanvas()
+        },
+
         /**
          * Get the most recent image and set `latest_image` to a 
          * string url to the image.
@@ -73,11 +110,11 @@ export default {
         getImageURL() {
             let apiName = 'ptr-api';
             let url = `/${this.active_site}/latest_image/`;
-
+            this.$store.dispatch('images/refresh_latest_images')
 
             API.get(apiName, url).then(response => {
-                this.latest_image_url= response.url
-                this.latest_image_name= response.filename
+                this.latest_image_url= response[0].url
+                this.latest_image_name= response[0].filename
                 this.initCanvas()
             }).catch(error => {
                 console.log(error.response)
@@ -136,7 +173,6 @@ export default {
             }
 
             upper_canvas.addEventListener('contextmenu', startPan)
-
         },
         initImage(image_url) {
             let that = this
@@ -149,6 +185,8 @@ export default {
         },
         getMousePos(event) {
             let mouse = this.canvas.canvas.getPointer(event)
+            this.mouseX = mouse.x
+            this.mouseY = mouse.y
             let res = wcs.pix2wcs(mouse.x, mouse.y)
             this.mouseCoords = res.map(function(each_element) {
                 return Number(each_element).toFixed(3)
@@ -219,9 +257,11 @@ export default {
         },
     },
     watch: {
+        /*
        isSelectable: function (val) {
            this.setSelectable()
        }, 
+       */
     },
     computed: {
 
@@ -229,6 +269,10 @@ export default {
             get() { return this.$store.getters['device_selection/site'] },
             set(value) { this.$store.commit('device_selection/setActiveSite', value) }
         },
+
+        ...mapGetters('images', {
+            recent_images: 'recent_images',
+        }) 
     }
 }
 </script>
@@ -246,5 +290,15 @@ export default {
     margin-top: 5px;
     width: auto;
     
+}
+
+.recent_images {
+    display: flex;
+    flex-direction: column;
+}
+.recent_image {
+    height: 60px;
+    margin: 5px;
+    cursor: pointer;
 }
 </style>

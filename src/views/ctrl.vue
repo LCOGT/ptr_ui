@@ -431,8 +431,8 @@ export default {
 
 
       API.get(apiName, url).then(response => {
-        this.latest_image_url= response.url
-        this.latest_image_name = response.filename
+        this.latest_image_url= response[0].url
+        this.latest_image_name = response[0].filename
       }).catch(error => {
         console.log(error.response)
       });
@@ -446,6 +446,7 @@ export default {
       this.timestamp = parseInt(Date.now() / 1000)
       // The status refresh requires a site to be specified (for the url).
       // Get the active site from the device_selection vuex module.
+      /*
       let the_active_site = this.active_site
       // Handle case when no site has been selected.
       // Note: sending the site '' will return and empty status.
@@ -453,9 +454,10 @@ export default {
         typeof this.active_site=== undefined || this.active_site== 'undefined'
         ? '' 
         : this.active_site)
+        */
 
       // Dispatch the vuex action that refreshes the site status. 
-      this.$store.dispatch('observatory/updateStatus', the_active_site)
+      this.$store.dispatch('observatory/updateStatus')
 
 
       // Refresh the image
