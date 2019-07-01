@@ -183,12 +183,24 @@
 
 
         <b-field horizontal label="Filter">
-            <b-select placeholder="Select filter" v-model="cam_filter" style="width: 100%">
+            <!--b-select placeholder="Select filter" v-model="cam_filter" style="width: 100%">
                 <option value="LUMINANCE">luminance</option>
                 <option value="RED">red</option>
                 <option value="GREEN">green</option>
                 <option value="BLUE">blue</option>
+            </b-select-->
+
+            <b-select placeholder="select filter..." v-model="filter_options_selection" style="width: 100%">
+              <option 
+                v-for="(filter, index) in filter_options"
+                v-bind:value="filter" 
+                v-bind:selected="index === 0"
+                v-bind:key="index"
+                >
+                {{ filter }}
+              </option>
             </b-select>
+
             <div class="buttons has-addons">
               <command-button :data="filter_command" style="width: 60%" />
               <command-button :data="filter_home_command" style="width: 40%" />
@@ -196,11 +208,12 @@
         </b-field>
 
         <b-field horizontal label="Area" v-if="camera_areas.length != 0">
-            <b-select placeholder="Select chip area" v-model="cam_area" style="width: 100%">
+            <b-select placeholder="Select chip area" v-model="camera_areas_selection" style="width: 100%">
               <option
                 v-for="(area, index) in camera_areas"
                 v-bind:value="area"
                 v-bind:selected="index === 0"
+                v-bind:key="index"
                 >
                 {{ area }}
               </option>
@@ -208,7 +221,7 @@
         </b-field>
 
 
-        <b-field horizontal label="Bin">
+        <b-field horizontal label="Bin" v-if="camera_can_bin=='True'">
             <b-field>
             <b-radio-button v-model="cam_bin"
                 native-value="1"
@@ -230,8 +243,8 @@
 
         <br>
         <div class="buttons has-addons">
-        <command-button :data="camera_expose_command" style="width: 70%" />
-        <command-button :data="camera_cancel_command" style="width: 30%" />
+          <command-button :data="camera_expose_command" style="width: 70%" />
+          <command-button :data="camera_cancel_command" style="width: 30%" />
         </div>
 
     </div>
@@ -450,21 +463,6 @@ export default {
         all_focuser_state: 'focuser',
         all_rotator_state: 'rotator',
     }),
-
-    // Getters from the device_selection vuex module.
-    // Available devices and currently active devices are stored here.
-    ...mapGetters('device_selection', [
-        'available_sites',
-        'available_enclosures',
-        'available_mounts',
-        'available_telescopes',
-        'available_rotators',
-        'available_focusers',
-        'available_filters',
-        'available_cameras',
-        'camera_areas',
-        'global_config',
-    ]),
 
     ...mapGetters('images', [
       'current_image',

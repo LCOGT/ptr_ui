@@ -6,6 +6,11 @@ import { mapGetters } from 'vuex'
 
 export const commands_mixin = {
 
+    beforeMount() {
+
+        // Set the initial filter selection
+    },
+
     methods: {
 
         /**
@@ -24,42 +29,41 @@ export const commands_mixin = {
          */
         base_command(device_type, action, name, req_params, opt_params) {
 
-
-        // Get the active device of the requested device type. 
-        let device
-        switch (device_type) {
-            case 'mount':
-            device = this.active_mount;
-            break;
-            case 'camera': 
-            device = this.active_camera;
-            break;
-            case 'filter':
-            device = this.active_filter;
-            break;
-            case 'rotator':
-            device = this.active_rotator;
-            break;
-            case 'focuser':
-            device = this.active_focuser;
-            break;
-        }
-
-        return {
-            name: name,
-            url: `/${this.active_site}/${this.active_mount}/command/`,
-            site: this.active_site,
-            mount: this.active_mount,
-            http_method: 'POST',
-            form: {
-            device: device,
-            type: device_type,
-            timestamp: parseInt(Date.now() / 1000),
-            action: action,
-            required_params: req_params || {},
-            optional_params: opt_params || {},
+            // Get the active device of the requested device type. 
+            let device
+            switch (device_type) {
+                case 'mount':
+                device = this.active_mount;
+                break;
+                case 'camera': 
+                device = this.active_camera;
+                break;
+                case 'filter':
+                device = this.active_filter;
+                break;
+                case 'rotator':
+                device = this.active_rotator;
+                break;
+                case 'focuser':
+                device = this.active_focuser;
+                break;
             }
-        }
+
+            return {
+                name: name,
+                url: `/${this.active_site}/${this.active_mount}/command/`,
+                site: this.active_site,
+                mount: this.active_mount,
+                http_method: 'POST',
+                form: {
+                device: device,
+                type: device_type,
+                timestamp: parseInt(Date.now() / 1000),
+                action: action,
+                required_params: req_params || {},
+                optional_params: opt_params || {},
+                }
+            }
 
         },
     },
@@ -87,8 +91,30 @@ export const commands_mixin = {
             'available_focusers',
             'available_filters',
             'available_cameras',
+
+            // These getters retrieve options in the commands 
+            // (eg. what filters are available)
+            'camera_areas',
+            'filter_options',
+
+            'camera_can_bin',
+
             'global_config',
         ]),
+
+        // Track the currently selected filter in vuex (note: not the device).
+        filter_options_selection: {
+            get() { return this.$store.getters['device_selection/filter_options_selection'] },
+            set(val) { this.$store.commit('device_selection/setFilterSelection', val) }
+        },
+        camera_areas_selection: {
+            get() { return this.$store.getters['device_selection/camera_areas_selection'] },
+            set(val) {this.$store.commit('device_selection/setCameraAreasSelection', val)}
+        },
+        bin_options_selection: {
+            get() { return this.$store.getters['device_selection/bin_options_selection'] },
+            set(val) {this.$store.commit('device_selection/setBinOptionsSelection', val)}
+        },
 
         // The `selected_${device}` computed properties are used for two way
         // binding between vuex (device_selection module) and the device 

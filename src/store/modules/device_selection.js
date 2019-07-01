@@ -66,6 +66,7 @@ const getters = {
     filter: state => state.selected_filter,
     camera: state => state.selected_camera,
 
+    // These getters produce the site-specific data for populating the command forms.
     camera_areas: state => {
         try {
             return state.global_config[state.selected_site].camera[state.selected_camera].settings.area
@@ -73,6 +74,37 @@ const getters = {
             return []
         }
     },
+    camera_areas_selection: state => {
+        try {
+            return state.global_config[state.selected_site].camera[state.selected_camera].settings.area[0]
+        } catch {
+            return []
+        }
+    },
+
+    filter_options: state => {
+        try {
+            return state.global_config[state.selected_site].filter[state.selected_filter].settings.filters
+        } catch {
+            return []
+        }
+    },
+    filter_options_selection: state => {
+        try {
+            return state.global_config[state.selected_site].filter[state.selected_filter].settings.filters[0]
+        } catch {
+            return []
+        }
+    },
+
+    camera_can_bin: state => {
+        try {
+            return state.global_config[state.selected_site].camera[state.selected_camera].settings.can_bin
+        } catch {
+            return 'False'
+        }
+    },
+    
 
 
     global_config: state => state.global_config,
@@ -85,12 +117,21 @@ const actions = {
      * This action gets the most recent config from AWS, which applies to all 
      * observatories in the network. 
      */
-    update_config({ commit }) {
+    update_config({ commit, getters }) {
         let apiName = 'ptr-api';
         let path = '/all/config/';
         API.get(apiName, path).then(response => {
+
             // Save the config to this vuex module.
             commit('setGlobalConfig', response)
+
+            // Set initial values in command fields
+            let filterSelection= getters.filter_options[0]
+            commit('setFilterSelection', filterSelection)
+
+            let areaSelection = getters.camera_areas[0]
+            commit('setCameraAreasSelection', areaSelection)
+
         }).catch(error => {
             console.log(error)
         });
@@ -113,6 +154,9 @@ const mutations = {
     setActiveFocuser(state, focuser) { state.selected_focuser = focuser },
     setActiveFilter(state, filter) { state.selected_filter = filter },
     setActiveCamera(state, camera) { state.selected_camera = camera },
+
+    setFilterSelection(state, filterSelection) { state.filter_options_selection = filterSelection },
+    setCameraAreasSelection(state, areaSelection) { state.camera_areas_selection = areaSelection },
 }
 
 export default {
