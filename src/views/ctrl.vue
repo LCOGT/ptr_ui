@@ -282,11 +282,11 @@
         <!--pre><code>{{ prior_command }}</code></pre-->
 
         <div class="title">Image</div>
-        <button class="button" @click="getImageURL">refresh image</button>
+        <button class="button" @click="update_status">refresh image</button>
         <br>
-        <img v-bind:src="latest_image_url" style="width: 100%; background-color: grey;"></img>
+        <img v-bind:src="current_image.url" style="width: 100%; background-color: grey;"></img>
         <div>Filename:</div>
-        <div>{{latest_image_name}}</div>
+        <div>{{current_image.name}}</div>
         <br>
     </div>
 
@@ -348,7 +348,7 @@ export default {
 
       // This is a setInterval object initialized in `created()`. 
       // Fetches status every few seconds.
-      update_status_interval: '',
+      update_status_interval: 2000,
 
       // If a user enters a value in an input field, that value maps here.
       // When commands are sent, values are read from here.
@@ -385,11 +385,11 @@ export default {
   },
 
   created() {
-    // Every second, we refresh the site status.
+    // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
-    this.update_status_interval = setInterval(this.update_status, 1000)
+    this.update_status_interval = setInterval(this.update_status, 3000)
 
-    // Set the initial devices for convenience.
+    // Default site/device values.
     if (true) {
       this.active_site= 'WMD';
       this.active_enclosure= 'enclosure1';
@@ -422,46 +422,16 @@ export default {
     },
 
     /**
-     * Get the most recent image and set `latest_image_url` to a 
-     * string url to the image.
-     */
-    getImageURL() {
-      let apiName = 'ptr-api';
-      let url = `/${this.active_site}/latest_image/`;
-
-
-      API.get(apiName, url).then(response => {
-        this.latest_image_url= response[0].url
-        this.latest_image_name = response[0].filename
-      }).catch(error => {
-        console.log(error.response)
-      });
-    },
-
-    /**
     * Update status by requesting data from dynamodb via vuex.
     * This function is called regularly in the `created` lifecycle hook.
     */
     update_status() {
-      this.timestamp = parseInt(Date.now() / 1000)
-      // The status refresh requires a site to be specified (for the url).
-      // Get the active site from the device_selection vuex module.
-      /*
-      let the_active_site = this.active_site
-      // Handle case when no site has been selected.
-      // Note: sending the site '' will return and empty status.
-      the_active_site = (
-        typeof this.active_site=== undefined || this.active_site== 'undefined'
-        ? '' 
-        : this.active_site)
-        */
 
       // Dispatch the vuex action that refreshes the site status. 
       this.$store.dispatch('observatory/updateStatus')
 
-
       // Refresh the image
-      this.getImageURL()
+      this.$store.dispatch('images/refresh_latest_images')
     },
 
   },
@@ -495,6 +465,10 @@ export default {
         'camera_areas',
         'global_config',
     ]),
+
+    ...mapGetters('images', [
+      'current_image',
+    ])
   },
   camera_expose_command () {
     return this.base_command( 'camera', 'expose', 'expose',

@@ -272,6 +272,7 @@ export default {
 
         ...mapGetters('images', {
             recent_images: 'recent_images',
+            current_image: 'current_image',
         }) 
     }
 }
