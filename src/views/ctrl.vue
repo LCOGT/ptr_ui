@@ -202,8 +202,8 @@
             </b-select>
 
             <div class="buttons has-addons">
-              <command-button :data="filter_command" style="width: 60%" />
-              <command-button :data="filter_home_command" style="width: 40%" />
+              <command-button :data="filter_command"/>
+              <!--command-button :data="filter_home_command" style="width: 40%" /-->
             </div>
         </b-field>
 
