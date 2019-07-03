@@ -17,6 +17,9 @@ const state = {
     selected_focuser: '',
     selected_filter: '',
     selected_camera: '',
+
+    camera_areas_selection: '',
+    filter_options_selection: '',
 }
 
 const getters = {
@@ -66,7 +69,8 @@ const getters = {
     filter: state => state.selected_filter,
     camera: state => state.selected_camera,
 
-    // These getters produce the site-specific data for populating the command forms.
+    /* These getters are used to customize the control form fields. */
+    // Available camera areas
     camera_areas: state => {
         try {
             return state.global_config[state.selected_site].camera[state.selected_camera].settings.area
@@ -74,14 +78,10 @@ const getters = {
             return []
         }
     },
-    camera_areas_selection: state => {
-        try {
-            return state.global_config[state.selected_site].camera[state.selected_camera].settings.area[0]
-        } catch {
-            return []
-        }
-    },
+    // Current selected camera area.
+    camera_areas_selection: state => state.camera_areas_selection, 
 
+    // Available filters
     filter_options: state => {
         try {
             return state.global_config[state.selected_site].filter[state.selected_filter].settings.filters
@@ -89,14 +89,10 @@ const getters = {
             return []
         }
     },
-    filter_options_selection: state => {
-        try {
-            return state.global_config[state.selected_site].filter[state.selected_filter].settings.filters[0]
-        } catch {
-            return []
-        }
-    },
+    // Currently selected filter
+    filter_options_selection: state => state.filter_options_selection,
 
+    // Does the camera bin or not? Returns string 'True' or 'False'.
     camera_can_bin: state => {
         try {
             return state.global_config[state.selected_site].camera[state.selected_camera].settings.can_bin
@@ -135,6 +131,9 @@ const actions = {
         }).catch(error => {
             console.log(error)
         });
+    },
+    set_default_filter_option({ commit, getters }) {
+        commit('setFilterSelection', getters.filter_options[0])
     },
 
 

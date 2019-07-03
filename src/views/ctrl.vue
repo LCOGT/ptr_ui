@@ -468,17 +468,6 @@ export default {
       'current_image',
     ])
   },
-  camera_expose_command () {
-    return this.base_command( 'camera', 'expose', 'expose',
-      { time: this.cam_exposure },
-      {
-      repeat: this.cam_repeat,
-      bin: this.cam_bin,
-      filter: this.cam_filter,
-      size: this.cam_area,
-      }
-    )
-  },
 
 }
 </script>

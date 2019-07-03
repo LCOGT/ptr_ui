@@ -6,11 +6,6 @@ import { mapGetters } from 'vuex'
 
 export const commands_mixin = {
 
-    beforeMount() {
-
-        // Set the initial filter selection
-    },
-
     methods: {
 
         /**
@@ -49,7 +44,7 @@ export const commands_mixin = {
                 break;
             }
 
-            return {
+            let the_base_command = {
                 name: name,
                 url: `/${this.active_site}/${this.active_mount}/command/`,
                 site: this.active_site,
@@ -64,6 +59,8 @@ export const commands_mixin = {
                 optional_params: opt_params || {},
                 }
             }
+
+            return the_base_command
 
         },
     },
@@ -96,25 +93,27 @@ export const commands_mixin = {
             // (eg. what filters are available)
             'camera_areas',
             'filter_options',
-
             'camera_can_bin',
 
             'global_config',
         ]),
 
-        // Track the currently selected filter in vuex (note: not the device).
+        /**
+         * The `..._selection` computed properties are used for two way
+         * binding between vuex stored state and selections in the command
+         * fields.
+         */
+        // v-model for the filter currently selected
         filter_options_selection: {
             get() { return this.$store.getters['device_selection/filter_options_selection'] },
             set(val) { this.$store.commit('device_selection/setFilterSelection', val) }
         },
+        // v-model for the camera area selection
         camera_areas_selection: {
             get() { return this.$store.getters['device_selection/camera_areas_selection'] },
             set(val) {this.$store.commit('device_selection/setCameraAreasSelection', val)}
         },
-        bin_options_selection: {
-            get() { return this.$store.getters['device_selection/bin_options_selection'] },
-            set(val) {this.$store.commit('device_selection/setBinOptionsSelection', val)}
-        },
+
 
         // The `selected_${device}` computed properties are used for two way
         // binding between vuex (device_selection module) and the device 
@@ -194,13 +193,15 @@ export const commands_mixin = {
          * and url to send it.
          */
         camera_expose_command () {
+            console.log('in cam expose command')
+            console.log(this.filter_options_selection)
             return this.base_command( 'camera', 'expose', 'expose',
                 { time: this.cam_exposure },
                 {
                 repeat: this.cam_repeat,
                 bin: this.cam_bin,
-                filter: this.cam_filter,
-                size: this.cam_area,
+                filter: this.filter_options_selection,
+                size: this.camera_areas_selection,
                 }
             )
         },
@@ -250,7 +251,7 @@ export const commands_mixin = {
         },
         filter_command () {
             return this.base_command( 'filter', 'set_name', 'apply',
-                { filter_name: this.cam_filter },
+                { filter_name: this.filter_options_selection},
             )
         },
         filter_home_command () {
