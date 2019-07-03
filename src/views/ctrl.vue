@@ -203,7 +203,7 @@
 
             <div class="buttons has-addons">
               <command-button :data="filter_command" style="width: 60%" />
-              <command-button :data="filter_home_command" style="width: 40%" />
+              <!--command-button :data="filter_home_command" style="width: 40%" /-->
             </div>
         </b-field>
 
@@ -467,17 +467,6 @@ export default {
     ...mapGetters('images', [
       'current_image',
     ])
-  },
-  camera_expose_command () {
-    return this.base_command( 'camera', 'expose', 'expose',
-      { time: this.cam_exposure },
-      {
-      repeat: this.cam_repeat,
-      bin: this.cam_bin,
-      filter: this.cam_filter,
-      size: this.cam_area,
-      }
-    )
   },
 
 }

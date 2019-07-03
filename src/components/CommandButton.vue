@@ -63,6 +63,7 @@ export default {
                         vm.isLoading = false;
                         console.log('SUCCESS')
                         console.log(response)
+                        console.log(myInit)
                     }).catch(error => {
                         console.log('ERROR')
                         console.log(error)

@@ -67,8 +67,8 @@
 				"Runtime": "nodejs8.10",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "ptr-mock-20190305161614-deployment",
-					"S3Key": "amplify-builds/testapi1lambda-1551831435-latest-build.zip"
+					"S3Bucket": "ptr-mock-dev-20190702162545-deployment",
+					"S3Key": "amplify-builds/testapi1lambda-1562110053-latest-build.zip"
 				}
 			}
 		},
