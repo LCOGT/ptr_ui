@@ -29,11 +29,11 @@
         </div>
 
         <div class="column controls">
-            <div class="field">
+            <!--div class="field">
                 <b-switch type="is-info" v-model="isSelectable" >
                     {{ isSelectable ? "Selectable" : "Not Selectable" }}
                 </b-switch>
-            </div>
+            </div-->
             <button class="button" @click="getImageURL">refresh image</button>
             <!--br-->
             <!--button class="button" @click="getAngle">get angle</button-->
@@ -121,11 +121,12 @@ export default {
             });
         },
         initCanvas() {
+            this.resetCanvas()
             var canvas_config = {
                 backgroundColor: '#555'
             }
 
-
+            
             this.canvas.canvas = new fabric.Canvas('img-canvas', canvas_config)
             
             this.initImage(this.latest_image_url)
@@ -140,10 +141,11 @@ export default {
             var upper_canvas_class = document.getElementsByClassName('upper-canvas')
             var upper_canvas = upper_canvas_class[0]
 
-            var startPan = function(event) {
+            let startPan = function(event) {
 
                 // No right-click menu
                 event.preventDefault();
+
 
                 // Right click only
                 if (event.button != 2) {
@@ -240,8 +242,9 @@ export default {
             this.canvas.canvas.renderAll()
         },
         resetCanvas() {
-            this.canvas.canvas.setZoom(1)
-            this.canvas.canvas.relativePan({ x: 0, y: 0 })
+            if(this.canvas.canvas) {
+                this.canvas.canvas.clear()
+            }
         },
         resetImage() {
             this.canvas.canvas.remove(this.canvas.image)
@@ -255,13 +258,6 @@ export default {
                 queue: false,
             })
         },
-    },
-    watch: {
-        /*
-       isSelectable: function (val) {
-           this.setSelectable()
-       }, 
-       */
     },
     computed: {
 

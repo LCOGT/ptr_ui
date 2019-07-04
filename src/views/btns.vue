@@ -250,7 +250,7 @@ export default {
      * authentication grants access to controls. 
      */
     signIn () {
-      Auth.signIn({ username: 'wmd_admin', password: 'Password1!' })
+      Auth.signIn({ username: 'wmd_admin', password: 'Password1!', region: 'us-west-2' })
         .then(user => {
           console.log(user)
           this.$store.commit('auth/setUser', user)

@@ -20,6 +20,12 @@ Amplify.configure({
     userPoolId: 'us-west-2_gAjMkmuFh',
     userPoolWebClientId: '7uh22ggsabjjusnb8fqdfitkf8',
   },
+  // Disable analytics to fix this bug:
+  // Description: https://github.com/aws-amplify/amplify-js/issues/3484
+  // Solution: https://stackoverflow.com/questions/56680112/bad-request-is-returned-when-amplify-is-configured-for-hosted-ui-in-angular-6/56685607#56685607
+  Analytics:{
+    disabled:true
+  },
 
 
   // API usage docs: https://bit.ly/30n9cTt
@@ -31,10 +37,6 @@ Amplify.configure({
         custom_header: async () => {
           return { Authorization: (await Auth.currentSession()).idToken.jwtToken }
         }
-      },
-      {
-        name: "LambdaNoAuth",
-        endpoint: "https://ubkz32a95c.execute-api.us-west-2.amazonaws.com/dev",
       },
       {
         name: "ptr-api",
@@ -54,13 +56,6 @@ export default {
     TheMenu,
     components
   },
-  created() {
-
-    // Update state information from flask-based server-sent-events stream. 
-    //this.$store.dispatch('observatory/streamSSE')
-    //this.$store.dispatch('observatory/updateStatus')
-
-  }
 }
 </script>
 
