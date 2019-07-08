@@ -205,6 +205,7 @@ export const commands_mixin = {
                     bin: this.cam_bin,
                     filter: this.filter_options_selection,
                     size: this.camera_areas_selection,
+                    dither: this.cam_dither,
                 }
             )
         },

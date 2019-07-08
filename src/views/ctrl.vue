@@ -233,6 +233,16 @@
           </b-select>
         </b-field>
 
+        <b-field horizontal label="Dither">
+          <b-checkbox
+            v-model="cam_dither"
+            true-value="on"
+            false-value="off"
+            >
+            {{ cam_dither }}
+          </b-checkbox>
+        </b-field>
+
         <b-field horizontal label="Bin" v-if="camera_can_bin=='True'">
             <b-field>
             <b-radio-button v-model="cam_bin"
@@ -385,6 +395,7 @@ export default {
       //cam_filter: '',
       cam_area: null,
       cam_bin: '1', 
+      cam_dither: 'off',
       cam_image_type: 'light',
       cam_image_type_options: ['light', 'toss', 'auto focus',  'fine focus', 'dark', 'bias', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
 
