@@ -196,12 +196,15 @@ export const commands_mixin = {
             console.log('in cam expose command')
             console.log(this.filter_options_selection)
             return this.base_command( 'camera', 'expose', 'expose',
-                { time: this.cam_exposure },
+                { 
+                    time: this.cam_exposure,
+                    image_type: this.cam_image_type,
+                },
                 {
-                repeat: this.cam_repeat,
-                bin: this.cam_bin,
-                filter: this.filter_options_selection,
-                size: this.camera_areas_selection,
+                    repeat: this.cam_repeat,
+                    bin: this.cam_bin,
+                    filter: this.filter_options_selection,
+                    size: this.camera_areas_selection,
                 }
             )
         },

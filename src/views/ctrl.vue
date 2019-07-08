@@ -220,6 +220,18 @@
             </b-select>
         </b-field>
 
+        <b-field horizontal label="Image Type">
+          <b-select placeholder="Select image type" v-model="cam_image_type">
+            <option
+              v-for="(image_type, index) in cam_image_type_options"
+              v-bind:value="image_type"
+              v-bind:selected="index === 0"
+              v-bind:key="index"
+              >
+              {{ image_type }}
+            </option>
+          </b-select>
+        </b-field>
 
         <b-field horizontal label="Bin" v-if="camera_can_bin=='True'">
             <b-field>
@@ -370,9 +382,11 @@ export default {
 
       cam_exposure: '1',
       cam_repeat: '1',
-      cam_filter: '',
+      //cam_filter: '',
       cam_area: null,
       cam_bin: '1', 
+      cam_image_type: 'light',
+      cam_image_type_options: ['light', 'toss', 'auto focus',  'fine focus', 'dark', 'bias', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
 
       focus_relative: '',
       focus_absolute: '',
