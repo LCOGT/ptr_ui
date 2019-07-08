@@ -3,8 +3,11 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import './registerServiceWorker'
+
 import Buefy from 'buefy'
 import './style/buefy-styles.scss'
+import '@mdi/font/css/materialdesignicons.css'
+
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import VueSidebarMenu from 'vue-sidebar-menu'
 

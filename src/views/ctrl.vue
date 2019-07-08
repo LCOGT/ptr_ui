@@ -274,10 +274,27 @@
     <!-- Other controls -->
     <div class="column" style="background:#ff8800">
         <div class="title">Focus</div>
-          <div class="buttons has-addons">
-          <command-button :data="focus_home_command" style="width: 50%" />
-          <command-button :data="focus_auto_command" style="width: 50%" />
-          </div>
+
+          <b-dropdown aria-role="list" style="width: 100%;">
+            <button class="button" slot="trigger" style="width: 100%;">
+                <span>Focus Action...</span>
+                <b-icon icon="menu-down"></b-icon>
+            </button>
+            <b-dropdown-item aria-role="listitem">
+              <command-button :data="focus_home_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_auto_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_fine_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_vcurve_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+          </b-dropdown>
+          <br>
+
           <b-field horizontal label="Relative">
             <b-field>
               <b-input name="subject" v-model="focus_relative"></b-input>
@@ -369,6 +386,7 @@ import CommandButton from '@/components/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import ObjectTable from '@/components/ObjectTable'
 import { commands_mixin } from '../mixins/commands_mixin'
+
 
 export default {
   name: 'ctrl',
@@ -543,4 +561,16 @@ export default {
 .label {
   color: #dbdee0;
 }
+
+.dropdown-button-command {
+  width: 100%;
+  border: none;
+  text-align: left;
+}
+.dropdown-button-command:hover {
+  color:grey;
+  font:bolder;
+}
+
+
 </style>

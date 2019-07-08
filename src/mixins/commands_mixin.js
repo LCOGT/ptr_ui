@@ -250,6 +250,12 @@ export const commands_mixin = {
         focus_home_command () {
                 return this.base_command( 'focuser', 'home', 'home' )
         },
+        focus_fine_command () {
+            return this.base_command('focuser', 'fine_focus', 'fine focus' )
+        },
+        focus_vcurve_command () {
+            return this.base_command('focuser', 'v_curve', 'v-curve focus' )
+        },
         focus_stop_command () {
             return this.base_command( 'focuser', 'stop', 'stop' )
         },
