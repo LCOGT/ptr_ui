@@ -1,7 +1,14 @@
 <template>
     <div class="columns">
         <div class="column">
-            <canvas id="img-canvas" width="716" height="716"> </canvas>
+            <!--canvas id="img-canvas" width="716" height="716"> </canvas-->
+
+            <div id="svg_container"></div>
+            <svg id='svg1'>
+                <image style="width: 716px; height: 716px;" :href="latest_image_url"></image>
+                <circle style="fill: #69b3a2" stroke="black" cx=100 cy=100 r=40></circle>
+            </svg>
+
             <div style="display: flex; justify-content: space-between;">
                 <!--p>ra: {{mouseCoords[0]}}, dec: {{mouseCoords[1]}}</p-->
                 <p>mouseX: {{mouseX}}, mouseY: {{mouseY}}</p>
@@ -35,6 +42,7 @@
                 </b-switch>
             </div-->
             <button class="button" @click="getImageURL">refresh image</button>
+            <button class="button" @click="drawCrosshairs">do something</button>
             <!--br-->
             <!--button class="button" @click="getAngle">get angle</button-->
             <!--button class="button" @click="getDimensions">get dimensions</button-->
@@ -53,6 +61,7 @@ import { API, Auth } from 'aws-amplify'
 import { fabric } from 'fabric'
 import wcs from '@/utils/pix2wcs'
 import { mapGetters } from 'vuex'
+import * as d3 from 'd3';
 
 
 export default {
@@ -94,7 +103,44 @@ export default {
         });
         */
     },
+    created() {
+        console.log('hello')
+        this.d3svg()
+        console.log('goodbye')
+
+    },
     methods: {
+
+        drawCrosshairs() {
+            console.log('drawing crosshairs')
+            // create svg element:
+            let svg = d3.select("#svg1").append("svg").attr("width",716).attr("height",716)
+
+            // Add the path using this helper function
+            svg.append('line')
+                .attr('x1', 10)
+                .attr('y1', 10)
+                .attr('x2', 700)
+                .attr('y2', 100)
+                .attr('stroke', 'red')
+        },
+
+        d3svg() {
+
+            console.log('in d3svg')
+            var elem = '#svg'
+
+            var svg1 = d3.select("#svg1")
+                svg.append('circle')
+                .attr('cx', 100)
+                .attr('cy', 100)
+                .attr('r', 50)
+                .attr('stroke', 'black')
+                .attr('fill', '#69a3b2')
+                //.attr('xlink:href', 'http://lorempixel.com/200/200/')
+                //.style("width", "200px")
+                //.style("height", "200px")
+        },
 
         setActiveImage(image) {
             this.latest_image_url = image.url
@@ -297,5 +343,10 @@ export default {
     height: 60px;
     margin: 5px;
     cursor: pointer;
+}
+
+#svg1 {
+    width: 716px;
+    height: 716px;
 }
 </style>
