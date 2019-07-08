@@ -140,7 +140,7 @@
 
     <!-- Mount Controls -->
     <div class="column" style="background: #ff0044;">
-        <div class="title">Slew</div>
+        <div class="title">Mount</div>
 
         <b-field horizontal label="Ra">
           <b-input name="subject" v-model="slew_ra"></b-input>
@@ -149,18 +149,62 @@
           <b-input name="subject" v-model="slew_dec"></b-input>
         </b-field>
 
+        <command-button :data="mount_slew_command"/>
         <br>
-        <div class="buttons has-addons">
-          <command-button :data="mount_slew_command" style="width: 50%" />
-          <command-button :data="mount_stop_command" style="width: 50%" />
-        </div>
+
+        <b-dropdown aria-role="list" style="width: 100%;">
+          <button class="button" slot="trigger" style="width: 100%;">
+              <span>Slew to...</span>
+              <b-icon icon="menu-down"></b-icon>
+          </button>
+          <b-dropdown-item aria-role="listitem">
+            <command-button :data="mount_slew_chart_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_screenflat_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_skyflat_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_home_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_park_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_raSidDec0_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_stop_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+        </b-dropdown>
+
         <br>
+        <div> (or) </div>
+        <br>
+
         <div class="buttons has-addons">
-        <command-button :data="mount_flat_command" style="width: 33%" />
-        <command-button :data="mount_park_command" style="width: 34%" />
-        <command-button :data="mount_home_command" style="width: 33%" />
+          <command-button :data="mount_slew_command" style="width: 100%" />
+          <command-button :data="mount_slew_chart_command" style="width: 100%;" />
         </div>
-        <command-button :data="mount_slew_chart_command" />
+
+        <div class="buttons has-addons">
+          <command-button :data="mount_screenflat_command" style="width: 50%" />
+          <command-button :data="mount_skyflat_command" style="width: 50%" />
+        </div>
+
+        <div class="buttons has-addons">
+          <command-button :data="mount_raSidDec0_command" style="width: 100%"/>
+        </div>
+
+        <div class="buttons has-addons">
+          <command-button :data="mount_home_command" style="width: 50%" />
+          <command-button :data="mount_park_command" style="width: 50%" />
+
+        </div>
+
+        <command-button :data="mount_stop_command" style="width: 100%" />
 
     </div>
 
@@ -202,8 +246,8 @@
             </b-select>
 
             <div class="buttons has-addons">
-              <command-button :data="filter_command"/>
-              <!--command-button :data="filter_home_command" style="width: 40%" /-->
+              <command-button :data="filter_command" style="width: 50%"/>
+              <command-button :data="filter_home_command" style="width: 50%" />
             </div>
         </b-field>
 
@@ -563,9 +607,7 @@ export default {
 }
 
 .dropdown-button-command {
-  width: 100%;
   border: none;
-  text-align: left;
 }
 .dropdown-button-command:hover {
   color:grey;
