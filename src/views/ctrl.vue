@@ -391,7 +391,12 @@
   <!-- Raw status for the active devices -->
   <div class="status">
     <div class="status-item">
-      <div class="title2">Mount</div>
+      <div class="title2">
+        Mount Status  
+        <span v-if="status_age < 10" style="color: lightgreen;"> {{" < 10 seconds old"}} </span>
+        <span v-if="status_age < 120 && status_age > 10" style="color: yellow;">{{" < 2 minutes old"}}</span>
+        <span v-if="status_age > 120" style="color:red;">{{" > 2 minutes old"}}</span>
+      </div>
       <pre><code>{{ JSON.stringify(mount_state,null,2) }}</code></pre>
     </div>
     <div class="status-item">
@@ -447,6 +452,8 @@ export default {
       // Fetches status every few seconds.
       update_status_interval: 2000,
 
+      local_timestamp: Date.now(),
+
       // If a user enters a value in an input field, that value maps here.
       // When commands are sent, values are read from here.
       slew_ra: '',
@@ -488,6 +495,7 @@ export default {
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_status_interval = setInterval(this.update_status, 3000)
+    this.update_time_interval = setInterval(this.update_time, 1000)
 
     // Default site/device values.
     if (true) {
@@ -534,6 +542,10 @@ export default {
       this.$store.dispatch('images/refresh_latest_images')
     },
 
+    update_time() {
+      this.local_timestamp= Date.now()
+    },
+
   },
 
   beforeDestroy() {
@@ -549,11 +561,16 @@ export default {
         all_filter_state: 'filter',
         all_focuser_state: 'focuser',
         all_rotator_state: 'rotator',
+        status_timestamp: 'timestamp',
     }),
 
     ...mapGetters('images', [
       'current_image',
-    ])
+    ]),
+
+    status_age() {
+      return (this.local_timestamp/1000 - this.status_timestamp).toFixed(1)
+    }
   },
 
 }

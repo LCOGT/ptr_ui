@@ -51,12 +51,12 @@ export const commands_mixin = {
                 mount: this.active_mount,
                 http_method: 'POST',
                 form: {
-                device: device,
-                type: device_type,
-                timestamp: parseInt(Date.now() / 1000),
-                action: action,
-                required_params: req_params || {},
-                optional_params: opt_params || {},
+                    device: device,
+                    type: device_type,
+                    timestamp: parseInt(Date.now() / 1000),
+                    action: action,
+                    required_params: req_params || {},
+                    optional_params: opt_params || {},
                 }
             }
 

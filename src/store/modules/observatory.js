@@ -9,6 +9,7 @@ var emptyState = function() {
         rotator: {},
         filter: {},
         enclosure: {},
+        timestamp: '',
 
         focus: {
             timestamp: "",
@@ -57,8 +58,10 @@ const getters = {
     filter: state => state.filter,
     focuser: state => state.focuser,
     rotator: state => state.rotator,
+    timestamp: state => state.timestamp,
 
     foo: state => state.foo,
+
     // Old getters below this comment.
     RightAscension: state => parseFloat(state.mount.RightAscension).toFixed(2),
     Declination: state => parseFloat(state.mount.Declination).toFixed(2),
@@ -110,6 +113,7 @@ const actions = {
             commit('setFocuser', [])
             commit('setFilter', [])
             commit('setRotator', [])
+            commit('setTimestamp', '')
         }
         // Otherwise, refresh the state for the selected site.
         else {
@@ -125,6 +129,7 @@ const actions = {
                 commit('setFocuser', response.content.focuser)
                 commit('setFilter', response.content.filter)
                 commit('setRotator', response.content.rotator)
+                commit('setTimestamp', response.content.timestamp)
                 commit('setTestState', response.content)
             }).catch(error => {
                 console.log(error)
@@ -135,6 +140,7 @@ const actions = {
 
 // mutations
 const mutations = {
+    setTimestamp(state, timestamp) { state.timestamp = timestamp },
     setMount(state, mount) { state.mount = mount },
     setCamera(state, camera) { state.camera = camera },
     setFocuser(state, focuser) { state.focuser = focuser },
