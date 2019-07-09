@@ -180,7 +180,7 @@
           </b-dropdown-item>
         </b-dropdown>
 
-        <br>
+        <!--br>
         <div> (or) </div>
         <br>
 
@@ -204,7 +204,7 @@
 
         </div>
 
-        <command-button :data="mount_stop_command" style="width: 100%" />
+        <command-button :data="mount_stop_command" style="width: 100%" /-->
 
     </div>
 
