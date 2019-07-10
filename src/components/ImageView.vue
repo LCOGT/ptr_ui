@@ -38,6 +38,21 @@
                 <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
             </b-field>
         </div>
+
+        <ul id="context-menu" class="menu">
+            <li class="svg" id="svg-id">SVG Item</li>
+            <li class="circle" id="action-circle-1">Circle item 1</li>
+            <li class="rect" id="action-rect-1">Rect item 1</li>
+            <li class="rect" id="action-rect-2">Rect item 2</li>
+            <li class="circle" id="circle-2">Circle item 2</li>
+            <li class="rect circle svg" id="action-color-select">Color: 
+                <ul>
+                    <li class="color color-1"></li>
+                    <li class="color color-2"></li>
+                </ul>
+            </li>
+        </ul>
+
     </div>
 </template>
 
@@ -46,9 +61,11 @@ import { API, Auth } from 'aws-amplify'
 import wcs from '@/utils/pix2wcs'
 import { mapGetters } from 'vuex'
 import * as d3 from 'd3'
+import { commands_mixin } from '../mixins/commands_mixin'
 
 export default {
     name: 'ImageView',
+    mixins: [commands_mixin],
     data() {
         return {
             latest_image_url: '',
@@ -68,6 +85,11 @@ export default {
 
             show_crosshairs: false,
 
+            // Timer to clear the right click marker after a few seconds.
+            context_marker_timer: '',
+            // Time that right click events stay on the screen.
+            right_click_ttl: 5000,
+
 
 
 
@@ -75,6 +97,7 @@ export default {
     },
     beforeMount() {
         this.active_site = 'WMD'
+        this.active_mount = 'mnt1'
         this.$store.dispatch('images/refresh_latest_images')
         this.getImageURL();
     },
@@ -90,9 +113,86 @@ export default {
                 that.mouseY = coords[1]
             })
         })
+        // Respond to right clicks
+        d3.select(this.image_element).on("contextmenu", function(data, index) {
+            let position = d3.mouse(this);
+            console.log("right click!")
+            that.draw_marker(position[0], position[1])
+            that.$snackbar.open({
+                    duration: that.right_click_ttl,
+                    message: 'Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.',
+                    type: 'is-warning',
+                    position: 'is-bottom-left',
+                    actionText: 'Slew',
+                    queue: false,
+                    onAction: () => {
+                        console.log('slew to '+position[0]+', '+position[1])
+                        that.send_pixels_center_command(position)
+                    }
+                })
+            d3.event.preventDefault();
+        });
     },
 
     methods: {
+
+        send_pixels_center_command(pixels) {
+            let req_params = {
+                x_from_left: pixels[0],
+                y_from_top: pixels[1], 
+            }
+            let opt_params = {}
+            let basecommand = this.base_command('mount', 'center_on_pixels', 'center_on_pixels', req_params, opt_params)
+            let apiName = 'ptr-api'
+            let url = basecommand.url
+            let body = {
+                "body": basecommand.form,
+            }
+            API.post(apiName, url, body).then(response => {
+                console.log("sent pixel center command")
+                console.log(response)
+                console.log(basecommand.form)
+            }).catch(error => {
+                console.log("error with pixel centercommand")
+                console.log(error)
+            })
+        },
+
+        draw_marker(pixelX, pixelY) {
+
+            // Make sure a previous timer doesn't wipe our current right-click marker
+            clearTimeout(this.context_marker_timer)
+
+            // Remove any other right click markers on the screen.
+            this.remove_context_marker();
+
+            // Draw a small cross where user clicks.
+            d3.select(this.image_element).append("line")
+                .attr('class', 'context-marker')
+                .attr('x1', pixelX-7)
+                .attr('y1', pixelY)
+                .attr('x2', pixelX+7)
+                .attr('y2', pixelY)
+                .attr('stroke','red')
+                .attr('stroke-width', 2)
+                .style('fill', 'none')
+            d3.select(this.image_element).append("line")
+                .attr('class', 'context-marker')
+                .attr('x1', pixelX)
+                .attr('y1', pixelY-7)
+                .attr('x2', pixelX)
+                .attr('y2', pixelY+7)
+                .attr('stroke','red')
+                .attr('stroke-width', 2)
+                .style('fill', 'none')
+
+            // Set a timer to clear the marker in a few seconds.
+            this.context_marker_timer = setTimeout(this.remove_context_marker, this.right_click_ttl);
+            
+        },
+        remove_context_marker() {
+            d3.select(this.image_element).selectAll('.context-marker').remove()
+        },
 
         toggleCrosshairs() {
             console.log("toggle crosshairs")
@@ -106,32 +206,19 @@ export default {
                     .attr('x2', this.image_length/2)
                     .attr('y2', this.image_length)
                     .attr('id', 'crosshair_vertical')
-                    .attr('stroke', 'lightblue')
+                    .attr('stroke', 'orange')
                 d3.select(elem).append('line')
                     .attr('y1', this.image_length/2)
                     .attr('x1', 0)
                     .attr('y2', this.image_length/2)
                     .attr('x2', this.image_length)
                     .attr('id', 'crosshair_horizontal')
-                    .attr('stroke', 'lightblue')
+                    .attr('stroke', 'orange')
             } else {
                 d3.select(elem).selectAll('line').remove()
             }
         },
 
-        context_menu() {
-
-            let elem = this.image_element
-
-            d3.select(elem).append('div')
-                .style('position', 'absolute')
-                .style('top', this.mouseY)
-                .style('left', this.mouseX)
-                .style('border', '2px solid green')
-                .style('width', '50px')
-                .style('height', '50px')
-
-        },
 
         setActiveImage(image) {
             this.latest_image_url = image.url
@@ -139,6 +226,7 @@ export default {
             this.active_image = image.filename
             this.initCanvas()
         },
+
 
         /**
          * Get the most recent image and set `latest_image` to a 
@@ -205,4 +293,6 @@ export default {
     width: 768px;
     height: 768px;
 }
+
+
 </style>

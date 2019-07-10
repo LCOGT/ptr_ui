@@ -45,7 +45,7 @@ export const commands_mixin = {
             }
 
             let the_base_command = {
-                name: name,
+                name: name, // used for naming the button
                 url: `/${this.active_site}/${this.active_mount}/command/`,
                 site: this.active_site,
                 mount: this.active_mount,
