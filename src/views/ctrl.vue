@@ -140,7 +140,7 @@
 
     <!-- Mount Controls -->
     <div class="column" style="background: #ff0044;">
-        <div class="title">Slew</div>
+        <div class="title">Mount</div>
 
         <b-field horizontal label="Ra">
           <b-input name="subject" v-model="slew_ra"></b-input>
@@ -149,18 +149,62 @@
           <b-input name="subject" v-model="slew_dec"></b-input>
         </b-field>
 
+        <command-button :data="mount_slew_command"/>
         <br>
-        <div class="buttons has-addons">
-          <command-button :data="mount_slew_command" style="width: 50%" />
-          <command-button :data="mount_stop_command" style="width: 50%" />
-        </div>
+
+        <b-dropdown aria-role="list" style="width: 100%;">
+          <button class="button" slot="trigger" style="width: 100%;">
+              <span>Slew to...</span>
+              <b-icon icon="menu-down"></b-icon>
+          </button>
+          <b-dropdown-item aria-role="listitem">
+            <command-button :data="mount_slew_chart_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_screenflat_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_skyflat_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_home_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_park_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_raSidDec0_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_stop_command" class="dropdown-button-command"/>
+          </b-dropdown-item>
+        </b-dropdown>
+
+        <!--br>
+        <div> (or) </div>
         <br>
+
         <div class="buttons has-addons">
-        <command-button :data="mount_flat_command" style="width: 33%" />
-        <command-button :data="mount_park_command" style="width: 34%" />
-        <command-button :data="mount_home_command" style="width: 33%" />
+          <command-button :data="mount_slew_command" style="width: 100%" />
+          <command-button :data="mount_slew_chart_command" style="width: 100%;" />
         </div>
-        <command-button :data="mount_slew_chart_command" />
+
+        <div class="buttons has-addons">
+          <command-button :data="mount_screenflat_command" style="width: 50%" />
+          <command-button :data="mount_skyflat_command" style="width: 50%" />
+        </div>
+
+        <div class="buttons has-addons">
+          <command-button :data="mount_raSidDec0_command" style="width: 100%"/>
+        </div>
+
+        <div class="buttons has-addons">
+          <command-button :data="mount_home_command" style="width: 50%" />
+          <command-button :data="mount_park_command" style="width: 50%" />
+
+        </div>
+
+        <command-button :data="mount_stop_command" style="width: 100%" /-->
 
     </div>
 
@@ -202,8 +246,8 @@
             </b-select>
 
             <div class="buttons has-addons">
-              <command-button :data="filter_command"/>
-              <!--command-button :data="filter_home_command" style="width: 40%" /-->
+              <command-button :data="filter_command" style="width: 50%"/>
+              <command-button :data="filter_home_command" style="width: 50%" />
             </div>
         </b-field>
 
@@ -220,6 +264,28 @@
             </b-select>
         </b-field>
 
+        <b-field horizontal label="Image Type">
+          <b-select placeholder="Select image type" v-model="cam_image_type">
+            <option
+              v-for="(image_type, index) in cam_image_type_options"
+              v-bind:value="image_type"
+              v-bind:selected="index === 0"
+              v-bind:key="index"
+              >
+              {{ image_type }}
+            </option>
+          </b-select>
+        </b-field>
+
+        <b-field horizontal label="Dither">
+          <b-checkbox
+            v-model="cam_dither"
+            true-value="on"
+            false-value="off"
+            >
+            {{ cam_dither }}
+          </b-checkbox>
+        </b-field>
 
         <b-field horizontal label="Bin" v-if="camera_can_bin=='True'">
             <b-field>
@@ -252,10 +318,27 @@
     <!-- Other controls -->
     <div class="column" style="background:#ff8800">
         <div class="title">Focus</div>
-          <div class="buttons has-addons">
-          <command-button :data="focus_home_command" style="width: 50%" />
-          <command-button :data="focus_auto_command" style="width: 50%" />
-          </div>
+
+          <b-dropdown aria-role="list" style="width: 100%;">
+            <button class="button" slot="trigger" style="width: 100%;">
+                <span>Focus Action...</span>
+                <b-icon icon="menu-down"></b-icon>
+            </button>
+            <b-dropdown-item aria-role="listitem">
+              <command-button :data="focus_home_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_auto_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_fine_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_vcurve_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+          </b-dropdown>
+          <br>
+
           <b-field horizontal label="Relative">
             <b-field>
               <b-input name="subject" v-model="focus_relative"></b-input>
@@ -308,7 +391,12 @@
   <!-- Raw status for the active devices -->
   <div class="status">
     <div class="status-item">
-      <div class="title2">Mount</div>
+      <div class="title2">
+        Mount Status  
+        <span v-if="status_age < 10" style="color: lightgreen;"> {{" < 10 seconds old"}} </span>
+        <span v-else-if="status_age < 120" style="color: yellow;">{{" < 2 minutes old"}}</span>
+        <span v-if="status_age > 120" style="color:red;">{{(status_age/60).toFixed(0)+" minutes old"}}</span>
+      </div>
       <pre><code>{{ JSON.stringify(mount_state,null,2) }}</code></pre>
     </div>
     <div class="status-item">
@@ -348,6 +436,7 @@ import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import ObjectTable from '@/components/ObjectTable'
 import { commands_mixin } from '../mixins/commands_mixin'
 
+
 export default {
   name: 'ctrl',
   components: {
@@ -363,6 +452,8 @@ export default {
       // Fetches status every few seconds.
       update_status_interval: 2000,
 
+      local_timestamp: Date.now(),
+
       // If a user enters a value in an input field, that value maps here.
       // When commands are sent, values are read from here.
       slew_ra: '',
@@ -370,9 +461,12 @@ export default {
 
       cam_exposure: '1',
       cam_repeat: '1',
-      cam_filter: '',
+      //cam_filter: '',
       cam_area: null,
       cam_bin: '1', 
+      cam_dither: 'off',
+      cam_image_type: 'light',
+      cam_image_type_options: ['light', 'toss', 'auto focus',  'fine focus', 'dark', 'bias', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
 
       focus_relative: '',
       focus_absolute: '',
@@ -401,6 +495,7 @@ export default {
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_status_interval = setInterval(this.update_status, 3000)
+    this.update_time_interval = setInterval(this.update_time, 1000)
 
     // Default site/device values.
     if (true) {
@@ -447,6 +542,10 @@ export default {
       this.$store.dispatch('images/refresh_latest_images')
     },
 
+    update_time() {
+      this.local_timestamp= Date.now()
+    },
+
   },
 
   beforeDestroy() {
@@ -462,11 +561,16 @@ export default {
         all_filter_state: 'filter',
         all_focuser_state: 'focuser',
         all_rotator_state: 'rotator',
+        status_timestamp: 'timestamp',
     }),
 
     ...mapGetters('images', [
       'current_image',
-    ])
+    ]),
+
+    status_age() {
+      return (this.local_timestamp/1000 - this.status_timestamp).toFixed(1)
+    }
   },
 
 }
@@ -518,4 +622,14 @@ export default {
 .label {
   color: #dbdee0;
 }
+
+.dropdown-button-command {
+  border: none;
+}
+.dropdown-button-command:hover {
+  color:grey;
+  font:bolder;
+}
+
+
 </style>

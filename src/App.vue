@@ -12,6 +12,7 @@ import awsmobile from './aws-exports';
 import { components } from 'aws-amplify-vue'
 
 
+
 Amplify.configure({
 
   Auth: {

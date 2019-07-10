@@ -1,16 +1,13 @@
 <template>
     <div class="columns">
         <div class="column">
-            <!--canvas id="img-canvas" width="716" height="716"> </canvas-->
 
             <div id="svg_container"></div>
-            <svg id='svg1'>
-                <image style="width: 716px; height: 716px;" :href="latest_image_url"></image>
-                <circle style="fill: #69b3a2" stroke="black" cx=100 cy=100 r=40></circle>
+            <svg id='image_svg'>
+                <image style="width: 768px; height: 768px;" :href="latest_image_url"></image>
             </svg>
 
             <div style="display: flex; justify-content: space-between;">
-                <!--p>ra: {{mouseCoords[0]}}, dec: {{mouseCoords[1]}}</p-->
                 <p>mouseX: {{mouseX}}, mouseY: {{mouseY}}</p>
                 <p> {{latest_image_name}} </p>
             </div>
@@ -36,29 +33,16 @@
         </div>
 
         <div class="column controls">
-            <!--div class="field">
-                <b-switch type="is-info" v-model="isSelectable" >
-                    {{ isSelectable ? "Selectable" : "Not Selectable" }}
-                </b-switch>
-            </div-->
-            <button class="button" @click="getImageURL">refresh image</button>
-            <button class="button" @click="drawCrosshairs">do something</button>
-            <!--br-->
-            <!--button class="button" @click="getAngle">get angle</button-->
-            <!--button class="button" @click="getDimensions">get dimensions</button-->
-            <!--br-->
-            <!--button class="button" @click="zoomToFillWindow">zoom to fill window</button-->
-            <!--br-->
-            <!--button class="button" @click="resetCanvas">reset canvas</button-->
-            <!--button class="button" @click="resetImage">reset image</button-->
-            <!--button class="button" @click="resetAll">reset</button-->
+            <button class="button" @click="getImageURL">refresh images</button>
+            <b-field horizontal label="crosshairs">
+                <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
+            </b-field>
         </div>
     </div>
 </template>
 
 <script>
 import { API, Auth } from 'aws-amplify'
-import { fabric } from 'fabric'
 import wcs from '@/utils/pix2wcs'
 import { mapGetters } from 'vuex'
 import * as d3 from 'd3';
@@ -74,72 +58,64 @@ export default {
             // The image that is selected and visible in the main viewer.
             active_image: '',
 
-            isSelectable: false,
-            canvas: {
-                canvas: '',
-                image: '',
-                crosshairX: '',
-                crosshairY: '',
-            },
-            mouseCoords: [],
+            image_length: 768,
+            image_element: '#image_svg',
+
             mouseX: 0,
             mouseY: 0,
+
             mouseRa: 0,
             mouseDec: 0,
+
+            show_crosshairs: false,
+
+
         }
     },
     beforeMount() {
         this.active_site = 'WMD'
         this.$store.dispatch('images/refresh_latest_images')
         this.getImageURL();
-        /*
-        API.post('LambdaNoAuth', '/getimage').then(response => {
-            this.latest_image_url= response.image_url
-            console.log(this.latest_image_url)
-            this.initCanvas()
-        }).catch(error => {
-            console.log(error.response)
-            console.log('error with getting image url')
-        });
-        */
     },
-    created() {
-        console.log('hello')
-        this.d3svg()
-        console.log('goodbye')
+    mounted() {
 
+        // Track mouse coordinates 
+        let that = this
+        d3.select(this.image_element)
+            .on('mouseover', function(d,i) {
+                d3.select(this).on('mousemove', function(d,i) {
+                let coords = d3.mouse(this)
+                that.mouseX = coords[0]
+                that.mouseY = coords[1]
+            })
+        })
     },
+
     methods: {
 
-        drawCrosshairs() {
-            console.log('drawing crosshairs')
-            // create svg element:
-            let svg = d3.select("#svg1").append("svg").attr("width",716).attr("height",716)
+        toggleCrosshairs() {
+            console.log("toggle crosshairs")
 
-            // Add the path using this helper function
-            svg.append('line')
-                .attr('x1', 10)
-                .attr('y1', 10)
-                .attr('x2', 700)
-                .attr('y2', 100)
-                .attr('stroke', 'red')
-        },
+            let elem = this.image_element
 
-        d3svg() {
-
-            console.log('in d3svg')
-            var elem = '#svg'
-
-            var svg1 = d3.select("#svg1")
-                svg.append('circle')
-                .attr('cx', 100)
-                .attr('cy', 100)
-                .attr('r', 50)
-                .attr('stroke', 'black')
-                .attr('fill', '#69a3b2')
-                //.attr('xlink:href', 'http://lorempixel.com/200/200/')
-                //.style("width", "200px")
-                //.style("height", "200px")
+            if (this.show_crosshairs) {
+                d3.select(elem).append('line')
+                    .attr('x1', this.image_length/2)
+                    .attr('y1', 0)
+                    .attr('x2', this.image_length/2)
+                    .attr('y2', this.image_length)
+                    .attr('id', 'crosshair_vertical')
+                    .attr('stroke', 'red')
+                d3.select(elem).append('line')
+                    .attr('y1', this.image_length/2)
+                    .attr('x1', 0)
+                    .attr('y2', this.image_length/2)
+                    .attr('x2', this.image_length)
+                    .attr('id', 'crosshair_horizontal')
+                    .attr('stroke', 'red')
+            } else {
+                d3.select(elem).selectAll('line').remove()
+            }
         },
 
         setActiveImage(image) {
@@ -166,144 +142,6 @@ export default {
                 console.log(error.response)
             });
         },
-        initCanvas() {
-            this.resetCanvas()
-            var canvas_config = {
-                backgroundColor: '#555'
-            }
-
-            
-            this.canvas.canvas = new fabric.Canvas('img-canvas', canvas_config)
-            
-            this.initImage(this.latest_image_url)
-
-            let that = this
-            this.canvas.canvas.on('mouse:move', function(e) {
-                that.getMousePos(e)
-            })
-
-
-            // Element to detect right clicks. Not part of native fabric.js functionality.
-            var upper_canvas_class = document.getElementsByClassName('upper-canvas')
-            var upper_canvas = upper_canvas_class[0]
-
-            let startPan = function(event) {
-
-                // No right-click menu
-                event.preventDefault();
-
-
-                // Right click only
-                if (event.button != 2) {
-                    return
-                }
-
-                // Get mouse coordinates
-                var x0 = event.screenX
-                var y0 = event.screenY
-
-                function continuePan(event) {
-                    var x = event.screenX
-                    var y = event.screenY
-                    that.canvas.canvas.relativePan({ x: x-x0, y: y-y0 })
-                    x0 = x
-                    y0 = y
-                }
-
-                function stopPan(event) {
-                    window.removeEventListener('mousemove', continuePan)
-                    window.removeEventListener('mouseup', stopPan)
-                }
-
-                window.addEventListener('mousemove', continuePan)
-                window.addEventListener('mouseup', stopPan)
-
-            }
-
-            upper_canvas.addEventListener('contextmenu', startPan)
-        },
-        initImage(image_url) {
-            let that = this
-            fabric.Image.fromURL(image_url, function(img) {
-                that.canvas.image = img
-                that.canvas.image.set('selectable', that.isSelectable)
-                that.canvas.canvas.add(that.canvas.image)
-                console.log('natural width: '+img.width)
-            })
-        },
-        getMousePos(event) {
-            let mouse = this.canvas.canvas.getPointer(event)
-            this.mouseX = mouse.x
-            this.mouseY = mouse.y
-            let res = wcs.pix2wcs(mouse.x, mouse.y)
-            this.mouseCoords = res.map(function(each_element) {
-                return Number(each_element).toFixed(3)
-            })
-        },
-        setSelectable() {
-            this.canvas.image.set({
-                selectable: this.isSelectable,
-                hoverCursor: 'default',
-            })
-            this.canvas.canvas
-                .discardActiveObject()
-                .renderAll()
-        },
-        getDimensions() {
-            let width = this.canvas.image.getScaledWidth()
-            let height = this.canvas.image.getScaledHeight()
-            this.$toast.open({
-                message: 'w: '+width+', h: '+height,
-                queue: false,
-            })
-            console.log('natural width: '+this.canvas.image.width)
-        },
-        getAngle() {
-            let angle = this.canvas.image.get('angle')
-            this.$toast.open({
-                message: 'Angle: '+parseFloat(angle).toFixed(1)+' degrees',
-                queue: false,
-            })
-        },
-        scaleImage100() {
-            this.canvas.image.scale(1)
-            this.canvas.canvas.renderAll()
-        },
-        setZoom() {
-            let img_width = this.canvas.image.width
-            let canvas_width = this.canvas.canvas.width
-            this.canvas.canvas.setZoom(canvas_width/img_width)
-        },
-        zoomToFillWindow() {
-            this.resetAll()
-            let naturalWidth = this.canvas.image.width
-            let naturalHeight = this.canvas.image.height
-            this.canvas.image.set({
-                angle: 0,
-                top: 0,
-                left: 0,
-            })
-            this.canvas.image.scale(1)
-            this.canvas.canvas.setZoom(this.canvas.canvas.width / this.canvas.image.width)
-            this.canvas.canvas.renderAll()
-        },
-        resetCanvas() {
-            if(this.canvas.canvas) {
-                this.canvas.canvas.clear()
-            }
-        },
-        resetImage() {
-            this.canvas.canvas.remove(this.canvas.image)
-            this.initImage(this.latest_image_url)
-        },
-        resetAll() {
-            this.resetImage()
-            this.resetCanvas()
-            this.$toast.open({
-                message: 'reset all',
-                queue: false,
-            })
-        },
     },
     computed: {
 
@@ -329,6 +167,9 @@ export default {
     flex-direction: column;
     align-items: flex-start;
 }
+.controls > * {
+    margin-bottom: 1em;
+}
 .button {
     margin-top: 5px;
     width: auto;
@@ -345,8 +186,8 @@ export default {
     cursor: pointer;
 }
 
-#svg1 {
-    width: 716px;
-    height: 716px;
+#image_svg {
+    width: 768px;
+    height: 768px;
 }
 </style>

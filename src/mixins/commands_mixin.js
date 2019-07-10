@@ -51,12 +51,12 @@ export const commands_mixin = {
                 mount: this.active_mount,
                 http_method: 'POST',
                 form: {
-                device: device,
-                type: device_type,
-                timestamp: parseInt(Date.now() / 1000),
-                action: action,
-                required_params: req_params || {},
-                optional_params: opt_params || {},
+                    device: device,
+                    type: device_type,
+                    timestamp: parseInt(Date.now() / 1000),
+                    action: action,
+                    required_params: req_params || {},
+                    optional_params: opt_params || {},
                 }
             }
 
@@ -193,15 +193,17 @@ export const commands_mixin = {
          * and url to send it.
          */
         camera_expose_command () {
-            console.log('in cam expose command')
-            console.log(this.filter_options_selection)
             return this.base_command( 'camera', 'expose', 'expose',
-                { time: this.cam_exposure },
+                { 
+                    time: this.cam_exposure,
+                    image_type: this.cam_image_type,
+                },
                 {
-                repeat: this.cam_repeat,
-                bin: this.cam_bin,
-                filter: this.filter_options_selection,
-                size: this.camera_areas_selection,
+                    repeat: this.cam_repeat,
+                    bin: this.cam_bin,
+                    filter: this.filter_options_selection,
+                    size: this.camera_areas_selection,
+                    dither: this.cam_dither,
                 }
             )
         },
@@ -209,7 +211,7 @@ export const commands_mixin = {
             return this.base_command( 'camera', 'stop', 'cancel' )
         },
         mount_slew_command () {
-            return this.base_command( 'mount', 'go', 'slew here',
+            return this.base_command( 'mount', 'go', 'slew to coordinates',
                 { ra: this.slew_ra, dec: this.slew_dec, }
             )
         },
@@ -219,7 +221,7 @@ export const commands_mixin = {
             )
         },
         mount_stop_command () {
-            return this.base_command( 'mount', 'stop', 'cancel' )
+            return this.base_command( 'mount', 'stop', 'stop movement' )
         },
         mount_park_command () {
             return this.base_command( 'mount', 'park', 'park' )
@@ -227,8 +229,15 @@ export const commands_mixin = {
         mount_home_command () {
             return this.base_command( 'mount', 'home', 'home' )
         },
-        mount_flat_command () {
-            return this.base_command( 'mount', 'flat-panel', 'flats')
+        mount_screenflat_command () {
+            return this.base_command( 'mount', 'screen_flat_position', 'screen flat position')
+        },
+        mount_skyflat_command () {
+            return this.base_command( 'mount', 'sky_flat_position', 'sky flat position')
+        },
+        // TODO: replace raSidDec0 with a sensible name and provide coordinates from frontend.
+        mount_raSidDec0_command () {
+            return this.base_command( 'mount', 'ra=sid, dec=0', 'ra=sid, dec=0')
         },
         focus_relative_command () {
             return this.base_command( 'focuser', 'move_relative', 'focus',
@@ -245,6 +254,12 @@ export const commands_mixin = {
         },
         focus_home_command () {
                 return this.base_command( 'focuser', 'home', 'home' )
+        },
+        focus_fine_command () {
+            return this.base_command('focuser', 'fine_focus', 'fine focus' )
+        },
+        focus_vcurve_command () {
+            return this.base_command('focuser', 'v_curve', 'v-curve focus' )
         },
         focus_stop_command () {
             return this.base_command( 'focuser', 'stop', 'stop' )
