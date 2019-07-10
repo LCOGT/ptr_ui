@@ -4,7 +4,7 @@
 
             <div id="svg_container"></div>
             <svg id='image_svg'>
-                <image style="width: 768px; height: 768px;" :href="latest_image_url"></image>
+                <image  style="width: 768px; height: 768px;" :href="latest_image_url"></image>
             </svg>
 
             <div style="display: flex; justify-content: space-between;">
@@ -45,8 +45,7 @@
 import { API, Auth } from 'aws-amplify'
 import wcs from '@/utils/pix2wcs'
 import { mapGetters } from 'vuex'
-import * as d3 from 'd3';
-
+import * as d3 from 'd3'
 
 export default {
     name: 'ImageView',
@@ -68,6 +67,8 @@ export default {
             mouseDec: 0,
 
             show_crosshairs: false,
+
+
 
 
         }
@@ -105,17 +106,31 @@ export default {
                     .attr('x2', this.image_length/2)
                     .attr('y2', this.image_length)
                     .attr('id', 'crosshair_vertical')
-                    .attr('stroke', 'red')
+                    .attr('stroke', 'lightblue')
                 d3.select(elem).append('line')
                     .attr('y1', this.image_length/2)
                     .attr('x1', 0)
                     .attr('y2', this.image_length/2)
                     .attr('x2', this.image_length)
                     .attr('id', 'crosshair_horizontal')
-                    .attr('stroke', 'red')
+                    .attr('stroke', 'lightblue')
             } else {
                 d3.select(elem).selectAll('line').remove()
             }
+        },
+
+        context_menu() {
+
+            let elem = this.image_element
+
+            d3.select(elem).append('div')
+                .style('position', 'absolute')
+                .style('top', this.mouseY)
+                .style('left', this.mouseX)
+                .style('border', '2px solid green')
+                .style('width', '50px')
+                .style('height', '50px')
+
         },
 
         setActiveImage(image) {
