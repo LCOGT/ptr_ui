@@ -1,59 +1,47 @@
 <template>
-    <div class="columns">
-        <div class="column">
+    <div id="component" ><div id="component-1">
 
-            <div id="svg_container"></div>
-            <svg id='image_svg'>
-                <image  style="width: 768px; height: 768px;" :href="latest_image_url"></image>
-            </svg>
-
-            <div style="display: flex; justify-content: space-between;">
-                <p>mouseX: {{mouseX}}, mouseY: {{mouseY}}</p>
-                <p> {{latest_image_name}} </p>
-            </div>
-        </div>
-
-        <div class="column is-narrow recent_images">
-
-            <div 
-                class="recent_image" 
-                style="display: flex;"
-                v-for="(item, index) in recent_images" 
-                v-bind:key="index"
-            >
-                <img 
-                    style="width: 60px; height: 60px;"
-                    v-bind:src="item.url"
-                    v-bind:title="item.filename"
-                    @click="setActiveImage(item)"
-                >
-                <p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p>
-            </div>
-                
-        </div>
-
-        <div class="column controls">
-            <button class="button" @click="getImageURL">refresh images</button>
-            <b-field horizontal label="crosshairs">
-                <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
-            </b-field>
-        </div>
-
-        <ul id="context-menu" class="menu">
-            <li class="svg" id="svg-id">SVG Item</li>
-            <li class="circle" id="action-circle-1">Circle item 1</li>
-            <li class="rect" id="action-rect-1">Rect item 1</li>
-            <li class="rect" id="action-rect-2">Rect item 2</li>
-            <li class="circle" id="circle-2">Circle item 2</li>
-            <li class="rect circle svg" id="action-color-select">Color: 
-                <ul>
-                    <li class="color color-1"></li>
-                    <li class="color color-2"></li>
-                </ul>
-            </li>
-        </ul>
-
+    <div class="controls">
+        <button class="button" @click="getImageURL">refresh images</button>
+        <b-field horizontal label="crosshairs">
+            <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
+        </b-field>
     </div>
+
+    <div class="image-div">
+
+        <div id="svg_container"></div>
+        <svg id='image_svg'>
+            <image  style="width: 768px; height: 768px;" :href="latest_image_url"></image>
+        </svg>
+
+        <div style="display: flex; justify-content: space-between;">
+            <p>mouseX: {{mouseX}}, mouseY: {{mouseY}}</p>
+            <p> {{latest_image_name}} </p>
+        </div>
+    </div>
+
+
+    <!--div class="column is-narrow recent_images"-->
+    <div class="recent_images">
+
+        <div 
+            class="recent_image" 
+            style="display: flex;"
+            v-for="(item, index) in recent_images" 
+            v-bind:key="index"
+        >
+            <img 
+                style="width: 60px; height: 60px;"
+                v-bind:src="item.url"
+                v-bind:title="item.filename"
+                @click="setActiveImage(item)"
+            >
+            <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
+        </div>
+            
+    </div>
+    </div></div>
 </template>
 
 <script>
@@ -124,7 +112,7 @@ export default {
                     type: 'is-warning',
                     position: 'is-bottom-left',
                     actionText: 'Slew',
-                    queue: false,
+                    queue:false,
                     onAction: () => {
                         console.log('slew to '+position[0]+', '+position[1])
                         that.send_pixels_center_command(position)
@@ -224,7 +212,6 @@ export default {
             this.latest_image_url = image.url
             this.latest_image_name = image.filename
             this.active_image = image.filename
-            this.initCanvas()
         },
 
 
@@ -262,16 +249,27 @@ export default {
 </script>
 
 <style scoped>
-.columns {
-    border: 1px white solid;
+#component {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width: 798px;
+    margin: 0 auto;
+}
+#component-1 {
+    display: block;
+    padding: 15px;
+    background-color:rgba(0, 0, 0, 0.8);
 }
 .controls {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
+    vertical-align: middle;
+    justify-content: space-between;
 }
 .controls > * {
-    margin-bottom: 1em;
+    margin: 1em;
 }
 .button {
     margin-top: 5px;
@@ -279,13 +277,22 @@ export default {
     
 }
 
+.image-div {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
 .recent_images {
     display: flex;
-    flex-direction: column;
+    flex-direction:row;
+    border-top: 1px solid white;
+    padding-top: 2em;
+    padding-bottom: 2em;
 }
 .recent_image {
     height: 60px;
     margin: 5px;
+    margin-left: 0;
     cursor: pointer;
 }
 

@@ -380,7 +380,13 @@
         <div class="title">Image</div>
         <button class="button" @click="update_status">refresh image</button>
         <br>
-        <img v-bind:src="current_image.url" style="width: 100%; background-color: grey;"></img>
+        <img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img>
+        <b-modal :active.sync="isImageModalActive" :width="1260">
+            <p class="image">
+                <!--img v-bind:src="current_image.url"-->
+                <image-view />
+            </p>
+        </b-modal>
         <div>Filename:</div>
         <div>{{current_image.name}}</div>
         <br>
@@ -435,6 +441,7 @@ import CommandButton from '@/components/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import ObjectTable from '@/components/ObjectTable'
 import { commands_mixin } from '../mixins/commands_mixin'
+import ImageView from '@/components/ImageView'
 
 
 export default {
@@ -443,6 +450,7 @@ export default {
     CommandButton,
     TheSkyChart,
     ObjectTable,
+    ImageView,
   },
   mixins: [commands_mixin],
   data () {
@@ -477,6 +485,9 @@ export default {
 
       // This is displayed as the prior command. Updated on button click.
       prior_command: null,
+
+      // Controls the toggle for image preview modal.
+      isImageModalActive: false,
 
       latest_image_url: '',
       latest_image_name: '',
@@ -629,6 +640,17 @@ export default {
 .dropdown-button-command:hover {
   color:grey;
   font:bolder;
+}
+
+.modal-dialog {
+    max-width: 100%;
+    margin: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 110vh;
+    display: flex;
 }
 
 
