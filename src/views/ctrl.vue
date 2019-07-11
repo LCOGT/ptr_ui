@@ -378,7 +378,7 @@
         <!--pre><code>{{ prior_command }}</code></pre-->
 
         <div class="title">Image</div>
-        <button class="button" @click="update_status">refresh image</button>
+        <button class="button" @click="getLatestImage">latest image</button>
         <br>
         <img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img>
         <b-modal :active.sync="isImageModalActive" :width="1260">
@@ -388,7 +388,7 @@
             </p>
         </b-modal>
         <div>Filename:</div>
-        <div>{{current_image.name}}</div>
+        <div>{{current_image.filename}}</div>
         <br>
     </div>
 
@@ -490,11 +490,6 @@ export default {
       // Controls the toggle for image preview modal.
       isImageModalActive: false,
 
-      latest_image_url: '',
-      latest_image_name: '',
-      download_path: '',
-      
-
     }
   },
 
@@ -541,6 +536,10 @@ export default {
       });
     },
 
+    getLatestImage() {
+      this.$store.dispatch('images/set_latest_image')
+    },
+
     /**
     * Update status by requesting data from dynamodb via vuex.
     * This function is called regularly in the `created` lifecycle hook.
@@ -550,8 +549,9 @@ export default {
       // Dispatch the vuex action that refreshes the site status. 
       this.$store.dispatch('observatory/updateStatus')
 
-      // Refresh the image
+      // Refresh the image list
       this.$store.dispatch('images/refresh_latest_images')
+
     },
 
     update_time() {

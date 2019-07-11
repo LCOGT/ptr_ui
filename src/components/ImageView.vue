@@ -2,7 +2,7 @@
     <div id="component" ><div id="component-1">
 
     <div class="controls">
-        <button class="button" @click="getImageURL">refresh images</button>
+        <button class="button" @click="setLatestImage">latest image</button>
         <b-field horizontal label="crosshairs">
             <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
         </b-field>
@@ -12,12 +12,12 @@
 
         <div id="svg_container"></div>
         <svg id='image_svg'>
-            <image  style="width: 768px; height: 768px;" :href="latest_image_url"></image>
+            <image  style="width: 768px; height: 768px;" :href="current_image.url"></image>
         </svg>
 
         <div style="display: flex; justify-content: space-between;">
             <p>mouseX: {{mouseX}}, mouseY: {{mouseY}}</p>
-            <p> {{latest_image_name}} </p>
+            <p> {{current_image.filename}} </p>
         </div>
     </div>
 
@@ -35,7 +35,9 @@
                 style="width: 60px; height: 60px;"
                 v-bind:src="item.url"
                 v-bind:title="item.filename"
+                v-bind:class="{'selected_thumbnail' : item.url == current_image.url}"
                 @click="setActiveImage(item)"
+
             >
             <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
         </div>
@@ -56,8 +58,6 @@ export default {
     mixins: [commands_mixin],
     data() {
         return {
-            latest_image_url: '',
-            latest_image_name: '',
 
             // The image that is selected and visible in the main viewer.
             active_image: '',
@@ -71,10 +71,12 @@ export default {
             mouseRa: 0,
             mouseDec: 0,
 
+            // This is modified by the crosshairs switch and controls whether the crosshairs are visible.
             show_crosshairs: false,
 
-            // Timer to clear the right click marker after a few seconds.
+            // Timer (setTimeout object) to clear the right click marker after a few seconds.
             context_marker_timer: '',
+
             // Time that right click events stay on the screen.
             right_click_ttl: 5000,
 
@@ -84,29 +86,31 @@ export default {
         }
     },
     beforeMount() {
+        // TODO: create a cleaner system of tracking the active site and devices.
         this.active_site = 'WMD'
         this.active_mount = 'mnt1'
         this.$store.dispatch('images/refresh_latest_images')
-        this.getImageURL();
     },
     mounted() {
 
-        // Track mouse coordinates 
         let that = this
         d3.select(this.image_element)
+
+            // Track mouse coordinates 
             .on('mouseover', function(d,i) {
                 d3.select(this).on('mousemove', function(d,i) {
                 let coords = d3.mouse(this)
                 that.mouseX = coords[0]
                 that.mouseY = coords[1]
+                })
             })
-        })
-        // Respond to right clicks
-        d3.select(this.image_element).on("contextmenu", function(data, index) {
-            let position = d3.mouse(this);
-            console.log("right click!")
-            that.draw_marker(position[0], position[1])
-            that.$snackbar.open({
+
+            // Respond to right clicks
+            .on("contextmenu", function(data, index) {
+                let position = d3.mouse(this);
+                console.log("right click!")
+                that.draw_marker(position[0], position[1])
+                that.$snackbar.open({
                     duration: that.right_click_ttl,
                     message: 'Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.',
                     type: 'is-warning',
@@ -115,19 +119,22 @@ export default {
                     queue:false,
                     onAction: () => {
                         console.log('slew to '+position[0]+', '+position[1])
-                        that.send_pixels_center_command(position)
+                        that.send_pixels_center_command(position, that.current_image.filename)
                     }
                 })
-            d3.event.preventDefault();
-        });
+
+                // Don't open the usual right-click menu
+                d3.event.preventDefault();
+            });
     },
 
     methods: {
 
-        send_pixels_center_command(pixels) {
+        send_pixels_center_command(pixels, filename) {
             let req_params = {
                 x_from_left: pixels[0],
                 y_from_top: pixels[1], 
+                filename: filename,
             }
             let opt_params = {}
             let basecommand = this.base_command('mount', 'center_on_pixels', 'center_on_pixels', req_params, opt_params)
@@ -207,31 +214,18 @@ export default {
             }
         },
 
-
+        // Activated by clicking on an image thumbnail. Displays that image
+        // in the main view.
         setActiveImage(image) {
-            this.latest_image_url = image.url
-            this.latest_image_name = image.filename
-            this.active_image = image.filename
+            this.$store.dispatch('images/set_current_image', image)
         },
 
-
-        /**
-         * Get the most recent image and set `latest_image` to a 
-         * string url to the image.
-         */
-        getImageURL() {
-            let apiName = 'ptr-api';
-            let url = `/${this.active_site}/latest_image/`;
+        // Display the latest image in the view.
+        setLatestImage() {
             this.$store.dispatch('images/refresh_latest_images')
-
-            API.get(apiName, url).then(response => {
-                this.latest_image_url= response[0].url
-                this.latest_image_name= response[0].filename
-                this.initCanvas()
-            }).catch(error => {
-                console.log(error.response)
-            });
+            this.$store.dispatch('images/set_latest_image')
         },
+
     },
     computed: {
 
@@ -243,7 +237,9 @@ export default {
         ...mapGetters('images', {
             recent_images: 'recent_images',
             current_image: 'current_image',
-        }) 
+        }),
+
+
     }
 }
 </script>
@@ -259,7 +255,7 @@ export default {
 #component-1 {
     display: block;
     padding: 15px;
-    background-color:rgba(0, 0, 0, 0.8);
+    background-color:rgba(24,30,30,0.8);
 }
 .controls {
     display: flex;
@@ -294,6 +290,9 @@ export default {
     margin: 5px;
     margin-left: 0;
     cursor: pointer;
+}
+.selected_thumbnail {
+    border: 1px solid gold;
 }
 
 #image_svg {
