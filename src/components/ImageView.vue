@@ -35,7 +35,7 @@
                 style="width: 60px; height: 60px;"
                 v-bind:src="item.url"
                 v-bind:title="item.filename"
-                v-bind:class="{'selected_thumbnail' : item.url == current_image.url}"
+                v-bind:class="{'selected_thumbnail' : item.filename == current_image.filename}"
                 @click="setActiveImage(item)"
 
             >
