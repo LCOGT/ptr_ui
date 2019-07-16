@@ -2,7 +2,7 @@ import helpers from '@/utils/helpers'
 
 var configs = {
 
-    /* NOTE: lat-lon temporary fix with hardcoded value. Get these from state. */
+    /* TODO: lat-lon temporary fix with hardcoded value. Get these from state. */
     lat: 34,//$('#static-state').data('lat');
     lon: -119,//$('#static-state').data('lon');
 
@@ -26,7 +26,7 @@ var configs = {
         lang: "",           // Language for names, so far only for constellations: de: german, es: spanish
                             // Default:en or empty string for english
         container: "celestial-map",   // ID of parent element, e.g. div
-        datapath: "../data",  // Path/URL to data files, empty = subfolder 'data'
+        datapath: "/data",  // Path/URL to data files, empty = subfolder 'data'
         stars: {
             show:true,    // Show stars
             limit: 3,      // Show only stars brighter than limit magnitude

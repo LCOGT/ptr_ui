@@ -29,25 +29,29 @@ const router = new VueRouter({
   linkExactActiveClass: 'is-active',
   base: process.env.BASE_URL,
   routes: [
+    { path: '*', redirect: '/' },
     { path: '/', name: 'home', component: Home },
     { path: '/register', name: 'register', component: Register },
     { path: '/login', name: 'login', component: Login },
     { path: '/profile', name: 'profile', meta: { requiresAuth: true }, component: Profile },
-    { path: '*', redirect: '/' },
     { path: '/about', name: 'about', component: About },
     { path: '/btns', name: 'btns', component: btns},
     { path: '/imgs', name: 'imgs', component: imgs},
     { path: '/skymap', name: 'skymap', component: skymap},
     { path: '/ctrl', name: 'ctrl', component:ctrl},
-    { path: '/ux1', name: 'ux1', component:ux1},
+    { 
+      path: '/ux1/:sitecode/:subpage', 
+      name: 'ux1', 
+      component:ux1,
+      props: true,
+    },
 
-    
     {
       path: '/site/:sitecode',
       name: 'site',
       component: Site,
       props: true,
-    }
+    },
   ]
 })
 

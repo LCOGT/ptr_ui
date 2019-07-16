@@ -138,7 +138,7 @@ export default {
             }
 
             Celestial.clear();
-            Celestial.add({type:"json", file:"../data/all_objects.json", callback: function(error,json) {
+            Celestial.add({type:"json", file:"/data/all_objects.json", callback: function(error,json) {
                 if (error) {return console.warn(error);}
 
                 var sky_objects = Celestial.getData(json, mapConfigs.config.transform);
