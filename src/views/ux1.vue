@@ -32,7 +32,6 @@
       <subpage-home v-if="subpage == 'home'" />
       <subpage-targets v-if="subpage == 'targets'" />
       <subpage-data v-if="subpage == 'data'" />
-      {{ subpage }} 
     </div>
 
 
@@ -92,7 +91,8 @@ export default {
 
     // Set the initial devices for convenience.
     if (true) {
-      this.selected_site = 'site4';
+      this.selected_site = this.sitecode;
+      console.log('selected site')
       this.selected_mount = 'mount1';
       this.selected_telescope = 't1';
       this.selected_camera = 'cam1';
@@ -109,10 +109,10 @@ export default {
 .menu-column {
   border-right: var(--light-grey) 1px solid;
   width: 180px;
+  height: auto;
 }
 .content {
-  border-right: var(--light-grey) 1px solid;
-  padding: 0 2em;
+  padding: 0 4em;
 }
 
 .page {
