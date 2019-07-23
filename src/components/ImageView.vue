@@ -12,7 +12,7 @@
 
         <div id="svg_container"></div>
         <svg id='image_svg'>
-            <image  style="width: 768px; height: 768px;" :href="current_image.url"></image>
+            <image :href="current_image.url" width="768" height="768"></image>
         </svg>
 
         <div style="display: flex; justify-content: space-between;">
