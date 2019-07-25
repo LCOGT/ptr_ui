@@ -380,8 +380,15 @@
         <div class="title">Image</div>
         <button class="button" @click="getLatestImage">latest image</button>
         <br>
-        <img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img>
-        <b-modal :active.sync="isImageModalActive" :width="1260">
+            <div style="width:100%;height:0; padding-top:50%;position:relative; background-fill: yellow;">
+                <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
+                <img
+                    v-bind:src="current_image.url" 
+                    @click="isImageModalActive = true" 
+                    style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
+            </div>
+        <!--img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img-->
+        <b-modal :active.sync="isImageModalActive" :width="800">
             <p class="image">
                 <!--img v-bind:src="current_image.url"-->
                 <image-view />
@@ -402,7 +409,8 @@
         <span v-if="status_age < 10" style="color: lightgreen;"> {{" < 10 seconds old"}} </span>
         <span v-else-if="status_age < 120" style="color: yellow;">{{" < 2 minutes old"}}</span>
         <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+" minutes old"}}</span>
-        <span v-else-if="status_age >= 3600" style="color:red;">{{(status_age/3600).toFixed(0)+" hours old"}}</span>
+        <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+" hours old"}}</span>
+        <span v-else-if="status_age >= 86400" style="color:red;">{{(status_age/86400).toFixed(0)+" days old"}}</span>
       </div>
       <pre><code>{{ JSON.stringify(mount_state,null,2) }}</code></pre>
     </div>

@@ -1,32 +1,51 @@
 
 
-<template><div class="page">
+<template><div>
+  
+  <section class="page">
 
   <div style="height: 5em"></div>
   <div class="columns">
 
-    <b-menu class="column is-narrow menu-column">
-      <b-menu-list label="Menu">
-          <!--b-menu-item icon="home" label="Site Home"></b-menu-item-->
-          <!--b-menu-item icon="target" label="Target Explorer"></b-menu-item-->
-          <!--b-menu-item icon="folder-multiple-image" label="Data & Images"></b-menu-item-->
-          <router-link 
-            :to="'/ux1/' + sitecode + '/home'" 
-            class="navbar-item"> 
-            Site Home 
-          </router-link>
-          <router-link 
-            :to="'/ux1/' + sitecode + '/targets'" 
-            class="navbar-item"> 
-            Target Explorer 
-          </router-link>
-          <router-link 
-            :to="'/ux1/' + sitecode + '/data'" 
-            class="navbar-item"> 
-            Data & Images 
-          </router-link>
-      </b-menu-list>
-    </b-menu>
+    <div class="column is-narrow menu-column">
+      <b-menu>
+        <b-menu-list label="Menu">
+            <!--b-menu-item icon="home" label="Site Home"></b-menu-item-->
+            <!--b-menu-item icon="target" label="Target Explorer"></b-menu-item-->
+            <!--b-menu-item icon="folder-multiple-image" label="Data & Images"></b-menu-item-->
+            <router-link 
+              :to="'/ux1/' + sitecode + '/home'" 
+              class="navbar-item"> 
+              Site Home 
+            </router-link>
+            <router-link 
+              :to="'/ux1/' + sitecode + '/targets'" 
+              class="navbar-item"> 
+              Target Explorer 
+            </router-link>
+            <router-link 
+              :to="'/ux1/' + sitecode + '/data'" 
+              class="navbar-item"> 
+              Data & Images 
+            </router-link>
+        </b-menu-list>
+      </b-menu>
+      <div style="height: 300px"></div>
+      <div class="menu-label"> telescope status </div>
+      <div class="left-status-box">
+
+        <div>
+          <p class="heading">Right Ascension</p>
+          <p class="title">12.324</p>
+        </div>
+
+        <div>
+          <p class="heading">Declination</p>
+          <p class="title">76.52</p>
+        </div>
+
+      </div>
+    </div>
 
     <div class="column content">
       <subpage-home v-if="subpage == 'home'" />
@@ -38,9 +57,18 @@
 
   </div>
 
-  <div class="footer-container">
-    <footer>footer</footer>
-  </div>
+  </section>
+
+
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        You are currently observing from site 
+        <span class="is-uppercase">{{sitecode}}</span> in the 
+        <strong>photon ranch</strong> network.
+      </p>
+    </div>
+  </footer>
 
 </div></template>
 
@@ -115,29 +143,27 @@ export default {
   padding: 0 4em;
 }
 
+.left-status-box {
+  background-color: #232929;
+  width: 100%;
+  height: 500px;
+}
+.left-status-box > * {
+  vertical-align: center;
+  text-align: center;
+  padding-top: 2em;
+}
+
 .page {
   --light-grey: #ddd;
   --mid-grey: #aaa;
   --dark-grey: #444;
   max-width: 1200px;
   margin: 0 auto; /* center the main div */
-  padding: 20px;
+  height: 150vh;
+  padding: 0 20px;
 }
 
-.footer-container {
-  position:fixed;
-  bottom: 0;
-  width: 100%;
-  height: auto;
-  background-color: grey;
-}
-footer {
-  max-width: 1200px;
-  margin: 0 auto;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
-  height: 3em;
-}
 
 #bottom-section {
   column-span: all;
