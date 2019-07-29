@@ -15,11 +15,11 @@ const state = {
     selected_telescope: '',
     selected_rotator: '',
     selected_focuser: '',
-    selected_filter: '',
+    selected_filter_wheel: '',
     selected_camera: '',
 
     camera_areas_selection: '',
-    filter_options_selection: '',
+    filter_wheel_options_selection: '',
 }
 
 const getters = {
@@ -49,9 +49,9 @@ const getters = {
             ? Object.keys(state.global_config[state.selected_site]["focuser"] || {})
             : []
     },
-    available_filters: state =>  {
+    available_filter_wheels: state =>  {
         return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["filter"] || {})
+            ? Object.keys(state.global_config[state.selected_site]["filter_wheel"] || {})
             : []
     },
     available_cameras: state =>  {
@@ -66,7 +66,7 @@ const getters = {
     telescope: state => state.selected_telescope,
     rotator: state => state.selected_rotator,
     focuser: state => state.selected_focuser,
-    filter: state => state.selected_filter,
+    filter_wheel: state => state.selected_filter_wheel,
     camera: state => state.selected_camera,
 
     /* These getters are used to customize the control form fields. */
@@ -82,15 +82,15 @@ const getters = {
     camera_areas_selection: state => state.camera_areas_selection, 
 
     // Available filters
-    filter_options: state => {
+    filter_wheel_options: state => {
         try {
-            return state.global_config[state.selected_site].filter[state.selected_filter].settings.filters
+            return state.global_config[state.selected_site].filter_wheel[state.selected_filter_wheel].settings.filters
         } catch {
             return []
         }
     },
     // Currently selected filter
-    filter_options_selection: state => state.filter_options_selection,
+    filter_wheel_options_selection: state => state.filter_wheel_options_selection,
 
     // Does the camera bin or not? Returns string 'True' or 'False'.
     camera_can_bin: state => {
@@ -122,7 +122,7 @@ const actions = {
             commit('setGlobalConfig', response)
 
             // Set initial values in command fields
-            let filterSelection= getters.filter_options[0]
+            let filterSelection= getters.filter_wheel_options[0]
             commit('setFilterSelection', filterSelection)
 
             let areaSelection = getters.camera_areas[0]
@@ -133,7 +133,7 @@ const actions = {
         });
     },
     set_default_filter_option({ commit, getters }) {
-        commit('setFilterSelection', getters.filter_options[0])
+        commit('setFilterSelection', getters.filter_wheel_options[0])
     },
 
 
@@ -151,10 +151,10 @@ const mutations = {
     setActiveTelescope(state, telescope) { state.selected_telescope = telescope },
     setActiveRotator(state, rotator) { state.selected_rotator = rotator },
     setActiveFocuser(state, focuser) { state.selected_focuser = focuser },
-    setActiveFilter(state, filter) { state.selected_filter = filter },
+    setActiveFilterWheel(state, filter_wheel) { state.selected_filter_wheel = filter_wheel },
     setActiveCamera(state, camera) { state.selected_camera = camera },
 
-    setFilterSelection(state, filterSelection) { state.filter_options_selection = filterSelection },
+    setFilterSelection(state, filterSelection) { state.filter_wheel_options_selection = filterSelection },
     setCameraAreasSelection(state, areaSelection) { state.camera_areas_selection = areaSelection },
 }
 

@@ -7,7 +7,7 @@ var emptyState = function() {
         camera: {},
         focuser: {},
         rotator: {},
-        filter: {},
+        filter_wheel: {},
         enclosure: {},
         timestamp: '',
 
@@ -55,7 +55,7 @@ const state = emptyState();
 const getters = {
     mount: state => state.mount || [],
     camera: state => state.camera,
-    filter: state => state.filter,
+    filter_wheel: state => state.filter_wheel,
     focuser: state => state.focuser,
     rotator: state => state.rotator,
     timestamp: state => state.timestamp,
@@ -109,9 +109,9 @@ const actions = {
         if (site == '') {
             commit('setMount', [])
             commit('setCamera', [])
-            commit('setFilter', [])
+            commit('setFilterWheel', [])
             commit('setFocuser', [])
-            commit('setFilter', [])
+            commit('setFilterWheel', [])
             commit('setRotator', [])
             commit('setTimestamp', '')
         }
@@ -125,9 +125,9 @@ const actions = {
                 //console.log(response)
                 commit('setMount', response.content.mount)
                 commit('setCamera', response.content.camera)
-                commit('setFilter', response.content.filter)
+                commit('setFilterWheel', response.content.filter_wheel)
                 commit('setFocuser', response.content.focuser)
-                commit('setFilter', response.content.filter)
+                commit('setFilterWheel', response.content.filter_wheel)
                 commit('setRotator', response.content.rotator)
                 commit('setTimestamp', response.content.timestamp)
                 commit('setTestState', response.content)
@@ -144,7 +144,7 @@ const mutations = {
     setMount(state, mount) { state.mount = mount },
     setCamera(state, camera) { state.camera = camera },
     setFocuser(state, focuser) { state.focuser = focuser },
-    setFilter(state, filter) { state.filter = filter },
+    setFilterWheel(state, filter_wheel) { state.filter_wheel = filter_wheel },
     setRotator(state, rotator) { state.rotator = rotator },
     setWeather(state, wx ) { state.weather = wx  },
     setObservatoryState(state, incoming) {
