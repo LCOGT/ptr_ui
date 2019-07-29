@@ -78,21 +78,21 @@
         </b-select>
     </b-field>
 
-    <!-- Filter Selection -->
-    <b-field class="select-device" label="Filter">
+    <!-- Filter Wheel Selection -->
+    <b-field class="select-device" label="Filter Wheel">
         <b-select 
-          placeholder="choose filter..." 
+          placeholder="choose filter wheel..." 
           default="" 
-          v-model="active_filter"
+          v-model="active_filter_wheel"
         >
           <option 
-            v-for="(filter, index) in available_filters" 
-            v-bind:value="filter"
-            v-bind:key="`filter-${index}`"
+            v-for="(filter_wheel, index) in available_filter_wheels" 
+            v-bind:value="filter_wheel"
+            v-bind:key="`filter_wheel-${index}`"
           >
-            {{ filter }}
+            {{ filter_wheel }}
           </option>
-          <option> dummy_filter </option>
+          <option> dummy_filter_wheel </option>
         </b-select>
     </b-field>
 
@@ -234,9 +234,9 @@
                 <option value="BLUE">blue</option>
             </b-select-->
 
-            <b-select placeholder="select filter..." v-model="filter_options_selection" style="width: 100%">
+            <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" style="width: 100%">
               <option 
-                v-for="(filter, index) in filter_options"
+                v-for="(filter, index) in filter_wheel_options"
                 v-bind:value="filter" 
                 v-bind:selected="index === 0"
                 v-bind:key="index"
@@ -246,8 +246,8 @@
             </b-select>
 
             <div class="buttons has-addons">
-              <command-button :data="filter_command" style="width: 50%"/>
-              <command-button :data="filter_home_command" style="width: 50%" />
+              <command-button :data="filter_wheel_command" style="width: 50%"/>
+              <command-button :data="filter_wheel_home_command" style="width: 50%" />
             </div>
         </b-field>
 
@@ -411,8 +411,8 @@
       <pre><code>{{ JSON.stringify(camera_state,null,2) }}</code></pre>
     </div>
     <div class="status-item">
-      <div class="title2">Filter</div>
-      <pre><code>{{ JSON.stringify(filter_state,null,2) }}</code></pre>
+      <div class="title2">Filter Wheel</div>
+      <pre><code>{{ JSON.stringify(filter_wheel_state,null,2) }}</code></pre>
     </div>
     <div class="status-item">
       <div class="title2">Focuser</div>
@@ -511,7 +511,7 @@ export default {
       this.active_mount= 'mnt1';
       this.active_telescope= 'tel1';
       this.active_camera= 'cam1';
-      this.active_filter= 'filter1';
+      this.active_filter_wheel= 'filter_wheel1';
       this.active_focuser= 'focuser1';
       this.active_rotator= 'rotator1';
     }
@@ -570,7 +570,7 @@ export default {
     ...mapGetters('observatory', {
         all_mount_state: 'mount',
         all_camera_state: 'camera',
-        all_filter_state: 'filter',
+        all_filter_wheel_state: 'filter_wheel',
         all_focuser_state: 'focuser',
         all_rotator_state: 'rotator',
         status_timestamp: 'timestamp',

@@ -33,8 +33,8 @@ export const commands_mixin = {
                 case 'camera': 
                 device = this.active_camera;
                 break;
-                case 'filter':
-                device = this.active_filter;
+                case 'filter_wheel':
+                device = this.active_filter_wheel;
                 break;
                 case 'rotator':
                 device = this.active_rotator;
@@ -72,7 +72,7 @@ export const commands_mixin = {
         ...mapGetters('observatory', {
             all_mount_state: 'mount',
             all_camera_state: 'camera',
-            all_filter_state: 'filter',
+            all_filter_wheel_state: 'filter_wheel',
             all_focuser_state: 'focuser',
             all_rotator_state: 'rotator',
         }),
@@ -86,13 +86,13 @@ export const commands_mixin = {
             'available_telescopes',
             'available_rotators',
             'available_focusers',
-            'available_filters',
+            'available_filter_wheels',
             'available_cameras',
 
             // These getters retrieve options in the commands 
-            // (eg. what filters are available)
+            // (eg. what filters are available in the filter wheel)
             'camera_areas',
-            'filter_options',
+            'filter_wheel_options',
             'camera_can_bin',
 
             'global_config',
@@ -104,8 +104,8 @@ export const commands_mixin = {
          * fields.
          */
         // v-model for the filter currently selected
-        filter_options_selection: {
-            get() { return this.$store.getters['device_selection/filter_options_selection'] },
+        filter_wheel_options_selection: {
+            get() { return this.$store.getters['device_selection/filter_wheel_options_selection'] },
             set(val) { this.$store.commit('device_selection/setFilterSelection', val) }
         },
         // v-model for the camera area selection
@@ -142,9 +142,9 @@ export const commands_mixin = {
             get() { return this.$store.getters['device_selection/focuser'] },
             set(value) { this.$store.commit('device_selection/setActiveFocuser', value) }
         },
-        active_filter: {
-            get() { return this.$store.getters['device_selection/filter'] },
-            set(value) { this.$store.commit('device_selection/setActiveFilter', value) }
+        active_filter_wheel: {
+            get() { return this.$store.getters['device_selection/filter_wheel'] },
+            set(value) { this.$store.commit('device_selection/setActiveFilterWheel', value) }
         },
         active_camera: {
             get() { return this.$store.getters['device_selection/camera'] },
@@ -165,9 +165,9 @@ export const commands_mixin = {
                 return this.all_camera_state[this.active_camera]
             } catch(error) { return [] }
         },
-        filter_state: function() {
+        filter_wheel_state: function() {
             try {
-                return this.all_filter_state[this.active_filter]
+                return this.all_filter_wheel_state[this.active_filter_wheel]
             } catch(error) { return [] }
         },
         focuser_state: function() {
@@ -201,7 +201,7 @@ export const commands_mixin = {
                 {
                     repeat: this.cam_repeat,
                     bin: this.cam_bin,
-                    filter: this.filter_options_selection,
+                    filter: this.filter_wheel_options_selection,
                     size: this.camera_areas_selection,
                     dither: this.cam_dither,
                 }
@@ -264,13 +264,13 @@ export const commands_mixin = {
         focus_stop_command () {
             return this.base_command( 'focuser', 'stop', 'stop' )
         },
-        filter_command () {
-            return this.base_command( 'filter', 'set_name', 'apply',
-                { filter_name: this.filter_options_selection},
+        filter_wheel_command () {
+            return this.base_command( 'filter_wheel', 'set_name', 'apply',
+                { filter_name: this.filter_wheel_options_selection},
             )
         },
-        filter_home_command () {
-            return this.base_command( 'filter', 'home', 'home' )
+        filter_wheel_home_command () {
+            return this.base_command( 'filter_wheel', 'home', 'home' )
         },
         rotate_home_command () {
             return this.base_command( 'rotator', 'home', 'home' )
