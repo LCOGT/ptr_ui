@@ -136,8 +136,9 @@ export default {
 
 .menu-column {
   border-right: var(--light-grey) 1px solid;
-  width: 180px;
+  width: 220px;
   height: auto;
+  padding-right: 2em;
 }
 .content {
   padding: 0 4em;

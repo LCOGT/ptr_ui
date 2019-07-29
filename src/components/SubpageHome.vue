@@ -11,18 +11,70 @@
     <div style="height: 2em;" />
 
 
-    <!-- TODO: make the 1-2-3 step view a tile with the layout:
+    <div class="tile">
+      <div class="tile is-4 is-parent is-vertical">
 
-        1111  3333
-        1111  3333
-              3333    
-        2222  3333
-        2222  3333        
+        <article class="tile is-child notification">
+            <p class="title is-4">1. Choose a target</p>
+            <br>
+            <b-field label="Search for a target">
+                    <b-input placeholder="target name or position"></b-input>
+            </b-field>
+            <p class="control">
+                <button class="button is-primary">Search</button>
+            </p>
+        </article>
 
-        -->
+        <article class="tile is-child notification">
+            <p class="title is-4">2. Expose an image</p>
+            <br>
+            <b-field label="Expose">
+                <b-field>
+                    <b-input name="subject" value="5.0"></b-input>
+                    <p class="control"> <span class="button is-static">seconds</span> </p>
+                </b-field>
+            </b-field>
+            <b-field label="Filter">
+                <b-select placeholder="Select filter" value="color">
+                    <option value="Color (RGB)">color</option>
+                    <option value="Luminance">luminance</option>
+                    <option value="Red">red</option>
+                    <option value="Green">green</option>
+                    <option value="Blue">blue</option>
+                </b-select>
+            </b-field>
+        </article>
+
+      </div>
+      <div class="tile is-parent">
+
+        <article class="tile is-child notification">
+            <p class="title is-4">3. See the results!</p>
+            <br>
+            <div style="width:100%;height:0; padding-top:100%;position:relative; background:grey;">
+                <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
+                <img
+                    v-bind:src="current_image.url" 
+                    @click="isImageModalActive = true" 
+                    class="preview-image" />
+            </div>
+
+            <b-modal :active.sync="isImageModalActive" :width="800">
+                <p class="image">
+                    <!--img v-bind:src="current_image.url"-->
+                    <image-view />
+                </p>
+            </b-modal>
+            <br>
+            <div>Filename:</div>
+            <div>{{current_image.filename}}</div>
+        </article>
+
+      </div>
+    </div>
 
 
-
+    <!--
     <div class="columns quick-image">
         <div class="column quick-image-column">  
             <p class="title is-4">1. Choose a target</p>
@@ -35,7 +87,6 @@
             </p>
         </div>
 
-        <!-- TODO: make these line dividers work responsively with columns -->
         <div class="line-divider"></div>
 
         <div class="column quick-image-column">  
@@ -65,7 +116,6 @@
             <p class="title is-4">3. See the results!</p>
             <br>
             <div style="width:100%;height:0; padding-top:100%;position:relative; background:grey;">
-                <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
                 <img
                     v-bind:src="current_image.url" 
                     @click="isImageModalActive = true" 
@@ -74,7 +124,7 @@
 
             <b-modal :active.sync="isImageModalActive" :width="800">
                 <p class="image">
-                    <!--img v-bind:src="current_image.url"-->
+                    <img v-bind:src="current_image.url">
                     <image-view />
                 </p>
             </b-modal>
@@ -83,6 +133,7 @@
 
         </div>
     </div>
+    -->
     <br>
 
     <br>
