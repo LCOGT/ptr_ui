@@ -307,6 +307,34 @@
             </b-field>
         </b-field>
 
+        <!-- Scripts select box; sent with camera commands -->
+        <b-field horizontal label="Scripts">
+          <b-select value="none" v-model="cam_scripts" style="width: 100;">
+            <option value="none">none</option>
+            <option value="stop_script">Stop Script</option>
+            <option value="take_lrgb_stack">Take LRGB Stack</option>
+            <option value="take_o3has2n2_stack">Take O3HaS2N2 Stack</option>
+            <option value="take_planet_stack">Take Planet Stack</option>
+            <option value="take_lunar_stack">Take Lunar Stack</option>
+            <option value="make_superbias">Make Superbias</option>
+            <option value="make_superdark">Make Superdark</option>
+            <option value="make_superscreenflats">Make SuperScreenFlats</option>
+            <option value="take_pre-open_calibrations">Take Pre-open Calibrations</option>
+            <option value="take_skyflats">Take SkyFlats</option>
+            <option value="find_field_center">Find Field Center</option>
+            <option value="calibrate_focus_v-curve">Calibrate Focus V-curve</option>
+            <option value="32_target_pointing_run">32 Target Pointing Run</option>
+            <option value="128_target_pointing_run">128 Target Pointing Run</option>
+            <option value="run_using_acp">Run Using ACP</option>
+            <option value="stop_using_acp">Stop Using ACP</option>
+          </b-select>
+        </b-field>
+
+        <div class="status-item">
+          <div class="title2">Script Status</div>
+          <pre>{{ camera_state.script_status }}</pre>
+        </div>
+
         <br>
         <div class="buttons has-addons">
           <command-button :data="camera_expose_command" style="width: 70%" />
@@ -434,7 +462,7 @@
 
   <div class="choose-target">
     <the-sky-chart />
-    <object-table class="choose-target-item"/>
+    <!--object-table class="choose-target-item"/-->
   </div>
 
 </div></template>
@@ -484,6 +512,7 @@ export default {
       cam_dither: 'off',
       cam_image_type: 'light',
       cam_image_type_options: ['light', 'toss', 'auto focus',  'fine focus', 'dark', 'bias', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
+      cam_scripts: 'none',
 
       focus_relative: '',
       focus_absolute: '',

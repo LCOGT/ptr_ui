@@ -204,6 +204,7 @@ export const commands_mixin = {
                     filter: this.filter_wheel_options_selection,
                     size: this.camera_areas_selection,
                     dither: this.cam_dither,
+                    scripts: this.cam_scripts,
                 }
             )
         },

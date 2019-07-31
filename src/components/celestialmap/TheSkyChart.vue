@@ -1,8 +1,11 @@
 <template>
     <div>
         <div id="celestial-map"></div>
-        <div id="celestial-form" style="display:none;"></div>
-        <div id="celestial-date" style="width:0"></div>
+        <!-- The following two elements have been moved to the main index.html file.
+            This is because we get errors if the elements are missing whenever the
+            celestial.js file is included. And they are set to be invisible anyways. -->
+        <!--div id="celestial-form" style="display:none;"></div-->
+        <!--div id="celestial-date" style="width:0"></div-->
    </div> 
 </template>
 

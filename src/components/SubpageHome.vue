@@ -43,6 +43,10 @@
                     <option value="Blue">blue</option>
                 </b-select>
             </b-field>
+            <p class="control">
+                <button class="button is-primary">Expose</button>
+            </p>
+
         </article>
 
       </div>
@@ -66,8 +70,7 @@
                 </p>
             </b-modal>
             <br>
-            <div>Filename:</div>
-            <div>{{current_image.filename}}</div>
+            <div>File: {{current_image.filename}} </div>
         </article>
 
       </div>
