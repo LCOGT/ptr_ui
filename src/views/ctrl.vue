@@ -332,7 +332,7 @@
 
         <div class="status-item">
           <div class="title2">Script Status</div>
-          <pre>{{ camera_state.script_status }}</pre>
+          <pre>{{ camera_state && camera_state.script_status}}</pre>
         </div>
 
         <br>
@@ -533,6 +533,16 @@ export default {
   beforeCreate() {
     // Make sure we're using the latest site configuration.
     this.$store.dispatch('device_selection/update_config')
+
+    // Default site/device values.
+    this.active_site= 'WMD';
+    this.active_enclosure= 'enclosure1';
+    this.active_mount= 'mnt1';
+    this.active_telescope= 'tel1';
+    this.active_camera= 'cam1';
+    this.active_filter_wheel= 'filter_wheel1';
+    this.active_focuser= 'focuser1';
+    this.active_rotator= 'rotator1';
   },
 
   created() {
@@ -541,17 +551,6 @@ export default {
     this.update_status_interval = setInterval(this.update_status, 3000)
     this.update_time_interval = setInterval(this.update_time, 1000)
 
-    // Default site/device values.
-    if (true) {
-      this.active_site= 'WMD';
-      this.active_enclosure= 'enclosure1';
-      this.active_mount= 'mnt1';
-      this.active_telescope= 'tel1';
-      this.active_camera= 'cam1';
-      this.active_filter_wheel= 'filter_wheel1';
-      this.active_focuser= 'focuser1';
-      this.active_rotator= 'rotator1';
-    }
   },
   
   methods: {

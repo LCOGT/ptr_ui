@@ -26,8 +26,14 @@
                 <a class="navbar-link"> sites </a>
 
                 <div class="navbar-dropdown">
-                    <template v-for="site in sites">
-                      <router-link class="navbar-item" v-bind:to="'/site/' + site.code"> {{site.name}} </router-link>
+                    <template v-for="(site, index) in sites">
+                      <router-link 
+                        class="navbar-item" 
+                        v-bind:to="'/site/' + site.code"
+                        v-bind:key="index"
+                        > 
+                        {{site.name}} 
+                      </router-link>
                     </template>
                     <hr class="navbar-divider">
                     <router-link class="navbar-item" to="/about"> About </router-link>
@@ -62,13 +68,32 @@
 <script>
 import { Auth } from 'aws-amplify'
 import { mapGetters, mapState } from 'vuex'
-import { sites } from '../sites'
+//import { sites } from '../sites'
 
 export default {
   name: 'TheMenu',
   data() {
     return {
-      sites: sites,
+      sites: [
+         {
+        'code': 'wmd',
+        'name': 'West Mountain Drive',
+        'country': 'USA',
+        'tz': -8,
+        'lat': 34,
+        'lng': -119,
+        'elevation': 0, // meters
+    },
+    {
+        'code': 'saf',
+        'name': 'Sollee Observatory',
+        'country': 'USA',
+        'tz': -7,
+        'lat': 35.55444,
+        'lng': -105.870277,
+        'elevation': 2201,
+    }
+      ],
     }
   },
   mounted () {
