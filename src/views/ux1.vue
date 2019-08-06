@@ -24,6 +24,11 @@
               Target Explorer 
             </router-link>
             <router-link 
+              :to="'/ux1/' + sitecode + '/planning'" 
+              class="navbar-item"> 
+              Planning
+            </router-link>
+            <router-link 
               :to="'/ux1/' + sitecode + '/data'" 
               class="navbar-item"> 
               Data & Images 
@@ -50,6 +55,7 @@
     <div class="column content">
       <subpage-home v-if="subpage == 'home'" />
       <subpage-targets v-if="subpage == 'targets'" />
+      <subpage-planning v-if="subpage == 'planning'" />
       <subpage-data v-if="subpage == 'data'" />
     </div>
 
@@ -79,6 +85,7 @@ import { commands_mixin } from '../mixins/commands_mixin'
 import CommandButton from '@/components/CommandButton'
 import SubpageHome from '@/components/SubpageHome'
 import SubpageTargets from '@/components/SubpageTargets'
+import SubpagePlanning from '@/components/SubpagePlanning'
 import SubpageData from '@/components/SubpageData'
 
 export default {
@@ -87,6 +94,7 @@ export default {
     CommandButton,
     SubpageHome,
     SubpageTargets,
+    SubpagePlanning,
     SubpageData,
   },
   props: ['sitecode', 'subpage'],
