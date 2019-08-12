@@ -84,7 +84,10 @@ const getters = {
     // Available filters
     filter_wheel_options: state => {
         try {
-            return state.global_config[state.selected_site].filter_wheel[state.selected_filter_wheel].settings.filters
+            let fwo = state.global_config[state.selected_site].filter_wheel[state.selected_filter_wheel].settings.filter_data;
+            let num_filters = fwo.length;
+            // Ignore the first element, which is really just the definitions of the items in the arrays representing each filter.j
+            return fwo.slice(1, num_filters)
         } catch {
             return []
         }

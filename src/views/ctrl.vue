@@ -134,7 +134,7 @@
 
   <br>
   </div>
-
+  
   <!-- Device control input fields -->
   <div class="columns">
 
@@ -237,11 +237,11 @@
             <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" style="width: 100%">
               <option 
                 v-for="(filter, index) in filter_wheel_options"
-                v-bind:value="filter" 
+                v-bind:value="filter[0]" 
                 v-bind:selected="index === 0"
                 v-bind:key="index"
                 >
-                {{ filter }}
+                {{ filter[0] }}
               </option>
             </b-select>
 
@@ -535,12 +535,12 @@ export default {
     this.$store.dispatch('device_selection/update_config')
 
     // Default site/device values.
-    this.active_site= 'WMD';
+    this.active_site= 'wmd';
     this.active_enclosure= 'enclosure1';
     this.active_mount= 'mnt1';
     this.active_telescope= 'tel1';
     this.active_camera= 'cam1';
-    this.active_filter_wheel= 'filter_wheel1';
+    this.active_filter_wheel= 'filter_whee11';
     this.active_focuser= 'focuser1';
     this.active_rotator= 'rotator1';
   },

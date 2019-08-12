@@ -98,6 +98,12 @@ export const commands_mixin = {
             'global_config',
         ]),
 
+        // Getters for click coordinates on the sky chart.
+        ...mapGetters('skyChart', {
+            chart_selectedRa: 'selectedRa',
+            chart_selectedDec: 'selectedDec',
+        }),
+
         /**
          * The `..._selection` computed properties are used for two way
          * binding between vuex stored state and selections in the command

@@ -12,8 +12,8 @@ const state = {
 
 // getters
 const getters = {
-    selectedRa: () => state.selectedRa,
-    selectedDec: () => state.selectedDec,
+    selectedRa: state => state.selectedRa,
+    selectedDec: state => state.selectedDec,
 
     star_types: () => state.filter.star_types,
     star_mags: () => state.filter.star_mags,
