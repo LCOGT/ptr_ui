@@ -125,7 +125,7 @@ const actions = {
             commit('setGlobalConfig', response)
 
             // Set initial values in command fields
-            let filterSelection= getters.filter_wheel_options[0]
+            let filterSelection= getters.filter_wheel_options[0][0]
             commit('setFilterSelection', filterSelection)
 
             let areaSelection = getters.camera_areas[0]
