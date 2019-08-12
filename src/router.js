@@ -18,6 +18,7 @@ import imgs from './views/imgs.vue'
 import skymap from './views/skymap.vue'
 import ctrl from './views/ctrl.vue'
 import ux1 from './views/ux1.vue'
+import imgnav from './views/imgnav.vue'
 
 import store from './store'
 import { Auth } from 'aws-amplify'
@@ -39,6 +40,7 @@ const router = new VueRouter({
     { path: '/imgs', name: 'imgs', component: imgs},
     { path: '/skymap', name: 'skymap', component: skymap},
     { path: '/ctrl', name: 'ctrl', component:ctrl},
+    { path: '/imgnav', name: 'imgnav', component: imgnav},
     { 
       path: '/ux1/:sitecode/:subpage', 
       name: 'ux1', 

@@ -17,6 +17,15 @@ const state = {
         url: '',
         last_modified: '',
     },
+
+    // a list of all a user's images
+    user_images: [],
+
+    images: {
+        filename: '',
+        url: '',
+        last_modified: '',
+    },
 }
 
 const getters = {
@@ -24,9 +33,26 @@ const getters = {
     most_recent_image: state => state.recent_images[0],
 
     current_image: state => state.current_image,
+
+    user_images: state => state.user_images,
+    images:state => state.images,
 }
 
 const actions = {
+
+    get_user_images({ commit, state, rootState }) {
+
+        // let username = rootState.auth.user.username
+        let username = "WER"
+        let apiName = 'ptr-api';
+        let path = `/image_by_observer/${username}/`;
+
+        API.get(apiName, path).then(response => {
+            commit('setUserImages', response)
+        }).catch(error => {
+            console.log(error)
+        });
+    },
 
     refresh_latest_images({ commit, state, rootState }) {
 
@@ -116,6 +142,7 @@ const actions = {
 const mutations = {
     setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setCurrentImage(state, the_current_image) { state.current_image = the_current_image },
+    //setUserImages(state, user_images_list) { state.user_images = user_images_list },
 }
 
 export default {
