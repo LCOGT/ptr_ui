@@ -76,11 +76,11 @@ const actions = {
 
             // If current_image is empty, set it to the first element from 'recent_images'. 
             if (state.current_image.name == '' || state.current_image.url == '') {
-               let the_current_image = {
-                   filename: state.recent_images[0].filename,
-                   url: state.recent_images[0].url,
-                   last_modified: state.recent_images[0].last_modified,
-               } 
+                let the_current_image = {
+                    filename: state.recent_images[0].filename,
+                    url: state.recent_images[0].url,
+                    last_modified: state.recent_images[0].last_modified,
+                } 
                 commit('setCurrentImage', the_current_image)
             }
 

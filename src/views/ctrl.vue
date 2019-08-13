@@ -419,7 +419,7 @@
         <b-modal :active.sync="isImageModalActive" :width="800">
             <p class="image">
                 <!--img v-bind:src="current_image.url"-->
-                <image-view />
+                <image-view :site="active_site" />
             </p>
         </b-modal>
         <div>Filename:</div>

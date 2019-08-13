@@ -1,5 +1,5 @@
 <template>
-    <image-view />
+    <image-view :site="sitecode"/>
 </template>
 
 

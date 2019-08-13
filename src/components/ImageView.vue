@@ -56,6 +56,9 @@ import { commands_mixin } from '../mixins/commands_mixin'
 export default {
     name: 'ImageView',
     mixins: [commands_mixin],
+    props: {
+        'site': String,
+    },
     data() {
         return {
 
@@ -80,16 +83,18 @@ export default {
             // Time that right click events stay on the screen.
             right_click_ttl: 5000,
 
-
-
-
         }
     },
-    beforeMount() {
-        // TODO: create a cleaner system of tracking the active site and devices.
-        this.active_site = 'wmd'
-        this.active_mount = 'mnt1'
+    created() {
+        console.log('ImageView site prop: '+this.site)
+        this.$store.commit('device_selection/setActiveSite', this.site)
         this.$store.dispatch('images/refresh_latest_images')
+    },
+    watch: {
+        site: function(newVal, oldVal) {
+            this.$store.commit('device_selection/setActiveSite', newVal)
+            this.$store.dispatch('images/refresh_latest_images')
+        }
     },
     mounted() {
 
@@ -201,14 +206,14 @@ export default {
                     .attr('x2', this.image_length/2)
                     .attr('y2', this.image_length)
                     .attr('id', 'crosshair_vertical')
-                    .attr('stroke', 'orange')
+                    .attr('stroke', 'red')
                 d3.select(elem).append('line')
                     .attr('y1', this.image_length/2)
                     .attr('x1', 0)
                     .attr('y2', this.image_length/2)
                     .attr('x2', this.image_length)
                     .attr('id', 'crosshair_horizontal')
-                    .attr('stroke', 'orange')
+                    .attr('stroke', 'red')
             } else {
                 d3.select(elem).selectAll('line').remove()
             }
