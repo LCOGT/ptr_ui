@@ -408,7 +408,7 @@
         <div class="title">Image</div>
         <button class="button" @click="getLatestImage">latest image</button>
         <br>
-            <div style="width:100%;height:0; padding-top:50%;position:relative; background-fill: yellow;">
+            <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
                 <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
                 <img
                     v-bind:src="current_image.url" 
@@ -540,7 +540,7 @@ export default {
     this.active_mount= 'mnt1';
     this.active_telescope= 'tel1';
     this.active_camera= 'cam1';
-    this.active_filter_wheel= 'filter_whee11';
+    this.active_filter_wheel= 'filter_wheel1';
     this.active_focuser= 'focuser1';
     this.active_rotator= 'rotator1';
   },
