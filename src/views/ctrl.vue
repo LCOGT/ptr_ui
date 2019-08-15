@@ -653,6 +653,7 @@ export default {
   /*background:lightskyblue;*/
   display: flex;
   border-bottom: solid grey 1px;
+  overflow-x: scroll;
 }
 .status-item {
   margin: 1em;
