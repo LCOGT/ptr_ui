@@ -2,12 +2,12 @@
 <template>
 
 
-<section class="component" style="border: solid white 2px;">
+<section class="component">
 
-    <div class="slider" v-bind:class="{ 'slider-open': slider_open }" >{{slider_open}}
-        <button @click="slide">hide or show slider</button>
-    </div>
     <the-sky-chart />
+    <div class="slider" v-bind:class="{ 'slider-open': slider_open }" >
+        <div class="button is-dark is-small" @click="slide">filter objects</div>
+    </div>
 
 </section>
 
@@ -47,10 +47,10 @@ export default {
 }
 .slider {
     height: 50px;
-    border: 1px solid green;
+    background-color:rgba(0, 0, 0, 0.76);
 }
 .slider-open {
-    height: 500px;
+    height: 200px;
 }
 
 </style>

@@ -6,6 +6,7 @@
  */
 
 <template>
+  <div class="container">
   <div class="columns">
 
     <!-- Buttons for AWS integration -->
@@ -73,6 +74,7 @@
         <button class="button" @click="updateStatus">update status</button>
     </div>
     
+  </div>
   </div>
 </template>
 

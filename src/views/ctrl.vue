@@ -1,6 +1,6 @@
 
 
-<template><div class="wrapper">
+<template><div class="wrapper container">
 
   <!-- Select the active devices here -->
   <div class="instrument-selection">
@@ -10,6 +10,7 @@
         <b-select 
           placeholder="choose site..." 
           default="" 
+          size="is-small"
           v-model="active_site"
          >
           <option 
@@ -29,6 +30,7 @@
         <b-select 
           placeholder="choose mount..." 
           default="" 
+          size="is-small"
           v-model="active_mount"
         >
           <option 
@@ -47,6 +49,7 @@
         <b-select 
           placeholder="choose telescope..." 
           default="" 
+          size="is-small"
           v-model="active_telescope"
         >
           <option 
@@ -65,6 +68,7 @@
         <b-select 
           placeholder="choose camera..." 
           default="" 
+          size="is-small"
           v-model="active_camera"
         >
           <option 
@@ -83,6 +87,7 @@
         <b-select 
           placeholder="choose filter wheel..." 
           default="" 
+          size="is-small"
           v-model="active_filter_wheel"
         >
           <option 
@@ -101,6 +106,7 @@
         <b-select 
           placeholder="choose focuser..." 
           default="" 
+          size="is-small"
           v-model="active_focuser"
         >
           <option 
@@ -119,6 +125,7 @@
         <b-select 
           placeholder="choose rotator..." 
           default="" 
+          size="is-small"
           v-model="active_rotator"
         >
           <option 
@@ -139,7 +146,8 @@
   <div class="columns">
 
     <!-- Mount Controls -->
-    <div class="column" style="background: #ff0044;">
+    <div class="column" style="padding: 0">
+    <div class="" style="background: #ff0044; padding: 2em;">
         <div class="title">Mount</div>
 
         <b-field horizontal label="Ra">
@@ -179,32 +187,11 @@
             <command-button :data="mount_stop_command" class="dropdown-button-command"/>
           </b-dropdown-item>
         </b-dropdown>
+    </div>
 
-        <!--br>
-        <div> (or) </div>
-        <br>
-
-        <div class="buttons has-addons">
-          <command-button :data="mount_slew_command" style="width: 100%" />
-          <command-button :data="mount_slew_chart_command" style="width: 100%;" />
-        </div>
-
-        <div class="buttons has-addons">
-          <command-button :data="mount_screenflat_command" style="width: 50%" />
-          <command-button :data="mount_skyflat_command" style="width: 50%" />
-        </div>
-
-        <div class="buttons has-addons">
-          <command-button :data="mount_raSidDec0_command" style="width: 100%"/>
-        </div>
-
-        <div class="buttons has-addons">
-          <command-button :data="mount_home_command" style="width: 50%" />
-          <command-button :data="mount_park_command" style="width: 50%" />
-
-        </div>
-
-        <command-button :data="mount_stop_command" style="width: 100%" /-->
+    <div class="">
+      <pre><code>Telescope: {{ JSON.stringify(telescope_state,null,2) }}</code></pre>
+    </div>
 
     </div>
 
@@ -221,7 +208,7 @@
 
         <b-field horizontal label="Count">
             <b-field>
-                <b-input name="subject" v-model="cam_repeat"></b-input>
+                <b-numberinput name="subject" type="is-light" min="1" controls-position="compact" v-model="cam_count"></b-numberinput>
             </b-field>
         </b-field>
 
@@ -499,28 +486,6 @@ export default {
 
       local_timestamp: Date.now(),
 
-      // If a user enters a value in an input field, that value maps here.
-      // When commands are sent, values are read from here.
-      slew_ra: '',
-      slew_dec: '',
-
-      cam_exposure: '1',
-      cam_repeat: '1',
-      //cam_filter: '',
-      cam_area: null,
-      cam_bin: '1', 
-      cam_dither: 'off',
-      cam_image_type: 'light',
-      cam_image_type_options: ['light', 'toss', 'auto focus',  'fine focus', 'dark', 'bias', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
-      cam_scripts: 'none',
-
-      focus_relative: '',
-      focus_absolute: '',
-
-      rotate_relative: '',
-      rotate_absolute: '',
-
-
       // This is displayed as the prior command. Updated on button click.
       prior_command: null,
 
@@ -653,10 +618,11 @@ export default {
   /*background:lightskyblue;*/
   display: flex;
   border-bottom: solid grey 1px;
-  overflow-x: scroll;
+  flex-wrap: wrap;
 }
 .status-item {
   margin: 1em;
+  flex: 1;
 }
 .choose-target {
   margin: 1em;

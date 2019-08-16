@@ -40,13 +40,13 @@
       <div class="left-status-box">
 
         <div>
-          <p class="heading">Right Ascension</p>
-          <p class="title">12.324</p>
+          <p class="heading">Active Site:</p>
+          <p class="title">{{active_site}}</p>
         </div>
 
         <div>
-          <p class="heading">Declination</p>
-          <p class="title">76.52</p>
+          <p class="heading">Active Mount:</p>
+          <p class="title">{{active_mount}}</p>
         </div>
 
       </div>

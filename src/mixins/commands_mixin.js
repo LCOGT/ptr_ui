@@ -1,10 +1,40 @@
 /**
  * This mixin provides the computed objects needed to send commands. 
+ * 
+ * TODO: refactor into smaller modules.
  */
 
 import { mapGetters } from 'vuex'
 
 export const commands_mixin = {
+
+    data() {
+        return {
+
+            // Mount Fields
+            slew_ra: '',
+            slew_dec: '',
+
+            // Camera Fields
+            cam_exposure: '1',
+            cam_count: 1, // numberinput form requires number, not string. converted to string in expose command.
+            cam_area: null,
+            cam_bin: '1', 
+            cam_dither: 'off',
+            cam_image_type: 'light',
+            cam_image_type_options: ['light', 'toss', 'auto focus',  'fine focus', 'dark', 'bias', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
+            cam_scripts: 'none',
+
+            // Focuser Fields
+            focus_relative: '',
+            focus_absolute: '',
+
+            // Rotator Fields
+            rotate_relative: '',
+            rotate_absolute: '',
+
+        }
+    },
 
     methods: {
 
@@ -71,6 +101,7 @@ export const commands_mixin = {
         // Observatory status is saved here.
         ...mapGetters('observatory', {
             all_mount_state: 'mount',
+            all_telescope_state: 'telescope',
             all_camera_state: 'camera',
             all_filter_wheel_state: 'filter_wheel',
             all_focuser_state: 'focuser',
@@ -166,6 +197,11 @@ export const commands_mixin = {
                 return this.all_mount_state[this.active_mount]
             } catch { return [] }
         },
+        telescope_state: function() {
+            try {
+                return this.all_telescope_state[this.active_telescope]
+            } catch(error) { return [] }
+        },
         camera_state: function() {
             try {
                 return this.all_camera_state[this.active_camera]
@@ -205,7 +241,7 @@ export const commands_mixin = {
                     image_type: this.cam_image_type,
                 },
                 {
-                    repeat: this.cam_repeat,
+                    repeat: this.cam_count.toString(),
                     bin: this.cam_bin,
                     filter: this.filter_wheel_options_selection,
                     size: this.camera_areas_selection,

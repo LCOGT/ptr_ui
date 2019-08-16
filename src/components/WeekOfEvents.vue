@@ -33,11 +33,10 @@ export default {
         return {
             week: [],
             selected_day: '',
-
         }
-
     },
-    beforeMount() {
+
+    mounted() {
 
         // Add one day to a js date object
         function addDays(date, days) {
@@ -54,10 +53,10 @@ export default {
         }
 
         // Initially, first day should be selected.
-        this.selected_day = week[0]
-
+        this.selected_day = this.week[0]
 
     },
+
     methods: {
 
         getDayStringShort(intDay) {

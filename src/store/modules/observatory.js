@@ -4,6 +4,7 @@ import { API } from 'aws-amplify'
 var emptyState = function() {
     return {
         mount: {},
+        telescope: {},
         camera: {},
         focuser: {},
         rotator: {},
@@ -54,6 +55,7 @@ const state = emptyState();
 // getters
 const getters = {
     mount: state => state.mount || [],
+    telescope: state => state.telescope,
     camera: state => state.camera,
     filter_wheel: state => state.filter_wheel,
     focuser: state => state.focuser,
@@ -108,6 +110,7 @@ const actions = {
         // Set empty values if a specific site has not been selected.
         if (site == '') {
             commit('setMount', [])
+            commit('setTelescope', [])
             commit('setCamera', [])
             commit('setFilterWheel', [])
             commit('setFocuser', [])
@@ -124,6 +127,7 @@ const actions = {
                 //console.log("retrieved status from observatory store")
                 //console.log(response)
                 commit('setMount', response.content.mount)
+                commit('setTelescope', response.content.telescope)
                 commit('setCamera', response.content.camera)
                 commit('setFilterWheel', response.content.filter_wheel)
                 commit('setFocuser', response.content.focuser)
@@ -142,6 +146,7 @@ const actions = {
 const mutations = {
     setTimestamp(state, timestamp) { state.timestamp = timestamp },
     setMount(state, mount) { state.mount = mount },
+    setTelescope(state, telescope) { state.telescope = telescope },
     setCamera(state, camera) { state.camera = camera },
     setFocuser(state, focuser) { state.focuser = focuser },
     setFilterWheel(state, filter_wheel) { state.filter_wheel = filter_wheel },

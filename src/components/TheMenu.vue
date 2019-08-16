@@ -1,8 +1,8 @@
 <template>
     <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+      <div class="container">
 
         <div class="navbar-brand">
-            <div style="padding-left: 50px"></div>
             <router-link class="navbar-item menu-title" to="/">photon ranch</router-link>
             <div></div>
 
@@ -61,7 +61,7 @@
             </div>
             </div>
         </div>
-
+      </div>
     </nav>
 </template>
 
