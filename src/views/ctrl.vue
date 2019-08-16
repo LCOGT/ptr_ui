@@ -157,7 +157,7 @@
           <b-input name="subject" v-model="slew_dec"></b-input>
         </b-field>
 
-        <command-button :data="mount_slew_command"/>
+        <command-button :data="mount_slew_command" style="margin-bottom: 1em;"/>
         <br>
 
         <b-dropdown aria-role="list" style="width: 100%;">
@@ -189,14 +189,16 @@
         </b-dropdown>
     </div>
 
-    <div class="">
-      <pre><code>Telescope: {{ JSON.stringify(telescope_state,null,2) }}</code></pre>
-    </div>
+    <pre>
+      <simple-device-status :device_name="active_mount" device_type="Mount" :device_status="mount_state" />
+      <simple-device-status :device_name="active_telescope" device_type="Telescope" :device_status="telescope_state" />
+    </pre>
 
     </div>
 
     <!-- Buttons for camera controls -->
-    <div class="column" style="background:orangered">
+    <div class="column" style="padding: 0">
+    <div style="background:orangered; padding: 2em;">
         <div class="title">Camera + Filter</div>
 
         <b-field horizontal label="Expose">
@@ -330,11 +332,19 @@
 
     </div>
 
+    <pre>
+      <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
+      <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
+    </pre>
+
+    </div>
+
     <!-- Other controls -->
-    <div class="column" style="background:#ff8800">
+    <div class="column" style="padding: 0">
+    <div style="background:#ff8800; padding: 2em;">
         <div class="title">Focus</div>
 
-          <b-dropdown aria-role="list" style="width: 100%;">
+          <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
             <button class="button" slot="trigger" style="width: 100%;">
                 <span>Focus Action...</span>
                 <b-icon icon="menu-down"></b-icon>
@@ -384,68 +394,57 @@
           </b-field>
           <br>
     </div>
+    <pre>
+      <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
+      <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
+    </pre>
+    </div>
 
     <!-- Verify expected data in this column. -->
-    <div class="column" style="background: orange">
-        <!--div class="title">Info</div-->
-        <!--button class="button" @click="getLastCommand">get prior command</button-->
-        <!--br-->
-        <!--pre><code>{{ prior_command }}</code></pre-->
+    <div class="column" style="padding: 0">
+      <div style="background: orange; padding: 2em;">
+          <!--div class="title">Info</div-->
+          <!--button class="button" @click="getLastCommand">get prior command</button-->
+          <!--br-->
+          <!--pre><code>{{ prior_command }}</code></pre-->
 
-        <div class="title">Image</div>
-        <button class="button" @click="getLatestImage">latest image</button>
-        <br>
-            <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
-                <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
-                <img
-                    v-bind:src="current_image.url" 
-                    @click="isImageModalActive = true" 
-                    style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
-            </div>
-        <!--img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img-->
-        <b-modal :active.sync="isImageModalActive" :width="800">
-            <p class="image">
-                <!--img v-bind:src="current_image.url"-->
-                <image-view :site="active_site" />
-            </p>
-        </b-modal>
-        <div>Filename:</div>
-        <div>{{current_image.filename}}</div>
-        <br>
-    </div>
-
-  </div>
-
-  <!-- Raw status for the active devices -->
-  <div class="status">
-    <div class="status-item">
-      <div class="title2">
-        Mount Status  
-        <span v-if="status_age < 10" style="color: lightgreen;"> {{" < 10 seconds old"}} </span>
-        <span v-else-if="status_age < 120" style="color: yellow;">{{" < 2 minutes old"}}</span>
-        <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+" minutes old"}}</span>
-        <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+" hours old"}}</span>
-        <span v-else-if="status_age >= 86400" style="color:red;">{{(status_age/86400).toFixed(0)+" days old"}}</span>
+          <div class="title">Image</div>
+          <button class="button" @click="getLatestImage" style="margin-bottom: 1em;">latest image</button>
+          <br>
+              <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
+                  <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
+                  <img
+                      v-bind:src="current_image.url" 
+                      @click="isImageModalActive = true" 
+                      style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
+              </div>
+          <!--img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img-->
+          <b-modal :active.sync="isImageModalActive" :width="800">
+              <p class="image">
+                  <!--img v-bind:src="current_image.url"-->
+                  <image-view :site="active_site" />
+              </p>
+          </b-modal>
+          <div>Filename:</div>
+          <div>{{current_image.filename}}</div>
+          <br>
       </div>
-      <pre><code>{{ JSON.stringify(mount_state,null,2) }}</code></pre>
+      <div style="background-color: #282f2f; padding: 2em;">
+        <p class="heading">Status Age: </p>
+        <p class="has-text-weight-semibold is-size-5">
+        <span v-if="status_age < 10" style="color: lightgreen;"> {{' < 10 seconds old'}} </span>
+        <span v-else-if="status_age < 120" style="color: yellow;">{{' < 2 minutes old'}}</span>
+        <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+' minutes old'}}</span>
+        <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+' hours old'}}</span>
+        <span v-else-if="status_age >= 86400" style="color:red;">{{(status_age/86400).toFixed(0)+' days old'}}</span>
+        </p>
+      </div>
     </div>
-    <div class="status-item">
-      <div class="title2">Camera</div>
-      <pre><code>{{ JSON.stringify(camera_state,null,2) }}</code></pre>
-    </div>
-    <div class="status-item">
-      <div class="title2">Filter Wheel</div>
-      <pre><code>{{ JSON.stringify(filter_wheel_state,null,2) }}</code></pre>
-    </div>
-    <div class="status-item">
-      <div class="title2">Focuser</div>
-      <pre><code>{{ JSON.stringify(focuser_state,null,2) }}</code></pre>
-    </div>
-    <div class="status-item">
-      <div class="title2">Rotator</div>
-      <pre><code>{{ JSON.stringify(rotator_state,null,2) }}</code></pre>
-    </div>
+
   </div>
+
+
+
 
   <div class="choose-target">
     <the-sky-chart />
@@ -466,6 +465,7 @@ import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import ObjectTable from '@/components/ObjectTable'
 import { commands_mixin } from '../mixins/commands_mixin'
 import ImageView from '@/components/ImageView'
+import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
 
 
 export default {
@@ -475,6 +475,7 @@ export default {
     TheSkyChart,
     ObjectTable,
     ImageView,
+    SimpleDeviceStatus,
   },
   mixins: [commands_mixin],
   data () {
@@ -599,11 +600,12 @@ export default {
   display: flex;
   flex-wrap: wrap;
 }
+
 .columns {
   margin: 1em;
 }
 .column {
-  margin: 2px;
+  margin: 5px;
   padding: 2em;
   display: flex;
   flex-direction:column;
@@ -628,7 +630,7 @@ export default {
   margin: 1em;
   padding: 1em;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 0fr;
 }
 .choose-target-item {
   height: width;
