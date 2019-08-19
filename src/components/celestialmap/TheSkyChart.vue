@@ -314,7 +314,7 @@ export default {
             selectedRa: 'selectedRa',
             selectedDec: 'selectedDec',
         }),
-        ...mapGetters('observatory', {
+        ...mapGetters('instrument_state', {
             all_mount_state: 'mount',
 
             star_types: 'star_types',
@@ -322,7 +322,7 @@ export default {
             dso_types: 'dso_types',
             dso_mags: 'dso_mags',
         }),
-        ...mapGetters('device_selection', {
+        ...mapGetters('observatory_configuration', {
             active_site: 'site',
             active_mount: 'mount',
         }),

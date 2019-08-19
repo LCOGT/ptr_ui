@@ -20,7 +20,6 @@
           >
             {{ site }}
           </option>
-          <option> dummy_site </option>
         </b-select>
     </b-field>
 
@@ -40,7 +39,6 @@
           >
             {{ mount }}
           </option>
-          <option> dummy_mount </option>
         </b-select>
     </b-field>
 
@@ -59,7 +57,6 @@
           >
             {{ ota }}
           </option>
-          <option> dummy_telescope </option>
         </b-select>
     </b-field>
     
@@ -78,7 +75,6 @@
           >
             {{ cam }}
           </option>
-          <option> dummy_camera </option>
         </b-select>
     </b-field>
 
@@ -97,7 +93,6 @@
           >
             {{ filter_wheel }}
           </option>
-          <option> dummy_filter_wheel </option>
         </b-select>
     </b-field>
 
@@ -116,7 +111,6 @@
           >
             {{ focuser }}
           </option>
-          <option> dummy_camera </option>
         </b-select>
     </b-field>
 
@@ -135,7 +129,6 @@
           >
             {{ rotator }}
           </option>
-          <option> dummy_rotator </option>
         </b-select>
     </b-field>
 
@@ -432,11 +425,12 @@
       <div style="background-color: #282f2f; padding: 2em;">
         <p class="heading">Status Age: </p>
         <p class="has-text-weight-semibold is-size-5">
-        <span v-if="status_age < 10" style="color: lightgreen;"> {{' < 10 seconds old'}} </span>
+        <span v-if="status_age < 15" style="color: lightgreen;"> {{' < 15 seconds old'}} </span>
         <span v-else-if="status_age < 120" style="color: yellow;">{{' < 2 minutes old'}}</span>
         <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+' minutes old'}}</span>
         <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+' hours old'}}</span>
-        <span v-else-if="status_age >= 86400" style="color:red;">{{(status_age/86400).toFixed(0)+' days old'}}</span>
+        <span v-else-if="status_age < 18000*86400" style="color:red;">{{(status_age/86400).toFixed(0)+' days old'}}</span>
+        <span v-else-if="status_age > 18000*86400" style="color:red;">{{'unavailable'}}</span>
         </p>
       </div>
     </div>
@@ -498,7 +492,7 @@ export default {
 
   beforeCreate() {
     // Make sure we're using the latest site configuration.
-    this.$store.dispatch('device_selection/update_config')
+    this.$store.dispatch('observatory_configuration/update_config')
 
     // Default site/device values.
     this.active_site= 'wmd';
@@ -549,7 +543,7 @@ export default {
     update_status() {
 
       // Dispatch the vuex action that refreshes the site status. 
-      this.$store.dispatch('observatory/updateStatus')
+      this.$store.dispatch('instrument_state/updateStatus')
 
       // Refresh the image list
       this.$store.dispatch('images/refresh_latest_images')
@@ -567,9 +561,9 @@ export default {
   },
 
   computed: {
-    // Getters from the observatory vuex module. 
-    // Observatory status is saved here.
-    ...mapGetters('observatory', {
+    // Getters from the instrument_state vuex module. 
+    // Observatory instrument status is saved here.
+    ...mapGetters('instrument_state', {
         all_mount_state: 'mount',
         all_camera_state: 'camera',
         all_filter_wheel_state: 'filter_wheel',

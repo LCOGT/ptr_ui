@@ -255,7 +255,7 @@ export default {
       Auth.signIn({ username: 'wmd_admin', password: 'Password1!', region: 'us-west-2' })
         .then(user => {
           console.log(user)
-          this.$store.commit('auth/setUser', user)
+          this.$store.dispatch('auth/log_in_user', user)
         })
         .catch(err => console.log(err))
     },

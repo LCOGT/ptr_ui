@@ -19,7 +19,12 @@ const getters = {
 }
 
 // actions
-const actions = {}
+const actions = {
+    log_in_user({ commit, dispatch }, user) {
+        commit('setUser', user)
+        dispatch('observatory_configuration/update_config', null, {root: true})
+    }
+}
 
 // mutations
 const mutations = {

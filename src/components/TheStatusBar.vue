@@ -70,7 +70,7 @@ export default {
     // mapGetters loads the vuex getter (the value) into the local context
     // under the key name. 
     // So foo: 'bar' allows access to the 'bar' getter from 'this.foo'. 
-    ...mapGetters('observatory', {
+    ...mapGetters('instrument_state', {
       ra_decimal: 'RightAscension',
       dec_decimal: 'Declination',
       alt: 'Altitude',

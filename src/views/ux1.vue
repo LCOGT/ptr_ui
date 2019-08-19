@@ -112,7 +112,7 @@ export default {
   async created() {
     console.log('From UX1, sitecode: '+this.sitecode)
     console.log('From UX1, subpage: '+this.subpage)
-    this.$store.commit('device_selection/setActiveSite', this.sitecode)
+    this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
     this.$store.dispatch('images/refresh_latest_images')
     // Get the global configuration for all sites from an api call.
     let apiName = 'ptr-api';

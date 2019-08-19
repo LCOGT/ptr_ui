@@ -97,9 +97,9 @@ export const commands_mixin = {
 
     computed: {
 
-        // Getters from the observatory vuex module. 
-        // Observatory status is saved here.
-        ...mapGetters('observatory', {
+        // Getters from the instrument_state vuex module. 
+        // Observatory instrument status is saved here.
+        ...mapGetters('instrument_state', {
             all_mount_state: 'mount',
             all_telescope_state: 'telescope',
             all_camera_state: 'camera',
@@ -108,9 +108,9 @@ export const commands_mixin = {
             all_rotator_state: 'rotator',
         }),
 
-        // Getters from the device_selection vuex module.
+        // Getters from the observatory_configuration vuex module.
         // Available devices and currently active devices are stored here.
-        ...mapGetters('device_selection', [
+        ...mapGetters('observatory_configuration', [
             'available_sites',
             'available_enclosures',
             'available_mounts',
@@ -142,53 +142,53 @@ export const commands_mixin = {
          */
         // v-model for the filter currently selected
         filter_wheel_options_selection: {
-            get() { return this.$store.getters['device_selection/filter_wheel_options_selection'] },
-            set(val) { this.$store.commit('device_selection/setFilterSelection', val) }
+            get() { return this.$store.getters['observatory_configuration/filter_wheel_options_selection'] },
+            set(val) { this.$store.commit('observatory_configuration/setFilterSelection', val) }
         },
         // v-model for the camera area selection
         camera_areas_selection: {
-            get() { return this.$store.getters['device_selection/camera_areas_selection'] },
-            set(val) {this.$store.commit('device_selection/setCameraAreasSelection', val)}
+            get() { return this.$store.getters['observatory_configuration/camera_areas_selection'] },
+            set(val) {this.$store.commit('observatory_configuration/setCameraAreasSelection', val)}
         },
 
 
         // The `selected_${device}` computed properties are used for two way
-        // binding between vuex (device_selection module) and the device 
+        // binding between vuex (observatory_configuration module) and the device 
         // selection inputs. 
         active_site: {
-            get() { return this.$store.getters['device_selection/site'] },
-            set(value) { this.$store.commit('device_selection/setActiveSite', value) }
+            get() { return this.$store.getters['observatory_configuration/site'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveSite', value) }
         },
         active_enclosure: {
-            get() { return this.$store.getters['device_selection/enclosure'] },
-            set(value) { this.$store.commit('device_selection/setActiveEnclosure', value) }
+            get() { return this.$store.getters['observatory_configuration/enclosure'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveEnclosure', value) }
         },
         active_mount: {
-            get() { return this.$store.getters['device_selection/mount'] },
-            set(value) { this.$store.commit('device_selection/setActiveMount', value) }
+            get() { return this.$store.getters['observatory_configuration/mount'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveMount', value) }
         },
         active_telescope: {
-            get() { return this.$store.getters['device_selection/telescope'] },
-            set(value) { this.$store.commit('device_selection/setActiveTelescope', value) }
+            get() { return this.$store.getters['observatory_configuration/telescope'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveTelescope', value) }
         },
         active_rotator: {
-            get() { return this.$store.getters['device_selection/rotator'] },
-            set(value) { this.$store.commit('device_selection/setActiveRotator', value) }
+            get() { return this.$store.getters['observatory_configuration/rotator'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveRotator', value) }
         },
         active_focuser: {
-            get() { return this.$store.getters['device_selection/focuser'] },
-            set(value) { this.$store.commit('device_selection/setActiveFocuser', value) }
+            get() { return this.$store.getters['observatory_configuration/focuser'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveFocuser', value) }
         },
         active_filter_wheel: {
-            get() { return this.$store.getters['device_selection/filter_wheel'] },
-            set(value) { this.$store.commit('device_selection/setActiveFilterWheel', value) }
+            get() { return this.$store.getters['observatory_configuration/filter_wheel'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveFilterWheel', value) }
         },
         active_camera: {
-            get() { return this.$store.getters['device_selection/camera'] },
-            set(value) { this.$store.commit('device_selection/setActiveCamera', value) }
+            get() { return this.$store.getters['observatory_configuration/camera'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveCamera', value) }
         },
 
-        // Since the vuex observatory getters return state for all devices of
+        // Since the vuex instrument_state getters return state for all devices of
         // a type together, we need to request the specific device from that 
         // collective state. These properties do that, and handle an undefined 
         // key by returning an empty list.

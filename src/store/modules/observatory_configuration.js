@@ -8,7 +8,7 @@ import { API } from 'aws-amplify'
 const state = {
     did_config_load_yet: false,
     is_site_selected: false,
-    global_config: {"a":1,"b":2},
+    global_config: {},
     selected_site: '',
     selected_enclosure: '',
     selected_mount: '',

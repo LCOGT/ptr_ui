@@ -22,9 +22,14 @@ const getters = {
 
 const actions = {
 
+    /**
+     *  This action will retrieve a list of the latest images (from the api).
+     *  The current local collection of the latest images will be updated if 
+     *  there are new images to display. 
+     */
     refresh_latest_images({ commit, state, rootState }) {
 
-        let site = rootState.device_selection.selected_site;
+        let site = rootState.observatory_configuration.selected_site;
         let apiName = 'ptr-api';
         let querySize = 10; // How many images to get
         let path = `/${site}/latest_images/${querySize}/`;
@@ -55,7 +60,7 @@ const actions = {
                  * To avoid redownloading everything every time we check for updates,
                  * only save the api return if the filenames are different.
                  */
-                // Also compare dates, as urls expire after an hour.
+                // TODO: Also compare dates, as urls expire after an hour.
                 let latest_local = state.recent_images[0].base_filename
                 let latest_response = response[0].base_filename
                 if (latest_local != latest_response) {
@@ -64,7 +69,6 @@ const actions = {
             }
 
             // If current_image is empty, set it to the first element from 'recent_images'. 
-            console.log(Object.keys(state.current_image).length)
             if (!Object.keys(state.current_image).length) {
                 commit('setCurrentImage', state.recent_images[0])
             }
@@ -74,6 +78,9 @@ const actions = {
         });
     },
 
+    /**
+     * Set the current image, usually to be displayed.
+     */
     set_current_image({ commit }, image_object) {
         commit('setCurrentImage',image_object)
     },

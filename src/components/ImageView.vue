@@ -87,12 +87,12 @@ export default {
     },
     created() {
         console.log('ImageView site prop: '+this.site)
-        this.$store.commit('device_selection/setActiveSite', this.site)
+        this.$store.commit('observatory_configuration/setActiveSite', this.site)
         this.$store.dispatch('images/refresh_latest_images')
     },
     watch: {
         site: function(newVal, oldVal) {
-            this.$store.commit('device_selection/setActiveSite', newVal)
+            this.$store.commit('observatory_configuration/setActiveSite', newVal)
             this.$store.dispatch('images/refresh_latest_images')
         }
     },
@@ -235,8 +235,8 @@ export default {
     computed: {
 
         active_site: {
-            get() { return this.$store.getters['device_selection/site'] },
-            set(value) { this.$store.commit('device_selection/setActiveSite', value) }
+            get() { return this.$store.getters['observatory_configuration/site'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveSite', value) }
         },
 
         ...mapGetters('images', {

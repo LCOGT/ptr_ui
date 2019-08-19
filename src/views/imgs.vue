@@ -21,7 +21,6 @@
             >
               {{ site }}
             </option>
-            <option> dummy_site </option>
           </b-select>
       </b-field>
 
@@ -45,17 +44,17 @@ export default {
   },
   beforeCreate() {
     // Set the default site for convenience
-    this.$store.commit('device_selection/setActiveSite', 'wmd')
-    this.$store.dispatch('device_selection/update_config')
+    this.$store.commit('observatory_configuration/setActiveSite', 'wmd')
+    this.$store.dispatch('observatory_configuration/update_config')
   },
   computed: {
-    ...mapGetters('device_selection', [
+    ...mapGetters('observatory_configuration', [
       'available_sites',
     ]),
 
     active_site: {
-        get() { return this.$store.getters['device_selection/site'] },
-        set(value) { this.$store.commit('device_selection/setActiveSite', value) }
+        get() { return this.$store.getters['observatory_configuration/site'] },
+        set(value) { this.$store.commit('observatory_configuration/setActiveSite', value) }
     },
 
   },

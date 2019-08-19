@@ -29,7 +29,7 @@ var create_commands = {
 
 
     store_test: function() {
-        console.log(store.getters['observatory/foo'])
+        console.log(store.getters['instrument_state/foo'])
     },
     test: function() {
         console.log('test from create_command.test()')
