@@ -148,7 +148,7 @@
     <!-- Mount Controls -->
     <div class="column" style="padding: 0">
     <div class="" style="background: #ff0044; padding: 2em;">
-        <div class="title">Mount</div>
+        <div class="title">Telescope</div>
 
         <b-field horizontal label="Ra">
           <b-input name="subject" v-model="slew_ra"></b-input>
@@ -342,7 +342,7 @@
     <!-- Other controls -->
     <div class="column" style="padding: 0">
     <div style="background:#ff8800; padding: 2em;">
-        <div class="title">Focus</div>
+        <div class="title">Focuser</div>
 
           <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
             <button class="button" slot="trigger" style="width: 100%;">
@@ -377,7 +377,7 @@
             </b-field>
           </b-field>
           <br>
-        <div class="title">Rotate</div>
+        <div class="title">Rotator</div>
           <command-button :data="rotate_home_command" />
           <br>
           <b-field horizontal label="Relative">
@@ -414,7 +414,7 @@
               <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
                   <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
                   <img
-                      v-bind:src="current_image.url" 
+                      v-bind:src="current_image.jpg13_url" 
                       @click="isImageModalActive = true" 
                       style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
               </div>
@@ -426,7 +426,7 @@
               </p>
           </b-modal>
           <div>Filename:</div>
-          <div>{{current_image.filename}}</div>
+          <div>{{current_image.base_filename}}</div>
           <br>
       </div>
       <div style="background-color: #282f2f; padding: 2em;">
@@ -603,6 +603,7 @@ export default {
 
 .columns {
   margin: 1em;
+  flex-wrap: wrap;
 }
 .column {
   margin: 5px;

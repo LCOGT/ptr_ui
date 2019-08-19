@@ -38,7 +38,6 @@ export default {
   watch: {
   },
   created() {
-      this.initialize()
       this.update_status = setInterval(this.updateStatus, 2000)
   },
   beforeDestroy() {

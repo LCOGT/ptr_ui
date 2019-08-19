@@ -89,7 +89,7 @@ const getters = {
             // Ignore the first element, which is really just the definitions of the items in the arrays representing each filter.j
             return fwo.slice(1, num_filters)
         } catch {
-            return []
+            return [[]]
         }
     },
     // Currently selected filter

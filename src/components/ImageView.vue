@@ -12,12 +12,12 @@
 
         <div id="svg_container"></div>
         <svg id='image_svg'>
-            <image :href="current_image.url" width="768" height="768"></image>
+            <image :href="current_image.jpg13_url" width="768" height="768"></image>
         </svg>
 
         <div style="display: flex; justify-content: space-between;">
             <p>mouseX: {{mouseX}}, mouseY: {{mouseY}}</p>
-            <p> {{current_image.filename}} </p>
+            <p> {{current_image.base_filename}} </p>
         </div>
     </div>
 
@@ -33,9 +33,9 @@
         >
             <img 
                 style="width: 60px; height: 60px;"
-                v-bind:src="item.url"
-                v-bind:title="item.filename"
-                v-bind:class="{'selected_thumbnail' : item.filename == current_image.filename}"
+                v-bind:src="item.jpg13_url"
+                v-bind:title="item.base_filename"
+                v-bind:class="{'selected_thumbnail' : item.base_filename == current_image.base_filename}"
                 @click="setActiveImage(item)"
 
             >
@@ -124,7 +124,7 @@ export default {
                     queue:false,
                     onAction: () => {
                         console.log('slew to '+position[0]+', '+position[1])
-                        that.send_pixels_center_command(position, that.current_image.filename)
+                        that.send_pixels_center_command(position, that.current_image.base_filename)
                     }
                 })
 
@@ -297,7 +297,7 @@ export default {
     cursor: pointer;
 }
 .selected_thumbnail {
-    border: 1px solid gold;
+    border: 2px solid gold;
 }
 
 #image_svg {

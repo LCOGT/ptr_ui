@@ -1,16 +1,19 @@
-<template>
+<template><section>
     <image-view :site="sitecode"/>
-</template>
+    <images-table style="margin-top: 3em;"/>
+</section></template>
 
 
 <script>
 
 import ImageView from '@/components/ImageView'
+import ImagesTable from '@/components/ImagesTable'
 export default {
     name: "SubpageData",
     props: ["sitecode"],
     components: {
         ImageView,
+        ImagesTable,
     },
     beforeMount() {
         // TODO: create a cleaner system of tracking the active site and devices.

@@ -12,17 +12,11 @@ const state = {
     recent_images: [],
 
     // 'current_image' defines what image is currently displayed.
-    current_image: {
-        filename: '',
-        url: '',
-        last_modified: '',
-    },
+    current_image: {},
 }
 
 const getters = {
     recent_images: state => state.recent_images,
-    most_recent_image: state => state.recent_images[0],
-
     current_image: state => state.current_image,
 }
 
@@ -61,27 +55,18 @@ const actions = {
                  * To avoid redownloading everything every time we check for updates,
                  * only save the api return if the filenames are different.
                  */
-                let latest_local = state.recent_images[0].filename
-                let latest_response = response[0].filename
+                // Also compare dates, as urls expire after an hour.
+                let latest_local = state.recent_images[0].base_filename
+                let latest_response = response[0].base_filename
                 if (latest_local != latest_response) {
-
                     commit('setRecentImages', response)
-                    let the_current_image = {
-                        filename: response[0].filename,
-                        url: response[0].url,
-                    }
-                    commit('setCurrentImage', the_current_image)
                 }
             }
 
             // If current_image is empty, set it to the first element from 'recent_images'. 
-            if (state.current_image.name == '' || state.current_image.url == '') {
-                let the_current_image = {
-                    filename: state.recent_images[0].filename,
-                    url: state.recent_images[0].url,
-                    last_modified: state.recent_images[0].last_modified,
-                } 
-                commit('setCurrentImage', the_current_image)
+            console.log(Object.keys(state.current_image).length)
+            if (!Object.keys(state.current_image).length) {
+                commit('setCurrentImage', state.recent_images[0])
             }
 
         }).catch(error => {
@@ -90,23 +75,14 @@ const actions = {
     },
 
     set_current_image({ commit }, image_object) {
-        let the_current_image = {
-            filename: image_object.filename,
-            url: image_object.url,
-            last_modified: image_object.last_modified,
-        }
-        commit('setCurrentImage', the_current_image)
+        commit('setCurrentImage',image_object)
     },
 
     /**
      * Set the current image to the most recent one in recent_images.
      */
     set_latest_image({ commit, state }) {
-        let the_current_image = {
-            filename: state.recent_images[0].filename,
-            url: state.recent_images[0].url,
-            last_modified: state.recent_images[0].last_modified,
-        } 
+        let the_current_image = state.recent_images[0]
         commit('setCurrentImage', the_current_image)
     }
 

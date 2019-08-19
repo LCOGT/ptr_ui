@@ -61,7 +61,7 @@
                 >
                 <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
                 <img
-                    v-bind:src="current_image.url" 
+                    v-bind:src="current_image.jpg13_url" 
                     class="preview-image" />
             </div>
 
@@ -72,7 +72,7 @@
                 </p>
             </b-modal>
             <br>
-            <div>File: {{current_image.filename}} </div>
+            <div>File: {{current_image.base_filename}} </div>
         </article>
 
       </div>
