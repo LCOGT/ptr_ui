@@ -23,6 +23,7 @@ const actions = {
     log_in_user({ commit, dispatch }, user) {
         commit('setUser', user)
         dispatch('observatory_configuration/update_config', null, {root: true})
+        dispatch('images/refresh_latest_images', null, {root: true})
     }
 }
 
