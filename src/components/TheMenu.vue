@@ -55,8 +55,9 @@
 
             <div v-if="!isLoggedIn" class="navbar-item">
                 <div class="buttons">
-                    <router-link to="/register" tag="button" class="button is-primary">Sign up</router-link>
-                    <router-link to="/login" tag="button" class="button is-light">Log in</router-link>
+                    <router-link to="/register" tag="button" class="button">sign up</router-link>
+                    <router-link to="/login" tag="button" class="button is-light">log in</router-link>
+                    <button class="button is-warning" @click="signIn">log in as wmd_admin</button>
                 </div>
             </div>
             </div>
@@ -114,7 +115,21 @@ export default {
           this.$router.go() // reload to redirect if user is on auth-required page.
         })
         .catch(err => console.log(err))
-    }
+    },
+
+    /**
+     * Sign in as wmd_admin. 
+     * This is temporary for quick testing, and will be disabled when 
+     * authentication grants access to controls. 
+     */
+    signIn () {
+      Auth.signIn({ username: 'wmd_admin', password: 'Password1!', region: 'us-west-2' })
+        .then(user => {
+          console.log(user)
+          this.$store.commit('auth/setUser', user)
+        })
+        .catch(err => console.log(err))
+    },
   },
   computed: {
     ...mapGetters('auth', {

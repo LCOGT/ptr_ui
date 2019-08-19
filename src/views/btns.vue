@@ -247,7 +247,7 @@ export default {
     },
 
     /**
-     * Sign in as timbeccue. 
+     * Sign in as wmd_admin. 
      * This is temporary for quick testing, and will be disabled when 
      * authentication grants access to controls. 
      */
