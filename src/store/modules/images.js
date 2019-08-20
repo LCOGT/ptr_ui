@@ -7,8 +7,7 @@ import { API } from 'aws-amplify'
 
 const state = {
 
-    // 'recent_images' is a list of elements with form {filename: "", url: ""}.
-    // It is updated whenever the action 'refresh_latest_images' is called.
+    // recent_images is updated whenever the action 'refresh_latest_images' is called.
     recent_images: [],
 
     // 'current_image' defines what image is currently displayed.
@@ -24,8 +23,6 @@ const actions = {
 
     /**
      *  This action will retrieve a list of the latest images (from the api).
-     *  The current local collection of the latest images will be updated if 
-     *  there are new images to display. 
      */
     refresh_latest_images({ commit, state, rootState }) {
 
@@ -36,40 +33,29 @@ const actions = {
 
         /**
          * The response for this api call is a list of elements with the form:
-         *  { 
-         *      filename: "", 
-         *      url: "",
-         *      recency_order: int in [0,k],
-         *      last_modified: "2019-07-10 04:51:21+00:00" //last modified time at s3
+         *  image = {
+         *      "recency_order": int,
+         *      "site": str,
+         *      "base_filename": str,
+         *      "capture_date": int (js timestamp, in milis),
+         *      "observer": str,
+         *      "right_ascension": str,
+         *      "declination": str,
+         *      "filter_used": str,
+         *      "exposure_time": str,
+         *      "airmass": str,
+         *      "jpg13_url": str,
+         *      "fits13_url": str,
          *  }
          */
         API.get(apiName, path).then(response => {
 
-            // Store the recent images if our vuex state is empty
-            if (state.recent_images.length == 0) {
-                commit('setRecentImages', response)
-            }
+            commit('setRecentImages', response)
 
-            // If we already have items in the vuex recent_images list:
-            else {
-
-                // Compare the filenames of the most recent images.
-                /**
-                 * Note: each api call for recent images generates unique urls
-                 * for each image returned, even if they point to the same files.
-                 * To avoid redownloading everything every time we check for updates,
-                 * only save the api return if the filenames are different.
-                 */
-                // TODO: Also compare dates, as urls expire after an hour.
-                let latest_local = state.recent_images[0].base_filename
-                let latest_response = response[0].base_filename
-                if (latest_local != latest_response) {
-                    commit('setRecentImages', response)
-                }
-            }
-
-            // If current_image is empty, set it to the first element from 'recent_images'. 
-            if (!Object.keys(state.current_image).length) {
+            // If current_image is empty, or if we've switched sites:
+            // set current_image to the first element from 'recent_images'. 
+            if (!Object.keys(state.current_image).length 
+                || state.current_image.site != response[0].site) {
                 commit('setCurrentImage', state.recent_images[0])
             }
 

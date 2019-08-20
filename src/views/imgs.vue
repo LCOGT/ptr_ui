@@ -22,6 +22,7 @@
               {{ site }}
             </option>
           </b-select>
+          <button class="button" @click="toggleSites">toggle sites</button>
       </b-field>
 
       <!-- The actual image view component -->
@@ -41,6 +42,19 @@ export default {
   name: 'imgs',
   components: {
     ImageView,
+  },
+  data() {
+    return {
+      toggleSiteIndex: 0,
+    }
+  },
+  methods: {
+    toggleSites() {
+      let the_sites = ['wmd', 'WMD']
+      let chosen_site = the_sites[this.toggleSiteIndex]
+      this.$store.commit('observatory_configuration/setActiveSite', chosen_site)
+      this.toggleSiteIndex = (this.toggleSiteIndex + 1) % 2;
+    }
   },
   beforeCreate() {
     // Set the default site for convenience
