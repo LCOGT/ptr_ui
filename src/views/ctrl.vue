@@ -1,6 +1,6 @@
 
 
-<template><div class="wrapper">
+<template><div class="wrapper container">
 
   <!-- Select the active devices here -->
   <div class="instrument-selection">
@@ -10,6 +10,7 @@
         <b-select 
           placeholder="choose site..." 
           default="" 
+          size="is-small"
           v-model="active_site"
          >
           <option 
@@ -19,7 +20,6 @@
           >
             {{ site }}
           </option>
-          <option> dummy_site </option>
         </b-select>
     </b-field>
 
@@ -29,6 +29,7 @@
         <b-select 
           placeholder="choose mount..." 
           default="" 
+          size="is-small"
           v-model="active_mount"
         >
           <option 
@@ -38,7 +39,6 @@
           >
             {{ mount }}
           </option>
-          <option> dummy_mount </option>
         </b-select>
     </b-field>
 
@@ -47,6 +47,7 @@
         <b-select 
           placeholder="choose telescope..." 
           default="" 
+          size="is-small"
           v-model="active_telescope"
         >
           <option 
@@ -56,7 +57,6 @@
           >
             {{ ota }}
           </option>
-          <option> dummy_telescope </option>
         </b-select>
     </b-field>
     
@@ -65,6 +65,7 @@
         <b-select 
           placeholder="choose camera..." 
           default="" 
+          size="is-small"
           v-model="active_camera"
         >
           <option 
@@ -74,7 +75,6 @@
           >
             {{ cam }}
           </option>
-          <option> dummy_camera </option>
         </b-select>
     </b-field>
 
@@ -83,6 +83,7 @@
         <b-select 
           placeholder="choose filter wheel..." 
           default="" 
+          size="is-small"
           v-model="active_filter_wheel"
         >
           <option 
@@ -92,7 +93,6 @@
           >
             {{ filter_wheel }}
           </option>
-          <option> dummy_filter_wheel </option>
         </b-select>
     </b-field>
 
@@ -101,6 +101,7 @@
         <b-select 
           placeholder="choose focuser..." 
           default="" 
+          size="is-small"
           v-model="active_focuser"
         >
           <option 
@@ -110,7 +111,6 @@
           >
             {{ focuser }}
           </option>
-          <option> dummy_camera </option>
         </b-select>
     </b-field>
 
@@ -119,6 +119,7 @@
         <b-select 
           placeholder="choose rotator..." 
           default="" 
+          size="is-small"
           v-model="active_rotator"
         >
           <option 
@@ -128,19 +129,19 @@
           >
             {{ rotator }}
           </option>
-          <option> dummy_rotator </option>
         </b-select>
     </b-field>
 
   <br>
   </div>
-
+  
   <!-- Device control input fields -->
   <div class="columns">
 
     <!-- Mount Controls -->
-    <div class="column" style="background: #ff0044;">
-        <div class="title">Mount</div>
+    <div class="column" style="padding: 0">
+    <div class="" style="background: #ff0044; padding: 2em;">
+        <div class="title">Telescope</div>
 
         <b-field horizontal label="Ra">
           <b-input name="subject" v-model="slew_ra"></b-input>
@@ -149,7 +150,7 @@
           <b-input name="subject" v-model="slew_dec"></b-input>
         </b-field>
 
-        <command-button :data="mount_slew_command"/>
+        <command-button :data="mount_slew_command" style="margin-bottom: 1em;"/>
         <br>
 
         <b-dropdown aria-role="list" style="width: 100%;">
@@ -179,37 +180,18 @@
             <command-button :data="mount_stop_command" class="dropdown-button-command"/>
           </b-dropdown-item>
         </b-dropdown>
+    </div>
 
-        <!--br>
-        <div> (or) </div>
-        <br>
-
-        <div class="buttons has-addons">
-          <command-button :data="mount_slew_command" style="width: 100%" />
-          <command-button :data="mount_slew_chart_command" style="width: 100%;" />
-        </div>
-
-        <div class="buttons has-addons">
-          <command-button :data="mount_screenflat_command" style="width: 50%" />
-          <command-button :data="mount_skyflat_command" style="width: 50%" />
-        </div>
-
-        <div class="buttons has-addons">
-          <command-button :data="mount_raSidDec0_command" style="width: 100%"/>
-        </div>
-
-        <div class="buttons has-addons">
-          <command-button :data="mount_home_command" style="width: 50%" />
-          <command-button :data="mount_park_command" style="width: 50%" />
-
-        </div>
-
-        <command-button :data="mount_stop_command" style="width: 100%" /-->
+    <pre>
+      <simple-device-status :device_name="active_mount" device_type="Mount" :device_status="mount_state" />
+      <simple-device-status :device_name="active_telescope" device_type="Telescope" :device_status="telescope_state" />
+    </pre>
 
     </div>
 
     <!-- Buttons for camera controls -->
-    <div class="column" style="background:orangered">
+    <div class="column" style="padding: 0">
+    <div style="background:orangered; padding: 2em;">
         <div class="title">Camera + Filter</div>
 
         <b-field horizontal label="Expose">
@@ -221,7 +203,7 @@
 
         <b-field horizontal label="Count">
             <b-field>
-                <b-input name="subject" v-model="cam_repeat"></b-input>
+                <b-numberinput name="subject" type="is-light" min="1" controls-position="compact" v-model="cam_count"></b-numberinput>
             </b-field>
         </b-field>
 
@@ -237,11 +219,11 @@
             <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" style="width: 100%">
               <option 
                 v-for="(filter, index) in filter_wheel_options"
-                v-bind:value="filter" 
+                v-bind:value="filter[0]" 
                 v-bind:selected="index === 0"
                 v-bind:key="index"
                 >
-                {{ filter }}
+                {{ filter[0] }}
               </option>
             </b-select>
 
@@ -343,11 +325,19 @@
 
     </div>
 
-    <!-- Other controls -->
-    <div class="column" style="background:#ff8800">
-        <div class="title">Focus</div>
+    <pre>
+      <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
+      <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
+    </pre>
 
-          <b-dropdown aria-role="list" style="width: 100%;">
+    </div>
+
+    <!-- Other controls -->
+    <div class="column" style="padding: 0">
+    <div style="background:#ff8800; padding: 2em;">
+        <div class="title">Focuser</div>
+
+          <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
             <button class="button" slot="trigger" style="width: 100%;">
                 <span>Focus Action...</span>
                 <b-icon icon="menu-down"></b-icon>
@@ -380,7 +370,7 @@
             </b-field>
           </b-field>
           <br>
-        <div class="title">Rotate</div>
+        <div class="title">Rotator</div>
           <command-button :data="rotate_home_command" />
           <br>
           <b-field horizontal label="Relative">
@@ -397,68 +387,58 @@
           </b-field>
           <br>
     </div>
+    <pre>
+      <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
+      <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
+    </pre>
+    </div>
 
     <!-- Verify expected data in this column. -->
-    <div class="column" style="background: orange">
-        <!--div class="title">Info</div-->
-        <!--button class="button" @click="getLastCommand">get prior command</button-->
-        <!--br-->
-        <!--pre><code>{{ prior_command }}</code></pre-->
+    <div class="column" style="padding: 0">
+      <div style="background: orange; padding: 2em;">
+          <!--div class="title">Info</div-->
+          <!--button class="button" @click="getLastCommand">get prior command</button-->
+          <!--br-->
+          <!--pre><code>{{ prior_command }}</code></pre-->
 
-        <div class="title">Image</div>
-        <button class="button" @click="getLatestImage">latest image</button>
-        <br>
-            <div style="width:100%;height:0; padding-top:50%;position:relative; background-fill: yellow;">
-                <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
-                <img
-                    v-bind:src="current_image.url" 
-                    @click="isImageModalActive = true" 
-                    style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
-            </div>
-        <!--img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img-->
-        <b-modal :active.sync="isImageModalActive" :width="800">
-            <p class="image">
-                <!--img v-bind:src="current_image.url"-->
-                <image-view />
-            </p>
-        </b-modal>
-        <div>Filename:</div>
-        <div>{{current_image.filename}}</div>
-        <br>
-    </div>
-
-  </div>
-
-  <!-- Raw status for the active devices -->
-  <div class="status">
-    <div class="status-item">
-      <div class="title2">
-        Mount Status  
-        <span v-if="status_age < 10" style="color: lightgreen;"> {{" < 10 seconds old"}} </span>
-        <span v-else-if="status_age < 120" style="color: yellow;">{{" < 2 minutes old"}}</span>
-        <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+" minutes old"}}</span>
-        <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+" hours old"}}</span>
-        <span v-else-if="status_age >= 86400" style="color:red;">{{(status_age/86400).toFixed(0)+" days old"}}</span>
+          <div class="title">Image</div>
+          <button class="button" @click="getLatestImage" style="margin-bottom: 1em;">latest image</button>
+          <br>
+              <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
+                  <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
+                  <img
+                      v-bind:src="current_image.jpg13_url" 
+                      @click="isImageModalActive = true" 
+                      style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
+              </div>
+          <!--img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img-->
+          <b-modal :active.sync="isImageModalActive" :width="800">
+              <p class="image">
+                  <!--img v-bind:src="current_image.url"-->
+                  <image-view :site="active_site" />
+              </p>
+          </b-modal>
+          <div>Filename:</div>
+          <div>{{current_image.base_filename}}</div>
+          <br>
       </div>
-      <pre><code>{{ JSON.stringify(mount_state,null,2) }}</code></pre>
+      <div style="background-color: #282f2f; padding: 2em;">
+        <p class="heading">Status Age: </p>
+        <p class="has-text-weight-semibold is-size-5">
+        <span v-if="status_age < 15" style="color: lightgreen;"> {{' < 15 seconds old'}} </span>
+        <span v-else-if="status_age < 120" style="color: yellow;">{{' < 2 minutes old'}}</span>
+        <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+' minutes old'}}</span>
+        <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+' hours old'}}</span>
+        <span v-else-if="status_age < 18000*86400" style="color:red;">{{(status_age/86400).toFixed(0)+' days old'}}</span>
+        <span v-else-if="status_age > 18000*86400" style="color:red;">{{'unavailable'}}</span>
+        </p>
+      </div>
     </div>
-    <div class="status-item">
-      <div class="title2">Camera</div>
-      <pre><code>{{ JSON.stringify(camera_state,null,2) }}</code></pre>
-    </div>
-    <div class="status-item">
-      <div class="title2">Filter Wheel</div>
-      <pre><code>{{ JSON.stringify(filter_wheel_state,null,2) }}</code></pre>
-    </div>
-    <div class="status-item">
-      <div class="title2">Focuser</div>
-      <pre><code>{{ JSON.stringify(focuser_state,null,2) }}</code></pre>
-    </div>
-    <div class="status-item">
-      <div class="title2">Rotator</div>
-      <pre><code>{{ JSON.stringify(rotator_state,null,2) }}</code></pre>
-    </div>
+
   </div>
+
+
+
 
   <div class="choose-target">
     <the-sky-chart />
@@ -479,6 +459,7 @@ import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import ObjectTable from '@/components/ObjectTable'
 import { commands_mixin } from '../mixins/commands_mixin'
 import ImageView from '@/components/ImageView'
+import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
 
 
 export default {
@@ -488,6 +469,7 @@ export default {
     TheSkyChart,
     ObjectTable,
     ImageView,
+    SimpleDeviceStatus,
   },
   mixins: [commands_mixin],
   data () {
@@ -498,28 +480,6 @@ export default {
       update_status_interval: 2000,
 
       local_timestamp: Date.now(),
-
-      // If a user enters a value in an input field, that value maps here.
-      // When commands are sent, values are read from here.
-      slew_ra: '',
-      slew_dec: '',
-
-      cam_exposure: '1',
-      cam_repeat: '1',
-      //cam_filter: '',
-      cam_area: null,
-      cam_bin: '1', 
-      cam_dither: 'off',
-      cam_image_type: 'light',
-      cam_image_type_options: ['light', 'toss', 'auto focus',  'fine focus', 'dark', 'bias', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
-      cam_scripts: 'none',
-
-      focus_relative: '',
-      focus_absolute: '',
-
-      rotate_relative: '',
-      rotate_absolute: '',
-
 
       // This is displayed as the prior command. Updated on button click.
       prior_command: null,
@@ -532,10 +492,10 @@ export default {
 
   beforeCreate() {
     // Make sure we're using the latest site configuration.
-    this.$store.dispatch('device_selection/update_config')
+    this.$store.dispatch('observatory_configuration/update_config')
 
     // Default site/device values.
-    this.active_site= 'WMD';
+    this.active_site= 'wmd';
     this.active_enclosure= 'enclosure1';
     this.active_mount= 'mnt1';
     this.active_telescope= 'tel1';
@@ -583,7 +543,7 @@ export default {
     update_status() {
 
       // Dispatch the vuex action that refreshes the site status. 
-      this.$store.dispatch('observatory/updateStatus')
+      this.$store.dispatch('instrument_state/updateStatus')
 
       // Refresh the image list
       this.$store.dispatch('images/refresh_latest_images')
@@ -601,9 +561,9 @@ export default {
   },
 
   computed: {
-    // Getters from the observatory vuex module. 
-    // Observatory status is saved here.
-    ...mapGetters('observatory', {
+    // Getters from the instrument_state vuex module. 
+    // Observatory instrument status is saved here.
+    ...mapGetters('instrument_state', {
         all_mount_state: 'mount',
         all_camera_state: 'camera',
         all_filter_wheel_state: 'filter_wheel',
@@ -634,11 +594,13 @@ export default {
   display: flex;
   flex-wrap: wrap;
 }
+
 .columns {
   margin: 1em;
+  flex-wrap: wrap;
 }
 .column {
-  margin: 2px;
+  margin: 5px;
   padding: 2em;
   display: flex;
   flex-direction:column;
@@ -653,15 +615,17 @@ export default {
   /*background:lightskyblue;*/
   display: flex;
   border-bottom: solid grey 1px;
+  flex-wrap: wrap;
 }
 .status-item {
   margin: 1em;
+  flex: 1;
 }
 .choose-target {
   margin: 1em;
   padding: 1em;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 0fr;
 }
 .choose-target-item {
   height: width;

@@ -40,23 +40,23 @@
       <div class="left-status-box">
 
         <div>
-          <p class="heading">Right Ascension</p>
-          <p class="title">12.324</p>
+          <p class="heading">Active Site:</p>
+          <p class="title">{{active_site}}</p>
         </div>
 
         <div>
-          <p class="heading">Declination</p>
-          <p class="title">76.52</p>
+          <p class="heading">Active Mount:</p>
+          <p class="title">{{active_mount}}</p>
         </div>
 
       </div>
     </div>
 
     <div class="column content">
-      <subpage-home v-if="subpage == 'home'" />
-      <subpage-targets v-if="subpage == 'targets'" />
-      <subpage-planning v-if="subpage == 'planning'" />
-      <subpage-data v-if="subpage == 'data'" />
+      <subpage-home v-if="subpage == 'home'" :sitecode="sitecode"/>
+      <subpage-targets v-if="subpage == 'targets'" :sitecode="sitecode"/>
+      <subpage-planning v-if="subpage == 'planning'" :sitecode="sitecode"/>
+      <subpage-data v-if="subpage == 'data'" :sitecode="sitecode"/>
     </div>
 
 
@@ -110,8 +110,10 @@ export default {
     }
   },
   async created() {
-    console.log(this.sitecode)
-    console.log(this.subpage)
+    console.log('From UX1, sitecode: '+this.sitecode)
+    console.log('From UX1, subpage: '+this.subpage)
+    this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
+    this.$store.dispatch('images/refresh_latest_images')
     // Get the global configuration for all sites from an api call.
     let apiName = 'ptr-api';
     let path = '/all/config/';

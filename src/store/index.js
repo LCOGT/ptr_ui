@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import auth from './modules/auth'
-import observatory from './modules/observatory'
-import device_selection from './modules/device_selection'
+import instrument_state from './modules/instrument_state'
+import observatory_configuration from './modules/observatory_configuration'
 import skyChart from './modules/skyChart'
 import images from './modules/images'
 import createPersistedState from 'vuex-persistedstate'
@@ -12,8 +12,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     modules: {
         auth,
-        observatory,
-        device_selection,
+        instrument_state,
+        observatory_configuration,
         skyChart,
         images,
     },

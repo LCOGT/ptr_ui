@@ -102,12 +102,12 @@ export default {
 
     computed: {
 
-        ...mapGetters('device_selection', [
+        ...mapGetters('observatory_configuration', [
             'available_cameras',
         ]),
         active_camera: {
-            get() { return this.$store.getters['device_selection/camera'] },
-            set(value) { this.$store.commit('device_selection/setActiveCamera', value) }
+            get() { return this.$store.getters['observatory_configuration/camera'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveCamera', value) }
         },
     }
 

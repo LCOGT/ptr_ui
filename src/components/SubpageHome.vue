@@ -55,88 +55,29 @@
         <article class="tile is-child notification">
             <p class="title is-4">3. See the results!</p>
             <br>
-            <div style="width:100%;height:0; padding-top:100%;position:relative; background:grey;">
+            <div 
+                style="width:100%;height:0; padding-top:100%;position:relative; background:grey;"
+                @click="isImageModalActive = true" 
+                >
                 <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
                 <img
-                    v-bind:src="current_image.url" 
-                    @click="isImageModalActive = true" 
+                    v-bind:src="current_image.jpg13_url" 
                     class="preview-image" />
             </div>
 
             <b-modal :active.sync="isImageModalActive" :width="800">
                 <p class="image">
                     <!--img v-bind:src="current_image.url"-->
-                    <image-view />
+                    <image-view :site="sitecode"/>
                 </p>
             </b-modal>
             <br>
-            <div>File: {{current_image.filename}} </div>
+            <div>File: {{current_image.base_filename}} </div>
         </article>
 
       </div>
     </div>
 
-
-    <!--
-    <div class="columns quick-image">
-        <div class="column quick-image-column">  
-            <p class="title is-4">1. Choose a target</p>
-            <br>
-            <b-field label="Search for a target">
-                    <b-input placeholder="target name or position"></b-input>
-            </b-field>
-            <p class="control">
-                <button class="button is-primary">Search</button>
-            </p>
-        </div>
-
-        <div class="line-divider"></div>
-
-        <div class="column quick-image-column">  
-            <p class="title is-4">2. Expose an image</p>
-            <br>
-            <b-field label="Expose">
-                <b-field>
-                    <b-input name="subject" value="5.0"></b-input>
-                    <p class="control"> <span class="button is-static">seconds</span> </p>
-                </b-field>
-            </b-field>
-            <b-field label="Filter">
-                <b-select placeholder="Select filter">
-                    <option value="Color (RGB)">color</option>
-                    <option value="Luminance">luminance</option>
-                    <option value="Red">red</option>
-                    <option value="Green">green</option>
-                    <option value="Blue">blue</option>
-                </b-select>
-            </b-field>
-
-        </div>
-
-        <div class="line-divider"></div>
-
-        <div class="column quick-image-column">  
-            <p class="title is-4">3. See the results!</p>
-            <br>
-            <div style="width:100%;height:0; padding-top:100%;position:relative; background:grey;">
-                <img
-                    v-bind:src="current_image.url" 
-                    @click="isImageModalActive = true" 
-                    class="preview-image" />
-            </div>
-
-            <b-modal :active.sync="isImageModalActive" :width="800">
-                <p class="image">
-                    <img v-bind:src="current_image.url">
-                    <image-view />
-                </p>
-            </b-modal>
-            <div>Filename:</div>
-            <div>{{current_image.filename}}</div>
-
-        </div>
-    </div>
-    -->
     <br>
 
     <br>

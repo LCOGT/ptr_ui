@@ -32,13 +32,12 @@ export default {
   },
   methods: {
     updateStatus() {
-        this.$store.dispatch('observatory/updateStatus')
+        this.$store.dispatch('instrument_state/updateStatus')
     }
   },
   watch: {
   },
   created() {
-      this.initialize()
       this.update_status = setInterval(this.updateStatus, 2000)
   },
   beforeDestroy() {

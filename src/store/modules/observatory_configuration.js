@@ -8,7 +8,7 @@ import { API } from 'aws-amplify'
 const state = {
     did_config_load_yet: false,
     is_site_selected: false,
-    global_config: {"a":1,"b":2},
+    global_config: {},
     selected_site: '',
     selected_enclosure: '',
     selected_mount: '',
@@ -84,9 +84,12 @@ const getters = {
     // Available filters
     filter_wheel_options: state => {
         try {
-            return state.global_config[state.selected_site].filter_wheel[state.selected_filter_wheel].settings.filters
+            let fwo = state.global_config[state.selected_site].filter_wheel[state.selected_filter_wheel].settings.filter_data;
+            let num_filters = fwo.length;
+            // Ignore the first element, which is really just the definitions of the items in the arrays representing each filter.j
+            return fwo.slice(1, num_filters)
         } catch {
-            return []
+            return [[]]
         }
     },
     // Currently selected filter
@@ -122,7 +125,7 @@ const actions = {
             commit('setGlobalConfig', response)
 
             // Set initial values in command fields
-            let filterSelection= getters.filter_wheel_options[0]
+            let filterSelection= getters.filter_wheel_options[0][0]
             commit('setFilterSelection', filterSelection)
 
             let areaSelection = getters.camera_areas[0]

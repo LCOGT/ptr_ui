@@ -12,12 +12,12 @@
 
         <div id="svg_container"></div>
         <svg id='image_svg'>
-            <image :href="current_image.url" width="768" height="768"></image>
+            <image :href="current_image.jpg13_url" width="768" height="768"></image>
         </svg>
 
         <div style="display: flex; justify-content: space-between;">
             <p>mouseX: {{mouseX}}, mouseY: {{mouseY}}</p>
-            <p> {{current_image.filename}} </p>
+            <p> {{current_image.base_filename}} </p>
         </div>
     </div>
 
@@ -33,9 +33,9 @@
         >
             <img 
                 style="width: 60px; height: 60px;"
-                v-bind:src="item.url"
-                v-bind:title="item.filename"
-                v-bind:class="{'selected_thumbnail' : item.filename == current_image.filename}"
+                v-bind:src="item.jpg13_url"
+                v-bind:title="item.base_filename"
+                v-bind:class="{'selected_thumbnail' : item.base_filename == current_image.base_filename}"
                 @click="setActiveImage(item)"
 
             >
@@ -56,6 +56,9 @@ import { commands_mixin } from '../mixins/commands_mixin'
 export default {
     name: 'ImageView',
     mixins: [commands_mixin],
+    props: {
+        'site': String,
+    },
     data() {
         return {
 
@@ -80,16 +83,18 @@ export default {
             // Time that right click events stay on the screen.
             right_click_ttl: 5000,
 
-
-
-
         }
     },
-    beforeMount() {
-        // TODO: create a cleaner system of tracking the active site and devices.
-        this.active_site = 'WMD'
-        this.active_mount = 'mnt1'
+    created() {
+        console.log('ImageView site prop: '+this.site)
+        this.$store.commit('observatory_configuration/setActiveSite', this.site)
         this.$store.dispatch('images/refresh_latest_images')
+    },
+    watch: {
+        site: function(newVal, oldVal) {
+            this.$store.commit('observatory_configuration/setActiveSite', newVal)
+            this.$store.dispatch('images/refresh_latest_images')
+        }
     },
     mounted() {
 
@@ -119,7 +124,7 @@ export default {
                     queue:false,
                     onAction: () => {
                         console.log('slew to '+position[0]+', '+position[1])
-                        that.send_pixels_center_command(position, that.current_image.filename)
+                        that.send_pixels_center_command(position, that.current_image.base_filename)
                     }
                 })
 
@@ -201,14 +206,14 @@ export default {
                     .attr('x2', this.image_length/2)
                     .attr('y2', this.image_length)
                     .attr('id', 'crosshair_vertical')
-                    .attr('stroke', 'orange')
+                    .attr('stroke', 'red')
                 d3.select(elem).append('line')
                     .attr('y1', this.image_length/2)
                     .attr('x1', 0)
                     .attr('y2', this.image_length/2)
                     .attr('x2', this.image_length)
                     .attr('id', 'crosshair_horizontal')
-                    .attr('stroke', 'orange')
+                    .attr('stroke', 'red')
             } else {
                 d3.select(elem).selectAll('line').remove()
             }
@@ -230,8 +235,8 @@ export default {
     computed: {
 
         active_site: {
-            get() { return this.$store.getters['device_selection/site'] },
-            set(value) { this.$store.commit('device_selection/setActiveSite', value) }
+            get() { return this.$store.getters['observatory_configuration/site'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveSite', value) }
         },
 
         ...mapGetters('images', {
@@ -292,7 +297,7 @@ export default {
     cursor: pointer;
 }
 .selected_thumbnail {
-    border: 1px solid gold;
+    border: 2px solid gold;
 }
 
 #image_svg {

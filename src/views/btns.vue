@@ -6,6 +6,7 @@
  */
 
 <template>
+  <div class="container">
   <div class="columns">
 
     <!-- Buttons for AWS integration -->
@@ -73,6 +74,7 @@
         <button class="button" @click="updateStatus">update status</button>
     </div>
     
+  </div>
   </div>
 </template>
 
@@ -245,7 +247,7 @@ export default {
     },
 
     /**
-     * Sign in as timbeccue. 
+     * Sign in as wmd_admin. 
      * This is temporary for quick testing, and will be disabled when 
      * authentication grants access to controls. 
      */
@@ -253,7 +255,7 @@ export default {
       Auth.signIn({ username: 'wmd_admin', password: 'Password1!', region: 'us-west-2' })
         .then(user => {
           console.log(user)
-          this.$store.commit('auth/setUser', user)
+          this.$store.dispatch('auth/log_in_user', user)
         })
         .catch(err => console.log(err))
     },

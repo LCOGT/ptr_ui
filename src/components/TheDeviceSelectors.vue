@@ -27,7 +27,7 @@ export default {
     mixins: [commands_mixin],
     beforeCreate() {
         // make sure we're using the latest site configuration.
-        this.$store.dispatch('device_selection/update_config')
+        this.$store.dispatch('observatory_configuration/update_config')
     },
 }
 
