@@ -15,11 +15,11 @@ var configs = {
         follow: "center",   // on which coordinates to center the map, default: zenith, if location enabled, otherwise center
 
         orientationfixed: true,  // Keep orientation angle the same as center[2]
-        geopos: [34,-119],    // optional initial geographic position [lat,lon] in degrees, overrides center
+        //geopos: [34,-119],    // optional initial geographic position [lat,lon] in degrees, overrides center
 
         background: { fill: "#080f17", stroke: " #17202a", opacity: 1 }, // Background style
         adaptable: true,    // Sizes are increased with higher zoom-levels
-        interactive: false, // Enable zooming and rotation with mousewheel and dragging
+        interactive:false, // Enable zooming and rotation with mousewheel and dragging
         form: false,        // Display settings form
         location: true,    // Display location settings
         controls: false,     // Display zoom controls
@@ -29,23 +29,23 @@ var configs = {
         datapath: "/data",  // Path/URL to data files, empty = subfolder 'data'
         stars: {
             show:true,    // Show stars
-            limit: 3,      // Show only stars brighter than limit magnitude
+            limit: 6,      // Show only stars brighter than limit magnitude
             colors: true,  // Show stars in spectral colors, if not use "color"
-            style: { fill: "#ffffff", opacity: 1 }, // Default style for stars
+            style: { fill: "#ffffff", opacity: .5 }, // Default style for stars
             names: false,   // Show star names (Bayer, Flamsteed, Variable star, Gliese, whichever applies first)
             proper: true, // Show proper name (if present)
             desig: false,  // Show all names, including Draper and Hipparcos
-            namelimit: 2.5,  // Show only names for stars brighter than namelimit
-            namestyle: { fill: "#ddddbb", font: "9px Georgia, Times, 'Times Roman', serif", align: "left", baseline: "top" },
-            propernamestyle: { fill: "#ddddbb", font: "9px Georgia, Times, 'Times Roman', serif", align: "right", baseline: "bottom" },
-            propernamelimit: 1.5,  // Show proper names for stars brighter than propernamelimit
-            size: 7,       // Maximum size (radius) of star circle in pixels
-            exponent: -0.28, // Scale exponent for star size, larger = more linear
+            namelimit: 3,  // Show only names for stars brighter than namelimit
+            namestyle: { fill: "#ddddbb", font: "10px Georgia, Times, 'Times Roman', serif", align: "left", baseline: "top" },
+            propernamestyle: { fill: "#ddddbb", font: "10px Georgia, Times, 'Times Roman', serif", align: "right", baseline: "bottom" },
+            propernamelimit: 2,  // Show proper names for stars brighter than propernamelimit
+            size: 6,       // Maximum size (radius) of star circle in pixels
+            exponent: -0.4, // Scale exponent for star size, larger = more linear
             data: 'stars.6.json' // Data source for stellar data
             //data: 'stars.8.json' // Alternative deeper data source for stellar data
         },
         dsos: {
-            show: false,    // Show Deep Space Objects
+            show:false,    // Show Deep Space Objects
             limit: 9,      // Show only DSOs brighter than limit magnitude
             names: true,   // Show DSO names
             desig: false,   // Show short DSO names
@@ -90,7 +90,7 @@ var configs = {
             boundstyle: { stroke: "#cccc00", width: 0.5, opacity: 0.8, dash: [2, 4] }
         },
         planets: {
-            show: false,
+            show:true,
             which: ["sol", "mer", "ven", "ter", "lun", "mar", "jup", "sat", "ura", "nep"],
             // Font styles for planetary symbols
             style: { fill: "#00ccff", font: "bold 17px 'Lucida Sans Unicode', Consolas, sans-serif",
@@ -117,7 +117,7 @@ var configs = {
             style: { fill: "#fef9e7", opacity:0.10}
         },
         lines: {
-            graticule: { show: true, stroke: "#cccccc", width: 0.3, opacity: 0.3,      // Show graticule lines
+            graticule: { show: true, stroke: "#cccccc", width: 0.3, opacity: 0.4,      // Show graticule lines
                     // grid values: "outline", "center", or [lat,...] specific position
             lon: {pos: ["center"], fill: "#aaa", font: "10px Helvetica, Arial, sans-serif"},
                     // grid values: "outline", "center", or [lon,...] specific position

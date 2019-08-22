@@ -175,6 +175,19 @@ const getters = {
 
 
 
+    /* Site properties */
+    site_latitude: state => {
+        return (state.did_config_load_yet && state.is_site_selected)
+        ? parseFloat(state.global_config[state.selected_site].latitude)
+        : 0
+    },
+    site_longitude: state => {
+        return (state.did_config_load_yet && state.is_site_selected)
+        ? parseFloat(state.global_config[state.selected_site].longitude)
+        : 0
+    },
+
+
     /* These getters are used to customize the control form fields. */
     // Available camera areas
     camera_areas: state => {
