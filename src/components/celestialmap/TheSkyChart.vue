@@ -6,6 +6,9 @@
             celestial.js file is included. And they are set to be invisible anyways. -->
         <!--div id="celestial-form" style="display:none;"></div-->
         <!--div id="celestial-date" style="width:0"></div-->
+        <button class="button" @click="rotate">recenter</button>
+        <!--button class="button" @click="zoom">zoom</button-->
+        <!--button class="button" @click="animateZoom">zoom2</button-->
    </div> 
 </template>
 
@@ -70,7 +73,6 @@ export default {
         },
         initializePointer () {
 
-
             var pointers = {
                 "type":"FeatureCollection",
                 "features":[
@@ -125,7 +127,6 @@ export default {
         },
 
         update_chart (filter = mapConfigs.default_filter) {
-
             var that = this;
 
             var nebula = ['Pl','Di','Bn','Dn', 'Sn'];
@@ -299,16 +300,54 @@ export default {
             Celestial.redraw()
         },
 
+        rotate() {
+            Celestial.rotate({center:[helpers.hour2degree(helpers.siderealTime(this.site_longitude)), this.site_latitude, 0]})
+            Celestial.redraw()
+        },
+
+        zoom() {
+            let position = Celestial.getPoint([this.selectedRa, this.selectedDec], 'equatorial')
+
+            // Center on the coordinates:
+            position = [helpers.hour2degree(position[0]), position[1], 0]
+            Celestial.zoomBy(1.3)
+            Celestial.rotate({center: position })
+
+            Celestial.redraw()
+        },
+
+        animateZoom() {
+
+            Celestial.resize({width: 2000})
+            Celestial.redraw()
+
+        }
+
 
     },
     mounted() {
+        this.$store.dispatch('instrument_state/updateStatus')
         this.$nextTick(function () {
             this.handleClick();
             this.initializePointer();
             this.update_chart();
             Celestial.display(mapConfigs.config);
         })
+        console.log('from mounted, celestial metrics:')
     },
+
+
+   // watch: {
+   //     site_latitude(newLat) {
+   //         Celestial.rotate({center:[helpers.hour2degree(helpers.siderealTime(this.site_longitude)), this.site_latitude, 0]})
+   //         Celestial.redraw()
+   //     },
+   //     site_longitude(newLon) {
+   //         Celestial.rotate({center:[helpers.hour2degree(helpers.siderealTime(this.site_longitude)), this.site_latitude, 0]})
+   //         Celestial.redraw()
+   //     }
+   // },
+
     computed: {
         ...mapGetters('skyChart', {
             selectedRa: 'selectedRa',
@@ -316,6 +355,7 @@ export default {
         }),
         ...mapGetters('instrument_state', {
             all_mount_state: 'mount',
+            all_telescope_state: 'telescope',
 
             star_types: 'star_types',
             star_mags: 'star_mags',
@@ -325,11 +365,14 @@ export default {
         ...mapGetters('observatory_configuration', {
             active_site: 'site',
             active_mount: 'mount',
+            active_telescope: 'telescope',
+            site_latitude: 'site_latitude',
+            site_longitude: 'site_longitude',
         }),
 
         mountRa () {
             try {
-                let ra = this.all_mount_state[this.active_mount].RightAscension
+                let ra = this.all_telescope_state[this.active_telescope].right_ascension
                 return parseFloat(ra)
             } catch {
                 return -1
@@ -337,13 +380,17 @@ export default {
         }, 
         mountDec () {
             try {
-                let dec = this.all_mount_state[this.active_mount].Declination
+                let dec = this.all_telescope_state[this.active_telescope].declination
                 return parseFloat(dec)
             } catch {
                 return -1
             }
         }, 
-    }
+    },
+
+    //beforeDestroy() {
+    //    Celestial.clear()
+    //},
 }
 </script>
 

@@ -20,6 +20,8 @@ const state = emptyState();
 
 // getters
 const getters = {
+
+    /* All the state, per instrument type */
     mount: state => state.mount || [],
     telescope: state => state.telescope,
     camera: state => state.camera,
@@ -27,7 +29,11 @@ const getters = {
     focuser: state => state.focuser,
     rotator: state => state.rotator,
     timestamp: state => state.timestamp,
+<<<<<<< HEAD
     screen: state => state.screen,
+=======
+
+>>>>>>> Skychart syncs with selected site at current time.
 }
 
 // actions
