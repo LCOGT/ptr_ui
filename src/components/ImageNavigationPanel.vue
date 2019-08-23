@@ -9,6 +9,7 @@
                 v-bind:title="item.filename"
             >
         </div>
+        <p>{{username}}</p>
     </div>
 </template>
 
@@ -32,6 +33,9 @@ export default {
     computed: {
         ...mapGetters('images', {
             user_images: 'user_images'
+        }),
+        ...mapGetters('auth', {
+            username: 'username'
         }),
 
     },
