@@ -19,6 +19,7 @@ import skymap from './views/skymap.vue'
 import ctrl from './views/ctrl.vue'
 import ux1 from './views/ux1.vue'
 import imgnav from './views/imgnav.vue'
+import archive from './views/archive.vue'
 
 import store from './store'
 import { Auth } from 'aws-amplify'
@@ -41,6 +42,7 @@ const router = new VueRouter({
     { path: '/skymap', name: 'skymap', component: skymap},
     { path: '/ctrl', name: 'ctrl', component:ctrl},
     { path: '/imgnav', name: 'imgnav', component: imgnav},
+    { path: '/archive', name: 'archive', component: archive},
     { 
       path: '/ux1/:sitecode/:subpage', 
       name: 'ux1', 

@@ -26,15 +26,11 @@ const getters = {
 }
 
 const actions = {
-<<<<<<< Updated upstream
 
     /**
      *  This action will retrieve a complete list of an account's images (from the api).
      */
     get_user_images({ commit, state, rootState }) {
-=======
-    get_user_images({ commit }) {
->>>>>>> Stashed changes
 
         // TODO: Remove hard coded values and make sure that username in UI is linked to image records in database
         // let username = rootState.auth.user.username
