@@ -28,7 +28,7 @@ const actions = {
 
         let site = rootState.observatory_configuration.selected_site;
         let apiName = 'ptr-api';
-        let querySize = 10; // How many images to get
+        let querySize = 40; // How many images to get
         let path = `/${site}/latest_images/${querySize}/`;
 
         /**
