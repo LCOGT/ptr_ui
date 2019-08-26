@@ -120,6 +120,16 @@ export const commands_mixin = {
             'available_filter_wheels',
             'available_cameras',
 
+            // Device specific properties
+            'focuser_reference',
+            'focuser_min',
+            'focuser_max',
+            'focuser_step_size',
+
+            'rotator_min',
+            'rotator_max',
+            'rotator_step_size',
+
             // These getters retrieve options in the commands 
             // (eg. what filters are available in the filter wheel)
             'camera_areas',
@@ -284,12 +294,12 @@ export const commands_mixin = {
         },
         focus_relative_command () {
             return this.base_command( 'focuser', 'move_relative', 'focus',
-                { position: this.focus_relative, }
+                { position: this.focus_relative.toString(), }
             )
         },
         focus_absolute_command () {
             return this.base_command( 'focuser', 'move_absolute', 'focus',
-                { position: this.focus_absolute, }
+                { position:(this.focus_absolute).toString() } 
             )
         },
         focus_auto_command () {
@@ -303,6 +313,15 @@ export const commands_mixin = {
         },
         focus_vcurve_command () {
             return this.base_command('focuser', 'v_curve', 'v-curve focus' )
+        },
+        focus_gotoreference_command () {
+            return this.base_command('focuser', 'go_to_reference', 'go to reference' )
+        },
+        focus_gotocompensated_command () {
+            return this.base_command('focuser', 'go_to_compensated', 'go to compensated' )
+        },
+        focus_saveasreference_command () {
+            return this.base_command('focuser', 'save_as_reference', 'save as reference' )
         },
         focus_stop_command () {
             return this.base_command( 'focuser', 'stop', 'stop' )
@@ -320,12 +339,12 @@ export const commands_mixin = {
         },
         rotate_relative_command () {
             return this.base_command( 'rotator', 'move_relative', 'rotate',
-                { position: this.rotate_relative } 
+                { position: this.rotate_relative.toString() } 
             )
         },
         rotate_absolute_command () {
             return this.base_command( 'rotator', 'move_absolute', 'rotate',
-                { position: this.rotate_absolute } 
+                { position: (((parseFloat(this.rotate_absolute) % 360) + 360) % 360).toString() } // avoid negative results (since -5 % 360 = -5)
             )
         },
         }

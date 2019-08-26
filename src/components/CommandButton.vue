@@ -37,7 +37,6 @@ export default {
                 // TODO: add UI notification here.
                 return
             }
-
             this.isLoading = true
             var vm = this
 

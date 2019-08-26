@@ -144,10 +144,10 @@
         <div class="title">Telescope</div>
 
         <b-field horizontal label="Ra">
-          <b-input name="subject" v-model="slew_ra"></b-input>
+          <b-input name="subject" v-model="slew_ra" autocomplete="off"></b-input>
         </b-field>
         <b-field horizontal label="Dec">
-          <b-input name="subject" v-model="slew_dec"></b-input>
+          <b-input name="subject" v-model="slew_dec" autocomplete="off"></b-input>
         </b-field>
 
         <command-button :data="mount_slew_command" style="margin-bottom: 1em;"/>
@@ -196,14 +196,14 @@
 
         <b-field horizontal label="Expose">
             <b-field>
-                <b-input name="subject" v-model="cam_exposure"></b-input>
+                <b-input name="subject" v-model="cam_exposure" autocomplete="off"></b-input>
                 <p class="control"> <span class="button is-static">s</span> </p>
             </b-field>
         </b-field>
 
         <b-field horizontal label="Count">
             <b-field>
-                <b-numberinput name="subject" type="is-light" min="1" controls-position="compact" v-model="cam_count"></b-numberinput>
+                <b-numberinput name="subject" type="is-light" min="1" controls-position="compact" v-model="cam_count" autocomplete="off"></b-numberinput>
             </b-field>
         </b-field>
 
@@ -354,35 +354,46 @@
             <b-dropdown-item>
               <command-button :data="focus_vcurve_command" class="dropdown-button-command"/>
             </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
           </b-dropdown>
           <br>
 
           <b-field horizontal label="Relative">
             <b-field>
-              <b-input name="subject" v-model="focus_relative"></b-input>
-              <p class="control"> <command-button :data="focus_relative_command" />  </p>
+              <b-input expanded name="subject" size="is-small" v-model="focus_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="focus_relative_command" class="is-small"/>  </p><br>
             </b-field>
           </b-field>
+
           <b-field horizontal label="Absolute">
             <b-field>
-              <b-input name="subject" v-model="focus_absolute"></b-input>
-              <p class="control"> <command-button :data="focus_absolute_command" />  </p>
+              <b-input expanded name="subject" size="is-small" v-model="focus_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
             </b-field>
           </b-field>
           <br>
+
         <div class="title">Rotator</div>
           <command-button :data="rotate_home_command" />
           <br>
           <b-field horizontal label="Relative">
             <b-field>
-              <b-input name="subject" v-model="rotate_relative"></b-input>
-              <p class="control"> <command-button :data="rotate_relative_command" />  </p>
+              <b-input expanded size="is-small" name="subject" v-model="rotate_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
             </b-field>
           </b-field>
           <b-field horizontal label="Absolute">
             <b-field>
-              <b-input name="subject" v-model="rotate_absolute"></b-input>
-              <p class="control"> <command-button :data="rotate_absolute_command" />  </p>
+              <b-input expanded size="is-small" name="subject" v-model="rotate_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
             </b-field>
           </b-field>
           <br>

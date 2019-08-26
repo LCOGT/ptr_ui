@@ -69,6 +69,105 @@ const getters = {
     filter_wheel: state => state.selected_filter_wheel,
     camera: state => state.selected_camera,
 
+
+    /* Getters for specific device attributes (implemented here as needed) */
+    focuser_reference: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .focuser[state.selected_focuser]
+                .reference
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    focuser_min: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .focuser[state.selected_focuser]
+                .minimum
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    focuser_max: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .focuser[state.selected_focuser]
+                .maximum
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    focuser_step_size: state => {
+        try {
+            return (
+                parseFloat(state
+                    .global_config[state.selected_site]
+                    .focuser[state.selected_focuser]
+                    .step_size
+                )
+            )
+        } catch {
+            return 1.0
+        }
+    },
+
+
+
+    rotator_min: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .rotator[state.selected_rotator]
+                .minimum
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    rotator_max: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .rotator[state.selected_rotator]
+                .maximum
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    rotator_step_size: state => {
+        try {
+            return (
+                parseFloat(state
+                    .global_config[state.selected_site]
+                    .rotator[state.selected_rotator]
+                    .step_size
+                )
+            )
+        } catch {
+            return 1.0
+        }
+    },
+
+
+
     /* These getters are used to customize the control form fields. */
     // Available camera areas
     camera_areas: state => {
