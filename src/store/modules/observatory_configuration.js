@@ -253,36 +253,28 @@ const actions = {
             commit('setActiveEnclosure', 'enclosure1')
             commit('setActiveMount', 'mount1')
             commit('setActiveTelescope', 'telescope1')
-            //dispatch('setActiveTelescope', 'telescope1')
-            commit('setActiveFilterWheel', 'filter_wheel1')
-            commit('setActiveCamera', 'camera1')
-            commit('setActiveFocuser', 'focuser1')
-            commit('setActiveRotator', 'rotator1')
-            commit('setActiveScreen', 'screen1')
+            dispatch('setActiveTelescope', 'telescope1')
         }
     },
 
-    setActiveTelescope({ commit, getters, }, telescope_name) {
-        commit('setActiveTelescope', telescope_name)
+    setActiveTelescope({ commit, getters, dispatch }, telescope_name) {
+        API.get('ptr-api', '/all/config/').then(response => {
+            commit('setActiveTelescope', telescope_name)
 
-        let active_site = getters.site
-        console.log('did config load')
-        console.log(getters.is_config_loaded)
-        let telescopes = getters.all_telescopes
-        console.log('telescopes: ')
-        console.log(telescopes)
-        let telescope_config =telescopes[telescope_name]
-        console.log('telescope_config: ')
-        console.log(telescope_config)
-        let rotator_name = telescope_config.rotator_name
-        let camera_name = telescope_config.camera_name
-        let screen_name = telescope_config.screen_name
-        let focuser_name = telescope_config.focuser_name
-        commit('setActiveCamera', camera_name)
-        commit('setActiveFocuser', focuser_name)
-        commit('setActiveRotator', rotator_name)
-        commit('setActiveScreen', screen_name)
+            let telescopes = getters.all_telescopes
+            let telescope_config =telescopes[telescope_name]
 
+            let rotator_name = telescope_config.rotator_name
+            let camera_name = telescope_config.camera_name
+            let screen_name = telescope_config.screen_name
+            let focuser_name = telescope_config.focuser_name
+            let filter_wheel_name = telescope_config.filter_wheel_name
+            commit('setActiveCamera', camera_name)
+            commit('setActiveFocuser', focuser_name)
+            commit('setActiveRotator', rotator_name)
+            commit('setActiveFilterWheel',filter_wheel_name)
+            commit('setActiveScreen', screen_name)
+        })
     }
 
 }
@@ -292,7 +284,6 @@ const mutations = {
         state.global_config = config;
         state.did_config_load_yet = true;
     },
-
     setActiveSite(state, site) { state.selected_site = site; state.is_site_selected = true },
     setActiveEnclosure(state, enclosure) { state.selected_enclosure = enclosure },
     setActiveMount(state, mount) { state.selected_mount = mount },

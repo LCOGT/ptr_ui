@@ -502,15 +502,15 @@ export default {
   },
 
   beforeCreate() {
+  },
+
+  created() {
     // Make sure we're using the latest site configuration.
     this.$store.dispatch('observatory_configuration/update_config')
 
     // Default site/device values.
     this.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
     this.$store.dispatch('instrument_state/updateStatus')
-  },
-
-  created() {
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_status_interval = setInterval(this.update_status, 3000)
