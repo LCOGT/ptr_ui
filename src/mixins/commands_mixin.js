@@ -112,6 +112,7 @@ export const commands_mixin = {
             all_filter_wheel_state: 'filter_wheel',
             all_focuser_state: 'focuser',
             all_rotator_state: 'rotator',
+            all_screen_state: 'screen',
         }),
 
         // Getters from the observatory_configuration vuex module.
@@ -125,6 +126,7 @@ export const commands_mixin = {
             'available_focusers',
             'available_filter_wheels',
             'available_cameras',
+            'available_screens',
 
             // Device specific properties
             'focuser_reference',
@@ -186,6 +188,7 @@ export const commands_mixin = {
         active_telescope: {
             get() { return this.$store.getters['observatory_configuration/telescope'] },
             set(value) { this.$store.commit('observatory_configuration/setActiveTelescope', value) }
+            //set(value) { this.$store.dispatch('observatory_configuration/setActiveTelescope', value) }
         },
         active_rotator: {
             get() { return this.$store.getters['observatory_configuration/rotator'] },
@@ -266,7 +269,7 @@ export const commands_mixin = {
                     image_type: this.cam_image_type,
                 },
                 {
-                    repeat: this.cam_count.toString(),
+                    count: this.cam_count.toString(),
                     bin: this.cam_bin,
                     filter: this.filter_wheel_options_selection,
                     size: this.camera_areas_selection,

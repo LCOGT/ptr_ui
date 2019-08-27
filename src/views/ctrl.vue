@@ -411,32 +411,24 @@
     <pre>
       <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
       <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
-      <simple-device-status :device_name="active_screen" device_type="Flat Screen" :device_status="screen_state" />
+      <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
     </pre>
     </div>
 
     <!-- Verify expected data in this column. -->
     <div class="column" style="padding: 0">
       <div style="background: orange; padding: 2em;">
-          <!--div class="title">Info</div-->
-          <!--button class="button" @click="getLastCommand">get prior command</button-->
-          <!--br-->
-          <!--pre><code>{{ prior_command }}</code></pre-->
-
           <div class="title">Image</div>
-          <button class="button" @click="getLatestImage" style="margin-bottom: 1em;">latest image</button>
+          <button class="button" @click="refresh_latest_image" style="margin-bottom: 1em;">latest image</button>
           <br>
-              <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
-                  <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
-                  <img
-                      v-bind:src="current_image.jpg13_url" 
-                      @click="isImageModalActive = true" 
-                      style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
-              </div>
-          <!--img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img-->
+          <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
+              <img
+                  v-bind:src="current_image.jpg13_url" 
+                  @click="isImageModalActive = true" 
+                  style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
+          </div>
           <b-modal :active.sync="isImageModalActive" :width="800">
               <p class="image">
-                  <!--img v-bind:src="current_image.url"-->
                   <image-view :site="active_site" />
               </p>
           </b-modal>
@@ -459,27 +451,21 @@
 
   </div>
 
-
-
-
   <div class="choose-target">
     <the-sky-chart />
-    <!--object-table class="choose-target-item"/-->
   </div>
 
 </div></template>
 
 <script>
-import { API, Auth } from 'aws-amplify'
-import { AmplifyEventBus } from 'aws-amplify-vue'
 import { mapGetters } from 'vuex'
-import axios from 'axios';
+import { commands_mixin } from '../mixins/commands_mixin'
 import helpers from '@/utils/helpers'
-import create_commands from '@/utils/create_command'
+import store from '../store/index'
+
+// Components
 import CommandButton from '@/components/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import ObjectTable from '@/components/ObjectTable'
-import { commands_mixin } from '../mixins/commands_mixin'
 import ImageView from '@/components/ImageView'
 import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
 
@@ -489,7 +475,6 @@ export default {
   components: {
     CommandButton,
     TheSkyChart,
-    ObjectTable,
     ImageView,
     SimpleDeviceStatus,
   },
@@ -500,15 +485,19 @@ export default {
       // This is a setInterval object initialized in `created()`. 
       // Fetches status every few seconds.
       update_status_interval: 2000,
-
       local_timestamp: Date.now(),
-
-      // This is displayed as the prior command. Updated on button click.
-      prior_command: null,
 
       // Controls the toggle for image preview modal.
       isImageModalActive: false,
 
+    }
+  },
+  beforeRouteEnter: async function(to, from, next) {
+    try {
+      await store.dispatch('observatory_configuration/update_config');
+      next();
+    } catch(exception) {
+      next(exception);
     }
   },
 
@@ -517,15 +506,8 @@ export default {
     this.$store.dispatch('observatory_configuration/update_config')
 
     // Default site/device values.
-    this.active_site= 'wmd';
-    this.active_enclosure= 'enclosure1';
-    this.active_mount= 'mnt1';
-    this.active_telescope= 'tel1';
-    this.active_camera= 'cam1';
-    this.active_filter_wheel= 'filter_wheel1';
-    this.active_focuser= 'focuser1';
-    this.active_rotator= 'rotator1';
-    this.active_screen='screen1';
+    this.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
+    this.$store.dispatch('instrument_state/updateStatus')
   },
 
   created() {
@@ -533,74 +515,45 @@ export default {
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_status_interval = setInterval(this.update_status, 3000)
     this.update_time_interval = setInterval(this.update_time, 1000)
-
   },
   
+  beforeDestroy() {
+    clearInterval(this.update_status_interval)
+  },
+
+
   methods: {
-
-    /**
-     * Get the most recent command sent to the selected site.
-     * Note: this deletes the command from the queue!
-     */
-    getLastCommand() {
-      // Parameters for api call to get last command
-      let apiName = 'ptr-api';
-      let url = `/${this.active_site}/${this.active_mount}/command/`;
-
-      API.get(apiName, url).then(response => {
-        console.log(response)
-        this.prior_command = response
-      }).catch(error => {
-        console.log(error.response)
-      });
-    },
-
-    getLatestImage() {
-      this.$store.dispatch('images/set_latest_image')
-    },
-
     /**
     * Update status by requesting data from dynamodb via vuex.
     * This function is called regularly in the `created` lifecycle hook.
     */
     update_status() {
-
       // Dispatch the vuex action that refreshes the site status. 
       this.$store.dispatch('instrument_state/updateStatus')
-
       // Refresh the image list
       this.$store.dispatch('images/refresh_latest_images')
-
     },
 
     update_time() {
       this.local_timestamp= Date.now()
     },
 
+    refresh_latest_image() {
+      this.$store.dispatch('images/set_latest_image')
+    },
+
   },
 
-  beforeDestroy() {
-    clearInterval(this.update_status_interval)
-  },
 
   computed: {
-    // Getters from the instrument_state vuex module. 
-    // Observatory instrument status is saved here.
-    ...mapGetters('instrument_state', {
-        all_mount_state: 'mount',
-        all_camera_state: 'camera',
-        all_filter_wheel_state: 'filter_wheel',
-        all_focuser_state: 'focuser',
-        all_rotator_state: 'rotator',
-        status_timestamp: 'timestamp',
-    }),
 
     ...mapGetters('images', [
       'current_image',
     ]),
 
     status_age() {
-      return (this.local_timestamp/1000 - this.status_timestamp).toFixed(1)
+      let status_timestamp = this.$store.getters['instrument_state/timestamp']
+      return (this.local_timestamp/1000 - status_timestamp).toFixed(1)
     }
   },
 

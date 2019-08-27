@@ -5,7 +5,7 @@
 
 import { API } from 'aws-amplify'
 
-const state = {
+var state = {
     did_config_load_yet: false,
     is_site_selected: false,
     global_config: {},
@@ -210,9 +210,10 @@ const getters = {
         }
     },
     
-
+    all_telescopes: state => state.global_config[state.selected_site]['telescope'],
 
     global_config: state => state.global_config,
+    is_config_loaded: state => state.did_config_load_yet,
     foo: () => "bar",
 }
 
@@ -241,26 +242,48 @@ const actions = {
             console.log(error)
         });
     },
+
     set_default_filter_option({ commit, getters }) {
         commit('setFilterSelection', getters.filter_wheel_options[0])
     },
 
-    setActiveTelescope({ commit, getters, state }, telescope_name) {
-        commit('setActiveTelescope', telescope_name)
-        console.log(state["global_config"][state.selected_site])
-        console.log(state.selected_site)
-        let screens = getters.available_screens
-        let active_screen = "no available screen"
-        for (var screen_name in screens) {
-            console.log(state.global_config[getters.site]["screen"])
-            let screen_parent = state.global_config[state.selected_site]["screen"][screen_name]["parent"]
-            if (screen_parent == telescope_name) {
-                active_screen = screen_name
-            }
-        } 
-        commit('setActiveScreen', screen_name)
-    }
+    set_default_active_devices({ commit, dispatch }, site) {
+        if (site=="wmd") {
+            commit('setActiveSite', site)
+            commit('setActiveEnclosure', 'enclosure1')
+            commit('setActiveMount', 'mount1')
+            commit('setActiveTelescope', 'telescope1')
+            //dispatch('setActiveTelescope', 'telescope1')
+            commit('setActiveFilterWheel', 'filter_wheel1')
+            commit('setActiveCamera', 'camera1')
+            commit('setActiveFocuser', 'focuser1')
+            commit('setActiveRotator', 'rotator1')
+            commit('setActiveScreen', 'screen1')
+        }
+    },
 
+    setActiveTelescope({ commit, getters, }, telescope_name) {
+        commit('setActiveTelescope', telescope_name)
+
+        let active_site = getters.site
+        console.log('did config load')
+        console.log(getters.is_config_loaded)
+        let telescopes = getters.all_telescopes
+        console.log('telescopes: ')
+        console.log(telescopes)
+        let telescope_config =telescopes[telescope_name]
+        console.log('telescope_config: ')
+        console.log(telescope_config)
+        let rotator_name = telescope_config.rotator_name
+        let camera_name = telescope_config.camera_name
+        let screen_name = telescope_config.screen_name
+        let focuser_name = telescope_config.focuser_name
+        commit('setActiveCamera', camera_name)
+        commit('setActiveFocuser', focuser_name)
+        commit('setActiveRotator', rotator_name)
+        commit('setActiveScreen', screen_name)
+
+    }
 
 }
 

@@ -57,6 +57,9 @@ export default {
     TheMenu,
     components
   },
+  beforeCreate() {
+    this.$store.dispatch('observatory_configuration/update_config')
+  },
 }
 </script>
 
