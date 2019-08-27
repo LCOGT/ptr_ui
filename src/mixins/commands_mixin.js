@@ -187,8 +187,8 @@ export const commands_mixin = {
         },
         active_telescope: {
             get() { return this.$store.getters['observatory_configuration/telescope'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveTelescope', value) }
-            //set(value) { this.$store.dispatch('observatory_configuration/setActiveTelescope', value) }
+            //set(value) { this.$store.commit('observatory_configuration/setActiveTelescope', value) }
+            set(value) { this.$store.dispatch('observatory_configuration/setActiveTelescope', value) }
         },
         active_rotator: {
             get() { return this.$store.getters['observatory_configuration/rotator'] },
