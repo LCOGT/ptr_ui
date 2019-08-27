@@ -24,7 +24,7 @@
 
     <!--div class="column is-narrow recent_images"-->
     <div class="recent_images">
-
+       
         <div 
             class="recent_image" 
             style="display: flex;"
@@ -41,7 +41,7 @@
             >
             <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
         </div>
-            
+          
     </div>
     </div></div>
 </template>
@@ -284,7 +284,9 @@ export default {
 }
 
 .recent_images {
-    display: flex;
+    display: flex; 
+    flex-wrap: nowrap;
+    overflow-x: auto;
     flex-direction:row;
     border-top: 1px solid white;
     padding-top: 2em;
@@ -295,6 +297,7 @@ export default {
     margin: 5px;
     margin-left: 0;
     cursor: pointer;
+    flex: 0 0 auto;
 }
 .selected_thumbnail {
     border: 2px solid gold;
