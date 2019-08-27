@@ -33,6 +33,9 @@ export const commands_mixin = {
             rotate_relative: '',
             rotate_absolute: '',
 
+            // Screen Fields
+            screen_brightness: 100,
+
         }
     },
 
@@ -71,6 +74,9 @@ export const commands_mixin = {
                 break;
                 case 'focuser':
                 device = this.active_focuser;
+                break;
+                case 'screen':
+                device = this.active_screen;
                 break;
             }
 
@@ -197,6 +203,10 @@ export const commands_mixin = {
             get() { return this.$store.getters['observatory_configuration/camera'] },
             set(value) { this.$store.commit('observatory_configuration/setActiveCamera', value) }
         },
+        active_screen: {
+            get() { return this.$store.getters['observatory_configuration/screen'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveScreen', value) }
+        },
 
         // Since the vuex instrument_state getters return state for all devices of
         // a type together, we need to request the specific device from that 
@@ -205,32 +215,37 @@ export const commands_mixin = {
         mount_state: function() {
             try {
                 return this.all_mount_state[this.active_mount]
-            } catch { return [] }
+            } catch { return {} }
         },
         telescope_state: function() {
             try {
                 return this.all_telescope_state[this.active_telescope]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
         },
         camera_state: function() {
             try {
                 return this.all_camera_state[this.active_camera]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
         },
         filter_wheel_state: function() {
             try {
                 return this.all_filter_wheel_state[this.active_filter_wheel]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
         },
         focuser_state: function() {
             try {
                 return this.all_focuser_state[this.active_focuser]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
         },
         rotator_state: function() {
             try {
                 return this.all_rotator_state[this.active_rotator]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
+        },
+        screen_state: function () {
+            try {
+                return this.all_screen_state[this.active_screen]
+            } catch(error) { return {} }
         },
 
         command_url: function () {
@@ -347,5 +362,14 @@ export const commands_mixin = {
                 { position: (((parseFloat(this.rotate_absolute) % 360) + 360) % 360).toString() } // avoid negative results (since -5 % 360 = -5)
             )
         },
-        }
+        screen_on_command () {
+            return this.base_command( 'screen', 'turn_on', 'on',
+                { brightness: this.screen_brightness }
+            )
+        },
+        screen_off_command() {
+            return this.base_command( 'screen', 'turn_off', 'off' )
+        },
+
+    }
 }

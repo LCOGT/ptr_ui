@@ -366,14 +366,14 @@
           </b-dropdown>
           <br>
 
-          <b-field horizontal label="Relative">
+          <b-field label="Relative">
             <b-field>
               <b-input expanded name="subject" size="is-small" v-model="focus_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="focus_relative_command" class="is-small"/>  </p><br>
             </b-field>
           </b-field>
 
-          <b-field horizontal label="Absolute">
+          <b-field label="Absolute">
             <b-field>
               <b-input expanded name="subject" size="is-small" v-model="focus_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
@@ -384,23 +384,34 @@
         <div class="title">Rotator</div>
           <command-button :data="rotate_home_command" />
           <br>
-          <b-field horizontal label="Relative">
+          <b-field label="Relative">
             <b-field>
               <b-input expanded size="is-small" name="subject" v-model="rotate_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
             </b-field>
           </b-field>
-          <b-field horizontal label="Absolute">
+          <b-field label="Absolute">
             <b-field>
               <b-input expanded size="is-small" name="subject" v-model="rotate_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
             </b-field>
           </b-field>
           <br>
+
+        <div class="title">Flat Screen</div>
+          <b-field label="Brightness">
+            <b-field>
+              <b-input expanded size="is-small" name="subject" v-model="screen_brightness" type="number" :step="1" min="0" max="100" autocomplete="off"></b-input>
+              <command-button :data="screen_on_command" class="is-small control" />
+              <command-button :data="screen_off_command" class="is-small control" /> 
+            </b-field>
+          </b-field>
+
     </div>
     <pre>
       <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
       <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
+      <simple-device-status :device_name="active_screen" device_type="Flat Screen" :device_status="screen_state" />
     </pre>
     </div>
 
@@ -514,6 +525,7 @@ export default {
     this.active_filter_wheel= 'filter_wheel1';
     this.active_focuser= 'focuser1';
     this.active_rotator= 'rotator1';
+    this.active_screen='screen1';
   },
 
   created() {
