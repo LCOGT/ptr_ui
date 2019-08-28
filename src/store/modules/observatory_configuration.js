@@ -5,7 +5,7 @@
 
 import { API } from 'aws-amplify'
 
-const state = {
+var state = {
     did_config_load_yet: false,
     is_site_selected: false,
     global_config: {},
@@ -17,6 +17,7 @@ const state = {
     selected_focuser: '',
     selected_filter_wheel: '',
     selected_camera: '',
+    selected_screen: '',
 
     camera_areas_selection: '',
     filter_wheel_options_selection: '',
@@ -26,37 +27,42 @@ const getters = {
     available_sites: state => Object.keys(state.global_config),
     available_enclosures: state =>  {
         return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["enclosure"] || {})
+            ? Object.keys(state.global_config[state.selected_site]["enclosure"] || [])
             : []
     },
     available_mounts: state => {
         return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["mount"] || {}) 
+            ? Object.keys(state.global_config[state.selected_site]["mount"] || []) 
             : []
     },
     available_telescopes: state =>  {
         return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["telescope"] || {}) 
+            ? Object.keys(state.global_config[state.selected_site]["telescope"] || []) 
             : []
     },
     available_rotators: state =>  {
         return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["rotator"] || {})
+            ? Object.keys(state.global_config[state.selected_site]["rotator"] || [])
             : []
     },
     available_focusers: state =>  {
         return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["focuser"] || {})
+            ? Object.keys(state.global_config[state.selected_site]["focuser"] || [])
             : []
     },
     available_filter_wheels: state =>  {
         return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["filter_wheel"] || {})
+            ? Object.keys(state.global_config[state.selected_site]["filter_wheel"] || [])
             : []
     },
     available_cameras: state =>  {
         return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["camera"] || {})
+            ? Object.keys(state.global_config[state.selected_site]["camera"] || [])
+            : []
+    },
+    available_screens: state =>  {
+        return (state.did_config_load_yet && state.is_site_selected)
+            ? Object.keys(state.global_config[state.selected_site]["screen"] || [])
             : []
     },
 
@@ -68,6 +74,106 @@ const getters = {
     focuser: state => state.selected_focuser,
     filter_wheel: state => state.selected_filter_wheel,
     camera: state => state.selected_camera,
+    screen: state => state.selected_screen,
+
+
+    /* Getters for specific device attributes (implemented here as needed) */
+    focuser_reference: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .focuser[state.selected_focuser]
+                .reference
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    focuser_min: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .focuser[state.selected_focuser]
+                .minimum
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    focuser_max: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .focuser[state.selected_focuser]
+                .maximum
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    focuser_step_size: state => {
+        try {
+            return (
+                parseFloat(state
+                    .global_config[state.selected_site]
+                    .focuser[state.selected_focuser]
+                    .step_size
+                )
+            )
+        } catch {
+            return 1.0
+        }
+    },
+
+
+
+    rotator_min: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .rotator[state.selected_rotator]
+                .minimum
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    rotator_max: state => {
+        try {
+            return (
+                parseFloat(state
+                .global_config[state.selected_site]
+                .rotator[state.selected_rotator]
+                .maximum
+                )
+            )
+        } catch {
+            return ''
+        }
+    },
+    rotator_step_size: state => {
+        try {
+            return (
+                parseFloat(state
+                    .global_config[state.selected_site]
+                    .rotator[state.selected_rotator]
+                    .step_size
+                )
+            )
+        } catch {
+            return 1.0
+        }
+    },
+
+
 
     /* These getters are used to customize the control form fields. */
     // Available camera areas
@@ -104,9 +210,10 @@ const getters = {
         }
     },
     
-
+    all_telescopes: state => state.global_config[state.selected_site]['telescope'],
 
     global_config: state => state.global_config,
+    is_config_loaded: state => state.did_config_load_yet,
     foo: () => "bar",
 }
 
@@ -135,10 +242,40 @@ const actions = {
             console.log(error)
         });
     },
+
     set_default_filter_option({ commit, getters }) {
         commit('setFilterSelection', getters.filter_wheel_options[0])
     },
 
+    set_default_active_devices({ commit, dispatch }, site) {
+        if (site=="wmd") {
+            commit('setActiveSite', site)
+            commit('setActiveEnclosure', 'enclosure1')
+            commit('setActiveMount', 'mount1')
+            commit('setActiveTelescope', 'telescope1')
+            dispatch('setActiveTelescope', 'telescope1')
+        }
+    },
+
+    setActiveTelescope({ commit, getters, dispatch }, telescope_name) {
+        API.get('ptr-api', '/all/config/').then(response => {
+            commit('setActiveTelescope', telescope_name)
+
+            let telescopes = getters.all_telescopes
+            let telescope_config =telescopes[telescope_name]
+
+            let rotator_name = telescope_config.rotator_name
+            let camera_name = telescope_config.camera_name
+            let screen_name = telescope_config.screen_name
+            let focuser_name = telescope_config.focuser_name
+            let filter_wheel_name = telescope_config.filter_wheel_name
+            commit('setActiveCamera', camera_name)
+            commit('setActiveFocuser', focuser_name)
+            commit('setActiveRotator', rotator_name)
+            commit('setActiveFilterWheel',filter_wheel_name)
+            commit('setActiveScreen', screen_name)
+        })
+    }
 
 }
 
@@ -147,7 +284,6 @@ const mutations = {
         state.global_config = config;
         state.did_config_load_yet = true;
     },
-
     setActiveSite(state, site) { state.selected_site = site; state.is_site_selected = true },
     setActiveEnclosure(state, enclosure) { state.selected_enclosure = enclosure },
     setActiveMount(state, mount) { state.selected_mount = mount },
@@ -156,6 +292,7 @@ const mutations = {
     setActiveFocuser(state, focuser) { state.selected_focuser = focuser },
     setActiveFilterWheel(state, filter_wheel) { state.selected_filter_wheel = filter_wheel },
     setActiveCamera(state, camera) { state.selected_camera = camera },
+    setActiveScreen(state, screen) { state.selected_screen = screen },
 
     setFilterSelection(state, filterSelection) { state.filter_wheel_options_selection = filterSelection },
     setCameraAreasSelection(state, areaSelection) { state.camera_areas_selection = areaSelection },
