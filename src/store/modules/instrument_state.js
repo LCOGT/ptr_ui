@@ -10,6 +10,7 @@ var emptyState = function() {
         rotator: {},
         filter_wheel: {},
         enclosure: {},
+        screen: {},
         timestamp: '',
     }
 }
@@ -26,6 +27,7 @@ const getters = {
     focuser: state => state.focuser,
     rotator: state => state.rotator,
     timestamp: state => state.timestamp,
+    screen: state => state.screen,
 }
 
 // actions
@@ -44,6 +46,7 @@ const actions = {
             commit('setFocuser', [])
             commit('setFilterWheel', [])
             commit('setRotator', [])
+            commit('setScreen', [])
             commit('setTimestamp', '')
         }
         // Otherwise, refresh the state for the selected site.
@@ -59,6 +62,7 @@ const actions = {
                 commit('setFocuser', response.content.focuser)
                 commit('setFilterWheel', response.content.filter_wheel)
                 commit('setRotator', response.content.rotator)
+                commit('setScreen', response.content.screen)
                 commit('setTimestamp', response.content.timestamp)
             }).catch(error => {
                 console.log(error)
@@ -76,6 +80,7 @@ const mutations = {
     setFocuser(state, focuser) { state.focuser = focuser },
     setFilterWheel(state, filter_wheel) { state.filter_wheel = filter_wheel },
     setRotator(state, rotator) { state.rotator = rotator },
+    setScreen(state, screen) { state.screen = screen },
     setEmptyState(state) {
         for (var key in emptyState()) {
             if (state.hasOwnProperty(key)) {

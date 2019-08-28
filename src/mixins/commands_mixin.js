@@ -33,6 +33,9 @@ export const commands_mixin = {
             rotate_relative: '',
             rotate_absolute: '',
 
+            // Screen Fields
+            screen_brightness: 100,
+
         }
     },
 
@@ -72,6 +75,9 @@ export const commands_mixin = {
                 case 'focuser':
                 device = this.active_focuser;
                 break;
+                case 'screen':
+                device = this.active_screen;
+                break;
             }
 
             let the_base_command = {
@@ -106,6 +112,7 @@ export const commands_mixin = {
             all_filter_wheel_state: 'filter_wheel',
             all_focuser_state: 'focuser',
             all_rotator_state: 'rotator',
+            all_screen_state: 'screen',
         }),
 
         // Getters from the observatory_configuration vuex module.
@@ -119,6 +126,17 @@ export const commands_mixin = {
             'available_focusers',
             'available_filter_wheels',
             'available_cameras',
+            'available_screens',
+
+            // Device specific properties
+            'focuser_reference',
+            'focuser_min',
+            'focuser_max',
+            'focuser_step_size',
+
+            'rotator_min',
+            'rotator_max',
+            'rotator_step_size',
 
             // These getters retrieve options in the commands 
             // (eg. what filters are available in the filter wheel)
@@ -169,7 +187,8 @@ export const commands_mixin = {
         },
         active_telescope: {
             get() { return this.$store.getters['observatory_configuration/telescope'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveTelescope', value) }
+            //set(value) { this.$store.commit('observatory_configuration/setActiveTelescope', value) }
+            set(value) { this.$store.dispatch('observatory_configuration/setActiveTelescope', value) }
         },
         active_rotator: {
             get() { return this.$store.getters['observatory_configuration/rotator'] },
@@ -187,6 +206,10 @@ export const commands_mixin = {
             get() { return this.$store.getters['observatory_configuration/camera'] },
             set(value) { this.$store.commit('observatory_configuration/setActiveCamera', value) }
         },
+        active_screen: {
+            get() { return this.$store.getters['observatory_configuration/screen'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveScreen', value) }
+        },
 
         // Since the vuex instrument_state getters return state for all devices of
         // a type together, we need to request the specific device from that 
@@ -195,32 +218,37 @@ export const commands_mixin = {
         mount_state: function() {
             try {
                 return this.all_mount_state[this.active_mount]
-            } catch { return [] }
+            } catch { return {} }
         },
         telescope_state: function() {
             try {
                 return this.all_telescope_state[this.active_telescope]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
         },
         camera_state: function() {
             try {
                 return this.all_camera_state[this.active_camera]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
         },
         filter_wheel_state: function() {
             try {
                 return this.all_filter_wheel_state[this.active_filter_wheel]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
         },
         focuser_state: function() {
             try {
                 return this.all_focuser_state[this.active_focuser]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
         },
         rotator_state: function() {
             try {
                 return this.all_rotator_state[this.active_rotator]
-            } catch(error) { return [] }
+            } catch(error) { return {} }
+        },
+        screen_state: function () {
+            try {
+                return this.all_screen_state[this.active_screen]
+            } catch(error) { return {} }
         },
 
         command_url: function () {
@@ -241,7 +269,7 @@ export const commands_mixin = {
                     image_type: this.cam_image_type,
                 },
                 {
-                    repeat: this.cam_count.toString(),
+                    count: this.cam_count.toString(),
                     bin: this.cam_bin,
                     filter: this.filter_wheel_options_selection,
                     size: this.camera_areas_selection,
@@ -284,12 +312,12 @@ export const commands_mixin = {
         },
         focus_relative_command () {
             return this.base_command( 'focuser', 'move_relative', 'focus',
-                { position: this.focus_relative, }
+                { position: this.focus_relative.toString(), }
             )
         },
         focus_absolute_command () {
             return this.base_command( 'focuser', 'move_absolute', 'focus',
-                { position: this.focus_absolute, }
+                { position:(this.focus_absolute).toString() } 
             )
         },
         focus_auto_command () {
@@ -303,6 +331,15 @@ export const commands_mixin = {
         },
         focus_vcurve_command () {
             return this.base_command('focuser', 'v_curve', 'v-curve focus' )
+        },
+        focus_gotoreference_command () {
+            return this.base_command('focuser', 'go_to_reference', 'go to reference' )
+        },
+        focus_gotocompensated_command () {
+            return this.base_command('focuser', 'go_to_compensated', 'go to compensated' )
+        },
+        focus_saveasreference_command () {
+            return this.base_command('focuser', 'save_as_reference', 'save as reference' )
         },
         focus_stop_command () {
             return this.base_command( 'focuser', 'stop', 'stop' )
@@ -320,13 +357,22 @@ export const commands_mixin = {
         },
         rotate_relative_command () {
             return this.base_command( 'rotator', 'move_relative', 'rotate',
-                { position: this.rotate_relative } 
+                { position: this.rotate_relative.toString() } 
             )
         },
         rotate_absolute_command () {
             return this.base_command( 'rotator', 'move_absolute', 'rotate',
-                { position: this.rotate_absolute } 
+                { position: (((parseFloat(this.rotate_absolute) % 360) + 360) % 360).toString() } // avoid negative results (since -5 % 360 = -5)
             )
         },
-        }
+        screen_on_command () {
+            return this.base_command( 'screen', 'turn_on', 'on',
+                { brightness: this.screen_brightness }
+            )
+        },
+        screen_off_command() {
+            return this.base_command( 'screen', 'turn_off', 'off' )
+        },
+
+    }
 }
