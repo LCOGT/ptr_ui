@@ -28,12 +28,8 @@ const getters = {
     filter_wheel: state => state.filter_wheel,
     focuser: state => state.focuser,
     rotator: state => state.rotator,
-    timestamp: state => state.timestamp,
-<<<<<<< HEAD
     screen: state => state.screen,
-=======
-
->>>>>>> Skychart syncs with selected site at current time.
+    timestamp: state => state.timestamp,
 }
 
 // actions
