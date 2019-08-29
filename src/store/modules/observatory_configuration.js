@@ -5,7 +5,42 @@
 
 import { API } from 'aws-amplify'
 
-var state = {
+var initial_state = function() {
+    console.log('initializing observatory_configuration state')
+    let apiName = 'ptr-api';
+    let path = '/all/config/';
+    let state = {
+        did_config_load_yet: false,
+        is_site_selected: false,
+        global_config: {},
+
+        selected_site: '',
+        selected_enclosure: '',
+        selected_mount: '',
+        selected_telescope: '',
+        selected_rotator: '',
+        selected_focuser: '',
+        selected_filter_wheel: '',
+        selected_camera: '',
+        selected_screen: '',
+
+        camera_areas_selection: '',
+        filter_wheel_options_selection: '',
+    };
+    API.get(apiName, path).then(response => {
+        console.log('about to fetch config from api')
+        state.global_config = response;
+        state.did_config_load_yet = true;
+        state.is_site_selected = false;
+    }).catch(error => {
+        console.log(error)
+    });
+    console.log('initial config state: ')
+    console.log(state)
+    return state;
+}
+
+const state = {
     did_config_load_yet: false,
     is_site_selected: false,
     global_config: {},
@@ -22,6 +57,7 @@ var state = {
     camera_areas_selection: '',
     filter_wheel_options_selection: '',
 }
+
 
 const getters = {
     available_sites: state => Object.keys(state.global_config),
@@ -237,23 +273,21 @@ const actions = {
      * observatories in the network. 
      */
     update_config({ commit, getters }) {
-        let apiName = 'ptr-api';
-        let path = '/all/config/';
-        API.get(apiName, path).then(response => {
+        return new Promise((resolve, reject) => {
+            let apiName = 'ptr-api';
+            let path = '/all/config/';
+            API.get(apiName, path).then(response => {
 
-            // Save the config to this vuex module.
-            commit('setGlobalConfig', response)
+                // Save the config to this vuex module.
+                commit('setGlobalConfig', response)
 
-            // Set initial values in command fields
-            let filterSelection= getters.filter_wheel_options[0][0]
-            commit('setFilterSelection', filterSelection)
+                resolve()
 
-            let areaSelection = getters.camera_areas[0]
-            commit('setCameraAreasSelection', areaSelection)
-
-        }).catch(error => {
-            console.log(error)
-        });
+            }).catch(error => {
+                console.log(error)
+                reject()
+            });
+        })
     },
 
     set_default_filter_option({ commit, getters }) {
@@ -271,7 +305,8 @@ const actions = {
     },
 
     setActiveTelescope({ commit, getters, dispatch }, telescope_name) {
-        API.get('ptr-api', '/all/config/').then(response => {
+        //API.get('ptr-api', '/all/config/').then(response => {
+        dispatch('update_config').then(response => {
             commit('setActiveTelescope', telescope_name)
 
             let telescopes = getters.all_telescopes
@@ -287,6 +322,17 @@ const actions = {
             commit('setActiveRotator', rotator_name)
             commit('setActiveFilterWheel',filter_wheel_name)
             commit('setActiveScreen', screen_name)
+
+            // Set initial values in command fields
+            if (getters.filter_wheel_options_selection== '') {
+                let filterSelection= getters.filter_wheel_options[0][0]
+                commit('setFilterSelection', filterSelection)
+            }
+
+            if (getters.camera_areas_selection == '') {
+                let areaSelection = getters.camera_areas[0]
+                commit('setCameraAreasSelection', areaSelection)
+            }
         })
     }
 
@@ -297,7 +343,10 @@ const mutations = {
         state.global_config = config;
         state.did_config_load_yet = true;
     },
-    setActiveSite(state, site) { state.selected_site = site; state.is_site_selected = true },
+    setActiveSite(state, site) { 
+        state.selected_site = site; 
+        state.is_site_selected = true 
+    },
     setActiveEnclosure(state, enclosure) { state.selected_enclosure = enclosure },
     setActiveMount(state, mount) { state.selected_mount = mount },
     setActiveTelescope(state, telescope) { state.selected_telescope = telescope },
