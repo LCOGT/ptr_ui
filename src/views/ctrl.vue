@@ -289,11 +289,24 @@
             </b-field>
         </b-field>
 
+        <br>
+        <div class="buttons has-addons">
+          <command-button :data="camera_expose_command" style="width: 70%" />
+          <command-button :data="camera_cancel_command" style="width: 30%" />
+        </div>
+
+    </div>
+
+    <div style="background:orangered; padding: 2em; margin-top: 10px;">
+        <div class="title">Scripts</div>
         <!-- Scripts select box; sent with camera commands -->
         <b-field horizontal label="Scripts">
-          <b-select value="none" v-model="cam_scripts" style="width: 100;">
+          <b-select value="none" v-model="selected_script" style="width: 100;">
             <option value="none">none</option>
             <option value="stop_script">Stop Script</option>
+            <option value="focus_auto">Focus Auto</option>
+            <option value="focus_fine">Focus Fine</option>
+            <option value="focus_vcurve">Focus V-Curve</option>
             <option value="take_lrgb_stack">Take LRGB Stack</option>
             <option value="take_o3has2n2_stack">Take O3HaS2N2 Stack</option>
             <option value="take_planet_stack">Take Planet Stack</option>
@@ -317,14 +330,12 @@
           <pre>{{ camera_state && camera_state.script_status}}</pre>
         </div>
 
-        <br>
         <div class="buttons has-addons">
-          <command-button :data="camera_expose_command" style="width: 70%" />
-          <command-button :data="camera_cancel_command" style="width: 30%" />
+          <command-button :data="script_run_command" style="width: 70%" />
+          <command-button :data="script_stop_command" style="width: 30%" />
         </div>
 
     </div>
-
     <pre>
       <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
       <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
@@ -345,15 +356,15 @@
             <b-dropdown-item aria-role="listitem">
               <command-button :data="focus_home_command" class="dropdown-button-command"/>
             </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="focus_auto_command" class="dropdown-button-command"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="focus_fine_command" class="dropdown-button-command"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="focus_vcurve_command" class="dropdown-button-command"/>
-            </b-dropdown-item>
+            <!--b-dropdown-item-->
+              <!--command-button :data="focus_auto_command" class="dropdown-button-command"/-->
+            <!--/b-dropdown-item-->
+            <!--b-dropdown-item-->
+              <!--command-button :data="focus_fine_command" class="dropdown-button-command"/-->
+            <!--/b-dropdown-item-->
+            <!--b-dropdown-item-->
+              <!--command-button :data="focus_vcurve_command" class="dropdown-button-command"/-->
+            <!--/b-dropdown-item-->
             <b-dropdown-item>
               <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
             </b-dropdown-item>
@@ -492,25 +503,29 @@ export default {
 
     }
   },
-  beforeRouteEnter: async function(to, from, next) {
-    try {
-      await store.dispatch('observatory_configuration/update_config');
-      next();
-    } catch(exception) {
-      next(exception);
-    }
-  },
+  //beforeRouteEnter: async function(to, from, next) {
+    //try {
+      //await store.dispatch('observatory_configuration/update_config');
+      //next();
+    //} catch(exception) {
+      //next(exception);
+    //}
+  //},
 
   beforeCreate() {
   },
 
   created() {
+    var that = this;
     // Make sure we're using the latest site configuration.
-    this.$store.dispatch('observatory_configuration/update_config')
+    this.$store.dispatch('observatory_configuration/update_config').then(function() {
 
-    // Default site/device values.
-    this.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
-    this.$store.dispatch('instrument_state/updateStatus')
+      // Default site/device values.
+      that.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
+      that.$store.dispatch('instrument_state/updateStatus')
+
+    }())
+
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_status_interval = setInterval(this.update_status, 3000)
