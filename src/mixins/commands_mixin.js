@@ -80,8 +80,8 @@ export const commands_mixin = {
                 case 'screen':
                 device = this.active_screen;
                 break;
-                case 'script':
-                device = 'script'; 
+                case 'sequencer':
+                device = 'sequencer'; 
                 break;
             }
 
@@ -92,8 +92,8 @@ export const commands_mixin = {
                 mount: this.active_mount,
                 http_method: 'POST',
                 form: {
-                    device: device,
-                    type: device_type,
+                    device: device_type,
+                    instance: device,
                     timestamp: parseInt(Date.now() / 1000),
                     action: action,
                     required_params: req_params || {},
@@ -287,12 +287,12 @@ export const commands_mixin = {
             return this.base_command( 'camera', 'stop', 'cancel' )
         },
         script_run_command () {
-            return this.base_command( 'script', 'run', 'run script',
+            return this.base_command( 'sequencer', 'run', 'run script',
                 { script: this.selected_script }
             )
         },
         script_stop_command () {
-            return this.base_command( 'script', 'stop', 'stop',)
+            return this.base_command( 'sequencer', 'stop', 'stop',)
         },
         mount_slew_command () {
             return this.base_command( 'mount', 'go', 'slew to coordinates',
