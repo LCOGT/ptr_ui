@@ -20,14 +20,16 @@ const state = emptyState();
 
 // getters
 const getters = {
+
+    /* All the state, per instrument type */
     mount: state => state.mount || [],
     telescope: state => state.telescope,
     camera: state => state.camera,
     filter_wheel: state => state.filter_wheel,
     focuser: state => state.focuser,
     rotator: state => state.rotator,
-    timestamp: state => state.timestamp,
     screen: state => state.screen,
+    timestamp: state => state.timestamp,
 }
 
 // actions

@@ -1,3 +1,5 @@
+import Celestial from '@/components/celestialmap/celestial'
+
 // initial state
 const state = {
     selectedRa: -1,
@@ -26,6 +28,11 @@ const actions = {
     setSelected({ commit }, data) {
         commit('selectedRa', data[0]),
         commit('selectedDec', data[1])
+    },
+
+    redrawMap(){
+        console.log('redrawing map')
+        Celestial.redraw()
     }
 }
 
