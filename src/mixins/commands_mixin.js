@@ -18,12 +18,14 @@ export const commands_mixin = {
             // Camera Fields
             cam_exposure: '1',
             cam_count: 1, // numberinput form requires number, not string. converted to string in expose command.
-            cam_area: null,
+            cam_area: null, 
             cam_bin: '1', 
             cam_dither: 'off',
             cam_image_type: 'light',
-            cam_image_type_options: ['light', 'toss', 'auto focus',  'fine focus', 'dark', 'bias', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
-            cam_scripts: 'none',
+            cam_image_type_options: ['light', 'toss', 'bias', 'dark', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
+
+            // Scripts Fields
+            selected_script: 'none',
 
             // Focuser Fields
             focus_relative: '',
@@ -78,6 +80,9 @@ export const commands_mixin = {
                 case 'screen':
                 device = this.active_screen;
                 break;
+                case 'sequencer':
+                device = 'sequencer'; 
+                break;
             }
 
             let the_base_command = {
@@ -87,8 +92,8 @@ export const commands_mixin = {
                 mount: this.active_mount,
                 http_method: 'POST',
                 form: {
-                    device: device,
-                    type: device_type,
+                    device: device_type,
+                    instance: device,
                     timestamp: parseInt(Date.now() / 1000),
                     action: action,
                     required_params: req_params || {},
@@ -166,6 +171,7 @@ export const commands_mixin = {
         // v-model for the camera area selection
         camera_areas_selection: {
             get() { return this.$store.getters['observatory_configuration/camera_areas_selection'] },
+            //get() { return this.camera_areas[0] },
             set(val) {this.$store.commit('observatory_configuration/setCameraAreasSelection', val)}
         },
 
@@ -274,12 +280,19 @@ export const commands_mixin = {
                     filter: this.filter_wheel_options_selection,
                     size: this.camera_areas_selection,
                     dither: this.cam_dither,
-                    scripts: this.cam_scripts,
                 }
             )
         },
         camera_cancel_command () {
             return this.base_command( 'camera', 'stop', 'cancel' )
+        },
+        script_run_command () {
+            return this.base_command( 'sequencer', 'run', 'run script',
+                { script: this.selected_script }
+            )
+        },
+        script_stop_command () {
+            return this.base_command( 'sequencer', 'stop', 'stop',)
         },
         mount_slew_command () {
             return this.base_command( 'mount', 'go', 'slew to coordinates',
