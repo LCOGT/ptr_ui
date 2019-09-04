@@ -115,7 +115,7 @@ export default {
                 let position = d3.mouse(this);
                 console.log("right click!")
                 that.draw_marker(position[0], position[1])
-                that.$snackbar.open({
+                that.$buefy.snackbar.open({
                     duration: that.right_click_ttl,
                     message: 'Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.',
                     type: 'is-warning',
