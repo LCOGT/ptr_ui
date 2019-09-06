@@ -3,9 +3,9 @@
 
     <div class="controls">
         <button class="button" @click="setLatestImage">latest image</button>
-        <a href="#" @click="setPreviousImage" style="color: #4caf50;"> &laquo; Previous</a>
+        <a href="#" @click="setPreviousImage" class="arrow left"></a>
         <p>{{ current_image.recency_order }}</p>
-        <a href="#" @click="setNextImage" style="color: #4caf50;"> Next &raquo; </a>
+        <a href="#" @click="setNextImage" class="arrow right"></a>
         <b-field horizontal label="crosshairs">
             <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
         </b-field>
@@ -285,6 +285,28 @@ export default {
 </script>
 
 <style scoped>
+.arrow {
+  border: solid #4caf50;
+  border-width: 0 5px 5px 0;
+  display: inline-block;
+  padding: 5px;
+  outline: 0;
+}
+
+.arrow:hover {
+  opacity: 0.5;
+}
+
+.right {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+
+.left {
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+}
+
 #component {
   display: flex;
   flex-direction: column;
