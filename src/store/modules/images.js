@@ -82,27 +82,28 @@ const actions = {
 
     set_next_image({ commit, state }) {
         let i = state.current_image.recency_order
-        let lastImageIndex = 39
-        console.log("*******" + "i:" + i + "lastimageindex:" + lastImageIndex)
+        let lastImageIndex = state.recent_images.length - 1
+
         if (i == lastImageIndex) {
             let the_next_image = state.recent_images[0]
+            commit('setCurrentImage', the_next_image)
         } else {
             let the_next_image = state.recent_images[i + 1]
+            commit('setCurrentImage', the_next_image)
         }
-        commit('setCurrentImage', the_next_image)
     },
 
     set_previous_image({ commit, state }) {
         let i = state.current_image.recency_order
         let lastImageIndex = state.recent_images.length - 1
-        console.log("*******" + "i:" + i + "lastimageindex:" + lastImageIndex)
 
         if (i == 0) {
             let the_previous_image = state.recent_images[lastImageIndex]
+            commit('setCurrentImage', the_previous_image)
         } else {
             let the_previous_image = state.recent_images[i - 1]
+            commit('setCurrentImage', the_previous_image)
         }
-        commit('setCurrentImage', the_previous_image)
     }
 
 }
