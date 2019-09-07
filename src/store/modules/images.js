@@ -12,6 +12,7 @@ const state = {
 
     // 'current_image' defines what image is currently displayed.
     current_image: {},
+
 }
 
 const getters = {
@@ -54,7 +55,7 @@ const actions = {
 
             // If current_image is empty, or if we've switched sites:
             // set current_image to the first element from 'recent_images'. 
-            if (!Object.keys(state.current_image).length 
+            if (!Object.keys(state.current_image).length
                 || state.current_image.site != response[0].site) {
                 commit('setCurrentImage', state.recent_images[0])
             }
@@ -68,7 +69,7 @@ const actions = {
      * Set the current image, usually to be displayed.
      */
     set_current_image({ commit }, image_object) {
-        commit('setCurrentImage',image_object)
+        commit('setCurrentImage', image_object)
     },
 
     /**
@@ -77,8 +78,33 @@ const actions = {
     set_latest_image({ commit, state }) {
         let the_current_image = state.recent_images[0]
         commit('setCurrentImage', the_current_image)
-    }
+    },
 
+    set_next_image({ commit, state }) {
+        let i = state.current_image.recency_order
+        let lastImageIndex = state.recent_images.length - 1
+
+        if (i == lastImageIndex) {
+            let the_next_image = state.recent_images[0]
+            commit('setCurrentImage', the_next_image)
+        } else {
+            let the_next_image = state.recent_images[i + 1]
+            commit('setCurrentImage', the_next_image)
+        }
+    },
+
+    set_previous_image({ commit, state }) {
+        let i = state.current_image.recency_order
+        let lastImageIndex = state.recent_images.length - 1
+
+        if (i == 0) {
+            let the_previous_image = state.recent_images[lastImageIndex]
+            commit('setCurrentImage', the_previous_image)
+        } else {
+            let the_previous_image = state.recent_images[i - 1]
+            commit('setCurrentImage', the_previous_image)
+        }
+    }
 
 }
 
@@ -89,7 +115,7 @@ const mutations = {
 
 export default {
     namespaced: true,
-    state, 
+    state,
     getters,
     actions,
     mutations,
