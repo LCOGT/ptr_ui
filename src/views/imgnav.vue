@@ -1,8 +1,8 @@
-<template>  
-  <div>
+<template><div class="page">
+  <div class="user-images">
     <ImageNavigationPanel/>
   </div>
-</template>
+</div></template>
 
 <script>
 import { API, Auth } from 'aws-amplify'
@@ -30,5 +30,9 @@ export default {
 </script>
 
 <style scoped>
-
+.page {
+  display: grid;
+  grid-template-columns: 20% 70% 10%;
+  grid-gap: 10px;
+}
 </style>
