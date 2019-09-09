@@ -1,11 +1,14 @@
+
 /**
  *  This is a page used for testing image display and manipulation. 
  *
  */
 <template>
   <div class="columns">
-
-    <div class="column is-full container">
+    <div class="nav-panel is-one-quarter">  
+      <ImageNavigationPanel/>
+    </div>
+    <div class="img-view is-half is-offset-one-quarter">
 
       <!-- Select the site that you wish to view -->
       <b-field class="select-device" label="Site" horizontal>
@@ -31,17 +34,20 @@
     </div>
 
   </div>
+  
 </template>
 
 <script>
 import { API, Auth } from 'aws-amplify'
 import ImageView from '@/components/ImageView'
+import ImageNavigationPanel from '@/components/ImageNavigationPanel'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'imgs',
   components: {
     ImageView,
+    ImageNavigationPanel,
   },
   data() {
     return {
@@ -80,8 +86,22 @@ export default {
   margin-top: 3em;
 }
 
+.columns{
+  padding: 50px;
+}
+
 .select-device {
   border-bottom: 1px solid silver;
   padding-bottom: 2em;
 }
+
+.nav-panel{
+  border-right: 1px solid darkgray;
+  padding-right: 50px;
+}
+.img-view{
+    padding-left: 50px;
+}
+
+
 </style>

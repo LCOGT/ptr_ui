@@ -16,7 +16,6 @@ const state = {
     // user_images a list of all a user's images associated with their account
     // TODO: Write an action that will update a user's image list when images are added to their account
     user_images: [],
-    trash_images: []
 }
 
 const getters = {
@@ -24,7 +23,6 @@ const getters = {
     current_image: state => state.current_image,
 
     user_images: state => state.user_images,
-    trash_images: state => state.trash_images,
 }
 
 const actions = {
@@ -46,20 +44,6 @@ const actions = {
         });
     },
 
-    get_trash_images({ commit, state, rootState }) {
-
-        // TODO: Remove hard coded values and make sure that username in UI is linked to image records in database
-        // let username = rootState.auth.user.username
-        let username = "wmd_admin" // TODO: Grab username from state 
-        let apiName = 'ptr-api';
-        let path = `/trash_images_by_user/${username}/`;
-
-        API.get(apiName, path).then(response => {
-            commit('setTrashImages', response)
-        }).catch(error => {
-            console.log(error)
-        });
-    },
 
     /**
      *  This action will retrieve a list of the latest images (from the api).
@@ -94,7 +78,7 @@ const actions = {
 
             // If current_image is empty, or if we've switched sites:
             // set current_image to the first element from 'recent_images'. 
-            if (!Object.keys(state.current_image).length 
+            if (!Object.keys(state.current_image).length
                 || state.current_image.site != response[0].site) {
                 commit('setCurrentImage', state.recent_images[0])
             }
@@ -108,7 +92,7 @@ const actions = {
      * Set the current image, usually to be displayed.
      */
     set_current_image({ commit }, image_object) {
-        commit('setCurrentImage',image_object)
+        commit('setCurrentImage', image_object)
     },
 
     /**
@@ -117,8 +101,33 @@ const actions = {
     set_latest_image({ commit, state }) {
         let the_current_image = state.recent_images[0]
         commit('setCurrentImage', the_current_image)
-    }
+    },
 
+    set_next_image({ commit, state }) {
+        let i = state.current_image.recency_order
+        let lastImageIndex = state.recent_images.length - 1
+
+        if (i == lastImageIndex) {
+            let the_next_image = state.recent_images[0]
+            commit('setCurrentImage', the_next_image)
+        } else {
+            let the_next_image = state.recent_images[i + 1]
+            commit('setCurrentImage', the_next_image)
+        }
+    },
+
+    set_previous_image({ commit, state }) {
+        let i = state.current_image.recency_order
+        let lastImageIndex = state.recent_images.length - 1
+
+        if (i == 0) {
+            let the_previous_image = state.recent_images[lastImageIndex]
+            commit('setCurrentImage', the_previous_image)
+        } else {
+            let the_previous_image = state.recent_images[i - 1]
+            commit('setCurrentImage', the_previous_image)
+        }
+    }
 
 }
 
@@ -126,12 +135,11 @@ const mutations = {
     setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setCurrentImage(state, the_current_image) { state.current_image = the_current_image },
     setUserImages(state, user_images_list) { state.user_images = user_images_list },
-    setTrashImages(state, trash_images_list) { state.trash_images = trash_images_list },
 }
 
 export default {
     namespaced: true,
-    state, 
+    state,
     getters,
     actions,
     mutations,
