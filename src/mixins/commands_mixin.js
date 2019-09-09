@@ -22,7 +22,19 @@ export const commands_mixin = {
             cam_bin: '1', 
             cam_dither: 'off',
             cam_image_type: 'light',
-            cam_image_type_options: ['light', 'toss', 'bias', 'dark', 'screen flat', 'sky flat', 'lamp', 'NeAr', 'ThAr', 'sun'],
+            cam_image_type_options: [
+                'light', 
+                'toss', 
+                'bias', 
+                'dark', 
+                'screen flat', 
+                'sky flat', 
+                'lamp flat', 
+                'arc flat',
+                'NeAr flat', 
+                'ThAr flat', 
+                'solar flat',
+            ],
 
             // Scripts Fields
             selected_script: 'none',
