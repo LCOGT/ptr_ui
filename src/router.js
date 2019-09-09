@@ -58,28 +58,33 @@ const router = new VueRouter({
 
 export default router
 
+
+// Do the following before each page load
 router.beforeEach((to, from, next) => {
 
-  // Update vuex state to reflect if user is logged in.
+  // Check if user is authenticated
   Auth.currentAuthenticatedUser()
-    .then(user => {
-      store.commit('auth/setUser', user)
-    })
-    .catch(err => console.log(err));
 
-  // Redirect to login page if user is not logged in.
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!store.getters['auth/isLoggedIn']) {
-      next({
-        path: '/login',
-        query: {
-          redirect: to.fullPath
-        }
-      })
-    } else {
+    // If user successfully authenticates:
+    .then(user => {
+      // Update the store with logged-in user
+      store.commit('auth/setUser', user)
+      // Proceed to the page
       next()
+
+    // If the user is not authenticated:
+    }).catch(err => {
+      // Clear the store of the user
+      store.commit('auth/setUser', '')
+      // If the requested page requires authentication, redirect to login page
+      if (to.matched.some(record => record.meta.requiresAuth)) {
+        next({
+          path: '/login',
+          query: { redirect: to.fullPath }
+        })
+      // If the page doesn't require authentication, proceed as normal.
+      } else { next() }
     }
-  } else {
-    next()
-  }
+
+  );
 })
