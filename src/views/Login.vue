@@ -70,13 +70,8 @@ export default {
      * authentication grants access to controls. 
      */
     adminLogIn() {
-      Auth.signIn({ username: 'wmd_admin', password: 'Password1!', region: 'us-west-2' })
-        .then(user => {
-          console.log(user)
-          this.$store.dispatch('auth/log_in_user', user)
-          this.$router.go(-1)
-        })
-        .catch(err => console.log(err))
+      this.$store.dispatch('auth/logInAdmin')
+      this.$router.go(-1)
     },
   }
 }
