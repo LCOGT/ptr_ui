@@ -236,14 +236,7 @@ export default {
      * Sign user out of all authenticated devices (global sign out). 
      */
     signOut () {
-      Auth.signOut({ global: true })
-        .then(data => {
-          console.log(data)
-
-          // Empty the current user from vuex store
-          this.$store.commit('auth/setUser', '')
-        })
-        .catch(err => console.log(err))
+      this.$store.dispatch('auth/logOutUser')
     },
 
     /**
@@ -252,12 +245,7 @@ export default {
      * authentication grants access to controls. 
      */
     signIn () {
-      Auth.signIn({ username: 'wmd_admin', password: 'Password1!', region: 'us-west-2' })
-        .then(user => {
-          console.log(user)
-          this.$store.dispatch('auth/log_in_user', user)
-        })
-        .catch(err => console.log(err))
+      this.$store.dispatch('auth/logInAdmin')
     },
 
     /**
