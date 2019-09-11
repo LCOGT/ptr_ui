@@ -55,6 +55,7 @@ import wcs from "@/utils/pix2wcs";
 import { mapGetters } from "vuex";
 import * as d3 from "d3";
 import { commands_mixin } from "../mixins/commands_mixin";
+import { SnackbarProgrammatic as Snackbar } from 'buefy'
 
 export default {
   name: "ImageView",
@@ -116,7 +117,7 @@ export default {
         let position = d3.mouse(this);
         console.log("right click!");
         that.draw_marker(position[0], position[1]);
-        that.$snackbar.open({
+        Snackbar.open({
           duration: that.right_click_ttl,
           message:
             "Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.",
