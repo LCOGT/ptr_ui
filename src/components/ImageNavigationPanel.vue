@@ -109,7 +109,6 @@ export default {
           isFullPage: false,
           activeColor:String,
           activeIndex: null,
-          trash_images: [],
     };
   },
   components: {
