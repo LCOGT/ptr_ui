@@ -1,5 +1,8 @@
 import { API } from 'aws-amplify'
+import { SnackbarProgrammatic as Snackbar } from 'buefy';
 
+// These default values (organized per script) are used to initialize values,
+// and also used when the user wishes to revert back to defaults.
 const defaults = {
     genBiasDarkMaster() {
         return {
@@ -28,34 +31,15 @@ const defaults = {
     },
 }
 
-// initial state
+// initial vuex state
 const state = {
+
+    // The currently active script. This is sent when 'run script' is clicked.
     selectedScript: "none",
 
     genBiasDarkMaster: defaults.genBiasDarkMaster(),
     genScreenFlatMasters: defaults.genScreenFlatMasters(),
     takeUGRIZSStack: defaults.takeUGRIZSStack(),
-    /*
-    genBiasDarkMaster: {
-        numOfBias: 1,
-        darkTime: 300,
-        numOfDark: 1,
-        dark2Time: 300,
-        numOfDark2: 1,
-        coldMap: true,
-        hotMap: true,
-    },
-    genScreenFlatMasters: {
-        numFrames: 15,
-        gainCalc: true,
-        shutterCompensation: true,
-    },
-    takeUGRIZSStack: {
-        numFrames: 1,
-        skipU: true,
-        skipZS: true,
-    },
-    */
 
     // If a script is not in this list, the UI settings button will be disabled.
     scriptsWithSettings: [
@@ -65,11 +49,11 @@ const state = {
     ]
 }
 
-// getters
+// vuex getters
 const getters = {
 
     /* General script settings getters */
-    getSelectedScript: state => state.selectedScript,
+    selectedScript: state => state.selectedScript,
 
     scriptHasSettings: state => state.scriptsWithSettings.includes(state.selectedScript),
 
@@ -101,9 +85,13 @@ const getters = {
 
 }
 
-// actions
+// vuex actions
 const actions = {
 
+    /**
+     *  Send a command to the observatory to stop any current running script.
+     *  The command is sent to a specific mount at the site (like all commands).
+     */
     script_run_command({ getters, rootState }) {
 
         // API parameters
@@ -113,7 +101,7 @@ const actions = {
         let path = `/${site}/${mount}/command/`
 
         // Command to send
-        let script_name = getters.getSelectedScript
+        let script_name = getters.selectedScript
         let command = {
             device: 'sequencer',
             instance: 'sequencer',
@@ -130,12 +118,34 @@ const actions = {
         API.post(apiName, path, {body:command}).then(response => {
             console.log(response)
             console.log(command)
+            // Small UI success notification
+            Snackbar.open({
+                duration: 5000,
+                message: `Script <span class="has-text-weight-bold">${script_name}</span> sent successfully!`,
+                type: "is-success",
+                position: "is-top",
+                queue: false,
+                actionText: null,
+            });
         }).catch(error => {
             console.log("error sending script.")
             console.log(error)
+            // Small UI error notification
+            Snackbar.open({
+                duration: 5000,
+                message: `Script <span class="has-text-weight-bold">${script_name}</span> failed to send. <br> ${error}`,
+                type: "is-danger",
+                position: "is-top",
+                queue: false,
+                actionText: null,
+            });
         })
     },
 
+    /**
+     *  Send a command to the observatory to stop any current running script.
+     *  The command is sent to a specific mount at the site (like all commands).
+     */
     script_stop_command({ rootState }) {
 
         // API parameters
@@ -157,9 +167,27 @@ const actions = {
         // Send the command and log the output
         API.post(apiName, path, {body: command}).then(response => {
             console.log(response)
+            // Small UI success notification
+            Snackbar.open({
+                duration: 5000,
+                message: `<span class="has-text-weight-bold"> Stop Script </span> has been sent successfully`,
+                type: "is-success",
+                position: "is-top",
+                queue: false,
+                actionText: null,
+            });
         }).catch(error => {
             console.log("error sending script.")
             console.log(error)
+            // Small UI error notification
+            Snackbar.open({
+                duration: 5000,
+                message: `<span class="has-text-weight-bold"> Stop Script </span> failed to send. <br> ${error}`,
+                type: "is-danger",
+                position: "is-top",
+                queue: false,
+                actionText: null,
+            });
         })
 
     },
@@ -181,39 +209,37 @@ const actions = {
                 val: keyval[1],
             }
             // Commit the mutation for the param. This is done for each value.
-            commit('set_generalScriptParam', payload)
+            commit('generalScriptParam', payload)
         })
     },
 }
 
-// mutations
+// vuex mutations
 const mutations = {
 
-    setSelectedScript(state, script) { state.selectedScript = script },
+    selectedScript(state, script) { state.selectedScript = script },
 
-    defaultParams(state, script_name) {
-        console.log(defaults[script_name]())
-    },
-
-    set_generalScriptParam(state, payload) {
+    // Set a script param defined by the script_name, script_param, and val. 
+    // Set these three key/val pairs in 'payload'. 
+    generalScriptParam(state, payload) {
         state[payload.script_name][payload.script_param] = payload.val
     },
 
-    set_genBiasDarkMaster_numOfBias(state, val) { state.genBiasDarkMaster.numOfBias = val },
-    set_genBiasDarkMaster_darkTime(state, val) { state.genBiasDarkMaster.darkTime= val },
-    set_genBiasDarkMaster_numOfDark(state, val) { state.genBiasDarkMaster.numOfDark= val },
-    set_genBiasDarkMaster_dark2Time(state, val) { state.genBiasDarkMaster.dark2Time= val },
-    set_genBiasDarkMaster_numOfDark2(state, val) { state.genBiasDarkMaster.numOfDark2= val },
-    set_genBiasDarkMaster_coldMap(state, val) { state.genBiasDarkMaster.coldMap= val },
-    set_genBiasDarkMaster_hotMap(state, val) { state.genBiasDarkMaster.hotMap= val },
+    genBiasDarkMaster_numOfBias(state, val) { state.genBiasDarkMaster.numOfBias = val },
+    genBiasDarkMaster_darkTime(state, val) { state.genBiasDarkMaster.darkTime= val },
+    genBiasDarkMaster_numOfDark(state, val) { state.genBiasDarkMaster.numOfDark= val },
+    genBiasDarkMaster_dark2Time(state, val) { state.genBiasDarkMaster.dark2Time= val },
+    genBiasDarkMaster_numOfDark2(state, val) { state.genBiasDarkMaster.numOfDark2= val },
+    genBiasDarkMaster_coldMap(state, val) { state.genBiasDarkMaster.coldMap= val },
+    genBiasDarkMaster_hotMap(state, val) { state.genBiasDarkMaster.hotMap= val },
 
-    set_genScreenFlatMasters_numFrames(state, val) { state.genScreenFlatMasters.numFrames = val },
-    set_genScreenFlatMasters_gainCalc(state, val) { state.genScreenFlatMasters.gainCalc= val },
-    set_genScreenFlatMasters_shutterCompensation(state, val) { state.genScreenFlatMasters.shutterCompensation= val },
+    genScreenFlatMasters_numFrames(state, val) { state.genScreenFlatMasters.numFrames = val },
+    genScreenFlatMasters_gainCalc(state, val) { state.genScreenFlatMasters.gainCalc= val },
+    genScreenFlatMasters_shutterCompensation(state, val) { state.genScreenFlatMasters.shutterCompensation= val },
 
-    set_takeUGRIZSStack_numFrames(state, val) { state.takeUGRIZSStack.numFrames = val },
-    set_takeUGRIZSStack_skipU(state, val) { state.takeUGRIZSStack.skipU= val },
-    set_takeUGRIZSStack_skipZS(state, val) { state.takeUGRIZSStack.skipZS= val },
+    takeUGRIZSStack_numFrames(state, val) { state.takeUGRIZSStack.numFrames = val },
+    takeUGRIZSStack_skipU(state, val) { state.takeUGRIZSStack.skipU= val },
+    takeUGRIZSStack_skipZS(state, val) { state.takeUGRIZSStack.skipZS= val },
 
 }
 
