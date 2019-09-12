@@ -13,14 +13,37 @@ const state = {
     // 'current_image' defines what image is currently displayed.
     current_image: {},
 
+    // user_images a list of all a user's images associated with their account
+    // TODO: Write an action that will update a user's image list when images are added to their account
+    user_images: [],
 }
 
 const getters = {
     recent_images: state => state.recent_images,
     current_image: state => state.current_image,
+
+    user_images: state => state.user_images,
 }
 
 const actions = {
+    /**
+     *  This action will retrieve a complete list of an account's images (from the api).
+     */
+    get_user_images({ commit, state, rootState }) {
+
+        // TODO: Remove hard coded values and make sure that username in UI is linked to image records in database
+        // let username = rootState.auth.user.username
+        let username = "wmd_admin" // TODO: Grab username from state 
+        let apiName = 'ptr-api';
+        let path = `/image_by_user/${username}/`;
+        
+        API.get(apiName, path).then(response => {
+            commit('setUserImages', response)
+        }).catch(error => {
+            console.log(error)
+        });
+    },
+
 
     /**
      *  This action will retrieve a list of the latest images (from the api).
@@ -111,6 +134,7 @@ const actions = {
 const mutations = {
     setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setCurrentImage(state, the_current_image) { state.current_image = the_current_image },
+    setUserImages(state, user_images_list) { state.user_images = user_images_list },
 }
 
 export default {
