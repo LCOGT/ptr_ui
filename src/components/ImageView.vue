@@ -3,9 +3,8 @@
 
     <div class="controls">
         <button class="button" @click="setLatestImage">latest image</button>
-        <a href="#" @click="setPreviousImage" class="arrow left"></a>
-        <p>{{ current_image.recency_order }}</p>
-        <a href="#" @click="setNextImage" class="arrow right"></a>
+        <div @click="setPreviousImage" class="arrow left"></div>
+        <div @click="setNextImage" class="arrow right"></div>
         <b-field horizontal label="crosshairs">
             <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
         </b-field>
@@ -55,7 +54,7 @@ import wcs from "@/utils/pix2wcs";
 import { mapGetters } from "vuex";
 import * as d3 from "d3";
 import { commands_mixin } from "../mixins/commands_mixin";
-import { SnackbarProgrammatic as Snackbar } from 'buefy'
+import { SnackbarProgrammatic as Snackbar } from "buefy";
 
 export default {
   name: "ImageView",
@@ -296,6 +295,7 @@ export default {
 
 .arrow:hover {
   opacity: 0.5;
+  cursor: pointer;
 }
 
 .right {
