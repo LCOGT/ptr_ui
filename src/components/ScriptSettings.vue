@@ -5,10 +5,13 @@
         <hr style="border-bottom: silver 4px solid; margin-bottom: 2em;">
 
         <gen-screen-flat-masters v-if="script=='genScreenFlatMasters'"/>
-        <take-filter-series v-if="script=='takeUGRIZSStack'"/>
         <gen-bias-dark-master v-if="script=='genBiasDarkMaster'"/>
+        <take-u-g-r-i-z-s-stack v-if="script=='takeUGRIZSStack'"/>
         <take-l-r-g-b-stack v-if="script=='takeLRGBStack'"/>
         <take-narrowband-stack v-if="script=='takeO3HaS2N2Stack'"/>
+        <take-lunar-stack v-if="script=='takeLunarStack'" />
+        <take-planet-stack v-if="script=='takePlanetStack'" />
+        <take-sky-flats v-if="script=='takeSkyFlats'" />
         <hr style="border-bottom: silver 4px solid; margin-bottom: 2em;">
         <div class="level">
             <button class="button is-light" @click="revertDefaultSettings">Revert To Default</button>
@@ -20,17 +23,23 @@
 <script>
 import GenScreenFlatMasters from '@/components/ScriptSettings/GenScreenFlatMasters'
 import GenBiasDarkMaster from '@/components/ScriptSettings/GenBiasDarkMaster'
-import TakeFilterSeries from '@/components/ScriptSettings/TakeFilterSeries'
+import TakeUGRIZSStack from '@/components/ScriptSettings/TakeUGRIZSStack'
 import TakeLRGBStack from '@/components/ScriptSettings/TakeLRGBStack'
 import TakeNarrowbandStack from '@/components/ScriptSettings/TakeNarrowbandStack'
+import TakePlanetStack from '@/components/ScriptSettings/TakePlanetStack'
+import TakeLunarStack from '@/components/ScriptSettings/TakeLunarStack'
+import TakeSkyFlats from '@/components/ScriptSettings/TakeSkyFlats'
 export default {
     name: 'ScriptSettings',
     components: {
         GenScreenFlatMasters,
         GenBiasDarkMaster,
-        TakeFilterSeries,
+        TakeUGRIZSStack,
         TakeLRGBStack,
         TakeNarrowbandStack,
+        TakePlanetStack,
+        TakeLunarStack,
+        TakeSkyFlats,
     },
     props: {
         'script': String,
