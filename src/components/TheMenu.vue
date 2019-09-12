@@ -21,9 +21,7 @@
             <router-link class="navbar-item" to="/skymap"> sky </router-link>
             <router-link class="navbar-item" to="/ctrl"> ctrl </router-link>
             <router-link class="navbar-item" to="/ux1/wmd/home"> ux1 </router-link>
-            <router-link class="navbar-item" to="/imgnav"> imgnav </router-link>
-            <router-link class="navbar-item" to="/archive"> archive </router-link>
-
+          
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link"> sites </a>
 
