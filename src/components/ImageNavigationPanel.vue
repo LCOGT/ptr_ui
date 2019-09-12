@@ -24,7 +24,12 @@
                             <div class="folder">
                             <draggable v-model="user_images">
                                 <transition-group class="trans">
-                                    <div v-on:click="toggle(index)" :class="{'active': index == activeIndex}" v-for="(item, index) in user_images" :key="index">
+                                    <div 
+                                        v-on:click="toggle(index)" 
+                                        :class="{'active': index == activeIndex}" 
+                                        v-for="(item, index) in user_images" 
+                                        :key="index"
+                                    >
                                             <div class="img-record"  @click="setActiveImage(item)">
                                                 <div class="image">
                                                     <img 
@@ -39,8 +44,12 @@
                                                         <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
                                                         <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
                                                         <div class=image-coordinates>
-                                                            <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
-                                                            <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
+                                                            <p style="color:rgb(175,175,175);">
+                                                                RA: {{item.right_ascension.toFixed(2)}}
+                                                            </p>
+                                                            <p style="color:rgb(175,175,175);">
+                                                                DEC: {{item.declination.toFixed(2)}}
+                                                            </p>
                                                         </div>
                                                 </div>
                                             </div>
