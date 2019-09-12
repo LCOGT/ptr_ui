@@ -51,15 +51,6 @@
                                                     </div>
                                             </div>
                                         </div>
-                                        <div class=image-information>
-                                                <p style="color:white;">Filename: {{item.base_filename}}</p>
-                                                <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
-                                                <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
-                                                <div class=image-coordinates>
-                                                    <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
-                                                    <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
-                                                </div>
-                                        </div>
                                     </div>
                             </div>
                         </b-collapse>
