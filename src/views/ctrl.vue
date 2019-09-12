@@ -597,8 +597,8 @@ export default {
     },
 
     selected_script: {
-      get() { return this.$store.getters['getSelectedScript']},
-      set(val) { this.$store.commit('setSelectedScript', val)},
+      get() { return this.$store.getters['selectedScript']},
+      set(val) { this.$store.commit('selectedScript', val)},
     }
   },
 

@@ -32,7 +32,6 @@ export default {
         },
 
         revertDefaultSettings() {
-            console.log(this.script)
             this.$store.dispatch('setScriptDefaults', this.script)
         },
     }
