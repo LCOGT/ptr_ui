@@ -1,6 +1,7 @@
 import { API } from 'aws-amplify'
 import { SnackbarProgrammatic as Snackbar } from 'buefy';
 
+
 // These default values (organized per script) are used to initialize values,
 // and also used when the user wishes to revert back to defaults.
 const defaults = {
@@ -29,6 +30,36 @@ const defaults = {
             skipZS: true,
         }
     },
+    takeLRGBStack() {
+        return {
+            numFrames: 1,
+            skipL: false,
+        }
+    },
+    takeO3HaS2N2Stack() {
+        return {
+            numFrames: 1,
+            skipO3: false,
+            skipHa: false,
+            skipS2: false,
+            skipN2: false,
+        }
+    },
+    takePlanetStack() {
+        return {
+            numFrames: 127,
+        }
+    },
+    takeLunarStack() {
+        return {
+            numFrames: 127,
+        }
+    },
+    takeSkyFlats() {
+        return {
+            numFrames: 15,
+        }
+    }
 }
 
 // initial vuex state
@@ -40,13 +71,35 @@ const state = {
     genBiasDarkMaster: defaults.genBiasDarkMaster(),
     genScreenFlatMasters: defaults.genScreenFlatMasters(),
     takeUGRIZSStack: defaults.takeUGRIZSStack(),
+    takeLRGBStack: defaults.takeLRGBStack(),
+    takeO3HaS2N2Stack: defaults.takeO3HaS2N2Stack(),
+    takePlanetStack: defaults.takePlanetStack(),
+    takeLunarStack: defaults.takeLunarStack(),
+    takeSkyFlats: defaults.takeSkyFlats(),
 
     // If a script is not in this list, the UI settings button will be disabled.
     scriptsWithSettings: [
+        'none',
         'genBiasDarkMaster',
         'genScreenFlatMasters',
         'takeUGRIZSStack',
-    ]
+        'takeLRGBStack',
+        'takeO3HaS2N2Stack',
+        'takePlanetStack',
+        'takeLunarStack',
+        'takeSkyFlats',
+    ],
+
+    readableScriptNames: {
+        takeLRGBStack: 'Take L/R/G/B Stack',
+        takeO3HaS2N2Stack: 'Take O3/Ha/N2/S2 Stack',
+        takeUGRIZSStack: 'Take u/g/r/i/zs Stack',
+        takePlanetStack: 'Take Planet Stack',
+        takeLunarStack: 'Take Lunar Stack',
+        genBiasDarkMaster: 'Generate Bias/Dark Master',
+        genScreenFlatMasters: 'Generate Screen-Flat Masters',
+        takeSkyFlats: 'Take Sky-Flats',
+    },
 }
 
 // vuex getters
@@ -59,6 +112,8 @@ const getters = {
 
     getGeneralScriptParam: state => payload => state[payload.script_name][payload.script_param],
     getAllParamsFromScript: state => script_name => state[script_name],
+
+    readableScriptNames: state => state.readableScriptNames,
 
     /* Specific script getters */
     genBiasDarkMaster: state => state.genBiasDarkMaster,
@@ -82,6 +137,26 @@ const getters = {
     takeUGRIZSStack_numFrames: state => state.takeUGRIZSStack.numFrames,
     takeUGRIZSStack_skipU: state => state.takeUGRIZSStack.skipU,
     takeUGRIZSStack_skipZS: state => state.takeUGRIZSStack.skipZS,
+
+    takeLRGBStack: state => state.takeLRGBStack,
+    takeLRGBStack_numFrames: state => state.takeLRGBStack.numFrames,
+    takeLRGBStack_skipL: state => state.takeLRGBStack.skipL,
+
+    takeO3HaS2N2Stack: state => state.takeO3HaS2N2Stack,
+    takeO3HaS2N2Stack_numFrames: state => state.takeO3HaS2N2Stack.numFrames,
+    takeO3HaS2N2Stack_skipO3: state => state.takeO3HaS2N2Stack.skipO3,
+    takeO3HaS2N2Stack_skipHa: state => state.takeO3HaS2N2Stack.skipHa,
+    takeO3HaS2N2Stack_skipS2: state => state.takeO3HaS2N2Stack.skipS2,
+    takeO3HaS2N2Stack_skipN2: state => state.takeO3HaS2N2Stack.skipN2,
+
+    takePlanetStack: state => state.takePlanetStack,
+    takePlanetStack_numFrames: state => state.takePlanetStack.numFrames,
+
+    takeLunarStack: state => state.takeLunarStack,
+    takeLunarStack_numFrames: state => state.takeLunarStack.numFrames,
+
+    takeSkyFlats: state => state.takeSkyFlats,
+    takeSkyFlats: state => state.takeSkyFlats.numFrames,
 
 }
 
@@ -212,6 +287,7 @@ const actions = {
             commit('generalScriptParam', payload)
         })
     },
+
 }
 
 // vuex mutations
@@ -241,6 +317,20 @@ const mutations = {
     takeUGRIZSStack_skipU(state, val) { state.takeUGRIZSStack.skipU= val },
     takeUGRIZSStack_skipZS(state, val) { state.takeUGRIZSStack.skipZS= val },
 
+    takeLRGBStack_numFrames(state, val) { state.takeLRGBStack.numFrames = val },
+    takeLRGBStack_skipL(state, val) { state.takeLRGBStack.skipL = val },
+
+    takeO3HaS2N2Stack_numFrames(state, val) { state.takeO3HaS2N2Stack.numFrames = val },
+    takeO3HaS2N2Stack_skipO3(state, val) { state.takeO3HaS2N2Stack.skipO3 = val },
+    takeO3HaS2N2Stack_skipHa(state, val) { state.takeO3HaS2N2Stack.skipHa = val },
+    takeO3HaS2N2Stack_skipS2(state, val) { state.takeO3HaS2N2Stack.skipS2 = val },
+    takeO3HaS2N2Stack_skipN2(state, val) { state.takeO3HaS2N2Stack.skipN2 = val },
+
+    takePlanetStack_numFrames(state, val) { state.takePlanetStack.numFrames = val },
+
+    takeLunarStack_numFrames(state, val) { state.takeLunarStack.numFrames = val },
+
+    takeSkyFlats(state, val) { state.takeSkyFlats.numFrames = val },
 }
 
 export default {
