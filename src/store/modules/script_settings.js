@@ -1,9 +1,41 @@
 import { API } from 'aws-amplify'
 
+const defaults = {
+    genBiasDarkMaster() {
+        return {
+            numOfBias: 511,
+            darkTime: 120,
+            numOfDark: 127,
+            dark2Time: 60,
+            numOfDark2: 0,
+            coldMap: true,
+            hotMap: true,
+        }
+    },
+    genScreenFlatMasters() {
+        return {
+            numFrames: 15,
+            gainCalc: true,
+            shutterCompensation: true,
+        }
+    },
+    takeUGRIZSStack() {
+        return {
+            numFrames: 1,
+            skipU: true,
+            skipZS: true,
+        }
+    },
+}
+
 // initial state
 const state = {
     selectedScript: "none",
 
+    genBiasDarkMaster: defaults.genBiasDarkMaster(),
+    genScreenFlatMasters: defaults.genScreenFlatMasters(),
+    takeUGRIZSStack: defaults.takeUGRIZSStack(),
+    /*
     genBiasDarkMaster: {
         numOfBias: 1,
         darkTime: 300,
@@ -23,6 +55,7 @@ const state = {
         skipU: true,
         skipZS: true,
     },
+    */
 
     // If a script is not in this list, the UI settings button will be disabled.
     scriptsWithSettings: [
@@ -129,13 +162,38 @@ const actions = {
             console.log(error)
         })
 
-    }
+    },
+
+    /**
+     * This action reverts script parameters to their default values for the
+     * given script. It takes values from the 'defaults' object defined above.
+     * @param {string} script_name defines the script to reset
+     */
+    setScriptDefaults({ commit }, script_name) {
+        // Get the default values
+        let default_params = defaults[script_name]()
+        // For each key/val pair in the defaults object
+        Object.entries(default_params).map(function(keyval){
+            // Define the name, key, and val (used in the mutation)
+            let payload = {
+                script_name: script_name,
+                script_param: keyval[0],
+                val: keyval[1],
+            }
+            // Commit the mutation for the param. This is done for each value.
+            commit('set_generalScriptParam', payload)
+        })
+    },
 }
 
 // mutations
 const mutations = {
 
     setSelectedScript(state, script) { state.selectedScript = script },
+
+    defaultParams(state, script_name) {
+        console.log(defaults[script_name]())
+    },
 
     set_generalScriptParam(state, payload) {
         state[payload.script_name][payload.script_param] = payload.val
