@@ -160,7 +160,7 @@ export default {
     overflow-y: auto;
 }
 .img-record:hover{
-  background:rgb(55, 65, 65);
+  background:rgb(65, 75, 75);
 }
 .card-content:focus-within{
     background:white;
@@ -186,7 +186,7 @@ export default {
   height: 740px;
 }
 .active{
-    background-color: rgb(50, 60, 60);
+    background-color: rgb(60, 70, 70);
 }
 .image-coordinates{
     padding-top: 20px;
