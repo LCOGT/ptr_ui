@@ -51,7 +51,7 @@
                                                     </div>
                                             </div>
                                         </div>
-                                        <div class=image-information>
+                                        <!--div class=image-information>
                                                 <p style="color:white;">Filename: {{item.base_filename}}</p>
                                                 <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
                                                 <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
@@ -59,7 +59,7 @@
                                                     <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
                                                     <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
                                                 </div>
-                                        </div>
+                                        </div-->
                                     </div>
                             </div>
                         </b-collapse>
@@ -169,7 +169,7 @@ export default {
     overflow-y: auto;
 }
 .img-record:hover{
-  background:gray;
+  background:rgb(55, 65, 65);
 }
 .card-content:focus-within{
     background:white;
@@ -195,7 +195,7 @@ export default {
   height: 740px;
 }
 .active{
-    background-color: gray;
+    background-color: rgb(50, 60, 60);
 }
 .image-coordinates{
     padding-top: 20px;
