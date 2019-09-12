@@ -51,18 +51,6 @@
                                                     </div>
                                             </div>
                                         </div>
-<<<<<<< HEAD
-                                        <!--div class=image-information>
-                                                <p style="color:white;">Filename: {{item.base_filename}}</p>
-                                                <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
-                                                <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
-                                                <div class=image-coordinates>
-                                                    <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
-                                                    <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
-                                                </div>
-                                        </div-->
-=======
->>>>>>> d124a2c18a8a8727adcf3dc2d915da82a0cbbca3
                                     </div>
                             </div>
                         </b-collapse>
