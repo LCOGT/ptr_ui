@@ -49,31 +49,31 @@ export default {
 
         numOfBias: {
             get() { return this.$store.getters['genBiasDarkMaster_numOfBias'] },
-            set(val) { this.$store.commit('set_genBiasDarkMaster_numOfBias', val) }
+            set(val) { this.$store.commit('genBiasDarkMaster_numOfBias', val) }
         },
         darkTime: {
             get() { return this.$store.getters['genBiasDarkMaster_darkTime'] },
-            set(val) { this.$store.commit('set_genBiasDarkMaster_darkTime', val) }
+            set(val) { this.$store.commit('genBiasDarkMaster_darkTime', val) }
         },
         numOfDark: {
             get() { return this.$store.getters['genBiasDarkMaster_numOfDark'] },
-            set(val) { this.$store.commit('set_genBiasDarkMaster_numOfDark', val) }
+            set(val) { this.$store.commit('genBiasDarkMaster_numOfDark', val) }
         },
         dark2Time: {
             get() { return this.$store.getters['genBiasDarkMaster_dark2Time'] },
-            set(val) { this.$store.commit('set_genBiasDarkMaster_dark2Time', val) }
+            set(val) { this.$store.commit('genBiasDarkMaster_dark2Time', val) }
         },
         numOfDark2: {
             get() { return this.$store.getters['genBiasDarkMaster_numOfDark2'] },
-            set(val) { this.$store.commit('set_genBiasDarkMaster_numOfDark2', val) }
+            set(val) { this.$store.commit('genBiasDarkMaster_numOfDark2', val) }
         },
         coldMap: {
             get() { return this.$store.getters['genBiasDarkMaster_coldMap'] },
-            set(val) { this.$store.commit('set_genBiasDarkMaster_coldMap', val) }
+            set(val) { this.$store.commit('genBiasDarkMaster_coldMap', val) }
         },
         hotMap: {
             get() { return this.$store.getters['genBiasDarkMaster_hotMap'] },
-            set(val) { this.$store.commit('set_genBiasDarkMaster_hotMap', val) }
+            set(val) { this.$store.commit('genBiasDarkMaster_hotMap', val) }
         },
     }
 }
