@@ -45,5 +45,6 @@ export default {
 <style lang="scss" scoped>
 .field-group {
     padding-right: 2em;
+    padding-bottom: 1em;
 }
 </style>

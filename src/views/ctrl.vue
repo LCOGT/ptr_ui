@@ -298,9 +298,9 @@
     </div>
 
     <div style="background:orangered; padding: 2em; margin-top: 10px;">
-        <div class="title">Scripts</div>
+        <div class="title">Sequencer</div>
 
-        <b-field label="Scripts">
+        <b-field label="Script">
           <b-field>
             <b-select value="none" v-model="selected_script" style="width: 100;">
               <option value="none">none</option>
@@ -310,11 +310,11 @@
               <option value="focus_vcurve">Focus V-Curve</option>
               <option value="take_lrgb_stack">Take LRGB Stack</option>
               <option value="take_o3has2n2_stack">Take O3HaS2N2 Stack</option>
-              <option value="take_ugrizs_stack">Take ugrizs Stack</option>
+              <option value="takeUGRIZSStack">Take ugrizs Stack</option>
               <option value="take_planet_stack">Take Planet Stack</option>
               <option value="take_lunar_stack">Take Lunar Stack</option>
-              <option value="gen_bias_dark_master">Gen Bias/Dark Master</option>
-              <option value="gen_screen_flat_masters">Gen Screen Flat Masters</option>
+              <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
+              <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
               <option value="take_pre-open_calibrations">Take Pre-open Calibrations</option>
               <option value="take_skyflats">Take SkyFlats</option>
               <option value="find_field_center">Find Field Center</option>
@@ -327,7 +327,7 @@
             <p class="control">
               <button 
                 class="button is-light" 
-                :disabled="scriptsWithSettings.includes(selected_script) ? false : true"
+                :disabled="!scriptHasSettings"
                 @click="isScriptSettingsActive = true"
                 >
                 <b-icon icon="settings"></b-icon>
@@ -341,13 +341,13 @@
         </b-modal>
 
         <div class="status-item">
-          <div class="title2">Script Status</div>
-          <pre>{{ camera_state && camera_state.script_status}}</pre>
+          <div class="title2">Sequencer Status</div>
+          <pre>{{ sequencer_state }}</pre>
         </div>
 
         <div class="buttons has-addons">
-          <command-button :data="script_run_command" style="width: 70%" />
-          <command-button :data="script_stop_command" style="width: 30%" />
+          <button class="button" @click="script_run_command" style="width: 70%;"> run script</button>
+          <button class="button" @click="script_stop_command" style="width: 30%"> stop script</button>
         </div>
 
     </div>
@@ -577,6 +577,8 @@ export default {
       this.$store.dispatch('images/set_latest_image')
     },
 
+
+
   },
 
 
@@ -586,12 +588,17 @@ export default {
       'current_image',
     ]),
     ...mapGetters([
-      'scriptsWithSettings',
+      'scriptHasSettings',
     ]),
 
     status_age() {
       let status_timestamp = this.$store.getters['instrument_state/timestamp']
       return (this.local_timestamp/1000 - status_timestamp).toFixed(1)
+    },
+
+    selected_script: {
+      get() { return this.$store.getters['getSelectedScript']},
+      set(val) { this.$store.commit('setSelectedScript', val)},
     }
   },
 

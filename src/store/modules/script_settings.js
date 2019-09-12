@@ -1,6 +1,9 @@
+import { API } from 'aws-amplify'
 
 // initial state
 const state = {
+    selectedScript: "none",
+
     genBiasDarkMaster: {
         numOfBias: 1,
         darkTime: 300,
@@ -23,15 +26,24 @@ const state = {
 
     // If a script is not in this list, the UI settings button will be disabled.
     scriptsWithSettings: [
-        'gen_bias_dark_master',
-        'gen_screen_flat_masters',
-        'take_UGRIZS_stack',
+        'genBiasDarkMaster',
+        'genScreenFlatMasters',
+        'takeUGRIZSStack',
     ]
 }
 
 // getters
 const getters = {
 
+    /* General script settings getters */
+    getSelectedScript: state => state.selectedScript,
+
+    scriptHasSettings: state => state.scriptsWithSettings.includes(state.selectedScript),
+
+    getGeneralScriptParam: state => payload => state[payload.script_name][payload.script_param],
+    getAllParamsFromScript: state => script_name => state[script_name],
+
+    /* Specific script getters */
     genBiasDarkMaster: state => state.genBiasDarkMaster,
     genBiasDarkMaster_numOfBias: state => state.genBiasDarkMaster.numOfBias,
     genBiasDarkMaster_darkTime: state => state.genBiasDarkMaster.darkTime, 
@@ -54,15 +66,80 @@ const getters = {
     takeUGRIZSStack_skipU: state => state.takeUGRIZSStack.skipU,
     takeUGRIZSStack_skipZS: state => state.takeUGRIZSStack.skipZS,
 
-    scriptsWithSettings: state => state.scriptsWithSettings,
 }
 
 // actions
 const actions = {
+
+    script_run_command({ getters, rootState }) {
+
+        // API parameters
+        let apiName = 'ptr-api';
+        let site = rootState.observatory_configuration.selected_site;
+        let mount = rootState.observatory_configuration.selected_mount;
+        let path = `/${site}/${mount}/command/`
+
+        // Command to send
+        let script_name = getters.getSelectedScript
+        let command = {
+            device: 'sequencer',
+            instance: 'sequencer',
+            timestamp: parseInt(Date.now() / 1000),
+            action: 'run',
+            required_params: {
+                script:script_name,
+                ...getters.getAllParamsFromScript(script_name),
+            },
+            optional_params: {}
+        }
+        
+        // Send the command and log the output
+        API.post(apiName, path, {body:command}).then(response => {
+            console.log(response)
+            console.log(command)
+        }).catch(error => {
+            console.log("error sending script.")
+            console.log(error)
+        })
+    },
+
+    script_stop_command({ rootState }) {
+
+        // API parameters
+        let apiName = 'ptr-api';
+        let site = rootState.observatory_configuration.selected_site;
+        let mount = rootState.observatory_configuration.selected_mount;
+        let path = `/${site}/${mount}/command/`
+
+        // Command to send
+        let command = {
+            device: 'sequencer',
+            instance: 'sequencer',
+            timestamp: parseInt(Date.now() / 1000),
+            action: 'stop',
+            required_params: {},
+            optional_params: {}
+        }
+
+        // Send the command and log the output
+        API.post(apiName, path, {body: command}).then(response => {
+            console.log(response)
+        }).catch(error => {
+            console.log("error sending script.")
+            console.log(error)
+        })
+
+    }
 }
 
 // mutations
 const mutations = {
+
+    setSelectedScript(state, script) { state.selectedScript = script },
+
+    set_generalScriptParam(state, payload) {
+        state[payload.script_name][payload.script_param] = payload.val
+    },
 
     set_genBiasDarkMaster_numOfBias(state, val) { state.genBiasDarkMaster.numOfBias = val },
     set_genBiasDarkMaster_darkTime(state, val) { state.genBiasDarkMaster.darkTime= val },

@@ -15,11 +15,11 @@ export default new Vuex.Store({
 
         // Vuex normally doesn't save between page reloads.
         // Use this plugin to save state for the duration of a browser session.
-        createPersistedState({
-            paths: [
-                'script_settings'
-            ]
-        })
+        //createPersistedState({
+        //    paths: [
+        //        'script_settings'
+        //    ]
+        //})
     ],
     modules: {
         auth,
