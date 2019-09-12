@@ -36,8 +36,6 @@ export const commands_mixin = {
                 'solar flat',
             ],
 
-            // Scripts Fields
-            selected_script: 'none',
 
             // Focuser Fields
             focus_relative: '',
@@ -116,6 +114,14 @@ export const commands_mixin = {
             return the_base_command
 
         },
+
+        script_run_command() {
+            this.$store.dispatch('script_run_command')
+        },
+        script_stop_command() {
+            this.$store.dispatch('script_stop_command')
+        },
+
     },
 
     computed: {
@@ -130,6 +136,7 @@ export const commands_mixin = {
             all_focuser_state: 'focuser',
             all_rotator_state: 'rotator',
             all_screen_state: 'screen',
+            all_sequencer_state: 'sequencer',
         }),
 
         // Getters from the observatory_configuration vuex module.
@@ -268,6 +275,11 @@ export const commands_mixin = {
                 return this.all_screen_state[this.active_screen]
             } catch(error) { return {} }
         },
+        sequencer_state: function () {
+            try {
+                return this.all_sequencer_state.sequencer
+            } catch(error) { return {} }
+        },
 
         command_url: function () {
             return `/${this.active_site}/${this.active_mount}/command/`
@@ -297,14 +309,6 @@ export const commands_mixin = {
         },
         camera_cancel_command () {
             return this.base_command( 'camera', 'stop', 'cancel' )
-        },
-        script_run_command () {
-            return this.base_command( 'sequencer', 'run', 'run script',
-                { script: this.selected_script }
-            )
-        },
-        script_stop_command () {
-            return this.base_command( 'sequencer', 'stop', 'stop',)
         },
         mount_slew_command () {
             return this.base_command( 'mount', 'go', 'slew to coordinates',
@@ -398,6 +402,7 @@ export const commands_mixin = {
         screen_off_command() {
             return this.base_command( 'screen', 'turn_off', 'off' )
         },
+
 
     }
 }
