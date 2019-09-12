@@ -21,7 +21,7 @@
                                     </b-icon>
                                 </a>
                             </div>
-                            <div class="test">
+                            <div class="folder">
                             <draggable v-model="user_images">
                                 <transition-group class="trans">
                                     <div v-on:click="toggle(index)" :class="{'active': index == activeIndex}" v-for="(item, index) in user_images" :key="index">
@@ -51,7 +51,7 @@
                         </b-collapse>
                         <br>
                         <!--Trash folder-->
-                        <b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
+                        <!--<b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
                             <div
                                 slot="trigger" 
                                 slot-scope="props"
@@ -90,7 +90,7 @@
                                     </div>
                                 </transition-group>
                             </draggable>
-                        </b-collapse>
+                        </b-collapse>-->
                     </b-menu-item>
                 </b-menu-list>
             </b-menu>
@@ -154,8 +154,8 @@ export default {
   padding-top: 22px;
   padding-bottom: 22px;
 }
-.test{
-    max-height: 580px;
+.folder{
+    max-height: 1000px;
     overflow-y: auto;
 }
 .img-record:hover{
