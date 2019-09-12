@@ -371,15 +371,6 @@
             <b-dropdown-item aria-role="listitem">
               <command-button :data="focus_home_command" class="dropdown-button-command"/>
             </b-dropdown-item>
-            <!--b-dropdown-item-->
-              <!--command-button :data="focus_auto_command" class="dropdown-button-command"/-->
-            <!--/b-dropdown-item-->
-            <!--b-dropdown-item-->
-              <!--command-button :data="focus_fine_command" class="dropdown-button-command"/-->
-            <!--/b-dropdown-item-->
-            <!--b-dropdown-item-->
-              <!--command-button :data="focus_vcurve_command" class="dropdown-button-command"/-->
-            <!--/b-dropdown-item-->
             <b-dropdown-item>
               <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
             </b-dropdown-item>
@@ -523,17 +514,6 @@ export default {
 
     }
   },
-  //beforeRouteEnter: async function(to, from, next) {
-    //try {
-      //await store.dispatch('observatory_configuration/update_config');
-      //next();
-    //} catch(exception) {
-      //next(exception);
-    //}
-  //},
-
-  beforeCreate() {
-  },
 
   created() {
     var that = this;
@@ -576,9 +556,6 @@ export default {
     refresh_latest_image() {
       this.$store.dispatch('images/set_latest_image')
     },
-
-
-
   },
 
 
@@ -674,6 +651,5 @@ export default {
     height: 110vh;
     display: flex;
 }
-
 
 </style>

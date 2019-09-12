@@ -79,7 +79,6 @@ const state = {
 
     // If a script is not in this list, the UI settings button will be disabled.
     scriptsWithSettings: [
-        'none',
         'genBiasDarkMaster',
         'genScreenFlatMasters',
         'takeUGRIZSStack',
