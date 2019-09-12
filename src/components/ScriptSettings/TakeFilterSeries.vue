@@ -28,15 +28,15 @@ export default {
 
         numFrames: {
             get() { return this.$store.getters['takeUGRIZSStack_numFrames'] },
-            set(val) { this.$store.commit('set_takeUGRIZSStack_numFrames', val) }
+            set(val) { this.$store.commit('takeUGRIZSStack_numFrames', val) }
         },
         skipU: {
             get() { return this.$store.getters['takeUGRIZSStack_skipU'] },
-            set(val) { this.$store.commit('set_takeUGRIZSStack_skipU', val) }
+            set(val) { this.$store.commit('takeUGRIZSStack_skipU', val) }
         },
         skipZS: {
             get() { return this.$store.getters['takeUGRIZSStack_skipZS'] },
-            set(val) { this.$store.commit('set_takeUGRIZSStack_skipZS', val) }
+            set(val) { this.$store.commit('takeUGRIZSStack_skipZS', val) }
         },
     }
 }

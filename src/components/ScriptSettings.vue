@@ -7,6 +7,8 @@
         <gen-screen-flat-masters v-if="script=='genScreenFlatMasters'"/>
         <take-filter-series v-if="script=='takeUGRIZSStack'"/>
         <gen-bias-dark-master v-if="script=='genBiasDarkMaster'"/>
+        <hr style="border-bottom: silver 4px solid; margin-bottom: 2em;">
+        <button class="button is-light" @click="revertDefaultSettings">Revert To Default</button>
     </div>
 </template>
 
@@ -27,7 +29,11 @@ export default {
     methods: {
         camelToSnake(s) {
             return s.replace(/\.?([A-Z]+)/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "")
-        }
+        },
+
+        revertDefaultSettings() {
+            this.$store.dispatch('setScriptDefaults', this.script)
+        },
     }
 }
 </script>

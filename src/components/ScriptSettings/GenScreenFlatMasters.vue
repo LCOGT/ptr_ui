@@ -29,15 +29,15 @@ export default {
 
         numFrames: {
             get() { return this.$store.getters['genScreenFlatMasters_numFrames'] },
-            set(val) { this.$store.commit('set_genScreenFlatMasters_numFrames', val) }
+            set(val) { this.$store.commit('genScreenFlatMasters_numFrames', val) }
         },
         gainCalc: {
             get() { return this.$store.getters['genScreenFlatMasters_gainCalc'] },
-            set(val) { this.$store.commit('set_genScreenFlatMasters_gainCalc', val) }
+            set(val) { this.$store.commit('genScreenFlatMasters_gainCalc', val) }
         },
         shutterCompensation: {
             get() { return this.$store.getters['genScreenFlatMasters_shutterCompensation'] },
-            set(val) { this.$store.commit('set_genScreenFlatMasters_shutterCompensation', val) }
+            set(val) { this.$store.commit('genScreenFlatMasters_shutterCompensation', val) }
         },
 
     }

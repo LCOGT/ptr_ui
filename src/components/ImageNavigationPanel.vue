@@ -22,7 +22,12 @@
                                 </a>
                             </div>
                             <div class="folder">
-                                <div v-on:click="toggle(index)" :class="{'active': index == activeIndex}" v-for="(item, index) in user_images" :key="index">
+                                    <div 
+                                        v-on:click="toggle(index)" 
+                                        :class="{'active': index == activeIndex}" 
+                                        v-for="(item, index) in user_images" 
+                                        :key="index"
+                                    >
                                         <div class="img-record"  @click="setActiveImage(item)">
                                             <div class="image">
                                                 <img 
@@ -37,12 +42,25 @@
                                                     <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
                                                     <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
                                                     <div class=image-coordinates>
-                                                        <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
-                                                        <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
+                                                        <p style="color:rgb(175,175,175);">
+                                                            RA: {{item.right_ascension.toFixed(2)}}
+                                                        </p>
+                                                        <p style="color:rgb(175,175,175);">
+                                                            DEC: {{item.declination.toFixed(2)}}
+                                                        </p>
                                                     </div>
                                             </div>
                                         </div>
-                                </div>
+                                        <div class=image-information>
+                                                <p style="color:white;">Filename: {{item.base_filename}}</p>
+                                                <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
+                                                <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
+                                                <div class=image-coordinates>
+                                                    <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
+                                                    <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
+                                                </div>
+                                        </div>
+                                    </div>
                             </div>
                         </b-collapse>
                         <br>
@@ -63,29 +81,25 @@
                                     </b-icon>
                                 </a>
                             </div>
-                            <draggable v-model="user_images">
-                                <transition-group>
-                                    <div class="card-content" v-for="(item, index) in trash_images" :key="index">
-                                        <div class="image">
-                                        <img 
-                                            style="width: 100px; height: 100px;"
-                                            v-bind:src="item.jpg13_url"
-                                            v-bind:title="item.base_filename"
-                                            alt="Preview Not Available"
-                                        >
-                                        </div>
-                                        <div class=image-information>
-                                            <p style="color:white;">Filename: {{item.base_filename}}</p>
-                                            <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
-                                            <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
-                                            <div class=image-coordinates>
-                                                <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
-                                                <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
-                                            </div>
-                                        </div>
+                            <div class="card-content" v-for="(item, index) in trash_images" :key="index">
+                                <div class="image">
+                                <img 
+                                    style="width: 100px; height: 100px;"
+                                    v-bind:src="item.jpg13_url"
+                                    v-bind:title="item.base_filename"
+                                    alt="Preview Not Available"
+                                >
+                                </div>
+                                <div class=image-information>
+                                    <p style="color:white;">Filename: {{item.base_filename}}</p>
+                                    <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
+                                    <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
+                                    <div class=image-coordinates>
+                                        <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
+                                        <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
                                     </div>
-                                </transition-group>
-                            </draggable>
+                                </div>
+                            </div>
                         </b-collapse>-->
                     </b-menu-item>
                 </b-menu-list>
