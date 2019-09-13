@@ -1,22 +1,30 @@
 <template>
-    <div class="the-settings card">
-        <p class="">settings: </p> 
-        <span class="heading is-light is-size-4 is-family-monospace">{{getReadableName(script)}}</span>
-        <hr style="border-bottom: silver 4px solid; margin-bottom: 2em;">
+    <div class="the-settings card modal-card">
+        <section class="modal-card-head">
+            <div>
+            <p class="">settings: </p> 
+            <span class="heading is-light is-size-4 is-family-monospace">{{getReadableName(script)}}</span>
+            </div>
+        </section>
+        <!--hr style="border-bottom: silver 4px solid; margin-bottom: 2em;"-->
 
-        <gen-screen-flat-masters v-if="script=='genScreenFlatMasters'"/>
-        <gen-bias-dark-master v-if="script=='genBiasDarkMaster'"/>
-        <take-u-g-r-i-z-s-stack v-if="script=='takeUGRIZSStack'"/>
-        <take-l-r-g-b-stack v-if="script=='takeLRGBStack'"/>
-        <take-narrowband-stack v-if="script=='takeO3HaS2N2Stack'"/>
-        <take-lunar-stack v-if="script=='takeLunarStack'" />
-        <take-planet-stack v-if="script=='takePlanetStack'" />
-        <take-sky-flats v-if="script=='takeSkyFlats'" />
-        <hr style="border-bottom: silver 4px solid; margin-bottom: 2em;">
-        <div class="level">
-            <button class="button is-light" @click="revertDefaultSettings">Revert To Default</button>
-            <button class="button" @click="script_run_command">Run Script</button>
-        </div>
+        <section class="modal-card-body">
+            <gen-screen-flat-masters v-if="script=='genScreenFlatMasters'"/>
+            <gen-bias-dark-master v-if="script=='genBiasDarkMaster'"/>
+            <take-u-g-r-i-z-s-stack v-if="script=='takeUGRIZSStack'"/>
+            <take-l-r-g-b-stack v-if="script=='takeLRGBStack'"/>
+            <take-narrowband-stack v-if="script=='takeO3HaS2N2Stack'"/>
+            <take-lunar-stack v-if="script=='takeLunarStack'" />
+            <take-planet-stack v-if="script=='takePlanetStack'" />
+            <take-sky-flats v-if="script=='takeSkyFlats'" />
+        </section>
+        <!--hr style="border-bottom: silver 4px solid; margin-bottom: 2em;"-->
+        <section class="modal-card-foot">
+            <div class="level" style="width: 100%;">
+                <button class="button is-light" @click="revertDefaultSettings">Revert To Default</button>
+                <button class="button" @click="script_run_command">Run Script</button>
+            </div>
+        </section>
     </div>
 </template>
 
@@ -76,6 +84,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.modal-card {
+    width: auto;
+}
 .modal-container {
     display:flex;
 }
