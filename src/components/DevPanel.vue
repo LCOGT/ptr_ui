@@ -5,11 +5,12 @@
             <div class="devpanell">
                 <div class="field" style="margin-left: 0.5em;">
                     <b-switch 
-                    @input="api_toggle"
-                    v-model="local_api_is_on"
+                    v-model="active_api"
+                    true-value='ptr-api-local'
+                    false-value='ptr-api'
                     size="is-small"
                     type="is-warning">
-                        local API is {{ local_api_is_on ? "on" : "off"}}
+                    local API is {{ active_api=="ptr-api-local" ? "on" : "off"}}
                     </b-switch>
                 </div>
             </div>
@@ -22,34 +23,11 @@
 
 export default {
     name: "DevPanel",
-    data() {
-        return {
-            local_api_is_on: false,
-        }
-    },
-    methods: {
-        api_toggle() {
-            if (this.local_api_is_on) {
-                this.$store.dispatch('dev/use_local_api')
-            }
-            else {
-                this.$store.dispatch('dev/use_production_api')
-            }
-        },
-    },
     computed: {
-
         // Toggle whether to use localhost:5000 or api.photonranch.org api for api calls. 
         active_api: {
             get() { return this.$store.getters['dev/api'] },
-            set(val) {
-                if (val) {
-                    this.$store.dispatch('dev/use_local_api')
-                }
-                else {
-                    this.$store.dispatch('dev/use_production_api')
-                }
-            }
+            set(val) { this.$store.dispatch('dev/set_active_api', val) }
         }
     } 
 }
