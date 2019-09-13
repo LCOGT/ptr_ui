@@ -308,15 +308,15 @@
               <option value="focus_auto">Focus Auto</option>
               <option value="focus_fine">Focus Fine</option>
               <option value="focus_vcurve">Focus V-Curve</option>
-              <option value="take_lrgb_stack">Take LRGB Stack</option>
-              <option value="take_o3has2n2_stack">Take O3HaS2N2 Stack</option>
+              <option value="takeLRGBStack">Take LRGB Stack</option>
+              <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
               <option value="takeUGRIZSStack">Take ugrizs Stack</option>
-              <option value="take_planet_stack">Take Planet Stack</option>
-              <option value="take_lunar_stack">Take Lunar Stack</option>
+              <option value="takePlanetStack">Take Planet Stack</option>
+              <option value="takeLunarStack">Take Lunar Stack</option>
               <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
               <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
               <option value="take_pre-open_calibrations">Take Pre-open Calibrations</option>
-              <option value="take_skyflats">Take SkyFlats</option>
+              <option value="takeSkyFlats">Take SkyFlats</option>
               <option value="find_field_center">Find Field Center</option>
               <option value="calibrate_focus_v-curve">Calibrate Focus V-curve</option>
               <option value="32_target_pointing_run">32 Target Pointing Run</option>
@@ -371,15 +371,6 @@
             <b-dropdown-item aria-role="listitem">
               <command-button :data="focus_home_command" class="dropdown-button-command"/>
             </b-dropdown-item>
-            <!--b-dropdown-item-->
-              <!--command-button :data="focus_auto_command" class="dropdown-button-command"/-->
-            <!--/b-dropdown-item-->
-            <!--b-dropdown-item-->
-              <!--command-button :data="focus_fine_command" class="dropdown-button-command"/-->
-            <!--/b-dropdown-item-->
-            <!--b-dropdown-item-->
-              <!--command-button :data="focus_vcurve_command" class="dropdown-button-command"/-->
-            <!--/b-dropdown-item-->
             <b-dropdown-item>
               <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
             </b-dropdown-item>
@@ -523,17 +514,6 @@ export default {
 
     }
   },
-  //beforeRouteEnter: async function(to, from, next) {
-    //try {
-      //await store.dispatch('observatory_configuration/update_config');
-      //next();
-    //} catch(exception) {
-      //next(exception);
-    //}
-  //},
-
-  beforeCreate() {
-  },
 
   created() {
     var that = this;
@@ -576,9 +556,6 @@ export default {
     refresh_latest_image() {
       this.$store.dispatch('images/set_latest_image')
     },
-
-
-
   },
 
 
@@ -674,6 +651,5 @@ export default {
     height: 110vh;
     display: flex;
 }
-
 
 </style>
