@@ -253,7 +253,7 @@ export default {
      * No authentication required.
      */
     testAPI () {
-      let apiName = "ptr-api"
+      let apiName = this.api
       let myInit = {
         response: true,
       }
@@ -271,7 +271,7 @@ export default {
      * 
      */
     testRestrictedAPI () {
-      let apiName = "ptr-api"
+      let apiName = this.api
       let myInit = {
         response: true,
       }
@@ -425,7 +425,7 @@ export default {
      * Note: this deletes the command from the queue!
      */
     getLastCommand() {
-      let apiName = 'ptr-api';
+      let apiName = this.api;
       API.get(apiName, '/site1/mount1/command/').then(response => {
         console.log(response)
       }).catch(error => {
@@ -439,7 +439,7 @@ export default {
      */
     updateStatus() {
 
-        let apiName = 'ptr-api';
+        let apiName = this.api;
         let path = '/site1/status/';
         let myInit = {
           body: {"parked": "true", "timestamp": Date.now().toString() }
@@ -460,6 +460,9 @@ export default {
       isLoggedIn: 'isLoggedIn',
       token: 'getToken',
     }),
+    ...mapGetters('dev', [
+      'api',
+    ])
   },
 }
 </script>

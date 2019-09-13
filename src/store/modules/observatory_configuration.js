@@ -7,7 +7,7 @@ import { API } from 'aws-amplify'
 
 var initial_state = function() {
     console.log('initializing observatory_configuration state')
-    let apiName = 'ptr-api';
+    let apiName = this.$store.getters['dev/api'];
     let path = '/all/config/';
     let state = {
         did_config_load_yet: false,
@@ -272,9 +272,9 @@ const actions = {
      * This action gets the most recent config from AWS, which applies to all 
      * observatories in the network. 
      */
-    update_config({ commit, getters }) {
+    update_config({ commit, getters, rootState }) {
         return new Promise((resolve, reject) => {
-            let apiName = 'ptr-api';
+            let apiName = rootState.dev.active_api;
             let path = '/all/config/';
             API.get(apiName, path).then(response => {
 
@@ -305,7 +305,6 @@ const actions = {
     },
 
     setActiveTelescope({ commit, getters, dispatch }, telescope_name) {
-        //API.get('ptr-api', '/all/config/').then(response => {
         dispatch('update_config').then(response => {
             commit('setActiveTelescope', telescope_name)
 

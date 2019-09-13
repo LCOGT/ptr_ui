@@ -56,7 +56,7 @@ const actions = {
         }
         // Otherwise, refresh the state for the selected site.
         else {
-            let apiName = 'ptr-api';
+            let apiName = rootState.dev.active_api;
             // 'site' is referencing the item in the observatory_configuration vuex module
             let path = `/${site}/status/`;
             API.get(apiName, path).then(response => {

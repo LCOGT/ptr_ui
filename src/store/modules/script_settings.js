@@ -169,7 +169,7 @@ const actions = {
     script_run_command({ getters, rootState }) {
 
         // API parameters
-        let apiName = 'ptr-api';
+        let apiName = rootState.dev.active_api;
         let site = rootState.observatory_configuration.selected_site;
         let mount = rootState.observatory_configuration.selected_mount;
         let path = `/${site}/${mount}/command/`
@@ -223,7 +223,7 @@ const actions = {
     script_stop_command({ rootState }) {
 
         // API parameters
-        let apiName = 'ptr-api';
+        let apiName = rootState.dev.active_api;
         let site = rootState.observatory_configuration.selected_site;
         let mount = rootState.observatory_configuration.selected_mount;
         let path = `/${site}/${mount}/command/`

@@ -6,13 +6,13 @@ import observatory_configuration from './modules/observatory_configuration'
 import skyChart from './modules/skyChart'
 import images from './modules/images'
 import script_settings from './modules/script_settings'
+import dev from './modules/dev'
 import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     plugins: [
-
         // Vuex normally doesn't save between page reloads.
         // Use this plugin to save state for the duration of a browser session.
         //createPersistedState({
@@ -28,5 +28,6 @@ export default new Vuex.Store({
         skyChart,
         images,
         script_settings,
+        dev,
     },
 })

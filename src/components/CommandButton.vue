@@ -42,7 +42,7 @@ export default {
 
             form.timestamp = parseInt(Date.now() / 1000)
 
-            let apiName = 'ptr-api';
+            let apiName = this.$store.getters['dev/api'];
             let path = url;
             let myInit = {
                 body: form,

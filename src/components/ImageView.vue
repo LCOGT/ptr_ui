@@ -153,7 +153,7 @@ export default {
         req_params,
         opt_params
       );
-      let apiName = "ptr-api";
+      let apiName = this.$store.getters['dev/api'];
       let url = basecommand.url;
       let body = {
         body: basecommand.form
