@@ -54,6 +54,7 @@ export default {
                         vm.isLoading = false;
                         console.log(response)
                     }).catch(error => {
+                        vm.isLoading = false;
                         console.log(error)
                     });
                     break;
@@ -64,6 +65,7 @@ export default {
                         console.log(response)
                         console.log(myInit)
                     }).catch(error => {
+                        vm.isLoading = false;
                         console.log('ERROR')
                         console.log(error)
                     });
@@ -73,6 +75,7 @@ export default {
                         vm.isLoading = false;
                         console.log(response)
                     }).catch(error => {
+                        vm.isLoading = false;
                         console.log(error)
                     });
                     break;

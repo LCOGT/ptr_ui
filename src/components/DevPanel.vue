@@ -3,7 +3,7 @@
         <div class="hero-body nopadding">
         <div class="container">
             <div class="devpanell">
-                <div class="field">
+                <div class="field" style="margin-left: 0.5em;">
                     <b-switch 
                     @input="api_toggle"
                     v-model="local_api_is_on"
