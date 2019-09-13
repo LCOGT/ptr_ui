@@ -34,7 +34,7 @@ const actions = {
         // TODO: Remove hard coded values and make sure that username in UI is linked to image records in database
         // let username = rootState.auth.user.username
         let username = "wmd_admin" // TODO: Grab username from state 
-        let apiName = this.$store.getters['dev/api'];
+        let apiName = rootState.dev.active_api;
         let path = `/image_by_user/${username}/`;
         
         API.get(apiName, path).then(response => {
