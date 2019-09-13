@@ -7,7 +7,6 @@
             </div>
         </section>
         <!--hr style="border-bottom: silver 4px solid; margin-bottom: 2em;"-->
-
         <section class="modal-card-body">
             <gen-screen-flat-masters v-if="script=='genScreenFlatMasters'"/>
             <gen-bias-dark-master v-if="script=='genBiasDarkMaster'"/>
