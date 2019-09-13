@@ -21,37 +21,38 @@
                                     </b-icon>
                                 </a>
                             </div>
-                            <div class="folder">
-                                    <div 
-                                        v-on:click="toggle(index)" 
-                                        :class="{'active': index == activeIndex}" 
-                                        v-for="(item, index) in user_images" 
-                                        :key="index"
-                                    >
-                                        <div class="img-record"  @click="setActiveImage(item)">
-                                            <div class="image">
-                                                <img 
-                                                    style="width: 100px; height: 100px;"
-                                                    v-bind:src="item.jpg13_url"
-                                                    v-bind:title="item.base_filename"
-                                                    alt="Preview Not Available"
-                                                >
-                                            </div>
-                                            <div class=image-information>
-                                                    <p style="color:white;">Filename: {{item.base_filename}}</p>
-                                                    <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
-                                                    <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
-                                                    <div class=image-coordinates>
-                                                        <p style="color:rgb(175,175,175);">
-                                                            RA: {{item.right_ascension.toFixed(2)}}
-                                                        </p>
-                                                        <p style="color:rgb(175,175,175);">
-                                                            DEC: {{item.declination.toFixed(2)}}
-                                                        </p>
-                                                    </div>
+                            <div class="folder" ref="records">
+                                <div 
+                                    v-on:click="toggle(index)" 
+                                    :class="{'active': index == activeIndex}" 
+                                    v-for="(item, index) in user_images" 
+                                    :key="item.image_id"
+                                >
+                                    <div v-bind:id="item.image_id" class="img-record" v-bind:class="{ active: isActive }"  @click="setActiveImage(item)">
+                                        <div class="image">
+                                            <img 
+                                                style="width: 100px; height: 100px;"
+                                                v-bind:src="item.jpg13_url"
+                                                v-bind:title="item.base_filename"
+                                                alt="Preview Not Available"
+                                            >
+                                        </div>
+                                        <div class=image-information>
+                                            <p>{{item.image_id}}</p>
+                                            <p style="color:white;">Filename: {{item.base_filename}}</p>
+                                            <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
+                                            <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
+                                            <div class=image-coordinates>
+                                                <p style="color:rgb(175,175,175);">
+                                                    RA: {{item.right_ascension.toFixed(2)}}
+                                                </p>
+                                                <p style="color:rgb(175,175,175);">
+                                                    DEC: {{item.declination.toFixed(2)}}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
                             </div>
                         </b-collapse>
                         <br>
@@ -95,6 +96,7 @@
                     </b-menu-item>
                 </b-menu-list>
             </b-menu>
+            <b-button @click="getUserImageAt(37511)">Click Me</b-button>
         </div>
     </div>
 </template>
@@ -104,18 +106,21 @@ import { mapGetters } from 'vuex'
 import draggable from 'vuedraggable'
 
 export default {
-  name: 'ImageNavigationPanel',
-  data() {
-      return {
-          isFullPage: false,
-          activeColor:String,
-          activeIndex: null,
-    };
-  },
-  components: {
-      draggable,
-  },
-  beforeMount() {
+    name: 'ImageNavigationPanel',
+    data() {
+        return {
+            isFullPage: false,
+            activeColor:String,
+            activeIndex: null,
+            isActive: false,
+        };
+    },
+
+    components: { 
+        draggable,
+    },
+
+    beforeMount() {
         this.$store.dispatch('images/get_user_images')
     },
 
@@ -130,6 +135,11 @@ export default {
         setActiveImage(image) {
             this.$store.dispatch("images/set_current_image", image);
         },
+        getUserImageAt(index) {
+            document.getElementById(index).classList.toggle('active');
+            // let image = this.$refs.records.children[index];
+            // this.isActive = true;
+        }
     },
 
     computed: {
