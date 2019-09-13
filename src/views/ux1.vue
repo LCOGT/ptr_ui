@@ -115,7 +115,7 @@ export default {
     this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
     this.$store.dispatch('images/refresh_latest_images')
     // Get the global configuration for all sites from an api call.
-    let apiName = 'ptr-api';
+    let apiName = this.$store.getters['dev/api'];
     let path = '/all/config/';
     const config_g = await API.get(apiName, path);
     this.config_g = config_g
