@@ -18,7 +18,7 @@
         </svg>
 
         <div style="display: flex; justify-content: space-between;">
-            <p>mouseX: {{mouseX}}, mouseY: {{mouseY}}</p>
+            <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
             <p> {{current_image.base_filename}} </p>
         </div>
     </div>
