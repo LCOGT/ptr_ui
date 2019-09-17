@@ -1,20 +1,18 @@
 <template>
-    <div class="columns">
-        <div class="column">
-            <div class="JS9"></div>
-        </div>
-        <div class="column controls">
-            <div class="field">
-                <b-switch type="is-info" v-model="isSelectable" >
-                    {{ isSelectable ? "Selectable" : "Not Selectable" }}
-                </b-switch>
-            </div>
-        </div>
-    </div>
+
+<div class="Analysis">
+    <p>Analyze your image below:</p>
+    <div class="JS9Menubar" style="visibility: visible;"></div>
+    <div class="JS9Toolbar" style="visibility: visible;"></div>
+    <div class="JS9" id="JS9" data-width="256px" data-height="256px" style="visibility: visible;"></div>
+</div>
+        
 </template>
 
 <script>
 import { fabric } from 'fabric'
+import { API } from 'aws-amplify'
+
 
 export default {
     name: 'JS9',
@@ -25,14 +23,16 @@ export default {
         }
     },
     beforeMount() {
-        API.post('LambdaTest', '/getimage').then(response => {
-            this.cur_img = response.image_url
-            console.log(this.cur_img)
-        }).catch(error => {
-            console.log(error.response)
-        });
+        // API.post('ptr-api', '/latest_images/1').then(response => {
+        //     this.cur_img = response.image_url
+        //     console.log(this.cur_img)
+        // }).catch(error => {
+        //     console.log(error.response)
+        // });
     },
     methods: {
+       
+
     }
 }
 </script>

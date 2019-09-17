@@ -38,7 +38,7 @@
                 v-bind:src="item.jpg13_url"
                 v-bind:title="item.base_filename"
                 v-bind:class="{'selected_thumbnail' : item.base_filename == current_image.base_filename}"
-                @click="setActiveImage(item)"
+                @click="setActiveImage(item); setImageFocus(item.image_id);"
 
             >
             <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
@@ -55,6 +55,7 @@ import { mapGetters } from "vuex";
 import * as d3 from "d3";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
+import { EventBus } from '../eventbus.js';
 
 export default {
   name: "ImageView",
@@ -83,7 +84,10 @@ export default {
       context_marker_timer: "",
 
       // Time that right click events stay on the screen.
-      right_click_ttl: 5000
+      right_click_ttl: 5000,
+
+      //Image ID of the currently highlighted image (focused)
+      highlighted_image: 0,
     };
   },
   created() {
@@ -264,6 +268,12 @@ export default {
 
     setPreviousImage() {
       this.$store.dispatch("images/set_previous_image");
+    },
+
+    setImageFocus(image_id) {
+      this.highlighted_image = image_id;
+      // Send the event on a channel (i-got-clicked) with a payload (the click count.)
+      EventBus.$emit('i-got-clicked', this.highlighted_image);
     }
   },
   computed: {
