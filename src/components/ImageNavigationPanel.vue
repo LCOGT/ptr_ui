@@ -24,8 +24,8 @@
                             <div class="folder" ref="records">
                                 <div 
                                     v-on:click="toggle(index)" 
-                                    :class="{'active': index == activeIndex}" 
                                     v-for="(item, index) in user_images" 
+                                    :class="{'active': item.image_id == activeImage}" 
                                     :key="item.image_id"
                                 >
                                     <div v-bind:id="item.image_id" class="img-record" v-bind:class="{ active: isActive }"  @click="setActiveImage(item)">
@@ -104,6 +104,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import draggable from 'vuedraggable'
+import { EventBus } from '../eventbus.js';
 
 export default {
     name: 'ImageNavigationPanel',
@@ -113,6 +114,8 @@ export default {
             activeColor:String,
             activeIndex: null,
             isActive: false,
+            highlighted_image: null,
+            activeImage: null,
         };
     },
 
@@ -122,6 +125,21 @@ export default {
 
     beforeMount() {
         this.$store.dispatch('images/get_user_images')
+    },
+    mounted() {
+        EventBus.$on('i-got-clicked', highlighted_image => {
+            console.log(`clicked index: ${highlighted_image} stored index: ${this.highlighted_image}`);
+            if(this.activeImage == highlighted_image) {
+                this.activeImage = null
+                console.log(`Toggle off a highlighted image.`);
+            } else if (this.activeImage == null) {
+                
+            }
+            else {
+                this.highlighted_image = highlighted_image
+                this.getUserImageAt(this.highlighted_image);
+            }
+        });
     },
 
     methods: {
