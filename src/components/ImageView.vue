@@ -37,8 +37,8 @@
                 style="width: 60px; height: 60px;"
                 v-bind:src="item.jpg13_url"
                 v-bind:title="item.base_filename"
-                v-bind:class="{'selected_thumbnail' : item.base_filename == current_image.base_filename}"
-                @click="setActiveImage(item); setImageFocus(item.image_id);"
+                v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
+                @click="setActiveImage(item)"
 
             >
             <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
@@ -55,7 +55,6 @@ import { mapGetters } from "vuex";
 import * as d3 from "d3";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
-import { EventBus } from '../eventbus.js';
 
 export default {
   name: "ImageView",
@@ -254,6 +253,7 @@ export default {
     // in the main view.
     setActiveImage(image) {
       this.$store.dispatch("images/set_current_image", image);
+      console.log(`This is a test ${image.image_id}`);
     },
 
     // Display the latest image in the view.
@@ -270,11 +270,6 @@ export default {
       this.$store.dispatch("images/set_previous_image");
     },
 
-    setImageFocus(image_id) {
-      this.highlighted_image = image_id;
-      // Send the event on a channel (i-got-clicked) with a payload (the click count.)
-      EventBus.$emit('i-got-clicked', this.highlighted_image);
-    }
   },
   computed: {
     active_site: {
