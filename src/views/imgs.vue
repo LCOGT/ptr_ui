@@ -4,12 +4,12 @@
  *
  */
 <template>
+  <div class="container">
   <div class="columns">
-    
-    <div class="nav-panel is-one-quarter">  
+    <div class="nav-panel">  
       <ImageNavigationPanel/>
     </div>
-    <div class="img-view is-half is-offset-one-quarter">
+    <div class="img-view is-half ">
 
       <!-- Select the site that you wish to view -->
       <b-field class="select-device" label="Site" horizontal>
@@ -35,6 +35,7 @@
     </div>
     <JS9/>
 
+  </div>
   </div>
   
 </template>
@@ -91,7 +92,7 @@ export default {
 }
 
 .columns{
-  padding: 50px;
+  padding-top: 50px;
 }
 
 .select-device {
