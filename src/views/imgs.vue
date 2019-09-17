@@ -5,6 +5,7 @@
  */
 <template>
   <div class="columns">
+    
     <div class="nav-panel is-one-quarter">  
       <ImageNavigationPanel/>
     </div>
@@ -32,6 +33,7 @@
       <image-view v-bind:site="active_site"/>
 
     </div>
+    <JS9/>
 
   </div>
   
@@ -41,6 +43,7 @@
 import { API, Auth } from 'aws-amplify'
 import ImageView from '@/components/ImageView'
 import ImageNavigationPanel from '@/components/ImageNavigationPanel'
+import JS9 from '@/components/JS9'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -48,6 +51,7 @@ export default {
   components: {
     ImageView,
     ImageNavigationPanel,
+    JS9,
   },
   data() {
     return {
