@@ -1,11 +1,15 @@
+
 /**
  *  This is a page used for testing image display and manipulation. 
  *
  */
 <template>
+  <div class="container">
   <div class="columns">
-
-    <div class="column is-full container">
+    <div class="nav-panel">  
+      <ImageNavigationPanel/>
+    </div>
+    <div class="img-view is-half ">
 
       <!-- Select the site that you wish to view -->
       <b-field class="select-device" label="Site" horizontal>
@@ -21,8 +25,8 @@
             >
               {{ site }}
             </option>
-            <option> dummy_site </option>
           </b-select>
+          <button class="button" @click="toggleSites">toggle sites</button>
       </b-field>
 
       <!-- The actual image view component -->
@@ -31,31 +35,48 @@
     </div>
 
   </div>
+  </div>
+  
 </template>
 
 <script>
 import { API, Auth } from 'aws-amplify'
 import ImageView from '@/components/ImageView'
+import ImageNavigationPanel from '@/components/ImageNavigationPanel'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'imgs',
   components: {
     ImageView,
+    ImageNavigationPanel,
+  },
+  data() {
+    return {
+      toggleSiteIndex: 0,
+    }
+  },
+  methods: {
+    toggleSites() {
+      let the_sites = ['wmd', 'WMD']
+      let chosen_site = the_sites[this.toggleSiteIndex]
+      this.$store.commit('observatory_configuration/setActiveSite', chosen_site)
+      this.toggleSiteIndex = (this.toggleSiteIndex + 1) % 2;
+    }
   },
   beforeCreate() {
     // Set the default site for convenience
-    this.$store.commit('device_selection/setActiveSite', 'wmd')
-    this.$store.dispatch('device_selection/update_config')
+    this.$store.commit('observatory_configuration/setActiveSite', 'wmd')
+    this.$store.dispatch('observatory_configuration/update_config')
   },
   computed: {
-    ...mapGetters('device_selection', [
+    ...mapGetters('observatory_configuration', [
       'available_sites',
     ]),
 
     active_site: {
-        get() { return this.$store.getters['device_selection/site'] },
-        set(value) { this.$store.commit('device_selection/setActiveSite', value) }
+        get() { return this.$store.getters['observatory_configuration/site'] },
+        set(value) { this.$store.commit('observatory_configuration/setActiveSite', value) }
     },
 
   },
@@ -67,8 +88,22 @@ export default {
   margin-top: 3em;
 }
 
+.columns{
+  padding-top: 50px;
+}
+
 .select-device {
   border-bottom: 1px solid silver;
   padding-bottom: 2em;
 }
+
+.nav-panel{
+  border-right: 1px solid darkgray;
+  padding-right: 50px;
+}
+.img-view{
+    padding-left: 50px;
+}
+
+
 </style>

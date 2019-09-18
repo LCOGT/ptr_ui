@@ -236,14 +236,7 @@ export default {
      * Sign user out of all authenticated devices (global sign out). 
      */
     signOut () {
-      Auth.signOut({ global: true })
-        .then(data => {
-          console.log(data)
-
-          // Empty the current user from vuex store
-          this.$store.commit('auth/setUser', '')
-        })
-        .catch(err => console.log(err))
+      this.$store.dispatch('auth/logOutUser')
     },
 
     /**
@@ -252,12 +245,7 @@ export default {
      * authentication grants access to controls. 
      */
     signIn () {
-      Auth.signIn({ username: 'wmd_admin', password: 'Password1!', region: 'us-west-2' })
-        .then(user => {
-          console.log(user)
-          this.$store.commit('auth/setUser', user)
-        })
-        .catch(err => console.log(err))
+      this.$store.dispatch('auth/logInAdmin')
     },
 
     /**
@@ -265,7 +253,7 @@ export default {
      * No authentication required.
      */
     testAPI () {
-      let apiName = "ptr-api"
+      let apiName = this.api
       let myInit = {
         response: true,
       }
@@ -283,7 +271,7 @@ export default {
      * 
      */
     testRestrictedAPI () {
-      let apiName = "ptr-api"
+      let apiName = this.api
       let myInit = {
         response: true,
       }
@@ -437,7 +425,7 @@ export default {
      * Note: this deletes the command from the queue!
      */
     getLastCommand() {
-      let apiName = 'ptr-api';
+      let apiName = this.api;
       API.get(apiName, '/site1/mount1/command/').then(response => {
         console.log(response)
       }).catch(error => {
@@ -451,7 +439,7 @@ export default {
      */
     updateStatus() {
 
-        let apiName = 'ptr-api';
+        let apiName = this.api;
         let path = '/site1/status/';
         let myInit = {
           body: {"parked": "true", "timestamp": Date.now().toString() }
@@ -472,6 +460,9 @@ export default {
       isLoggedIn: 'isLoggedIn',
       token: 'getToken',
     }),
+    ...mapGetters('dev', [
+      'api',
+    ])
   },
 }
 </script>

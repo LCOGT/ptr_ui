@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     updateStatus() {
-        this.$store.dispatch('observatory/updateStatus')
+        this.$store.dispatch('instrument_state/updateStatus')
     }
   },
   watch: {

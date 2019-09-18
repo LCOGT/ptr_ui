@@ -126,7 +126,7 @@ export default {
       }
   },
   computed: {
-      ...mapGetters('observatory', {
+      ...mapGetters('instrument_state', {
           wx: 'wx',
           temp: 'amb_temp_C',
           wind: 'wind',

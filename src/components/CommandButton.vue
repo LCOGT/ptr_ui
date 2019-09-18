@@ -37,13 +37,12 @@ export default {
                 // TODO: add UI notification here.
                 return
             }
-
             this.isLoading = true
             var vm = this
 
             form.timestamp = parseInt(Date.now() / 1000)
 
-            let apiName = 'ptr-api';
+            let apiName = this.$store.getters['dev/api'];
             let path = url;
             let myInit = {
                 body: form,
@@ -55,6 +54,7 @@ export default {
                         vm.isLoading = false;
                         console.log(response)
                     }).catch(error => {
+                        vm.isLoading = false;
                         console.log(error)
                     });
                     break;
@@ -65,6 +65,7 @@ export default {
                         console.log(response)
                         console.log(myInit)
                     }).catch(error => {
+                        vm.isLoading = false;
                         console.log('ERROR')
                         console.log(error)
                     });
@@ -74,6 +75,7 @@ export default {
                         vm.isLoading = false;
                         console.log(response)
                     }).catch(error => {
+                        vm.isLoading = false;
                         console.log(error)
                     });
                     break;

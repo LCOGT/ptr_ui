@@ -1,12 +1,14 @@
 <template>
   <div id="app">
     <the-menu />
+    <dev-panel /> <!-- Developer testing tools. Not for prodution. -->
     <router-view></router-view>
   </div>
 </template>
 
 <script>
 import TheMenu from '@/components/TheMenu.vue'
+import DevPanel from '@/components/DevPanel.vue'
 import Amplify, { Auth, API } from 'aws-amplify'
 import awsmobile from './aws-exports';
 import { components } from 'aws-amplify-vue'
@@ -40,9 +42,17 @@ Amplify.configure({
         }
       },
       {
+        // This is the production api.
         name: "ptr-api",
         endpoint: "http://api.photonranch.org",
-        //endpoint: "http://localhost:5000",
+        custom_header: async () => {
+          return { Authorization: 'Bearer '+(await Auth.currentSession()).accessToken.jwtToken }
+        }
+      },
+      {
+        // This is a copy of the production api running locally. Used for testing.
+        name: "ptr-api-local",
+        endpoint: "http://localhost:5000",
         custom_header: async () => {
           return { Authorization: 'Bearer '+(await Auth.currentSession()).accessToken.jwtToken }
         }
@@ -55,7 +65,11 @@ export default {
   name: 'App',
   components: {
     TheMenu,
+    DevPanel,
     components
+  },
+  created() {
+    this.$store.dispatch('observatory_configuration/update_config')
   },
 }
 </script>
