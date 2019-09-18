@@ -1,8 +1,12 @@
 <template>
-    <div id="component" ><div id="component-1">
+    <div id="component" >
+      <div id="component-1" v-if="!this.analyze">
 
     <div class="controls">
+        <button class="button" @click="toggleAnalysis">ANALYZE</button>
         <button class="button" @click="setLatestImage">latest image</button>
+        
+
         <div @click="setPreviousImage" class="arrow left"></div>
         <div @click="setNextImage" class="arrow right"></div>
         <b-field horizontal label="crosshairs">
@@ -44,8 +48,52 @@
             <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
         </div>
           
+        </div>
+      </div>
+
+      <div id="component-2" v-if="this.analyze">
+
+        <div class="controls">
+            <button class="button" @click="toggleAnalysis">EXIT</button>
+            <div @click="setPreviousImage" class="arrow left"></div>
+            <div @click="setNextImage" class="arrow right"></div>
+        </div>
+
+        <div class="image-div">
+
+            <div id="svg_container"></div>
+            <JS9 onload="JS9.Preload('./wmd-gf01-20190909-00004836-EX13.fits');"/>
+            <div style="display: flex; justify-content: space-between;">
+                <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
+                <p> {{current_image.base_filename}} </p>
+            </div>
+        </div>
+
+
+        <!--div class="column is-narrow recent_images"-->
+        <div class="recent_images">
+          
+            <div 
+                class="recent_image" 
+                style="display: flex;"
+                v-for="(item, index) in recent_images" 
+                v-bind:key="index"
+            >
+                <img 
+                    style="width: 60px; height: 60px;"
+                    v-bind:src="item.jpg13_url"
+                    v-bind:title="item.base_filename"
+                    v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
+                    @click="setActiveImage(item)"
+
+                >
+                <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
+            </div>
+              
+        </div>
     </div>
-    </div></div>
+    </div>
+    
 </template>
 
 <script>
@@ -55,9 +103,13 @@ import { mapGetters } from "vuex";
 import * as d3 from "d3";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
+import JS9 from '@/components/JS9'
 
 export default {
   name: "ImageView",
+  components: {
+    JS9,
+  },
   mixins: [commands_mixin],
   props: {
     site: String
@@ -75,6 +127,8 @@ export default {
 
       mouseRa: 0,
       mouseDec: 0,
+
+      analyze: false,
 
       // This is modified by the crosshairs switch and controls whether the crosshairs are visible.
       show_crosshairs: false,
@@ -262,6 +316,14 @@ export default {
       this.$store.dispatch("images/set_latest_image");
     },
 
+    toggleAnalysis() {
+      if(this.analyze) {
+        this.analyze = false
+      } else {
+        this.analyze = true
+      }
+    },
+
     setNextImage() {
       this.$store.dispatch("images/set_next_image");
     },
@@ -324,6 +386,11 @@ export default {
   display: block;
   padding: 15px;
   background-color: rgba(24, 30, 30, 0.8);
+}
+#component-2 {
+  display: block;
+  padding: 15px;
+  background-color: rgba(43, 121, 173, 0.8);
 }
 .controls {
   display: flex;
