@@ -32,7 +32,7 @@
       <!-- The actual image view component -->
       <image-view v-bind:site="active_site"/>
 
-    </div>
+  </div>
 
   </div>
   </div>
@@ -43,7 +43,6 @@
 import { API, Auth } from 'aws-amplify'
 import ImageView from '@/components/ImageView'
 import ImageNavigationPanel from '@/components/ImageNavigationPanel'
-import JS9 from '@/components/JS9'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -57,6 +56,9 @@ export default {
     return {
       toggleSiteIndex: 0,
     }
+  },
+  mounted() {
+    
   },
   methods: {
     toggleSites() {
