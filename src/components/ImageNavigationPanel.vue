@@ -47,8 +47,9 @@
                                                 <p style="color:rgb(175,175,175);">
                                                     DEC: {{item.declination.toFixed(2)}}
                                                 </p>
-                                                <b-button class="button download-button" tag="a" :href="item.fits13_url" icon-pack="fas" icon-left="download"></b-button>
-                                                    <!--<b-icon pack="fas" icon="download" size="is-small" type="is-white"></b-icon>-->
+                                                <b-tooltip class="tooltip" label="Download FITS" :delay="1000" type="is-dark" position="is-left">
+                                                    <b-button class="button download-button" tag="a" :href="item.fits13_url" icon-pack="fas" icon-left="download"></b-button>
+                                                </b-tooltip>
                                             </div>
                                         </div>
                                     </div>
@@ -169,6 +170,7 @@ export default {
   border-right: 1px solid darkgray;
   text-align: center;
   padding-left:10px;
+  padding-top: 10px;
 }
 .image-information{
   grid-column: 2;
@@ -176,7 +178,7 @@ export default {
 }
 .image-coordinates{
   display: grid;
-  grid-template-columns: 40% 40% 20%;
+  grid-template-columns: 42% 42% 16%;
   grid-row-gap: 5px;
   padding-top: 20px;
   text-align: left;
@@ -192,6 +194,9 @@ export default {
 .download-button{
     padding-bottom: 30px;
     width: 35px;
+}
+.tooltip{
+    padding-left: 0px;
 }
 </style>
 
