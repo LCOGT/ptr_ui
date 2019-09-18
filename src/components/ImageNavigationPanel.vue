@@ -47,9 +47,8 @@
                                                 <p style="color:rgb(175,175,175);">
                                                     DEC: {{item.declination.toFixed(2)}}
                                                 </p>
-                                                <button class="button download-button">
-                                                    <b-icon pack="fas" icon="download" size="is-small" type="is-white"></b-icon>
-                                                </button>
+                                                <b-button class="button download-button" tag="a" :href="item.fits13_url" icon-pack="fas" icon-left="download"></b-button>
+                                                    <!--<b-icon pack="fas" icon="download" size="is-small" type="is-white"></b-icon>-->
                                             </div>
                                         </div>
                                     </div>
@@ -177,9 +176,10 @@ export default {
 }
 .image-coordinates{
   display: grid;
-  grid-template-columns: 45% 45% 10%;
+  grid-template-columns: 40% 40% 20%;
   grid-row-gap: 5px;
   padding-top: 20px;
+  text-align: left;
 }
 .side-panel {
   grid-column: 1;
@@ -190,7 +190,8 @@ export default {
     background-color: rgb(60, 70, 70);
 }
 .download-button{
-    background-color:coral;
+    padding-bottom: 30px;
+    width: 35px;
 }
 </style>
 
