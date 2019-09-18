@@ -30,7 +30,6 @@ Amplify.configure({
     disabled:true
   },
 
-
   // API usage docs: https://bit.ly/30n9cTt
   API: {
     endpoints: [
