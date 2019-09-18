@@ -9,9 +9,9 @@
     <div class="nav-panel">  
       <ImageNavigationPanel/>
     </div>
-    <div class="img-view is-half ">
+    <div class="img-view">
 
-      <!-- Select the site that you wish to view -->
+      <!-- Select the site that you wish to view
       <b-field class="select-device" label="Site" horizontal>
           <b-select 
             placeholder="choose site..." 
@@ -27,7 +27,7 @@
             </option>
           </b-select>
           <button class="button" @click="toggleSites">toggle sites</button>
-      </b-field>
+      </b-field>-->
 
       <!-- The actual image view component -->
       <image-view v-bind:site="active_site"/>
@@ -36,7 +36,7 @@
 
   </div>
   </div>
-  
+
 </template>
 
 <script>
