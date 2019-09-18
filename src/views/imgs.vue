@@ -33,7 +33,6 @@
       <image-view v-bind:site="active_site"/>
 
     </div>
-    <JS9/>
 
   </div>
   </div>
