@@ -88,7 +88,7 @@ export default {
     methods: {
     },
     computed: {
-        ...mapGetters('observatory', {
+        ...mapGetters('instrument_state', {
             positionAngle: 'positionAngle'
         })
     }

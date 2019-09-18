@@ -21,7 +21,7 @@
             <router-link class="navbar-item" to="/skymap"> sky </router-link>
             <router-link class="navbar-item" to="/ctrl"> ctrl </router-link>
             <router-link class="navbar-item" to="/ux1/wmd/home"> ux1 </router-link>
-
+          
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link"> sites </a>
 
@@ -108,13 +108,8 @@ export default {
   },
   methods: {
     signOut () {
-      Auth.signOut({ global: true })
-        .then(data => {
-          console.log(data)
-          this.$store.commit('auth/setUser', '')
-          this.$router.go() // reload to redirect if user is on auth-required page.
-        })
-        .catch(err => console.log(err))
+      this.$store.dispatch('auth/logOutUser')
+      this.$router.go()
     },
 
     /**
@@ -123,12 +118,7 @@ export default {
      * authentication grants access to controls. 
      */
     signIn () {
-      Auth.signIn({ username: 'wmd_admin', password: 'Password1!', region: 'us-west-2' })
-        .then(user => {
-          console.log(user)
-          this.$store.commit('auth/setUser', user)
-        })
-        .catch(err => console.log(err))
+      this.$store.dispatch('auth/logInAdmin')
     },
   },
   computed: {

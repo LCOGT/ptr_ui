@@ -20,7 +20,6 @@
           >
             {{ site }}
           </option>
-          <option> dummy_site </option>
         </b-select>
     </b-field>
 
@@ -40,7 +39,6 @@
           >
             {{ mount }}
           </option>
-          <option> dummy_mount </option>
         </b-select>
     </b-field>
 
@@ -59,7 +57,6 @@
           >
             {{ ota }}
           </option>
-          <option> dummy_telescope </option>
         </b-select>
     </b-field>
     
@@ -78,7 +75,6 @@
           >
             {{ cam }}
           </option>
-          <option> dummy_camera </option>
         </b-select>
     </b-field>
 
@@ -97,7 +93,6 @@
           >
             {{ filter_wheel }}
           </option>
-          <option> dummy_filter_wheel </option>
         </b-select>
     </b-field>
 
@@ -116,7 +111,6 @@
           >
             {{ focuser }}
           </option>
-          <option> dummy_camera </option>
         </b-select>
     </b-field>
 
@@ -135,7 +129,6 @@
           >
             {{ rotator }}
           </option>
-          <option> dummy_rotator </option>
         </b-select>
     </b-field>
 
@@ -151,10 +144,10 @@
         <div class="title">Telescope</div>
 
         <b-field horizontal label="Ra">
-          <b-input name="subject" v-model="slew_ra"></b-input>
+          <b-input name="subject" v-model="slew_ra" autocomplete="off"></b-input>
         </b-field>
         <b-field horizontal label="Dec">
-          <b-input name="subject" v-model="slew_dec"></b-input>
+          <b-input name="subject" v-model="slew_dec" autocomplete="off"></b-input>
         </b-field>
 
         <command-button :data="mount_slew_command" style="margin-bottom: 1em;"/>
@@ -203,14 +196,14 @@
 
         <b-field horizontal label="Expose">
             <b-field>
-                <b-input name="subject" v-model="cam_exposure"></b-input>
+                <b-input name="subject" v-model="cam_exposure" autocomplete="off"></b-input>
                 <p class="control"> <span class="button is-static">s</span> </p>
             </b-field>
         </b-field>
 
         <b-field horizontal label="Count">
             <b-field>
-                <b-numberinput name="subject" type="is-light" min="1" controls-position="compact" v-model="cam_count"></b-numberinput>
+                <b-numberinput name="subject" type="is-light" min="1" controls-position="compact" v-model="cam_count" autocomplete="off"></b-numberinput>
             </b-field>
         </b-field>
 
@@ -296,34 +289,6 @@
             </b-field>
         </b-field>
 
-        <!-- Scripts select box; sent with camera commands -->
-        <b-field horizontal label="Scripts">
-          <b-select value="none" v-model="cam_scripts" style="width: 100;">
-            <option value="none">none</option>
-            <option value="stop_script">Stop Script</option>
-            <option value="take_lrgb_stack">Take LRGB Stack</option>
-            <option value="take_o3has2n2_stack">Take O3HaS2N2 Stack</option>
-            <option value="take_planet_stack">Take Planet Stack</option>
-            <option value="take_lunar_stack">Take Lunar Stack</option>
-            <option value="make_superbias">Make Superbias</option>
-            <option value="make_superdark">Make Superdark</option>
-            <option value="make_superscreenflats">Make SuperScreenFlats</option>
-            <option value="take_pre-open_calibrations">Take Pre-open Calibrations</option>
-            <option value="take_skyflats">Take SkyFlats</option>
-            <option value="find_field_center">Find Field Center</option>
-            <option value="calibrate_focus_v-curve">Calibrate Focus V-curve</option>
-            <option value="32_target_pointing_run">32 Target Pointing Run</option>
-            <option value="128_target_pointing_run">128 Target Pointing Run</option>
-            <option value="run_using_acp">Run Using ACP</option>
-            <option value="stop_using_acp">Stop Using ACP</option>
-          </b-select>
-        </b-field>
-
-        <div class="status-item">
-          <div class="title2">Script Status</div>
-          <pre>{{ camera_state && camera_state.script_status}}</pre>
-        </div>
-
         <br>
         <div class="buttons has-addons">
           <command-button :data="camera_expose_command" style="width: 70%" />
@@ -332,6 +297,60 @@
 
     </div>
 
+    <div style="background:orangered; padding: 2em; margin-top: 10px;">
+        <div class="title">Sequencer</div>
+
+        <b-field label="Script">
+          <b-field>
+            <b-select value="none" v-model="selected_script" style="width: 100;">
+              <option value="none">none</option>
+              <option value="stop_script">Stop Script</option>
+              <option value="focus_auto">Focus Auto</option>
+              <option value="focus_fine">Focus Fine</option>
+              <option value="focus_vcurve">Focus V-Curve</option>
+              <option value="takeLRGBStack">Take LRGB Stack</option>
+              <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
+              <option value="takeUGRIZSStack">Take ugrizs Stack</option>
+              <option value="takePlanetStack">Take Planet Stack</option>
+              <option value="takeLunarStack">Take Lunar Stack</option>
+              <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
+              <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
+              <option value="take_pre-open_calibrations">Take Pre-open Calibrations</option>
+              <option value="takeSkyFlats">Take SkyFlats</option>
+              <option value="find_field_center">Find Field Center</option>
+              <option value="calibrate_focus_v-curve">Calibrate Focus V-curve</option>
+              <option value="32_target_pointing_run">32 Target Pointing Run</option>
+              <option value="128_target_pointing_run">128 Target Pointing Run</option>
+              <option value="run_using_acp">Run Using ACP</option>
+              <option value="stop_using_acp">Stop Using ACP</option>
+            </b-select>
+            <p class="control">
+              <button 
+                class="button is-light" 
+                :disabled="!scriptHasSettings"
+                @click="isScriptSettingsActive = true"
+                >
+                <b-icon icon="settings"></b-icon>
+              </button>
+            </p>
+          </b-field>
+        </b-field>
+
+        <b-modal :active.sync="isScriptSettingsActive" has-modal-card>
+            <script-settings :script="selected_script" />
+        </b-modal>
+
+        <div class="status-item">
+          <div class="title2">Sequencer Status</div>
+          <pre>{{ sequencer_state }}</pre>
+        </div>
+
+        <div class="buttons has-addons">
+          <button class="button" @click="script_run_command" style="width: 70%;"> run script</button>
+          <button class="button" @click="script_stop_command" style="width: 30%"> stop script</button>
+        </div>
+
+    </div>
     <pre>
       <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
       <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
@@ -353,75 +372,80 @@
               <command-button :data="focus_home_command" class="dropdown-button-command"/>
             </b-dropdown-item>
             <b-dropdown-item>
-              <command-button :data="focus_auto_command" class="dropdown-button-command"/>
+              <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
             </b-dropdown-item>
             <b-dropdown-item>
-              <command-button :data="focus_fine_command" class="dropdown-button-command"/>
+              <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
             </b-dropdown-item>
             <b-dropdown-item>
-              <command-button :data="focus_vcurve_command" class="dropdown-button-command"/>
+              <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
             </b-dropdown-item>
           </b-dropdown>
           <br>
 
-          <b-field horizontal label="Relative">
+          <b-field label="Relative">
             <b-field>
-              <b-input name="subject" v-model="focus_relative"></b-input>
-              <p class="control"> <command-button :data="focus_relative_command" />  </p>
+              <b-input expanded name="subject" size="is-small" v-model="focus_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="focus_relative_command" class="is-small"/>  </p><br>
             </b-field>
           </b-field>
-          <b-field horizontal label="Absolute">
+
+          <b-field label="Absolute">
             <b-field>
-              <b-input name="subject" v-model="focus_absolute"></b-input>
-              <p class="control"> <command-button :data="focus_absolute_command" />  </p>
+              <b-input expanded name="subject" size="is-small" v-model="focus_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
             </b-field>
           </b-field>
           <br>
+
         <div class="title">Rotator</div>
           <command-button :data="rotate_home_command" />
           <br>
-          <b-field horizontal label="Relative">
+          <b-field label="Relative">
             <b-field>
-              <b-input name="subject" v-model="rotate_relative"></b-input>
-              <p class="control"> <command-button :data="rotate_relative_command" />  </p>
+              <b-input expanded size="is-small" name="subject" v-model="rotate_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
             </b-field>
           </b-field>
-          <b-field horizontal label="Absolute">
+          <b-field label="Absolute">
             <b-field>
-              <b-input name="subject" v-model="rotate_absolute"></b-input>
-              <p class="control"> <command-button :data="rotate_absolute_command" />  </p>
+              <b-input expanded size="is-small" name="subject" v-model="rotate_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
             </b-field>
           </b-field>
           <br>
+
+        <div class="title">Flat Screen</div>
+          <b-field label="Brightness">
+            <b-field>
+              <b-input expanded size="is-small" name="subject" v-model="screen_brightness" type="number" :step="1" min="0" max="100" autocomplete="off"></b-input>
+              <command-button :data="screen_on_command" class="is-small control" />
+              <command-button :data="screen_off_command" class="is-small control" /> 
+            </b-field>
+          </b-field>
+
     </div>
     <pre>
       <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
       <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
+      <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
     </pre>
     </div>
 
     <!-- Verify expected data in this column. -->
     <div class="column" style="padding: 0">
       <div style="background: orange; padding: 2em;">
-          <!--div class="title">Info</div-->
-          <!--button class="button" @click="getLastCommand">get prior command</button-->
-          <!--br-->
-          <!--pre><code>{{ prior_command }}</code></pre-->
-
           <div class="title">Image</div>
-          <button class="button" @click="getLatestImage" style="margin-bottom: 1em;">latest image</button>
+          <button class="button" @click="refresh_latest_image" style="margin-bottom: 1em;">latest image</button>
           <br>
-              <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
-                  <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
-                  <img
-                      v-bind:src="current_image.jpg13_url" 
-                      @click="isImageModalActive = true" 
-                      style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
-              </div>
-          <!--img v-bind:src="current_image.url" @click="isImageModalActive = true" style="width: 100%; background-color: grey; cursor: pointer;"></img-->
+          <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
+              <img
+                  v-bind:src="current_image.jpg13_url" 
+                  @click="isImageModalActive = true" 
+                  style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
+          </div>
           <b-modal :active.sync="isImageModalActive" :width="800">
               <p class="image">
-                  <!--img v-bind:src="current_image.url"-->
                   <image-view :site="active_site" />
               </p>
           </b-modal>
@@ -432,40 +456,36 @@
       <div style="background-color: #282f2f; padding: 2em;">
         <p class="heading">Status Age: </p>
         <p class="has-text-weight-semibold is-size-5">
-        <span v-if="status_age < 10" style="color: lightgreen;"> {{' < 10 seconds old'}} </span>
+        <span v-if="status_age < 15" style="color: lightgreen;"> {{' < 15 seconds old'}} </span>
         <span v-else-if="status_age < 120" style="color: yellow;">{{' < 2 minutes old'}}</span>
         <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+' minutes old'}}</span>
         <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+' hours old'}}</span>
-        <span v-else-if="status_age >= 86400" style="color:red;">{{(status_age/86400).toFixed(0)+' days old'}}</span>
+        <span v-else-if="status_age < 18000*86400" style="color:red;">{{(status_age/86400).toFixed(0)+' days old'}}</span>
+        <span v-else-if="status_age > 18000*86400" style="color:red;">{{'unavailable'}}</span>
         </p>
       </div>
     </div>
 
   </div>
 
-
-
-
   <div class="choose-target">
     <the-sky-chart />
-    <!--object-table class="choose-target-item"/-->
   </div>
 
 </div></template>
 
 <script>
-import { API, Auth } from 'aws-amplify'
-import { AmplifyEventBus } from 'aws-amplify-vue'
 import { mapGetters } from 'vuex'
-import axios from 'axios';
+import { commands_mixin } from '../mixins/commands_mixin'
 import helpers from '@/utils/helpers'
-import create_commands from '@/utils/create_command'
+import store from '../store/index'
+
+// Components
 import CommandButton from '@/components/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import ObjectTable from '@/components/ObjectTable'
-import { commands_mixin } from '../mixins/commands_mixin'
 import ImageView from '@/components/ImageView'
 import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
+import ScriptSettings from '@/components/ScriptSettings'
 
 
 export default {
@@ -473,9 +493,9 @@ export default {
   components: {
     CommandButton,
     TheSkyChart,
-    ObjectTable,
     ImageView,
     SimpleDeviceStatus,
+    ScriptSettings,
   },
   mixins: [commands_mixin],
   data () {
@@ -484,106 +504,78 @@ export default {
       // This is a setInterval object initialized in `created()`. 
       // Fetches status every few seconds.
       update_status_interval: 2000,
-
       local_timestamp: Date.now(),
-
-      // This is displayed as the prior command. Updated on button click.
-      prior_command: null,
 
       // Controls the toggle for image preview modal.
       isImageModalActive: false,
 
+      // Toggles the script settings visiblity
+      isScriptSettingsActive: false,
+
     }
   },
 
-  beforeCreate() {
-    // Make sure we're using the latest site configuration.
-    this.$store.dispatch('device_selection/update_config')
-
-    // Default site/device values.
-    this.active_site= 'wmd';
-    this.active_enclosure= 'enclosure1';
-    this.active_mount= 'mnt1';
-    this.active_telescope= 'tel1';
-    this.active_camera= 'cam1';
-    this.active_filter_wheel= 'filter_wheel1';
-    this.active_focuser= 'focuser1';
-    this.active_rotator= 'rotator1';
-  },
-
   created() {
+    var that = this;
+    // Make sure we're using the latest site configuration.
+    this.$store.dispatch('observatory_configuration/update_config').then(function() {
+
+      // Default site/device values.
+      that.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
+      that.$store.dispatch('instrument_state/updateStatus')
+
+    }())
+
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_status_interval = setInterval(this.update_status, 3000)
     this.update_time_interval = setInterval(this.update_time, 1000)
-
   },
   
+  beforeDestroy() {
+    clearInterval(this.update_status_interval)
+  },
+
+
   methods: {
-
-    /**
-     * Get the most recent command sent to the selected site.
-     * Note: this deletes the command from the queue!
-     */
-    getLastCommand() {
-      // Parameters for api call to get last command
-      let apiName = 'ptr-api';
-      let url = `/${this.active_site}/${this.active_mount}/command/`;
-
-      API.get(apiName, url).then(response => {
-        console.log(response)
-        this.prior_command = response
-      }).catch(error => {
-        console.log(error.response)
-      });
-    },
-
-    getLatestImage() {
-      this.$store.dispatch('images/set_latest_image')
-    },
-
     /**
     * Update status by requesting data from dynamodb via vuex.
     * This function is called regularly in the `created` lifecycle hook.
     */
     update_status() {
-
       // Dispatch the vuex action that refreshes the site status. 
-      this.$store.dispatch('observatory/updateStatus')
-
+      this.$store.dispatch('instrument_state/updateStatus')
       // Refresh the image list
       this.$store.dispatch('images/refresh_latest_images')
-
     },
 
     update_time() {
       this.local_timestamp= Date.now()
     },
 
+    refresh_latest_image() {
+      this.$store.dispatch('images/set_latest_image')
+    },
   },
 
-  beforeDestroy() {
-    clearInterval(this.update_status_interval)
-  },
 
   computed: {
-    // Getters from the observatory vuex module. 
-    // Observatory status is saved here.
-    ...mapGetters('observatory', {
-        all_mount_state: 'mount',
-        all_camera_state: 'camera',
-        all_filter_wheel_state: 'filter_wheel',
-        all_focuser_state: 'focuser',
-        all_rotator_state: 'rotator',
-        status_timestamp: 'timestamp',
-    }),
 
     ...mapGetters('images', [
       'current_image',
     ]),
+    ...mapGetters([
+      'scriptHasSettings',
+    ]),
 
     status_age() {
-      return (this.local_timestamp/1000 - this.status_timestamp).toFixed(1)
+      let status_timestamp = this.$store.getters['instrument_state/timestamp']
+      return (this.local_timestamp/1000 - status_timestamp).toFixed(1)
+    },
+
+    selected_script: {
+      get() { return this.$store.getters['selectedScript']},
+      set(val) { this.$store.commit('selectedScript', val)},
     }
   },
 
@@ -659,6 +651,5 @@ export default {
     height: 110vh;
     display: flex;
 }
-
 
 </style>

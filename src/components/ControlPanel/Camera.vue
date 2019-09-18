@@ -141,7 +141,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('observatory', {
+        ...mapGetters('instrument_state', {
             focus: 'focus'
         }),
     }
