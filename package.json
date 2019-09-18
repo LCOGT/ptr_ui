@@ -11,6 +11,7 @@
     "@fortawesome/fontawesome-free": "^5.10.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.21",
     "@fortawesome/vue-fontawesome": "^0.1.6",
+    "@mdi/js": "^4.4.95",
     "@shopify/draggable": "^1.0.0-beta.8",
     "amazon-cognito-identity-js": "^3.0.15",
     "aws-amplify": "^1.1.35",

@@ -21,6 +21,7 @@
                                     </b-icon>
                                 </a>
                             </div>
+
                             <div class="folder" ref="records">
                                 <div 
                                     v-for="(item) in user_images" 
@@ -46,11 +47,15 @@
                                                 <p style="color:rgb(175,175,175);">
                                                     DEC: {{item.declination.toFixed(2)}}
                                                 </p>
+                                                <button class="button download-button">
+                                                    <b-icon pack="fas" icon="download" size="is-small" type="is-white"></b-icon>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            
                         </b-collapse>
                         <br>
                         <!--Trash folder-->
@@ -101,6 +106,8 @@
 import { mapGetters } from 'vuex'
 import draggable from 'vuedraggable'
 
+
+
 export default {
     name: 'ImageNavigationPanel',
     data() {
@@ -139,6 +146,8 @@ export default {
 </script>
 
 <style scoped>
+@import "https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css";
+
 .img-record{
   display: grid;
   grid-template-columns: 30% 70%;
@@ -168,7 +177,7 @@ export default {
 }
 .image-coordinates{
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 45% 45% 10%;
   grid-row-gap: 5px;
   padding-top: 20px;
 }
@@ -179,6 +188,9 @@ export default {
 }
 .selected_thumbnail{
     background-color: rgb(60, 70, 70);
+}
+.download-button{
+    background-color:coral;
 }
 </style>
 
