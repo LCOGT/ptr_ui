@@ -3,7 +3,7 @@
         <div class="side-panel">
             <b-menu>
                 <b-menu-list>
-                    <b-menu-item icon="account" label="My Account Images" :expanded="true">
+                    <b-menu-item active icon="account" label="My Account Images" :expanded="true">
                         <!--All images folder-->
                         <b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
                             <div
@@ -21,14 +21,13 @@
                                     </b-icon>
                                 </a>
                             </div>
+
                             <div class="folder" ref="records">
                                 <div 
-                                    v-on:click="toggle(index)" 
-                                    :class="{'active': index == activeIndex}" 
-                                    v-for="(item, index) in user_images" 
+                                    v-for="(item) in user_images" 
                                     :key="item.image_id"
                                 >
-                                    <div v-bind:id="item.image_id" class="img-record" v-bind:class="{ active: isActive }"  @click="setActiveImage(item)">
+                                    <div v-bind:id="item.image_id" class="img-record" v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"  @click="setActiveImage(item)">
                                         <div class="image">
                                             <img 
                                                 style="width: 100px; height: 100px;"
@@ -38,7 +37,6 @@
                                             >
                                         </div>
                                         <div class=image-information>
-                                            <p>{{item.image_id}}</p>
                                             <p style="color:white;">Filename: {{item.base_filename}}</p>
                                             <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
                                             <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
@@ -49,11 +47,17 @@
                                                 <p style="color:rgb(175,175,175);">
                                                     DEC: {{item.declination.toFixed(2)}}
                                                 </p>
+                                                <div v-if="item.ex13_fits_exists">
+                                                    <b-tooltip class="tooltip" label="Download EX13 FITS" :delay="1000" type="is-dark" position="is-left">
+                                                        <b-button class="button download-button" tag="a" :href="item.fits13_url" icon-pack="fas" icon-left="download"></b-button>
+                                                    </b-tooltip>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            
                         </b-collapse>
                         <br>
                         <!--Trash folder-->
@@ -96,7 +100,6 @@
                     </b-menu-item>
                 </b-menu-list>
             </b-menu>
-            <b-button @click="getUserImageAt(37511)">Click Me</b-button>
         </div>
     </div>
 </template>
@@ -105,14 +108,12 @@
 import { mapGetters } from 'vuex'
 import draggable from 'vuedraggable'
 
+
 export default {
     name: 'ImageNavigationPanel',
     data() {
         return {
-            isFullPage: false,
-            activeColor:String,
-            activeIndex: null,
-            isActive: false,
+
         };
     },
 
@@ -124,30 +125,21 @@ export default {
         this.$store.dispatch('images/get_user_images')
     },
 
+    mounted() {
+        
+    },
+
     methods: {
-        toggle: function(index) {
-            if(this.activeIndex == index) {
-                this.activeIndex = null
-            } else {
-                this.activeIndex = index
-            }
-        },
         setActiveImage(image) {
             this.$store.dispatch("images/set_current_image", image);
         },
-        getUserImageAt(index) {
-            document.getElementById(index).classList.toggle('active');
-            // let image = this.$refs.records.children[index];
-            // this.isActive = true;
-        }
     },
 
     computed: {
         ...mapGetters('images', {
-            user_images: 'user_images'
-        }),
-        ...mapGetters('auth', {
-            username: 'username'
+            username: 'username',
+            user_images: 'user_images',
+            current_image: "current_image"
         }),
     },
 }
@@ -155,6 +147,8 @@ export default {
 </script>
 
 <style scoped>
+@import "https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css";
+
 .img-record{
   display: grid;
   grid-template-columns: 30% 70%;
@@ -172,14 +166,12 @@ export default {
 .img-record:hover{
   background:rgb(65, 75, 75);
 }
-.card-content:focus-within{
-    background:white;
-}
 .image{
   grid-column: 1;
   border-right: 1px solid darkgray;
   text-align: center;
   padding-left:10px;
+  padding-top: 10px;
 }
 .image-information{
   grid-column: 2;
@@ -187,19 +179,22 @@ export default {
 }
 .image-coordinates{
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 42% 42% 16%;
   grid-row-gap: 5px;
+  padding-top: 20px;
+  text-align: left;
 }
 .side-panel {
   grid-column: 1;
   width: 520px;
-  height: 740px;
+  height: 650px;
 }
-.active{
+.selected_thumbnail{
     background-color: rgb(60, 70, 70);
 }
-.image-coordinates{
-    padding-top: 20px;
+.download-button{
+    padding-bottom: 30px;
+    width: 35px;
 }
 </style>
 
