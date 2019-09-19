@@ -1,0 +1,34 @@
+{
+    "paths": [
+        {
+            "name": "/testapi1",
+            "lambdaFunction": "testapi1lambda",
+            "privacy": {
+                "open": true
+            }
+        }
+    ],
+    "resourceName": "testapi1",
+    "apiName": "testapi1",
+    "functionArns": [
+        {
+            "lambdaFunction": "testapi1lambda"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "ptr-mock-20190228115057-authRole",
+        "unAuthRoleName": "ptr-mock-20190228115057-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "testapi1lambda",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}
