@@ -29,7 +29,24 @@
         },
         "categories": {
             "auth": {
-                "cognito69779ad2": {}
+                "photonusers": {}
+            }
+        }
+    },
+    "prod": {
+        "awscloudformation": {
+            "AuthRoleName": "ptr-mock-prod-20190919143556-authRole",
+            "UnauthRoleArn": "arn:aws:iam::306389350997:role/ptr-mock-prod-20190919143556-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::306389350997:role/ptr-mock-prod-20190919143556-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "ptr-mock-prod-20190919143556-deployment",
+            "UnauthRoleName": "ptr-mock-prod-20190919143556-unauthRole",
+            "StackName": "ptr-mock-prod-20190919143556",
+            "StackId": "arn:aws:cloudformation:us-east-1:306389350997:stack/ptr-mock-prod-20190919143556/76cf97e0-db25-11e9-9f09-0a437bda7b86"
+        },
+        "categories": {
+            "auth": {
+                "photonusers": {}
             }
         }
     }

@@ -3,7 +3,7 @@
 	"function": {},
 	"api": {},
 	"auth": {
-		"cognito69779ad2": {
+		"photonusers": {
 			"service": "Cognito",
 			"providerPlugin": "awscloudformation"
 		}
