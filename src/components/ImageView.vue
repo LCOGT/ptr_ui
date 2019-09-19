@@ -62,7 +62,7 @@
         <div class="image-div">
 
             <div id="svg_container"></div>
-            <JS9 onload="JS9.Preload('./wmd-gf01-20190909-00004836-EX13.fits');"/>
+            <JS9/>
             <div style="display: flex; justify-content: space-between;">
                 <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
                 <p> {{current_image.base_filename}} </p>
@@ -103,12 +103,12 @@ import { mapGetters } from "vuex";
 import * as d3 from "d3";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
-import JS9 from '@/components/JS9'
+import JS9 from "@/components/JS9";
 
 export default {
   name: "ImageView",
   components: {
-    JS9,
+    JS9
   },
   mixins: [commands_mixin],
   props: {
@@ -140,7 +140,7 @@ export default {
       right_click_ttl: 5000,
 
       //Image ID of the currently highlighted image (focused)
-      highlighted_image: 0,
+      highlighted_image: 0
     };
   },
   created() {
@@ -210,7 +210,7 @@ export default {
         req_params,
         opt_params
       );
-      let apiName = this.$store.getters['dev/api'];
+      let apiName = this.$store.getters["dev/api"];
       let url = basecommand.url;
       let body = {
         body: basecommand.form
@@ -317,10 +317,10 @@ export default {
     },
 
     toggleAnalysis() {
-      if(this.analyze) {
-        this.analyze = false
+      if (this.analyze) {
+        this.analyze = false;
       } else {
-        this.analyze = true
+        this.analyze = true;
       }
     },
 
@@ -330,8 +330,7 @@ export default {
 
     setPreviousImage() {
       this.$store.dispatch("images/set_previous_image");
-    },
-
+    }
   },
   computed: {
     active_site: {
