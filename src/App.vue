@@ -14,7 +14,7 @@ import awsmobile from './aws-exports';
 import { components } from 'aws-amplify-vue'
 
 
-Amplify.configure(awsmobile)
+
 Amplify.configure({
 
   //Auth: {
@@ -29,6 +29,7 @@ Amplify.configure({
   //Analytics:{
   //  disabled:true
   //},
+
 
   // API usage docs: https://bit.ly/30n9cTt
   API: {
