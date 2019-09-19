@@ -24,9 +24,7 @@
 
                             <div class="folder" ref="records">
                                 <div 
-                                    v-for="(item) in user_images" 
-                                    :key="item.image_id"
-                                >
+                                    v-for="item in limitedItems" :key="item.image_id">
                                     <div v-bind:id="item.image_id" class="img-record" v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"  @click="setActiveImage(item)">
                                         <div class="image">
                                             <img 
@@ -59,6 +57,7 @@
                             </div>
                             
                         </b-collapse>
+                        <button class="show-more button" @click="limitNumber += 50">Show more</button>
                         <br>
                         <!--Trash folder-->
                         <!--<b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
@@ -113,7 +112,7 @@ export default {
     name: 'ImageNavigationPanel',
     data() {
         return {
-
+            limitNumber: 20,
         };
     },
 
@@ -141,6 +140,9 @@ export default {
             user_images: 'user_images',
             current_image: "current_image"
         }),
+        limitedItems() {
+            return this.user_images.slice(0,this.limitNumber)
+        },
     },
 }
 
@@ -195,6 +197,10 @@ export default {
 .download-button{
     padding-bottom: 30px;
     width: 35px;
+}
+.show-more {
+  margin-top: 5px;
+  width: 480px;
 }
 </style>
 
