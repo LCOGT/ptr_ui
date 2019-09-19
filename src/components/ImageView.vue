@@ -1,6 +1,6 @@
 <template>
     <div id="component" >
-      <div id="component-1" v-if="!this.analyze">
+      <div id="image-window" v-if="!this.analyze">
 
     <div class="controls">
         <button class="button" @click="toggleAnalysis">ANALYZE</button>
@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div id="component-2" v-if="this.analyze">
+      <div id="js9-window2" v-if="this.analyze">
 
         <div class="controls">
             <button class="button" @click="toggleAnalysis">EXIT</button>
@@ -381,15 +381,17 @@ export default {
   width: 798px;
   margin: 0 auto;
 }
-#component-1 {
+#image-window {
+  border-radius: 25px;
   display: block;
   padding: 15px;
   background-color: rgba(24, 30, 30, 0.8);
 }
-#component-2 {
+#js9-window2 {
+  border-radius: 25px;
   display: block;
   padding: 15px;
-  background-color: rgba(43, 121, 173, 0.8);
+  background-color: rgba(40, 228, 203, 0.582);
 }
 .controls {
   display: flex;
