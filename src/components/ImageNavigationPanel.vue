@@ -47,9 +47,11 @@
                                                 <p style="color:rgb(175,175,175);">
                                                     DEC: {{item.declination.toFixed(2)}}
                                                 </p>
-                                                <b-tooltip class="tooltip" label="Download FITS" :delay="1000" type="is-dark" position="is-left">
-                                                    <b-button class="button download-button" tag="a" :href="item.fits13_url" icon-pack="fas" icon-left="download"></b-button>
-                                                </b-tooltip>
+                                                <div v-if="item.ex13_fits_exists">
+                                                    <b-tooltip class="tooltip" label="Download EX13 FITS" :delay="1000" type="is-dark" position="is-left">
+                                                        <b-button class="button download-button" tag="a" :href="item.fits13_url" icon-pack="fas" icon-left="download"></b-button>
+                                                    </b-tooltip>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -105,7 +107,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import draggable from 'vuedraggable'
-
 
 
 export default {
@@ -186,7 +187,7 @@ export default {
 .side-panel {
   grid-column: 1;
   width: 520px;
-  height: 740px;
+  height: 650px;
 }
 .selected_thumbnail{
     background-color: rgb(60, 70, 70);
@@ -194,9 +195,6 @@ export default {
 .download-button{
     padding-bottom: 30px;
     width: 35px;
-}
-.tooltip{
-    padding-left: 0px;
 }
 </style>
 
