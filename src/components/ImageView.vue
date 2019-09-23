@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div id="js9-window2" v-if="this.analyze">
+      <div id="js9-window" v-if="this.analyze">
 
         <div class="controls">
             <button class="button" @click="toggleAnalysis">EXIT</button>
@@ -385,13 +385,13 @@ export default {
   border-radius: 25px;
   display: block;
   padding: 15px;
-  background-color: rgba(24, 30, 30, 0.8);
+  background-color:  rgba(40, 228, 203, 0.582);
 }
-#js9-window2 {
+#js9-window {
   border-radius: 25px;
   display: block;
   padding: 15px;
-  background-color: rgba(40, 228, 203, 0.582);
+  background-color: rgba(233, 95, 77, 0.582);
 }
 .controls {
   display: flex;

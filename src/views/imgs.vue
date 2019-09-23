@@ -44,6 +44,7 @@ import { API, Auth } from 'aws-amplify'
 import ImageView from '@/components/ImageView'
 import ImageNavigationPanel from '@/components/ImageNavigationPanel'
 import { mapGetters } from 'vuex'
+import JS9 from "@/components/JS9";
 
 export default {
   name: 'imgs',
