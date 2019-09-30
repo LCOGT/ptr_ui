@@ -21,6 +21,9 @@ import { AmplifyPlugin } from 'aws-amplify-vue'
  */
 import awsmobile from './aws-exports'
 
+// Used to load js9 scripts in the component
+import LoadScript from 'vue-plugin-load-script';
+Vue.use(LoadScript);
 
 Vue.use(AmplifyPlugin, AmplifyModules)
 Vue.use(Buefy)
