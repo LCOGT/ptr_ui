@@ -14,7 +14,7 @@
         <button class="button" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
 
         <b-tooltip label="download fits file" position="is-right" type="is-black">
-          <button class="button" :href="current_image.fits13_url"><b-icon icon="cloud-download" /></button>
+          <a class="button has-text-white" :href="current_image.fits13_url" download><b-icon icon="cloud-download" /></a>
         </b-tooltip>
         <!--div @click="setPreviousImage" class="arrow left"></div-->
         <!--div @click="setNextImage" class="arrow right"></div-->
@@ -169,7 +169,6 @@ export default {
     };
   },
   created() {
-    console.log("ImageView site prop: " + this.site);
     this.$store.commit("observatory_configuration/setActiveSite", this.site);
     this.$store.dispatch("images/refresh_latest_images");
 
