@@ -2,26 +2,43 @@
     <div id="component" >
       <div id="image-window" v-if="!this.analyze">
 
-    <div class="controls">
-        <button class="button" @click="toggleAnalysis">ANALYZE</button>
-        <button class="button" @click="setLatestImage">latest image</button>
+    <div class="controls level is-mobile">
+      <div class="level-left left-controls">
+        <button class="button" @click="toggleAnalysis">
+          <b-icon icon="tune"></b-icon>
+        </button>
+        <button class="button" @click="setLatestImage">latest</button>
         
 
-        <div @click="setPreviousImage" class="arrow left"></div>
-        <div @click="setNextImage" class="arrow right"></div>
+        <button class="button" @click="setPreviousImage"><b-icon icon="arrow-left-bold" /></button>
+        <button class="button" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
+
+        <b-tooltip label="download fits file" position="is-right" type="is-black">
+          <button class="button" :href="current_image.fits13_url"><b-icon icon="cloud-download" /></button>
+        </b-tooltip>
+        <!--div @click="setPreviousImage" class="arrow left"></div-->
+        <!--div @click="setNextImage" class="arrow right"></div-->
+      </div>
+
+      <div class="level-right right-controls">
+        <div class="level-item">
         <b-field horizontal label="crosshairs">
             <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
         </b-field>
+        </div>
+      </div>
+
     </div>
 
     <div class="image-div">
 
-        <div id="svg_container"></div>
-        <svg id='image_svg'>
-            <image :href="current_image.jpg13_url" width="768" height="768"></image>
+        <svg id='image_svg' ref="svgElement">
+            <!-- NOTE: image width and heigh must be set explicitly to work in firefox -->
+            <!-- These values are changed programatically to work with dynamic window sizes. -->
+            <image height="1px" width="1px" ref="image" :href="current_image.jpg13_url"></image>
         </svg>
 
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
             <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
             <p> {{current_image.base_filename}} </p>
         </div>
@@ -122,6 +139,10 @@ export default {
       image_length: 768,
       image_element: "#image_svg",
 
+      // Width of image in UI
+      imageWidth: 0,
+      imageHeight: 0,
+
       mouseX: 0,
       mouseY: 0,
 
@@ -140,20 +161,36 @@ export default {
       right_click_ttl: 5000,
 
       //Image ID of the currently highlighted image (focused)
-      highlighted_image: 0
+      highlighted_image: 0,
+
+      // Runs a function at a regular interval to update the size of the image component.
+      syncImageSize: '',
+      syncImageInterval: 1000,
     };
   },
   created() {
     console.log("ImageView site prop: " + this.site);
     this.$store.commit("observatory_configuration/setActiveSite", this.site);
     this.$store.dispatch("images/refresh_latest_images");
+
+    // Keep the displayed image element width and height in sync.
+    // This is important for relative measurements on the image (crosshairs, clicks, etc)
+    this.syncImageSize = setInterval(this.get_image_element_dimensions, this.syncImageInterval);
   },
+
+  
+  beforeDestroy() {
+    // We don't need to keep the image dimensions in sync if it's not displayed.
+    clearInterval(this.syncImageSize)
+  },
+
   watch: {
     site: function(newVal, oldVal) {
       this.$store.commit("observatory_configuration/setActiveSite", newVal);
       this.$store.dispatch("images/refresh_latest_images");
     }
   },
+
   mounted() {
     let that = this;
     d3
@@ -182,7 +219,7 @@ export default {
           actionText: "Slew",
           queue: false,
           onAction: () => {
-            console.log("slew to " + position[0] + ", " + position[1]);
+            console.log("slew to " + position[0]/that.imageWidth + ", " + position[1]/that.imageHeight);
             that.send_pixels_center_command(
               position,
               that.current_image.base_filename
@@ -196,30 +233,58 @@ export default {
   },
 
   methods: {
+
+    get_image_element_dimensions() {
+      // WARNING: this may have bugs if image is not a square.
+      // See the final line of this function (imageEl.setAtt...).
+      let imageRect = this.$refs.image.getBoundingClientRect();
+      this.imageWidth = imageRect.width
+      this.imageHeight = imageRect.height
+
+      let svgRect = this.$refs.svgElement.getBoundingClientRect();
+      let imageEl = this.$refs.image
+      imageEl.setAttribute("width", svgRect.width)
+      imageEl.setAttribute("height", svgRect.width)
+    },
+
     send_pixels_center_command(pixels, filename) {
+
       let req_params = {
-        x_from_left: pixels[0],
-        y_from_top: pixels[1],
+        //x_from_left: pixels[0],
+        //y_from_top: pixels[1],
+        rel_x_pos: pixels[0]/this.imageWidth,
+        rel_y_pos: pixels[1]/this.imageHeight,
         filename: filename
       };
       let opt_params = {};
-      let basecommand = this.base_command(
-        "mount",
-        "center_on_pixels",
-        "center_on_pixels",
-        req_params,
-        opt_params
-      );
+      let theCommand = {
+          url: `/${this.active_site}/${this.active_mount}/command/`,
+          http_method: 'POST',
+          form: {
+              device:"mount",
+              instance: this.active_mount,
+              timestamp: parseInt(Date.now() / 1000),
+              action: "center_on_pixels",
+              required_params: req_params,
+              optional_params: opt_params,
+          }
+      }
+      // Old code
+      //let basecommand = this.base_command(
+        //"mount",
+        //"center_on_pixels",
+        //"center_on_pixels",
+        //req_params,
+        //opt_params
+      //);
       let apiName = this.$store.getters["dev/api"];
-      let url = basecommand.url;
-      let body = {
-        body: basecommand.form
-      };
+      let url = theCommand.url;
+      let body = { body: theCommand.form };
       API.post(apiName, url, body)
         .then(response => {
           console.log("sent pixel center command");
           console.log(response);
-          console.log(basecommand.form);
+          console.log(theCommand.form);
         })
         .catch(error => {
           console.log("error with pixel centercommand");
@@ -280,19 +345,19 @@ export default {
         d3
           .select(elem)
           .append("line")
-          .attr("x1", this.image_length / 2)
+          .attr("x1", this.imageWidth / 2)
           .attr("y1", 0)
-          .attr("x2", this.image_length / 2)
-          .attr("y2", this.image_length)
+          .attr("x2", this.imageWidth / 2)
+          .attr("y2", this.imageHeight)
           .attr("id", "crosshair_vertical")
           .attr("stroke", "red");
         d3
           .select(elem)
           .append("line")
-          .attr("y1", this.image_length / 2)
+          .attr("y1", this.imageHeight / 2)
           .attr("x1", 0)
-          .attr("y2", this.image_length / 2)
-          .attr("x2", this.image_length)
+          .attr("y2", this.imageHeight / 2)
+          .attr("x2", this.imageWidth )
           .attr("id", "crosshair_horizontal")
           .attr("stroke", "red");
       } else {
@@ -351,66 +416,52 @@ export default {
 </script>
 
 <style scoped>
-.arrow {
-  border: solid #4caf50;
-  border-width: 0 5px 5px 0;
-  display: inline-block;
-  padding: 5px;
-  outline: 0;
-}
-
-.arrow:hover {
-  opacity: 0.5;
-  cursor: pointer;
-}
-
-.right {
-  transform: rotate(-45deg);
-  -webkit-transform: rotate(-45deg);
-}
-
-.left {
-  transform: rotate(135deg);
-  -webkit-transform: rotate(135deg);
-}
 
 #component {
   display: flex;
   flex-direction: column;
   text-align: center;
-  width: 798px;
+  width: auto;
   margin: 0 auto;
 }
 #image-window {
-  border-radius: 25px;
+  border-radius: 5px;
   display: block;
   padding: 15px;
-  background-color:  rgba(40, 228, 203, 0.582);
+  background-color:  rgba(52, 60, 61, 0.733)
 }
 #js9-window {
   border-radius: 25px;
   display: block;
-  padding: 15px;
+  padding: 10px;
   background-color: rgba(233, 95, 77, 0.582);
 }
 .controls {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  vertical-align: middle;
-  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 768px;
+  margin-top: 1em;
+  overflow-x:auto;
 }
-.controls > * {
-  margin: 1em;
+.left-controls > * {
+  margin-right: 5px;
 }
-.button {
-  margin-top: 5px;
-  width: auto;
+.right-controls > * {
+  margin-left: 5px;
 }
 
 .image-div {
-  padding-top: 1em;
   padding-bottom: 1em;
+}
+#image_svg {
+  width:100%;
+  max-width: 768px;
+  height:1px;
+  margin-bottom: 100%;
+  overflow:visible;
+}
+#image_svg image {
+  width:inherit;
+  height:auto;
 }
 
 .recent_images {
@@ -433,8 +484,4 @@ export default {
   border: 2px solid gold;
 }
 
-#image_svg {
-  width: 768px;
-  height: 768px;
-}
 </style>
