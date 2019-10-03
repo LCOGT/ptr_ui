@@ -6,10 +6,7 @@
 <template>
   <div class="container">
   <div class="columns">
-    <div class="nav-panel">  
-      <ImageNavigationPanel/>
-    </div>
-    <div class="img-view">
+    <div class="img-view column is-three-fifths" style="padding: 2em;">
 
       <!-- Select the site that you wish to view
       <b-field class="select-device" label="Site" horizontal>
@@ -32,7 +29,10 @@
       <!-- The actual image view component -->
       <image-view v-bind:site="active_site"/>
 
-  </div>
+    </div>
+    <div class="nav-panel column is-two-fifths" style="padding: 2em;">  
+      <ImageNavigationPanel/>
+    </div>
 
   </div>
   </div>
@@ -101,14 +101,5 @@ export default {
   border-bottom: 1px solid silver;
   padding-bottom: 2em;
 }
-
-.nav-panel{
-  border-right: 1px solid darkgray;
-  padding-right: 50px;
-}
-.img-view{
-    padding-left: 50px;
-}
-
 
 </style>
