@@ -4,6 +4,7 @@
             <div active icon="account" label="My Account Images" :expanded="true">
                 <!--All images folder-->
                 <b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
+                    <ImageFilter/>
                     <div
                         slot="trigger" 
                         slot-scope="props"
@@ -119,12 +120,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import draggable from 'vuedraggable'
-
+import { mapGetters } from "vuex";
+import draggable from "vuedraggable";
+import ImageFilter from "@/components/ImageFilter";
 
 export default {
     name: 'ImageNavigationPanel',
+    components: {
+      ImageFilter
+  }
     data() {
         return {
             limitNumber: 20,
@@ -134,9 +138,9 @@ export default {
         };
     },
 
-    components: { 
-        draggable,
-    },
+  beforeMount() {
+    this.$store.dispatch("images/get_user_images");
+  },
 
     beforeMount() {
     },
@@ -176,61 +180,71 @@ export default {
     },
 }
 
+  computed: {
+    ...mapGetters("images", {
+      username: "username",
+      user_images: "user_images",
+      current_image: "current_image"
+    }),
+    limitedItems() {
+      return this.user_images.slice(0, this.limitNumber);
+    }
+  }
+};
 </script>
 
 <style scoped>
-
-.img-record{
-  display:flex;
+.img-record {
+  display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   border-bottom: 1px solid rgb(78, 74, 74);
   padding: 10px;
 }
-.folder{
-    max-height:65vh;
-    overflow-y:scroll;
+.folder {
+  max-height: 65vh;
+  overflow-y: scroll;
 }
-.img-record:hover{
-  background:rgb(65, 75, 75);
+.img-record:hover {
+  background: rgb(65, 75, 75);
 }
-.image{
+.image {
   padding-right: 10px;
   text-align: center;
   flex-basis: 100px;
   flex-grow: 1;
 }
-.image img{
-    width:100%;
+.image img {
+  width: 100%;
 }
 .image img:after {
   content: "";
   display: block;
   padding-bottom: 100%;
 }
-.image-information{
-    flex-basis: 200px;
-    flex-grow:5;
+.image-information {
+  flex-basis: 200px;
+  flex-grow: 5;
 }
-.image-coordinates{
-  display:flex;
+.image-coordinates {
+  display: flex;
   text-align: left;
 }
 .side-panel {
   grid-column: 1;
-  width:auto;
+  width: auto;
   height: 1000px;
 }
-.selected_thumbnail{
-    background-color: rgb(60, 70, 70);
+.selected_thumbnail {
+  background-color: rgb(60, 70, 70);
 }
-.download-link:hover{
-    cursor:pointer;
-    text-decoration: underline;
+.download-link:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 .show-more {
   margin-top: 5px;
-  width:100%;
+  width: 100%;
 }
 </style>
 
