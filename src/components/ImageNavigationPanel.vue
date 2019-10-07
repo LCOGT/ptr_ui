@@ -4,8 +4,13 @@
             <b-menu>
                 <b-menu-list>
                     <b-menu-item active icon="account" label="My Account Images" :expanded="true">
+
+
                         <!--All images folder-->
                         <b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
+
+                    <ImageFilter/>
+
                             <div
                                 slot="trigger" 
                                 slot-scope="props"
@@ -104,54 +109,51 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import draggable from 'vuedraggable'
-
+import { mapGetters } from "vuex";
+import draggable from "vuedraggable";
+import ImageFilter from "@/components/ImageFilter";
 
 export default {
-    name: 'ImageNavigationPanel',
-    data() {
-        return {
-            limitNumber: 20,
-        };
-    },
+  name: "ImageNavigationPanel",
+  components: {
+    ImageFilter,
+    draggable
+  },
+  data() {
+    return {
+      limitNumber: 20
+    };
+  },
 
-    components: { 
-        draggable,
-    },
+  beforeMount() {
+    this.$store.dispatch("images/get_user_images");
+  },
 
-    beforeMount() {
-        this.$store.dispatch('images/get_user_images')
-    },
+  mounted() {},
 
-    mounted() {
-        
-    },
+  methods: {
+    setActiveImage(image) {
+      this.$store.dispatch("images/set_current_image", image);
+    }
+  },
 
-    methods: {
-        setActiveImage(image) {
-            this.$store.dispatch("images/set_current_image", image);
-        },
-    },
-
-    computed: {
-        ...mapGetters('images', {
-            username: 'username',
-            user_images: 'user_images',
-            current_image: "current_image"
-        }),
-        limitedItems() {
-            return this.user_images.slice(0,this.limitNumber)
-        },
-    },
-}
-
+  computed: {
+    ...mapGetters("images", {
+      username: "username",
+      user_images: "user_images",
+      current_image: "current_image"
+    }),
+    limitedItems() {
+      return this.user_images.slice(0, this.limitNumber);
+    }
+  }
+};
 </script>
 
 <style scoped>
 @import "https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css";
 
-.img-record{
+.img-record {
   display: grid;
   grid-template-columns: 30% 70%;
   grid-row-gap: 5px;
@@ -161,25 +163,25 @@ export default {
   padding-top: 22px;
   padding-bottom: 22px;
 }
-.folder{
-    max-height: 1000px;
-    overflow-y: auto;
+.folder {
+  max-height: 1000px;
+  overflow-y: auto;
 }
-.img-record:hover{
-  background:rgb(65, 75, 75);
+.img-record:hover {
+  background: rgb(65, 75, 75);
 }
-.image{
+.image {
   grid-column: 1;
   border-right: 1px solid darkgray;
   text-align: center;
-  padding-left:10px;
+  padding-left: 10px;
   padding-top: 10px;
 }
-.image-information{
+.image-information {
   grid-column: 2;
   padding-left: 15px;
 }
-.image-coordinates{
+.image-coordinates {
   display: grid;
   grid-template-columns: 42% 42% 16%;
   grid-row-gap: 5px;
@@ -191,12 +193,12 @@ export default {
   width: 520px;
   height: 650px;
 }
-.selected_thumbnail{
-    background-color: rgb(60, 70, 70);
+.selected_thumbnail {
+  background-color: rgb(60, 70, 70);
 }
-.download-button{
-    padding-bottom: 30px;
-    width: 35px;
+.download-button {
+  padding-bottom: 30px;
+  width: 35px;
 }
 .show-more {
   margin-top: 5px;
