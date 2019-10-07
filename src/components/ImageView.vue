@@ -430,10 +430,9 @@ export default {
   background-color:  rgba(52, 60, 61, 0.733)
 }
 #js9-window {
-  border-radius: 25px;
   display: block;
   padding: 10px;
-  background-color: rgba(233, 95, 77, 0.582);
+  background-color: rgba(59, 31, 29, 0.582);
 }
 .controls {
   margin: 0 auto;
