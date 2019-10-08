@@ -16,12 +16,19 @@
         <b-tooltip label="download fits file" position="is-right" type="is-black">
           <a class="button has-text-white" :href="current_image.fits13_url" download><b-icon icon="cloud-download" /></a>
         </b-tooltip>
-        <!--div @click="setPreviousImage" class="arrow left"></div-->
-        <!--div @click="setNextImage" class="arrow right"></div-->
+
+        <p>{{ mouseIsDown }}</p>
+        <p>{{ subframeSelectIsActive }}</p>
+        <p>{{ subframeWidth }}</p>
+        <p>{{ subframeHeight }}</p>
       </div>
 
       <div class="level-right right-controls">
         <div class="level-item">
+
+        <b-field horizontal label="select subframe">
+            <b-switch type="is-info" v-model="subframeSelectIsActive"></b-switch>
+        </b-field>
         <b-field horizontal label="crosshairs">
             <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
         </b-field>
@@ -117,10 +124,10 @@
 import { API, Auth } from "aws-amplify";
 import wcs from "@/utils/pix2wcs";
 import { mapGetters } from "vuex";
-import * as d3 from "d3";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
 import JS9 from "@/components/JS9";
+import * as d3 from "d3";
 
 export default {
   name: "ImageView",
@@ -150,6 +157,16 @@ export default {
       mouseDec: 0,
 
       analyze: false,
+
+      subframeSVG: '',
+      subframeSelectIsActive: false,
+      subframeX: -1,
+      subframeY: -1,
+      subframeX2: -1,
+      subframeY2: -1,
+      subframeWidth: 10,
+      subframeHeight: 10,
+      mouseIsDown: false,
 
       // This is modified by the crosshairs switch and controls whether the crosshairs are visible.
       show_crosshairs: false,
@@ -187,21 +204,91 @@ export default {
     site: function(newVal, oldVal) {
       this.$store.commit("observatory_configuration/setActiveSite", newVal);
       this.$store.dispatch("images/refresh_latest_images");
-    }
+    },
+
+    // Toggle whether the subframe box is displayed or not
+    subframeSelectIsActive: function(newVal, oldVal) {
+      if (newVal) {
+        this.subframeSVG.style("display","block")
+      }
+      else {
+        this.subframeSVG.style("display", "none")
+      }
+    },
+
   },
 
   mounted() {
     let that = this;
-    d3
-      .select(this.image_element)
 
-      // Track mouse coordinates
-      .on("mouseover", function(d, i) {
-        d3.select(this).on("mousemove", function(d, i) {
-          let coords = d3.mouse(this);
-          that.mouseX = coords[0];
-          that.mouseY = coords[1];
-        });
+    // Initialize subframe rectangle
+    const rect = [{"x":this.imageWidth/2 - 50, "y":this.imageWidth/2 -50}]
+    d3.select(this.image_element)
+      .selectAll("subframeBox")
+      .data(rect)
+      .join("rect")
+        .attr("id", "subframeSVG")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y)
+        .attr("width", 100)
+        .attr("height", 100)
+        .style("display","none")
+        .style("stroke", "orange")
+        .style("stroke-width", 3)
+        .style("fill", "none")
+
+    that.subframeSVG = d3.select("#subframeSVG")
+    // Subframe stuff
+    function updateSubframe() {
+      let minX = Math.min(that.subframeX, that.subframeX2) 
+      let minY = Math.min(that.subframeY, that.subframeY2) 
+      let width = Math.abs(that.subframeX - that.subframeX2)
+      let height = Math.abs(that.subframeY - that.subframeY2) 
+      d3.select("#subframeSVG")
+        .attr("x", minX)
+        .attr("y", minY)
+        .attr("width",width)
+        .attr("height", height)
+    }
+
+    // Event actions to perform on the image window element
+    d3.select(this.image_element)
+
+      .on("mousedown", function() {
+
+        // start drawing a subframe box if subframe mode is active.
+        if (that.subframeSelectIsActive) {
+          that.mouseIsDown = true;
+          let mClick = d3.mouse(this)
+          that.subframeX = mClick[0]
+          that.subframeY = mClick[1]
+          that.subframeX2 = mClick[0]
+          that.subframeY2 = mClick[1]
+          updateSubframe()
+        }
+      })
+
+      .on("mousemove", function() {
+        // coordinates of current mouse position
+        let mDrag = d3.mouse(this)
+
+        // log the current mouse coordinates
+        that.mouseX = mDrag[0]
+        that.mouseY = mDrag[1]
+
+        // if subframe mode is active, and the mouse is dragging, 
+        // save the current coordinates and draw them as a rectangle.
+        if (that.subframeSelectIsActive && that.mouseIsDown) {
+          //let mDrag = d3.mouse(this)
+          that.subframeX2 = mDrag[0]
+          that.subframeY2 = mDrag[1]
+          updateSubframe()
+        }
+      })
+
+      // Defines the end of a drag event.
+      .on("mouseup", function() {
+        that.mouseIsDown = false;
       })
 
       // Respond to right clicks
@@ -228,10 +315,34 @@ export default {
 
         // Don't open the usual right-click menu
         d3.event.preventDefault();
-      });
+      })
+
+
+
+    d3.select(this.image_element)
+
+      // Track mouse coordinates
+      //.on("mouseover", function(d, i) {
+        //d3.select(this).on("mousemove", function(d, i) {
+          //let coords = d3.mouse(this);
+          //that.mouseX = coords[0];
+          //that.mouseY = coords[1];
+
+          //// subframe stuff
+          //if(!that.subframeSelectIsActive && that.mouseIsDown) {
+            //let mDrag = d3.mouse(this)
+            //that.subframeX2 = mDrag[0]
+            //that.subframeY2 = mDrag[1]
+            //updateSubframe()
+          //}
+        //});
+      //})
+
+
   },
 
   methods: {
+
 
     get_image_element_dimensions() {
       // WARNING: this may have bugs if image is not a square.
