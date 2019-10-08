@@ -16,22 +16,18 @@
         <b-tooltip label="download fits file" position="is-right" type="is-black">
           <a class="button has-text-white" :href="current_image.fits13_url" download><b-icon icon="cloud-download" /></a>
         </b-tooltip>
-
-        <p>{{ mouseIsDown }}</p>
-        <p>{{ subframeSelectIsActive }}</p>
-        <p>{{ subframeWidth }}</p>
-        <p>{{ subframeHeight }}</p>
       </div>
 
       <div class="level-right right-controls">
         <div class="level-item">
-
-        <b-field horizontal label="select subframe">
-            <b-switch type="is-info" v-model="subframeSelectIsActive"></b-switch>
-        </b-field>
-        <b-field horizontal label="crosshairs">
-            <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
-        </b-field>
+          <b-field horizontal label="subframe">
+              <b-switch type="is-info" v-model="subframeSelectIsActive"></b-switch>
+          </b-field>
+        </div>
+        <div class="level-item">
+          <b-field horizontal label="crosshairs">
+              <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
+          </b-field>
         </div>
       </div>
 
@@ -42,7 +38,11 @@
         <svg id='image_svg' ref="svgElement">
             <!-- NOTE: image width and heigh must be set explicitly to work in firefox -->
             <!-- These values are changed programatically to work with dynamic window sizes. -->
-            <image height="1px" width="1px" ref="image" :href="current_image.jpg13_url"></image>
+            <image 
+              :class="{'image-div-pointer-cross':subframeSelectIsActive}" 
+              height="1px" width="1px" 
+              ref="image" 
+              :href="current_image.jpg13_url" />
         </svg>
 
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
@@ -85,7 +85,7 @@
 
         <div class="image-div">
 
-            <div id="svg_container"></div>
+            <div id="svg_container" />
             <JS9/>
             <div style="display: flex; justify-content: space-between;">
                 <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
@@ -143,29 +143,28 @@ export default {
       // The image that is selected and visible in the main viewer.
       active_image: "",
 
-      image_length: 768,
       image_element: "#image_svg",
 
       // Width of image in UI
       imageWidth: 0,
       imageHeight: 0,
 
+      // Mouse position, in px, on the image window
       mouseX: 0,
       mouseY: 0,
 
-      mouseRa: 0,
-      mouseDec: 0,
-
       analyze: false,
 
+      // The subframe rectangle svg element
       subframeSVG: '',
+      // Toggles whether the subframe is visible or not
       subframeSelectIsActive: false,
+      // (X,Y) and (X2,Y2) define the corners of the subframe rectangle
       subframeX: -1,
       subframeY: -1,
       subframeX2: -1,
       subframeY2: -1,
-      subframeWidth: 10,
-      subframeHeight: 10,
+      // Defines when the user is dragging the mouse (for drawing the rectangle)
       mouseIsDown: false,
 
       // This is modified by the crosshairs switch and controls whether the crosshairs are visible.
@@ -209,10 +208,13 @@ export default {
     // Toggle whether the subframe box is displayed or not
     subframeSelectIsActive: function(newVal, oldVal) {
       if (newVal) {
-        this.subframeSVG.style("display","block")
+        this.subframeSVG
+          .style("display","block")
+          .attr("class","image-div-pointer-cross")
       }
       else {
-        this.subframeSVG.style("display", "none")
+        this.subframeSVG
+          .style("display", "none")
       }
     },
 
@@ -222,7 +224,7 @@ export default {
     let that = this;
 
     // Initialize subframe rectangle
-    const rect = [{"x":this.imageWidth/2 - 50, "y":this.imageWidth/2 -50}]
+    const rect = [{"x":0, "y":0}]
     d3.select(this.image_element)
       .selectAll("subframeBox")
       .data(rect)
@@ -230,12 +232,13 @@ export default {
         .attr("id", "subframeSVG")
         .attr("x", d => d.x)
         .attr("y", d => d.y)
-        .attr("width", 100)
-        .attr("height", 100)
+        .attr("width", 0)
+        .attr("height", 0)
         .style("display","none")
         .style("stroke", "orange")
         .style("stroke-width", 3)
         .style("fill", "none")
+        .style("cursor", "crosshair")
 
     that.subframeSVG = d3.select("#subframeSVG")
     // Subframe stuff
@@ -316,27 +319,6 @@ export default {
         // Don't open the usual right-click menu
         d3.event.preventDefault();
       })
-
-
-
-    d3.select(this.image_element)
-
-      // Track mouse coordinates
-      //.on("mouseover", function(d, i) {
-        //d3.select(this).on("mousemove", function(d, i) {
-          //let coords = d3.mouse(this);
-          //that.mouseX = coords[0];
-          //that.mouseY = coords[1];
-
-          //// subframe stuff
-          //if(!that.subframeSelectIsActive && that.mouseIsDown) {
-            //let mDrag = d3.mouse(this)
-            //that.subframeX2 = mDrag[0]
-            //that.subframeY2 = mDrag[1]
-            //updateSubframe()
-          //}
-        //});
-      //})
 
 
   },
@@ -552,15 +534,12 @@ export default {
   margin-top: 1em;
   overflow-x:auto;
 }
-.left-controls > * {
-  margin-right: 5px;
-}
-.right-controls > * {
-  margin-left: 5px;
-}
 
 .image-div {
   padding-bottom: 1em;
+}
+.image-div-pointer-cross:hover {
+  cursor:crosshair;
 }
 #image_svg {
   width:100%;

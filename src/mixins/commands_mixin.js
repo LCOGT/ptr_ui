@@ -304,6 +304,13 @@ export const commands_mixin = {
                     filter: this.filter_wheel_options_selection,
                     size: this.camera_areas_selection,
                     dither: this.cam_dither,
+                    //subframe_custom: {
+                        //"reference_image": "sldkfj",
+                        //"x0": 0,
+                        //"x1": 1,
+                        //"y0": 0,
+                        //"y1": 1,
+                    //},
                 }
             )
         },
