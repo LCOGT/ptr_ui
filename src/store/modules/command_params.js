@@ -1,6 +1,10 @@
-
-
-import { API } from 'aws-amplify'
+/**
+ *  This module is responsible for tracking the state of fields holding parameters
+ *  for commands (eg. exposure time).
+ *  
+ *  (oct 9) Some of these parameters are currently tracked in vuex module
+ *  'observatory_configuration', and should be migrated to this module.
+ */
 
 const state = {
 
@@ -15,7 +19,7 @@ const state = {
 
 const getters = {
     subframeIsActive: state => state.subframeIsActive,
-    subframeDefinedWithFile: state => state.subframeIsActive,
+    subframeDefinedWithFile: state => state.subframeDefinedWithFile,
     subframe_x0: state => state.subframe_x0,
     subframe_y0: state => state.subframe_y0,
     subframe_x1: state => state.subframe_x1,
