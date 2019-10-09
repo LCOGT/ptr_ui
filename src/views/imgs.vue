@@ -31,7 +31,8 @@
 
     </div>
     <div class="nav-panel column is-two-fifths" style="padding: 2em;">  
-      <ImageNavigationPanel/>
+      <!--button class="button" @click="imagesByUser">imageByUser</button-->
+      <!--ImageNavigationPanel/-->
     </div>
 
   </div>
@@ -67,7 +68,11 @@ export default {
       let chosen_site = the_sites[this.toggleSiteIndex]
       this.$store.commit('observatory_configuration/setActiveSite', chosen_site)
       this.toggleSiteIndex = (this.toggleSiteIndex + 1) % 2;
+    },
+    imagesByUser() {
+        this.$store.dispatch('images/get_user_images')
     }
+
   },
   beforeCreate() {
     // Set the default site for convenience
