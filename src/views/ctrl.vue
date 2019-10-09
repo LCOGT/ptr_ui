@@ -249,7 +249,7 @@
         <b-field horizontal label="Subframe" v-if="subframeIsActive">
           <p>Enabled</p>
           <p>({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
-          <button class="button" @click="function(){subframeIsActive = false}"> disable </button>
+          <button class="button" @click="function(){subframeIsActive = false}"> deactivate </button>
         </b-field>
 
 
