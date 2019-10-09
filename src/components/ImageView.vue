@@ -1,5 +1,5 @@
 <template>
-    <div id="component" >
+    <div id="component" v-on:keyup.right="setNextImage" v-on:keyup.left="setPreviousImage" >
       <div id="image-window" v-if="!this.analyze">
 
     <div class="controls level is-mobile">
@@ -20,8 +20,13 @@
 
       <div class="level-right right-controls">
         <div class="level-item">
-          <b-field horizontal label="subframe">
-              <b-switch type="is-info" v-model="subframeSelectIsActive"></b-switch>
+          <b-field horizontal label="subframe active">
+              <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
+          </b-field>
+        </div>
+        <div class="level-item">
+          <b-field horizontal label="subframe visible">
+              <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
           </b-field>
         </div>
         <div class="level-item">
@@ -34,19 +39,19 @@
     </div>
 
     <div class="image-div">
-
         <svg id='image_svg' ref="svgElement">
             <!-- NOTE: image width and heigh must be set explicitly to work in firefox -->
             <!-- These values are changed programatically to work with dynamic window sizes. -->
             <image 
-              :class="{'image-div-pointer-cross':subframeSelectIsActive}" 
+              :class="{'image-div-pointer-cross':subframeIsVisible}" 
               height="1px" width="1px" 
               ref="image" 
               :href="current_image.jpg13_url" />
         </svg>
 
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-            <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
+            <!--p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p-->
+            <p>{{ current_image.exposure_time }} seconds  |  {{current_image.filter_used}} </p>
             <p> {{current_image.base_filename}} </p>
         </div>
     </div>
@@ -146,8 +151,8 @@ export default {
       image_element: "#image_svg",
 
       // Width of image in UI
-      imageWidth: 0,
-      imageHeight: 0,
+      imageWidth: 1,
+      imageHeight: 1,
 
       // Mouse position, in px, on the image window
       mouseX: 0,
@@ -158,8 +163,9 @@ export default {
       // The subframe rectangle svg element
       subframeSVG: '',
       // Toggles whether the subframe is visible or not
-      subframeSelectIsActive: false,
+      subframeIsVisible: false,
       // (X,Y) and (X2,Y2) define the corners of the subframe rectangle
+      // TODO: change to relative values, not pixels
       subframeX: -1,
       subframeY: -1,
       subframeX2: -1,
@@ -169,6 +175,7 @@ export default {
 
       // This is modified by the crosshairs switch and controls whether the crosshairs are visible.
       show_crosshairs: false,
+      crosshair_color: "#32cd32",
 
       // Timer (setTimeout object) to clear the right click marker after a few seconds.
       context_marker_timer: "",
@@ -206,7 +213,7 @@ export default {
     },
 
     // Toggle whether the subframe box is displayed or not
-    subframeSelectIsActive: function(newVal, oldVal) {
+    subframeIsVisible: function(newVal, oldVal) {
       if (newVal) {
         this.subframeSVG
           .style("display","block")
@@ -221,6 +228,12 @@ export default {
   },
 
   mounted() {
+    this.init()
+  },
+
+  methods: {
+
+  init() {
     let that = this;
 
     // Initialize subframe rectangle
@@ -235,24 +248,12 @@ export default {
         .attr("width", 0)
         .attr("height", 0)
         .style("display","none")
-        .style("stroke", "orange")
-        .style("stroke-width", 3)
+        .style("stroke", "red")
+        .style("stroke-width", 1)
         .style("fill", "none")
         .style("cursor", "crosshair")
 
     that.subframeSVG = d3.select("#subframeSVG")
-    // Subframe stuff
-    function updateSubframe() {
-      let minX = Math.min(that.subframeX, that.subframeX2) 
-      let minY = Math.min(that.subframeY, that.subframeY2) 
-      let width = Math.abs(that.subframeX - that.subframeX2)
-      let height = Math.abs(that.subframeY - that.subframeY2) 
-      d3.select("#subframeSVG")
-        .attr("x", minX)
-        .attr("y", minY)
-        .attr("width",width)
-        .attr("height", height)
-    }
 
     // Event actions to perform on the image window element
     d3.select(this.image_element)
@@ -260,14 +261,14 @@ export default {
       .on("mousedown", function() {
 
         // start drawing a subframe box if subframe mode is active.
-        if (that.subframeSelectIsActive) {
+        if (that.subframeIsVisible) {
           that.mouseIsDown = true;
           let mClick = d3.mouse(this)
-          that.subframeX = mClick[0]
-          that.subframeY = mClick[1]
-          that.subframeX2 = mClick[0]
-          that.subframeY2 = mClick[1]
-          updateSubframe()
+          that.subframe_x0 = mClick[0] / that.imageWidth
+          that.subframe_y0 = mClick[1] / that.imageHeight
+          that.subframe_x1 = mClick[0] / that.imageWidth
+          that.subframe_y1 = mClick[1] / that.imageHeight
+          that.drawSubframe()
         }
       })
 
@@ -281,17 +282,18 @@ export default {
 
         // if subframe mode is active, and the mouse is dragging, 
         // save the current coordinates and draw them as a rectangle.
-        if (that.subframeSelectIsActive && that.mouseIsDown) {
+        if (that.subframeIsVisible && that.mouseIsDown) {
           //let mDrag = d3.mouse(this)
-          that.subframeX2 = mDrag[0]
-          that.subframeY2 = mDrag[1]
-          updateSubframe()
+          that.subframe_x1 = mDrag[0] / that.imageWidth
+          that.subframe_y1 = mDrag[1] / that.imageHeight
+          that.drawSubframe()
         }
       })
 
       // Defines the end of a drag event.
       .on("mouseup", function() {
         that.mouseIsDown = false;
+        that.subframeIsActive = true;
       })
 
       // Respond to right clicks
@@ -319,13 +321,23 @@ export default {
         // Don't open the usual right-click menu
         d3.event.preventDefault();
       })
+    }, 
+
+    // Subframe stuff
+    drawSubframe() {
+      let minX = this.imageWidth * Math.min(this.subframe_x0, this.subframe_x1) 
+      let minY = this.imageHeight * Math.min(this.subframe_y0, this.subframe_y1) 
+      let width = this.imageWidth * Math.abs(this.subframe_x0 - this.subframe_x1)
+      let height = this.imageHeight * Math.abs(this.subframe_y0 - this.subframe_y1) 
+      d3.select("#subframeSVG")
+        .attr("x", minX)
+        .attr("y", minY)
+        .attr("width",width)
+        .attr("height", height)
+    },
 
 
-  },
-
-  methods: {
-
-
+    // Resize the image element to fit the browser window
     get_image_element_dimensions() {
       // WARNING: this may have bugs if image is not a square.
       // See the final line of this function (imageEl.setAtt...).
@@ -337,6 +349,8 @@ export default {
       let imageEl = this.$refs.image
       imageEl.setAttribute("width", svgRect.width)
       imageEl.setAttribute("height", svgRect.width)
+
+      this.drawSubframe()
     },
 
     send_pixels_center_command(pixels, filename) {
@@ -437,25 +451,29 @@ export default {
         d3
           .select(elem)
           .append("line")
+          .attr("class", "crosshairs")
           .attr("x1", this.imageWidth / 2)
           .attr("y1", 0)
           .attr("x2", this.imageWidth / 2)
           .attr("y2", this.imageHeight)
           .attr("id", "crosshair_vertical")
-          .attr("stroke", "red");
+          .attr("stroke-width", 2)
+          .attr("stroke", this.crosshair_color);
         d3
           .select(elem)
           .append("line")
+          .attr("class", "crosshairs")
           .attr("y1", this.imageHeight / 2)
           .attr("x1", 0)
           .attr("y2", this.imageHeight / 2)
           .attr("x2", this.imageWidth )
           .attr("id", "crosshair_horizontal")
-          .attr("stroke", "red");
+          .attr("stroke-width", 2)
+          .attr("stroke", this.crosshair_color);
       } else {
         d3
           .select(elem)
-          .selectAll("line")
+          .selectAll(".crosshairs")
           .remove();
       }
     },
@@ -502,7 +520,33 @@ export default {
     ...mapGetters("images", {
       recent_images: "recent_images",
       current_image: "current_image"
-    })
+    }),
+
+    subframeIsActive: {
+        get() { return this.$store.getters['command_params/subframeIsActive']},
+        set(val) { this.$store.commit('command_params/subframeIsActive', val)},
+    },
+    subframeDefinedWithFile: {
+        get() { return this.$store.getters['command_params/subframeDefinedWithFile']},
+        set(val) { this.$store.commit('command_params/subframeDefinedWithFile', val)},
+    },
+    subframe_x0: {
+        get() { return this.$store.getters['command_params/subframe_x0']},
+        set(val) { this.$store.commit('command_params/subframe_x0', val)},
+    },
+    subframe_y0: {
+        get() { return this.$store.getters['command_params/subframe_y0']},
+        set(val) { this.$store.commit('command_params/subframe_y0', val)},
+    },
+    subframe_x1: {
+        get() { return this.$store.getters['command_params/subframe_x1']},
+        set(val) { this.$store.commit('command_params/subframe_x1', val)},
+    },
+    subframe_y1: {
+        get() { return this.$store.getters['command_params/subframe_y1']},
+        set(val) { this.$store.commit('command_params/subframe_y1', val)},
+    },
+
   }
 };
 </script>
