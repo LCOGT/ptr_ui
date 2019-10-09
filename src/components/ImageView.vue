@@ -1,6 +1,6 @@
 <template>
     <div id="component" v-on:keyup.right="setNextImage" v-on:keyup.left="setPreviousImage" >
-      <div id="image-window" v-if="!this.analyze">
+      <div id="image-window">
 
     <div class="controls level is-mobile">
       <div class="level-left left-controls">
@@ -80,48 +80,12 @@
         </div>
       </div>
 
-      <div id="js9-window" v-if="this.analyze">
+      <br>
+      <div id="js9-window" >
+        <JS9/>
+      </div>
 
-        <div class="controls">
-            <button class="button" @click="toggleAnalysis">EXIT</button>
-            <div @click="setPreviousImage" class="arrow left"></div>
-            <div @click="setNextImage" class="arrow right"></div>
-        </div>
-
-        <div class="image-div">
-
-            <div id="svg_container" />
-            <JS9/>
-            <div style="display: flex; justify-content: space-between;">
-                <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
-                <p> {{current_image.base_filename}} </p>
-            </div>
-        </div>
-
-
-        <!--div class="column is-narrow recent_images"-->
-        <div class="recent_images">
-          
-            <div 
-                class="recent_image" 
-                style="display: flex;"
-                v-for="(item, index) in recent_images" 
-                v-bind:key="index"
-            >
-                <img 
-                    style="width: 60px; height: 60px;"
-                    v-bind:src="item.jpg13_url"
-                    v-bind:title="item.base_filename"
-                    v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
-                    @click="setActiveImage(item)"
-
-                >
-                <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
-            </div>
-              
-        </div>
-    </div>
-    </div>
+  </div>
     
 </template>
 
@@ -570,7 +534,7 @@ export default {
 #js9-window {
   display: block;
   padding: 10px;
-  background-color: rgba(59, 31, 29, 0.582);
+  background-color:  rgba(52, 60, 61, 0.733)
 }
 .controls {
   margin: 0 auto;
