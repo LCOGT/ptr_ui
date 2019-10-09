@@ -20,17 +20,17 @@
 
       <div class="level-right right-controls">
         <div class="level-item">
-          <b-field horizontal label="subframe active">
+          <b-field label="subframe active">
               <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
           </b-field>
         </div>
         <div class="level-item">
-          <b-field horizontal label="subframe visible">
+          <b-field label="subframe visible">
               <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
           </b-field>
         </div>
         <div class="level-item">
-          <b-field horizontal label="crosshairs">
+          <b-field label="crosshairs">
               <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
           </b-field>
         </div>
@@ -294,6 +294,7 @@ export default {
       .on("mouseup", function() {
         that.mouseIsDown = false;
         that.subframeIsActive = true;
+        that.subframeDefinedWithFile = that.current_image.base_filename
       })
 
       // Respond to right clicks

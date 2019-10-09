@@ -186,6 +186,15 @@ export const commands_mixin = {
             chart_selectedDec: 'selectedDec',
         }),
 
+        ...mapGetters('command_params', [
+            'subframeIsActive',
+            'subframdeDefinedWithFile',
+            'subframe_x0',
+            'subframe_y0',
+            'subframe_x1',
+            'subframe_y1',
+        ]),
+
         /**
          * The `..._selection` computed properties are used for two way
          * binding between vuex stored state and selections in the command
@@ -201,30 +210,6 @@ export const commands_mixin = {
             get() { return this.$store.getters['observatory_configuration/camera_areas_selection'] },
             //get() { return this.camera_areas[0] },
             set(val) {this.$store.commit('observatory_configuration/setCameraAreasSelection', val)}
-        },
-        subframeIsActive: {
-            get() { return this.$store.getters['command_params/subframeIsActive']},
-            set(val) { this.$store.commit('command_params/subframeIsActive', val)},
-        },
-        subframeDefinedWithFile: {
-            get() { return this.$store.getters['command_params/subframeDefinedWithFile']},
-            set(val) { this.$store.commit('command_params/subframeDefinedWithFile', val)},
-        },
-        subframe_x0: {
-            get() { return this.$store.getters['command_params/subframe_x0']},
-            set(val) { this.$store.commit('command_params/subframe_x0', val)},
-        },
-        subframe_y0: {
-            get() { return this.$store.getters['command_params/subframe_y0']},
-            set(val) { this.$store.commit('command_params/subframe_y0', val)},
-        },
-        subframe_x1: {
-            get() { return this.$store.getters['command_params/subframe_x1']},
-            set(val) { this.$store.commit('command_params/subframe_x1', val)},
-        },
-        subframe_y1: {
-            get() { return this.$store.getters['command_params/subframe_y1']},
-            set(val) { this.$store.commit('command_params/subframe_y1', val)},
         },
 
 
