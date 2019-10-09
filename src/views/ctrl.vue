@@ -234,7 +234,7 @@
         </b-field>
 
         <b-field horizontal label="Area" v-if="camera_areas.length != 0">
-            <b-select placeholder="Select chip area" v-model="camera_areas_selection" style="width: 100%" :disabled="subframeIsActive">
+            <b-select placeholder="Select chip area" v-model="camera_areas_selection" style="width: 100%">
               <option
                 v-for="(area, index) in camera_areas"
                 v-bind:value="area"
@@ -246,10 +246,11 @@
             </b-select>
         </b-field>
   
-        <b-field horizontal label="Subframe" v-if="subframeIsActive">
-          <p>Enabled</p>
+        <b-field horizontal label="Subframe">
+          <p>{{ subframeIsActive ? "Active" : "Not Active"}}</p>
           <p>({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
-          <button class="button" @click="function(){subframeIsActive = false}"> deactivate </button>
+          <button class="button" v-if="subframeIsActive" @click="function(){subframeIsActive = false}"> deactivate </button>
+          <button class="button" v-if="!subframeIsActive" @click="function(){subframeIsActive = true}"> activate </button>
         </b-field>
 
 

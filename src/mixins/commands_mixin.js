@@ -321,9 +321,10 @@ export const commands_mixin = {
                 filter: this.filter_wheel_options_selection,
                 size: this.camera_areas_selection,
                 dither: this.cam_dither,
+                size: this.camera_areas_selection,
             }
 
-            // Either use a custom subframe, of default to the chip area parameter.
+            // If active, add subframe parameters.
             if (this.subframeIsActive) {
                 opt_params["subframe"] = {
                     "definedOnThisFile": this.subframeDefinedWithFile,
@@ -331,10 +332,6 @@ export const commands_mixin = {
                     "y0": this.subframe_y0,
                     "x1": this.subframe_x1,
                     "y1": this.subframe_y1,
-                }
-            } else {
-                opt_params["area"] = {
-                    size: this.camera_areas_selection
                 }
             }
             return this.base_command( 'camera', 'expose', 'expose', 
