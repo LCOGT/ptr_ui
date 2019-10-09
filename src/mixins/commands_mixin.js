@@ -171,11 +171,29 @@ export const commands_mixin = {
             'global_config',
         ]),
 
+        ...mapGetters('command_params', [
+            'subframeIsActive',
+            'subframeDefinedWithFile',
+            'subframe_x0',
+            'subframe_y0',
+            'subframe_x1',
+            'subframe_y1',
+        ]),
+
         // Getters for click coordinates on the sky chart.
         ...mapGetters('skyChart', {
             chart_selectedRa: 'selectedRa',
             chart_selectedDec: 'selectedDec',
         }),
+
+        ...mapGetters('command_params', [
+            'subframeIsActive',
+            'subframdeDefinedWithFile',
+            'subframe_x0',
+            'subframe_y0',
+            'subframe_x1',
+            'subframe_y1',
+        ]),
 
         /**
          * The `..._selection` computed properties are used for two way
@@ -293,19 +311,31 @@ export const commands_mixin = {
          * and url to send it.
          */
         camera_expose_command () {
-            return this.base_command( 'camera', 'expose', 'expose',
-                { 
-                    time: this.cam_exposure,
-                    image_type: this.cam_image_type,
-                },
-                {
-                    count: this.cam_count.toString(),
-                    bin: this.cam_bin,
-                    filter: this.filter_wheel_options_selection,
-                    size: this.camera_areas_selection,
-                    dither: this.cam_dither,
+            let req_params = {
+                time: this.cam_exposure,
+                image_type: this.cam_image_type,
+            }
+            let opt_params = {
+                count: this.cam_count.toString(),
+                bin: this.cam_bin,
+                filter: this.filter_wheel_options_selection,
+                size: this.camera_areas_selection,
+                dither: this.cam_dither,
+                size: this.camera_areas_selection,
+            }
+
+            // If active, add subframe parameters.
+            if (this.subframeIsActive) {
+                opt_params["subframe"] = {
+                    "definedOnThisFile": this.subframeDefinedWithFile,
+                    "x0": this.subframe_x0,
+                    "y0": this.subframe_y0,
+                    "x1": this.subframe_x1,
+                    "y1": this.subframe_y1,
                 }
-            )
+            }
+            return this.base_command( 'camera', 'expose', 'expose', 
+                                       req_params, opt_params)
         },
         camera_cancel_command () {
             return this.base_command( 'camera', 'stop', 'cancel' )
