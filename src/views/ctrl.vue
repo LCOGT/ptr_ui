@@ -234,7 +234,7 @@
         </b-field>
 
         <b-field horizontal label="Area" v-if="camera_areas.length != 0">
-            <b-select placeholder="Select chip area" v-model="camera_areas_selection" style="width: 100%">
+            <b-select placeholder="Select chip area" v-model="camera_areas_selection" style="width: 100%" :disabled="subframeIsActive">
               <option
                 v-for="(area, index) in camera_areas"
                 v-bind:value="area"
@@ -245,6 +245,13 @@
               </option>
             </b-select>
         </b-field>
+  
+        <b-field horizontal label="Subframe" v-if="subframeIsActive">
+          <p>Enabled</p>
+          <p>({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
+          <button class="button" @click="function(){subframeIsActive = false}"> disable </button>
+        </b-field>
+
 
         <b-field horizontal label="Image Type">
           <b-select placeholder="Select image type" v-model="cam_image_type">
@@ -512,6 +519,8 @@ export default {
       // Toggles the script settings visiblity
       isScriptSettingsActive: false,
 
+      testSubframeIsActive: false,
+
     }
   },
 
@@ -576,7 +585,8 @@ export default {
     selected_script: {
       get() { return this.$store.getters['selectedScript']},
       set(val) { this.$store.commit('selectedScript', val)},
-    }
+    },
+
   },
 
 }

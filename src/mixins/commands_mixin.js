@@ -171,6 +171,15 @@ export const commands_mixin = {
             'global_config',
         ]),
 
+        ...mapGetters('command_params', [
+            'subframeIsActive',
+            'subframeDefinedWithFile',
+            'subframe_x0',
+            'subframe_y0',
+            'subframe_x1',
+            'subframe_y1',
+        ]),
+
         // Getters for click coordinates on the sky chart.
         ...mapGetters('skyChart', {
             chart_selectedRa: 'selectedRa',
@@ -192,6 +201,30 @@ export const commands_mixin = {
             get() { return this.$store.getters['observatory_configuration/camera_areas_selection'] },
             //get() { return this.camera_areas[0] },
             set(val) {this.$store.commit('observatory_configuration/setCameraAreasSelection', val)}
+        },
+        subframeIsActive: {
+            get() { return this.$store.getters['command_params/subframeIsActive']},
+            set(val) { this.$store.commit('command_params/subframeIsActive', val)},
+        },
+        subframeDefinedWithFile: {
+            get() { return this.$store.getters['command_params/subframeDefinedWithFile']},
+            set(val) { this.$store.commit('command_params/subframeDefinedWithFile', val)},
+        },
+        subframe_x0: {
+            get() { return this.$store.getters['command_params/subframe_x0']},
+            set(val) { this.$store.commit('command_params/subframe_x0', val)},
+        },
+        subframe_y0: {
+            get() { return this.$store.getters['command_params/subframe_y0']},
+            set(val) { this.$store.commit('command_params/subframe_y0', val)},
+        },
+        subframe_x1: {
+            get() { return this.$store.getters['command_params/subframe_x1']},
+            set(val) { this.$store.commit('command_params/subframe_x1', val)},
+        },
+        subframe_y1: {
+            get() { return this.$store.getters['command_params/subframe_y1']},
+            set(val) { this.$store.commit('command_params/subframe_y1', val)},
         },
 
 
@@ -293,26 +326,34 @@ export const commands_mixin = {
          * and url to send it.
          */
         camera_expose_command () {
-            return this.base_command( 'camera', 'expose', 'expose',
-                { 
-                    time: this.cam_exposure,
-                    image_type: this.cam_image_type,
-                },
-                {
-                    count: this.cam_count.toString(),
-                    bin: this.cam_bin,
-                    filter: this.filter_wheel_options_selection,
-                    size: this.camera_areas_selection,
-                    dither: this.cam_dither,
-                    //subframe_custom: {
-                        //"reference_image": "sldkfj",
-                        //"x0": 0,
-                        //"x1": 1,
-                        //"y0": 0,
-                        //"y1": 1,
-                    //},
+            let req_params = {
+                time: this.cam_exposure,
+                image_type: this.cam_image_type,
+            }
+            let opt_params = {
+                count: this.cam_count.toString(),
+                bin: this.cam_bin,
+                filter: this.filter_wheel_options_selection,
+                size: this.camera_areas_selection,
+                dither: this.cam_dither,
+            }
+
+            // Either use a custom subframe, of default to the chip area parameter.
+            if (this.subframeIsActive) {
+                opt_params["subframe"] = {
+                    "definedOnThisFile": this.subframeDefinedWithFile,
+                    "x0": this.subframe_x0,
+                    "y0": this.subframe_y0,
+                    "x1": this.subframe_x1,
+                    "y1": this.subframe_y1,
                 }
-            )
+            } else {
+                opt_params["area"] = {
+                    size: this.camera_areas_selection
+                }
+            }
+            return this.base_command( 'camera', 'expose', 'expose', 
+                                       req_params, opt_params)
         },
         camera_cancel_command () {
             return this.base_command( 'camera', 'stop', 'cancel' )
