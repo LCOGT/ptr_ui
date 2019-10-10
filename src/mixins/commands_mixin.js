@@ -193,6 +193,7 @@ export const commands_mixin = {
             'subframe_y0',
             'subframe_x1',
             'subframe_y1',
+            'camera_hint',
         ]),
         ...mapGetters('auth', [
             'username',
@@ -325,6 +326,7 @@ export const commands_mixin = {
                 size: this.camera_areas_selection,
                 dither: this.cam_dither,
                 size: this.camera_areas_selection,
+                hint: this.camera_hint,
                 username: this.username,
             }
 

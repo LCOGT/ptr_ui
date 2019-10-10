@@ -15,6 +15,8 @@ const state = {
     subframe_y0: 0,
     subframe_x1: 1,
     subframe_y1: 1,
+
+    camera_hint: '',
 }
 
 const getters = {
@@ -24,6 +26,8 @@ const getters = {
     subframe_y0: state => state.subframe_y0,
     subframe_x1: state => state.subframe_x1,
     subframe_y1: state => state.subframe_y1,
+
+    camera_hint: state => state.camera_hint,
 }
 
 const actions = {
@@ -48,6 +52,8 @@ const mutations = {
     subframe_y0 (state, val) { state.subframe_y0 = val; },
     subframe_x1 (state, val) { state.subframe_x1 = val; },
     subframe_y1 (state, val) { state.subframe_y1 = val; },
+
+    camera_hint (state, val) { state.camera_hint = val; },
 }
 
 export default {
