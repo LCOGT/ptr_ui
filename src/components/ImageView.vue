@@ -14,7 +14,7 @@
         <button class="button" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
 
         <b-tooltip label="download fits file" position="is-right" type="is-black">
-          <a class="button has-text-white" :href="current_image.fits13_url" download><b-icon icon="cloud-download" /></a>
+          <a class="button has-text-white" @click="getFits13Url(current_image)"><b-icon icon="cloud-download" /></a>
         </b-tooltip>
       </div>
 
@@ -94,7 +94,6 @@
             <JS9/>
             <div style="display: flex; justify-content: space-between;">
                 <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
-                <p> {{current_image.base_filename}} </p>
             </div>
         </div>
 
@@ -121,6 +120,7 @@
               
         </div>
     </div>
+    <p>{{current_image}}</p>
     </div>
     
 </template>
@@ -506,7 +506,23 @@ export default {
 
     setPreviousImage() {
       this.$store.dispatch("images/set_previous_image");
-    }
+    },
+
+    async getFits13Url(image) {
+      console.log('Image download requested.')
+
+      // Get image information for path construction
+      let site = image.site
+      let base_filename = image.base_filename
+
+      // Get the global configuration for all sites from an api call.
+      let apiName = this.$store.getters['dev/api'];
+      let path = `/fits13_url/${site}/${base_filename}/`;
+
+      const fits13Url = await API.get(apiName, path);
+      window.location.assign(fits13Url);
+  },
+    
   },
   computed: {
     active_site: {

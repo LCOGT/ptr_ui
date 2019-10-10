@@ -156,12 +156,7 @@ export default {
                 this.filter = true;
             }
         },
-        filterImages() {
-            if (this.start_date && this.end_date) {
-                let imgs = []
-                
-            }
-        },
+
     },
 
     computed: {
