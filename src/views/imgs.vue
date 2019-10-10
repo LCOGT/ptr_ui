@@ -27,7 +27,8 @@
       </b-field>-->
 
       <!-- The actual image view component -->
-      <image-view v-bind:site="active_site"/>
+      <!--image-view v-bind:site="active_site"/-->
+      <j-s9 />
 
     </div>
     <div class="nav-panel column is-two-fifths" style="padding: 2em;">  

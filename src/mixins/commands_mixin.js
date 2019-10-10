@@ -194,6 +194,9 @@ export const commands_mixin = {
             'subframe_x1',
             'subframe_y1',
         ]),
+         ...mapGetters('auth', [
+            'username',
+         ]),
 
         /**
          * The `..._selection` computed properties are used for two way
@@ -322,6 +325,7 @@ export const commands_mixin = {
                 size: this.camera_areas_selection,
                 dither: this.cam_dither,
                 size: this.camera_areas_selection,
+                user: this.username,
             }
 
             // If active, add subframe parameters.

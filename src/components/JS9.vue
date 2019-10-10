@@ -1,6 +1,7 @@
 <template>
 
 <div class="Analysis">
+  <p>js9</p>
     <div class="JS9Menubar" data-width="768px"></div>
     <div class="JS9Toolbar" data-width="768px"></div>
     <div class="JS9" data-width="768px" data-height="768px"></div>
@@ -9,9 +10,9 @@
 </template>
 
 <script>
-import { fabric } from "fabric";
 import { API } from "aws-amplify";
 import $ from 'jquery'
+import { fabric } from "fabric";
 
 export default {
   name: "JS9",
@@ -57,35 +58,45 @@ export default {
 
     //this.loadScript('https://ptr-js9.s3.amazonaws.com/js9prefs.js')
     
+  },
+  mounted() {
+
+
     let js9prefs= document.createElement("script");
-    js9prefs.setAttribute(
-      "src",
-      "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9prefs.js"
-    );
+    js9prefs.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9prefs.js"
+    js9prefs.async = false
+    //js9prefs.setAttribute(
+      //"src",
+      //"http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9prefs.js"
+    //);
     document.head.appendChild(js9prefs);
 
     let js9support = document.createElement("script");
-    js9support.setAttribute(
-      "src",
-      "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9support.min.js"
-    );
+    js9support.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9support.min.js"
+    js9support.async = false
+    //js9support.setAttribute(
+      //"src",
+      //"http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9support.min.js"
+    //);
     document.head.appendChild(js9support);
 
     let js9 = document.createElement("script");
-    js9.setAttribute(
-      "src",
-      "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9.min.js"
-    );
+    js9.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9.min.js"
+    js9.async = false
+    //js9.setAttribute(
+      //"src",
+      //"http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9.min.js"
+    //);
     document.head.appendChild(js9);
 
-    let js9PluginsJS = document.createElement("script");
-    js9PluginsJS.setAttribute(
-      "src",
-      "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9plugins.js"
-    );
-    document.head.appendChild(js9PluginsJS);
-  },
-  mounted() {
+    let js9plugins = document.createElement("script");
+    js9plugins.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9plugins.js"
+    js9plugins.async = false
+    //js9plugins.setAttribute(
+      //"src",
+      //"http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9plugins.js"
+    //);
+    document.head.appendChild(js9plugins);
 
   },
 
