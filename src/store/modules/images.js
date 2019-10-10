@@ -44,7 +44,6 @@ const actions = {
         });
     },
 
-
     /**
      *  This action will retrieve a list of the latest images (from the api).
      */
