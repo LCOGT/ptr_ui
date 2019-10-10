@@ -120,7 +120,6 @@
               
         </div>
     </div>
-    <p>{{current_image}}</p>
     </div>
     
 </template>
