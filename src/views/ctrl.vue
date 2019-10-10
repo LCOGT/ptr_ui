@@ -234,7 +234,11 @@
         </b-field>
 
         <b-field horizontal label="Area" v-if="camera_areas.length != 0">
-            <b-select placeholder="Select chip area" v-model="camera_areas_selection" style="width: 100%">
+            <b-select 
+              placeholder="Select chip area" 
+              v-model="camera_areas_selection" 
+              style="width: 100%"
+              >
               <option
                 v-for="(area, index) in camera_areas"
                 v-bind:value="area"
@@ -568,6 +572,13 @@ export default {
     },
   },
 
+  watch: {
+    // If the user changes the chip area parameter, deactivate the subframe.
+    camera_areas_selection: function(newVal, oldVal) {
+      console.log("watched value triggered")
+      this.subframeIsActive = false;
+    }
+  },
 
   computed: {
 
