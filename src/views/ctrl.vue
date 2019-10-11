@@ -144,10 +144,10 @@
         <div class="title">Telescope</div>
 
         <b-field horizontal label="Ra">
-          <b-input name="subject" size="is-small" v-model="slew_ra" autocomplete="off"></b-input>
+          <b-input name="subject" size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
         </b-field>
         <b-field horizontal label="Dec">
-          <b-input name="subject" size="is-small" v-model="slew_dec" autocomplete="off"></b-input>
+          <b-input name="subject" size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
         </b-field>
 
         <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>
@@ -196,14 +196,14 @@
 
         <b-field horizontal label="Expose">
             <b-field>
-                <b-input name="subject" size="is-small" v-model="cam_exposure" autocomplete="off"></b-input>
+                <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
                 <p class="control"> <span class="button is-static is-small">s</span> </p>
             </b-field>
         </b-field>
 
         <b-field horizontal label="Count">
             <b-field>
-                <b-numberinput name="subject" type="is-light" min="1" size="is-small" controls-position="compact" v-model="cam_count" autocomplete="off"></b-numberinput>
+                <b-numberinput name="subject" type="is-light" min="1" size="is-small" controls-position="compact" v-model="camera_count" autocomplete="off"></b-numberinput>
             </b-field>
         </b-field>
 
@@ -260,9 +260,9 @@
 
 
         <b-field horizontal label="Image Type">
-          <b-select placeholder="Select image type" v-model="cam_image_type" size="is-small">
+          <b-select placeholder="Select image type" v-model="camera_image_type" size="is-small">
             <option
-              v-for="(image_type, index) in cam_image_type_options"
+              v-for="(image_type, index) in camera_image_type_options"
               v-bind:value="image_type"
               v-bind:selected="index === 0"
               v-bind:key="index"
@@ -274,27 +274,27 @@
 
         <b-field horizontal label="Dither">
           <b-checkbox
-            v-model="cam_dither"
+            v-model="camera_dither"
             true-value="on"
             false-value="off"
             >
-            {{ cam_dither }}
+            {{ camera_dither }}
           </b-checkbox>
         </b-field>
 
         <b-field horizontal label="Bin" v-if="camera_can_bin=='True'">
             <b-field>
-            <b-radio-button v-model="cam_bin"
+            <b-radio-button v-model="camera_bin"
                 native-value="1"
                 type="is-white is-outlined">
                 1x
             </b-radio-button>
-            <b-radio-button v-model="cam_bin"
+            <b-radio-button v-model="camera_bin"
                 native-value="2"
                 type="is-white is-outlined">
                 2x
             </b-radio-button>
-            <b-radio-button v-model="cam_bin"
+            <b-radio-button v-model="camera_bin"
                 native-value="4"
                 type="is-white is-outlined">
                 4x
@@ -408,14 +408,14 @@
 
           <b-field label="Relative">
             <b-field>
-              <b-input expanded name="subject" size="is-small" v-model="focus_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
+              <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="focus_relative_command" class="is-small"/>  </p><br>
             </b-field>
           </b-field>
 
           <b-field label="Absolute">
             <b-field>
-              <b-input expanded name="subject" size="is-small" v-model="focus_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+              <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
             </b-field>
           </b-field>
@@ -426,13 +426,13 @@
           <br>
           <b-field label="Relative">
             <b-field>
-              <b-input expanded size="is-small" name="subject" v-model="rotate_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <b-input expanded size="is-small" name="subject" v-model="rotator_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
             </b-field>
           </b-field>
           <b-field label="Absolute">
             <b-field>
-              <b-input expanded size="is-small" name="subject" v-model="rotate_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <b-input expanded size="is-small" name="subject" v-model="rotator_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
             </b-field>
           </b-field>
@@ -609,16 +609,78 @@ export default {
       set(val) { this.$store.commit('selectedScript', val)},
     },
 
+
+    // command_params
+    mount_ra: {
+        get() { return this.$store.getters['command_params/mount_ra']},
+        set(val) { this.$store.commit('command_params/mount_ra', val)},
+    },
+    mount_dec: {
+        get() { return this.$store.getters['command_params/mount_dec']},
+        set(val) { this.$store.commit('command_params/mount_dec', val)},
+    },
+
     subframeIsActive: {
         get() { return this.$store.getters['command_params/subframeIsActive']},
         set(val) { this.$store.commit('command_params/subframeIsActive', val)},
     },
 
+    camera_areas_selection: {
+        get() { return this.$store.getters['command_params/camera_areas_selection'] },
+        set(val) {this.$store.commit('command_params/camera_areas_selection', val)}
+    },
     camera_hint: {
         get() { return this.$store.getters['command_params/camera_hint']},
         set(val) { this.$store.commit('command_params/camera_hint', val)},
-    }
+    },
+    camera_exposure: {
+        get() { return this.$store.getters['command_params/camera_exposure'] },
+        set(val) {this.$store.commit('command_params/camera_exposure', val)}
+    },
+    camera_count: {
+        get() { return this.$store.getters['command_params/camera_count'] },
+        set(val) {this.$store.commit('command_params/camera_count', val)}
+    },
+    camera_bin: {
+        get() { return this.$store.getters['command_params/camera_bin'] },
+        set(val) {this.$store.commit('command_params/camera_bin', val)}
+    },
+    camera_dither: {
+        get() { return this.$store.getters['command_params/camera_dither'] },
+        set(val) {this.$store.commit('command_params/camera_dither', val)}
+    },
+    camera_image_type: {
+        get() { return this.$store.getters['command_params/camera_image_type'] },
+        set(val) {this.$store.commit('command_params/camera_image_type', val)}
+    },
 
+    filter_wheel_options_selection: {
+        get() { return this.$store.getters['command_params/filter_wheel_options_selection'] },
+        set(val) { this.$store.commit('command_params/filter_wheel_options_selection', val) }
+    },
+
+    focuser_relative: {
+        get() { return this.$store.getters['command_params/focuser_relative'] },
+        set(val) {this.$store.commit('command_params/focuser_relative', val)}
+    },
+    focuser_absolute: {
+        get() { return this.$store.getters['command_params/focuser_absolute'] },
+        set(val) {this.$store.commit('command_params/focuser_absolute', val)}
+    },
+
+    rotator_relative: {
+        get() { return this.$store.getters['command_params/rotator_relative'] },
+        set(val) {this.$store.commit('command_params/rotator_relative', val)}
+    },
+    rotator_absolute: {
+        get() { return this.$store.getters['command_params/rotator_absolute'] },
+        set(val) {this.$store.commit('command_params/rotate_absolute', val)}
+    },
+
+    screen_brightness: {
+        get() { return this.$store.getters['command_params/screen_brightness'] },
+        set(val) {this.$store.commit('command_params/screen_brightness', val)}
+    },
   },
 
 }
