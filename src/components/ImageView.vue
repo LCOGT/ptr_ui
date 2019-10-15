@@ -1,5 +1,5 @@
 <template>
-    <div id="component" >
+    <div id="component" v-on:keyup.right="setNextImage" v-on:keyup.left="setPreviousImage" >
       <div id="image-window" v-if="!this.analyze">
 
     <div class="controls level is-mobile">
@@ -14,30 +14,44 @@
         <button class="button" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
 
         <b-tooltip label="download fits file" position="is-right" type="is-black">
-          <a class="button has-text-white" :href="current_image.fits13_url" download><b-icon icon="cloud-download" /></a>
+          <a class="button has-text-white" @click="getFits13Url(current_image)"><b-icon icon="cloud-download" /></a>
         </b-tooltip>
       </div>
 
       <div class="level-right right-controls">
         <div class="level-item">
-        <b-field horizontal label="crosshairs">
-            <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
-        </b-field>
+          <b-field label="subframe active">
+              <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
+          </b-field>
+        </div>
+        <div class="level-item">
+          <b-field label="subframe visible">
+              <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
+          </b-field>
+        </div>
+        <div class="level-item">
+          <b-field label="crosshairs">
+              <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
+          </b-field>
         </div>
       </div>
 
     </div>
 
     <div class="image-div">
-
         <svg id='image_svg' ref="svgElement">
             <!-- NOTE: image width and heigh must be set explicitly to work in firefox -->
             <!-- These values are changed programatically to work with dynamic window sizes. -->
-            <image height="1px" width="1px" ref="image" :href="current_image.jpg13_url"></image>
+            <image 
+              :class="{'image-div-pointer-cross':subframeIsVisible}" 
+              height="1px" width="1px" 
+              ref="image" 
+              :href="current_image.jpg13_url" />
         </svg>
 
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-            <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
+            <!--p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p-->
+            <p>{{ current_image.exposure_time }} seconds  |  {{current_image.filter_used}} </p>
             <p> {{current_image.base_filename}} </p>
         </div>
     </div>
@@ -76,11 +90,10 @@
 
         <div class="image-div">
 
-            <div id="svg_container"></div>
+            <div id="svg_container" />
             <JS9/>
             <div style="display: flex; justify-content: space-between;">
                 <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
-                <p> {{current_image.base_filename}} </p>
             </div>
         </div>
 
@@ -115,10 +128,10 @@
 import { API, Auth } from "aws-amplify";
 import wcs from "@/utils/pix2wcs";
 import { mapGetters } from "vuex";
-import * as d3 from "d3";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
 import JS9 from "@/components/JS9";
+import * as d3 from "d3";
 
 export default {
   name: "ImageView",
@@ -134,23 +147,34 @@ export default {
       // The image that is selected and visible in the main viewer.
       active_image: "",
 
-      image_length: 768,
       image_element: "#image_svg",
 
       // Width of image in UI
-      imageWidth: 0,
-      imageHeight: 0,
+      imageWidth: 1,
+      imageHeight: 1,
 
+      // Mouse position, in px, on the image window
       mouseX: 0,
       mouseY: 0,
 
-      mouseRa: 0,
-      mouseDec: 0,
-
       analyze: false,
+
+      // The subframe rectangle svg element
+      subframeSVG: '',
+      // Toggles whether the subframe is visible or not
+      subframeIsVisible: false,
+      // (X,Y) and (X2,Y2) define the corners of the subframe rectangle
+      // TODO: change to relative values, not pixels
+      subframeX: -1,
+      subframeY: -1,
+      subframeX2: -1,
+      subframeY2: -1,
+      // Defines when the user is dragging the mouse (for drawing the rectangle)
+      mouseIsDown: false,
 
       // This is modified by the crosshairs switch and controls whether the crosshairs are visible.
       show_crosshairs: false,
+      crosshair_color: "#32cd32",
 
       // Timer (setTimeout object) to clear the right click marker after a few seconds.
       context_marker_timer: "",
@@ -187,21 +211,91 @@ export default {
     site: function(newVal, oldVal) {
       this.$store.commit("observatory_configuration/setActiveSite", newVal);
       this.$store.dispatch("images/refresh_latest_images");
-    }
+    },
+
+    // Toggle whether the subframe box is displayed or not
+    subframeIsVisible: function(newVal, oldVal) {
+      if (newVal) {
+        this.subframeSVG
+          .style("display","block")
+          .attr("class","image-div-pointer-cross")
+      }
+      else {
+        this.subframeSVG
+          .style("display", "none")
+      }
+    },
+
   },
 
   mounted() {
-    let that = this;
-    d3
-      .select(this.image_element)
+    this.init()
+  },
 
-      // Track mouse coordinates
-      .on("mouseover", function(d, i) {
-        d3.select(this).on("mousemove", function(d, i) {
-          let coords = d3.mouse(this);
-          that.mouseX = coords[0];
-          that.mouseY = coords[1];
-        });
+  methods: {
+
+  init() {
+    let that = this;
+
+    // Initialize subframe rectangle
+    const rect = [{"x":0, "y":0}]
+    d3.select(this.image_element)
+      .selectAll("subframeBox")
+      .data(rect)
+      .join("rect")
+        .attr("id", "subframeSVG")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y)
+        .attr("width", 0)
+        .attr("height", 0)
+        .style("display","none")
+        .style("stroke", "red")
+        .style("stroke-width", 1)
+        .style("fill", "none")
+        .style("cursor", "crosshair")
+
+    that.subframeSVG = d3.select("#subframeSVG")
+
+    // Event actions to perform on the image window element
+    d3.select(this.image_element)
+
+      .on("mousedown", function() {
+
+        // start drawing a subframe box if subframe mode is active.
+        if (that.subframeIsVisible) {
+          that.mouseIsDown = true;
+          let mClick = d3.mouse(this)
+          that.subframe_x0 = mClick[0] / that.imageWidth
+          that.subframe_y0 = mClick[1] / that.imageHeight
+          that.subframe_x1 = mClick[0] / that.imageWidth
+          that.subframe_y1 = mClick[1] / that.imageHeight
+          that.drawSubframe()
+        }
+      })
+
+      .on("mousemove", function() {
+        // coordinates of current mouse position
+        let mDrag = d3.mouse(this)
+
+        // log the current mouse coordinates
+        that.mouseX = mDrag[0]
+        that.mouseY = mDrag[1]
+
+        // if subframe mode is active, and the mouse is dragging, 
+        // save the current coordinates and draw them as a rectangle.
+        if (that.subframeIsVisible && that.mouseIsDown) {
+          //let mDrag = d3.mouse(this)
+          that.subframe_x1 = mDrag[0] / that.imageWidth
+          that.subframe_y1 = mDrag[1] / that.imageHeight
+          that.drawSubframe()
+        }
+      })
+
+      // Defines the end of a drag event.
+      .on("mouseup", function() {
+        that.mouseIsDown = false;
+        that.subframeIsActive = true;
+        that.subframeDefinedWithFile = that.current_image.base_filename
       })
 
       // Respond to right clicks
@@ -233,10 +327,23 @@ export default {
 
         // Don't open the usual right-click menu
         d3.event.preventDefault();
-      });
-  },
+      })
+    }, 
 
-  methods: {
+    // Subframe stuff
+    drawSubframe() {
+      let minX = this.imageWidth * Math.min(this.subframe_x0, this.subframe_x1) 
+      let minY = this.imageHeight * Math.min(this.subframe_y0, this.subframe_y1) 
+      let width = this.imageWidth * Math.abs(this.subframe_x0 - this.subframe_x1)
+      let height = this.imageHeight * Math.abs(this.subframe_y0 - this.subframe_y1) 
+      d3.select("#subframeSVG")
+        .attr("x", minX)
+        .attr("y", minY)
+        .attr("width",width)
+        .attr("height", height)
+    },
+
+    // Resize the image element to fit the browser window
     get_image_element_dimensions() {
       // WARNING: this may have bugs if image is not a square.
       // See the final line of this function (imageEl.setAtt...).
@@ -245,9 +352,11 @@ export default {
       this.imageHeight = imageRect.height;
 
       let svgRect = this.$refs.svgElement.getBoundingClientRect();
-      let imageEl = this.$refs.image;
-      imageEl.setAttribute("width", svgRect.width);
-      imageEl.setAttribute("height", svgRect.width);
+      let imageEl = this.$refs.image
+      imageEl.setAttribute("width", svgRect.width)
+      imageEl.setAttribute("height", svgRect.width)
+
+      this.drawSubframe()
     },
 
     send_pixels_center_command(pixels, filename) {
@@ -347,25 +456,29 @@ export default {
         d3
           .select(elem)
           .append("line")
+          .attr("class", "crosshairs")
           .attr("x1", this.imageWidth / 2)
           .attr("y1", 0)
           .attr("x2", this.imageWidth / 2)
           .attr("y2", this.imageHeight)
           .attr("id", "crosshair_vertical")
-          .attr("stroke", "red");
+          .attr("stroke-width", 2)
+          .attr("stroke", this.crosshair_color);
         d3
           .select(elem)
           .append("line")
+          .attr("class", "crosshairs")
           .attr("y1", this.imageHeight / 2)
           .attr("x1", 0)
           .attr("y2", this.imageHeight / 2)
           .attr("x2", this.imageWidth)
           .attr("id", "crosshair_horizontal")
-          .attr("stroke", "red");
+          .attr("stroke-width", 2)
+          .attr("stroke", this.crosshair_color);
       } else {
         d3
           .select(elem)
-          .selectAll("line")
+          .selectAll(".crosshairs")
           .remove();
       }
     },
@@ -397,7 +510,23 @@ export default {
 
     setPreviousImage() {
       this.$store.dispatch("images/set_previous_image");
-    }
+    },
+
+    async getFits13Url(image) {
+      console.log('Image download requested.')
+
+      // Get image information for path construction
+      let site = image.site
+      let base_filename = image.base_filename
+
+      // Get the global configuration for all sites from an api call.
+      let apiName = this.$store.getters['dev/api'];
+      let path = `/fits13_url/${site}/${base_filename}/`;
+
+      const fits13Url = await API.get(apiName, path);
+      window.location.assign(fits13Url);
+  },
+    
   },
   computed: {
     active_site: {
@@ -412,7 +541,33 @@ export default {
     ...mapGetters("images", {
       recent_images: "recent_images",
       current_image: "current_image"
-    })
+    }),
+
+    subframeIsActive: {
+        get() { return this.$store.getters['command_params/subframeIsActive']},
+        set(val) { this.$store.commit('command_params/subframeIsActive', val)},
+    },
+    subframeDefinedWithFile: {
+        get() { return this.$store.getters['command_params/subframeDefinedWithFile']},
+        set(val) { this.$store.commit('command_params/subframeDefinedWithFile', val)},
+    },
+    subframe_x0: {
+        get() { return this.$store.getters['command_params/subframe_x0']},
+        set(val) { this.$store.commit('command_params/subframe_x0', val)},
+    },
+    subframe_y0: {
+        get() { return this.$store.getters['command_params/subframe_y0']},
+        set(val) { this.$store.commit('command_params/subframe_y0', val)},
+    },
+    subframe_x1: {
+        get() { return this.$store.getters['command_params/subframe_x1']},
+        set(val) { this.$store.commit('command_params/subframe_x1', val)},
+    },
+    subframe_y1: {
+        get() { return this.$store.getters['command_params/subframe_y1']},
+        set(val) { this.$store.commit('command_params/subframe_y1', val)},
+    },
+
   }
 };
 </script>
@@ -442,15 +597,12 @@ export default {
   margin-top: 1em;
   overflow-x: auto;
 }
-.left-controls > * {
-  margin-right: 5px;
-}
-.right-controls > * {
-  margin-left: 5px;
-}
 
 .image-div {
   padding-bottom: 1em;
+}
+.image-div-pointer-cross:hover {
+  cursor:crosshair;
 }
 #image_svg {
   width: 100%;

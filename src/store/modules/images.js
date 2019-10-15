@@ -7,20 +7,19 @@ import { API } from 'aws-amplify'
 
 const state = {
 
-    // recent_images is updated whenever the action 'refresh_latest_images' is called.
-    recent_images: [],
-
     // 'current_image' defines what image is currently displayed.
     current_image: {},
 
+    // recent_images is updated whenever the action 'refresh_latest_images' is called.
+    recent_images: [],
     // user_images a list of all a user's images associated with their account
     // TODO: Write an action that will update a user's image list when images are added to their account
     user_images: [],
 }
 
 const getters = {
-    recent_images: state => state.recent_images,
     current_image: state => state.current_image,
+    recent_images: state => state.recent_images,
     user_images: state => state.user_images,
 }
 
@@ -55,7 +54,7 @@ const actions = {
             console.log(error)
         });
     },
-
+      
     /**
      *  This action will retrieve a list of the latest images (from the api).
      */
@@ -100,7 +99,7 @@ const actions = {
     },
 
     /**
-     * Set the current image, usually to be displayed.
+     * Set the current image (usually for display).
      */
     set_current_image({ commit }, image_object) {
         commit('setCurrentImage', image_object)
@@ -143,8 +142,9 @@ const actions = {
 }
 
 const mutations = {
-    setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setCurrentImage(state, the_current_image) { state.current_image = the_current_image },
+
+    setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setUserImages(state, user_images_list) { state.user_images = user_images_list },
 }
 

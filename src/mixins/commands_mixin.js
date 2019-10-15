@@ -11,18 +11,8 @@ export const commands_mixin = {
     data() {
         return {
 
-            // Mount Fields
-            slew_ra: '',
-            slew_dec: '',
-
             // Camera Fields
-            cam_exposure: '1',
-            cam_count: 1, // numberinput form requires number, not string. converted to string in expose command.
-            cam_area: null, 
-            cam_bin: '1', 
-            cam_dither: 'off',
-            cam_image_type: 'light',
-            cam_image_type_options: [
+            camera_image_type_options: [
                 'light', 
                 'toss', 
                 'bias', 
@@ -35,18 +25,6 @@ export const commands_mixin = {
                 'ThAr flat', 
                 'solar flat',
             ],
-
-
-            // Focuser Fields
-            focus_relative: '',
-            focus_absolute: '',
-
-            // Rotator Fields
-            rotate_relative: '',
-            rotate_absolute: '',
-
-            // Screen Fields
-            screen_brightness: 100,
 
         }
     },
@@ -72,27 +50,13 @@ export const commands_mixin = {
             // Get the active device of the requested device type. 
             let device
             switch (device_type) {
-                case 'mount':
-                device = this.active_mount;
-                break;
-                case 'camera': 
-                device = this.active_camera;
-                break;
-                case 'filter_wheel':
-                device = this.active_filter_wheel;
-                break;
-                case 'rotator':
-                device = this.active_rotator;
-                break;
-                case 'focuser':
-                device = this.active_focuser;
-                break;
-                case 'screen':
-                device = this.active_screen;
-                break;
-                case 'sequencer':
-                device = 'sequencer'; 
-                break;
+                case 'mount': device = this.active_mount; break;
+                case 'camera': device = this.active_camera; break;
+                case 'filter_wheel': device = this.active_filter_wheel; break;
+                case 'rotator': device = this.active_rotator; break;
+                case 'focuser': device = this.active_focuser; break;
+                case 'screen': device = this.active_screen; break;
+                case 'sequencer': device = 'sequencer'; break;
             }
 
             let the_base_command = {
@@ -177,23 +141,38 @@ export const commands_mixin = {
             chart_selectedDec: 'selectedDec',
         }),
 
-        /**
-         * The `..._selection` computed properties are used for two way
-         * binding between vuex stored state and selections in the command
-         * fields.
-         */
-        // v-model for the filter currently selected
-        filter_wheel_options_selection: {
-            get() { return this.$store.getters['observatory_configuration/filter_wheel_options_selection'] },
-            set(val) { this.$store.commit('observatory_configuration/setFilterSelection', val) }
-        },
-        // v-model for the camera area selection
-        camera_areas_selection: {
-            get() { return this.$store.getters['observatory_configuration/camera_areas_selection'] },
-            //get() { return this.camera_areas[0] },
-            set(val) {this.$store.commit('observatory_configuration/setCameraAreasSelection', val)}
-        },
+        // User-supplied command parameters
+        ...mapGetters('command_params', [
+            'subframeIsActive',
+            'subframeDefinedWithFile',
+            'subframe_x0',
+            'subframe_y0',
+            'subframe_x1',
+            'subframe_y1',
 
+            'camera_areas_selection',
+            'camera_hint',
+            'camera_exposure',
+            'camera_count',
+            'camera_bin',
+            'camera_dither',
+            'camera_image_type',
+
+            'filter_wheel_options_selection',
+
+            'focuser_relative',
+            'focuser_absolute',
+
+            'rotator_relative',
+            'rotator_absolute',
+
+            'screen_brightness',
+        ]),
+
+        // Logged-in user info
+        ...mapGetters('auth', [
+            'username',
+        ]),
 
         // The `selected_${device}` computed properties are used for two way
         // binding between vuex (observatory_configuration module) and the device 
@@ -293,26 +272,40 @@ export const commands_mixin = {
          * and url to send it.
          */
         camera_expose_command () {
-            return this.base_command( 'camera', 'expose', 'expose',
-                { 
-                    time: this.cam_exposure,
-                    image_type: this.cam_image_type,
-                },
-                {
-                    count: this.cam_count.toString(),
-                    bin: this.cam_bin,
-                    filter: this.filter_wheel_options_selection,
-                    size: this.camera_areas_selection,
-                    dither: this.cam_dither,
+            let req_params = {
+                time: this.camera_exposure,
+                image_type: this.camera_image_type,
+            }
+            let opt_params = {
+                count: this.camera_count.toString(),
+                bin: this.camera_bin,
+                filter: this.filter_wheel_options_selection,
+                size: this.camera_areas_selection,
+                dither: this.camera_dither,
+                size: this.camera_areas_selection,
+                hint: this.camera_hint,
+                username: this.username,
+            }
+
+            // If active, add subframe parameters.
+            if (this.subframeIsActive) {
+                opt_params["subframe"] = {
+                    "definedOnThisFile": this.subframeDefinedWithFile,
+                    "x0": this.subframe_x0,
+                    "y0": this.subframe_y0,
+                    "x1": this.subframe_x1,
+                    "y1": this.subframe_y1,
                 }
-            )
+            }
+            return this.base_command( 'camera', 'expose', 'expose', 
+                                       req_params, opt_params)
         },
         camera_cancel_command () {
             return this.base_command( 'camera', 'stop', 'cancel' )
         },
         mount_slew_command () {
             return this.base_command( 'mount', 'go', 'slew to coordinates',
-                { ra: this.slew_ra, dec: this.slew_dec, }
+                { ra: this.mount_ra, dec: this.mount_dec, }
             )
         },
         mount_slew_chart_command () {
@@ -341,12 +334,12 @@ export const commands_mixin = {
         },
         focus_relative_command () {
             return this.base_command( 'focuser', 'move_relative', 'focus',
-                { position: this.focus_relative.toString(), }
+                { position: this.focuser_relative.toString(), }
             )
         },
         focus_absolute_command () {
             return this.base_command( 'focuser', 'move_absolute', 'focus',
-                { position:(this.focus_absolute).toString() } 
+                { position:(this.focuser_absolute).toString() } 
             )
         },
         focus_auto_command () {
@@ -386,12 +379,12 @@ export const commands_mixin = {
         },
         rotate_relative_command () {
             return this.base_command( 'rotator', 'move_relative', 'rotate',
-                { position: this.rotate_relative.toString() } 
+                { position: this.rotator_relative.toString() } 
             )
         },
         rotate_absolute_command () {
             return this.base_command( 'rotator', 'move_absolute', 'rotate',
-                { position: (((parseFloat(this.rotate_absolute) % 360) + 360) % 360).toString() } // avoid negative results (since -5 % 360 = -5)
+                { position: (((parseFloat(this.rotator_absolute) % 360) + 360) % 360).toString() } // avoid negative results (since -5 % 360 = -5)
             )
         },
         screen_on_command () {

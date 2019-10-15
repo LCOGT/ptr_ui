@@ -7,6 +7,7 @@ import skyChart from './modules/skyChart'
 import images from './modules/images'
 import script_settings from './modules/script_settings'
 import dev from './modules/dev'
+import command_params from './modules/command_params'
 import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
@@ -29,5 +30,6 @@ export default new Vuex.Store({
         images,
         script_settings,
         dev,
+        command_params,
     },
 })
