@@ -56,6 +56,33 @@ const actions = {
         });
     },
 
+
+    get_filtered_images({ commit, state, rootState }, filter_params) {
+        let username = "wmd_admin"
+        let apiName = rootState.dev.active_api;
+        let path = `/images/filtered_images/`;
+
+        API.get(apiName, path, filter_params).then(response => {
+            commit('setUserImages', response)
+        }).catch(error => {
+            console.log(error)
+        });
+    },
+
+
+
+    get_images_by_date_range({ commit, state, rootState }) {
+        let username = "wmd_admin" // TODO: Grab username from state
+        let apiName = rootState.dev.active_api;
+        let path = `/images_by_date_range/${username}/${start_date}/${end_date}`;
+
+        API.get(apiName, path).then(response => {
+            commit('setUserImages', response)
+        }).catch(error => {
+            console.log(error)
+        });
+    },
+
     /**
      *  This action will retrieve a list of the latest images (from the api).
      */
