@@ -16,8 +16,6 @@
         <b-tooltip label="download fits file" position="is-right" type="is-black">
           <a class="button has-text-white" :href="current_image.fits13_url" download><b-icon icon="cloud-download" /></a>
         </b-tooltip>
-        <!--div @click="setPreviousImage" class="arrow left"></div-->
-        <!--div @click="setNextImage" class="arrow right"></div-->
       </div>
 
       <div class="level-right right-controls">
@@ -164,8 +162,8 @@ export default {
       highlighted_image: 0,
 
       // Runs a function at a regular interval to update the size of the image component.
-      syncImageSize: '',
-      syncImageInterval: 1000,
+      syncImageSize: "",
+      syncImageInterval: 1000
     };
   },
   created() {
@@ -174,13 +172,15 @@ export default {
 
     // Keep the displayed image element width and height in sync.
     // This is important for relative measurements on the image (crosshairs, clicks, etc)
-    this.syncImageSize = setInterval(this.get_image_element_dimensions, this.syncImageInterval);
+    this.syncImageSize = setInterval(
+      this.get_image_element_dimensions,
+      this.syncImageInterval
+    );
   },
 
-  
   beforeDestroy() {
     // We don't need to keep the image dimensions in sync if it's not displayed.
-    clearInterval(this.syncImageSize)
+    clearInterval(this.syncImageSize);
   },
 
   watch: {
@@ -218,7 +218,12 @@ export default {
           actionText: "Slew",
           queue: false,
           onAction: () => {
-            console.log("slew to " + position[0]/that.imageWidth + ", " + position[1]/that.imageHeight);
+            console.log(
+              "slew to " +
+                position[0] / that.imageWidth +
+                ", " +
+                position[1] / that.imageHeight
+            );
             that.send_pixels_center_command(
               position,
               that.current_image.base_filename
@@ -232,49 +237,47 @@ export default {
   },
 
   methods: {
-
     get_image_element_dimensions() {
       // WARNING: this may have bugs if image is not a square.
       // See the final line of this function (imageEl.setAtt...).
       let imageRect = this.$refs.image.getBoundingClientRect();
-      this.imageWidth = imageRect.width
-      this.imageHeight = imageRect.height
+      this.imageWidth = imageRect.width;
+      this.imageHeight = imageRect.height;
 
       let svgRect = this.$refs.svgElement.getBoundingClientRect();
-      let imageEl = this.$refs.image
-      imageEl.setAttribute("width", svgRect.width)
-      imageEl.setAttribute("height", svgRect.width)
+      let imageEl = this.$refs.image;
+      imageEl.setAttribute("width", svgRect.width);
+      imageEl.setAttribute("height", svgRect.width);
     },
 
     send_pixels_center_command(pixels, filename) {
-
       let req_params = {
         //x_from_left: pixels[0],
         //y_from_top: pixels[1],
-        rel_x_pos: pixels[0]/this.imageWidth,
-        rel_y_pos: pixels[1]/this.imageHeight,
+        rel_x_pos: pixels[0] / this.imageWidth,
+        rel_y_pos: pixels[1] / this.imageHeight,
         filename: filename
       };
       let opt_params = {};
       let theCommand = {
-          url: `/${this.active_site}/${this.active_mount}/command/`,
-          http_method: 'POST',
-          form: {
-              device:"mount",
-              instance: this.active_mount,
-              timestamp: parseInt(Date.now() / 1000),
-              action: "center_on_pixels",
-              required_params: req_params,
-              optional_params: opt_params,
-          }
-      }
+        url: `/${this.active_site}/${this.active_mount}/command/`,
+        http_method: "POST",
+        form: {
+          device: "mount",
+          instance: this.active_mount,
+          timestamp: parseInt(Date.now() / 1000),
+          action: "center_on_pixels",
+          required_params: req_params,
+          optional_params: opt_params
+        }
+      };
       // Old code
       //let basecommand = this.base_command(
-        //"mount",
-        //"center_on_pixels",
-        //"center_on_pixels",
-        //req_params,
-        //opt_params
+      //"mount",
+      //"center_on_pixels",
+      //"center_on_pixels",
+      //req_params,
+      //opt_params
       //);
       let apiName = this.$store.getters["dev/api"];
       let url = theCommand.url;
@@ -356,7 +359,7 @@ export default {
           .attr("y1", this.imageHeight / 2)
           .attr("x1", 0)
           .attr("y2", this.imageHeight / 2)
-          .attr("x2", this.imageWidth )
+          .attr("x2", this.imageWidth)
           .attr("id", "crosshair_horizontal")
           .attr("stroke", "red");
       } else {
@@ -415,7 +418,6 @@ export default {
 </script>
 
 <style scoped>
-
 #component {
   display: flex;
   flex-direction: column;
@@ -427,7 +429,7 @@ export default {
   border-radius: 5px;
   display: block;
   padding: 15px;
-  background-color:  rgba(52, 60, 61, 0.733)
+  background-color: rgba(52, 60, 61, 0.733);
 }
 #js9-window {
   display: block;
@@ -438,7 +440,7 @@ export default {
   margin: 0 auto;
   max-width: 768px;
   margin-top: 1em;
-  overflow-x:auto;
+  overflow-x: auto;
 }
 .left-controls > * {
   margin-right: 5px;
@@ -451,15 +453,15 @@ export default {
   padding-bottom: 1em;
 }
 #image_svg {
-  width:100%;
+  width: 100%;
   max-width: 768px;
-  height:1px;
+  height: 1px;
   margin-bottom: 100%;
-  overflow:visible;
+  overflow: visible;
 }
 #image_svg image {
-  width:inherit;
-  height:auto;
+  width: inherit;
+  height: auto;
 }
 
 .recent_images {
@@ -481,5 +483,4 @@ export default {
 .selected_thumbnail {
   border: 2px solid gold;
 }
-
 </style>

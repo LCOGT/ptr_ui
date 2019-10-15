@@ -1,10 +1,12 @@
 <template>
     <div>      
         <div class="side-panel">
+            <ImageFilter/>
+            <br>
             <div active icon="account" label="My Account Images" :expanded="true">
                 <!--All images folder-->
-                <b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
-                    <ImageFilter/>
+                <b-collapse class="card" :open="true" aria-id="contentIdForA11y3">
+
                     <div
                         slot="trigger" 
                         slot-scope="props"
@@ -12,7 +14,7 @@
                         role="button"
                         aria-controls="contentIdForA11y3">
                         <p class="card-header-title">
-                            All Images
+                            Images
                         </p>
                         <a class="card-header-icon">
                             <b-icon
@@ -125,60 +127,44 @@ import draggable from "vuedraggable";
 import ImageFilter from "@/components/ImageFilter";
 
 export default {
-    name: 'ImageNavigationPanel',
-    components: {
-      ImageFilter
-  }
-    data() {
-        return {
-            limitNumber: 20,
-            filter: false,
-            start_date: null,
-            end_date: null,
-        };
-    },
+  name: "ImageNavigationPanel",
+  components: {
+    ImageFilter
+  },
+  data() {
+    return {
+      limitNumber: 20,
+      filter: false,
+      start_date: null,
+      end_date: null
+    };
+  },
 
   beforeMount() {
     this.$store.dispatch("images/get_user_images");
   },
 
-    beforeMount() {
-    },
+  mounted() {
+    this.$store.dispatch("images/get_user_images");
+  },
 
-    mounted() {
-        this.$store.dispatch('images/get_user_images')
+  methods: {
+    setActiveImage(image) {
+      this.$store.dispatch("images/set_current_image", image);
     },
-
-    methods: {
-        setActiveImage(image) {
-            this.$store.dispatch("images/set_current_image", image);
-        },
-        toggleFilter() {
-            if (this.filter) {
-                this.filter = false;
-            } else {
-                this.filter = true;
-            }
-        },
-        filterImages() {
-            if (this.start_date && this.end_date) {
-                let imgs = []
-                
-            }
-        },
+    toggleFilter() {
+      if (this.filter) {
+        this.filter = false;
+      } else {
+        this.filter = true;
+      }
     },
-
-    computed: {
-        ...mapGetters('images', {
-            username: 'username',
-            user_images: 'user_images',
-            current_image: "current_image"
-        }),
-        limitedItems() {
-            return this.user_images.slice(0,this.limitNumber)
-        },
-    },
-}
+    filterImages() {
+      if (this.start_date && this.end_date) {
+        let imgs = [];
+      }
+    }
+  },
 
   computed: {
     ...mapGetters("images", {
