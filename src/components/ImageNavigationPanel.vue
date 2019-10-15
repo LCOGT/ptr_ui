@@ -5,7 +5,7 @@
             <br>
             <div active icon="account" label="My Account Images" :expanded="true">
                 <!--All images folder-->
-                <b-collapse class="card" :open="true" aria-id="contentIdForA11y3">
+                <b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
 
                     <div
                         slot="trigger" 
