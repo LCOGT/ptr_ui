@@ -26,18 +26,13 @@
 
                         <b-field  label="Site">
                             <b-select v-model="site" placeholder="--" >
-                                <option>wmd
-                                </option>
+                                <option>wmd</option>
                             </b-select>
                         </b-field>
 
                         <b-field label="Filter">
                             <b-select v-model="filter" placeholder="--">
-                        <option>w</option>
-                        <option>r</option>
-                        <option>air</option>
-                        <option>HA</option>
-                        <option>dark</option>
+                                <option v-for="filter_option in filter_options">{{ filter_option }}</option>
                             </b-select>
                         </b-field>
 
@@ -81,7 +76,32 @@ export default {
       site: null,
       start_date: null,
       end_date: null,
-      filter: null
+      filter: null,
+      filter_options: [
+        "air",
+        "dif",
+        "w",
+        "ContR",
+        "N2",
+        "u",
+        "g",
+        "r",
+        "i",
+        "zs",
+        "PL",
+        "PR",
+        "PG",
+        "PB",
+        "O3",
+        "HA",
+        "S2",
+        "dif_u",
+        "dif_g",
+        "dif_r",
+        "dif_i",
+        "dif_zs",
+        "dark"
+      ]
     };
   },
 
