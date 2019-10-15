@@ -1,3 +1,7 @@
+/**
+ *  This module stores state related to development tools. 
+ */
+
 // Get the saved value of the api to use (local or not).
 function init_active_api() {
     let active_api = localStorage.getItem('ptrui-active-api') || 'ptr-api';
