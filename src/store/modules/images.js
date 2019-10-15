@@ -21,7 +21,6 @@ const state = {
 const getters = {
     recent_images: state => state.recent_images,
     current_image: state => state.current_image,
-
     user_images: state => state.user_images,
 }
 
@@ -44,28 +43,13 @@ const actions = {
         });
     },
 
-
-
+    /**
+     *  This action will retrieve a list of images filtered by the parameters in filter_params
+     */
     get_filtered_images({ commit, state, rootState }, filter_params) {
-        let username = "wmd_admin"
         let apiName = rootState.dev.active_api;
-        let path = `/images/filtered_images/`;
-
-        API.get(apiName, path, filter_params).then(response => {
-            commit('setUserImages', response)
-        }).catch(error => {
-            console.log(error)
-        });
-    },
-
-
-
-    get_images_by_date_range({ commit, state, rootState }) {
-        let username = "wmd_admin" // TODO: Grab username from state
-        let apiName = rootState.dev.active_api;
-        let path = `/images_by_date_range/${username}/${start_date}/${end_date}`;
-
-        API.get(apiName, path).then(response => {
+        let path = `/filtered_images/`;
+        API.get(apiName, path, { 'queryStringParameters': filter_params }).then(response => {
             commit('setUserImages', response)
         }).catch(error => {
             console.log(error)
