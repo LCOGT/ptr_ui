@@ -107,13 +107,6 @@ export default {
       };
 
       this.$store.dispatch("images/get_filtered_images", filterparams);
-
-      //Clear form fields after sumbit
-      this.site = null;
-      this.start_date = null;
-      this.end_date = null;
-      this.filter = null;
-      this.filename = null;
     }
   }
 };
