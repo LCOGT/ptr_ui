@@ -54,9 +54,18 @@
                             </b-datepicker>
                         </b-field>
 
+                        <div style="display: flex;">                          
                         <p>
                             <input type="submit" class="button" value="Submit">  
-                        </p>    
+                        </p>  
+                        <button
+                        @click="removeFilter"
+                        class="button"
+                        style="float: left;"
+                        aria-controls="contentIdForA11y1">
+                        <i style="font-size:14px" class="fa">&#xf0e2;</i>
+                        </button>
+                        </div> 
                     </form>
                 </div>
             </div>
@@ -106,6 +115,18 @@ export default {
   },
 
   methods: {
+    removeFilter() {
+      //Clear form fields
+      this.site = null;
+      this.start_date = null;
+      this.end_date = null;
+      this.filter = null;
+      this.filename = null;
+
+      //Get all images
+      this.$store.dispatch("images/get_user_images");
+    },
+
     onSubmit() {
       let startDate = null;
       let endDate = null;
