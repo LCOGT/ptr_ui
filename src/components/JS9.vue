@@ -2,6 +2,7 @@
 
 <div class="Analysis">
   <p>js9</p>
+    <button class="button" @click="loadImage(current_image.base_filename)">load</button>
     <div class="JS9Menubar" data-width="768px"></div>
     <div class="JS9Toolbar" data-width="768px"></div>
     <div class="JS9" data-width="768px" data-height="768px"></div>
@@ -13,13 +14,21 @@
 import { API } from "aws-amplify";
 import $ from 'jquery'
 import { fabric } from "fabric";
+import { mapGetters } from "vuex";
 
 export default {
   name: "JS9",
   data() {
     return {
       cur_img: "",
-      isSelectable: true
+      isSelectable: true,
+
+      // HTML header elements
+      js9supportcss: '',
+      js9css: '',
+      js9prefs: '',
+      js9: '',
+      js9plugins: '',
     };
   },
   beforeMount() {
@@ -60,67 +69,79 @@ export default {
     
   },
   mounted() {
+    //this.js9supportcss = document.createElement("link");
+    //this.js9supportcss.rel = "stylesheet"
+    //this.js9supportcss.class= "js9css"
+    //this.js9supportcss.type = "text/css"
+    //this.js9supportcss.href = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9support.css"
+    //this.js9supportcss.async = false
+    //document.head.appendChild(this.js9supportcss);
 
+    //this.js9css = document.createElement("link");
+    //this.js9css.rel = "stylesheet"
+    //this.js9css.class= "js9css"
+    //this.js9css.type = "text/css"
+    //this.js9css.href = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9.css"
+    //this.js9css.async = false
+    //document.head.appendChild(this.js9css);
 
-    let js9prefs= document.createElement("script");
-    js9prefs.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9prefs.js"
-    js9prefs.async = false
-    //js9prefs.setAttribute(
-      //"src",
-      //"http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9prefs.js"
-    //);
-    document.head.appendChild(js9prefs);
+    this.js9prefs= document.createElement("script");
+    this.js9prefs.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9prefs.js"
+    this.js9prefs.async = false
+    document.head.appendChild(this.js9prefs);
 
-    let js9support = document.createElement("script");
-    js9support.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9support.min.js"
-    js9support.async = false
-    //js9support.setAttribute(
-      //"src",
-      //"http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9support.min.js"
-    //);
-    document.head.appendChild(js9support);
+    this.js9support = document.createElement("script");
+    this.js9support.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9support.js"
+    this.js9support.async = false
+    document.head.appendChild(this.js9support);
 
-    let js9 = document.createElement("script");
-    js9.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9.min.js"
-    js9.async = false
-    //js9.setAttribute(
-      //"src",
-      //"http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9.min.js"
-    //);
-    document.head.appendChild(js9);
+    this.js9 = document.createElement("script");
+    this.js9.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9.js"
+    this.js9.async = false
+    document.head.appendChild(this.js9);
 
-    let js9plugins = document.createElement("script");
-    js9plugins.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9plugins.js"
-    js9plugins.async = false
-    //js9plugins.setAttribute(
-      //"src",
-      //"http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9plugins.js"
-    //);
-    document.head.appendChild(js9plugins);
+    this.js9plugins = document.createElement("script");
+    this.js9plugins.src = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9plugins.js"
+    this.js9plugins.async = false
+    document.head.appendChild(this.js9plugins);
 
+  },
+
+  beforeDestroy() {
+    //function removeHeadItem(element) {
+      //element.parentNode.removeChild(element)
+    //}
+    let remove_elements = [
+      //this.js9supportcss,
+      //this.js9css,
+      this.js9prefs,
+      this.js9support,
+      this.js9,
+      this.js9plugins,
+    ].map(element => element.parentNode.removeChild(element))
   },
 
   methods: {
-    loadScript( url, callback ) {
-      var script = document.createElement( "script" )
-      script.type = "text/javascript";
-      if(script.readyState) {  // only required for IE <9
-        script.onreadystatechange = function() {
-          if ( script.readyState === "loaded" || script.readyState === "complete" ) {
-            script.onreadystatechange = null;
-            callback();
-          }
-        };
-      } else {  //Others
-        script.onload = function() {
-          callback();
-        };
-      }
 
-      script.src = url;
-      document.getElementsByTagName( "head" )[0].appendChild( script );
+    loadImage(base_filename) {
+      let apiName = this.$store.getters['dev/api'];
+      let path = `/fits13_url/${base_filename.slice(0,3)}/${base_filename}/`;
+      console.log(path)
+
+      let fitsURL = API.get(apiName, path, {}).then(response => {
+        console.log(response)
+        JS9.Load(response)
+      })
     }
   },
+  computed: {
+
+    ...mapGetters("images", [
+      "recent_images",
+      "current_image"
+    ]),
+
+  }
 
 };
 </script>

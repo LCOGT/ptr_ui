@@ -8,29 +8,12 @@
   <div class="columns">
     <div class="img-view column is-three-fifths" style="padding: 2em;">
 
-      <!-- Select the site that you wish to view
-      <b-field class="select-device" label="Site" horizontal>
-          <b-select 
-            placeholder="choose site..." 
-            default="" 
-            v-model="active_site"
-          >
-            <option 
-              v-for="(site, index) in available_sites" 
-              v-bind:value="site"
-              v-bind:key="`site-${index}`"
-            >
-              {{ site }}
-            </option>
-          </b-select>
-          <button class="button" @click="toggleSites">toggle sites</button>
-      </b-field>-->
-
       <!-- The actual image view component -->
-      <!--image-view v-bind:site="active_site"/-->
-      <j-s9 />
+      <image-view v-bind:site="active_site"/>
+      <!--j-s9 /-->
 
     </div>
+
     <div class="nav-panel column is-two-fifths" style="padding: 2em;">  
       <!--button class="button" @click="imagesByUser">imageByUser</button-->
       <!--ImageNavigationPanel/-->

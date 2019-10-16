@@ -14,7 +14,7 @@
     "@mdi/js": "^4.4.95",
     "@shopify/draggable": "^1.0.0-beta.8",
     "amazon-cognito-identity-js": "^3.0.15",
-    "aws-amplify": "^1.1.35",
+    "aws-amplify": "^1.2.2",
     "aws-amplify-vue": "^0.2.14",
     "aws-sdk": "^2.504.0",
     "axios": "^0.18.1",
