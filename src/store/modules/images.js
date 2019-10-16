@@ -50,11 +50,12 @@ const actions = {
         let path = `/filtered_images/`;
         API.get(apiName, path, { 'queryStringParameters': filter_params }).then(response => {
             commit('setUserImages', response)
+            commit('setRecentImages', response)
         }).catch(error => {
             console.log(error)
         });
     },
-      
+
     /**
      *  This action will retrieve a list of the latest images (from the api).
      */
@@ -143,7 +144,6 @@ const actions = {
 
 const mutations = {
     setCurrentImage(state, the_current_image) { state.current_image = the_current_image },
-
     setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setUserImages(state, user_images_list) { state.user_images = user_images_list },
 }

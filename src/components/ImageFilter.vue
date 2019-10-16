@@ -125,6 +125,8 @@ export default {
 
       //Get all images
       this.$store.dispatch("images/get_user_images");
+      this.$store.dispatch("images/refresh_latest_images");
+      this.$store.dispatch("images/set_latest_image");
     },
 
     onSubmit() {
