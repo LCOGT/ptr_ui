@@ -14,7 +14,7 @@
         <button class="button" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
 
         <b-tooltip label="download fits file" position="is-right" type="is-black">
-          <a class="button has-text-white" @click="getFits13Url(current_image)"><b-icon icon="cloud-download" /></a>
+          <a class="button has-text-white" @click="downloadFits13Url(current_image)"><b-icon icon="cloud-download" /></a>
         </b-tooltip>
       </div>
 
@@ -519,8 +519,13 @@ export default {
       let path = `/fits13_url/${site}/${base_filename}/`;
 
       const fits13Url = await API.get(apiName, path);
-      window.location.assign(fits13Url);
-  },
+      return fits13Url;
+    },
+
+    async downloadFits13Url(image) {
+      let fits13url = await this.getFits13Url(image)
+      window.location.assign(fits13url)
+    },
     
   },
   computed: {
