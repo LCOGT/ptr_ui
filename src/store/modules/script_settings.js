@@ -89,6 +89,7 @@ const state = {
         'takeSkyFlats',
     ],
 
+    // This is used to fetch a user-friendly name in the UI.
     readableScriptNames: {
         takeLRGBStack: 'Take L/R/G/B Stack',
         takeO3HaS2N2Stack: 'Take O3/Ha/N2/S2 Stack',

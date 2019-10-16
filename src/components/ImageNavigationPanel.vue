@@ -50,32 +50,6 @@
                     <button class="show-more button" @click="limitNumber += 50">Show more</button>
                 </b-collapse>
                 
-                <br>
-                <p>_____________________________________________________________________________</p>
-                <br>
-                <br>
-                <button class="button" @click="toggleFilter">
-                    <b-icon icon="tune"></b-icon>
-                </button>
-                <div class="filter tools" v-if="this.filter">
-                    <b-field label="Select a start date">
-                        <b-datepicker
-                            v-model="start_date"
-                            placeholder="Click to select..."
-                            icon="calendar-today">
-                        </b-datepicker>
-                    </b-field>
-                    <b-field label="Select an end date">
-                        <b-datepicker
-                            v-model="end_date"
-                            placeholder="Click to select..."
-                            icon="calendar-today">
-                        </b-datepicker>
-                    </b-field>
-                    <button class="button" @click="filterImages">Filter</button>
-                    <p>{{start_date}}</p>
-                    <p>{{end_date}}</p>
-                </div>
                 <!--Trash folder-->
                 <!--<b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
                     <div
@@ -128,9 +102,6 @@ export default {
     data() {
         return {
             limitNumber: 20,
-            filter: false,
-            start_date: null,
-            end_date: null,
         };
     },
 
@@ -149,19 +120,7 @@ export default {
         setActiveImage(image) {
             this.$store.dispatch("images/set_current_image", image);
         },
-        toggleFilter() {
-            if (this.filter) {
-                this.filter = false;
-            } else {
-                this.filter = true;
-            }
-        },
-        filterImages() {
-            if (this.start_date && this.end_date) {
-                let imgs = []
-                
-            }
-        },
+
     },
 
     computed: {

@@ -14,7 +14,7 @@
         <button class="button" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
 
         <b-tooltip label="download fits file" position="is-right" type="is-black">
-          <a class="button has-text-white" :href="current_image.fits13_url" download><b-icon icon="cloud-download" /></a>
+          <a class="button has-text-white" @click="downloadFits13Url(current_image)"><b-icon icon="cloud-download" /></a>
         </b-tooltip>
       </div>
 
@@ -470,7 +470,28 @@ export default {
 
     setPreviousImage() {
       this.$store.dispatch("images/set_previous_image");
-    }
+    },
+
+    async getFits13Url(image) {
+      console.log('Image download requested.')
+
+      // Get image information for path construction
+      let site = image.site
+      let base_filename = image.base_filename
+
+      // Get the global configuration for all sites from an api call.
+      let apiName = this.$store.getters['dev/api'];
+      let path = `/fits13_url/${site}/${base_filename}/`;
+
+      const fits13Url = await API.get(apiName, path);
+      return fits13Url;
+    },
+
+    async downloadFits13Url(image) {
+      let fits13url = await this.getFits13Url(image)
+      window.location.assign(fits13url)
+    },
+    
   },
   computed: {
     active_site: {
