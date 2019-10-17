@@ -32,7 +32,9 @@
 
                         <b-field label="Filter">
                             <b-select v-model="filter" placeholder="--">
-                                <option v-for="filter_option in filter_options">{{ filter_option }}</option>
+                                <option v-for="filter_option in filter_options">
+                                    {{ filter_option }}
+                                </option>
                             </b-select>
                         </b-field>
 
@@ -53,6 +55,33 @@
                                 editable>
                             </b-datepicker>
                         </b-field>
+
+                        <div class="columns">
+                            <div class="column">
+                                <b-field label="Exposure time (seconds)"> 
+                                    <b-input
+                                    type="number"
+                                    step="any"
+                                    min="0"
+                                    style="width: 175px;"
+                                    v-model="exp_time_min"
+                                    placeholder="min">
+                                    </b-input> 
+                                </b-field> 
+                            </div> 
+                            <div class="column"> 
+                                <b-field label="(range optional)">
+                                    <b-input
+                                    type="number"
+                                    step="any"
+                                    min="0"
+                                    style="width: 175px;"
+                                    v-model="exp_time_max"
+                                    placeholder="max">
+                                    </b-input>
+                                </b-field> 
+                            </div> 
+                        </div>
 
                         <div style="display: flex;">                          
                         <p>
@@ -82,6 +111,8 @@ export default {
   data() {
     return {
       filename: null,
+      exp_time_min: null,
+      exp_time_max: null,
       site: null,
       start_date: null,
       end_date: null,
@@ -122,6 +153,8 @@ export default {
       this.end_date = null;
       this.filter = null;
       this.filename = null;
+      this.exp_time_min = null;
+      this.exp_time_max = null;
 
       //Get all images
       this.$store.dispatch("images/get_user_images");
@@ -143,6 +176,8 @@ export default {
       let filterparams = {
         username: "wmd_admin",
         filename: this.filename,
+        exposure_time_min: this.exp_time_min,
+        exposure_time_max: this.exp_time_max,
         site: this.site,
         start_date: startDate,
         end_date: endDate,
@@ -156,4 +191,7 @@ export default {
 </script>
 
 <style scoped>
+.exp-time {
+  display: inline-block;
+}
 </style>
