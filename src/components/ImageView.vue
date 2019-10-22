@@ -317,7 +317,7 @@ export default {
 
       let imageWindow = this.$refs.imagewindow.getBoundingClientRect();
 
-      if(this.analyze) {
+      if (this.analyze) {
         let resize_opts = {
           id: "myJS9",
           width: imageWindow.width-30, // adjust for 15px padding
@@ -602,6 +602,7 @@ export default {
   height: 1px;
   margin-bottom: 100%;
   overflow: visible;
+  padding-top: 35px;
 }
 #image_svg image {
   width: inherit;
