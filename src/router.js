@@ -8,7 +8,6 @@ import About from './views/About.vue'
 import Register from './views/Register.vue'
 import Login from './views/Login.vue'
 import Profile from './views/Profile.vue'
-import js9 from './views/js9.vue'
 
 // Observatories
 import Site from './views/Site.vue'
@@ -40,7 +39,6 @@ const router = new VueRouter({
     { path: '/imgs', name: 'imgs', component: imgs},
     { path: '/skymap', name: 'skymap', component: skymap},
     { path: '/ctrl', name: 'ctrl', component:ctrl},
-    { path: '/js9', name: 'js9', component: js9},
     { 
       path: '/ux1/:sitecode/:subpage', 
       name: 'ux1', 

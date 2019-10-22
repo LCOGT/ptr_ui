@@ -54,8 +54,6 @@ const state = {
     selected_camera: '',
     selected_screen: '',
 
-    camera_areas_selection: '',
-    filter_wheel_options_selection: '',
 }
 
 
@@ -233,8 +231,6 @@ const getters = {
             return []
         }
     },
-    // Current selected camera area.
-    camera_areas_selection: state => state.camera_areas_selection, 
 
     // Available filters
     filter_wheel_options: state => {
@@ -247,8 +243,6 @@ const getters = {
             return [[]]
         }
     },
-    // Currently selected filter
-    filter_wheel_options_selection: state => state.filter_wheel_options_selection,
 
     // Does the camera bin or not? Returns string 'True' or 'False'.
     camera_can_bin: state => {
@@ -263,7 +257,6 @@ const getters = {
 
     global_config: state => state.global_config,
     is_config_loaded: state => state.did_config_load_yet,
-    foo: () => "bar",
 }
 
 const actions = {
@@ -291,7 +284,10 @@ const actions = {
     },
 
     set_default_filter_option({ commit, getters }) {
-        commit('setFilterSelection', getters.filter_wheel_options[0])
+        commit('command_params/filter_wheel_options_selection', 
+                getters.filter_wheel_options[0],
+                {root: true},
+            )
     },
 
     set_default_active_devices({ commit, dispatch }, site) {
@@ -304,7 +300,7 @@ const actions = {
         }
     },
 
-    setActiveTelescope({ commit, getters, dispatch }, telescope_name) {
+    setActiveTelescope({ commit, getters, dispatch, rootGetters }, telescope_name) {
         dispatch('update_config').then(response => {
             commit('setActiveTelescope', telescope_name)
 
@@ -323,14 +319,20 @@ const actions = {
             commit('setActiveScreen', screen_name)
 
             // Set initial values in command fields
-            if (getters.filter_wheel_options_selection== '') {
+            if (rootGetters['command_params/filter_wheel_options_selection'] == '') {
                 let filterSelection= getters.filter_wheel_options[0][0]
-                commit('setFilterSelection', filterSelection)
+                commit('command_params/filter_wheel_options_selection', 
+                        filterSelection,
+                        {root: true},
+                    )
             }
 
-            if (getters.camera_areas_selection == '') {
+            if (rootGetters['command_params/camera_areas_selection'] == '') {
                 let areaSelection = getters.camera_areas[0]
-                commit('setCameraAreasSelection', areaSelection)
+                commit('command_params/camera_areas_selection', 
+                        areaSelection,
+                        {root: true},
+                    )
             }
         })
     }
@@ -355,8 +357,6 @@ const mutations = {
     setActiveCamera(state, camera) { state.selected_camera = camera },
     setActiveScreen(state, screen) { state.selected_screen = screen },
 
-    setFilterSelection(state, filterSelection) { state.filter_wheel_options_selection = filterSelection },
-    setCameraAreasSelection(state, areaSelection) { state.camera_areas_selection = areaSelection },
 }
 
 export default {

@@ -144,40 +144,40 @@
         <div class="title">Telescope</div>
 
         <b-field horizontal label="Ra">
-          <b-input name="subject" v-model="slew_ra" autocomplete="off"></b-input>
+          <b-input name="subject" size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
         </b-field>
         <b-field horizontal label="Dec">
-          <b-input name="subject" v-model="slew_dec" autocomplete="off"></b-input>
+          <b-input name="subject" size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
         </b-field>
 
-        <command-button :data="mount_slew_command" style="margin-bottom: 1em;"/>
+        <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>
         <br>
 
-        <b-dropdown aria-role="list" style="width: 100%;">
-          <button class="button" slot="trigger" style="width: 100%;">
+        <b-dropdown aria-role="list" style="width: 100%;" size="is-small">
+          <button class="button is-small" slot="trigger" style="width: 100%;">
               <span>Slew to...</span>
               <b-icon icon="menu-down"></b-icon>
           </button>
           <b-dropdown-item aria-role="listitem">
-            <command-button :data="mount_slew_chart_command" class="dropdown-button-command"/>
+            <command-button :data="mount_slew_chart_command" class="dropdown-button-command is-small"/>
           </b-dropdown-item>
           <b-dropdown-item>
-            <command-button :data="mount_screenflat_command" class="dropdown-button-command"/>
+            <command-button :data="mount_screenflat_command" class="dropdown-button-command is-small"/>
           </b-dropdown-item>
           <b-dropdown-item>
-            <command-button :data="mount_skyflat_command" class="dropdown-button-command"/>
+            <command-button :data="mount_skyflat_command" class="dropdown-button-command is-small"/>
           </b-dropdown-item>
           <b-dropdown-item>
-            <command-button :data="mount_home_command" class="dropdown-button-command"/>
+            <command-button :data="mount_home_command" class="dropdown-button-command is-small"/>
           </b-dropdown-item>
           <b-dropdown-item>
-            <command-button :data="mount_park_command" class="dropdown-button-command"/>
+            <command-button :data="mount_park_command" class="dropdown-button-command is-small"/>
           </b-dropdown-item>
           <b-dropdown-item>
-            <command-button :data="mount_raSidDec0_command" class="dropdown-button-command"/>
+            <command-button :data="mount_raSidDec0_command" class="dropdown-button-command is-small"/>
           </b-dropdown-item>
           <b-dropdown-item>
-            <command-button :data="mount_stop_command" class="dropdown-button-command"/>
+            <command-button :data="mount_stop_command" class="dropdown-button-command is-small"/>
           </b-dropdown-item>
         </b-dropdown>
     </div>
@@ -196,14 +196,14 @@
 
         <b-field horizontal label="Expose">
             <b-field>
-                <b-input name="subject" v-model="cam_exposure" autocomplete="off"></b-input>
-                <p class="control"> <span class="button is-static">s</span> </p>
+                <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
+                <p class="control"> <span class="button is-static is-small">s</span> </p>
             </b-field>
         </b-field>
 
         <b-field horizontal label="Count">
             <b-field>
-                <b-numberinput name="subject" type="is-light" min="1" controls-position="compact" v-model="cam_count" autocomplete="off"></b-numberinput>
+                <b-numberinput name="subject" type="is-light" min="1" size="is-small" controls-position="compact" v-model="camera_count" autocomplete="off"></b-numberinput>
             </b-field>
         </b-field>
 
@@ -216,7 +216,7 @@
                 <option value="BLUE">blue</option>
             </b-select-->
 
-            <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" style="width: 100%">
+            <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" size="is-small" style="width: 100%">
               <option 
                 v-for="(filter, index) in filter_wheel_options"
                 v-bind:value="filter[0]" 
@@ -228,13 +228,18 @@
             </b-select>
 
             <div class="buttons has-addons">
-              <command-button :data="filter_wheel_command" style="width: 50%"/>
-              <command-button :data="filter_wheel_home_command" style="width: 50%" />
+              <command-button :data="filter_wheel_command" style="width: 50%" class="is-small"/>
+              <command-button :data="filter_wheel_home_command" style="width: 50%" class="is-small" />
             </div>
         </b-field>
 
         <b-field horizontal label="Area" v-if="camera_areas.length != 0">
-            <b-select placeholder="Select chip area" v-model="camera_areas_selection" style="width: 100%">
+            <b-select 
+              placeholder="Select chip area" 
+              v-model="camera_areas_selection" 
+              style="width: 100%"
+              size="is-small"
+              >
               <option
                 v-for="(area, index) in camera_areas"
                 v-bind:value="area"
@@ -245,11 +250,19 @@
               </option>
             </b-select>
         </b-field>
+  
+        <b-field horizontal label="Subframe">
+          <p>{{ subframeIsActive ? "Active" : "Not Active"}}</p>
+          <p>({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
+          <button class="button is-small" v-if="subframeIsActive" @click="function(){subframeIsActive = false}"> deactivate </button>
+          <button class="button is-small" v-if="!subframeIsActive" @click="function(){subframeIsActive = true}"> activate </button>
+        </b-field>
+
 
         <b-field horizontal label="Image Type">
-          <b-select placeholder="Select image type" v-model="cam_image_type">
+          <b-select placeholder="Select image type" v-model="camera_image_type" size="is-small">
             <option
-              v-for="(image_type, index) in cam_image_type_options"
+              v-for="(image_type, index) in camera_image_type_options"
               v-bind:value="image_type"
               v-bind:selected="index === 0"
               v-bind:key="index"
@@ -261,27 +274,27 @@
 
         <b-field horizontal label="Dither">
           <b-checkbox
-            v-model="cam_dither"
+            v-model="camera_dither"
             true-value="on"
             false-value="off"
             >
-            {{ cam_dither }}
+            {{ camera_dither }}
           </b-checkbox>
         </b-field>
 
         <b-field horizontal label="Bin" v-if="camera_can_bin=='True'">
             <b-field>
-            <b-radio-button v-model="cam_bin"
+            <b-radio-button v-model="camera_bin"
                 native-value="1"
                 type="is-white is-outlined">
                 1x
             </b-radio-button>
-            <b-radio-button v-model="cam_bin"
+            <b-radio-button v-model="camera_bin"
                 native-value="2"
                 type="is-white is-outlined">
                 2x
             </b-radio-button>
-            <b-radio-button v-model="cam_bin"
+            <b-radio-button v-model="camera_bin"
                 native-value="4"
                 type="is-white is-outlined">
                 4x
@@ -289,10 +302,20 @@
             </b-field>
         </b-field>
 
+        <b-field horizontal label="Hint">
+          <b-input placeholder="a hint for the camera..."
+            type="text"
+            min="0"
+            max="64"
+            size="is-small"
+            v-model="camera_hint">
+          </b-input>
+        </b-field>
+
         <br>
         <div class="buttons has-addons">
-          <command-button :data="camera_expose_command" style="width: 70%" />
-          <command-button :data="camera_cancel_command" style="width: 30%" />
+          <command-button :data="camera_expose_command" style="width: 70%" class="is-small"/>
+          <command-button :data="camera_cancel_command" style="width: 30%" class="is-small"/>
         </div>
 
     </div>
@@ -302,7 +325,7 @@
 
         <b-field label="Script">
           <b-field>
-            <b-select value="none" v-model="selected_script" style="width: 100;">
+            <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
               <option value="none">none</option>
               <option value="stop_script">Stop Script</option>
               <option value="focus_auto">Focus Auto</option>
@@ -326,7 +349,7 @@
             </b-select>
             <p class="control">
               <button 
-                class="button is-light" 
+                class="button is-light is-small" 
                 :disabled="!scriptHasSettings"
                 @click="isScriptSettingsActive = true"
                 >
@@ -346,8 +369,8 @@
         </div>
 
         <div class="buttons has-addons">
-          <button class="button" @click="script_run_command" style="width: 70%;"> run script</button>
-          <button class="button" @click="script_stop_command" style="width: 30%"> stop script</button>
+          <button class="button is-small" @click="script_run_command" style="width: 70%;"> run script</button>
+          <button class="button is-small" @click="script_stop_command" style="width: 30%"> stop script</button>
         </div>
 
     </div>
@@ -364,7 +387,7 @@
         <div class="title">Focuser</div>
 
           <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
-            <button class="button" slot="trigger" style="width: 100%;">
+            <button class="button is-small" slot="trigger" style="width: 100%;">
                 <span>Focus Action...</span>
                 <b-icon icon="menu-down"></b-icon>
             </button>
@@ -385,31 +408,31 @@
 
           <b-field label="Relative">
             <b-field>
-              <b-input expanded name="subject" size="is-small" v-model="focus_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
+              <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="focus_relative_command" class="is-small"/>  </p><br>
             </b-field>
           </b-field>
 
           <b-field label="Absolute">
             <b-field>
-              <b-input expanded name="subject" size="is-small" v-model="focus_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+              <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
             </b-field>
           </b-field>
           <br>
 
         <div class="title">Rotator</div>
-          <command-button :data="rotate_home_command" />
+          <command-button :data="rotate_home_command" class="is-small"/>
           <br>
           <b-field label="Relative">
             <b-field>
-              <b-input expanded size="is-small" name="subject" v-model="rotate_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <b-input expanded size="is-small" name="subject" v-model="rotator_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
             </b-field>
           </b-field>
           <b-field label="Absolute">
             <b-field>
-              <b-input expanded size="is-small" name="subject" v-model="rotate_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <b-input expanded size="is-small" name="subject" v-model="rotator_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
               <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
             </b-field>
           </b-field>
@@ -436,7 +459,7 @@
     <div class="column" style="padding: 0">
       <div style="background: orange; padding: 2em;">
           <div class="title">Image</div>
-          <button class="button" @click="refresh_latest_image" style="margin-bottom: 1em;">latest image</button>
+          <button class="button is-small" @click="refresh_latest_image" style="margin-bottom: 1em;">latest image</button>
           <br>
           <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
               <img
@@ -512,6 +535,8 @@ export default {
       // Toggles the script settings visiblity
       isScriptSettingsActive: false,
 
+      testSubframeIsActive: false,
+
     }
   },
 
@@ -558,6 +583,12 @@ export default {
     },
   },
 
+  watch: {
+    // If the user changes the chip area parameter, deactivate the subframe.
+    camera_areas_selection: function(newVal, oldVal) {
+      this.subframeIsActive = false;
+    }
+  },
 
   computed: {
 
@@ -576,7 +607,80 @@ export default {
     selected_script: {
       get() { return this.$store.getters['selectedScript']},
       set(val) { this.$store.commit('selectedScript', val)},
-    }
+    },
+
+
+    // command_params
+    mount_ra: {
+        get() { return this.$store.getters['command_params/mount_ra']},
+        set(val) { this.$store.commit('command_params/mount_ra', val)},
+    },
+    mount_dec: {
+        get() { return this.$store.getters['command_params/mount_dec']},
+        set(val) { this.$store.commit('command_params/mount_dec', val)},
+    },
+
+    subframeIsActive: {
+        get() { return this.$store.getters['command_params/subframeIsActive']},
+        set(val) { this.$store.commit('command_params/subframeIsActive', val)},
+    },
+
+    camera_areas_selection: {
+        get() { return this.$store.getters['command_params/camera_areas_selection'] },
+        set(val) {this.$store.commit('command_params/camera_areas_selection', val)}
+    },
+    camera_hint: {
+        get() { return this.$store.getters['command_params/camera_hint']},
+        set(val) { this.$store.commit('command_params/camera_hint', val)},
+    },
+    camera_exposure: {
+        get() { return this.$store.getters['command_params/camera_exposure'] },
+        set(val) {this.$store.commit('command_params/camera_exposure', val)}
+    },
+    camera_count: {
+        get() { return this.$store.getters['command_params/camera_count'] },
+        set(val) {this.$store.commit('command_params/camera_count', val)}
+    },
+    camera_bin: {
+        get() { return this.$store.getters['command_params/camera_bin'] },
+        set(val) {this.$store.commit('command_params/camera_bin', val)}
+    },
+    camera_dither: {
+        get() { return this.$store.getters['command_params/camera_dither'] },
+        set(val) {this.$store.commit('command_params/camera_dither', val)}
+    },
+    camera_image_type: {
+        get() { return this.$store.getters['command_params/camera_image_type'] },
+        set(val) {this.$store.commit('command_params/camera_image_type', val)}
+    },
+
+    filter_wheel_options_selection: {
+        get() { return this.$store.getters['command_params/filter_wheel_options_selection'] },
+        set(val) { this.$store.commit('command_params/filter_wheel_options_selection', val) }
+    },
+
+    focuser_relative: {
+        get() { return this.$store.getters['command_params/focuser_relative'] },
+        set(val) {this.$store.commit('command_params/focuser_relative', val)}
+    },
+    focuser_absolute: {
+        get() { return this.$store.getters['command_params/focuser_absolute'] },
+        set(val) {this.$store.commit('command_params/focuser_absolute', val)}
+    },
+
+    rotator_relative: {
+        get() { return this.$store.getters['command_params/rotator_relative'] },
+        set(val) {this.$store.commit('command_params/rotator_relative', val)}
+    },
+    rotator_absolute: {
+        get() { return this.$store.getters['command_params/rotator_absolute'] },
+        set(val) {this.$store.commit('command_params/rotate_absolute', val)}
+    },
+
+    screen_brightness: {
+        get() { return this.$store.getters['command_params/screen_brightness'] },
+        set(val) {this.$store.commit('command_params/screen_brightness', val)}
+    },
   },
 
 }
