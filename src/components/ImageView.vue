@@ -33,7 +33,7 @@
     <!-- The main image view -->
     <div class="image-div" ref="image_div">
 
-        <svg id='image_svg' ref="svgElement" v-if="!analyze">
+        <svg id='image_svg' ref="svgElement" v-show="!analyze">
           <!-- NOTE: image svg width and heigh must be set explicitly to work in firefox -->
           <!-- These values are changed programatically to work with dynamic window sizes. -->
           <image 
@@ -484,6 +484,7 @@ export default {
     toggleAnalysis() {
       if (this.analyze) {
         this.analyze = false;
+        this.init()
       } else {
         this.js9LoadImage(this.current_image)
         this.analyze = true;
