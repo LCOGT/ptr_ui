@@ -1,13 +1,10 @@
 <template>
+  <div class="Analysis" id="js9parent" ref="js9parent">
 
-<div class="Analysis">
-  <p>js9</p>
-    <button class="button" @click="loadImage(current_image.base_filename)">load</button>
-    <div class="JS9Menubar" data-width="768px"></div>
-    <div class="JS9Toolbar" data-width="768px"></div>
-    <div class="JS9" data-width="768px" data-height="768px"></div>
-</div>
-        
+    <!-- This is where we load the js9 DOM elements -->
+    <div id="js9component" ref="js9component"></div>
+
+  </div>
 </template>
 
 <script>
@@ -18,6 +15,10 @@ import { mapGetters } from "vuex";
 
 export default {
   name: "JS9",
+  props: [
+    'thewidth',
+    'theheight',
+  ],
   data() {
     return {
       cur_img: "",
@@ -29,103 +30,113 @@ export default {
       js9prefs: '',
       js9: '',
       js9plugins: '',
+
+      js9content: '',
     };
   },
   beforeMount() {
-    //let js9SupportCSS = document.createElement("script");
-    //js9SupportCSS.setAttribute(
-      //"src",
-      //"https://cdn.lco.global/js9/js9support.css"
-    //);
-    //document.head.appendChild(js9SupportCSS);
-
-    //let js9CSS = document.createElement("script");
-    //js9CSS.setAttribute("src", "https://cdn.lco.global/js9/js9.css");
-    //document.head.appendChild(js9CSS);
-
-    //let js9PrefsJS = document.createElement("script");
-    //js9PrefsJS.setAttribute("src", "https://cdn.lco.global/js9/js9prefs.js");
-    //document.head.appendChild(js9PrefsJS);
-
-    //let js9SupportMinJS = document.createElement("script");
-    //js9SupportMinJS.setAttribute(
-      //"src",
-      //"https://cdn.lco.global/js9/js9support.min.js"
-    //);
-    //document.head.appendChild(js9SupportMinJS);
-
-    //let js9MinJS = document.createElement("script");
-    //js9MinJS.setAttribute("src", "https://cdn.lco.global/js9/js9.min.js");
-    //document.head.appendChild(js9MinJS);
-
-    //let js9PluginsJS = document.createElement("script");
-    //js9PluginsJS.setAttribute(
-      //"src",
-      //"https://cdn.lco.global/js9/js9plugins.js"
-    //);
-    //document.head.appendChild(js9PluginsJS);
-
-    //this.loadScript('https://ptr-js9.s3.amazonaws.com/js9prefs.js')
-    
   },
   mounted() {
-    //var baseurl = "http://ec2-52-201-236-65.compute-1.amazonaws.com/js9"
-    //var baseurl = "http://ec2-34-201-76-221.compute-1.amazonaws.com/js9"
-    var baseurl = "https://js9.photonranch.org/js9"
 
-    this.js9supportcss = document.createElement("link");
-    this.js9supportcss.rel = "stylesheet"
-    this.js9supportcss.class= "js9css"
-    this.js9supportcss.type = "text/css"
-    this.js9supportcss.href = `${baseurl}/js9support.css`
-    this.js9supportcss.async = false
-    document.head.appendChild(this.js9supportcss);
+    // Move the js9 DOM elements into our visible component
+    this.js9content = document.getElementById('js9content')
+    var js9away = document.getElementById('js9component')
+    js9away.appendChild(this.js9content);
 
-    this.js9css = document.createElement("link");
-    this.js9css.rel = "stylesheet"
-    this.js9css.class= "js9css"
-    this.js9css.type = "text/css"
-    this.js9css.href = `${baseurl}/js9.css`
-    this.js9css.async = false
-    document.head.appendChild(this.js9css);
-
-    this.js9prefs= document.createElement("script");
-    this.js9prefs.src = `${baseurl}/js9prefs.js`
-    this.js9prefs.async = false
-    document.head.appendChild(this.js9prefs);
-
-    this.js9support = document.createElement("script");
-    this.js9support.src = `${baseurl}/js9support.js`
-    this.js9support.async = false
-    document.head.appendChild(this.js9support);
-
-    this.js9 = document.createElement("script");
-    this.js9.src = `${baseurl}/js9.js`
-    this.js9.async = false
-    document.head.appendChild(this.js9);
-
-    this.js9plugins = document.createElement("script");
-    this.js9plugins.src = `${baseurl}/js9plugins.js`
-    this.js9plugins.async = false
-    document.head.appendChild(this.js9plugins);
-
+    this.$store.dispatch("images/refresh_latest_images")
   },
 
   beforeDestroy() {
-    //function removeHeadItem(element) {
-      //element.parentNode.removeChild(element)
-    //}
-    let remove_elements = [
+
+    // Don't destroy the js9 DOM elements; move them to a hidden parent element
+    // (a div with ID='js9content'), so we avoid js9 reloading-related problems.
+    let js9home = document.getElementById('js9home')
+    js9home.appendChild(this.js9content);
+
+    //let remove_elements = [
       //this.js9supportcss,
       //this.js9css,
-      this.js9prefs,
-      this.js9support,
-      this.js9,
-      this.js9plugins,
-    ].map(element => element.parentNode.removeChild(element))
+      //this.js9prefs,
+      //this.js9support,
+      //this.js9,
+      //this.js9plugins,
+    //].map(element => element.parentNode.removeChild(element))
+  },
+
+  watch: {
+
+    thewidth() {
+      console.log("resizing: "+this.thewidth)
+      JS9.ResizeDisplay("myJS9", this.thewidth,this.thewidth, );
+    }
   },
 
   methods: {
+
+    loadScripts() {
+      var baseurl = "https://js9.photonranch.org/js9"
+
+      this.js9prefs= document.createElement("script");
+      this.js9prefs.src = `${baseurl}/js9prefs.js`
+      this.js9prefs.async = false
+      document.head.appendChild(this.js9prefs);
+
+      this.js9support = document.createElement("script");
+      this.js9support.src = `${baseurl}/js9support.js`
+      this.js9support.async = false
+      document.head.appendChild(this.js9support);
+
+      this.js9 = document.createElement("script");
+      this.js9.src = `${baseurl}/js9.js`
+      this.js9.async = false
+      document.head.appendChild(this.js9);
+
+      this.js9plugins = document.createElement("script");
+      this.js9plugins.src = `${baseurl}/js9plugins.js`
+      this.js9plugins.async = false
+      document.head.appendChild(this.js9plugins);
+
+      //setTimeout(this.init_js9(), 5000)
+      console.log("loading js9 scripts")
+    },
+    
+    loadJS9Styles() {
+      var baseurl = "https://js9.photonranch.org/js9"
+
+      this.js9supportcss= document.createElement("script");
+      this.js9supportcss.href = `${baseurl}/js9.css`
+      this.js9supportcss.rel = `stylesheet`
+      this.js9supportcss.async = false
+      document.head.appendChild(this.js9supportcss);
+
+      this.js9css= document.createElement("script");
+      this.js9css.href = `${baseurl}/js9support.css`
+      this.js9css.rel = `stylesheet`
+      this.js9css.async = false
+      document.head.appendChild(this.js9css);
+    },
+
+    init_js9() {
+      JS9.init()
+    },
+    
+    new_js9() {
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+      }
+      //var js9ID = "js9-"+getRandomInt(99).toString()
+      //console.log("js9ID: "+js9ID)
+      //var anewjs9 = document.createElement("div");
+      //anewjs9.class ="JS9"
+      //anewjs9.id=js9ID
+      //this.$refs.js9parent.appendChild(this.anewjs9);
+      JS9.AddDivs('myJS9')
+    },
+
+    addDiv() {
+      JS9.AddDivs("myJS9");
+    },
+
 
     loadImage(base_filename) {
       let apiName = this.$store.getters['dev/api'];
@@ -134,7 +145,7 @@ export default {
 
       let fitsURL = API.get(apiName, path, {}).then(response => {
         console.log(response)
-        JS9.Load(response)
+        JS9.Load(response, {"display": "myJS9"}, "light")
       })
     }
   },
@@ -151,10 +162,8 @@ export default {
 </script>
 
 <style scoped>
-/*
-@import url("http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9.css");
-@import url("http://ec2-52-201-236-65.compute-1.amazonaws.com/js9/js9support.css");
-*/
+@import url("https://js9.photonranch.org/js9/js9.css");
+@import url("https://js9.photonranch.org/js9/js9support.css");
 
 .columns {
   border: 1px white solid;
