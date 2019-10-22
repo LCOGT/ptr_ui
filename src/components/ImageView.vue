@@ -149,13 +149,15 @@ export default {
 
     // Keep the displayed image element width and height in sync.
     // This is important for relative measurements on the image (crosshairs, clicks, etc)
-    this.syncImageSize = setInterval(this.get_image_element_dimensions, this.syncImageInterval);
+    this.syncImageSize = setInterval(
+      this.get_image_element_dimensions,
+      this.syncImageInterval
+    );
   },
 
-  
   beforeDestroy() {
     // We don't need to keep the image dimensions in sync if it's not displayed.
-    clearInterval(this.syncImageSize)
+    clearInterval(this.syncImageSize);
   },
 
   watch: {
@@ -337,34 +339,33 @@ export default {
     },
 
     send_pixels_center_command(pixels, filename) {
-
       let req_params = {
         //x_from_left: pixels[0],
         //y_from_top: pixels[1],
-        rel_x_pos: pixels[0]/this.imageWidth,
-        rel_y_pos: pixels[1]/this.imageHeight,
+        rel_x_pos: pixels[0] / this.imageWidth,
+        rel_y_pos: pixels[1] / this.imageHeight,
         filename: filename
       };
       let opt_params = {};
       let theCommand = {
-          url: `/${this.active_site}/${this.active_mount}/command/`,
-          http_method: 'POST',
-          form: {
-              device:"mount",
-              instance: this.active_mount,
-              timestamp: parseInt(Date.now() / 1000),
-              action: "center_on_pixels",
-              required_params: req_params,
-              optional_params: opt_params,
-          }
-      }
+        url: `/${this.active_site}/${this.active_mount}/command/`,
+        http_method: "POST",
+        form: {
+          device: "mount",
+          instance: this.active_mount,
+          timestamp: parseInt(Date.now() / 1000),
+          action: "center_on_pixels",
+          required_params: req_params,
+          optional_params: opt_params
+        }
+      };
       // Old code
       //let basecommand = this.base_command(
-        //"mount",
-        //"center_on_pixels",
-        //"center_on_pixels",
-        //req_params,
-        //opt_params
+      //"mount",
+      //"center_on_pixels",
+      //"center_on_pixels",
+      //req_params,
+      //opt_params
       //);
       let apiName = this.$store.getters["dev/api"];
       let url = theCommand.url;
@@ -449,7 +450,7 @@ export default {
           .attr("y1", this.imageHeight / 2)
           .attr("x1", 0)
           .attr("y2", this.imageHeight / 2)
-          .attr("x2", this.imageWidth )
+          .attr("x2", this.imageWidth)
           .attr("id", "crosshair_horizontal")
           .attr("stroke-width", 2)
           .attr("stroke", this.crosshair_color);
@@ -565,7 +566,6 @@ export default {
 </script>
 
 <style scoped>
-
 #component {
   display: flex;
   flex-direction: column;
@@ -577,7 +577,7 @@ export default {
   border-radius: 5px;
   display: block;
   padding: 15px;
-  background-color:  rgba(52, 60, 61, 0.733)
+  background-color: rgba(52, 60, 61, 0.733);
 }
 #js9-window {
   display: block;
@@ -587,7 +587,7 @@ export default {
   margin: 0 auto;
   max-width: 768px;
   margin-top: 1em;
-  overflow-x:auto;
+  overflow-x: auto;
 }
 
 .image-div {
@@ -597,15 +597,15 @@ export default {
   cursor:crosshair;
 }
 #image_svg {
-  width:100%;
+  width: 100%;
   max-width: 768px;
-  height:1px;
+  height: 1px;
   margin-bottom: 100%;
-  overflow:visible;
+  overflow: visible;
 }
 #image_svg image {
-  width:inherit;
-  height:auto;
+  width: inherit;
+  height: auto;
 }
 
 .recent_images {
@@ -627,5 +627,4 @@ export default {
 .selected_thumbnail {
   border: 2px solid gold;
 }
-
 </style>
