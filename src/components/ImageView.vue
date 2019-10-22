@@ -304,16 +304,7 @@ export default {
 
     // Resize the image element to fit the browser window
     get_image_element_dimensions() {
-      // WARNING: this may have bugs if image is not a square.
-      // See the final line of this function (imageEl.setAtt...).
-      //let imageRect = this.$refs.image.getBoundingClientRect();
-      //this.imageWidth = imageRect.width
-      //this.imageHeight = imageRect.height
 
-      //let svgRect = this.$refs.svgElement.getBoundingClientRect();
-      //let imageEl = this.$refs.image
-      //imageEl.setAttribute("width", svgRect.width)
-      //imageEl.setAttribute("height", svgRect.width)
 
       let imageWindow = this.$refs.imagewindow.getBoundingClientRect();
 
@@ -324,6 +315,18 @@ export default {
           height: imageWindow.width-30,
         }
         this.$store.dispatch('js9/resizeDisplay', resize_opts)
+      } else {
+        // Resize the image displayed
+        let svgRect = this.$refs.svgElement.getBoundingClientRect();
+        let imageEl = this.$refs.image
+        imageEl.setAttribute("width", svgRect.width)
+        imageEl.setAttribute("height", svgRect.width)
+        // Resize the svg
+        // WARNING: this may have bugs if image is not a square.
+        // See the final line of this function (imageEl.setAtt...).
+        let imageRect = this.$refs.image.getBoundingClientRect();
+        this.imageWidth = imageRect.width
+        this.imageHeight = imageRect.height
       }
       
       //let imagediv = this.$refs.image_div.getBoundingClientRect();
