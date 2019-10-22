@@ -1,200 +1,198 @@
 <template>
     <div>      
         <div class="side-panel">
-            <b-menu>
-                <b-menu-list>
-                    <b-menu-item active icon="account" label="My Account Images" :expanded="true">
-                        <!--All images folder-->
-                        <b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
-                            <div
-                                slot="trigger" 
-                                slot-scope="props"
-                                class="card-header"
-                                role="button"
-                                aria-controls="contentIdForA11y3">
-                                <p class="card-header-title">
-                                    All Images
-                                </p>
-                                <a class="card-header-icon">
-                                    <b-icon
-                                        :icon="props.open ? 'menu-down' : 'menu-up'">
-                                    </b-icon>
-                                </a>
-                            </div>
+            <ImageFilter/>
+            <br>
+            <div active icon="account" label="My Account Images" :expanded="true">
+                <!--All images folder-->
+                <b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
 
-                            <div class="folder" ref="records">
-                                <div 
-                                    v-for="(item) in user_images" 
-                                    :key="item.image_id"
-                                >
-                                    <div v-bind:id="item.image_id" class="img-record" v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"  @click="setActiveImage(item)">
-                                        <div class="image">
-                                            <img 
-                                                style="width: 100px; height: 100px;"
-                                                v-bind:src="item.jpg13_url"
-                                                v-bind:title="item.base_filename"
-                                                alt="Preview Not Available"
-                                            >
-                                        </div>
-                                        <div class=image-information>
-                                            <p style="color:white;">Filename: {{item.base_filename}}</p>
-                                            <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
-                                            <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
-                                            <div class=image-coordinates>
-                                                <p style="color:rgb(175,175,175);">
-                                                    RA: {{item.right_ascension.toFixed(2)}}
-                                                </p>
-                                                <p style="color:rgb(175,175,175);">
-                                                    DEC: {{item.declination.toFixed(2)}}
-                                                </p>
-                                                <div v-if="item.ex13_fits_exists">
-                                                    <b-tooltip class="tooltip" label="Download EX13 FITS" :delay="1000" type="is-dark" position="is-left">
-                                                        <b-button class="button download-button" tag="a" :href="item.fits13_url" icon-pack="fas" icon-left="download"></b-button>
-                                                    </b-tooltip>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                        </b-collapse>
-                        <br>
-                        <!--Trash folder-->
-                        <!--<b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
-                            <div
-                                slot="trigger" 
-                                slot-scope="props"
-                                class="card-header"
-                                role="button"
-                                aria-controls="contentIdForA11y3">
-                                <p class="card-header-title">
-                                    Trash
-                                </p>
-                                <a class="card-header-icon">
-                                    <b-icon
-                                        :icon="props.open ? 'menu-down' : 'menu-up'">
-                                    </b-icon>
-                                </a>
-                            </div>
-                            <div class="card-content" v-for="(item, index) in trash_images" :key="index">
+                    <div
+                        slot="trigger" 
+                        slot-scope="props"
+                        class="card-header"
+                        role="button"
+                        aria-controls="contentIdForA11y3">
+                        <p class="card-header-title">
+                            Images
+                        </p>
+                        <a class="card-header-icon">
+                            <b-icon
+                                :icon="props.open ? 'menu-down' : 'menu-up'">
+                            </b-icon>
+                        </a>
+                    </div>
+
+                    <div class="folder" ref="records">
+                        <div v-for="item in limitedItems" :key="item.image_id">
+                            <div v-bind:id="item.image_id" class="img-record level" v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"  @click="setActiveImage(item)">
                                 <div class="image">
-                                <img 
-                                    style="width: 100px; height: 100px;"
-                                    v-bind:src="item.jpg13_url"
-                                    v-bind:title="item.base_filename"
-                                    alt="Preview Not Available"
-                                >
+                                    <img 
+                                        v-bind:src="item.jpg13_url"
+                                        v-bind:title="item.base_filename"
+                                        alt="Preview Not Available"
+                                    >
                                 </div>
-                                <div class=image-information>
-                                    <p style="color:white;">Filename: {{item.base_filename}}</p>
-                                    <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
-                                    <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
+                                <div class="image-information">
+                                    <p style="color:white;"> {{item.base_filename}}</p>
+                                    <!--p style="color:rgb(175,175,175);"> {{item.site}}</p-->
+                                    <p style="color:rgb(175,175,175);"> {{new Date(item.capture_date).toISOString().slice(0, 19).replace('T', ' ')}}</p>
                                     <div class=image-coordinates>
-                                        <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
-                                        <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
+                                        <p style="color:rgb(175,175,175); padding-right: 5px;">
+                                            ra: {{item.right_ascension.toFixed(2)}}
+                                        </p>
+                                        <p style="color:rgb(175,175,175);">
+                                            dec: {{item.declination.toFixed(2)}}
+                                        </p>
                                     </div>
+                                    <!--a class="is-text has-text-white" :href="item.fits13_url" download>download fits</a-->
                                 </div>
                             </div>
-                        </b-collapse>-->
-                    </b-menu-item>
-                </b-menu-list>
-            </b-menu>
+                        </div>
+                    </div>
+                    <button class="show-more button" @click="limitNumber += 50">Show more</button>
+                </b-collapse>
+                
+                <!--Trash folder-->
+                <!--<b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
+                    <div
+                        slot="trigger" 
+                        slot-scope="props"
+                        class="card-header"
+                        role="button"
+                        aria-controls="contentIdForA11y3">
+                        <p class="card-header-title">
+                            Trash
+                        </p>
+                        <a class="card-header-icon">
+                            <b-icon
+                                :icon="props.open ? 'menu-down' : 'menu-up'">
+                            </b-icon>
+                        </a>
+                    </div>
+                    <div class="card-content" v-for="(item, index) in trash_images" :key="index">
+                        <div class="image">
+                        <img 
+                            style="width: 100px; height: 100px;"
+                            v-bind:src="item.jpg13_url"
+                            v-bind:title="item.base_filename"
+                            alt="Preview Not Available"
+                        >
+                        </div>
+                        <div class=image-information>
+                            <p style="color:white;">Filename: {{item.base_filename}}</p>
+                            <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
+                            <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
+                            <div class=image-coordinates>
+                                <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
+                                <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </b-collapse>-->
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import draggable from 'vuedraggable'
-
+import { mapGetters } from "vuex";
+import draggable from "vuedraggable";
+import ImageFilter from "@/components/ImageFilter";
 
 export default {
-    name: 'ImageNavigationPanel',
-    data() {
-        return {
+  name: "ImageNavigationPanel",
+  components: {
+    ImageFilter
+  },
+  data() {
+    return {
+      limitNumber: 20,
+      filter: false,
+      start_date: null,
+      end_date: null
+    };
+  },
 
-        };
+  beforeMount() {
+    this.$store.dispatch("images/get_user_images");
+  },
+
+  mounted() {
+    this.$store.dispatch("images/get_user_images");
+  },
+
+  methods: {
+    setActiveImage(image) {
+      this.$store.dispatch("images/set_current_image", image);
     },
+  },
 
-    components: { 
-        draggable,
-    },
-
-    beforeMount() {
-        this.$store.dispatch('images/get_user_images')
-    },
-
-    mounted() {
-        
-    },
-
-    methods: {
-        setActiveImage(image) {
-            this.$store.dispatch("images/set_current_image", image);
-        },
-    },
-
-    computed: {
-        ...mapGetters('images', {
-            username: 'username',
-            user_images: 'user_images',
-            current_image: "current_image"
-        }),
-    },
-}
-
+  computed: {
+    ...mapGetters("images", {
+      username: "username",
+      user_images: "user_images",
+      current_image: "current_image"
+    }),
+    limitedItems() {
+      return this.user_images.slice(0, this.limitNumber);
+    }
+  }
+};
 </script>
 
 <style scoped>
-@import "https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css";
-
-.img-record{
-  display: grid;
-  grid-template-columns: 30% 70%;
-  grid-row-gap: 5px;
+.img-record {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   border-bottom: 1px solid rgb(78, 74, 74);
+  padding: 10px;
+}
+.folder {
+  max-height: 65vh;
+  overflow-y: scroll;
+}
+.img-record:hover {
+  background: rgb(65, 75, 75);
+}
+.image {
   padding-right: 10px;
-  padding-left: 10px;
-  padding-top: 22px;
-  padding-bottom: 22px;
-}
-.folder{
-    max-height: 1000px;
-    overflow-y: auto;
-}
-.img-record:hover{
-  background:rgb(65, 75, 75);
-}
-.image{
-  grid-column: 1;
-  border-right: 1px solid darkgray;
   text-align: center;
-  padding-left:10px;
-  padding-top: 10px;
+  flex-basis: 100px;
+  flex-grow: 1;
 }
-.image-information{
-  grid-column: 2;
-  padding-left: 15px;
+.image img {
+  width: 100%;
 }
-.image-coordinates{
-  display: grid;
-  grid-template-columns: 42% 42% 16%;
-  grid-row-gap: 5px;
-  padding-top: 20px;
+.image img:after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
+.image-information {
+  flex-basis: 200px;
+  flex-grow: 5;
+}
+.image-coordinates {
+  display: flex;
   text-align: left;
 }
 .side-panel {
   grid-column: 1;
-  width: 520px;
-  height: 650px;
+  width: auto;
+  height: 1000px;
 }
-.selected_thumbnail{
-    background-color: rgb(60, 70, 70);
+.selected_thumbnail {
+  background-color: rgb(60, 70, 70);
 }
-.download-button{
-    padding-bottom: 30px;
-    width: 35px;
+.download-link:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.show-more {
+  margin-top: 5px;
+  width: 100%;
 }
 </style>
 

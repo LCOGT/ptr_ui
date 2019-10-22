@@ -1,7 +1,7 @@
 <template>
 
 <div class="Analysis">
-    <div class="JS9Menubar"data-width="768px"></div>
+    <div class="JS9Menubar" data-width="768px"></div>
     <div class="JS9Toolbar" data-width="768px"></div>
     <div class="JS9" data-width="768px" data-height="768px"></div>
 </div>

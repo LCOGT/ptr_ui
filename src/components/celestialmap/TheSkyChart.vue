@@ -333,7 +333,6 @@ export default {
             this.update_chart();
             Celestial.display(mapConfigs.config);
         })
-        console.log('from mounted, celestial metrics:')
     },
 
 
