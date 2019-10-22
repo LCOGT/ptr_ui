@@ -19,7 +19,6 @@ const state = {
 
 const getters = {
     current_image: state => state.current_image,
-
     recent_images: state => state.recent_images,
     user_images: state => state.user_images,
 }
@@ -35,9 +34,23 @@ const actions = {
         let username = "wmd_admin" // TODO: Grab username from state 
         let apiName = rootState.dev.active_api;
         let path = `/image_by_user/${username}/`;
-        
+
         API.get(apiName, path).then(response => {
             commit('setUserImages', response)
+        }).catch(error => {
+            console.log(error)
+        });
+    },
+
+    /**
+     *  This action will retrieve a list of images filtered by the parameters in filter_params
+     */
+    get_filtered_images({ commit, state, rootState }, filter_params) {
+        let apiName = rootState.dev.active_api;
+        let path = `/filtered_images/`;
+        API.get(apiName, path, { 'queryStringParameters': filter_params }).then(response => {
+            commit('setUserImages', response)
+            commit('setRecentImages', response)
         }).catch(error => {
             console.log(error)
         });
@@ -131,7 +144,6 @@ const actions = {
 
 const mutations = {
     setCurrentImage(state, the_current_image) { state.current_image = the_current_image },
-
     setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setUserImages(state, user_images_list) { state.user_images = user_images_list },
 }

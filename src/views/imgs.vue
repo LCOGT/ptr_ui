@@ -25,31 +25,32 @@
 </template>
 
 <script>
-import { API, Auth } from 'aws-amplify'
-import ImageView from '@/components/ImageView'
-import ImageNavigationPanel from '@/components/ImageNavigationPanel'
-import { mapGetters } from 'vuex'
+import { API, Auth } from "aws-amplify";
+import ImageView from "@/components/ImageView";
+import ImageNavigationPanel from "@/components/ImageNavigationPanel";
+import { mapGetters } from "vuex";
 import JS9 from "@/components/JS9";
 
 export default {
-  name: 'imgs',
+  name: "imgs",
   components: {
     ImageView,
     ImageNavigationPanel,
-    JS9,
+    JS9
   },
   data() {
     return {
       toggleSiteIndex: 0,
     }
   },
-  mounted() {
-  },
   methods: {
     toggleSites() {
-      let the_sites = ['wmd', 'WMD']
-      let chosen_site = the_sites[this.toggleSiteIndex]
-      this.$store.commit('observatory_configuration/setActiveSite', chosen_site)
+      let the_sites = ["wmd", "WMD"];
+      let chosen_site = the_sites[this.toggleSiteIndex];
+      this.$store.commit(
+        "observatory_configuration/setActiveSite",
+        chosen_site
+      );
       this.toggleSiteIndex = (this.toggleSiteIndex + 1) % 2;
     },
     imagesByUser() {
@@ -59,21 +60,22 @@ export default {
   },
   beforeCreate() {
     // Set the default site for convenience
-    this.$store.commit('observatory_configuration/setActiveSite', 'wmd')
-    this.$store.dispatch('observatory_configuration/update_config')
+    this.$store.commit("observatory_configuration/setActiveSite", "wmd");
+    this.$store.dispatch("observatory_configuration/update_config");
   },
   computed: {
-    ...mapGetters('observatory_configuration', [
-      'available_sites',
-    ]),
+    ...mapGetters("observatory_configuration", ["available_sites"]),
 
     active_site: {
-        get() { return this.$store.getters['observatory_configuration/site'] },
-        set(value) { this.$store.commit('observatory_configuration/setActiveSite', value) }
-    },
-
-  },
-}
+      get() {
+        return this.$store.getters["observatory_configuration/site"];
+      },
+      set(value) {
+        this.$store.commit("observatory_configuration/setActiveSite", value);
+      }
+    }
+  }
+};
 </script>
 
 <style scoped>
@@ -81,7 +83,7 @@ export default {
   margin-top: 3em;
 }
 
-.columns{
+.columns {
   padding-top: 50px;
 }
 
@@ -89,5 +91,4 @@ export default {
   border-bottom: 1px solid silver;
   padding-bottom: 2em;
 }
-
 </style>
