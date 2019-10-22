@@ -30,6 +30,7 @@
     "mathjs": "^5.10.3",
     "npm-check": "^5.9.0",
     "perf_hooks": "0.0.1",
+    "portal-vue": "^2.1.6",
     "register-service-worker": "^1.5.2",
     "upgrade": "^1.1.0",
     "vue": "^2.6.10",

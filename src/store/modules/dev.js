@@ -30,7 +30,7 @@ const actions = {
 const mutations = {
     active_api(state, api_name) {
         state.active_api = api_name
-    }
+    },
 }
 
 export default {

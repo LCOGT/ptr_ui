@@ -11,6 +11,7 @@ import '@mdi/font/css/materialdesignicons.css'
 
 import Amplify, * as AmplifyModules from 'aws-amplify'
 import { AmplifyPlugin } from 'aws-amplify-vue'
+import PortalVue from 'portal-vue'
 
 /** 
  * This used to be used in Amplify.configure(awsmobile), but that broke the 
@@ -27,6 +28,7 @@ Vue.use(LoadScript);
 
 Vue.use(AmplifyPlugin, AmplifyModules)
 Vue.use(Buefy)
+Vue.use(PortalVue)
 
 Vue.config.productionTip = false
 

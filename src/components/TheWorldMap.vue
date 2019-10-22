@@ -19,7 +19,7 @@ export default {
   mounted: function () {
     const element = document.getElementById(this.mapName)
     const options = {
-      zoom: 2.5,
+      zoom: 2,
       center: new google.maps.LatLng(0, 0),
       styles: [
         {

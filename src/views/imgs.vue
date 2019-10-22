@@ -44,7 +44,6 @@ export default {
     }
   },
   mounted() {
-    
   },
   methods: {
     toggleSites() {
