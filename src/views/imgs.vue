@@ -16,7 +16,7 @@
 
     <div class="nav-panel column is-two-fifths" style="padding: 2em;">  
       <!--button class="button" @click="imagesByUser">imageByUser</button-->
-      <!--ImageNavigationPanel/-->
+      <ImageNavigationPanel/>
     </div>
 
   </div>
