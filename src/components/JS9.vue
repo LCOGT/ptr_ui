@@ -16,8 +16,8 @@ import { mapGetters } from "vuex";
 export default {
   name: "JS9",
   props: [
-    'thewidth',
-    'theheight',
+    'initialWidth',
+    'initialHeight',
   ],
   data() {
     return {
@@ -35,6 +35,15 @@ export default {
     };
   },
   beforeMount() {
+
+    // Set the initial display size
+    let resize_opts = {
+      id: 'myJS9',
+      width: this.initialWidth,
+      height: this.initialHeight,
+    }
+    this.$store.dispatch('js9/resizeDisplay', resize_opts)
+
   },
   mounted() {
 
