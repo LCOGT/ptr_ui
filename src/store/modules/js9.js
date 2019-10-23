@@ -30,7 +30,7 @@ const actions = {
             let path = `/fits13_url/${site}/${base_filename}/`;
             
             API.get(apiName, path).then(response => {
-                JS9.Load(response, {scale: "log"}, {display: state.JS9_ID})
+                JS9.Load(response, {scale: "histeq"}, {display: state.JS9_ID})
                 commit('js9_current_image', base_filename)
             }).catch(error => {
                 console.log(error)
