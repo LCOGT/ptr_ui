@@ -309,7 +309,7 @@
         <-->
 
         <b-field horizontal label="Hint">
-          <b-input placeholder="a hint for the camera..."
+          <b-input placeholder="a hint for the FITS header..."
             type="text"
             min="0"
             max="64"
