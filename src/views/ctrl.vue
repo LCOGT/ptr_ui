@@ -282,25 +282,31 @@
           </b-checkbox>
         </b-field>
 
-        <b-field horizontal label="Bin" v-if="camera_can_bin=='True'">
+        <b-field horizontal label="Bin" v-if="camera_can_bin">
+          <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
+            <option
+              v-for="(bin_option, index) in camera_bin_options"
+              v-bind:value="bin_option"
+              v-bind:selected="index === 0"
+              v-bind:key="index"
+              >
+              {{ bin_option }}
+            </option>
+          </b-select>
+        </b-field>
+
+        <!-- Alternative bin layout with radio buttons >
+        <b-field horizontal label="Bin" v-if="camera_can_bin">
             <b-field>
-            <b-radio-button v-model="camera_bin"
-                native-value="1"
-                type="is-white is-outlined">
-                1x
-            </b-radio-button>
-            <b-radio-button v-model="camera_bin"
-                native-value="2"
-                type="is-white is-outlined">
-                2x
-            </b-radio-button>
-            <b-radio-button v-model="camera_bin"
-                native-value="4"
-                type="is-white is-outlined">
-                4x
+            <b-radio-button
+              v-for="(bin_option, index) in camera_bin_options"
+              v-bind:value="bin_option"
+              v-bind:key="index">
+              {{ bin_option }}
             </b-radio-button>
             </b-field>
         </b-field>
+        <-->
 
         <b-field horizontal label="Hint">
           <b-input placeholder="a hint for the camera..."
