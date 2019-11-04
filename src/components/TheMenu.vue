@@ -60,6 +60,9 @@
                     <button class="button is-warning" @click="signIn">log in as wmd_admin</button>
                 </div>
             </div>
+
+            <button @click="closeNavbar" class="button" id="up-button">&#x25B2;</button>
+
             </div>
         </div>
       </div>
@@ -67,73 +70,81 @@
 </template>
 
 <script>
-import { Auth } from 'aws-amplify'
-import { mapGetters, mapState } from 'vuex'
+import { Auth } from "aws-amplify";
+import { mapGetters, mapState } from "vuex";
 //import { sites } from '../sites'
 
 export default {
-  name: 'TheMenu',
+  name: "TheMenu",
   data() {
     return {
       sites: [
-         {
-        'code': 'wmd',
-        'name': 'West Mountain Drive',
-        'country': 'USA',
-        'tz': -8,
-        'lat': 34,
-        'lng': -119,
-        'elevation': 0, // meters
-    },
-    {
-        'code': 'saf',
-        'name': 'Sollee Observatory',
-        'country': 'USA',
-        'tz': -7,
-        'lat': 35.55444,
-        'lng': -105.870277,
-        'elevation': 2201,
-    }
-      ],
-    }
+        {
+          code: "wmd",
+          name: "West Mountain Drive",
+          country: "USA",
+          tz: -8,
+          lat: 34,
+          lng: -119,
+          elevation: 0 // meters
+        },
+        {
+          code: "saf",
+          name: "Sollee Observatory",
+          country: "USA",
+          tz: -7,
+          lat: 35.55444,
+          lng: -105.870277,
+          elevation: 2201
+        }
+      ]
+    };
   },
-  mounted () {
-    let navbar = document.querySelector('.navbar-burger')
-    navbar.addEventListener('click', function () {
-      let target = navbar.dataset.target
-      let $target = document.getElementById(target)
-      navbar.classList.toggle('is-active')
-      $target.classList.toggle('is-active')
-    })
+  mounted() {
+    let navbar = document.querySelector(".navbar-burger");
+    navbar.addEventListener("click", function() {
+      let target = navbar.dataset.target;
+      let $target = document.getElementById(target);
+      navbar.classList.toggle("is-active");
+      $target.classList.toggle("is-active");
+    });
   },
   methods: {
-    signOut () {
-      this.$store.dispatch('auth/logOutUser')
-      this.$router.go()
+    signOut() {
+      this.$store.dispatch("auth/logOutUser");
+      this.$router.go();
+    },
+
+    closeNavbar() {
+      let navbar = document.querySelector(".navbar-burger");
+      let btn = document.queryselector("#up-button");
+
+      $(document).click(function() {
+        navbar.classList.toggle("is-active");
+      });
     },
 
     /**
-     * Sign in as wmd_admin. 
-     * This is temporary for quick testing, and will be disabled when 
-     * authentication grants access to controls. 
+     * Sign in as wmd_admin.
+     * This is temporary for quick testing, and will be disabled when
+     * authentication grants access to controls.
      */
-    signIn () {
-      this.$store.dispatch('auth/logInAdmin')
-    },
+    signIn() {
+      this.$store.dispatch("auth/logInAdmin");
+    }
   },
   computed: {
-    ...mapGetters('auth', {
-      username: 'username',
-      isLoggedIn: 'isLoggedIn'
-    }),
+    ...mapGetters("auth", {
+      username: "username",
+      isLoggedIn: "isLoggedIn"
+    })
   }
-
-}
+};
 </script>
 
 <style scoped>
 .menu-title {
-  font: 30px 'Share Tech Mono', monospace; 
+  font: 30px "Share Tech Mono", monospace;
   margin-right: 2em;
 }
 nav {
