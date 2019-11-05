@@ -14,6 +14,7 @@ export const commands_mixin = {
             // Camera Fields
             camera_image_type_options: [
                 'light', 
+                'quick',
                 'toss', 
                 'bias', 
                 'dark', 
@@ -130,6 +131,7 @@ export const commands_mixin = {
             // (eg. what filters are available in the filter wheel)
             'camera_areas',
             'filter_wheel_options',
+            'camera_bin_options',
             'camera_can_bin',
 
             'global_config',

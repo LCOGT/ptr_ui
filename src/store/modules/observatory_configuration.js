@@ -244,12 +244,27 @@ const getters = {
         }
     },
 
+    camera_bin_options: state => {
+        try {
+            let bin_options = []
+            let bins = state.global_config[state.selected_site].camera[state.selected_camera].settings.bin_modes
+            for (let i=0; i<bins.length; i++) { bin_options.push(bins[i].join()) }
+            return bin_options
+        } catch {
+            return [];
+        }
+    },
+
     // Does the camera bin or not? Returns string 'True' or 'False'.
     camera_can_bin: state => {
         try {
-            return state.global_config[state.selected_site].camera[state.selected_camera].settings.can_bin
+            // Check if the array is undefined or zero -> return false; else return true. 
+            return (
+                Array.isArray(state.global_config[state.selected_site].camera[state.selected_camera].settings.bin_modes)
+                && (state.global_config[state.selected_site].camera[state.selected_camera].settings.bin_modes).length
+            ) 
         } catch {
-            return 'False'
+            return false
         }
     },
     
@@ -331,6 +346,14 @@ const actions = {
                 let areaSelection = getters.camera_areas[0]
                 commit('command_params/camera_areas_selection', 
                         areaSelection,
+                        {root: true},
+                    )
+            }
+
+            if (rootGetters['command_params/camera_bin'] == '' && getters.camera_can_bin) { 
+                let bin_selection = getters.camera_bin_options[0]
+                commit('command_params/camera_bin', 
+                        bin_selection,
                         {root: true},
                     )
             }
