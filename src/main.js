@@ -6,7 +6,6 @@ import './registerServiceWorker'
 
 import Buefy from 'buefy'
 import './style/buefy-styles.scss'
-import './style/bulmaswatch.min.scss.scss'
 import '@mdi/font/css/materialdesignicons.css'
 
 import Amplify, * as AmplifyModules from 'aws-amplify'
