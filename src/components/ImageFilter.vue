@@ -141,14 +141,8 @@ export default {
         "dif_i",
         "dif_zs",
         "dark"
-      ],
-      limitNumber: 20
+      ]
     };
-  },
-  computed: {
-    limitedItems() {
-      return this.user_images.slice(0, this.limitNumber);
-    }
   },
 
   methods: {
