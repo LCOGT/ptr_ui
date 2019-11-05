@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <button @click="closeNavbar" class="button" id="up-button">&#x25B2;</button>
+            <!--button @click="closeNavbar" class="button" id="up-button">&#x25B2;</button-->
 
             </div>
         </div>
