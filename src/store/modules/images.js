@@ -50,7 +50,8 @@ const actions = {
         let path = `/filtered_images/`;
         API.get(apiName, path, { 'queryStringParameters': filter_params }).then(response => {
             commit('setUserImages', response)
-            commit('setRecentImages', response)
+            let recent_image_list = response.slice(0, 40)
+            commit('setRecentImages', recent_image_list)
         }).catch(error => {
             console.log(error)
         });
