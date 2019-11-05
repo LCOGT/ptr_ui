@@ -9,8 +9,6 @@
 
 <script>
 import { API } from "aws-amplify";
-//import $ from 'jquery'
-//import { fabric } from "fabric";
 import { mapGetters } from "vuex";
 
 export default {
