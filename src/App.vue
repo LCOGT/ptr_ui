@@ -58,9 +58,9 @@ Amplify.configure({
         // This is the production api.
         name: "ptr-api",
         endpoint: "https://api.photonranch.org",
-        custom_header: async () => {
-          return { Authorization: 'Bearer '+(await Auth.currentSession()).accessToken.jwtToken }
-        }
+        //custom_header: async () => {
+          //return { Authorization: 'Bearer '+(await Auth.currentSession()).accessToken.jwtToken }
+        //}
       },
       {
         // This is a copy of the production api running locally. Used for testing.
