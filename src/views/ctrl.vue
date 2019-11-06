@@ -233,6 +233,19 @@
             </div>
         </b-field>
 
+        <b-field horizontal label="Bin" v-if="camera_can_bin">
+          <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
+            <option
+              v-for="(bin_option, index) in camera_bin_options"
+              v-bind:value="bin_option"
+              v-bind:selected="index === 0"
+              v-bind:key="index"
+              >
+              {{ bin_option }}
+            </option>
+          </b-select>
+        </b-field>
+
         <b-field horizontal label="Area" v-if="camera_areas.length != 0">
             <b-select 
               placeholder="Select chip area" 
@@ -281,32 +294,6 @@
             {{ camera_dither }}
           </b-checkbox>
         </b-field>
-
-        <b-field horizontal label="Bin" v-if="camera_can_bin">
-          <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
-            <option
-              v-for="(bin_option, index) in camera_bin_options"
-              v-bind:value="bin_option"
-              v-bind:selected="index === 0"
-              v-bind:key="index"
-              >
-              {{ bin_option }}
-            </option>
-          </b-select>
-        </b-field>
-
-        <!-- Alternative bin layout with radio buttons >
-        <b-field horizontal label="Bin" v-if="camera_can_bin">
-            <b-field>
-            <b-radio-button
-              v-for="(bin_option, index) in camera_bin_options"
-              v-bind:value="bin_option"
-              v-bind:key="index">
-              {{ bin_option }}
-            </b-radio-button>
-            </b-field>
-        </b-field>
-        <-->
 
         <b-field horizontal label="Hint">
           <b-input placeholder="a hint for the FITS header..."
