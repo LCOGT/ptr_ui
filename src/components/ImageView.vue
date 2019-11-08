@@ -6,10 +6,10 @@
     <div class="controls level is-mobile">
 
       <div class="level-left left-controls">
-        <button class="button" @click="toggleAnalysis"> <b-icon icon="tune"></b-icon> </button>
-        <button class="button" @click="setLatestImage">latest</button>
-        <button class="button" @click="setPreviousImage"><b-icon icon="arrow-left-bold" /></button>
-        <button class="button" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
+        <button class="button level-item" @click="toggleAnalysis"> <b-icon icon="tune"></b-icon> </button>
+        <button class="button level-item" @click="setLatestImage">latest</button>
+        <button class="button level-item" @click="setPreviousImage"><b-icon icon="arrow-left-bold" /></button>
+        <button class="button level-item" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
         <b-tooltip label="download fits file" position="is-right" type="is-black">
           <a class="button has-text-white" @click="downloadFits13Url(current_image)">
             <b-icon icon="cloud-download" /></a>
