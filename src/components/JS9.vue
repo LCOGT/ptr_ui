@@ -19,6 +19,7 @@ export default {
   ],
   data() {
     return {
+      JS9: JS9, // grab the global variable for use in our component
       cur_img: "",
       isSelectable: true,
 
@@ -72,50 +73,7 @@ export default {
 
 
   methods: {
-
-    loadScripts() {
-      var baseurl = "https://js9.photonranch.org/js9"
-
-      this.js9prefs= document.createElement("script");
-      this.js9prefs.src = `${baseurl}/js9prefs.js`
-      this.js9prefs.async = false
-      document.head.appendChild(this.js9prefs);
-
-      this.js9support = document.createElement("script");
-      this.js9support.src = `${baseurl}/js9support.js`
-      this.js9support.async = false
-      document.head.appendChild(this.js9support);
-
-      this.js9 = document.createElement("script");
-      this.js9.src = `${baseurl}/js9.js`
-      this.js9.async = false
-      document.head.appendChild(this.js9);
-
-      this.js9plugins = document.createElement("script");
-      this.js9plugins.src = `${baseurl}/js9plugins.js`
-      this.js9plugins.async = false
-      document.head.appendChild(this.js9plugins);
-
-      //setTimeout(this.init_js9(), 5000)
-      console.log("loading js9 scripts")
-    },
     
-    loadJS9Styles() {
-      var baseurl = "https://js9.photonranch.org/js9"
-
-      this.js9supportcss= document.createElement("script");
-      this.js9supportcss.href = `${baseurl}/js9.css`
-      this.js9supportcss.rel = `stylesheet`
-      this.js9supportcss.async = false
-      document.head.appendChild(this.js9supportcss);
-
-      this.js9css= document.createElement("script");
-      this.js9css.href = `${baseurl}/js9support.css`
-      this.js9css.rel = `stylesheet`
-      this.js9css.async = false
-      document.head.appendChild(this.js9css);
-    },
-
     init_js9() {
       JS9.init()
     },
