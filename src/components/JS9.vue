@@ -70,13 +70,6 @@ export default {
     //].map(element => element.parentNode.removeChild(element))
   },
 
-  watch: {
-
-    thewidth() {
-      console.log("resizing: "+this.thewidth)
-      JS9.ResizeDisplay("myJS9", this.thewidth,this.thewidth, );
-    }
-  },
 
   methods: {
 

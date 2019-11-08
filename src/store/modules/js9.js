@@ -43,6 +43,8 @@ const actions = {
         if (state.js9Width==width && state.js9Height==height) {
             return;
         } else {
+            // we might later want to adjust the zoom level when the window size changes. 
+            let zoom = JS9.GetZoom(id)
             JS9.ResizeDisplay(id, width, height)
             commit('js9Width', width)
             commit('js9Height', height)
