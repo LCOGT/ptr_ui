@@ -29,11 +29,10 @@
       </div>
 
     </div>
-
     <!-- The main image view -->
     <div class="image-div" ref="image_div">
 
-        <svg id='image_svg' ref="svgElement" v-show="!analyze">
+        <svg id='image_svg' ref="svgElement" v-show="!js9IsVisible">
           <!-- NOTE: image svg width and heigh must be set explicitly to work in firefox -->
           <!-- These values are changed programatically to work with dynamic window sizes. -->
           <image 
@@ -43,7 +42,7 @@
             :href="current_image.jpg13_url" />
         </svg>
 
-        <div id="js9-window" v-if="analyze" >
+        <div id="js9-window" v-if="js9IsVisible" >
           <JS9 ref="js9" :thewidth="js9width" :theheight="js9height" />
         </div>
 
@@ -53,7 +52,6 @@
             <p> {{current_image.base_filename}} </p>
         </div>
     </div>
-
 
     <!-- Row of selectable image thumbnails under the main view. -->
     <div class="recent_images">
@@ -113,7 +111,6 @@ export default {
       mouseX: 0,
       mouseY: 0,
 
-      analyze: false,
 
       // The subframe rectangle svg element
       subframeSVG: '',
@@ -182,7 +179,7 @@ export default {
     current_image: function(newVal, oldVal) {
       // If we're in the js9 window mode, keep the image updated with the 
       // selected thumbnail.
-      if (this.analyze) {
+      if (this.js9IsVisible) {
         this.js9LoadImage(newVal)
       }
     },
@@ -308,7 +305,7 @@ export default {
 
       let imageWindow = this.$refs.imagewindow.getBoundingClientRect();
 
-      if (this.analyze) {
+      if (this.js9IsVisible) {
         let resize_opts = {
           id: "myJS9",
           width: imageWindow.width-30, // adjust for 15px padding
@@ -486,12 +483,12 @@ export default {
     },
 
     toggleAnalysis() {
-      if (this.analyze) {
-        this.analyze = false;
+      if (this.js9IsVisible) {
+        this.js9IsVisible= false;
         this.init()
       } else {
         this.js9LoadImage(this.current_image)
-        this.analyze = true;
+        this.js9IsVisible= true;
       }
     },
 
@@ -538,6 +535,11 @@ export default {
       recent_images: "recent_images",
       current_image: "current_image"
     }),
+
+    js9IsVisible: {
+      get() { return this.$store.getters['js9/instanceIsVisible']},
+      set(val) { this.$store.commit('js9/instanceIsVisible', val)},
+    },
 
     subframeIsActive: {
         get() { return this.$store.getters['command_params/subframeIsActive']},

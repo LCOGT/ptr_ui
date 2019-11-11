@@ -70,18 +70,18 @@ export default {
     ...mapGetters("observatory_configuration", ["available_sites"]),
 
     active_site: {
-      get() {
-        return this.$store.getters["observatory_configuration/site"];
-      },
-      set(value) {
-        this.$store.commit("observatory_configuration/setActiveSite", value);
-      }
+      get() { return this.$store.getters["observatory_configuration/site"]; },
+      set(value) { this.$store.commit("observatory_configuration/setActiveSite", value); }
     }
   }
 };
 </script>
 
 <style scoped>
+.columns {
+  padding-left: 1em;
+  padding-right: 1em;
+}
 .container {
   margin-top: 3em;
 }
