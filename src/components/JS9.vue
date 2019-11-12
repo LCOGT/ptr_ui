@@ -1,5 +1,5 @@
 <template>
-  <div class="Analysis" id="js9parent" ref="js9parent">
+  <div id="js9parent" ref="js9parent">
 
     <!-- This is where we load the js9 DOM elements -->
     <div id="js9component" ref="js9component"></div>
@@ -14,8 +14,9 @@ import { mapGetters } from "vuex";
 export default {
   name: "JS9",
   props: [
-    'initialWidth',
-    'initialHeight',
+    "initialWidth",
+    "initialHeight",
+    "includeMenu",
   ],
   data() {
     return {
@@ -23,25 +24,20 @@ export default {
       cur_img: "",
       isSelectable: true,
 
-      // HTML header elements
-      js9supportcss: '',
-      js9css: '',
-      js9prefs: '',
-      js9: '',
-      js9plugins: '',
-
       js9content: '',
+      js9menu: '',
     };
   },
   beforeMount() {
 
+    console.log(this.JS9)
     // Set the initial display size
     let resize_opts = {
       id: 'myJS9',
       width: this.initialWidth,
       height: this.initialHeight,
     }
-    this.$store.dispatch('js9/resizeDisplay', resize_opts)
+    //this.$store.dispatch('js9/resizeDisplay', resize_opts)
 
   },
   mounted() {
@@ -50,6 +46,10 @@ export default {
     this.js9content = document.getElementById('js9content')
     var js9away = document.getElementById('js9component')
     js9away.appendChild(this.js9content);
+
+    // Determine whether or not the menu is included
+    this.js9menu = document.getElementById('myJS9Menubar')
+    this.js9menu.style.display= this.includeMenu ? "block" : "none";
 
     this.$store.dispatch("images/refresh_latest_images")
   },
@@ -61,14 +61,6 @@ export default {
     let js9home = document.getElementById('js9home')
     js9home.appendChild(this.js9content);
 
-    //let remove_elements = [
-      //this.js9supportcss,
-      //this.js9css,
-      //this.js9prefs,
-      //this.js9support,
-      //this.js9,
-      //this.js9plugins,
-    //].map(element => element.parentNode.removeChild(element))
   },
 
 
@@ -95,17 +87,6 @@ export default {
       JS9.AddDivs("myJS9");
     },
 
-
-    loadImage(base_filename) {
-      let apiName = this.$store.getters['dev/api'];
-      let path = `/fits13_url/${base_filename.slice(0,3)}/${base_filename}/`;
-      console.log(path)
-
-      let fitsURL = API.get(apiName, path, {}).then(response => {
-        console.log(response)
-        JS9.Load(response, {"display": "myJS9"}, "light")
-      })
-    }
   },
   computed: {
 

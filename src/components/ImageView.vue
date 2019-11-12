@@ -43,7 +43,7 @@
         </svg>
 
         <div id="js9-window" v-if="js9IsVisible" >
-          <JS9 ref="js9" :thewidth="js9width" :theheight="js9height" />
+          <JS9 ref="js9" :include-menu="true" :initial-width="js9width" :initial-height="js9height" />
         </div>
 
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
@@ -316,6 +316,11 @@ export default {
         // Resize the image displayed
         let svgRect = this.$refs.svgElement.getBoundingClientRect();
         let imageEl = this.$refs.image
+
+        // This is fed to js9 just before displaying to set the matching size. 
+        this.js9width=svgRect.width
+        this.js9height=svgRect.width
+
         imageEl.setAttribute("width", svgRect.width)
         imageEl.setAttribute("height", svgRect.width)
         // Resize the svg
@@ -326,15 +331,6 @@ export default {
         this.imageHeight = imageRect.height
       }
       
-      //let imagediv = this.$refs.image_div.getBoundingClientRect();
-      //let js9El = this.$refs.js9
-      //let js9El = document.getElementById('js99')
-      //js9El.setAttribute("width",imagediv.width)
-      //js9El.setAttribute("height",imagediv.width)
-      //this.js9width = imagediv.width
-      //this.js9height = imagediv.width
-      //console.log(imagediv.width)
-
       this.drawSubframe()
     },
 
@@ -475,11 +471,11 @@ export default {
     },
 
     js9LoadImage(image) {
-      let load_options = {
+      let the_load_options = {
         site: image.site,
         base_filename: image.base_filename,
       }
-      this.$store.dispatch('js9/loadImage', load_options)
+      this.$store.dispatch('js9/loadImage', the_load_options)
     },
 
     toggleAnalysis() {

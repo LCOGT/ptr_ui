@@ -14,6 +14,9 @@
             <b-navbar-item tag="router-link" :to="{ path: '/imgs' }">
                 images
             </b-navbar-item>
+            <b-navbar-item tag="router-link" :to="{ path: '/analysis' }">
+                analysis
+            </b-navbar-item>
             <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
                 sky
             </b-navbar-item>
