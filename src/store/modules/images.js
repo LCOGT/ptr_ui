@@ -27,7 +27,7 @@ const actions = {
     /**
      *  This action will retrieve a complete list of an account's images (from the api).
      */
-    get_user_images({ commit, state, rootState }) {
+    async get_user_images({ commit, state, rootState }) {
 
         // TODO: Remove hard coded values and make sure that username in UI is linked to image records in database
         // let username = rootState.auth.user.username
@@ -60,7 +60,7 @@ const actions = {
     /**
      *  This action will retrieve a list of the latest images (from the api).
      */
-    refresh_latest_images({ commit, state, rootState }) {
+    async refresh_latest_images({ commit, state, rootState }) {
 
         let site = rootState.observatory_configuration.selected_site;
         let apiName = rootState.dev.active_api;
@@ -84,16 +84,17 @@ const actions = {
          *      "fits13_url": str,
          *  }
          */
-        API.get(apiName, path).then(response => {
+        await API.get(apiName, path).then(async response => {
 
-            commit('setRecentImages', response)
 
             // If current_image is empty, or if we've switched sites:
             // set current_image to the first element from 'recent_images'. 
             if (!Object.keys(state.current_image).length
                 || state.current_image.site != response[0].site) {
-                commit('setCurrentImage', state.recent_images[0])
+                commit('setCurrentImage',response[0])
             }
+
+            await commit('setRecentImages', response)
 
         }).catch(error => {
             console.log(error)

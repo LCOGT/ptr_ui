@@ -47,15 +47,6 @@ export default {
     }
   },
   methods: {
-    toggleSites() {
-      let the_sites = ["wmd", "WMD"];
-      let chosen_site = the_sites[this.toggleSiteIndex];
-      this.$store.commit(
-        "observatory_configuration/setActiveSite",
-        chosen_site
-      );
-      this.toggleSiteIndex = (this.toggleSiteIndex + 1) % 2;
-    },
     imagesByUser() {
         this.$store.dispatch('images/get_user_images')
     }

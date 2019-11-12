@@ -298,21 +298,24 @@ const actions = {
         })
     },
 
-    set_default_filter_option({ commit, getters }) {
-        commit('command_params/filter_wheel_options_selection', 
+    async set_default_filter_option({ commit, getters }) {
+        await commit('command_params/filter_wheel_options_selection', 
                 getters.filter_wheel_options[0],
                 {root: true},
             )
     },
 
-    set_default_active_devices({ commit, dispatch }, site) {
-        if (site=="wmd") {
-            commit('setActiveSite', site)
-            commit('setActiveEnclosure', 'enclosure1')
-            commit('setActiveMount', 'mount1')
-            commit('setActiveTelescope', 'telescope1')
-            dispatch('setActiveTelescope', 'telescope1')
-        }
+    async set_default_active_devices({ commit, dispatch }, site) {
+        return new Promise((resolve, reject) => {
+            if (site=="wmd") {
+                commit('setActiveSite', site)
+                commit('setActiveEnclosure', 'enclosure1')
+                commit('setActiveMount', 'mount1')
+                commit('setActiveTelescope', 'telescope1')
+                dispatch('setActiveTelescope', 'telescope1')
+            }
+            resolve()
+        })
     },
 
     setActiveTelescope({ commit, getters, dispatch, rootGetters }, telescope_name) {

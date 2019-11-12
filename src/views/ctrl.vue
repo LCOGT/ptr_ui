@@ -533,16 +533,21 @@ export default {
     }
   },
 
-  created() {
+  async created() {
     var that = this;
-    // Make sure we're using the latest site configuration.
-    this.$store.dispatch('observatory_configuration/update_config').then(function() {
 
-      // Default site/device values.
-      that.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
-      that.$store.dispatch('instrument_state/updateStatus')
+    //// Make sure we're using the latest site configuration.
+    //this.$store.dispatch('observatory_configuration/update_config').then(function() {
 
-    }())
+      //// Default site/device values.
+      //that.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
+      //that.$store.dispatch('instrument_state/updateStatus')
+
+    //}())
+    
+    await this.$store.dispatch('observatory_configuration/update_config')
+    await this.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
+    await this.$store.dispatch('instrument_state/updateStatus')
 
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.

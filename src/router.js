@@ -19,6 +19,7 @@ import skymap from './views/skymap.vue'
 import ctrl from './views/ctrl.vue'
 import ux1 from './views/ux1.vue'
 import js9 from './views/js9.vue'
+import analysis from './views/analysis.vue'
 
 import store from './store'
 import { Auth } from 'aws-amplify'
@@ -41,6 +42,7 @@ const router = new VueRouter({
     { path: '/skymap', name: 'skymap', component: skymap},
     { path: '/ctrl', name: 'ctrl', component:ctrl},
     { path: '/js9', name: 'js9', component:js9},
+    { path: '/analysis', name: 'analysis', component:analysis},
     { 
       path: '/ux1/:sitecode/:subpage', 
       name: 'ux1', 

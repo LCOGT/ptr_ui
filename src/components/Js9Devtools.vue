@@ -15,7 +15,7 @@
                 <div class="server-tasks">
                     <div :disabled="!js9IsVisible" class="button" @click="JS9.RunAnalysis('macros')">Show Macros</div>
                     <div :disabled="!js9IsVisible" class="button is-warning" @click="JS9.RunAnalysis('update')">Update server scripts</div>
-                    <div :disabled="!js9IsVisible" class="button" @click="runMyAnalysis('ex-plot')">Random plot</div>
+                    <div :disabled="!js9IsVisible" class="button" @click="runMyAnalysis('script2')">Plot profile</div>
                 </div>
                 <div id="js9-plot-1" style="height: 100px;"></div>
             </div>
