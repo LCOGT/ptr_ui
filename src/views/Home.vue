@@ -41,7 +41,7 @@ export default {
         minBorderMargin: 0,
         borderWidth: 0,
         hoverable: true,
-        markings: [ { xaxis: { from: 3, to: 3 }, yaxis: {from: 0, to: 8}, color: "white", lineWidth: 1,}],
+        markings: [ { xaxis: { from: 3, to: 3 }, yaxis: {from: 0, to: 8}, color: "white", lineWidth: 1}],
       },
       yaxis: {
         show: false,

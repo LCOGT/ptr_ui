@@ -14,8 +14,13 @@
             <div class="js9-dev-buttons">
                 <div class="server-tasks">
                     <div :disabled="!js9IsVisible" class="button" @click="JS9.RunAnalysis('macros')">Show Macros</div>
-                    <div :disabled="!js9IsVisible" class="button is-warning" @click="JS9.RunAnalysis('update')">Update server scripts</div>
                     <div :disabled="!js9IsVisible" class="button" @click="runMyAnalysis('script2')">Plot profile</div>
+                    <div :disabled="!js9IsVisible" class="button" @click="zoomJs9('toFit')">Zoom to fit</div>
+                    <div :disabled="!js9IsVisible" class="button" @click="zoomJs9('0.5')">Zoom to half</div>
+                    <hr>
+                    <div :disabled="!js9IsVisible" 
+                          class="button is-warning" 
+                         @click="JS9.RunAnalysis('update')">Update server scripts</div>
                 </div>
                 <div id="js9-plot-1" style="height: 100px;"></div>
             </div>
@@ -40,6 +45,10 @@ export default {
         // run ananlysis on current image, defining a function to display results
         runMyAnalysis: function(aname){
             JS9.RunAnalysis(aname, null, this.displayMyAnalysis);
+        },
+
+        zoomJs9: function(zoomlevel) {
+            this.$store.dispatch('js9/zoom', zoomlevel)
         },
 
         // display function passed to JS9.RunAnalysis and JS9.SubmitAnalysis
