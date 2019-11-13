@@ -11,11 +11,18 @@
   <div class="columns">
     <div class="img-view column is-two-thirds">
 
-      <div id="js9analysiswrapper" style="width: 100%; /*border: solid 1px red;*/">
-      <JS9 :include-menu="false" />
+      <div class="js9-grid">
+
+      <!--div id="js9analysiswrapper" style="width: 100%; /*border: solid 1px red;*/"-->
+      <JS9 id="js9analysiswrapper" :include-menu="false" />
+      <!--/div-->
+
+
+      <div id="js9-x-profile" ></div>
+      <div id="js9-y-profile" ></div>
+    
       </div>
 
-      <div id="js9-x-profile" style='height: 60px;'></div>
 
     </div>
 
@@ -90,7 +97,7 @@ export default {
 
       let resize_opts = {
         id: "myJS9",
-        width: imageWindow.width, // adjust for 15px padding
+        width: imageWindow.width, 
         height: imageWindow.width,
       }
       this.$store.dispatch('js9/resizeDisplay', resize_opts)
@@ -168,11 +175,26 @@ export default {
 .analysis-status {
   padding: 0 0.75em;
 }
-.select-device {
-  border-bottom: 1px solid silver;
-  padding-bottom: 2em;
-}
 .nav-panel > * {
   margin-bottom: 1em;
 }
+
+.js9-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: calc(100% - 80px) 70px;
+  grid-template-rows: calc(100% - 80px) 70px;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+}
+
+#js9-analysis-wrapper { grid-area: 1 / 1 / 2 / 2; }
+.js9-component { grid-area: 1 / 1 / 2 / 2; }
+#js9-x-profile { grid-area: 2 / 1 / 3 / 2; }
+#js9-y-profile { 
+  grid-area: 2 / 1 / 3 / 2; 
+  transform-origin: top right; 
+  transform: rotate(-90deg) translate(10px, 10px) scale(-1,1);  
+  }
+
 </style>
