@@ -30,14 +30,31 @@ import { API } from 'aws-amplify'
         }
     }
 
-    function drawCrosshairCuts(im, ipos, evt){
-        if( im && im.crosshair && im.params.crosshair /*&& evt.shiftKey*/ ){
+    // Helper function for finding max in an array. 
+    // Note: Math.max(...large_array) gives stackoverflow error.
+    function findmax(array) {
+        var max = 0,
+            a = array.length,
+            counter
 
+        for (counter=0;counter<a;counter++) {
+            if (array[counter] > max) {
+                max = array[counter]
+            }
+        }
+        return max 
+    }
+
+    function drawCrosshairCuts(im, ipos, evt){
+        if( im && im.crosshair && im.params.crosshair && evt.key=="Shift" ){
+            console.log(evt)
+
+            // Select the divs that will contain the plots.
             let xOutDiv = document.getElementById("js9-x-profile")
             let yOutDiv = document.getElementById("js9-y-profile")
 
+            // Get data from the displayed image.
             let obj = JS9.GetImageData(true)
-            console.log(obj)
 
             // These arrays are plotted by flot
             let xdata = []
@@ -131,14 +148,16 @@ import { API } from 'aws-amplify'
             },
             yaxis: {
                 show: false,
+                min: 0,
+                max: findmax(obj.data)
             },
             xaxis: {
                 show: false,
             },
             }
+
             let yOpts = {
             zoomStack: true,
-            //selection: { mode: "xy" },
             grid: {
                 backgroundColor: "#232929",
                 margin: {
@@ -166,6 +185,8 @@ import { API } from 'aws-amplify'
             },
             yaxis: {
                 show: false,
+                min: 0,
+                max: findmax(obj.data),
             },
             xaxis: {
                 show: false,
@@ -183,6 +204,7 @@ import { API } from 'aws-amplify'
 
 // initial state
 const state = {
+    js9Ready: false,
     JS9_ID: 'myJS9',
     instanceIsVisible: false,
     js9_current_image: '',
@@ -190,6 +212,7 @@ const state = {
     js9Width: '',
     js9Height: '',
     js9Zoom: '',
+    crosshairActive: false,
 }
 
 // getters
@@ -204,6 +227,20 @@ const getters = {
 
 // actions
 const actions = {
+
+    // Use this action to ensure js9 is ready to go
+    // Either returns true, or waits for the event and then returns true. 
+    async waitForJs9Ready({ commit, state }) {
+        console.log('js9ready state: ',state.js9Ready)
+        if (state.js9Ready) { console.log('js9 already ready'); return true }
+        else {
+            console.log('js9 not ready yet, waiting for event...')
+            return $(document).on("JS9:ready", async () => {
+                console.log('js9 ready event recieved.')
+                commit('js9Ready', true)
+            })
+        }
+    },
 
     loadImage({ rootState, state, commit }, { base_filename, site, zoom }) {
 
@@ -282,6 +319,7 @@ const actions = {
 
 // mutations
 const mutations = {
+    js9Ready(state, val) { state.js9Ready = val },
     JS9_ID(state, id) { state.JS9_ID = id },
     instanceIsVisible(state, vis) { state.instanceIsVisible = vis },
     js9_current_image(state, base_filename ) { state.js9_current_image = base_filename },
@@ -289,6 +327,7 @@ const mutations = {
     js9Width(state,val) { state.js9Width = val },
     js9Height(state,val) { state.js9Height = val },
     js9Zoom(state, val) { state.js9ZOom = val },
+    crosshairActive(state, val) {state.crosshairActive = val}
 }
 
 export default {

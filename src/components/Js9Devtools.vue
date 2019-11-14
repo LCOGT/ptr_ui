@@ -14,9 +14,17 @@
             <div class="js9-dev-buttons">
                 <div class="server-tasks">
                     <div :disabled="!js9IsVisible" class="button" @click="JS9.RunAnalysis('macros')">Show Macros</div>
-                    <div :disabled="!js9IsVisible" class="button" @click="runMyAnalysis('script2')">Plot profile</div>
+                    <div :disabled="!js9IsVisible" class="button" @click="runMyAnalysis('script2')">Plot something</div>
                     <div :disabled="!js9IsVisible" class="button" @click="zoomJs9('toFit')">Zoom to fit</div>
                     <div :disabled="!js9IsVisible" class="button" @click="zoomJs9('0.5')">Zoom to half</div>
+                    <b-tooltip 
+                        label="When activated, hold shift while moving the mouse over the image." 
+                        position="is-right" 
+                        multilined>
+                        <b-field label="crosshairs">
+                            <b-switch type="is-light" v-model="crosshairIsActive" @input="toggleCrosshair"></b-switch>
+                        </b-field>
+                    </b-tooltip>
                     <hr>
                     <div :disabled="!js9IsVisible" 
                           class="button is-warning" 
@@ -49,6 +57,10 @@ export default {
 
         zoomJs9: function(zoomlevel) {
             this.$store.dispatch('js9/zoom', zoomlevel)
+        },
+
+        toggleCrosshair: function() {
+            JS9.SetParam("crosshair", this.crosshairIsActive)
         },
 
         // display function passed to JS9.RunAnalysis and JS9.SubmitAnalysis
@@ -94,6 +106,14 @@ export default {
     
     },
     computed: {
+        ...mapState('js9', [
+            'js9Zoom',
+            'crosshairActive'
+        ]),
+        crosshairIsActive: {
+            get() { return this.crosshairActive },
+            set(val) { this.$store.commit('js9/crosshairActive', val)},
+        },
         js9IsVisible: {
             get() { return this.$store.getters['js9/instanceIsVisible']},
             set(val) { this.$store.commit('js9/instanceIsVisible', val)},
@@ -111,6 +131,7 @@ export default {
 .server-tasks {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
 }
 .server-tasks > * {
     margin-bottom: 0.5em;
