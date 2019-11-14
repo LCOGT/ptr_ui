@@ -18,8 +18,8 @@
       <!--/div-->
 
 
-      <div id="js9-x-profile" ></div>
-      <div id="js9-y-profile" ></div>
+      <div id="js9-x-profile" />
+      <div id="js9-y-profile" />
     
       </div>
 
@@ -105,25 +105,20 @@ export default {
     },
 
   },
-  beforeCreate() {
+  async beforeCreate() {
 
     // Set the default site for convenience
     this.active_site = "wmd";
     this.$store.dispatch("observatory_configuration/update_config");
 
     this.$store.commit('js9/instanceIsVisible', true)
+
+    await this.$store.dispatch("js9/waitForJs9Ready")
      
   },
-  created() {
-  },
-  beforeDestory() {
-    // We don't need to keep the image dimensions in sync if it's not displayed.
-    clearInterval(this.syncImageSize);
-  },
-  async mounted() {
-
-    $(document).on("JS9:ready", async () => {
-	      console.log("js9 ready");
+  async created() {
+    //$(document).on("JS9:ready", async () => {
+	      //console.log("js9 ready");
         await this.$store.dispatch("images/refresh_latest_images")
 
         // Load the latest image into js9
@@ -143,7 +138,14 @@ export default {
           this.computeJs9WindowSize,
           this.syncImageInterval
         );
-    });
+    //});
+  },
+  beforeDestroy() {
+    // We don't need to keep the image dimensions in sync if it's not displayed.
+    clearInterval(this.syncImageSize);
+  },
+  async mounted() {
+
 
 
   },
@@ -188,13 +190,18 @@ export default {
   grid-row-gap: 10px;
 }
 
+/** Note: the y-profile was originally a div in the grid layout defined above. 
+However, it was easier to figure out how to rotate the plot than generate a 
+sideways plot with flot. So the y-profile div is located in the same place as 
+the x-profile div, but it is rotated and shifted with css to position in the
+(correct) position to the right of the main js9 display.
+*/
+
 #js9-analysis-wrapper { grid-area: 1 / 1 / 2 / 2; }
-.js9-component { grid-area: 1 / 1 / 2 / 2; }
 #js9-x-profile { grid-area: 2 / 1 / 3 / 2; }
-#js9-y-profile { 
-  grid-area: 2 / 1 / 3 / 2; 
+#js9-y-profile { grid-area: 2 / 1 / 3 / 2; 
   transform-origin: top right; 
   transform: rotate(-90deg) translate(10px, 10px) scale(-1,1);  
-  }
+}
 
 </style>
