@@ -230,19 +230,40 @@ const actions = {
 
     // Use this action to ensure js9 is ready to go
     // Either returns true, or waits for the event and then returns true. 
-    async waitForJs9Ready({ commit, state }) {
-        console.log('js9ready state: ',state.js9Ready)
-        if (state.js9Ready) { console.log('js9 already ready'); return true }
-        else {
-            console.log('js9 not ready yet, waiting for event...')
-            return $(document).on("JS9:ready", async () => {
-                console.log('js9 ready event recieved.')
-                commit('js9Ready', true)
-            })
-        }
-    },
+    waitForJs9Ready({ commit, state }) {
+        return new Promise((resolve, reject) => {
 
-    loadImage({ rootState, state, commit }, { base_filename, site, zoom }) {
+            if (state.js9Ready) { console.log('js9 already ready'); console.log(JS9.readied); resolve(true) }
+            else if (JS9.readied) { console.log('js9 already ready'); commit('js9Ready', true); resolve(true); }
+            else {
+                console.log('js9 not ready yet, waiting for event...')
+                $(document).on("JS9:ready", () => {
+                    console.log('js9 ready event recieved.')
+                    commit('js9Ready', true)
+                    resolve(true)
+                })
+            }
+        })
+    },
+    //async waitForJs9Ready({ commit, state }) {
+
+            //if (state.js9Ready) { console.log('js9 already ready'); console.log(JS9.readied);return true; }
+            //else if (JS9.readied) { console.log('js9 already ready'); commit('js9Ready', true); return true; }
+            //else {
+                //console.log('js9 not ready yet, waiting for event...')
+                //$(document).on("JS9:ready", () => {
+                    //console.log('js9 ready event recieved.')
+                    //commit('js9Ready', true)
+                    //return true;
+                //})
+            //}
+    //},
+
+    async loadImage({ rootState, state, commit, dispatch }, { base_filename, site, zoom }) {
+
+        console.log('awaiting js9ready')
+        await dispatch('waitForJs9Ready')
+        console.log('done awaiting js9ready')
 
         // only load if it's not currently loaded.
         if (!base_filename || !site) {

@@ -113,12 +113,14 @@ export default {
 
     this.$store.commit('js9/instanceIsVisible', true)
 
-    await this.$store.dispatch("js9/waitForJs9Ready")
      
   },
   async created() {
     //$(document).on("JS9:ready", async () => {
-	      //console.log("js9 ready");
+        //console.log("js9 ready");
+        //console.log('first await:')
+        //this.$store.dispatch("js9/waitForJs9Ready")
+        //console.log('second await')
         await this.$store.dispatch("images/refresh_latest_images")
 
         // Load the latest image into js9
