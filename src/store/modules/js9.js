@@ -31,7 +31,7 @@ import { API } from 'aws-amplify'
     }
 
     // Helper function for finding max in an array. 
-    // Note: Math.max(...large_array) gives stackoverflow error.
+    // Note: Math.max(...large_array) runs out of memory for large arrays.
     function findmax(array) {
         var max = 0,
             a = array.length,

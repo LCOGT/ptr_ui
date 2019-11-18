@@ -14,7 +14,7 @@
       <div class="js9-grid">
 
       <!--div id="js9analysiswrapper" style="width: 100%; /*border: solid 1px red;*/"-->
-      <JS9 id="js9analysiswrapper" :include-menu="false" />
+      <JS9 id="js9analysiswrapper" class="no-crosshairs" :include-menu="false" />
       <!--/div-->
 
 
@@ -67,7 +67,7 @@
 import { API, Auth } from "aws-amplify";
 import ImageView from "@/components/ImageView";
 import ImageNavigationPanel from "@/components/ImageNavigationPanel";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import Js9Devtools from "@/components/Js9Devtools";
 import ImageFilter from "@/components/ImageFilter";
 import JS9 from "@/components/JS9";
@@ -93,7 +93,9 @@ export default {
   methods: {
 
     computeJs9WindowSize() {
-      let imageWindow = document.getElementById("js9analysiswrapper").getBoundingClientRect()
+      let withCrosshairs = document.getElementById("js9analysiswrapper").getBoundingClientRect()
+      let noCrosshairs = document.getElementsByClassName("js9-grid")[0].getBoundingClientRect()
+      let imageWindow = (this.crosshairActive) ? withCrosshairs : noCrosshairs;
 
       let resize_opts = {
         id: "myJS9",
@@ -159,6 +161,10 @@ export default {
       current_image: "current_image"
     }),
 
+    ...mapState("js9", [
+      'crosshairActive',
+    ]),
+
     active_site: {
       get() { return this.$store.getters["observatory_configuration/site"]; },
       set(value) { this.$store.commit("observatory_configuration/setActiveSite", value); }
@@ -200,10 +206,13 @@ the x-profile div, but it is rotated and shifted with css to position in the
 */
 
 #js9-analysis-wrapper { grid-area: 1 / 1 / 2 / 2; }
+#js9-analysis-wrapper.no-crosshairs { grid-area: 1/2/3/3; }
 #js9-x-profile { grid-area: 2 / 1 / 3 / 2; }
+#js9-x-profile.no-crosshairs { display:none; }
 #js9-y-profile { grid-area: 2 / 1 / 3 / 2; 
   transform-origin: top right; 
   transform: rotate(-90deg) translate(10px, 10px) scale(-1,1);  
 }
+#js9-y-profile.no-crosshairs { display:none; }
 
 </style>
