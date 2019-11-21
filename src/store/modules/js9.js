@@ -95,6 +95,7 @@ const actions = {
                 setTimeout(function(){
                     ensureImageLoaded().then(function(){
                         console.log(JS9.GetLoadStatus())
+                        commit('crosshairActive', false)
                         JS9.UploadFITSFile()
                         if (zoom) JS9.SetZoom(zoom)
                     })
