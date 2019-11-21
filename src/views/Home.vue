@@ -3,7 +3,7 @@
     <nav class="level"><div class="level-item title">photon ranch</div></nav>
     <!--the-world-map name="google" /-->
 
-    <!--leaflet-map name="leafmap"></leaflet-map-->
+    <leaflet-map name="leafmap"></leaflet-map>
     <div id="testplotdiv" style="width: 600px; height: 200px;" />
   </div>
 </template>
