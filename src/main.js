@@ -11,6 +11,8 @@ import '@mdi/font/css/materialdesignicons.css'
 import Amplify, * as AmplifyModules from 'aws-amplify'
 import { AmplifyPlugin } from 'aws-amplify-vue'
 
+import JS9Helpers from '@/utils/js9Helpers'
+
 /** 
  * This used to be used in Amplify.configure(awsmobile), but that broke the 
  * api that is configured in App.vue. (Probably two calls to Amplify.configure 

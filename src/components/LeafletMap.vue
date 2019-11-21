@@ -5,6 +5,7 @@
 </template>
 
 <script>
+
 import nite from '@/utils/nite-overlay'
 export default {
   name: 'LeafletMap',
@@ -37,6 +38,14 @@ export default {
         apiKey: OWM_API_KEY,
         opacity: 0.5
       })
+      console.log(owm_clouds)
+      console.log(`http://${s}.tile.openweathermap.org/map/clouds/${z}/${x}/${y}.png?appid=${apiKey}`, {
+        maxZoom: 19,
+        attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
+        apiKey: OWM_API_KEY,
+        opacity: 0.5
+      }
+      )
       var owm_wind = L.tileLayer('http://{s}.tile.openweathermap.org/map/wind/{z}/{x}/{y}.png?appid={apiKey}', {
         maxZoom: 19,
         attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',

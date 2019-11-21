@@ -59,8 +59,10 @@ export default {
             this.$store.dispatch('js9/zoom', zoomlevel)
         },
 
-        toggleCrosshair: function() {
-            JS9.SetParam("crosshair", this.crosshairIsActive)
+        toggleCrosshair: async function() {
+            //JS9.SetParam("crosshair", this.crosshairIsActive)
+            await this.$store.dispatch('js9/toggleCrosshair')
+            await this.$store.dispatch('js9/resizeForCrosshairs')
 
             if (this.crosshairIsActive) {
                 document.getElementById("js9-x-profile").classList.remove("no-crosshairs")

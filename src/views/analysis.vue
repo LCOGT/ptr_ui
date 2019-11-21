@@ -17,9 +17,8 @@
       <JS9 id="js9analysiswrapper" class="no-crosshairs" :include-menu="false" />
       <!--/div-->
 
-
-      <div id="js9-x-profile" />
-      <div id="js9-y-profile" />
+      <div id="js9-x-profile" class="no-crosshairs"/>
+      <div id="js9-y-profile" class="no-crosshairs"/>
     
       </div>
 
@@ -92,18 +91,9 @@ export default {
   },
   methods: {
 
-    computeJs9WindowSize() {
-      let withCrosshairs = document.getElementById("js9analysiswrapper").getBoundingClientRect()
-      let noCrosshairs = document.getElementsByClassName("js9-grid")[0].getBoundingClientRect()
-      let imageWindow = (this.crosshairActive) ? withCrosshairs : noCrosshairs;
-
-      let resize_opts = {
-        id: "myJS9",
-        width: imageWindow.width, 
-        height: imageWindow.width,
-      }
-      this.$store.dispatch('js9/resizeDisplay', resize_opts)
-      document.getElementById("js9-x-profile").setAttribute("width", imageWindow.width)
+    onResize(event) {
+      console.log('window has been resized', event) 
+      this.$store.dispatch('js9/resizeForCrosshairs')
     },
 
   },
@@ -112,47 +102,36 @@ export default {
     // Set the default site for convenience
     this.active_site = "wmd";
     this.$store.dispatch("observatory_configuration/update_config");
-
     this.$store.commit('js9/instanceIsVisible', true)
-
-     
   },
+
   async created() {
-    //$(document).on("JS9:ready", async () => {
-        //console.log("js9 ready");
-        //console.log('first await:')
-        //this.$store.dispatch("js9/waitForJs9Ready")
-        //console.log('second await')
-        await this.$store.dispatch("images/refresh_latest_images")
 
-        // Load the latest image into js9
-        let load_options = {
-          site: this.current_image.site,
-          base_filename: this.current_image.base_filename,
-          zoom: "toFit"
-        }
-        this.computeJs9WindowSize()
+    await this.$store.dispatch("images/refresh_latest_images")
 
-        this.$store.dispatch('js9/loadImage', load_options)
-        this.$store.dispatch('js9/zoom', "toFit")
+    this.$store.dispatch('js9/resizeForCrosshairs')
 
-        // Keep the displayed image element width and height in sync.
-        // This is important for relative measurements on the image (crosshairs, clicks, etc)
-        this.syncImageSize = setInterval(
-          this.computeJs9WindowSize,
-          this.syncImageInterval
-        );
-    //});
+    // Load the latest image into js9
+    let load_options = {
+      site: this.current_image.site,
+      base_filename: this.current_image.base_filename,
+      zoom: "toFit",
+    }
+
+    await this.$store.dispatch('js9/loadImage', load_options)
+//    this.$store.dispatch('js9/zoom', "toFit")
+
+  },
+
+  mounted() {
+    // Register an event listener when the Vue component is ready
+    window.addEventListener('resize', this.onResize)
   },
   beforeDestroy() {
-    // We don't need to keep the image dimensions in sync if it's not displayed.
-    clearInterval(this.syncImageSize);
+    // Unregister the event listener before destroying this Vue instance
+    window.removeEventListener('resize', this.onResize)
   },
-  async mounted() {
 
-
-
-  },
   computed: {
     ...mapGetters("observatory_configuration", ["available_sites"]),
 
@@ -207,11 +186,11 @@ the x-profile div, but it is rotated and shifted with css to position in the
 
 #js9-analysis-wrapper { grid-area: 1 / 1 / 2 / 2; }
 #js9-analysis-wrapper.no-crosshairs { grid-area: 1/2/3/3; }
-#js9-x-profile { grid-area: 2 / 1 / 3 / 2; }
+#js9-x-profile { grid-area: 2 / 1 / 3 / 2; background-color: #232929; }
 #js9-x-profile.no-crosshairs { display:none; }
-#js9-y-profile { grid-area: 2 / 1 / 3 / 2; 
+#js9-y-profile { grid-area: 2 / 1 / 3 / 2; background-color: #232929;
   transform-origin: top right; 
-  transform: rotate(-90deg) translate(10px, 10px) scale(-1,1);  
+  transform: rotate(-90deg) translate(15px, 10px) scale(-1,1);  
 }
 #js9-y-profile.no-crosshairs { display:none; }
 
