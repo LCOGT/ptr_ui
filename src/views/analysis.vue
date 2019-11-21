@@ -28,7 +28,7 @@
     <div class="nav-panel column is-one-third">  
       <js9-devtools/>
 
-      <b-collapse class="card" :open="true">
+      <b-collapse class="card" :open="false">
           <div
           slot="trigger" 
           slot-scope="props"
@@ -49,12 +49,11 @@
               <div class="JS9Plugin JS9Panner" id="myJS9Panner" />
             </div>
           </div>
-
-
       </b-collapse>
 
-      <!--image-filter/-->
-      <!--image-navigation-panel/-->
+      <image-filter/>
+      <image-navigation-panel/>
+
     </div>
 
   </div>
@@ -65,9 +64,9 @@
 <script>
 import { API, Auth } from "aws-amplify";
 import ImageView from "@/components/ImageView";
-import ImageNavigationPanel from "@/components/ImageNavigationPanel";
 import { mapGetters, mapState } from "vuex";
 import Js9Devtools from "@/components/Js9Devtools";
+import ImageNavigationPanel from "@/components/ImageNavigationPanel";
 import ImageFilter from "@/components/ImageFilter";
 import JS9 from "@/components/JS9";
 

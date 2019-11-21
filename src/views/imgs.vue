@@ -28,9 +28,9 @@
 <script>
 import { API, Auth } from "aws-amplify";
 import ImageView from "@/components/ImageView";
-import ImageNavigationPanel from "@/components/ImageNavigationPanel";
 import { mapGetters } from "vuex";
 import Js9Devtools from "@/components/Js9Devtools";
+import ImageNavigationPanel from "@/components/ImageNavigationPanel";
 import ImageFilter from "@/components/ImageFilter";
 
 export default {
