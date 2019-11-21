@@ -94,18 +94,38 @@ const actions = {
                 // Wait a bit before checking so we don't get the 'complete' status from the prior image.
                 setTimeout(function(){
                     ensureImageLoaded().then(function(){
-                        console.log(JS9.GetLoadStatus())
+
+                        // turn off the crosshair for new images
                         commit('crosshairActive', false)
+                        dispatch('crosshairOff')
+
+                        // upload to enable server side tasks
                         JS9.UploadFITSFile()
+
+                        // set zoom level
                         if (zoom) JS9.SetZoom(zoom)
                     })
                 }, 500)
-
 
             }).catch(error => {
                 console.log(error)
             });
         }
+    },
+
+    crosshairOff({ state, dispatch }) {
+        if (JS9.GetImage(state.JS9_ID).params.crosshair){
+            JS9.Keyboard.Actions["toggle crosshair"](JS9.GetImage(state.JS9_ID))
+        }
+        // Secondary tasks: resizing and hiding the crosshair plots.
+        dispatch('resizeForCrosshairs')
+    },
+    crosshairOn({ state, dispatch }) {
+        if (!JS9.GetImage(state.JS9_ID).params.crosshair){
+            JS9.Keyboard.Actions["toggle crosshair"](JS9.GetImage(state.JS9_ID))
+        }
+        // Secondary tasks: resizing and hiding the crosshair plots.
+        dispatch('resizeForCrosshairs')
     },
 
     toggleCrosshair({ state }) {
