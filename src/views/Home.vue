@@ -1,9 +1,10 @@
 <template>  
   <div>
     <nav class="level"><div class="level-item title">photon ranch</div></nav>
-    <!--the-world-map name="google" /-->
 
-    <leaflet-map name="leafmap"></leaflet-map>
+    <the-world-map name="google" />
+    <!--leaflet-map name="leafmap"></leaflet-map-->
+
   </div>
 </template>
 
