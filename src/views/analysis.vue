@@ -14,11 +14,11 @@
       <div class="js9-grid">
 
       <!--div id="js9analysiswrapper" style="width: 100%; /*border: solid 1px red;*/"-->
-      <JS9 id="js9analysiswrapper" class="no-crosshairs" :include-menu="false" />
+      <JS9 id="js9analysiswrapper" :class="{ 'no-crosshairs' : !crosshairActive }" :include-menu="false" />
       <!--/div-->
 
-      <div id="js9-x-profile" class="no-crosshairs"/>
-      <div id="js9-y-profile" class="no-crosshairs"/>
+      <div id="js9-x-profile" :class="{ 'no-crosshairs' : !crosshairActive }"/>
+      <div id="js9-y-profile" :class="{ 'no-crosshairs' : !crosshairActive }"/>
     
       </div>
 
@@ -129,6 +129,7 @@ export default {
   beforeDestroy() {
     // Unregister the event listener before destroying this Vue instance
     window.removeEventListener('resize', this.onResize)
+
   },
 
   computed: {

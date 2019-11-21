@@ -60,17 +60,24 @@ export default {
         },
 
         toggleCrosshair: async function() {
-            //JS9.SetParam("crosshair", this.crosshairIsActive)
-            await this.$store.dispatch('js9/toggleCrosshair')
-            await this.$store.dispatch('js9/resizeForCrosshairs')
-
+            console.log('crosshairIsActive', this.crosshairIsActive)
             if (this.crosshairIsActive) {
-                document.getElementById("js9-x-profile").classList.remove("no-crosshairs")
-                document.getElementById("js9-y-profile").classList.remove("no-crosshairs")
-            } else {
-                document.getElementById("js9-x-profile").classList.add("no-crosshairs")
-                document.getElementById("js9-y-profile").classList.add("no-crosshairs")
+                this.$store.dispatch('js9/crosshairOn')
+            } 
+            else {
+                this.$store.dispatch('js9/crosshairOff')
             }
+            //JS9.SetParam("crosshair", this.crosshairIsActive)
+            //await this.$store.dispatch('js9/toggleCrosshair')
+            //await this.$store.dispatch('js9/resizeForCrosshairs')
+
+            //if (this.crosshairIsActive) {
+                //document.getElementById("js9-x-profile").classList.remove("no-crosshairs")
+                //document.getElementById("js9-y-profile").classList.remove("no-crosshairs")
+            //} else {
+                //document.getElementById("js9-x-profile").classList.add("no-crosshairs")
+                //document.getElementById("js9-y-profile").classList.add("no-crosshairs")
+            //}
         },
 
         // display function passed to JS9.RunAnalysis and JS9.SubmitAnalysis

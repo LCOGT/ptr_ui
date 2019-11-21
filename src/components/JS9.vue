@@ -9,7 +9,7 @@
 
 <script>
 import { API } from "aws-amplify";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "JS9",
@@ -42,6 +42,9 @@ export default {
   },
   mounted() {
 
+    // Mark js9 as visible
+    this.$store.commit('js9/instanceIsVisible', true)
+
     // Move the js9 DOM elements into our visible component
     this.js9content = document.getElementById('js9content')
     var js9away = document.getElementById('js9component')
@@ -56,6 +59,9 @@ export default {
 
   beforeDestroy() {
 
+    // Mark js9 as no longer visible
+    this.$store.commit('js9/instanceIsVisible',false)
+
     // Don't destroy the js9 DOM elements; move them to a hidden parent element
     // (a div with ID='js9content'), so we avoid js9 reloading-related problems.
     let js9home = document.getElementById('js9home')
@@ -63,6 +69,18 @@ export default {
 
   },
 
+
+  watch: {
+
+    current_image: function(newVal, oldVal) {
+      let loadOptions = {
+        base_filename: newVal.base_filename,
+        site: newVal.site,
+      }
+      this.$store.dispatch('js9/loadImage', loadOptions)
+    },
+
+  },
 
   methods: {
     
