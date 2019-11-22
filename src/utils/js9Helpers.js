@@ -43,10 +43,11 @@ function findmax(array) {
     return max 
 }
 
-let JS9Helpers = {
-    drawCrosshairCuts: function(im, ipos, evt){
+let JS9Helpers = {}
+
+try {
+    JS9Helpers.drawCrosshairCuts = function(im, ipos, evt){
         if( im && im.crosshair && im.params.crosshair && evt.key=="Shift" ){
-            console.log(evt)
 
             // Select the divs that will contain the plots.
             let xOutDiv = document.getElementById("js9-x-profile")
@@ -194,12 +195,15 @@ let JS9Helpers = {
             $.plot(xOutDiv, [xdata], xOpts);
             $.plot(yOutDiv, [ydata], yOpts);
         }
-    },
+    }
+
+    // Registers our plugin so the crosshair cuts are plotted whenever the crosshairs change.
+    JS9.RegisterPlugin("MyPlugins", "CrosshairCut",
+            function(){},
+            {onkeyup: JS9Helpers.drawCrosshairCuts, winDims: [0, 0]});
+
+} catch(e) {
+    console.log(e)
 }
 
 export default JS9Helpers;
-
-// Registers our plugin so the crosshair cuts are plotted whenever the crosshairs change.
-JS9.RegisterPlugin("MyPlugins", "CrosshairCut",
-        function(){},
-        {onkeyup: JS9Helpers.drawCrosshairCuts, winDims: [0, 0]});
