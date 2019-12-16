@@ -37,7 +37,7 @@
             </b-navbar-dropdown>
             <b-navbar-dropdown label="dev">
                 <b-navbar-item tag="router-link" :to="{ path: '/ux1/wmd/home' }">
-                    layout-1
+                    layout--1
                 </b-navbar-item>
                 <b-navbar-item tag="router-link" :to="{ path: '/btns' }">
                     some buttons
