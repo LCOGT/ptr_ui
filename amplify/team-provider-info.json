@@ -16,23 +16,6 @@
 			}
 		}
 	},
-	"dev": {
-		"awscloudformation": {
-			"AuthRoleName": "ptr-mock-dev-20190702162545-authRole",
-			"UnauthRoleArn": "arn:aws:iam::306389350997:role/ptr-mock-dev-20190702162545-unauthRole",
-			"AuthRoleArn": "arn:aws:iam::306389350997:role/ptr-mock-dev-20190702162545-authRole",
-			"Region": "us-east-1",
-			"DeploymentBucketName": "ptr-mock-dev-20190702162545-deployment",
-			"UnauthRoleName": "ptr-mock-dev-20190702162545-unauthRole",
-			"StackName": "ptr-mock-dev-20190702162545",
-			"StackId": "arn:aws:cloudformation:us-east-1:306389350997:stack/ptr-mock-dev-20190702162545/b7840e30-9d20-11e9-a867-0e061c1f1416"
-		},
-		"categories": {
-			"auth": {
-				"photonusers": {}
-			}
-		}
-	},
 	"prod": {
 		"awscloudformation": {
 			"AuthRoleName": "ptr-mock-prod-20190919143556-authRole",
