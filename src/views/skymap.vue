@@ -1,6 +1,7 @@
 
 <template>
     <div class="column is-full container">
+      
       <the-sky-chart />
     </div>
 </template>

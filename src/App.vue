@@ -3,6 +3,17 @@
     <the-menu />
     <dev-panel /> <!-- Developer testing tools. Not for prodution. -->
     <router-view></router-view>
+
+    <!-- This is the home for the JS9 DOM elements. They are hidden here and only 
+    visible when moved into the js9 component. This avoid js9-reloading issues. -->
+    <div id="js9home" ref="js9home" v-show="false">
+      <div id="js9content" ref="js9content">
+        <div class="JS9Menubar" id="myJS9Menubar" ></div>
+        <div class="JS9" id="myJS9" data-js9init="true"></div>
+      </div>
+    </div>
+
+
   </div>
 </template>
 
@@ -12,8 +23,9 @@ import DevPanel from '@/components/DevPanel.vue'
 import Amplify, { Auth, API } from 'aws-amplify'
 import awsmobile from './aws-exports';
 import { components } from 'aws-amplify-vue'
+import JS9 from "@/components/JS9";
 
-
+ 
 // This enables connection to the backend resources created in the amplify cli.
 Amplify.configure(awsmobile)
 
@@ -47,9 +59,9 @@ Amplify.configure({
         // This is the production api.
         name: "ptr-api",
         endpoint: "https://api.photonranch.org",
-        custom_header: async () => {
-          return { Authorization: 'Bearer '+(await Auth.currentSession()).accessToken.jwtToken }
-        }
+        //custom_header: async () => {
+          //return { Authorization: 'Bearer '+(await Auth.currentSession()).accessToken.jwtToken }
+        //}
       },
       {
         // This is a copy of the production api running locally. Used for testing.
@@ -68,7 +80,8 @@ export default {
   components: {
     TheMenu,
     DevPanel,
-    components
+    JS9,
+    components,
   },
   created() {
     this.$store.dispatch('observatory_configuration/update_config')

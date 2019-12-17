@@ -1,8 +1,10 @@
 <template>  
   <div>
     <nav class="level"><div class="level-item title">photon ranch</div></nav>
+
     <the-world-map name="google" />
     <!--leaflet-map name="leafmap"></leaflet-map-->
+
   </div>
 </template>
 
@@ -10,12 +12,14 @@
 import TheWorldMap from '@/components/TheWorldMap'
 import LeafletMap from '@/components/LeafletMap'
 
+//console.log(JS9)
+
 export default {
   name: 'Home',
   components: {
     TheWorldMap,
     LeafletMap
-  }
+  },
 }
 </script>
 

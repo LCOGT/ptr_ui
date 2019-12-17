@@ -7,6 +7,7 @@ $primary-invert: findColorInvert($primary);
 $twitter: #4099FF;
 $twitter-invert: findColorInvert($twitter);
 
+$dark: #282f2f;
 $dark-box: #282f2f;
 
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
@@ -28,6 +29,9 @@ $link: $primary;
 $link-invert: $primary-invert;
 $link-focus-border: $primary;
 
+// Elements
+$pre-background: $dark;
+$pre: $dark-invert;
 
 // Dark Colors
 //$body-background-color: $grey-dark;

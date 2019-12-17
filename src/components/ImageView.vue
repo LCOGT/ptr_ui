@@ -1,53 +1,50 @@
 <template>
     <div id="component" v-on:keyup.right="setNextImage" v-on:keyup.left="setPreviousImage" >
-      <div id="image-window" v-if="!this.analyze">
+      <div id="image-window" ref="imagewindow">
 
+    <!-- Controls in the top row above the main view --> 
     <div class="controls level is-mobile">
+
       <div class="level-left left-controls">
-        <button class="button" @click="toggleAnalysis">
-          <b-icon icon="tune"></b-icon>
-        </button>
-        <button class="button" @click="setLatestImage">latest</button>
-        
-
-        <button class="button" @click="setPreviousImage"><b-icon icon="arrow-left-bold" /></button>
-        <button class="button" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
-
+        <button class="button level-item" @click="toggleAnalysis"> <b-icon icon="tune"></b-icon> </button>
+        <button class="button level-item" @click="setLatestImage">latest</button>
+        <button class="button level-item" @click="setPreviousImage"><b-icon icon="arrow-left-bold" /></button>
+        <button class="button level-item" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
         <b-tooltip label="download fits file" position="is-right" type="is-black">
-          <a class="button has-text-white" @click="downloadFits13Url(current_image)"><b-icon icon="cloud-download" /></a>
+          <a class="button has-text-white" @click="downloadFits13Url(current_image)">
+            <b-icon icon="cloud-download" /></a>
         </b-tooltip>
       </div>
 
       <div class="level-right right-controls">
-        <div class="level-item">
-          <b-field label="subframe active">
+        <div class="level-item"> <b-field label="subframe active">
               <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
-          </b-field>
-        </div>
-        <div class="level-item">
-          <b-field label="subframe visible">
+          </b-field> </div>
+        <div class="level-item"> <b-field label="subframe visible">
               <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
-          </b-field>
-        </div>
-        <div class="level-item">
-          <b-field label="crosshairs">
+          </b-field> </div>
+        <div class="level-item"> <b-field label="crosshairs">
               <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
-          </b-field>
-        </div>
+          </b-field> </div>
       </div>
 
     </div>
+    <!-- The main image view -->
+    <div class="image-div" ref="image_div">
 
-    <div class="image-div">
-        <svg id='image_svg' ref="svgElement">
-            <!-- NOTE: image width and heigh must be set explicitly to work in firefox -->
-            <!-- These values are changed programatically to work with dynamic window sizes. -->
-            <image 
-              :class="{'image-div-pointer-cross':subframeIsVisible}" 
-              height="1px" width="1px" 
-              ref="image" 
-              :href="current_image.jpg13_url" />
+        <svg id='image_svg' ref="svgElement" v-show="!js9IsVisible">
+          <!-- NOTE: image svg width and heigh must be set explicitly to work in firefox -->
+          <!-- These values are changed programatically to work with dynamic window sizes. -->
+          <image 
+            :class="{'image-div-pointer-cross':subframeIsVisible}" 
+            height="1px" width="1px" 
+            ref="image" 
+            :href="current_image.jpg13_url" />
         </svg>
+
+        <div id="js9-window" v-if="js9IsVisible" >
+          <JS9 ref="js9" :include-menu="true" :initial-width="js9width" :initial-height="js9height" />
+        </div>
 
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
             <!--p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p-->
@@ -56,72 +53,29 @@
         </div>
     </div>
 
-
-    <!--div class="column is-narrow recent_images"-->
+    <!-- Row of selectable image thumbnails under the main view. -->
     <div class="recent_images">
-       
-        <div 
-            class="recent_image" 
-            style="display: flex;"
-            v-for="(item, index) in recent_images" 
-            v-bind:key="index"
+      <div 
+          class="recent_image" 
+          style="display: flex;"
+          v-for="(item, index) in recent_images" 
+          v-bind:key="index"
+      >
+        <img 
+            style="width: 60px; height: 60px;"
+            v-bind:src="item.jpg13_url"
+            v-bind:title="item.base_filename"
+            v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
+            @click="setActiveImage(item)"
         >
-            <img 
-                style="width: 60px; height: 60px;"
-                v-bind:src="item.jpg13_url"
-                v-bind:title="item.base_filename"
-                v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
-                @click="setActiveImage(item)"
-
-            >
-            <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
-        </div>
-          
-        </div>
+        <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
       </div>
-
-      <div id="js9-window" v-if="this.analyze">
-
-        <div class="controls">
-            <button class="button" @click="toggleAnalysis">EXIT</button>
-            <div @click="setPreviousImage" class="arrow left"></div>
-            <div @click="setNextImage" class="arrow right"></div>
-        </div>
-
-        <div class="image-div">
-
-            <div id="svg_container" />
-            <JS9/>
-            <div style="display: flex; justify-content: space-between;">
-                <p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p>
-            </div>
-        </div>
-
-
-        <!--div class="column is-narrow recent_images"-->
-        <div class="recent_images">
-          
-            <div 
-                class="recent_image" 
-                style="display: flex;"
-                v-for="(item, index) in recent_images" 
-                v-bind:key="index"
-            >
-                <img 
-                    style="width: 60px; height: 60px;"
-                    v-bind:src="item.jpg13_url"
-                    v-bind:title="item.base_filename"
-                    v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
-                    @click="setActiveImage(item)"
-
-                >
-                <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
-            </div>
-              
-        </div>
+        
     </div>
+
+
     </div>
-    
+  </div>
 </template>
 
 <script>
@@ -157,18 +111,11 @@ export default {
       mouseX: 0,
       mouseY: 0,
 
-      analyze: false,
 
       // The subframe rectangle svg element
       subframeSVG: '',
       // Toggles whether the subframe is visible or not
       subframeIsVisible: false,
-      // (X,Y) and (X2,Y2) define the corners of the subframe rectangle
-      // TODO: change to relative values, not pixels
-      subframeX: -1,
-      subframeY: -1,
-      subframeX2: -1,
-      subframeY2: -1,
       // Defines when the user is dragging the mouse (for drawing the rectangle)
       mouseIsDown: false,
 
@@ -186,8 +133,11 @@ export default {
       highlighted_image: 0,
 
       // Runs a function at a regular interval to update the size of the image component.
-      syncImageSize: "",
-      syncImageInterval: 1000
+      syncImageSize: '',
+      syncImageInterval: 1000,
+
+      js9width: 200,
+      js9height: 500
     };
   },
   created() {
@@ -226,6 +176,14 @@ export default {
       }
     },
 
+    current_image: function(newVal, oldVal) {
+      // If we're in the js9 window mode, keep the image updated with the 
+      // selected thumbnail.
+      if (this.js9IsVisible) {
+        this.js9LoadImage(newVal)
+      }
+    },
+
   },
 
   mounted() {
@@ -234,104 +192,102 @@ export default {
 
   methods: {
 
-  init() {
-    let that = this;
+    init() {
+      let that = this;
 
-    // Initialize subframe rectangle
-    const rect = [{"x":0, "y":0}]
-    d3.select(this.image_element)
-      .selectAll("subframeBox")
-      .data(rect)
-      .join("rect")
-        .attr("id", "subframeSVG")
-        .attr("x", d => d.x)
-        .attr("y", d => d.y)
-        .attr("width", 0)
-        .attr("height", 0)
-        .style("display","none")
-        .style("stroke", "red")
-        .style("stroke-width", 1)
-        .style("fill", "none")
-        .style("cursor", "crosshair")
+      // Initialize subframe rectangle
+      const rect = [{"x":0, "y":0}]
+      d3.select(this.image_element)
+        .selectAll("subframeBox")
+        .data(rect)
+        .join("rect")
+          .attr("id", "subframeSVG")
+          .attr("x", d => d.x)
+          .attr("y", d => d.y)
+          .attr("width", 0)
+          .attr("height", 0)
+          .style("display","none")
+          .style("stroke", "red")
+          .style("stroke-width", 1)
+          .style("fill", "none")
+          .style("cursor", "crosshair")
 
-    that.subframeSVG = d3.select("#subframeSVG")
+      that.subframeSVG = d3.select("#subframeSVG")
 
-    // Event actions to perform on the image window element
-    d3.select(this.image_element)
+      // Event actions to perform on the image window element
+      d3.select(this.image_element)
 
-      .on("mousedown", function() {
+        .on("mousedown", function() {
 
-        // start drawing a subframe box if subframe mode is active.
-        if (that.subframeIsVisible) {
-          that.mouseIsDown = true;
-          let mClick = d3.mouse(this)
-          that.subframe_x0 = mClick[0] / that.imageWidth
-          that.subframe_y0 = mClick[1] / that.imageHeight
-          that.subframe_x1 = mClick[0] / that.imageWidth
-          that.subframe_y1 = mClick[1] / that.imageHeight
-          that.drawSubframe()
-        }
-      })
-
-      .on("mousemove", function() {
-        // coordinates of current mouse position
-        let mDrag = d3.mouse(this)
-
-        // log the current mouse coordinates
-        that.mouseX = mDrag[0]
-        that.mouseY = mDrag[1]
-
-        // if subframe mode is active, and the mouse is dragging, 
-        // save the current coordinates and draw them as a rectangle.
-        if (that.subframeIsVisible && that.mouseIsDown) {
-          //let mDrag = d3.mouse(this)
-          that.subframe_x1 = mDrag[0] / that.imageWidth
-          that.subframe_y1 = mDrag[1] / that.imageHeight
-          that.drawSubframe()
-        }
-      })
-
-      // Defines the end of a drag event.
-      .on("mouseup", function() {
-        that.mouseIsDown = false;
-        that.subframeIsActive = true;
-        that.subframeDefinedWithFile = that.current_image.base_filename
-      })
-
-      // Respond to right clicks
-      .on("contextmenu", function(data, index) {
-        let position = d3.mouse(this);
-        console.log("right click!");
-        that.draw_marker(position[0], position[1]);
-        Snackbar.open({
-          duration: that.right_click_ttl,
-          message:
-            "Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.",
-          type: "is-warning",
-          position: "is-bottom-left",
-          actionText: "Slew",
-          queue: false,
-          onAction: () => {
-            console.log(
-              "slew to " +
-                position[0] / that.imageWidth +
-                ", " +
-                position[1] / that.imageHeight
-            );
-            that.send_pixels_center_command(
-              position,
-              that.current_image.base_filename
-            );
+          // start drawing a subframe box if subframe mode is active.
+          if (that.subframeIsVisible) {
+            that.mouseIsDown = true;
+            let mClick = d3.mouse(this)
+            that.subframe_x0 = mClick[0] / that.imageWidth
+            that.subframe_y0 = mClick[1] / that.imageHeight
+            that.subframe_x1 = mClick[0] / that.imageWidth
+            that.subframe_y1 = mClick[1] / that.imageHeight
+            that.drawSubframe()
           }
-        });
+        })
 
-        // Don't open the usual right-click menu
-        d3.event.preventDefault();
-      })
-    }, 
+        .on("mousemove", function() {
+          // coordinates of current mouse position
+          let mDrag = d3.mouse(this)
 
-    // Subframe stuff
-    drawSubframe() {
+          // log the current mouse coordinates
+          that.mouseX = mDrag[0]
+          that.mouseY = mDrag[1]
+
+          // if subframe mode is active, and the mouse is dragging, 
+          // save the current coordinates and draw them as a rectangle.
+          if (that.subframeIsVisible && that.mouseIsDown) {
+            //let mDrag = d3.mouse(this)
+            that.subframe_x1 = mDrag[0] / that.imageWidth
+            that.subframe_y1 = mDrag[1] / that.imageHeight
+            that.drawSubframe()
+          }
+        })
+
+        // Defines the end of a drag event.
+        .on("mouseup", function() {
+          that.mouseIsDown = false;
+          if(that.subframeIsVisible) {
+            that.subframeIsActive = true;
+            that.subframeDefinedWithFile = that.current_image.base_filename
+          }
+        })
+
+        // Respond to right clicks
+        .on("contextmenu", function(data, index) {
+          let position = d3.mouse(this);
+          console.log("right click!");
+          that.draw_marker(position[0], position[1]);
+          Snackbar.open({
+            duration: that.right_click_ttl,
+            message:
+              "Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.",
+            type: "is-warning",
+            position: "is-bottom-left",
+            actionText: "Slew",
+            queue: false,
+            onAction: () => {
+              console.log("slew to " + position[0]/that.imageWidth + ", " + position[1]/that.imageHeight);
+              that.send_pixels_center_command(
+                position,
+                that.current_image.base_filename
+              );
+            }
+          });
+
+          // Don't open the usual right-click menu
+          d3.event.preventDefault();
+        })
+
+      }, 
+
+      // Subframe stuff
+      drawSubframe() {
       let minX = this.imageWidth * Math.min(this.subframe_x0, this.subframe_x1) 
       let minY = this.imageHeight * Math.min(this.subframe_y0, this.subframe_y1) 
       let width = this.imageWidth * Math.abs(this.subframe_x0 - this.subframe_x1)
@@ -345,17 +301,36 @@ export default {
 
     // Resize the image element to fit the browser window
     get_image_element_dimensions() {
-      // WARNING: this may have bugs if image is not a square.
-      // See the final line of this function (imageEl.setAtt...).
-      let imageRect = this.$refs.image.getBoundingClientRect();
-      this.imageWidth = imageRect.width;
-      this.imageHeight = imageRect.height;
 
-      let svgRect = this.$refs.svgElement.getBoundingClientRect();
-      let imageEl = this.$refs.image
-      imageEl.setAttribute("width", svgRect.width)
-      imageEl.setAttribute("height", svgRect.width)
 
+      let imageWindow = this.$refs.imagewindow.getBoundingClientRect();
+
+      if (this.js9IsVisible) {
+        let resize_opts = {
+          id: "myJS9",
+          width: imageWindow.width-30, // adjust for 15px padding
+          height: imageWindow.width-30,
+        }
+        this.$store.dispatch('js9/resizeDisplay', resize_opts)
+      } else {
+        // Resize the image displayed
+        let svgRect = this.$refs.svgElement.getBoundingClientRect();
+        let imageEl = this.$refs.image
+
+        // This is fed to js9 just before displaying to set the matching size. 
+        this.js9width=svgRect.width
+        this.js9height=svgRect.width
+
+        imageEl.setAttribute("width", svgRect.width)
+        imageEl.setAttribute("height", svgRect.width)
+        // Resize the svg
+        // WARNING: this may have bugs if image is not a square.
+        // See the final line of this function (imageEl.setAtt...).
+        let imageRect = this.$refs.image.getBoundingClientRect();
+        this.imageWidth = imageRect.width
+        this.imageHeight = imageRect.height
+      }
+      
       this.drawSubframe()
     },
 
@@ -487,7 +462,6 @@ export default {
     // in the main view.
     setActiveImage(image) {
       this.$store.dispatch("images/set_current_image", image);
-      console.log(`This is a test ${image.image_id}`);
     },
 
     // Display the latest image in the view.
@@ -496,11 +470,21 @@ export default {
       this.$store.dispatch("images/set_latest_image");
     },
 
+    js9LoadImage(image) {
+      let the_load_options = {
+        site: image.site,
+        base_filename: image.base_filename,
+      }
+      this.$store.dispatch('js9/loadImage', the_load_options)
+    },
+
     toggleAnalysis() {
-      if (this.analyze) {
-        this.analyze = false;
+      if (this.js9IsVisible) {
+        this.js9IsVisible= false;
+        this.init()
       } else {
-        this.analyze = true;
+        this.js9LoadImage(this.current_image)
+        this.js9IsVisible= true;
       }
     },
 
@@ -548,6 +532,11 @@ export default {
       current_image: "current_image"
     }),
 
+    js9IsVisible: {
+      get() { return this.$store.getters['js9/instanceIsVisible']},
+      set(val) { this.$store.commit('js9/instanceIsVisible', val)},
+    },
+
     subframeIsActive: {
         get() { return this.$store.getters['command_params/subframeIsActive']},
         set(val) { this.$store.commit('command_params/subframeIsActive', val)},
@@ -593,8 +582,7 @@ export default {
 }
 #js9-window {
   display: block;
-  padding: 10px;
-  background-color: rgba(59, 31, 29, 0.582);
+  background-color:  rgba(52, 60, 61, 0.733)
 }
 .controls {
   margin: 0 auto;
@@ -615,6 +603,7 @@ export default {
   height: 1px;
   margin-bottom: 100%;
   overflow: visible;
+  padding-top: 35px;
 }
 #image_svg image {
   width: inherit;
