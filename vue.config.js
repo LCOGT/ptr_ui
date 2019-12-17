@@ -12,7 +12,16 @@ module.exports = {
 
   configureWebpack: {
     module: {
-     rules: []
+     rules: [
+       {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      },
+     ]
    },
  },
 }

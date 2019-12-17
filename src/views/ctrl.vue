@@ -233,6 +233,19 @@
             </div>
         </b-field>
 
+        <b-field horizontal label="Bin" v-if="camera_can_bin">
+          <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
+            <option
+              v-for="(bin_option, index) in camera_bin_options"
+              v-bind:value="bin_option"
+              v-bind:selected="index === 0"
+              v-bind:key="index"
+              >
+              {{ bin_option }}
+            </option>
+          </b-select>
+        </b-field>
+
         <b-field horizontal label="Area" v-if="camera_areas.length != 0">
             <b-select 
               placeholder="Select chip area" 
@@ -282,28 +295,8 @@
           </b-checkbox>
         </b-field>
 
-        <b-field horizontal label="Bin" v-if="camera_can_bin=='True'">
-            <b-field>
-            <b-radio-button v-model="camera_bin"
-                native-value="1"
-                type="is-white is-outlined">
-                1x
-            </b-radio-button>
-            <b-radio-button v-model="camera_bin"
-                native-value="2"
-                type="is-white is-outlined">
-                2x
-            </b-radio-button>
-            <b-radio-button v-model="camera_bin"
-                native-value="4"
-                type="is-white is-outlined">
-                4x
-            </b-radio-button>
-            </b-field>
-        </b-field>
-
         <b-field horizontal label="Hint">
-          <b-input placeholder="a hint for the camera..."
+          <b-input placeholder="a hint for the FITS header..."
             type="text"
             min="0"
             max="64"
@@ -540,16 +533,21 @@ export default {
     }
   },
 
-  created() {
+  async created() {
     var that = this;
-    // Make sure we're using the latest site configuration.
-    this.$store.dispatch('observatory_configuration/update_config').then(function() {
 
-      // Default site/device values.
-      that.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
-      that.$store.dispatch('instrument_state/updateStatus')
+    //// Make sure we're using the latest site configuration.
+    //this.$store.dispatch('observatory_configuration/update_config').then(function() {
 
-    }())
+      //// Default site/device values.
+      //that.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
+      //that.$store.dispatch('instrument_state/updateStatus')
+
+    //}())
+    
+    await this.$store.dispatch('observatory_configuration/update_config')
+    await this.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
+    await this.$store.dispatch('instrument_state/updateStatus')
 
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.

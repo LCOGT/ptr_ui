@@ -58,12 +58,11 @@
 
                         <div class="columns">
                             <div class="column">
-                                <b-field label="Exposure time (seconds)"> 
+                                <b-field label="Exposure time (s)"> 
                                     <b-input
                                     type="number"
                                     step="any"
                                     min="0"
-                                    style="width: 175px;"
                                     v-model="exp_time_min"
                                     placeholder="min">
                                     </b-input> 
@@ -75,7 +74,6 @@
                                     type="number"
                                     step="any"
                                     min="0"
-                                    style="width: 175px;"
                                     v-model="exp_time_max"
                                     placeholder="max">
                                     </b-input>
@@ -191,7 +189,4 @@ export default {
 </script>
 
 <style scoped>
-.exp-time {
-  display: inline-block;
-}
 </style>

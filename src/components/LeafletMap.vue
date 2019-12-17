@@ -5,6 +5,7 @@
 </template>
 
 <script>
+
 import nite from '@/utils/nite-overlay'
 export default {
   name: 'LeafletMap',
@@ -67,8 +68,8 @@ export default {
       }
 
       map = L.map(this.mapName, {
-        center: new L.LatLng(35, 0),
-        zoom: 2,
+        center: new L.LatLng(0, 0),
+        zoom: 2.3,
         layers: [googleMaps, owm_clouds]
       })
 
@@ -93,7 +94,7 @@ export default {
 
 <style scoped>
     .leaflet-map {
-        width: 80vw;
+        width: 100vw;
         height: 50vw;
         background-color: grey;
         margin: 20px auto;
