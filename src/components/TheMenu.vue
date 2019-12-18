@@ -64,7 +64,7 @@
                   <div class="buttons">
                       <router-link to="/register" tag="button" class="button">sign up</router-link>
                       <router-link to="/login" tag="button" class="button is-light">log in</router-link>
-                      <button class="button is-warning" @click="signIn">log in as wmd_admin</button>
+                      <!--button class="button is-warning" @click="signIn">log in as wmd_admin</button-->
                   </div>
               </div>
             </b-navbar-item>
