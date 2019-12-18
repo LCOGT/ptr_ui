@@ -21,43 +21,44 @@
       :unselectAuto="unselectAuto"
       :selectMirror="true"
       :editable="true"
-      :slotDuration="slotDuration"
+      slotDuration="00:30:00"
       min-time="12:00:00"
       max-time="36:00:00"
       scrollTime="17:00:00"
-      @select="newEventOptions"
-      @dateClick="handleDateClick"
-      @eventClick="handleEventClick"
+      @dateClick="handleSelection"
+      @select="newEventSelected"
+      @eventClick="existingEventSelected"
     />
 
     <!-- popup for creating calendar events -->
-    <b-modal :active.sync="isCreateEventModalActive" :width="640" scroll="keep">
+    <b-modal :active.sync="isEventModalActive " :width="640" scroll="keep">
       <div class="card">
           <div class="card-content">
 
-            <div class="columns">
-              <div class="column">
+              <b-field horizontal label="Username">
+                <b-field>
+                  <b-input type="text" v-model="activeEvent.username" disabled></b-input>
+                </b-field>
+              </b-field>
+              
               <b-field label="Event Name">
                 <b-field>
-                  <b-input v-model="newEventArgs.title"></b-input>
+                  <b-input v-model="activeEvent.title"></b-input>
                 </b-field>
               </b-field>
-              </div>
-              <div class="column">
+
               <b-field label="Start Time">
                 <b-field>
-                  <b-input v-model="newEventArgs.startStr"></b-input>
+                  <b-input v-model="activeEvent.startStr"></b-input>
                 </b-field>
               </b-field>
-              </div>
-              <div class="column">
+
               <b-field label="End Time">
                   <b-field>
-                      <b-input name="subject" v-model="newEventArgs.endStr" autocomplete="off"></b-input>
+                      <b-input name="subject" v-model="activeEvent.endStr" autocomplete="off"></b-input>
                   </b-field>
               </b-field>
-              </div>
-            </div>
+
 
             <div class="button" @click="createNewEvent">submit</div>
             <div class="button" @click="cancelNewEvent">cancel</div>
@@ -65,7 +66,6 @@
           </div>
       </div>
     </b-modal>
-
   </div>
 </template>
 
@@ -90,14 +90,13 @@ export default {
   data: function() {
     return {
 
-      calendarApi: '',
-
       // popup for setting calendar events
-      isCreateEventModalActive: false,
-      newEventArgs: {
+      isEventModalActive : false,
+      activeEvent: {
         startStr: '',
         endStr: '',
         title: '',
+        username: '',
       },
 
       themeSystem: 'bootstrap',
@@ -121,39 +120,15 @@ export default {
       ]
     };
   },
-  mounted() {
-    //let btns = document.querySelectorAll(".btn")
-    //let len = btns.length
-    //for (let i=0; i<len; i+=1) {
-      //btns[i].classList.add('button')
-    //}
-    //let btngroups = document.querySelectorAll(".btn-group")
-    //len = btngroups.length
-    //for (let i=0; i<len; i+=1) {
-      //btngroups[i].classList.add('control')
-    //}
-  },
   methods: {
+
+    clear(){console.clear()},
     gotoPast() {
       let calendarApi = this.$refs.fullCalendar.getApi(); // from the ref="..."
       calendarApi.gotoDate("2000-01-01"); // call a method on the Calendar object
     },
-    handleDateClick(arg) {
-      //if (confirm("Would you like to add an event to " + arg.dateStr + " ?")) {
-        //this.calendarEvents.push({
-          //// add new event data
-          //title: "New Event",
-          //start: arg.date,
-          //allDay: arg.allDay
-        //});
-      //}
-    },
-    newEventOptions(arg){ 
-      this.newEventArgs.startStr = arg.startStr;
-      this.newEventArgs.endStr = arg.endStr;
-      //this.newEventArgs.startStr = arg.startStr;
-      this.isCreateEventModalActive = true;
-    },
+
+
     handleSelection(arg) {
       if (confirm("Would you like to add an event to " + arg.startStr+ " ?")) {
         this.calendarEvents.push({
@@ -167,26 +142,36 @@ export default {
       let calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.unselect()
     },
-    handleEventClick(arg) {
-      let event = arg.event;
-      this.newEventArgs.startStr = event.start;
-      this.newEventArgs.endStr = event.end;
-      this.newEventArgs.title = event.title;
-      //this.newEventArgs.startStr = arg.startStr;
-      this.isCreateEventModalActive = true;
+
+    newEventSelected(arg){ 
+      this.activeEvent.startStr = arg.startStr;
+      this.activeEvent.endStr = arg.endStr;
+      //this.activeEvent.startStr = arg.startStr;
+      this.isEventModalActive = true;
     },
+    
+    existingEventSelected(arg) {
+      let event = arg.event;
+      this.activeEvent.startStr = event.start;
+      this.activeEvent.endStr = event.end;
+      this.activeEvent.title = event.title;
+      //this.activeEvent.startStr = arg.startStr;
+      this.isEventModalActive = true;
+    },
+
     createNewEvent() {
       this.calendarEvents.push({
-        title: this.newEventArgs.title,
-        start: this.newEventArgs.startStr,
-        end: this.newEventArgs.endStr,
+        title: this.activeEvent.title,
+        start: this.activeEvent.startStr,
+        end: this.activeEvent.endStr,
       })
-      this.isCreateEventModalActive = false;
+      this.isEventModalActive = false;
       let calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.unselect()
     },
+
     cancelNewEvent() {
-      this.isCreateEventModalActive =false;
+      this.isEventModalActive =false;
       let calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.unselect()
     }
