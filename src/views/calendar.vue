@@ -15,7 +15,8 @@
       }"
       :plugins="calendarPlugins"
       :weekends="calendarWeekends"
-      :events="calendarEvents"
+      :events1="calendarEvents"
+      :events="fetchSiteEvents"
       :themeSystem="themeSystem"
       :selectable="selectable"
       :unselectAuto="unselectAuto"
@@ -35,33 +36,37 @@
       <div class="card">
           <div class="card-content">
 
-              <b-field horizontal label="Username">
+              <b-field horizontal label="User">
                 <b-field>
-                  <b-input type="text" v-model="activeEvent.username" disabled></b-input>
+                  <p class="is-family-primary">{{activeEvent.username}}</p>
                 </b-field>
               </b-field>
               
-              <b-field label="Event Name">
+              <b-field horizontal label="Event Name">
                 <b-field>
-                  <b-input v-model="activeEvent.title"></b-input>
+                  <b-input :default="activeEvent.title" v-model="activeEvent.title"></b-input>
                 </b-field>
               </b-field>
 
-              <b-field label="Start Time">
+              <b-field horizontal label="Start Time">
                 <b-field>
                   <b-input v-model="activeEvent.startStr"></b-input>
                 </b-field>
               </b-field>
 
-              <b-field label="End Time">
+              <b-field horizontal label="End Time">
                   <b-field>
                       <b-input name="subject" v-model="activeEvent.endStr" autocomplete="off"></b-input>
                   </b-field>
               </b-field>
 
-
-            <div class="button" @click="createNewEvent">submit</div>
-            <div class="button" @click="cancelNewEvent">cancel</div>
+              <b-field horizontal>
+                <b-field>
+                <button class="button is-info" :disabled="isSubmitDisabled" @click="createNewEvent" style="margin-right: 1em; background-color: #55f;">submit</button>
+                <button class="button is-grey" @click="cancelNewEvent">cancel</button>
+                <button class="button is-danger" @click="deleteEvent">delete event</button>
+                </b-field>
+              </b-field>
 
           </div>
       </div>
@@ -70,6 +75,9 @@
 </template>
 
 <script>
+import { Auth } from "aws-amplify";
+import axios from 'axios'
+import moment from 'moment'
 
 import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -92,6 +100,7 @@ export default {
 
       // popup for setting calendar events
       isEventModalActive : false,
+      isSubmitDisabled: false,
       activeEvent: {
         startStr: '',
         endStr: '',
@@ -122,7 +131,6 @@ export default {
   },
   methods: {
 
-    clear(){console.clear()},
     gotoPast() {
       let calendarApi = this.$refs.fullCalendar.getApi(); // from the ref="..."
       calendarApi.gotoDate("2000-01-01"); // call a method on the Calendar object
@@ -130,6 +138,7 @@ export default {
 
 
     handleSelection(arg) {
+      return;
       if (confirm("Would you like to add an event to " + arg.startStr+ " ?")) {
         this.calendarEvents.push({
           // add new event data
@@ -146,27 +155,49 @@ export default {
     newEventSelected(arg){ 
       this.activeEvent.startStr = arg.startStr;
       this.activeEvent.endStr = arg.endStr;
-      //this.activeEvent.startStr = arg.startStr;
+      this.activeEvent.title = "new reservation"
+      this.activeEvent.username = this.$store.getters['auth/username']
+      this.activeEvent.id = Date.now()+this.$store.getters['auth/username']
+
+      let startstr = arg.startStr
+      console.log(startstr)
+      console.log(new Date(startstr))
+      let a = new Date(startstr).toISOString()
+      let b = moment(a).format()
+      console.log(a)
+      console.log(b)
+
+      this.isSubmitDisabled = false
       this.isEventModalActive = true;
     },
     
     existingEventSelected(arg) {
       let event = arg.event;
-      this.activeEvent.startStr = event.start;
-      this.activeEvent.endStr = event.end;
+      this.activeEvent.id = event.id,
+      this.activeEvent.startStr = event.start.toISOString();
+      this.activeEvent.endStr = event.end.toISOString();
       this.activeEvent.title = event.title;
       //this.activeEvent.startStr = arg.startStr;
-      this.isEventModalActive = true;
+      this.isSubmitDisabled = true
+      this.isEventModalActive = true
     },
 
     createNewEvent() {
-      this.calendarEvents.push({
+
+      let newEvent = {
         title: this.activeEvent.title,
         start: this.activeEvent.startStr,
         end: this.activeEvent.endStr,
-      })
+        id: this.activeEvent.id,
+      }
+
+      //this.calendarEvents.push(newEvent)
+
+      this.postNewEvent(newEvent)
+
       this.isEventModalActive = false;
       let calendarApi = this.$refs.fullCalendar.getApi();
+      calendarApi.addEvent(newEvent)
       calendarApi.unselect()
     },
 
@@ -174,7 +205,158 @@ export default {
       this.isEventModalActive =false;
       let calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.unselect()
-    }
+    },
+
+    reloadCal() {
+      let calendarApi = this.$refs.fullCalendar.getApi();
+      calendarApi.rerenderEvents()
+    },
+    removeEvent() {
+      let calendarApi = this.$refs.fullCalendar.getApi();
+      this.calendarEvents.pop()
+    },
+
+    async fetchSiteEvents(fetchInfo) {
+
+      // TODO: we don't want to hardcode the site here
+      let site = 'wmd'
+
+      let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/siteevents'
+      let axiosConfig = {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+        }
+      };
+
+      let body = {
+        "site": site,
+        "start": fetchInfo.startStr,
+        "end": fetchInfo.endStr,
+      }
+      console.log(body)
+
+      let resp = await axios.post(url, body, axiosConfig)
+      console.log(resp)
+      let formatted_events = resp.data.table_response.Items.map(obj => {
+        let fObj = {
+          'start': obj.start,
+          'end': obj.end,
+          'id': obj.event_id,
+          'title': obj.title,
+        }
+        return fObj
+      })
+      return formatted_events
+    },
+
+    async fetchCalendarEvents(fetchInfo/*, successCallback, failureCallback*/) {
+      /* fetchInfo = {
+        start: initial date for event fetch
+        end: end date for event fetch (up to but not including)
+        startStr: ISO8601 string representation of the start date
+        endStr: same, but for the end date
+        timeZone: exact value of the calendar's timeZone setting.
+      }
+      */
+      let axiosConfig = {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+        }
+      };
+
+      let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/getwmd'
+
+      let resp = await axios.get(url, {}, axiosConfig)
+
+
+      let calendarApi = this.$refs.fullCalendar.getApi();
+      let formatted_events = resp.data.results.Items.map(obj => {
+        let fObj = {
+          'start': obj.start,
+          'end': obj.end,
+          'id': obj.event_id,
+          'title': obj.title,
+        }
+        //calendarApi.addEvent(fObj)
+        return fObj
+      })
+      return formatted_events
+      //this.calendarEvents.push(...formatted_events)
+      
+    },
+
+    async deleteEvent() {
+      let axiosConfig = {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+        }
+      };
+      let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/delete'
+
+      let body = {
+        "event_id": this.activeEvent.id,
+        "start": moment(this.activeEvent.startStr).format(),
+      }
+      console.log(body)
+
+      let res = await axios.post(url, body, axiosConfig)
+      console.log(res)
+
+      // if success:
+      this.isEventModalActive = false
+      let calendarApi = this.$refs.fullCalendar.getApi();
+      calendarApi.rerenderEvents();
+
+
+    },
+
+    async getWMD() {
+
+      let axiosConfig = {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+        }
+      };
+      let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/getwmd'
+
+      let res = await axios.get(url, {}, axiosConfig)
+      console.log(res)
+    },
+
+    async postNewEvent(newEvent) {
+      let url = "https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/newevent"
+
+      let eventToPost = {
+        "event_id": newEvent.id,
+        "start": newEvent.start,
+        "end": newEvent.end,
+        "creator": 'tim',
+        "site": 'wmd',
+        "title": newEvent.title,
+      }
+      console.log(eventToPost)
+
+      let axiosConfig = {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+        }
+      };
+
+      let res = await axios.post(url, eventToPost, axiosConfig)
+      console.log(res)
+
+      //if success
+      let calendarApi = this.$refs.fullCalendar.getApi();
+      calendarApi.rerenderEvents();
+
+
+    },
+
   }
 };
 </script>
