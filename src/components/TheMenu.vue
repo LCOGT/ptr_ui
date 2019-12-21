@@ -23,6 +23,9 @@
             <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
                 sky
             </b-navbar-item>
+            <b-navbar-item tag="router-link" :to="{ path: '/calendar' }">
+                calendar
+            </b-navbar-item>
             <b-navbar-dropdown label="sites">
                 <template v-for="(site, index) in sites">
                   <router-link 
@@ -40,7 +43,7 @@
             </b-navbar-dropdown>
             <b-navbar-dropdown label="dev">
                 <b-navbar-item tag="router-link" :to="{ path: '/ux1/wmd/home' }">
-                    layout-1
+                    layout--1
                 </b-navbar-item>
                 <b-navbar-item tag="router-link" :to="{ path: '/btns' }">
                     some buttons
@@ -72,7 +75,7 @@
                         <!-- show logout when authenticated -->
                         <button class="button" v-if="$auth.isAuthenticated" @click="logout">Log out</button>
                       </div>
-                      <button class="button is-warning" @click="signIn">log in as wmd_admin</button>
+                      <!-- <button class="button is-warning" @click="signIn">log in as wmd_admin</button> -->
                   </div>
               </div>
             </b-navbar-item>

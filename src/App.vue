@@ -25,7 +25,7 @@ import awsmobile from './aws-exports';
 import { components } from 'aws-amplify-vue'
 import JS9 from "@/components/JS9";
 
-
+ 
 // This enables connection to the backend resources created in the amplify cli.
 Amplify.configure(awsmobile)
 
