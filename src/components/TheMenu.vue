@@ -8,6 +8,9 @@
         </template>
 
         <template slot="start">
+            <b-navbar-item  v-if="$auth.isAuthenticated" tag="router-link" :to="{ path: '/profile' }">
+                profile
+            </b-navbar-item>
             <b-navbar-item tag="router-link" :to="{ path: '/ctrl' }">
                 ctrl
             </b-navbar-item>
@@ -62,9 +65,17 @@
 
               <div v-if="!isLoggedIn" class="navbar-item">
                   <div class="buttons">
-                      <router-link to="/register" tag="button" class="button">sign up</router-link>
-                      <router-link to="/login" tag="button" class="button is-light">log in</router-link>
-                      <!--button class="button is-warning" @click="signIn">log in as wmd_admin</button-->
+                      <!-- <router-link to="/register" tag="button" class="button">sign up</router-link> -->
+                      <!-- <router-link to="/login" tag="button" class="button is-light">log in</router-link> -->
+                  
+                      <!-- Check that the SDK client is not currently loading before accessing is methods -->
+                      <div v-if="!$auth.loading">
+                        <!-- show login when not authenticated -->
+                        <button class="button" v-if="!$auth.isAuthenticated" @click="login">Log in</button>
+                        <!-- show logout when authenticated -->
+                        <button class="button" v-if="$auth.isAuthenticated" @click="logout">Log out</button>
+                      </div>
+                      <!-- <button class="button is-warning" @click="signIn">log in as wmd_admin</button> -->
                   </div>
               </div>
             </b-navbar-item>
@@ -125,6 +136,18 @@ export default {
 
       $(document).click(function() {
         navbar.classList.toggle("is-active");
+      });
+    },
+
+    // Log the user in with Auth0
+    login() {
+      this.$auth.loginWithRedirect();
+    },
+
+    // Log the user out
+    logout() {
+      this.$auth.logout({
+        returnTo: window.location.origin
       });
     },
 

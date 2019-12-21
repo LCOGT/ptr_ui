@@ -91,7 +91,7 @@ const actions = {
             // set current_image to the first element from 'recent_images'. 
             if (!Object.keys(state.current_image).length
                 || state.current_image.site != response[0].site) {
-                commit('setCurrentImage',response[0])
+                commit('setCurrentImage', response[0])
             }
 
             await commit('setRecentImages', response)
