@@ -21,6 +21,7 @@ import ux1 from './views/ux1.vue'
 import js9 from './views/js9.vue'
 import analysis from './views/analysis.vue'
 import { authGuard } from "./auth/authGuard";
+import calendar from './views/calendar.vue'
 
 import store from './store'
 import { Auth } from 'aws-amplify'
@@ -44,6 +45,7 @@ const router = new VueRouter({
     { path: '/ctrl', name: 'ctrl', component: ctrl },
     { path: '/js9', name: 'js9', component: js9 },
     { path: '/analysis', name: 'analysis', component: analysis },
+    { path: '/calendar', name: 'calendar', component: calendar },
     {
       path: '/ux1/:sitecode/:subpage',
       name: 'ux1',
