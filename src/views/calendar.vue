@@ -3,6 +3,12 @@
   <div class="demo-app container">
     <div class="demo-app-top">
       <!--button @click="gotoPast">go to a date in the past</button-->
+      <b-field label="Site">
+        <b-select v-model="calendarSite">
+          <option value="wmd">wmd</option>
+          <option value="other">other</option>
+        </b-select>
+      </b-field>
     </div>
     <FullCalendar
       class="demo-app-calendar"
@@ -15,8 +21,8 @@
       }"
       :plugins="calendarPlugins"
       :weekends="calendarWeekends"
-      :events1="calendarEvents"
       :events="fetchSiteEvents"
+      :nowIndicator="true"
       :themeSystem="themeSystem"
       :selectable="selectable"
       :unselectAuto="unselectAuto"
@@ -26,45 +32,37 @@
       min-time="12:00:00"
       max-time="36:00:00"
       scrollTime="17:00:00"
-      @dateClick="handleSelection"
       @select="newEventSelected"
       @eventClick="existingEventSelected"
     />
 
     <!-- popup for creating calendar events -->
-    <b-modal :active.sync="isEventModalActive " :width="640" scroll="keep">
+    <b-modal :active.sync="isEventModalActive " @close="eventModalClosed" :width="640" scroll="keep">
       <div class="card">
           <div class="card-content">
 
-              <b-field horizontal label="User">
-                <b-field>
-                  <p class="is-family-primary">{{activeEvent.username}}</p>
-                </b-field>
+              <b-field horizontal label="Owner">
+                  <p class="is-family-primary">{{activeEvent.creator}}</p>
               </b-field>
               
               <b-field horizontal label="Event Name">
-                <b-field>
                   <b-input :default="activeEvent.title" v-model="activeEvent.title"></b-input>
-                </b-field>
               </b-field>
 
               <b-field horizontal label="Start Time">
-                <b-field>
                   <b-input v-model="activeEvent.startStr"></b-input>
-                </b-field>
               </b-field>
 
               <b-field horizontal label="End Time">
-                  <b-field>
-                      <b-input name="subject" v-model="activeEvent.endStr" autocomplete="off"></b-input>
-                  </b-field>
+                  <b-input name="subject" v-model="activeEvent.endStr" autocomplete="off"></b-input>
               </b-field>
 
               <b-field horizontal>
                 <b-field>
-                <button class="button is-info" :disabled="isSubmitDisabled" @click="createNewEvent" style="margin-right: 1em; background-color: #55f;">submit</button>
-                <button class="button is-grey" @click="cancelNewEvent">cancel</button>
-                <button class="button is-danger" @click="deleteEvent">delete event</button>
+                <button class="button is-info" :disabled="isSubmitDisabled" @click="submitButtonClicked" style="margin-right: 1em; background-color: #55f;">submit</button>
+                <button class="button is-grey" @click="cancelButtonClicked">cancel</button>
+                <div style="width: 1em;" />
+                <button class="button is-danger" @click="deleteButtonClicked">delete event</button>
                 </b-field>
               </b-field>
 
@@ -98,16 +96,31 @@ export default {
   data: function() {
     return {
 
+      // prototype of the active observatory site
+      calendarSite: "wmd",
+
+      // Helper data for communicating with the calendar backend.
+      axiosConfig: {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+        }
+      },
+      backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
+
       // popup for setting calendar events
       isEventModalActive : false,
       isSubmitDisabled: false,
+
+      // properties of the selected calendar event
       activeEvent: {
         startStr: '',
         endStr: '',
         title: '',
-        username: '',
+        creator: '',
       },
 
+      // Settings used to configure the fullcalendar component
       themeSystem: 'bootstrap',
       calendarPlugins: [
         // plugins must be defined in the JS
@@ -136,28 +149,25 @@ export default {
       calendarApi.gotoDate("2000-01-01"); // call a method on the Calendar object
     },
 
-
-    handleSelection(arg) {
-      return;
-      if (confirm("Would you like to add an event to " + arg.startStr+ " ?")) {
-        this.calendarEvents.push({
-          // add new event data
-          title: "New Event",
-          start: arg.startStr,
-          end: arg.endStr,
-          allDay: arg.allDay
-        });
-      }
+    refreshCalendarView() {
       let calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.unselect()
+      calendarApi.refetchEvents();
     },
 
+    /*===================================================/
+      Calendar Event Selection Handlers
+    /===================================================*/
+    /**
+     *  This is run when a user clicks on the calendar to create a new event.
+     */
     newEventSelected(arg){ 
+      console.log('new event selected')
       this.activeEvent.startStr = arg.startStr;
       this.activeEvent.endStr = arg.endStr;
       this.activeEvent.title = "new reservation"
-      this.activeEvent.username = this.$store.getters['auth/username']
+      this.activeEvent.creator = this.$store.getters['auth/username']
       this.activeEvent.id = Date.now()+this.$store.getters['auth/username']
+      this.activeEvent.site = this.calendarSite
 
       let startstr = arg.startStr
       console.log(startstr)
@@ -170,64 +180,106 @@ export default {
       this.isSubmitDisabled = false
       this.isEventModalActive = true;
     },
-    
+    /**
+     *  This is run when a user clicks on an existing event in the calendar.
+     */
     existingEventSelected(arg) {
+      console.log('existing event selected')
       let event = arg.event;
+      //console.log(event)
       this.activeEvent.id = event.id,
       this.activeEvent.startStr = event.start.toISOString();
       this.activeEvent.endStr = event.end.toISOString();
       this.activeEvent.title = event.title;
-      //this.activeEvent.startStr = arg.startStr;
+      this.activeEvent.creator = event.extendedProps.creator
+      this.activeEvent.site = event.extendedProps.site
       this.isSubmitDisabled = true
       this.isEventModalActive = true
     },
 
-    createNewEvent() {
 
+    /*===================================================/
+      Calendar CRUD
+    /===================================================*/
+    /**
+     * When the user clicks submit, event details are sent to the backend.
+     */
+    submitButtonClicked() {
       let newEvent = {
         title: this.activeEvent.title,
         start: this.activeEvent.startStr,
         end: this.activeEvent.endStr,
         id: this.activeEvent.id,
+        creator: this.activeEvent.creator,
+        site: this.activeEvent.site,
       }
-
-      //this.calendarEvents.push(newEvent)
-
       this.postNewEvent(newEvent)
-
       this.isEventModalActive = false;
       let calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.addEvent(newEvent)
       calendarApi.unselect()
     },
-
-    cancelNewEvent() {
+    /**
+     * Close the event modal and deselect its associated calendar event.
+     */
+    cancelButtonClicked() {
       this.isEventModalActive =false;
       let calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.unselect()
     },
-
-    reloadCal() {
+    /**
+     * Replicates the 'cancelButtonClicked' function for the case when the user
+     * closes the modal window by clicking outside of it.
+     */
+    eventModalClosed() {
       let calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.rerenderEvents()
+      calendarApi.unselect()
     },
-    removeEvent() {
-      let calendarApi = this.$refs.fullCalendar.getApi();
-      this.calendarEvents.pop()
+    /**
+     * Delete the selected calendar event from the backend database
+     */
+    async deleteButtonClicked() {
+      let url = `${this.backendUrl}/dev/delete`
+      let body = {
+        "event_id": this.activeEvent.id,
+        "start": moment(this.activeEvent.startStr).format(),
+      }
+      console.log(body)
+
+      let res = await axios.post(url, body, this.axiosConfig)
+      console.log(res)
+
+      // refresh to show update
+      this.isEventModalActive = false
+      this.refreshCalendarView()
+
+    },
+    async postNewEvent(newEvent) {
+      let url = `${this.backendUrl}/dev/newevent`
+      let eventToPost = {
+        "event_id": newEvent.id,
+        "start": newEvent.start,
+        "end": newEvent.end,
+        "creator": newEvent.creator,
+        "site": newEvent.site,
+        "title": newEvent.title,
+      }
+      console.log(eventToPost)
+
+      let res = await axios.post(url, eventToPost, this.axiosConfig)
+      console.log(res)
+
+      // refresh to show update
+      this.refreshCalendarView()
     },
 
+
+    /*===================================================/
+      Fetching Calendar Events
+    /===================================================*/
     async fetchSiteEvents(fetchInfo) {
-
       // TODO: we don't want to hardcode the site here
-      let site = 'wmd'
-
-      let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/siteevents'
-      let axiosConfig = {
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-        }
-      };
+      let site = this.calendarSite
+      let url = `${this.backendUrl}/dev/siteevents`
 
       let body = {
         "site": site,
@@ -236,7 +288,7 @@ export default {
       }
       console.log(body)
 
-      let resp = await axios.post(url, body, axiosConfig)
+      let resp = await axios.post(url, body, this.axiosConfig)
       console.log(resp)
       let formatted_events = resp.data.table_response.Items.map(obj => {
         let fObj = {
@@ -244,119 +296,22 @@ export default {
           'end': obj.end,
           'id': obj.event_id,
           'title': obj.title,
+          'creator': obj.creator,
+          'site': obj.site,
         }
         return fObj
       })
       return formatted_events
     },
 
-    async fetchCalendarEvents(fetchInfo/*, successCallback, failureCallback*/) {
-      /* fetchInfo = {
-        start: initial date for event fetch
-        end: end date for event fetch (up to but not including)
-        startStr: ISO8601 string representation of the start date
-        endStr: same, but for the end date
-        timeZone: exact value of the calendar's timeZone setting.
-      }
-      */
-      let axiosConfig = {
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-        }
-      };
 
-      let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/getwmd'
+  },
 
-      let resp = await axios.get(url, {}, axiosConfig)
-
-
-      let calendarApi = this.$refs.fullCalendar.getApi();
-      let formatted_events = resp.data.results.Items.map(obj => {
-        let fObj = {
-          'start': obj.start,
-          'end': obj.end,
-          'id': obj.event_id,
-          'title': obj.title,
-        }
-        //calendarApi.addEvent(fObj)
-        return fObj
-      })
-      return formatted_events
-      //this.calendarEvents.push(...formatted_events)
-      
-    },
-
-    async deleteEvent() {
-      let axiosConfig = {
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-        }
-      };
-      let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/delete'
-
-      let body = {
-        "event_id": this.activeEvent.id,
-        "start": moment(this.activeEvent.startStr).format(),
-      }
-      console.log(body)
-
-      let res = await axios.post(url, body, axiosConfig)
-      console.log(res)
-
-      // if success:
-      this.isEventModalActive = false
-      let calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.rerenderEvents();
-
-
-    },
-
-    async getWMD() {
-
-      let axiosConfig = {
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-        }
-      };
-      let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/getwmd'
-
-      let res = await axios.get(url, {}, axiosConfig)
-      console.log(res)
-    },
-
-    async postNewEvent(newEvent) {
-      let url = "https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev/newevent"
-
-      let eventToPost = {
-        "event_id": newEvent.id,
-        "start": newEvent.start,
-        "end": newEvent.end,
-        "creator": 'tim',
-        "site": 'wmd',
-        "title": newEvent.title,
-      }
-      console.log(eventToPost)
-
-      let axiosConfig = {
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-        }
-      };
-
-      let res = await axios.post(url, eventToPost, axiosConfig)
-      console.log(res)
-
-      //if success
-      let calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.rerenderEvents();
-
-
-    },
-
+  watch: {
+    calendarSite: function(val){
+      console.log(`site changed to ${val}`)
+      this.refreshCalendarView()
+    }
   }
 };
 </script>
