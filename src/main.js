@@ -24,9 +24,24 @@ import JS9Helpers from '@/utils/js9Helpers'
  */
 import awsmobile from './aws-exports'
 
+// Import the Auth0 configuration and plugin
+import { domain, clientId } from "../auth_config.json";
+import { Auth0Plugin } from "./auth";
+
 
 Vue.use(AmplifyPlugin, AmplifyModules)
 Vue.use(Buefy)
+Vue.use(Auth0Plugin, {
+  domain,
+  clientId,
+  onRedirectCallback: appState => {
+    router.push(
+      appState && appState.targetUrl
+        ? appState.targetUrl
+        : window.location.pathname
+    );
+  }
+});
 
 Vue.config.productionTip = false
 
