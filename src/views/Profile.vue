@@ -1,15 +1,23 @@
 <template>
+  <div>
     <div>
-        <span> Profile for {{ this.$store.getters['auth/username'] }}</span>
+      <div>
+        <img :src="$auth.user.picture">
+        <h2>{{ $auth.user.name }}</h2>
+        <p>{{ $auth.user.email }}</p>
+      </div>
+    <div>
+      <pre>{{ JSON.stringify($auth.user, null, 2) }}</pre>
     </div>
+  </div>
+</div>
 </template>
 
 <script>
-
 export default {
-  name: 'Profile',
-}
+  name: "Profile"
+};
 </script>
 
-<style scoped>
+<style>
 </style>
