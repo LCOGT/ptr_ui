@@ -7,7 +7,7 @@ import Home from './views/Home.vue'
 import About from './views/About.vue'
 import Register from './views/Register.vue'
 import Login from './views/Login.vue'
-import profile from './views/profile.vue'
+import Profile from './views/Profile.vue'
 
 // Observatories
 import Site from './views/Site.vue'
@@ -37,7 +37,7 @@ const router = new VueRouter({
     { path: '/', name: 'home', component: Home },
     { path: '/register', name: 'register', component: Register },
     { path: '/login', name: 'login', component: Login },
-    { path: '/profile', name: 'profile', component: profile, beforeEnter: authGuard },
+    { path: '/profile', name: 'profile', component: Profile, beforeEnter: authGuard },
     { path: '/about', name: 'about', component: About },
     { path: '/btns', name: 'btns', component: btns },
     { path: '/imgs', name: 'imgs', component: imgs },
