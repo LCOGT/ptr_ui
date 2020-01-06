@@ -37,36 +37,15 @@
     />
 
     <!-- popup for creating calendar events -->
-    <b-modal :active.sync="isEventModalActive " @close="eventModalClosed" :width="640" scroll="keep">
+    <b-modal :active.sync="isEventEditorActive" :width="640" scroll="keep">
       <div class="card">
-          <div class="card-content">
-
-              <b-field horizontal label="Owner">
-                  <p class="is-family-primary">{{activeEvent.creator}}</p>
-              </b-field>
-              
-              <b-field horizontal label="Event Name">
-                  <b-input :default="activeEvent.title" v-model="activeEvent.title"></b-input>
-              </b-field>
-
-              <b-field horizontal label="Start Time">
-                  <b-input v-model="activeEvent.startStr"></b-input>
-              </b-field>
-
-              <b-field horizontal label="End Time">
-                  <b-input name="subject" v-model="activeEvent.endStr" autocomplete="off"></b-input>
-              </b-field>
-
-              <b-field horizontal>
-                <b-field>
-                <button class="button is-info" :disabled="isSubmitDisabled" @click="submitButtonClicked" style="margin-right: 1em; background-color: #55f;">submit</button>
-                <button class="button is-grey" @click="cancelButtonClicked">cancel</button>
-                <div style="width: 1em;" />
-                <button class="button is-danger" @click="deleteButtonClicked">delete event</button>
-                </b-field>
-              </b-field>
-
-          </div>
+        <div class="card-content">
+          <calendar-event-editor :activeEvent="activeEvent" 
+          @submit="submitButtonClicked"
+          @cancel="cancelButtonClicked"
+          @delete="deleteButtonClicked"
+          />
+        </div>
       </div>
     </b-modal>
   </div>
@@ -76,6 +55,9 @@
 import { Auth } from "aws-amplify";
 import axios from 'axios'
 import moment from 'moment'
+
+import CalendarEventEditor from "@/components/CalendarEventEditor";
+import CalendarEventCreator from "@/components/CalendarEventCreator";
 
 import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -92,6 +74,8 @@ export default {
   name: 'calendar',
   components: {
     FullCalendar, // make the <FullCalendar> tag available
+    CalendarEventEditor,
+    CalendarEventCreator,
   },
   data: function() {
     return {
@@ -109,7 +93,8 @@ export default {
       backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
 
       // popup for setting calendar events
-      isEventModalActive : false,
+      isEventModalActive: false,
+      isEventEditorActive: false,
       isSubmitDisabled: false,
 
       // properties of the selected calendar event
@@ -144,6 +129,17 @@ export default {
   },
   methods: {
 
+    onClicked(val) {
+      console.log(val)
+    },
+
+    makeUniqueID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    },
+
     gotoPast() {
       let calendarApi = this.$refs.fullCalendar.getApi(); // from the ref="..."
       calendarApi.gotoDate("2000-01-01"); // call a method on the Calendar object
@@ -166,7 +162,7 @@ export default {
       this.activeEvent.endStr = arg.endStr;
       this.activeEvent.title = "new reservation"
       this.activeEvent.creator = this.$store.getters['auth/username']
-      this.activeEvent.id = Date.now()+this.$store.getters['auth/username']
+      this.activeEvent.id = this.makeUniqueID()
       this.activeEvent.site = this.calendarSite
 
       let startstr = arg.startStr
@@ -178,7 +174,8 @@ export default {
       console.log(b)
 
       this.isSubmitDisabled = false
-      this.isEventModalActive = true;
+      //this.isEventModalActive = true;
+      this.isEventEditorActive = true;
     },
     /**
      *  This is run when a user clicks on an existing event in the calendar.
@@ -194,7 +191,8 @@ export default {
       this.activeEvent.creator = event.extendedProps.creator
       this.activeEvent.site = event.extendedProps.site
       this.isSubmitDisabled = true
-      this.isEventModalActive = true
+      //this.isEventModalActive = true
+      this.isEventEditorActive = true
     },
 
 
@@ -204,25 +202,35 @@ export default {
     /**
      * When the user clicks submit, event details are sent to the backend.
      */
-    submitButtonClicked() {
-      let newEvent = {
-        title: this.activeEvent.title,
-        start: this.activeEvent.startStr,
-        end: this.activeEvent.endStr,
-        id: this.activeEvent.id,
-        creator: this.activeEvent.creator,
-        site: this.activeEvent.site,
+    async submitButtonClicked(newEvent) {
+      console.log(newEvent)
+
+      let url = `${this.backendUrl}/dev/newevent`
+      let eventToPost = {
+        "event_id": newEvent.id,
+        "start": newEvent.startStr,
+        "end": newEvent.endStr,
+        "creator": newEvent.creator,
+        "site": newEvent.site,
+        "title": newEvent.title,
       }
-      this.postNewEvent(newEvent)
+      console.log(eventToPost)
+
+      let res = await axios.post(url, eventToPost, this.axiosConfig)
+      console.log(res)
+
+      // refresh to show update
+      this.refreshCalendarView()
       this.isEventModalActive = false;
-      let calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.unselect()
+      this.isEventEditorActive =false;
     },
     /**
      * Close the event modal and deselect its associated calendar event.
      */
     cancelButtonClicked() {
-      this.isEventModalActive =false;
+      console.log('cancel button clicked')
+      this.isEventModalActive = false;
+      this.isEventEditorActive =false;
       let calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.unselect()
     },
@@ -237,11 +245,11 @@ export default {
     /**
      * Delete the selected calendar event from the backend database
      */
-    async deleteButtonClicked() {
+    async deleteButtonClicked(eventToDelete) {
       let url = `${this.backendUrl}/dev/delete`
       let body = {
-        "event_id": this.activeEvent.id,
-        "start": moment(this.activeEvent.startStr).format(),
+        "event_id": eventToDelete.id,
+        "start": moment(eventToDelete.startStr).format(),
       }
       console.log(body)
 
@@ -250,6 +258,7 @@ export default {
 
       // refresh to show update
       this.isEventModalActive = false
+      this.isEventEditorActive = false
       this.refreshCalendarView()
 
     },
@@ -270,6 +279,8 @@ export default {
 
       // refresh to show update
       this.refreshCalendarView()
+      this.isEventModalActive = false;
+      this.isEventEditorActive =false;
     },
 
 
@@ -324,7 +335,7 @@ export default {
   font-size: 14px;
 }
 .fc table * {
-  border-color: grey;
+  border-color:#444;
 }
 
 .demo-app-top {
