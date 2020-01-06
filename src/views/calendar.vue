@@ -161,7 +161,8 @@ export default {
       this.activeEvent.startStr = arg.startStr;
       this.activeEvent.endStr = arg.endStr;
       this.activeEvent.title = "new reservation"
-      this.activeEvent.creator = this.$store.getters['auth/username']
+      //this.activeEvent.creator = this.$store.getters['auth/username']
+      this.activeEvent.creator = this.$auth.user.name
       this.activeEvent.id = this.makeUniqueID()
       this.activeEvent.site = this.calendarSite
 

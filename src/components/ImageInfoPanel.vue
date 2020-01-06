@@ -16,43 +16,44 @@
                     <table>
                         <tr> 
                             <td class="prop-col" align="right">capture time: </td>
-                            <td>{{new Date(current_image.capture_date).toLocaleString()}}</td> 
+                            <td>{{new Date(current_image.capture_date).toLocaleString() || "---"}}</td> 
                         </tr>
                         <tr> 
                             <td class="prop-col" align="right">site: </td>
-                            <td>{{current_image.site}}</td> 
+                            <td>{{current_image.site || "---"}}</td> 
                         </tr>
                         <div class="blank-row" />
 
                         <tr> 
                             <td class="prop-col" align="right">exposure time: </td>
-                            <td>{{current_image.exposure_time}}</td> 
+                            <td>{{current_image.exposure_time || "---"}}</td> 
                         </tr>
                         <tr> 
                             <td class="prop-col" align="right">filter_used: </td>
-                            <td>{{current_image.filter_used}}</td> 
+                            <td>{{current_image.filter_used || "---"}}</td> 
                         </tr>
                         <div class="blank-row" />
 
                         <tr> 
                             <td class="prop-col" align="right">right ascension: </td>
-                            <td>{{current_image.right_ascension.toFixed(2)}}</td> 
+                            <td>{{rightAscension}}</td> 
                         </tr>
                         <tr> 
                             <td class="prop-col" align="right">declination: </td>
-                            <td>{{current_image.declination.toFixed(2)}}</td> 
+                            <td>{{declination}}</td> 
                         </tr>
+
                         <tr> 
                             <td class="prop-col" align="right">altitude: </td>
-                            <td>{{current_image.altitude}}</td> 
+                            <td>{{current_image.altitude || "---"}}</td> 
                         </tr>
                         <tr> 
                             <td class="prop-col" align="right">azimuth: </td>
-                            <td>{{current_image.azimuth}}</td> 
+                            <td>{{current_image.azimuth || "---"}}</td> 
                         </tr>
                         <tr> 
                             <td class="prop-col" align="right">airmass: </td>
-                            <td>{{current_image.airmass}}</td> 
+                            <td>{{current_image.airmass || "---"}}</td> 
                         </tr>
                     </table>
             </div>
@@ -65,10 +66,25 @@
 import { mapState } from 'vuex';
 export default {
     name: "ImageInfoPanel",
-    props: ["current_image"],
+    props: {
+        current_image: { type: Object }
+    },
     methods: {
     },
     computed: {
+        rightAscension() {
+            if (this.current_image.right_ascension){
+                return this.current_image.right_ascension.toFixed(2)
+            }
+            return "---"
+        },
+        declination() {
+            if (this.current_image.declination) {
+                return this.current_image.declination.toFixed(2)
+            }
+            return "---"
+        },
+
         ...mapState('js9', [
             'js9Zoom',
             'crosshairActive'

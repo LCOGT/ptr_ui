@@ -51,7 +51,8 @@ const router = new VueRouter({
       name: 'ux1',
       component: ux1,
       props: true,
-      meta: { requiresAuth: true },
+      beforeEnter: authGuard,
+      //meta: { requiresAuth: true },
     },
 
     {
