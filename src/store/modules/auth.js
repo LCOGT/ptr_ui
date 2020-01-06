@@ -1,4 +1,5 @@
 import { Auth } from 'aws-amplify'
+import { domain, clientId } from "../../../auth_config.json";
 
 // initial state
 const state = {
@@ -39,6 +40,22 @@ const actions = {
             })
             .catch(err => console.log(err))
     },
+    
+    logInUser2({ commit, dispatch }, user_credentials) {
+        // TODO: validate username/password
+        let username = user_credentials.username
+        let password = user_credentials.password
+
+        let bodyParams = {
+            client_id: clientId,
+            grant_type: 'http://auth0.com/oauth/grant-type/password-realm',
+            username: username,
+            password: password,
+        }
+
+
+    },
+
 
     logInAdmin({ dispatch }) {
         let user_credentials = {
@@ -49,12 +66,15 @@ const actions = {
     },
 
     logOutUser({ commit }) {
-        Auth.signOut()
-            .then(data => {
-            console.log(data)
-            commit('setUser', '')
-            })
-            .catch(err => console.log(err))
+        //Auth.signOut()
+            //.then(data => {
+            //console.log(data)
+            //commit('setUser', '')
+            //})
+            //.catch(err => console.log(err))
+        this.$auth.logout({
+            returnTo: window.location.origin
+        });
     }
 
 }

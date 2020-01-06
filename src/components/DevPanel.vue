@@ -15,8 +15,6 @@
                 </b-switch>
                 <div class="divider" />
                 <button class="button is-small is-dark" @click="clearConsole">clear console</button>
-                <div class="divider" />
-                <button class="button is-small is-dark" @click="signInAdmin">log in as wmd_admin</button>
             </div>
         </div>
         </div>
@@ -29,15 +27,6 @@ export default {
     name: "DevPanel",
     methods: {
         clearConsole(){console.clear()},
-
-        /**
-         * Sign in as wmd_admin.
-         * This is temporary for quick testing, and will be disabled when
-         * authentication grants access to controls.
-         */
-        signInAdmin() {
-        this.$store.dispatch("auth/logInAdmin");
-        },
     },
     computed: {
         // Toggle whether to use localhost:5000 or api.photonranch.org api for api calls. 
