@@ -48,7 +48,7 @@
 
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
             <!--p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p-->
-            <p>{{ current_image.exposure_time }} seconds  |  {{current_image.filter_used}} </p>
+            <p>{{ current_image.exposure_time }} seconds  |  {{current_image.filter_used}}</p>
             <p> {{current_image.base_filename}} </p>
         </div>
     </div>

@@ -4,6 +4,10 @@
         <template slot="brand">
             <b-navbar-item tag="router-link" class="menu-title" :to="{ path: '/' }">
                 photon ranch
+                <!--img
+                    src="img/icons/logo-via-logohub.png"
+                    alt="photon ranch observatory"
+                -->
             </b-navbar-item>
         </template>
 
@@ -53,8 +57,8 @@
 
         <template slot="end">
             <b-navbar-item tag="div">
-              <div v-if="isLoggedIn" class="navbar-item has-dropdown is-hoverable is-dark">
-                  <a class="navbar-link">Hello, {{username}} </a>
+              <div v-if="$auth.isAuthenticated" class="navbar-item has-dropdown is-hoverable is-dark">
+                  <a class="navbar-link">Hello, {{$auth.user.name}} </a>
 
                   <div class="navbar-dropdown">
                       <router-link to="/profile" class="navbar-item">Profile</router-link>
@@ -63,7 +67,7 @@
                   </div>
               </div>
 
-              <div v-if="!isLoggedIn" class="navbar-item">
+              <div v-if="false && !isLoggedIn" class="navbar-item">
                   <div class="buttons">
                       <!-- <router-link to="/register" tag="button" class="button">sign up</router-link> -->
                       <!-- <router-link to="/login" tag="button" class="button is-light">log in</router-link> -->
