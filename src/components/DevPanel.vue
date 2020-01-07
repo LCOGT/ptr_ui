@@ -15,6 +15,8 @@
                 </b-switch>
                 <div class="divider" />
                 <button class="button is-small is-dark" @click="clearConsole">clear console</button>
+                <div class="divider" />
+                <button class="button is-small is-dark" @click="userInfo">user info</button>
             </div>
         </div>
         </div>
@@ -27,6 +29,7 @@ export default {
     name: "DevPanel",
     methods: {
         clearConsole(){console.clear()},
+        userInfo(){console.log(this.$auth.user)}
     },
     computed: {
         // Toggle whether to use localhost:5000 or api.photonranch.org api for api calls. 

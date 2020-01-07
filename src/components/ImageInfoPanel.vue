@@ -16,7 +16,7 @@
                     <table>
                         <tr> 
                             <td class="prop-col" align="right">capture time: </td>
-                            <td>{{new Date(current_image.capture_date).toLocaleString() || "---"}}</td> 
+                            <td>{{new Date(current_image.capture_date).toISOString() || "---"}}</td> 
                         </tr>
                         <tr> 
                             <td class="prop-col" align="right">site: </td>
