@@ -54,6 +54,12 @@
 
         <template slot="end">
             <b-navbar-item tag="div">
+
+              <!-- Check that the SDK client is not currently loading before accessing is methods -->
+              <div v-if="$auth.loading">
+                <div style="color: red; font-weight: bolder;">AUTH IS LOADING</div>
+              </div>
+
               <div v-if="$auth.isAuthenticated" class="navbar-item has-dropdown is-hoverable is-dark">
                   <a class="navbar-link">Hello, {{$auth.user.name}} </a>
 
@@ -64,19 +70,11 @@
                   </div>
               </div>
 
-              <div class="navbar-item">
-                  <div class="buttons">
-                      <!-- <router-link to="/register" tag="button" class="button">sign up</router-link> -->
-                      <!-- <router-link to="/login" tag="button" class="button is-light">log in</router-link> -->
-                  
-                      <!-- Check that the SDK client is not currently loading before accessing is methods -->
-                      <div v-if="!$auth.loading">
-                        <!-- show login when not authenticated -->
-                        <button class="button" v-if="!$auth.isAuthenticated" @click="login">Log in</button>
-                      </div>
-                      <!-- <button class="button is-warning" @click="signIn">log in as wmd_admin</button> -->
-                  </div>
-              </div>
+              <!-- show login when not authenticated -->
+              <button class="button" v-if="!$auth.isAuthenticated" @click="login">Log in</button>
+
+
+
             </b-navbar-item>
         </template>
     </b-navbar> 
