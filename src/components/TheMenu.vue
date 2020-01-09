@@ -55,11 +55,6 @@
         <template slot="end">
             <b-navbar-item tag="div">
 
-              <!-- Check that the SDK client is not currently loading before accessing is methods -->
-              <div v-if="$auth.loading">
-                <div style="color: red; font-weight: bolder;">AUTH IS LOADING</div>
-              </div>
-
               <div v-if="$auth.isAuthenticated" class="navbar-item has-dropdown is-hoverable is-dark">
                   <a class="navbar-link">Hello, {{$auth.user.name}} </a>
 

@@ -1,5 +1,6 @@
 import { Auth } from 'aws-amplify'
 import { domain, clientId } from "../../../auth_config.json";
+import { getInstance } from "../../auth/index";
 
 // initial state
 const state = {

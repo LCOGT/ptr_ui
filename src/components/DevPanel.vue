@@ -17,6 +17,8 @@
                 <button class="button is-small is-dark" @click="clearConsole">clear console</button>
                 <div class="divider" />
                 <button class="button is-small is-dark" @click="userInfo">user info</button>
+                <div v-if="$auth.loading" class="divider" />
+                <button v-if="$auth.loading" class="button is-small is-danger" style="background-color: red;">auth is loading</button>
             </div>
         </div>
         </div>

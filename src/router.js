@@ -22,6 +22,7 @@ import calendar from './views/calendar.vue'
 
 import store from './store'
 import { Auth } from 'aws-amplify'
+import { getInstance } from "./auth/index";
 
 Vue.use(VueRouter)
 
@@ -30,9 +31,15 @@ const router = new VueRouter({
   linkExactActiveClass: 'is-active',
   base: process.env.BASE_URL,
   routes: [
-    { path: '*', redirect: '/' },
+    //{ path: '*', redirect: '/' },
     { path: '/', name: 'home', component: Home },
-    { path: '/profile', name: 'profile', component: Profile, beforeEnter: authGuard },
+    { 
+      path: '/profile', 
+      name: 'profile', 
+      component: Profile, 
+      beforeEnter: authGuard, 
+      meta: { requiresRole: 'admin'}
+    },
     { path: '/about', name: 'about', component: About },
     { path: '/btns', name: 'btns', component: btns },
     { path: '/imgs', name: 'imgs', component: imgs },
@@ -59,4 +66,15 @@ const router = new VueRouter({
 
 export default router
 
+//router.beforeEach(async (to, from , next) => {
+  //if(to.meta.requiresAuth) {
+    
+    //const authService = getInstance();
+    //const user = await authService.user;
 
+    //console.log(typeof authService)
+    //console.log(authService.getUser())
+    //next()
+
+  //}
+//})
