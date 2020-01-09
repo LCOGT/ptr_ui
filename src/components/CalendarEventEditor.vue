@@ -45,10 +45,10 @@
     </b-field>
 
     <b-field horizontal>
-    <div/>
     <p class='login-warning' v-if="!$auth.isAuthenticated">
         Note: you must be authenticated to create and modify events.
     </p>
+    <div/>
     </b-field>
 </section></template>
 

@@ -55,6 +55,7 @@
 import { Auth } from "aws-amplify";
 import axios from 'axios'
 import moment from 'moment'
+import titleGenerator from '@/utils/titleGenerator'
 
 import CalendarEventEditor from "@/components/CalendarEventEditor";
 import CalendarEventCreator from "@/components/CalendarEventCreator";
@@ -127,11 +128,6 @@ export default {
   },
   methods: {
 
-    onClicked(val) {
-      console.log(val)
-    },
-
-
     async getConfigWithAuth() {
       let token;
       try {
@@ -160,7 +156,7 @@ export default {
       return configWithAuth;
     },
 
-    // Make a unique id for calendar events. This is the pk in dynamodb.
+    // Make a unique id for calendar events. UUID style. This is the pk in dynamodb.
     makeUniqueID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -191,7 +187,7 @@ export default {
       console.log('new event selected')
       this.activeEvent.startStr = arg.startStr;
       this.activeEvent.endStr = arg.endStr;
-      this.activeEvent.title = "new reservation"
+      this.activeEvent.title = titleGenerator.makeTitle()
       //this.activeEvent.creator = this.$store.getters['auth/username']
       //this.activeEvent.creator = 'no name'
       this.activeEvent.creator = this.$auth.user.name
@@ -215,6 +211,7 @@ export default {
      */
     existingEventSelected(arg) {
       console.log('existing event selected')
+      console.log(arg)
       let event = arg.event;
       //console.log(event)
       this.activeEvent.id = event.id,
@@ -239,7 +236,7 @@ export default {
 
       // Make request headers and include token. 
       // Requires user to be logged in.
-      let config = await this.getConfigWithAuth()
+      let config = await this.getConfigWithAuth();
 
       let url = `${this.backendUrl}/dev/newevent`
       let eventToPost = {
@@ -255,20 +252,15 @@ export default {
       let res = await axios.post(url, eventToPost, config)
       console.log(res)
 
-      // refresh to show update
+      // refresh to show update and close modal
       this.refreshCalendarView()
-      this.isEventModalActive = false;
-      this.isEventEditorActive =false;
     },
     /**
      * Close the event modal and deselect its associated calendar event.
      */
     cancelButtonClicked() {
       console.log('cancel button clicked')
-      this.isEventModalActive = false;
-      this.isEventEditorActive =false;
-      let calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.unselect()
+      this.refreshCalendarView()
     },
     /**
      * Replicates the 'cancelButtonClicked' function for the case when the user
@@ -290,34 +282,10 @@ export default {
       }
 
       let res = await axios.post(url, body, config)
+      console.log(res)
 
-      // refresh to show update
-      this.isEventModalActive = false
-      this.isEventEditorActive = false
+      // refresh to show update and close modal
       this.refreshCalendarView()
-
-    },
-
-
-    async postNewEvent(newEvent) {
-
-      let config= await this.getConfigWithAuth();
-      let url = `${this.backendUrl}/dev/newevent`
-      let eventToPost = {
-        "event_id": newEvent.id,
-        "start": newEvent.start,
-        "end": newEvent.end,
-        "creator": newEvent.creator,
-        "site": newEvent.site,
-        "title": newEvent.title,
-      }
-
-      let res = await axios.post(url, eventToPost, config)
-
-      // refresh to show update
-      this.refreshCalendarView()
-      this.isEventModalActive = false;
-      this.isEventEditorActive= false;
     },
 
 
@@ -340,6 +308,7 @@ export default {
 
       let resp = await axios.post(url, body, header)
 
+      // Format the returned items to work nicely with fullcalendar.
       let formatted_events = resp.data.table_response.Items.map(obj => {
         let fObj = {
           'start': obj.start,
@@ -354,7 +323,6 @@ export default {
       return formatted_events
     },
 
-
   },
 
   watch: {
@@ -362,7 +330,8 @@ export default {
       console.log(`site changed to ${val}`)
       this.refreshCalendarView()
     }
-  }
+  },
+
 };
 </script>
 

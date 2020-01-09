@@ -56,7 +56,13 @@
             <b-navbar-item tag="div">
 
               <div v-if="$auth.isAuthenticated" class="navbar-item has-dropdown is-hoverable is-dark">
-                  <a class="navbar-link">Hello, {{$auth.user.name}} </a>
+
+                  <div class="navbar-link">
+                  <p>  {{$auth.user.name}} </p>
+                  <!--figure class="image is-24x24">
+                    <img :src="$auth.user.picture" style="margin-left: 10px" class="is-rounded" >
+                  </figure-->
+                  </div>
 
                   <div class="navbar-dropdown">
                       <router-link to="/profile" class="navbar-item">Profile</router-link>
