@@ -20,6 +20,7 @@
 
                 <button 
                 class="button is-info" 
+                :disabled="!$auth.isAuthenticated"
                 @click="$emit('submit', activeEvent)" 
                 style="margin-right: 1em; background-color: #55f;">
                 submit
@@ -35,6 +36,7 @@
 
                 <button 
                 class="button is-danger" 
+                :disabled="!$auth.isAuthenticated"
                 @click="$emit('delete', activeEvent)">
                 delete event
                 </button>
@@ -49,19 +51,9 @@ export default {
     props: ['activeEvent', 'isNewEvent'],
     methods: {
         submitButtonClicked() {
-
             this.$emit('clicked', 'submit')
         },
-
-
     },
-    computed: {
-
-        numFrames: {
-            get() { return this.$store.getters['takeLunarStack_numFrames'] },
-            set(val) { this.$store.commit('takeLunarStack_numFrames', val) }
-        },
-    }
 }
 </script>
 

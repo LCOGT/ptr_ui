@@ -6,7 +6,22 @@ export const authGuard = (to, from, next) => {
   const fn = () => {
     // If the user is authenticated, continue with the route
     if (authService.isAuthenticated) {
-      return next();
+      console.log('user is authenticated')
+
+      if (to.meta.requiresRole == 'admin') {
+        console.log('requires admin role')
+        const requiredRole = to.meta.requiresRole;
+        if (authService.user['https://photonranch.org/isAdmin'] == 'true') {
+          return next();
+        }
+        else {
+          return next(false);
+        }
+
+      }
+      else {
+        return next();
+      };
     }
 
     // Otherwise, log in

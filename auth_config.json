@@ -1,4 +1,5 @@
 {
     "domain": "photonranch.auth0.com",
-    "clientId": "czNLK0BPUFeoR9p98U7uIP4OoAy4XnyM"
+    "clientId": "czNLK0BPUFeoR9p98U7uIP4OoAy4XnyM",
+    "audience": "https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com"
 }

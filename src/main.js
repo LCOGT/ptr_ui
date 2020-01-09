@@ -25,7 +25,7 @@ import JS9Helpers from '@/utils/js9Helpers'
 import awsmobile from './aws-exports'
 
 // Import the Auth0 configuration and plugin
-import { domain, clientId } from "../auth_config.json";
+import { domain, clientId, audience } from "../auth_config.json";
 import { Auth0Plugin } from "./auth";
 
 
@@ -34,6 +34,7 @@ Vue.use(Buefy)
 Vue.use(Auth0Plugin, {
   domain,
   clientId,
+  audience,
   onRedirectCallback: appState => {
     router.push(
       appState && appState.targetUrl

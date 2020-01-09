@@ -37,7 +37,7 @@
     />
 
     <!-- popup for creating calendar events -->
-    <b-modal :active.sync="isEventEditorActive" :width="640" scroll="keep">
+    <b-modal :active.sync="isEventEditorActive" :width="640" scroll="keep" @close="eventModalClosed">
       <div class="card">
         <div class="card-content">
           <calendar-event-editor :activeEvent="activeEvent" 
@@ -84,11 +84,9 @@ export default {
       calendarSite: "wmd",
 
       // Helper data for communicating with the calendar backend.
-      axiosConfig: {
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-        }
+      corsHeaders: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Access-Control-Allow-Origin': '*',
       },
       backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
 
@@ -133,6 +131,36 @@ export default {
       console.log(val)
     },
 
+
+    async getConfigWithAuth() {
+      let token;
+      try {
+        token = await this.$auth.getTokenSilently(); 
+      } catch(err) {
+        console.error(err)
+        console.warn('Did not acquire the needed token. Stopping request.')
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: "Oops! You aren't authorized to do that.",
+          position: 'is-bottom',
+          type: 'is-danger' ,
+        })
+      }
+
+      let configWithAuth = {
+        'headers': {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+
+      console.log('config with auth: ')
+      console.log(configWithAuth)
+      return configWithAuth;
+    },
+
+    // Make a unique id for calendar events. This is the pk in dynamodb.
     makeUniqueID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -147,7 +175,10 @@ export default {
 
     refreshCalendarView() {
       let calendarApi = this.$refs.fullCalendar.getApi();
+      calendarApi.unselect();
       calendarApi.refetchEvents();
+      this.isEventModalActive = false;
+      this.isEventEditorActive =false;
     },
 
     /*===================================================/
@@ -162,17 +193,18 @@ export default {
       this.activeEvent.endStr = arg.endStr;
       this.activeEvent.title = "new reservation"
       //this.activeEvent.creator = this.$store.getters['auth/username']
+      //this.activeEvent.creator = 'no name'
       this.activeEvent.creator = this.$auth.user.name
       this.activeEvent.id = this.makeUniqueID()
       this.activeEvent.site = this.calendarSite
 
-      let startstr = arg.startStr
-      console.log(startstr)
-      console.log(new Date(startstr))
-      let a = new Date(startstr).toISOString()
-      let b = moment(a).format()
-      console.log(a)
-      console.log(b)
+      //let startstr = arg.startStr
+      //console.log(startstr)
+      //console.log(new Date(startstr))
+      //let a = new Date(startstr).toISOString()
+      //let b = moment(a).format()
+      //console.log(a)
+      //console.log(b)
 
       this.isSubmitDisabled = false
       //this.isEventModalActive = true;
@@ -204,7 +236,10 @@ export default {
      * When the user clicks submit, event details are sent to the backend.
      */
     async submitButtonClicked(newEvent) {
-      console.log(newEvent)
+
+      // Make request headers and include token. 
+      // Requires user to be logged in.
+      let config = await this.getConfigWithAuth()
 
       let url = `${this.backendUrl}/dev/newevent`
       let eventToPost = {
@@ -217,7 +252,7 @@ export default {
       }
       console.log(eventToPost)
 
-      let res = await axios.post(url, eventToPost, this.axiosConfig)
+      let res = await axios.post(url, eventToPost, config)
       console.log(res)
 
       // refresh to show update
@@ -247,15 +282,14 @@ export default {
      * Delete the selected calendar event from the backend database
      */
     async deleteButtonClicked(eventToDelete) {
+      let config = await this.getConfigWithAuth();
       let url = `${this.backendUrl}/dev/delete`
       let body = {
         "event_id": eventToDelete.id,
         "start": moment(eventToDelete.startStr).format(),
       }
-      console.log(body)
 
-      let res = await axios.post(url, body, this.axiosConfig)
-      console.log(res)
+      let res = await axios.post(url, body, config)
 
       // refresh to show update
       this.isEventModalActive = false
@@ -263,7 +297,11 @@ export default {
       this.refreshCalendarView()
 
     },
+
+
     async postNewEvent(newEvent) {
+
+      let config= await this.getConfigWithAuth();
       let url = `${this.backendUrl}/dev/newevent`
       let eventToPost = {
         "event_id": newEvent.id,
@@ -273,15 +311,13 @@ export default {
         "site": newEvent.site,
         "title": newEvent.title,
       }
-      console.log(eventToPost)
 
-      let res = await axios.post(url, eventToPost, this.axiosConfig)
-      console.log(res)
+      let res = await axios.post(url, eventToPost, config)
 
       // refresh to show update
       this.refreshCalendarView()
       this.isEventModalActive = false;
-      this.isEventEditorActive =false;
+      this.isEventEditorActive= false;
     },
 
 
@@ -289,19 +325,21 @@ export default {
       Fetching Calendar Events
     /===================================================*/
     async fetchSiteEvents(fetchInfo) {
-      // TODO: we don't want to hardcode the site here
-      let site = this.calendarSite
-      let url = `${this.backendUrl}/dev/siteevents`
 
+      // TODO: we don't want to define the site from the select box
+      // on this page.
+      let site = this.calendarSite
+
+      const url = `${this.backendUrl}/dev/siteevents`
+      const header = { 'headers': { ...this.corsHeaders, } }; 
       let body = {
         "site": site,
         "start": fetchInfo.startStr,
         "end": fetchInfo.endStr,
       }
-      console.log(body)
 
-      let resp = await axios.post(url, body, this.axiosConfig)
-      console.log(resp)
+      let resp = await axios.post(url, body, header)
+
       let formatted_events = resp.data.table_response.Items.map(obj => {
         let fObj = {
           'start': obj.start,
