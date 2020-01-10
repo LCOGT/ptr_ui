@@ -2,6 +2,10 @@
     <b-field horizontal label="Owner">
         <p class="is-family-primary">{{activeEvent.creator}}</p>
     </b-field>
+
+    <b-field horizontal label="Observatory">
+        <p class="is-family-primary">{{activeEvent.resourceId}}</p>
+    </b-field>
     
     <b-field horizontal label="Event Name">
         <b-input :default="activeEvent.title" v-model="activeEvent.title"></b-input>
@@ -56,12 +60,6 @@
 export default {
     name: 'CalendarEventEditor',
     props: ['activeEvent', 'isNewEvent'],
-    methods: {
-        submitButtonClicked() {
-            this.$emit('clicked', 'submit')
-        },
-
-    },
 }
 </script>
 

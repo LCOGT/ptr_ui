@@ -48,6 +48,7 @@
     "perf_hooks": "0.0.1",
     "portal-vue": "^2.1.6",
     "register-service-worker": "^1.5.2",
+    "suncalc": "^1.8.0",
     "upgrade": "^1.1.0",
     "vue": "^2.6.10",
     "vue-multiselect": "^2.1.6",
