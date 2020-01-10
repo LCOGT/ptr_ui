@@ -80,6 +80,20 @@ import "@fullcalendar/daygrid/main.css";
 import "@fullcalendar/timegrid/main.css";
 import "@fullcalendar/resource-timeline/main.css";
 
+/* TODO:
+
+- Refactor so the calendar is a component, not a view (page). 
+
+- Convert stuff to UTC instead of local times. Somehow preserve notion of local time.
+
+- Make events editable.
+
+- Set permissions so non-admins can only edit events they've made. 
+
+
+*/
+
+
 export default {
   name: 'calendar',
   components: {
@@ -215,24 +229,28 @@ export default {
       let allDays = []
       let msPerDay = 1000*60*60*24
       for (let day=firstDay; day<lastDay; day+=msPerDay) {
+        // Define each day by the timestamp a little after 1:01am to avoid DST hell
         allDays.push(day+3700000)
       }
       console.log('info: ', info)
       console.log('allDays: ', allDays)
 
       function getTwighlightEvents(timestamp, latitude, longitude) {
+
+        let events = {}
+
         let msPerDay = 1000*60*60*24
         let sunEvents = SunCalc.getTimes(new Date(timestamp), latitude, longitude)
         let nextDayEvents = SunCalc.getTimes(new Date(timestamp+msPerDay),latitude, longitude)
-        console.log('sunEvents: ', sunEvents)
-        let events = {}
 
+        let currentDateObj = new Date(timestamp)
+
+        // The event colors for the calendar
         let daylightColor = "rgb(129, 212, 250)"
         let civilColor = "rgb(52, 152, 219)"
         let nauticalColor = "rgb(36, 113, 163)"
         let astronomicalColor = "rgb(26, 82, 118)"
 
-        let currentDateObj = new Date(timestamp)
 
         events.daylightAfternoon = {
           title: "Afternoon Daylight",
@@ -243,15 +261,6 @@ export default {
           backgroundColor: daylightColor,
           id: `${currentDateObj.toISOString()}_day_afternoon`,
         }
-        events.daylightMorning = {
-          title: "Morning Daylight",
-          start: nextDayEvents.sunrise,
-          end: new Date(timestamp).setHours(36),
-          rendering: "background",
-          backgroundColor: daylightColor,
-          id: `${currentDateObj.toISOString()}_day_morning`,
-        }
-
         events.civilTwighlightDusk = {
           title: "Civil Twighlight",
           start: sunEvents.sunset,
@@ -260,15 +269,6 @@ export default {
           rendering: "background",
           id: `${currentDateObj.toISOString()}_civil_dusk`,
         }
-        events.civilTwighlightDawn = {
-          title: "Civil Twighlight",
-          start:nextDayEvents.dawn,
-          end:nextDayEvents.sunrise,
-          backgroundColor: civilColor,
-          rendering: "background",
-          id: `${currentDateObj.toISOString()}_civil_dawn`,
-        }
-
         events.nauticalTwighlightDusk = {
           title: "Nautical Twighlight",
           start: sunEvents.dusk,
@@ -276,6 +276,23 @@ export default {
           backgroundColor: nauticalColor,
           rendering: "background",
           id: `${currentDateObj.toISOString()}_nautical_dusk`,
+        }
+        events.astronomicalTwighlightDusk = {
+          title: "Astronomical Twighlight",
+          start: sunEvents.nauticalDusk,
+          end: sunEvents.night,
+          backgroundColor: astronomicalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_astronomical_dusk`,
+        }
+
+        events.astronomicalTwighlightDawn = {
+          title: "Astronomical Twighlight",
+          start: nextDayEvents.nightEnd,
+          end: nextDayEvents.nauticalDawn,
+          backgroundColor: astronomicalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_astronomical_dawn`,
         }
         events.nauticalTwighlightDawn = {
           title: "Nautical Twighlight",
@@ -285,22 +302,21 @@ export default {
           rendering: "background",
           id: `${currentDateObj.toISOString()}_nautical_dawn`,
         }
-
-        events.astronomicalTwighlightDusk = {
-          title: "Astronomical Twighlight",
-          start: sunEvents.nauticalDusk,
-          end: sunEvents.night,
-          backgroundColor: astronomicalColor,
+        events.civilTwighlightDawn = {
+          title: "Civil Twighlight",
+          start:nextDayEvents.dawn,
+          end:nextDayEvents.sunrise,
+          backgroundColor: civilColor,
           rendering: "background",
-          id: `${currentDateObj.toISOString()}_astronomical_dusk`,
+          id: `${currentDateObj.toISOString()}_civil_dawn`,
         }
-        events.astronomicalTwighlightDawn = {
-          title: "Astronomical Twighlight",
-          start: nextDayEvents.nightEnd,
-          end: nextDayEvents.nauticalDawn,
-          backgroundColor: astronomicalColor,
+        events.daylightMorning = {
+          title: "Morning Daylight",
+          start: nextDayEvents.sunrise,
+          end: new Date(timestamp).setHours(36),
           rendering: "background",
-          id: `${currentDateObj.toISOString()}_astronomical_dawn`,
+          backgroundColor: daylightColor,
+          id: `${currentDateObj.toISOString()}_day_morning`,
         }
         return events
       }
@@ -316,27 +332,8 @@ export default {
       let t1 = performance.now()
       console.log('TIME to make astro twighlight: ', t1-t0)
       return alltheevents
-      },
+    },
 
-
-      
-
-      //let calApi = this.$refs.fullCalendar.getApi()
-
-      //let dates = []
-      //let start = 10;
-      //let end = 15;
-      //for (let day=start; day<end; day++) {
-        //dates.push(new Date(2020, 0, day))
-      //}
-      
-      //let latitude = 33.4;
-      //let longitude = -119;
-
-      //let suncalcTimes = SunCalc.getTimes(dates[0], latitude, longitude)
-
-      //console.log("suncalc", suncalcTimes)
-    //},
 
     listObservatories() {
 
