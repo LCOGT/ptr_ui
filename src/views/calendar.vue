@@ -17,21 +17,26 @@
       :header="{
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        right: 'resourceTimelineTenDay,resourceTimeGridDay,dayGridMonth,timeGridWeek,timeGridDay,listWeek'
       }"
+      aspect-ratio="1.5"
+      :views="resourceViews"
       :plugins="calendarPlugins"
       :weekends="calendarWeekends"
-      :events="fetchSiteEvents"
+      :eventSources="eventSources"
+      :eventRender="eventRender"
       :nowIndicator="true"
       :themeSystem="themeSystem"
       :selectable="selectable"
       :unselectAuto="unselectAuto"
       :selectMirror="true"
       :editable="true"
+      :resources="listOfObservatories"
       slotDuration="00:30:00"
       min-time="12:00:00"
       max-time="36:00:00"
       scrollTime="17:00:00"
+      schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
       @select="newEventSelected"
       @eventClick="existingEventSelected"
     />
@@ -53,9 +58,10 @@
 
 <script>
 import { Auth } from "aws-amplify";
-import axios from 'axios'
-import moment from 'moment'
-import titleGenerator from '@/utils/titleGenerator'
+import axios from 'axios';
+import moment from 'moment';
+import titleGenerator from '@/utils/titleGenerator';
+import SunCalc from 'suncalc';
 
 import CalendarEventEditor from "@/components/CalendarEventEditor";
 import CalendarEventCreator from "@/components/CalendarEventCreator";
@@ -64,12 +70,15 @@ import FullCalendar from "@fullcalendar/vue";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
+import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import bootstrapPlugin from '@fullcalendar/bootstrap';
 
 // must manually include stylesheets for each plugin
 import "@fullcalendar/core/main.css";
 import "@fullcalendar/daygrid/main.css";
 import "@fullcalendar/timegrid/main.css";
+import "@fullcalendar/resource-timeline/main.css";
 
 export default {
   name: 'calendar',
@@ -77,6 +86,23 @@ export default {
     FullCalendar, // make the <FullCalendar> tag available
     CalendarEventEditor,
     CalendarEventCreator,
+  },
+  computed: {
+
+    // Return the list of sources that feed fullCalendar with events
+    eventSources: function() {
+      return [
+        {
+          // Events from dynamodb backend
+          events: this.fetchSiteEvents
+        },
+        {
+          // Astronomical twighlight events
+          events: this.suncalcs
+        }
+      ]
+    }
+
   },
   data: function() {
     return {
@@ -92,9 +118,7 @@ export default {
       backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
 
       // popup for setting calendar events
-      isEventModalActive: false,
       isEventEditorActive: false,
-      isSubmitDisabled: false,
 
       // properties of the selected calendar event
       activeEvent: {
@@ -102,6 +126,58 @@ export default {
         endStr: '',
         title: '',
         creator: '',
+        resourceId: '',
+        id: '',
+      },
+
+
+      // Calendar Resources (Observatories)
+      listOfObservatories: [
+        {
+          'id': 'wmd',
+          'title': 'West Mountain Drive',
+          'eventColor': '#7d12ff',
+          //'eventBackgroundColor': '#ab20fd',
+          'eventBorderColor': '#200589',
+          'eventTextColor': '#fbf8fd',
+          'eventClassNames': '',
+          'eventOverlap': false, // defines whether events are allowed to overlap
+          'eventConstraint': '',
+          'eventAllow': '',
+          'businessHours': '',
+          'children': '',
+          'parentId': '',
+          'anyOtherPropsHere': 'call from key extendedProps of this resource object',
+        },
+        {
+          'id': 'other',
+          'title': 'Another Observatory',
+          'eventColor': '#f6903d',
+          'eventBackgroundColor': '#f6903d',
+          'eventBorderColor': '#200589',
+          'eventTextColor': '#fbf8fd',
+          'eventClassNames': '',
+          'eventOverlap': false, // defines whether events are allowed to overlap
+          'eventConstraint': '',
+          'eventAllow': '',
+          'businessHours': '',
+          'children': '',
+          'parentId': '',
+          'anyOtherPropsHere': 'call from key extendedProps of this resource object',
+        },
+      ],
+
+      // Define alternate calendar views (eg. 10 days at a time)
+      resourceViews: {
+        resourceTimelineDay: {
+          buttonText: ':15 slots',
+          slotDuration: '00:15'
+        },
+        resourceTimelineTenDay: {
+          type: 'resourceTimeline',
+          duration: { days: 10 },
+          buttonText: '10 days'
+        }
       },
 
       // Settings used to configure the fullcalendar component
@@ -111,22 +187,184 @@ export default {
         dayGridPlugin,
         timeGridPlugin,
         interactionPlugin, // needed for dateClick
-        bootstrapPlugin
+        bootstrapPlugin,
+        resourceTimelinePlugin,
+        resourceTimeGridPlugin,
       ],
       selectable: true,
       unselectAuto: false,
       calendarWeekends: true,
       slotDuration: '00:30:00',
-      calendarEvents: [
-        // initial event data
-        { 
-          title: "Event Now", 
-          start: new Date(),
-        }
-      ]
     };
   },
   methods: {
+
+    eventRender(event, element) {
+      if (event.rendering == 'background') {
+        element.append(event.title)
+      }
+    },
+
+    async suncalcs(info) {
+
+      let t0=performance.now()
+      let firstDay = info.start.valueOf()
+      let lastDay = info.end.valueOf()
+      
+      // List all the days we'll need to display
+      let allDays = []
+      let msPerDay = 1000*60*60*24
+      for (let day=firstDay; day<lastDay; day+=msPerDay) {
+        allDays.push(day+3700000)
+      }
+      console.log('info: ', info)
+      console.log('allDays: ', allDays)
+
+      function getTwighlightEvents(timestamp, latitude, longitude) {
+        let msPerDay = 1000*60*60*24
+        let sunEvents = SunCalc.getTimes(new Date(timestamp), latitude, longitude)
+        let nextDayEvents = SunCalc.getTimes(new Date(timestamp+msPerDay),latitude, longitude)
+        console.log('sunEvents: ', sunEvents)
+        let events = {}
+
+        let daylightColor = "rgb(129, 212, 250)"
+        let civilColor = "rgb(52, 152, 219)"
+        let nauticalColor = "rgb(36, 113, 163)"
+        let astronomicalColor = "rgb(26, 82, 118)"
+
+        let currentDateObj = new Date(timestamp)
+
+        events.daylightAfternoon = {
+          title: "Afternoon Daylight",
+          // Start daylight event at noon
+          start: new Date(timestamp).setHours(12),
+          end: sunEvents.sunset,
+          rendering: "background",
+          backgroundColor: daylightColor,
+          id: `${currentDateObj.toISOString()}_day_afternoon`,
+        }
+        events.daylightMorning = {
+          title: "Morning Daylight",
+          start: nextDayEvents.sunrise,
+          end: new Date(timestamp).setHours(36),
+          rendering: "background",
+          backgroundColor: daylightColor,
+          id: `${currentDateObj.toISOString()}_day_morning`,
+        }
+
+        events.civilTwighlightDusk = {
+          title: "Civil Twighlight",
+          start: sunEvents.sunset,
+          end: sunEvents.dusk,
+          backgroundColor: civilColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_civil_dusk`,
+        }
+        events.civilTwighlightDawn = {
+          title: "Civil Twighlight",
+          start:nextDayEvents.dawn,
+          end:nextDayEvents.sunrise,
+          backgroundColor: civilColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_civil_dawn`,
+        }
+
+        events.nauticalTwighlightDusk = {
+          title: "Nautical Twighlight",
+          start: sunEvents.dusk,
+          end: sunEvents.nauticalDusk,
+          backgroundColor: nauticalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_nautical_dusk`,
+        }
+        events.nauticalTwighlightDawn = {
+          title: "Nautical Twighlight",
+          start: nextDayEvents.nauticalDawn,
+          end: nextDayEvents.dawn,
+          backgroundColor: nauticalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_nautical_dawn`,
+        }
+
+        events.astronomicalTwighlightDusk = {
+          title: "Astronomical Twighlight",
+          start: sunEvents.nauticalDusk,
+          end: sunEvents.night,
+          backgroundColor: astronomicalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_astronomical_dusk`,
+        }
+        events.astronomicalTwighlightDawn = {
+          title: "Astronomical Twighlight",
+          start: nextDayEvents.nightEnd,
+          end: nextDayEvents.nauticalDawn,
+          backgroundColor: astronomicalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_astronomical_dawn`,
+        }
+        return events
+      }
+
+      let twighlightEvents = []
+
+      let alltheevents = [];
+      allDays.map((day) => alltheevents.push(...Object.values(getTwighlightEvents(day, 33, -119))))
+
+
+      console.log('twighlight events: ', twighlightEvents)
+
+      let t1 = performance.now()
+      console.log('TIME to make astro twighlight: ', t1-t0)
+      return alltheevents
+      },
+
+
+      
+
+      //let calApi = this.$refs.fullCalendar.getApi()
+
+      //let dates = []
+      //let start = 10;
+      //let end = 15;
+      //for (let day=start; day<end; day++) {
+        //dates.push(new Date(2020, 0, day))
+      //}
+      
+      //let latitude = 33.4;
+      //let longitude = -119;
+
+      //let suncalcTimes = SunCalc.getTimes(dates[0], latitude, longitude)
+
+      //console.log("suncalc", suncalcTimes)
+    //},
+
+    listObservatories() {
+
+      let allResources = [];
+
+      // A resource (an observatory) to return.
+      // Defined here: https://fullcalendar.io/docs/resource-parsing
+      const wmd = {
+        'id': 'wmd',
+        'title': 'West Mountain Drive',
+        'eventColor': '#7d12ff',
+        'eventBackgroundColor': '#200589',
+        'eventBorderColor': '#000000',
+        'eventTextColor': '#fbf8fd',
+        'eventClassNames': '',
+        'eventOverlap': false, // defines whether events are allowed to overlap
+        'eventConstraint': '',
+        'eventAllow': '',
+        'businessHours': '',
+        'children': '',
+        'parentId': '',
+        'anyOtherPropsHere': 'call from key extendedProps of this resource object',
+      }
+
+      allResources.push(wmd)
+      return allResources;
+
+    },
 
     async getConfigWithAuth() {
       let token;
@@ -185,6 +423,7 @@ export default {
      */
     newEventSelected(arg){ 
       console.log('new event selected')
+      console.log(arg)
       this.activeEvent.startStr = arg.startStr;
       this.activeEvent.endStr = arg.endStr;
       this.activeEvent.title = titleGenerator.makeTitle()
@@ -193,6 +432,7 @@ export default {
       this.activeEvent.creator = this.$auth.user.name
       this.activeEvent.id = this.makeUniqueID()
       this.activeEvent.site = this.calendarSite
+      this.activeEvent.resourceId = this.calendarSite
 
       //let startstr = arg.startStr
       //console.log(startstr)
@@ -202,8 +442,6 @@ export default {
       //console.log(a)
       //console.log(b)
 
-      this.isSubmitDisabled = false
-      //this.isEventModalActive = true;
       this.isEventEditorActive = true;
     },
     /**
@@ -220,8 +458,8 @@ export default {
       this.activeEvent.title = event.title;
       this.activeEvent.creator = event.extendedProps.creator
       this.activeEvent.site = event.extendedProps.site
-      this.isSubmitDisabled = true
-      //this.isEventModalActive = true
+      this.activeEvent.resourceId = event.getResources()[0].title
+      //this.activeEvent.rendering = event.rendering;
       this.isEventEditorActive = true
     },
 
@@ -246,6 +484,8 @@ export default {
         "creator": newEvent.creator,
         "site": newEvent.site,
         "title": newEvent.title,
+        "resourceId": newEvent.resourceId,
+        "rendering": newEvent.rendering
       }
       console.log(eventToPost)
 
@@ -307,6 +547,8 @@ export default {
       }
 
       let resp = await axios.post(url, body, header)
+      console.log('resp')
+      console.log(resp)
 
       // Format the returned items to work nicely with fullcalendar.
       let formatted_events = resp.data.table_response.Items.map(obj => {
@@ -317,9 +559,12 @@ export default {
           'title': obj.title,
           'creator': obj.creator,
           'site': obj.site,
+          'resourceId': obj.resourceId,
+          'rendering': obj.rendering,
         }
         return fObj
       })
+      console.log('formatted_events: ', formatted_events)
       return formatted_events
     },
 
@@ -337,6 +582,14 @@ export default {
 
 <!-- TODO: reduce the bootstrap css (below) to the minimum required for button groups. -->
 <style lang='scss'>
+
+/* the line showing the current time */
+.fc-now-indicator.fc-now-indicator-line {
+  border-color: rgba(255, 0, 0, 0.5);
+}
+.fc-now-indicator.fc-now-indicator-arrow {
+  border-color: rgba(255, 0, 0, 0.5);
+}
 /*@import url("https://bootswatch.com/4/darkly/bootstrap.min.css");*/
 .demo-app {
   font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
