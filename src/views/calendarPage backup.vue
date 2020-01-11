@@ -95,7 +95,7 @@ import "@fullcalendar/resource-timeline/main.css";
 
 
 export default {
-  name: 'calendar',
+  name: 'calendarPage',
   components: {
     FullCalendar, // make the <FullCalendar> tag available
     CalendarEventEditor,
