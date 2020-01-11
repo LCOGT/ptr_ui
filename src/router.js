@@ -18,7 +18,7 @@ import ctrl from './views/ctrl.vue'
 import ux1 from './views/ux1.vue'
 import analysis from './views/analysis.vue'
 import { authGuard } from "./auth/authGuard";
-import calendar from './views/calendar.vue'
+import calendarPage from './views/calendarPage.vue'
 
 import store from './store'
 import { Auth } from 'aws-amplify'
@@ -46,7 +46,7 @@ const router = new VueRouter({
     { path: '/skymap', name: 'skymap', component: skymap },
     { path: '/ctrl', name: 'ctrl', component: ctrl },
     { path: '/analysis', name: 'analysis', component: analysis },
-    { path: '/calendar', name: 'calendar', component: calendar },
+    { path: '/calendar', name: 'calendar', component: calendarPage },
     {
       path: '/ux1/:sitecode/:subpage',
       name: 'ux1',
