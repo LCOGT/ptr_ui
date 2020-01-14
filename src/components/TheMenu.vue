@@ -66,6 +66,7 @@
 
                   <div class="navbar-dropdown">
                       <router-link to="/profile" class="navbar-item">Profile</router-link>
+                      <router-link to="/adminonly" class="navbar-item">Admins Only</router-link>
                       <hr class="navbar-divider">
                       <a v-on:click="logout" class="navbar-item has-link">Log out</a>
                   </div>

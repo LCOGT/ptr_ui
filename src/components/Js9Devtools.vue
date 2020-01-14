@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-collapse class="card" :open="true">
+        <b-collapse class="card" :open="false">
             <div
             slot="trigger" 
             slot-scope="props"

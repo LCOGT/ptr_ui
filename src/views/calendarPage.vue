@@ -114,23 +114,10 @@ export default {
 
 </script>
 
-<!-- TODO: reduce the bootstrap css (below) to the minimum required for button groups. -->
 <style lang='scss'>
-
-/* the line showing the current time */
-.fc-now-indicator.fc-now-indicator-line {
-  border-color: rgba(255, 0, 0, 0.5);
-}
-.fc-now-indicator.fc-now-indicator-arrow {
-  border-color: rgba(255, 0, 0, 0.5);
-}
-/*@import url("https://bootswatch.com/4/darkly/bootstrap.min.css");*/
 .demo-app {
   font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 14px;
-}
-.fc table * {
-  border-color:#444;
 }
 
 .demo-app-top {

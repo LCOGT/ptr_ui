@@ -1,4 +1,5 @@
 import { getInstance } from "./index";
+import { ToastProgrammatic as Toast } from 'buefy'
 
 export const authGuard = (to, from, next) => {
   const authService = getInstance();
@@ -8,13 +9,18 @@ export const authGuard = (to, from, next) => {
     if (authService.isAuthenticated) {
       console.log('user is authenticated')
 
-      if (to.meta.requiresRole == 'admin') {
+      if (to.meta.requiresRole) {
         console.log('requires admin role')
         const requiredRole = to.meta.requiresRole;
-        if (authService.user['https://photonranch.org/isAdmin'] == 'true') {
+        const userRoles = authService.user['https://photonranch.org/user_metadata']['roles']
+        if (userRoles.includes(requiredRole)) {
           return next();
         }
         else {
+          Toast.open({
+            message: 'Requires admin role',
+            type: 'is-danger',
+          })
           return next(false);
         }
 
