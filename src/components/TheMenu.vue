@@ -84,7 +84,6 @@
 </template>
 
 <script>
-import { Auth } from "aws-amplify";
 import { mapGetters, mapState } from "vuex";
 //import { sites } from '../sites'
 

@@ -21,9 +21,6 @@ import analysis from './views/analysis.vue'
 import { authGuard } from "./auth/authGuard";
 import calendarPage from './views/calendarPage.vue'
 
-import store from './store'
-import { Auth } from 'aws-amplify'
-import { getInstance } from "./auth/index";
 
 Vue.use(VueRouter)
 
