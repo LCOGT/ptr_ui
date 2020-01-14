@@ -324,10 +324,10 @@ export default {
                 console.error(err)
                 console.warn('Did not acquire the needed token. Stopping request.')
                 this.$buefy.toast.open({
-                duration: 5000,
-                message: "Oops! You aren't authorized to do that.",
-                position: 'is-bottom',
-                type: 'is-danger' ,
+                    duration: 5000,
+                    message: "Oops! You aren't authorized to do that.",
+                    position: 'is-bottom',
+                    type: 'is-danger' ,
                 })
             }
 
@@ -337,6 +337,28 @@ export default {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': `Bearer ${token}`
                 }
+            }
+        },
+
+        handleNotAuthorizedResponse(error) {
+            if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+                // small popup notification describing error
+                this.$buefy.toast.open({
+                    duration: 5000,
+                    message: `${error.response.status} error: ${error.response.data}`,
+                    position: 'is-bottom',
+                    type: 'is-danger' ,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
             }
         },
 
@@ -373,6 +395,7 @@ export default {
             this.activeEvent.id = this.makeUniqueID()
             this.activeEvent.site = this.calendarSite
             this.activeEvent.resourceId = this.calendarSite
+            this.activeEvent.creator_id = this.$auth.user.sub
             // Testing time formats:
             //let startstr = arg.startStr
             //console.log(startstr)
@@ -421,6 +444,7 @@ export default {
                 "start": newEvent.startStr,
                 "end": newEvent.endStr,
                 "creator": newEvent.creator,
+                "creator_id": newEvent.creator_id,
                 "site": newEvent.site,
                 "title": newEvent.title,
                 "resourceId": newEvent.resourceId,
@@ -457,6 +481,8 @@ export default {
                 "start": moment(eventToDelete.startStr).format(),
             }
             let res = await axios.post(url, body, config)
+                .catch(error => {this.handleNotAuthorizedResponse(error)})
+
             console.log(res)
 
             // refresh to show update and close modal

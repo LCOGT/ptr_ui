@@ -27,7 +27,7 @@ import JS9 from "@/components/JS9";
 
  
 // This enables connection to the backend resources created in the amplify cli.
-Amplify.configure(awsmobile)
+//Amplify.configure(awsmobile)
 
 Amplify.configure({
 

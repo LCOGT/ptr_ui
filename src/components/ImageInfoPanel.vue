@@ -15,8 +15,13 @@
             <div style="margin: 1em;">
                     <table>
                         <tr> 
+                            <td class="prop-col" align="right">capture date: </td>
+                            <!--td>{{moment.utc(new Date(current_image.capture_date)).format('YYYY:MM:DD HH:MM') ||-- "---"}}</td--> 
+                            <td>{{captureDate}}</td>
+                        </tr>
+                        <tr>
                             <td class="prop-col" align="right">capture time: </td>
-                            <td>{{new Date(current_image.capture_date).toISOString() || "---"}}</td> 
+                            <td>{{captureTime + " GMT"}}</td>
                         </tr>
                         <tr> 
                             <td class="prop-col" align="right">site: </td>
@@ -63,6 +68,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 import { mapState } from 'vuex';
 export default {
     name: "ImageInfoPanel",
@@ -72,6 +78,12 @@ export default {
     methods: {
     },
     computed: {
+        captureDate() {
+            return moment.utc(new Date(this.current_image.capture_date)).format('MMMM DD, YYYY')
+        },
+        captureTime() {
+            return moment.utc(new Date(this.current_image.capture_date)).format('HH:mm:ss')
+        },
         rightAscension() {
             if (this.current_image.right_ascension){
                 return this.current_image.right_ascension.toFixed(2)

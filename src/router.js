@@ -6,6 +6,7 @@ import VueRouter from 'vue-router'
 import Home from './views/Home.vue'
 import About from './views/About.vue'
 import Profile from './views/Profile.vue'
+import AdminOnly from './views/AdminOnly.vue'
 
 // Observatories
 import Site from './views/Site.vue'
@@ -34,12 +35,13 @@ const router = new VueRouter({
     //{ path: '*', redirect: '/' },
     { path: '/', name: 'home', component: Home },
     { 
-      path: '/profile', 
-      name: 'profile', 
-      component: Profile, 
+      path: '/adminonly', 
+      name: 'adminonly', 
+      component: AdminOnly, 
       beforeEnter: authGuard, 
       meta: { requiresRole: 'admin'}
     },
+    { path: '/profile', name: 'profile', component: Profile},
     { path: '/about', name: 'about', component: About },
     { path: '/btns', name: 'btns', component: btns },
     { path: '/imgs', name: 'imgs', component: imgs },
