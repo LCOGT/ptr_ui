@@ -48,7 +48,6 @@
 <script>
 
 //{ import scripts (collapsible)
-    import { Auth } from "aws-amplify";
     import axios from 'axios';
     import moment from 'moment';
     import titleGenerator from '@/utils/titleGenerator';
@@ -577,7 +576,7 @@ export default {
   margin: 0 0 3em;
 }
 
-.calendar-containerr {
+.calendar-container {
   margin: 0 auto;
   max-width: 900px;
 }

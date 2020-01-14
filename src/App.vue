@@ -20,7 +20,7 @@
 <script>
 import TheMenu from '@/components/TheMenu.vue'
 import DevPanel from '@/components/DevPanel.vue'
-import Amplify, { Auth, API } from 'aws-amplify'
+import Amplify from 'aws-amplify'
 import awsmobile from './aws-exports';
 import { components } from 'aws-amplify-vue'
 import JS9 from "@/components/JS9";
@@ -30,20 +30,6 @@ import JS9 from "@/components/JS9";
 //Amplify.configure(awsmobile)
 
 Amplify.configure({
-
-  //Auth: {
-  //  identityPoolId: 'us-west-2:b9d6f9e8-202a-4a6f-9487-1e918f945f29',
-  //  region: 'us-west-2',
-  //  userPoolId: 'us-west-2_gAjMkmuFh',
-  //  userPoolWebClientId: '7uh22ggsabjjusnb8fqdfitkf8',
-  //},
-  //// Disable analytics to fix this bug:
-  //// Description: https://github.com/aws-amplify/amplify-js/issues/3484
-  //// Solution: https://stackoverflow.com/questions/56680112/bad-request-is-returned-when-amplify-is-configured-for-hosted-ui-in-angular-6/56685607#56685607
-  //Analytics:{
-  //  disabled:true
-  //},
-
 
   // API usage docs: https://bit.ly/30n9cTt
   API: {
