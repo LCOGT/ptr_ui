@@ -79,8 +79,6 @@
 
     - Make events editable.
 
-    - Set permissions so non-admins can only edit events they've made. 
-
     */
 
 //}
@@ -204,22 +202,32 @@ export default {
 
     methods: {
 
+        // TODO: remove hardcoded lat/long
         async getTwighlightEvents(info) {
 
+            // Timer start
             let t0=performance.now()
+
+            // Get the time range we need to display in the UI.
             let firstDay = info.start.valueOf()
             let lastDay = info.end.valueOf()
             
             // List all the days we'll need to display
             let allDays = []
             let msPerDay = 1000*60*60*24
-            for (let day=firstDay; day<lastDay; day+=msPerDay) {
+            // Generate events for 60 days before the start time to 60 days after.
+            // This is to prevent the loading flicker when changing weeks.
+            // note: this still only takes ~5ms to compute.
+            for (let day=firstDay-(60*msPerDay); day<lastDay+(60*msPerDay); day+=msPerDay) {
                 // Define each day by the timestamp a little after 1:01am to avoid DST hell
                 allDays.push(day+3700000)
             }
+
             //console.log('info: ', info)
             //console.log('allDays: ', allDays)
 
+            // Generate the twighlight events (in proper fullCalendar format)
+            // for one day column (evening-of and morning-after the given date.)
             function oneDayTwighlight(timestamp, latitude, longitude) {
 
                 let events = {}
@@ -306,13 +314,15 @@ export default {
                 return events
             }
 
+            // Collect all the events to display here
             let twighlightEvents = []
 
+            // Compute events for each day. 
+            // TODO: don't harcode lat/long info!!
             allDays.map((day) => twighlightEvents.push(...Object.values(oneDayTwighlight(day, 33, -119))))
-            //console.log('twighlight events: ', twighlightEvents)
 
-            let t1 = performance.now()
-            //console.log('TIME to make astro twighlight: ', t1-t0)
+            // Finish timer
+            console.log('Time to make astro twighlight: ', (performance.now()-t0).toFixed(2)+'ms')
             return twighlightEvents
         },
 
@@ -323,6 +333,8 @@ export default {
             } catch(err) {
                 console.error(err)
                 console.warn('Did not acquire the needed token. Stopping request.')
+                
+                // small popup notification
                 this.$buefy.toast.open({
                     duration: 5000,
                     message: "Oops! You aren't authorized to do that.",
