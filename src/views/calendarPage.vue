@@ -1,16 +1,14 @@
 <template>
-  <div class="demo-app container">
-    <div class="demo-app-top">
-      <!--button @click="gotoPast">go to a date in the past</button-->
-      <b-field label="Site">
-        <b-select v-model="calendarSite">
-          <option value="wmd">wmd</option>
-          <option value="other">other</option>
-        </b-select>
-      </b-field>
-    </div>
+  <div class="container">
+    
+    <b-field class="site-selector" label="Site">
+      <b-select v-model="calendarSite">
+        <option value="wmd">wmd</option>
+        <option value="other">other</option>
+      </b-select>
+    </b-field>
 
-    <the-calendar :calendarSite="calendarSite"/>
+    <the-calendar :calendarSite="calendarSite" :fc_resources="listOfObservatories"/>
 
   </div>
 </template>
@@ -29,7 +27,7 @@ export default {
       // prototype of the active observatory site
       calendarSite: "wmd",
 
-      // Calendar Resources (Observatories)
+      // Calendar Resources (Observatories) to feed into the calendar component
       listOfObservatories: [
         {
           'id': 'wmd',
@@ -65,67 +63,18 @@ export default {
         },
       ],
 
-      // Define alternate calendar views (eg. 10 days at a time)
-      resourceViews: {
-        resourceTimelineDay: {
-          buttonText: ':15 slots',
-          slotDuration: '00:15'
-        },
-        resourceTimelineTenDay: {
-          type: 'resourceTimeline',
-          duration: { days: 10 },
-          buttonText: '10 days'
-        }
-      },
-
     };
   },
-  methods: {
-
-    listObservatories() {
-
-      let allResources = [];
-
-      // A resource (an observatory) to return.
-      // Defined here: https://fullcalendar.io/docs/resource-parsing
-      const wmd = {
-        'id': 'wmd',
-        'title': 'West Mountain Drive',
-        'eventColor': '#7d12ff',
-        'eventBackgroundColor': '#200589',
-        'eventBorderColor': '#000000',
-        'eventTextColor': '#fbf8fd',
-        'eventClassNames': '',
-        'eventOverlap': false, // defines whether events are allowed to overlap
-        'eventConstraint': '',
-        'eventAllow': '',
-        'businessHours': '',
-        'children': '',
-        'parentId': '',
-        'anyOtherPropsHere': 'call from key extendedProps of this resource object',
-      }
-
-      allResources.push(wmd)
-      return allResources;
-
-    },
-  }
+  methods: {}
 }
-
 </script>
 
 <style lang='scss'>
-.demo-app {
-  font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 14px;
+
+.site-selector {
+  margin-top: 2em;
+  padding-bottom: 2em;
+  margin-left: 2em;
 }
 
-.demo-app-top {
-  margin: 0 0 3em;
-}
-
-.demo-app-calendar {
-  margin: 0 auto;
-  max-width: 900px;
-}
 </style>

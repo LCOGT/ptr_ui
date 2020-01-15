@@ -89,7 +89,13 @@ export default {
         CalendarEventEditor,
         CalendarEventCreator,
     },
-    props: ['calendarSite'],
+    props: [
+        // The active site (resource) disaplyed in the calendar
+        'calendarSite', 
+
+        // Resources for fullcalendar (in our case they are observatories)
+        'fc_resources'
+    ],
     computed: {
         // Return the list of sources that feed fullCalendar with events
         fc_eventSources: function() {
@@ -142,41 +148,6 @@ export default {
         fc_aspectRatio: 1.2, // calendar window width/height
         fc_themeSystem: 'bootstrap', // uses bootstrap css (see <style> below)
         fc_schedulerLicenseKey: "GPL-My-Project-Is-Open-Source", // free use of scheduler/resources 
-        // Resources for fullcalendar (in our case they are observatories)
-        fc_resources: [
-            {
-                'id': 'wmd',
-                'title': 'West Mountain Drive',
-                'eventColor': '#7d12ff',
-                //'eventBackgroundColor': '#ab20fd',
-                'eventBorderColor': '#200589',
-                'eventTextColor': '#fbf8fd',
-                'eventClassNames': '',
-                'eventOverlap': false, // defines whether events are allowed to overlap
-                'eventConstraint': '',
-                'eventAllow': '',
-                'businessHours': '',
-                'children': '',
-                'parentId': '',
-                'anyOtherPropsHere': 'call from key extendedProps of this resource object',
-            },
-            {
-                'id': 'other',
-                'title': 'Another Observatory',
-                'eventColor': '#f6903d',
-                'eventBackgroundColor': '#f6903d',
-                'eventBorderColor': '#200589',
-                'eventTextColor': '#fbf8fd',
-                'eventClassNames': '',
-                'eventOverlap': false, // defines whether events are allowed to overlap
-                'eventConstraint': '',
-                'eventAllow': '',
-                'businessHours': '',
-                'children': '',
-                'parentId': '',
-                'anyOtherPropsHere': 'call from key extendedProps of this resource object',
-            },
-        ],
         // fullcalendar plugins
         fc_plugins: [
             // plugins must be defined in the JS
