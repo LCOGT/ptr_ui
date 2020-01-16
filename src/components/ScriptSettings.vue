@@ -91,7 +91,7 @@ export default {
 }
 .the-settings {
     width: fit-content;
-    background-color: $dark-box;
+    background-color: #282f2f;
     padding: 2em;
 }
 </style>

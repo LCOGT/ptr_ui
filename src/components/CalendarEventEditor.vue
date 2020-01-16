@@ -229,6 +229,6 @@ export default {
     padding-bottom: 1em;
 }
 .login-warning {
-    color: $yellow;
+    color: #f1b70e;
 }
 </style>

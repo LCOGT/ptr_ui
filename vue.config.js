@@ -5,7 +5,8 @@ module.exports = {
   css: {
     loaderOptions: {
       sass: {
-        data: `@import "@/style/buefy-styles.scss";`
+        // This produced 6mb(!!) of css! 
+        //data: `@import "@/style/buefy-styles.scss";`
       }
     }
   },
