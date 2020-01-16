@@ -1,49 +1,65 @@
-<template>
-  <div class="calendar-container">
+<template> <div class="calendar-container">
 
     <FullCalendar
-      class="demo-app-calendar"
-      ref="fullCalendar"
+        class="demo-app-calendar"
+        ref="fullCalendar"
 
-      :views="fc_views"
-      :defaultView="fc_defaultView"
-      :header="fc_header"
-      :slotDuration="fc_slotDuration"
-      :min-time="fc_minTime"
-      :max-time="fc_maxTime"
-      :scrollTime="fc_scrollTime"
-      :navLinks="fc_navLinks"
-      :selectable="fc_selectable"
-      :selectMirror="fc_selectMirror"
-      :unselectAuto="fc_unselectAuto"
-      :editable="fc_editable"
-      :weekends="fc_weekends"
-      :nowIndicator="fc_nowIndicator"
-      :aspect-ratio="fc_aspectRatio"
-      :themeSystem="fc_themeSystem"
-      :schedulerLicenseKey="fc_schedulerLicenseKey"
-      :eventSources="fc_eventSources"
-      :resources="fc_resources"
-      :plugins="fc_plugins"
+        :views="fc_views"
+        :defaultView="fc_defaultView"
+        :header="fc_header"
+        :slotDuration="fc_slotDuration"
+        :slotLabelFormat="fc_slotLabelFormat"
+        :eventTimeFormat="fc_eventTimeFormat"
+        :min-time="fc_minTime"
+        :max-time="fc_maxTime"
+        :scrollTime="fc_scrollTime"
+        :navLinks="fc_navLinks"
+        :selectable="fc_selectable"
+        :selectMirror="fc_selectMirror"
+        :unselectAuto="fc_unselectAuto"
+        :editable="fc_editable"
+        :weekends="fc_weekends"
+        :nowIndicator="fc_nowIndicator"
+        :progressiveEventRendering="fc_progressiveEventRendering"
+        :aspect-ratio="fc_aspectRatio"
+        :themeSystem="fc_themeSystem"
+        :schedulerLicenseKey="fc_schedulerLicenseKey"
+        :eventSources="fc_eventSources"
+        :resources="fc_resources"
+        :plugins="fc_plugins"
 
-      @select="newEventSelected"
-      @eventClick="existingEventSelected"
+        @loading="fc_isLoading"
+        @select="newEventSelected"
+        @eventClick="existingEventSelected"
     />
 
-    <!-- popup for creating calendar events -->
-    <b-modal :active.sync="isEventEditorActive" :width="640" scroll="keep" @close="eventModalClosed">
-      <div class="card">
-        <div class="card-content">
-          <calendar-event-editor :activeEvent="activeEvent" 
-          @submit="submitButtonClicked"
-          @cancel="cancelButtonClicked"
-          @delete="deleteButtonClicked"
-          />
+    <div class="level">
+        <div class="level-left"/>
+        <div class="level-right">
+        <div class="level-item"/>
+        <button v-if="isLoading" class="level-item button is-text is-loading">loading</button>
         </div>
-      </div>
+    </div>
+
+
+    <!-- popup for creating calendar events -->
+    <b-modal :active.sync="eventEditorIsActive" :width="640" scroll="keep" @close="eventModalClosed">
+        <div class="card">
+            <div class="card-content">
+            <calendar-event-editor 
+            :eventDetails="activeEvent" 
+            :isNewEvent="isNewEvent"
+            :eventIsLoading="isLoading"
+            @submit="submitButtonClicked"
+            @cancel="cancelButtonClicked"
+            @delete="deleteButtonClicked"
+            @modify="modifyButtonClicked"
+            />
+            </div>
+        </div>
     </b-modal>
-  </div>
-</template>
+
+</div> </template>
 
 <script>
 
@@ -100,15 +116,14 @@ export default {
         // Return the list of sources that feed fullCalendar with events
         fc_eventSources: function() {
             return [
-                {
                 // Astronomical twighlight events (computed locally)
-                events: this.getTwighlightEvents
-                },
-                {
+                { events: this.getTwighlightEvents },
                 // Events from dynamodb backend
-                events: this.fetchSiteEvents
-                },
+                { events: this.fetchSiteEvents },
             ]
+        },
+        fc_selectable() { // whether to let user click and drag to select a time range.
+            return this.$auth.isAuthenticated
         }
     },
 
@@ -135,16 +150,18 @@ export default {
             right: 'resourceTimelineTenDay,resourceTimeGridDay,dayGridMonth,timeGridWeek,timeGridDay,listWeek'
         },
         fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
+        fc_eventTimeFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr times on events
+        fc_slotLabelFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr time on axis labels
         fc_minTime: "12:00:00", // start the day column at noon
         fc_maxTime: "36:00:00", // end the day column at noon for the following day
         fc_scrollTime: "16:00:00", // calendar default view starts at 4pm.
         fc_navLinks: false, // whether to enable clicking on a day to view that day only.
-        fc_selectable: true, // whether to let user click and drag to select a time range.
         fc_selectMirror: true, // whether to draw placeholder event while user is dragging
         fc_unselectAuto: false, // whether clicking elsewhere closes the current selection
         fc_editable: true, // whether events on calendar can be modified
         fc_weekends: true, // whether to show weekends in week view
         fc_nowIndicator: true, // whether to draw line indicating current time in grid views.
+        fc_progressiveEventRendering: true,
         fc_aspectRatio: 1.2, // calendar window width/height
         fc_themeSystem: 'bootstrap', // uses bootstrap css (see <style> below)
         fc_schedulerLicenseKey: "GPL-My-Project-Is-Open-Source", // free use of scheduler/resources 
@@ -159,18 +176,27 @@ export default {
             resourceTimeGridPlugin,
         ],
 
+
+
         // URL for the calendar backend api
         backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
 
+        // this informs what buttons appear in the modal event editor
+        isNewEvent: false,
+
         // toggles the popup for setting calendar events
-        isEventEditorActive: false,
+        eventEditorIsActive: false,
 
         // properties of the selected calendar event
         activeEvent: {},
 
+        isLoading: false,
+
     }},
 
     methods: {
+        // Displays loading spinner when calendar is fetching.
+        fc_isLoading(val) { this.isLoading = val; },
 
         // TODO: remove hardcoded lat/long
         async getTwighlightEvents(info) {
@@ -292,7 +318,12 @@ export default {
             allDays.map((day) => twighlightEvents.push(...Object.values(oneDayTwighlight(day, 33, -119))))
 
             // Finish timer
-            console.log('Time to make astro twighlight: ', (performance.now()-t0).toFixed(2)+'ms')
+            let t1=performance.now()
+            let twighlightComputeTime = t1-t0
+            if (twighlightComputeTime > 100) {
+                console.warn('Time to make astro twighlight: ', twighlightComputeTime.toFixed(2)+'ms')
+            }
+
             return twighlightEvents
         },
 
@@ -357,8 +388,7 @@ export default {
             let calendarApi = this.$refs.fullCalendar.getApi();
             calendarApi.unselect();
             calendarApi.refetchEvents();
-            this.isEventModalActive = false;
-            this.isEventEditorActive =false;
+            this.eventEditorIsActive=false;
         },
 
         /*===================================================/
@@ -368,8 +398,6 @@ export default {
          *  This is run when a user clicks on the calendar to create a new event.
          */
         newEventSelected(arg){ 
-            console.log('new event selected')
-            console.log(arg)
             this.activeEvent.startStr = arg.startStr;
             this.activeEvent.endStr = arg.endStr;
             this.activeEvent.title = titleGenerator.makeTitle()
@@ -378,33 +406,25 @@ export default {
             this.activeEvent.site = this.calendarSite
             this.activeEvent.resourceId = this.calendarSite
             this.activeEvent.creator_id = this.$auth.user.sub
-            // Testing time formats:
-            //let startstr = arg.startStr
-            //console.log(startstr)
-            //console.log(new Date(startstr))
-            //let a = new Date(startstr).toISOString()
-            //let b = moment(a).format()
-            //console.log(a)
-            //console.log(b)
-            this.isEventEditorActive = true;
+
+            this.isNewEvent = true; // setting for the modal event editor
+            this.eventEditorIsActive= true;
         },
         /**
          *  This is run when a user clicks on an existing event in the calendar.
          */
         existingEventSelected(arg) {
-            console.log('existing event selected')
-            console.log(arg)
             let event = arg.event;
-            //console.log(event)
             this.activeEvent.id = event.id,
             this.activeEvent.startStr = event.start.toISOString();
             this.activeEvent.endStr = event.end.toISOString();
             this.activeEvent.title = event.title;
             this.activeEvent.creator = event.extendedProps.creator
             this.activeEvent.site = event.extendedProps.site
-            this.activeEvent.resourceId = event.getResources()[0].title
-            //this.activeEvent.rendering = event.rendering;
-            this.isEventEditorActive = true
+            this.activeEvent.resourceId = event.getResources()[0].id
+
+            this.isNewEvent = false; // setting for the modal event editor
+            this.eventEditorIsActive= true
         },
 
 
@@ -432,17 +452,25 @@ export default {
                 "resourceId": newEvent.resourceId,
                 "rendering": newEvent.rendering
             }
-            let res = await axios.post(url, eventToPost, config)
-            console.log(res)
+            axios.post(url, eventToPost, config)
+                .then(res => {
+                    this.isLoading = true;
+                    this.refreshCalendarView()
+                })
+                .catch(error => {
+                    this.eventEditorIsActive= false;
+                    this.handleNotAuthorizedResponse(error)
+                })
 
             // refresh to show update and close modal
-            this.refreshCalendarView()
         },
         /**
          * Close the event modal and deselect its associated calendar event.
          */
         cancelButtonClicked() {
-            this.refreshCalendarView()
+            let calendarApi = this.$refs.fullCalendar.getApi();
+            calendarApi.unselect()
+            this.eventEditorIsActive = false;
         },
         /**
          * Replicates the 'cancelButtonClicked' function for the case when the user
@@ -463,12 +491,68 @@ export default {
                 "start": moment(eventToDelete.startStr).format(),
             }
             let res = await axios.post(url, body, config)
-                .catch(error => {this.handleNotAuthorizedResponse(error)})
+                .then(res => {
+                    this.isLoading = true;
+                    this.refreshCalendarView()
+                })
+                .catch(error => {
+                    this.eventEditorIsActive= false;
+                    this.handleNotAuthorizedResponse(error)
+                })
+        },
 
-            console.log(res)
+        async modifyButtonClicked(events) {
+            let initialEvent = events.initialEvent
+            let modifiedEvent = events.modifiedEvent
 
-            // refresh to show update and close modal
-            this.refreshCalendarView()
+            // Maybe we don't need to update anything?
+            if (JSON.stringify(initialEvent) == JSON.stringify(modifiedEvent)){
+                this.refreshCalendarView()
+                return;
+            }
+
+            // Make request headers and include token. 
+            // Requires user to be logged in.
+            let config = await this.getConfigWithAuth();
+            let url = `${this.backendUrl}/dev/modifyevent`
+            let theModifiedEvent = {
+                "event_id":modifiedEvent.id,
+                "start": moment(modifiedEvent.startStr).format(),
+                "end":  moment(modifiedEvent.endStr).format(),
+                "creator":modifiedEvent.creator,
+                "creator_id":modifiedEvent.creator_id,
+                "site":modifiedEvent.site,
+                "title":modifiedEvent.title,
+                "resourceId":modifiedEvent.resourceId,
+                "rendering":modifiedEvent.rendering
+            }
+            let theInitialEvent = {
+                "event_id":initialEvent.id,
+                "start": moment(initialEvent.startStr).format(),
+                "end": moment(initialEvent.endStr).format(),
+                "creator":initialEvent.creator,
+                "creator_id":initialEvent.creator_id,
+                "site":initialEvent.site,
+                "title":initialEvent.title,
+                "resourceId":initialEvent.resourceId,
+                "rendering":initialEvent.rendering
+            }
+            console.log(theModifiedEvent)
+            console.log(theInitialEvent)
+            let body = {
+                originalEvent: theInitialEvent,
+                modifiedEvent: theModifiedEvent,
+            }
+
+            axios.post(url,body,config)
+                .then(res => {
+                    this.isLoading = true;
+                    this.refreshCalendarView()
+                })
+                .catch(error => {
+                    this.eventEditorIsActive= false;
+                    this.handleNotAuthorizedResponse(error)
+                })
         },
 
 
