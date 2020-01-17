@@ -51,50 +51,12 @@
             <button class="show-more button" @click="limitNumber += 50">Show more</button>
         </b-collapse>
         
-        <!--Trash folder-->
-        <!--<b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
-            <div
-                slot="trigger" 
-                slot-scope="props"
-                class="card-header"
-                role="button"
-                aria-controls="contentIdForA11y3">
-                <p class="card-header-title">
-                    Trash
-                </p>
-                <a class="card-header-icon">
-                    <b-icon
-                        :icon="props.open ? 'menu-down' : 'menu-up'">
-                    </b-icon>
-                </a>
-            </div>
-            <div class="card-content" v-for="(item, index) in trash_images" :key="index">
-                <div class="image">
-                <img 
-                    style="width: 100px; height: 100px;"
-                    v-bind:src="item.jpg13_url"
-                    v-bind:title="item.base_filename"
-                    alt="Preview Not Available"
-                >
-                </div>
-                <div class=image-information>
-                    <p style="color:white;">Filename: {{item.base_filename}}</p>
-                    <p style="color:rgb(175,175,175);">Site: {{item.site}}</p>
-                    <p style="color:rgb(175,175,175);">Date Captured: {{item.capture_date}}</p>
-                    <div class=image-coordinates>
-                        <p style="color:rgb(175,175,175);">RA: {{item.right_ascension}}</p>
-                        <p style="color:rgb(175,175,175);">DEC: {{item.declination}}</p>
-                    </div>
-                </div>
-            </div>
-        </b-collapse>-->
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import draggable from "vuedraggable";
 import ImageFilter from "@/components/ImageFilter";
 
 export default {

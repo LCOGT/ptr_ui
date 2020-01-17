@@ -92,8 +92,6 @@
 
     - Convert stuff to UTC instead of local times. Somehow preserve notion of local time.
 
-    - Make events editable.
-
     */
 
 //}

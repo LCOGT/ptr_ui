@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import { API } from "aws-amplify";
 import { mapGetters, mapState } from "vuex";
 
 export default {

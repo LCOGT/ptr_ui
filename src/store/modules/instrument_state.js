@@ -1,4 +1,5 @@
-import { API } from 'aws-amplify'
+//import { API } from 'aws-amplify'
+import axios from 'axios'
 
 // Used to initialize state, and to replace stale state anytime the server can't be reached.
 var emptyState = function() {
@@ -59,7 +60,9 @@ const actions = {
             let apiName = rootState.dev.active_api;
             // 'site' is referencing the item in the observatory_configuration vuex module
             let path = `/${site}/status/`;
-            API.get(apiName, path).then(response => {
+            //API.get(apiName, path).then(response => {
+            axios.get(apiName+path).then(response => {
+                response = response.data
                 commit('setMount', response.content.mount)
                 commit('setTelescope', response.content.telescope)
                 commit('setCamera', response.content.camera)

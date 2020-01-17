@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import { API, Auth } from "aws-amplify";
 import ImageView from "@/components/ImageView";
 import { mapGetters, mapState } from "vuex";
 import Js9Devtools from "@/components/Js9Devtools";
