@@ -7,8 +7,8 @@
                 <b-switch 
                 style="margin-left: 1em;"
                 v-model="active_api"
-                true-value='ptr-api-local'
-                false-value='ptr-api'
+                true-value='http://localhost:5000'
+                false-value='https://api.photonranch.org'
                 size="is-small"
                 type="is-warning">
                 local API is {{ active_api=="ptr-api-local" ? "on" : "off"}}

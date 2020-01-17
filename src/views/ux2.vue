@@ -100,7 +100,6 @@
 import { API, Auth } from 'aws-amplify'
 import { AmplifyEventBus } from 'aws-amplify-vue'
 import { mapGetters } from 'vuex'
-import axios from 'axios';
 import helpers from '@/utils/helpers'
 import create_commands from '@/utils/create_command'
 import CommandButton from '@/components/CommandButton'

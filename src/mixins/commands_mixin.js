@@ -234,7 +234,7 @@ export const commands_mixin = {
         camera_state: function() {
             try {
                 return this.all_camera_state[this.active_camera]
-            } catch(error) { return {} }
+            } catch(error) { console.log(error); return {} }
         },
         filter_wheel_state: function() {
             try {

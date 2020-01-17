@@ -3,7 +3,8 @@
  * @fileoverview This is the vuex store that maintains the state of images.
  */
 
-import { API } from 'aws-amplify'
+//import { API } from 'aws-amplify'
+import axios from 'axios'
 
 const state = {
 
@@ -35,7 +36,8 @@ const actions = {
         let apiName = rootState.dev.active_api;
         let path = `/image_by_user/${username}/`;
 
-        API.get(apiName, path).then(response => {
+        axios.get(apiName+path).then(response => {
+            response = JSON.parse(response.data)
             commit('setUserImages', response)
         }).catch(error => {
             console.log(error)
@@ -46,9 +48,12 @@ const actions = {
      *  This action will retrieve a list of images filtered by the parameters in filter_params
      */
     get_filtered_images({ commit, state, rootState }, filter_params) {
+        console.log(filter_params)
         let apiName = rootState.dev.active_api;
-        let path = `/filtered_images/`;
-        API.get(apiName, path, { 'queryStringParameters': filter_params }).then(response => {
+        let path = `/filtered_images`;
+        let body = { params: filter_params}
+        axios.get(apiName+path, body).then(response => {
+            response = response.data
             commit('setUserImages', response)
             let recent_image_list = response.slice(0, 40)
             commit('setRecentImages', recent_image_list)
@@ -84,8 +89,8 @@ const actions = {
          *      "fits13_url": str,
          *  }
          */
-        await API.get(apiName, path).then(async response => {
-
+        axios.get(apiName+path).then(async response => {
+            response = JSON.parse(response.data)
 
             // If current_image is empty, or if we've switched sites:
             // set current_image to the first element from 'recent_images'. 

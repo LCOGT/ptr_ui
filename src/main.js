@@ -6,30 +6,15 @@ import './registerServiceWorker'
 
 import Buefy from 'buefy'
 import './style/buefy-styles.scss'
-import '@mdi/font/css/materialdesignicons.css'
-
-//import Amplify, * as AmplifyModules from 'aws-amplify'
-//import { AmplifyPlugin } from 'aws-amplify-vue'
 
 // Import this (even if it's not used directly here) to register the local js9
 // crosshair plugin
 import JS9Helpers from '@/utils/js9Helpers'
 
-/** 
- * This used to be used in Amplify.configure(awsmobile), but that broke the 
- * api that is configured in App.vue. (Probably two calls to Amplify.configure 
- * wasn't intended use). For now, I can't find any issues from not using it, 
- * but I'll keep this note here for reference in case Amplify causes issues in
- * the future.
- */
-import awsmobile from './aws-exports'
-
 // Import the Auth0 configuration and plugin
 import { domain, clientId, audience } from "../auth_config.json";
 import { Auth0Plugin } from "./auth";
 
-
-//Vue.use(AmplifyPlugin, AmplifyModules)
 Vue.use(Buefy)
 Vue.use(Auth0Plugin, {
   domain,
@@ -44,6 +29,7 @@ Vue.use(Auth0Plugin, {
   }
 });
 
+// Hide the 'you are running in development mode!' warning in the console.
 Vue.config.productionTip = false
 
 new Vue({

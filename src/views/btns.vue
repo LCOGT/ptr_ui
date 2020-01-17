@@ -9,24 +9,6 @@
   <div class="container">
   <div class="columns">
 
-    <!-- Buttons for AWS integration -->
-    <div class="column buttons">
-        <div class="title">AWS</div>
-        <button class="button" @click="authenticate">authenticate</button>
-        <button class="button" @click="currentSession">current session</button>
-        <button class="button" @click="currentUserInfo">current user info</button>
-        <hr>
-        <button class="button" @click="signOut">sign out</button>
-        <button class="button" @click="signIn">sign in as wmd_admin</button>
-        <hr>
-        <button class="button" @click="testAPI">public flask</button>
-        <button class="button" @click="testRestrictedAPI">private flask</button>
-        <hr>
-        <button class="button" @click="testLambdaPublic">public lambda</button>
-        <button class="button" @click="testLambdaPrivate">private lambda</button>
-        <button class="button" @click="sqsWrite">sqs write</button>
-        <button class="button" @click="sqsRead">sqs read</button>
-    </div>
 
     <!-- Buttons for mount and camera controls -->
     <div class="column buttons">
@@ -79,8 +61,6 @@
 </template>
 
 <script>
-import { API, Auth } from 'aws-amplify'
-import { AmplifyEventBus } from 'aws-amplify-vue'
 import { mapGetters } from 'vuex'
 import axios from 'axios';
 import helpers from '@/utils/helpers'
@@ -200,87 +180,7 @@ export default {
 
   methods: {
 
-    /**
-     *  AWS Amplify function. 
-     *  Retrieves session information from cognito.
-     */
-    authenticate () {
-      Auth.currentAuthenticatedUser({
-        bypassCache: false
-      }).then(user => console.log(user))
-        .catch(err => console.log(err))
-    },
 
-    /**
-     *  AWS Amplify function.
-     *  Retrieves tokens from cognito for the current authenticated user.
-     */
-    currentSession () {
-      Auth.currentSession()
-        .then(data => console.log(data))
-        .catch(err => console.log(err))
-    },
-
-    /**
-     * AWS Amplify function.
-     * Retrieves attributes associcated with the current authetnicated user,
-     * such as username, email, annd verification status.
-     */
-    currentUserInfo () {
-      Auth.currentUserInfo()
-        .then(data => console.log(data))
-        .catch(err => console.log(err))
-    },
-
-    /**
-     * Sign user out of all authenticated devices (global sign out). 
-     */
-    signOut () {
-      this.$store.dispatch('auth/logOutUser')
-    },
-
-    /**
-     * Sign in as wmd_admin. 
-     * This is temporary for quick testing, and will be disabled when 
-     * authentication grants access to controls. 
-     */
-    signIn () {
-      this.$store.dispatch('auth/logInAdmin')
-    },
-
-    /**
-     * Send a POST to local flask development server.
-     * No authentication required.
-     */
-    testAPI () {
-      let apiName = this.api
-      let myInit = {
-        response: true,
-      }
-      API.post(apiName, '/home/', myInit).then(response => {
-          console.log(response)
-      }).catch(error => {
-          console.log(error)
-      });
-    },
-
-    /**
-     * Send a POST to local flask development server that requires authentication.
-     * If user is logged in, the POST request includes their ID JWT.
-     * If the request does not have valid credentials, it should return 401.
-     * 
-     */
-    testRestrictedAPI () {
-      let apiName = this.api
-      let myInit = {
-        response: true,
-      }
-      API.get(apiName, '/site1/status/', myInit).then(response => {
-          console.log(response)
-      }).catch(error => {
-          console.log(error.response)
-      });
-    },
 
     calculations() {
       let ra = 1
@@ -350,70 +250,6 @@ export default {
     },
 
     /**
-     * Call a lambda function and log the output.
-     */
-    testLambdaPublic() {
-
-      // Choose the name of the AWS API configured in App.vue.
-      let apiName = 'LambdaTest';
-
-      // Configure params for the api call.
-      let myInit = {
-        response: true, // Include entire response, not just body.
-      }
-      
-      API.get(apiName, '/public', myInit).then(response => {
-          console.log(response)
-      }).catch(error => {
-          console.log(error.response)
-      });
-    },
-
-    /**
-     * Call a lambda function that requires authentication, and log the output.
-     */
-    testLambdaPrivate() {
-
-      // Choose the name of the AWS API configured in App.vue.
-      let apiName = 'LambdaTest';
-
-      // Configure params for the api call.
-      let myInit = {
-        response: true, // Include entire response, not just body.
-      }
-      API.get(apiName, '/private/', myInit).then(response => {
-          console.log(response)
-      }).catch(error => {
-          console.log(error.response)
-      });
-    },
-
-    /**
-     * Call a lambda function that writes the current timestamp to SQS.
-     */
-    sqsWrite() {
-      let apiName = 'LambdaTest';
-      API.post(apiName, '/sqs_write').then(response => {
-          console.log(response)
-      }).catch(error => {
-          console.log(error.response)
-      });
-    },
-
-    /**
-     * Call a lambda function that reads the contents of SQS queue.
-     * This should include values added from `sqsWrite()` defined above.
-     */
-    sqsRead() {
-      let apiName = 'LambdaTest';
-      API.post(apiName, '/sqs_read/').then(response => {
-          console.log(response)
-      }).catch(error => {
-          console.log(error.response)
-      });
-    },
-
-    /**
      * Test a function from pix2wcs.js
      */
     testWCS() {
@@ -426,7 +262,7 @@ export default {
      */
     getLastCommand() {
       let apiName = this.api;
-      API.get(apiName, '/site1/mount1/command/').then(response => {
+      axios.get(apiName+'/site1/mount1/command/').then(response => {
         console.log(response)
       }).catch(error => {
         console.log(error.response)
@@ -444,7 +280,7 @@ export default {
         let myInit = {
           body: {"parked": "true", "timestamp": Date.now().toString() }
         }
-        API.put(apiName, path, myInit).then(response => {
+        axios.put(apiName+path, myInit).then(response => {
           console.log('updated status: ');
           console.log(response);
         }).catch(error => {

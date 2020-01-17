@@ -75,8 +75,6 @@
               <!-- show login when not authenticated -->
               <button class="button" v-if="!$auth.isAuthenticated" @click="login">Log in</button>
 
-
-
             </b-navbar-item>
         </template>
     </b-navbar> 
@@ -85,7 +83,6 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
-//import { sites } from '../sites'
 
 export default {
   name: "TheMenu",
@@ -113,29 +110,7 @@ export default {
       ]
     };
   },
-  mounted() {
-    let navbar = document.querySelector(".navbar-burger");
-    navbar.addEventListener("click", function() {
-      let target = navbar.dataset.target;
-      let $target = document.getElementById(target);
-      navbar.classList.toggle("is-active");
-      $target.classList.toggle("is-active");
-    });
-  },
   methods: {
-    signOut() {
-      this.$store.dispatch("auth/logOutUser");
-      this.$router.go();
-    },
-
-    closeNavbar() {
-      let navbar = document.querySelector(".navbar-burger");
-      let btn = document.queryselector("#up-button");
-
-      $(document).click(function() {
-        navbar.classList.toggle("is-active");
-      });
-    },
 
     // Log the user in with Auth0
     login() {
@@ -147,23 +122,10 @@ export default {
       this.$auth.logout({
         returnTo: window.location.origin
       });
+      this.$router.go();
     },
 
-    /**
-     * Sign in as wmd_admin.
-     * This is temporary for quick testing, and will be disabled when
-     * authentication grants access to controls.
-     */
-    signIn() {
-      this.$store.dispatch("auth/logInAdmin");
-    }
   },
-  computed: {
-    ...mapGetters("auth", {
-      username: "username",
-      isLoggedIn: "isLoggedIn"
-    })
-  }
 };
 </script>
 
