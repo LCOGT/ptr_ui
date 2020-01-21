@@ -58,10 +58,9 @@
               <div v-if="$auth.isAuthenticated" class="navbar-item has-dropdown is-hoverable is-dark">
 
                   <div class="navbar-link">
-                  <p>  {{$auth.user.name}} </p>
-                  <!--figure class="image is-24x24">
-                    <img :src="$auth.user.picture" style="margin-left: 10px" class="is-rounded" >
-                  </figure-->
+                      <img :src="$auth.user.picture" width="30" height="30" style="border-radius: 50%;">
+                      <div style="width:5px"></div>
+                      <p> {{$auth.user.name}} </p>
                   </div>
 
                   <div class="navbar-dropdown">
@@ -111,7 +110,6 @@ export default {
     };
   },
   methods: {
-
     // Log the user in with Auth0
     login() {
       this.$auth.loginWithRedirect();
@@ -123,9 +121,8 @@ export default {
         returnTo: window.location.origin
       });
       this.$router.go();
-    },
-
-  },
+    }
+  }
 };
 </script>
 
