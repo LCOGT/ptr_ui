@@ -20,6 +20,7 @@ import ux1 from './views/ux1.vue'
 import analysis from './views/analysis.vue'
 import { authGuard } from "./auth/authGuard";
 import calendarPage from './views/calendarPage.vue'
+import iot from './views/iot.vue'
 
 
 Vue.use(VueRouter)
@@ -46,6 +47,7 @@ const router = new VueRouter({
     { path: '/ctrl', name: 'ctrl', component: ctrl },
     { path: '/analysis', name: 'analysis', component: analysis },
     { path: '/calendar', name: 'calendar', component: calendarPage },
+    { path: '/iot', name: 'iot', component: iot},
     {
       path: '/ux1/:sitecode/:subpage',
       name: 'ux1',
