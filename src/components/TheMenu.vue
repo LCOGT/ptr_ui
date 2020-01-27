@@ -58,7 +58,7 @@
               <div v-if="$auth.isAuthenticated" class="navbar-item has-dropdown is-hoverable is-dark">
 
                   <div class="navbar-link">
-                      <img :src="$auth.user.picture" width="30" height="30" style="border-radius: 50%;">
+                      <img :src="$auth.user.picture" width="25" height="25" style="border-radius: 50%;">
                       <div style="width:5px"></div>
                       <p> {{$auth.user.name}} </p>
                   </div>
