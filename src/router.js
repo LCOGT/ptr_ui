@@ -38,7 +38,7 @@ const router = new VueRouter({
       beforeEnter: authGuard, 
       meta: { requiresRole: 'admin'}
     },
-    { path: '/profile', name: 'profile', component: Profile},
+    { path: '/profile', name: 'profile', component: Profile, beforeEnter: authGuard,},
     { path: '/about', name: 'about', component: About },
     { path: '/btns', name: 'btns', component: btns },
     { path: '/imgs', name: 'imgs', component: imgs },
