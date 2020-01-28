@@ -119,8 +119,7 @@ export default {
     logout() {
       this.$auth.logout({
         returnTo: window.location.origin
-      });
-      this.$router.go();
+      }).then($router.go)
     }
   }
 };
