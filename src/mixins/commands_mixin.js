@@ -5,6 +5,8 @@
  */
 
 import { mapGetters } from 'vuex'
+import { getInstance } from '../auth/index' // get user object: getInstance().user
+
 
 export const commands_mixin = {
 
@@ -171,11 +173,6 @@ export const commands_mixin = {
             'screen_brightness',
         ]),
 
-        // Logged-in user info
-        ...mapGetters('auth', [
-            'username',
-        ]),
-
         // The `selected_${device}` computed properties are used for two way
         // binding between vuex (observatory_configuration module) and the device 
         // selection inputs. 
@@ -285,8 +282,12 @@ export const commands_mixin = {
                 size: this.camera_areas_selection,
                 dither: this.camera_dither,
                 size: this.camera_areas_selection,
-                hint: this.camera_hint,
-                username: this.username,
+                username: getInstance().user.name, // from auth0
+            }
+
+            // Avoid empty strings (thanks, dynamodb)
+            if (this.camera_hint != '') {
+                opt_params["hint"] = this.camera_hint
             }
 
             // If active, add subframe parameters.
