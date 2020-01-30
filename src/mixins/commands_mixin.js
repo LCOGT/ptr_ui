@@ -173,6 +173,16 @@ export const commands_mixin = {
             'screen_brightness',
         ]),
 
+        // Get username if user is logged in
+        username() {
+            if (getInstance().user) {
+                return getInstance().user.name
+            }
+            else {
+                return 'anonymous'
+            }
+        },
+
         // The `selected_${device}` computed properties are used for two way
         // binding between vuex (observatory_configuration module) and the device 
         // selection inputs. 
@@ -282,7 +292,7 @@ export const commands_mixin = {
                 size: this.camera_areas_selection,
                 dither: this.camera_dither,
                 size: this.camera_areas_selection,
-                username: getInstance().user.name, // from auth0
+                username: this.username, // from auth0
             }
 
             // Avoid empty strings (thanks, dynamodb)
