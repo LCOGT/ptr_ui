@@ -117,6 +117,8 @@ export default {
 
     // Log the user out
     logout() {
+      // make sure the logout happens before redirect.
+      // otherwise, the redirect check for authentication might log the user back in.
       this.$auth.logout({
         returnTo: window.location.origin
       }).then($router.go)

@@ -28,7 +28,33 @@ export default {
         }
     },
     methods: {
-        handleClick (url, form, http_method) {
+        async getConfigWithAuth() {
+            let token, configWithAuth;
+            try {
+                token = await this.$auth.getTokenSilently(); 
+            } catch(err) {
+                console.error(err)
+                console.warn('Did not acquire the needed token. Stopping request.')
+                
+                // small popup notification
+                this.$buefy.toast.open({
+                    duration: 5000,
+                    message: "Oops! You aren't authorized to do that.",
+                    position: 'is-bottom',
+                    type: 'is-danger' ,
+                })
+            }
+
+            return {
+                'headers': {
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        },
+
+        async handleClick (url, form, http_method) {
 
             if (this.data.site == ''|| this.data.mount == '') {
                 console.log('No site and/or mount specified for the command. Command has been cancelled.')
@@ -69,6 +95,11 @@ export default {
                         console.log('ERROR')
                         console.log(error)
                     });
+                    const options = await this.getConfigWithAuth()
+                    console.log('options', options)
+                    form.site=this.data.site
+                    form.mount=this.data.mount
+                    axios.post("https://jobs.photonranch.org/jobs/newjob",form, options).then(console.log).catch(e => {console.warn(e)})
                     break;
                 case 'PUT':
                     axios.put(apiName+path, myInit).then(response => {

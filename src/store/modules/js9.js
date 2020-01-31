@@ -47,7 +47,7 @@ const actions = {
         })
     },
 
-    async loadImage({ rootState, state, commit, dispatch }, { base_filename, site, zoom, }) {
+    async loadImage({ rootState, state, commit, dispatch }, { base_filename, site, zoom, flip,}) {
 
         // Make sure js9 is ready to load an image
         await dispatch('waitForJs9Ready')
@@ -98,13 +98,16 @@ const actions = {
 
                         // turn off the crosshair for new images
                         commit('crosshairActive', false)
-                        dispatch('crosshairOff')
+                        //dispatch('crosshairOff')
+
 
                         // upload to enable server side tasks
                         JS9.UploadFITSFile()
 
+                        console.warn('settign zoom level')
                         // set zoom level
                         if (zoom) JS9.SetZoom(zoom)
+                        if (flip) JS9.SetFlip(flip)
                     })
                 }, 500)
 
