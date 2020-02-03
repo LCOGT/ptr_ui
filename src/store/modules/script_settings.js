@@ -1,4 +1,5 @@
-import { API } from 'aws-amplify'
+//import { API } from 'aws-amplify'
+import axios from 'axios'
 import { SnackbarProgrammatic as Snackbar } from 'buefy';
 
 
@@ -190,7 +191,8 @@ const actions = {
         }
         
         // Send the command and log the output
-        API.post(apiName, path, {body:command}).then(response => {
+        axios.post(apiName+path, {body:command}).then(response => {
+            response = response.data
             console.log(response)
             console.log(command)
             // Small UI success notification
@@ -240,7 +242,8 @@ const actions = {
         }
 
         // Send the command and log the output
-        API.post(apiName, path, {body: command}).then(response => {
+        axios.post(apiName+path, {body: command}).then(response => {
+            response = response.data
             console.log(response)
             // Small UI success notification
             Snackbar.open({

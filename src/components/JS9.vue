@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import { API } from "aws-amplify";
 import { mapGetters, mapState } from "vuex";
 
 export default {
@@ -76,6 +75,8 @@ export default {
       let loadOptions = {
         base_filename: newVal.base_filename,
         site: newVal.site,
+        zoom: 'toFit',
+        flip: 'y'
       }
       this.$store.dispatch('js9/loadImage', loadOptions)
     },

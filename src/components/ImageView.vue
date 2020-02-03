@@ -48,7 +48,7 @@
 
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
             <!--p>mouseX: {{parseInt(mouseX)}}, mouseY: {{parseInt(mouseY)}}</p-->
-            <p>{{ current_image.exposure_time }} seconds  |  {{current_image.filter_used}} </p>
+            <p>{{ current_image.exposure_time }} seconds  |  {{current_image.filter_used}}</p>
             <p> {{current_image.base_filename}} </p>
         </div>
     </div>
@@ -79,7 +79,8 @@
 </template>
 
 <script>
-import { API, Auth } from "aws-amplify";
+//import { API, Auth } from "aws-amplify";
+import axios from 'axios';
 import wcs from "@/utils/pix2wcs";
 import { mapGetters } from "vuex";
 import { commands_mixin } from "../mixins/commands_mixin";
@@ -366,10 +367,10 @@ export default {
       let apiName = this.$store.getters["dev/api"];
       let url = theCommand.url;
       let body = { body: theCommand.form };
-      API.post(apiName, url, body)
+      axios.post(apiName+url, body)
         .then(response => {
           console.log("sent pixel center command");
-          console.log(response);
+          console.log(response.data);
           console.log(theCommand.form);
         })
         .catch(error => {
@@ -507,8 +508,9 @@ export default {
       let apiName = this.$store.getters['dev/api'];
       let path = `/fits13_url/${site}/${base_filename}/`;
 
-      const fits13Url = await API.get(apiName, path);
-      return fits13Url;
+      const fits13Url = await axios.get(apiName+path);
+      console.log(fits13Url)
+      return fits13Url.data;
     },
 
     async downloadFits13Url(image) {

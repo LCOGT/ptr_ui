@@ -1,4 +1,5 @@
-import { Auth } from 'aws-amplify'
+import { domain, clientId } from "../../../auth_config.json";
+import { getInstance } from "../../auth/index";
 
 // initial state
 const state = {
@@ -40,21 +41,10 @@ const actions = {
             .catch(err => console.log(err))
     },
 
-    logInAdmin({ dispatch }) {
-        let user_credentials = {
-            "username": "wmd_admin",
-            "password": "Password1!",
-        }
-        dispatch('logInUser', user_credentials)
-    },
-
     logOutUser({ commit }) {
-        Auth.signOut()
-            .then(data => {
-            console.log(data)
-            commit('setUser', '')
-            })
-            .catch(err => console.log(err))
+        this.$auth.logout({
+            returnTo: window.location.origin
+        });
     }
 
 }

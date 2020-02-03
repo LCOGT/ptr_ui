@@ -15,6 +15,7 @@
     </div>
 
     <div class="nav-panel column is-two-fifths">  
+      <image-info-panel :current_image="current_image"/>
       <js9-devtools/>
       <image-filter/>
       <image-navigation-panel/>
@@ -26,16 +27,17 @@
 </template>
 
 <script>
-import { API, Auth } from "aws-amplify";
 import ImageView from "@/components/ImageView";
 import { mapGetters } from "vuex";
 import Js9Devtools from "@/components/Js9Devtools";
 import ImageNavigationPanel from "@/components/ImageNavigationPanel";
 import ImageFilter from "@/components/ImageFilter";
+import ImageInfoPanel from "@/components/ImageInfoPanel";
 
 export default {
   name: "imgs",
   components: {
+    ImageInfoPanel,
     ImageView,
     ImageNavigationPanel,
     ImageFilter,
@@ -59,6 +61,11 @@ export default {
   },
   computed: {
     ...mapGetters("observatory_configuration", ["available_sites"]),
+
+    ...mapGetters("images", {
+      recent_images: "recent_images",
+      current_image: "current_image"
+    }),
 
     active_site: {
       get() { return this.$store.getters["observatory_configuration/site"]; },
