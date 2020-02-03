@@ -1,5 +1,6 @@
 
-import { API } from 'aws-amplify'
+//import { API } from 'aws-amplify'
+import axios from 'axios'
 
 
 // initial state
@@ -81,8 +82,8 @@ const actions = {
             // Get the url based on the image filename
             let apiName = rootState.dev.active_api;
             let path = `/fits13_url/${site}/${base_filename}/`;
-            API.get(apiName, path).then(async response => {
-
+            axios.get(apiName+path).then(async response => {
+                response = response.data
                 //console.log('response from loadImage: ',response)
 
                 // Download the image to the browser instance

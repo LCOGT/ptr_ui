@@ -3,7 +3,8 @@
  * that are either available for selection or currently selected and active.
  */
 
-import { API } from 'aws-amplify'
+//import { API } from 'aws-amplify'
+import axios from 'axios'
 
 var initial_state = function() {
     console.log('initializing observatory_configuration state')
@@ -27,9 +28,10 @@ var initial_state = function() {
         camera_areas_selection: '',
         filter_wheel_options_selection: '',
     };
-    API.get(apiName, path).then(response => {
+    //API.get(apiName, path).then(response => {
+    axios.get(apiName+path).then(response => {
         console.log('about to fetch config from api')
-        state.global_config = response;
+        state.global_config = response.data;
         state.did_config_load_yet = true;
         state.is_site_selected = false;
     }).catch(error => {
@@ -284,10 +286,9 @@ const actions = {
         return new Promise((resolve, reject) => {
             let apiName = rootState.dev.active_api;
             let path = '/all/config/';
-            API.get(apiName, path).then(response => {
-
+            axios.get(apiName+path).then(response => {
                 // Save the config to this vuex module.
-                commit('setGlobalConfig', response)
+                commit('setGlobalConfig', response.data)
 
                 resolve()
 

@@ -10,7 +10,7 @@
 
 <script>
 import axios from 'axios'
-import { API } from 'aws-amplify'
+//import { API } from 'aws-amplify'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -50,19 +50,19 @@ export default {
 
             switch (http_method.toString()) {
                 case 'GET':
-                    API.get(apiName, path, myInit).then(response => {
+                    axios.get(apiName+path, myInit).then(response => {
                         vm.isLoading = false;
-                        console.log(response)
+                        console.log(JSON.parse(response.data))
                     }).catch(error => {
                         vm.isLoading = false;
                         console.log(error)
                     });
                     break;
                 case 'POST': 
-                    API.post(apiName, path, myInit).then(response => {
+                    axios.post(apiName+path, myInit).then(response => {
                         vm.isLoading = false;
                         console.log('SUCCESS')
-                        console.log(response)
+                        console.log(JSON.parse(response.data))
                         console.log(myInit)
                     }).catch(error => {
                         vm.isLoading = false;
@@ -71,9 +71,9 @@ export default {
                     });
                     break;
                 case 'PUT':
-                    API.put(apiName, path, myInit).then(response => {
+                    axios.put(apiName+path, myInit).then(response => {
                         vm.isLoading = false;
-                        console.log(response)
+                        console.log(JSON.parse(response.data))
                     }).catch(error => {
                         vm.isLoading = false;
                         console.log(error)

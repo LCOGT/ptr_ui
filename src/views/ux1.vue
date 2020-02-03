@@ -79,8 +79,8 @@
 </div></template>
 
 <script>
-import { API, Auth } from 'aws-amplify'
 import { mapGetters } from 'vuex'
+import axios from 'axios';
 import { commands_mixin } from '../mixins/commands_mixin'
 import CommandButton from '@/components/CommandButton'
 import SubpageHome from '@/components/SubpageHome'
@@ -117,7 +117,7 @@ export default {
     // Get the global configuration for all sites from an api call.
     let apiName = this.$store.getters['dev/api'];
     let path = '/all/config/';
-    const config_g = await API.get(apiName, path);
+    const config_g = await axios.get(apiName+path);
     this.config_g = config_g
     console.log(config_g)
 

@@ -1,31 +1,29 @@
 <template>  
   <div>
     <nav class="level"><div class="level-item title">photon ranch</div></nav>
-
     <the-world-map name="google" />
     <!--leaflet-map name="leafmap"></leaflet-map-->
-
   </div>
 </template>
 
 <script>
-import TheWorldMap from '@/components/TheWorldMap'
-import LeafletMap from '@/components/LeafletMap'
+import TheWorldMap from "@/components/TheWorldMap";
+import LeafletMap from "@/components/LeafletMap";
 
 //console.log(JS9)
 
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
     TheWorldMap,
     LeafletMap
-  },
-}
+  }
+};
 </script>
 
 <style scoped>
 .title {
-  font: 70px 'Share Tech Mono', monospace;
+  font: 70px "Share Tech Mono", monospace;
   /*font: 70px 'Faster One', cursive;*/
   margin: 20px;
 }
