@@ -2,10 +2,10 @@
 <template>
     <div class="column is-full container">
       <!--the-sky-chart /-->
-      {{ username}}
+      
       <div v-for="(msg, idx) in messages" v-bind:key="idx">
         <div>
-          <span class="has-text-weight-bold">{{msg.username || "anonymous"}}</span>
+          <span class="has-text-weight-bold">{{msg.username}}</span>
           : {{msg.content}}
         </div>
       </div>
@@ -36,19 +36,26 @@ export default {
   },
   data() {
     return {
-      messages: ["hello"],
-      //username: "client-" + Math.floor(Math.random() * 10000),
-      username: this.$auth.user.name,
+      messages: [{"username": "computer", "content": "default message"}],
+      //username: '--',
       socket: '',
       tosend: '',
+    }
+  },
+  computed: {
+    username() {
+      if (this.$auth.user) {
+        return this.$auth.user.name
+      }
+      return "anonymous"
     }
   },
   mounted() {
     this.start()
   },
   methods: {
-    start() {
-      this.username = this.$auth.user.name
+    async start() {
+
       this.socket = new ReconnectingWebSocket("wss://zda8hlm9u0.execute-api.us-east-1.amazonaws.com/dev")
       this.socket.onopen = this.getRecent()
       this.socket.onmessage = (message) => {
@@ -58,6 +65,15 @@ export default {
             this.messages.push(message)
           });
       };
+
+      this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
+      this.imageSubscriber.onmessage = (message) => {
+          let data = JSON.parse(message.data);
+          data["messages"].forEach((message) => {
+            //console.log(message)
+            this.messages.push(message)
+          });
+      }
     },
 
     getRecent() {
@@ -71,7 +87,8 @@ export default {
     // Sends a message to the websocket using the text in the post bar
     postMessage() {
       if (this.tosend=='') {return;}
-      let dataToSend = {"action": "sendMessage", "username": this.$auth.user.name, "content":this.tosend};
+      let dataToSend = {"action": "sendMessage", "username": this.username, "content":this.tosend};
+      console.log(dataToSend)
       this.socket.send(JSON.stringify(dataToSend));
       this.tosend=''
     },
