@@ -4,6 +4,7 @@ import axios from 'axios'
 // Used to initialize state, and to replace stale state anytime the server can't be reached.
 var emptyState = function() {
     return {
+        allState: {},
         mount: {},
         telescope: {},
         camera: {},
@@ -13,6 +14,7 @@ var emptyState = function() {
         enclosure: {},
         screen: {},
         sequencer: {},
+        observingConditions: {},
         timestamp: '',
     }
 }
@@ -24,6 +26,7 @@ const state = emptyState();
 const getters = {
 
     /* All the state, per instrument type */
+    allState: state => state,
     mount: state => state.mount || [],
     telescope: state => state.telescope,
     camera: state => state.camera,
@@ -32,6 +35,7 @@ const getters = {
     rotator: state => state.rotator,
     screen: state => state.screen,
     sequencer: state => state.sequencer,
+    observingConditions: state => state.observing_conditions,
     timestamp: state => state.timestamp,
 }
 
@@ -53,6 +57,7 @@ const actions = {
             commit('setRotator', [])
             commit('setScreen', [])
             commit('setSequencer', [])
+            commit('setObservingConditions', [])
             commit('setTimestamp', '')
         }
         // Otherwise, refresh the state for the selected site.
@@ -72,6 +77,7 @@ const actions = {
                 commit('setRotator', response.content.rotator)
                 commit('setScreen', response.content.screen)
                 commit('setSequencer', response.content.sequencer)
+                commit('setObservingConditions', response.content.observing_conditions)
                 commit('setTimestamp', response.content.timestamp)
             }).catch(error => {
                 console.log(error)
@@ -91,6 +97,7 @@ const mutations = {
     setRotator(state, rotator) { state.rotator = rotator },
     setScreen(state, screen) { state.screen = screen },
     setSequencer(state, sequencer) {state.sequencer = sequencer },
+    setObservingConditions(state, wx) {state.observingConditions = wx },
     setEmptyState(state) {
         for (var key in emptyState()) {
             if (state.hasOwnProperty(key)) {
