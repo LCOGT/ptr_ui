@@ -288,14 +288,14 @@ export default {
 
     getSitesForMap() {
       let sites = [
-        {
-          "name": "Sedgwick Observatory",
-          "geo": {
-            "latitude": 34.691499,
-            "longitude": -120.042252
-          },
-          "sitecode": "sqa",
-        },
+        //{
+          //"name": "Sedgwick Observatory",
+          //"geo": {
+            //"latitude": 34.691499,
+            //"longitude": -120.042252
+          //},
+          //"sitecode": "sqa",
+        //},
         {
           "name": "Apache Ridge Observatory",
           "geo": {
@@ -328,11 +328,15 @@ export default {
             </div>
 
             <div class="content">
-              <button class="button is-success">Go to ${sitecode}</button>
+              <a class="button is-success" href="ux1/${sitecode}/observe" style="font-weight: bold">Observe here!</a>
             </div>
           </div>
         </div>`
       return contentString
+    },
+
+    goToObservePage(site) {
+      this.$router.push({path: `/ux1/${site}/observe`})
     },
 
 
