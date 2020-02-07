@@ -13,7 +13,8 @@ export default {
   props: ['name'],
   data: function () {
     return {
-      mapName: this.name + '-map'
+      mapName: this.name + '-map',
+      infoWindows: [],
     }
   },
   mounted: function () {
@@ -222,26 +223,46 @@ export default {
 
     const map = new google.maps.Map(element, options)
 
-    var marker = new google.maps.Marker({
-      position: { lat: 34.7, lng: -120.0 },
-      map: map,
-      title: 'Sedgwick'
-    })
-    var contentString = '<div id="content">' +
-            '<div id="siteNotice" style="width: auto;">' +
-            '</div>' +
-            '<img src="https://www.independent.com/wp-content/uploads/2016/08/30/20160811_LCOGT_Sedgwick_009.jpg" style="width: 200px;"></img>' +
-            '<div id="bodyContent">' +
-            '<p>Sedgwick</p>' +
-            '</div>' +
-            '</div>'
+    let sites = this.getSitesForMap()
 
-    var infowindow = new google.maps.InfoWindow({
-      content: contentString
+    sites.forEach(site => {
+
+      var marker = new google.maps.Marker({
+        position: { lat: site.geo.latitude, lng: site.geo.longitude },
+        map: map,
+        title: site.name
+      })
+      let siteInfoWindow = new google.maps.InfoWindow({
+        content: this.renderSiteContent(site.name, site.sitecode)
+      })
+      this.infoWindows.push(siteInfoWindow)
+      marker.addListener('click', () => {
+        this.infoWindows.map(x => x.close())
+        siteInfoWindow.open(map, marker)
+      })
+
     })
-    marker.addListener('click', function () {
-      infowindow.open(map, marker)
-    })
+
+    //var marker = new google.maps.Marker({
+      //position: { lat: 34.7, lng: -120.0 },
+      //map: map,
+      //title: 'Sedgwick'
+    //})
+    //var contentString = '<div id="content">' +
+            //'<div id="siteNotice" style="width: auto;">' +
+            //'</div>' +
+            //'<img src="https://www.independent.com/wp-content/uploads/2016/08/30/20160811_LCOGT_Sedgwick_009.jpg" style="width: 200px;"></img>' +
+            //'<div id="bodyContent">' +
+            //'<p>Sedgwick</p>' +
+            //'</div>' +
+            //'</div>'
+
+    //var infowindow = new google.maps.InfoWindow({
+      //content: this.renderSiteContent("West Mountain Drive Observatory", "wmd")
+    //})
+    //marker.addListener('click', () => {
+      //infowindow.open(map, marker)
+    //})
 
     nite.init(map)
     setInterval(function () { nite.refresh() }, 10000) // every 10s
@@ -258,12 +279,65 @@ export default {
         strokeColor: 'gold',
         strokeWeight: 3,
         strokeOpacity: 0.8
-
       },
       title: 'Sun',
       map: map
     })
-  }
+  },
+  methods: {
+
+    getSitesForMap() {
+      let sites = [
+        {
+          "name": "Sedgwick Observatory",
+          "geo": {
+            "latitude": 34.691499,
+            "longitude": -120.042252
+          },
+          "sitecode": "sqa",
+        },
+        {
+          "name": "Apache Ridge Observatory",
+          "geo": {
+            "latitude": 35.554444,
+            "longitude": -105.870278,
+          },
+          "sitecode": "saf",
+        },
+        {
+          "name": "West Mountain Drive Observatory",
+          "geo": {
+            "latitude": 34.34293028,
+            "longitude": -119.68112805,
+          },
+          "sitecode": "wmd",
+        }
+      ]
+      return sites
+    },
+
+    renderSiteContent(name, sitecode) {
+      let contentString = `
+        <div class="card" style="max-width: 200px">
+          <div class="card-content">
+            <div class="media">
+              <div class="media-content">
+                <p class="title is-4">${name}</p>
+                <p class="subtitle is-6">site code: ${sitecode}</p>
+              </div>
+            </div>
+
+            <div class="content">
+              <button class="button is-success">Go to ${sitecode}</button>
+            </div>
+          </div>
+        </div>`
+      return contentString
+    },
+
+
+
+  },
 }
 </script>
 
