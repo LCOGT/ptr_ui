@@ -99,7 +99,7 @@ export default {
                     console.log('options', options)
                     form.site=this.data.site
                     form.mount=this.data.mount
-                    axios.post("https://jobs.photonranch.org/jobs/newjob",form, options).then(console.log).catch(e => {console.warn(e)})
+                    axios.post("https://jobs.photonranch.org/jobs/newjob",form, options).then(console.warn).catch(e => {console.warn(e)})
                     break;
                 case 'PUT':
                     axios.put(apiName+path, myInit).then(response => {
