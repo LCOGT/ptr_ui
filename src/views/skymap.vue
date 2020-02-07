@@ -74,6 +74,7 @@ export default {
             this.messages.push(message)
           });
       }
+
     },
 
     getRecent() {

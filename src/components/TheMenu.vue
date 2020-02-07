@@ -27,6 +27,9 @@
             <b-navbar-item tag="router-link" :to="{ path: '/calendar' }">
                 calendar
             </b-navbar-item>
+            <b-navbar-item tag="router-link" :to="{ path: '/jobs' }">
+                jobs
+            </b-navbar-item>
             <b-navbar-dropdown label="sites">
                 <template v-for="(site, index) in sites">
                   <router-link 
