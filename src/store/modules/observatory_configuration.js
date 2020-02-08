@@ -315,6 +315,13 @@ const actions = {
                 commit('setActiveTelescope', 'telescope1')
                 dispatch('setActiveTelescope', 'telescope1')
             }
+            if (site=="saf") {
+                commit('setActiveSite', site)
+                commit('setActiveEnclosure', 'enclosure1')
+                commit('setActiveMount', 'mount1')
+                commit('setActiveTelescope', 'telescope1')
+                dispatch('setActiveTelescope', 'telescope1')
+            }
             resolve()
         })
     },

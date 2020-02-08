@@ -19,6 +19,11 @@
               Site Home 
             </router-link>
             <router-link 
+              :to="'/ux1/' + sitecode + '/observe'" 
+              class="navbar-item"> 
+              Observe
+            </router-link>
+            <router-link 
               :to="'/ux1/' + sitecode + '/targets'" 
               class="navbar-item"> 
               Target Explorer 
@@ -54,6 +59,7 @@
 
     <div class="column content">
       <subpage-home v-if="subpage == 'home'" :sitecode="sitecode"/>
+      <subpage-observe v-if="subpage == 'observe'" :sitecode="sitecode"/>
       <subpage-targets v-if="subpage == 'targets'" :sitecode="sitecode"/>
       <subpage-planning v-if="subpage == 'planning'" :sitecode="sitecode"/>
       <subpage-data v-if="subpage == 'data'" :sitecode="sitecode"/>
@@ -84,6 +90,7 @@ import axios from 'axios';
 import { commands_mixin } from '../mixins/commands_mixin'
 import CommandButton from '@/components/CommandButton'
 import SubpageHome from '@/components/SubpageHome'
+import SubpageObserve from '@/components/SubpageObserve'
 import SubpageTargets from '@/components/SubpageTargets'
 import SubpagePlanning from '@/components/SubpagePlanning'
 import SubpageData from '@/components/SubpageData'
@@ -93,6 +100,7 @@ export default {
   components: {
     CommandButton,
     SubpageHome,
+    SubpageObserve,
     SubpageTargets,
     SubpagePlanning,
     SubpageData,
@@ -171,7 +179,6 @@ export default {
   --dark-grey: #444;
   max-width: 1200px;
   margin: 0 auto; /* center the main div */
-  height: 150vh;
   padding: 0 20px;
 }
 
