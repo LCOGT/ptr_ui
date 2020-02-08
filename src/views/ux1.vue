@@ -14,27 +14,27 @@
             <!--b-menu-item icon="target" label="Target Explorer"></b-menu-item-->
             <!--b-menu-item icon="folder-multiple-image" label="Data & Images"></b-menu-item-->
             <router-link 
-              :to="'/ux1/' + sitecode + '/home'" 
+              :to="'/site/' + sitecode + '/home'" 
               class="navbar-item"> 
               Site Home 
             </router-link>
             <router-link 
-              :to="'/ux1/' + sitecode + '/observe'" 
+              :to="'/site/' + sitecode + '/observe'" 
               class="navbar-item"> 
               Observe
             </router-link>
             <router-link 
-              :to="'/ux1/' + sitecode + '/targets'" 
+              :to="'/site/' + sitecode + '/targets'" 
               class="navbar-item"> 
               Target Explorer 
             </router-link>
             <router-link 
-              :to="'/ux1/' + sitecode + '/planning'" 
+              :to="'/site/' + sitecode + '/planning'" 
               class="navbar-item"> 
               Planning
             </router-link>
             <router-link 
-              :to="'/ux1/' + sitecode + '/data'" 
+              :to="'/site/' + sitecode + '/data'" 
               class="navbar-item"> 
               Data & Images 
             </router-link>
