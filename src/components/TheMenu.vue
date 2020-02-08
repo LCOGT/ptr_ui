@@ -31,7 +31,7 @@
                 <template v-for="(site, index) in sites">
                   <router-link 
                     class="navbar-item" 
-                    v-bind:to="'/ux1/' + site.code +'/home'"
+                    v-bind:to="'/ux1/' + site.code +'/observe'"
                     v-bind:key="index"
                     > 
                     {{site.name}} 

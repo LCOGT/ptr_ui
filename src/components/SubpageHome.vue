@@ -1,6 +1,6 @@
 <template><div>
 
-    <the-dome-cam />
+    <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
 
     <div class="quick-status">
