@@ -47,19 +47,19 @@ const router = new VueRouter({
     { path: '/analysis', name: 'analysis', component: analysis },
     { path: '/calendar', name: 'calendar', component: calendarPage },
     {
-      path: '/ux1/:sitecode/:subpage',
-      name: 'ux1',
+      path: '/site/:sitecode/:subpage',
+      name: 'site',
       component: ux1,
       props: true,
       beforeEnter: authGuard,
       //meta: { requiresAuth: true },
     },
-    {
-      path: '/site/:sitecode',
-      name: 'site',
-      component: Site,
-      props: true,
-    },
+    //{
+      //path: '/site/:sitecode',
+      //name: 'site',
+      //component: Site,
+      //props: true,
+    //},
   ]
 })
 

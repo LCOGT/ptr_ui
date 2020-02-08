@@ -328,18 +328,12 @@ export default {
             </div>
 
             <div class="content">
-              <a class="button is-success" href="ux1/${sitecode}/observe" style="font-weight: bold">Observe here!</a>
+              <a class="button is-success" href="site/${sitecode}/observe" style="font-weight: bold">Observe here!</a>
             </div>
           </div>
         </div>`
       return contentString
     },
-
-    goToObservePage(site) {
-      this.$router.push({path: `/ux1/${site}/observe`})
-    },
-
-
 
   },
 }
