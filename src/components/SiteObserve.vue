@@ -518,7 +518,7 @@ import ScriptSettings from '@/components/ScriptSettings'
 
 
 export default {
-  name: 'SubpageObserve',
+  name: 'SiteObserve',
   components: {
     CommandButton,
     TheSkyChart,
