@@ -1,7 +1,7 @@
 <template><div>
 
-    <week-of-events />
-    <!--the-calendar :calendarSite="sitecode" /-->
+    <!--week-of-events /-->
+    <the-calendar :calendarSite="sitecode" />
 
 </div></template>
 

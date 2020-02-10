@@ -43,11 +43,6 @@ export default {
     ImageFilter,
     Js9Devtools,
   },
-  data() {
-    return {
-      toggleSiteIndex: 0,
-    }
-  },
   methods: {
     imagesByUser() {
         this.$store.dispatch('images/get_user_images')
