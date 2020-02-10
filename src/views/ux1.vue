@@ -10,34 +10,32 @@
     <div class="column is-narrow menu-column">
       <b-menu>
         <b-menu-list label="Menu">
-            <!--b-menu-item icon="home" label="Site Home"></b-menu-item-->
-            <!--b-menu-item icon="target" label="Target Explorer"></b-menu-item-->
-            <!--b-menu-item icon="folder-multiple-image" label="Data & Images"></b-menu-item-->
-            <router-link 
-              :to="'/site/' + sitecode + '/home'" 
-              class="navbar-item"> 
-              Site Home 
-            </router-link>
-            <router-link 
+            <b-menu-item 
+              icon="home" 
+              label="Site Home" 
+              tag="router-link" 
+              :to="'/site/'+sitecode+'/home'"></b-menu-item>
+            <b-menu-item 
+              icon="camera" 
+              tag="router-link"
               :to="'/site/' + sitecode + '/observe'" 
-              class="navbar-item"> 
-              Observe
-            </router-link>
-            <router-link 
+              label="Observe"></b-menu-item>
+            <b-menu-item 
+              icon="target" 
+              tag="router-link"
               :to="'/site/' + sitecode + '/targets'" 
-              class="navbar-item"> 
-              Target Explorer 
-            </router-link>
-            <router-link 
-              :to="'/site/' + sitecode + '/planning'" 
-              class="navbar-item"> 
-              Planning
-            </router-link>
-            <router-link 
+              label="Target Explorer"></b-menu-item>
+            <b-menu-item 
+              icon="folder-multiple-image"
+              tag="router-link"
               :to="'/site/' + sitecode + '/data'" 
-              class="navbar-item"> 
-              Data & Images 
-            </router-link>
+              label="Data & Images"></b-menu-item>
+            <b-menu-item 
+              icon="calendar"
+              tag="router-link"
+              :to="'/site/' + sitecode + '/planning'" 
+              label="Planning"></b-menu-item>
+
         </b-menu-list>
       </b-menu>
       <div style="height: 300px"></div>
@@ -57,7 +55,7 @@
       </div>
     </div>
 
-    <div class="column content">
+    <div class="column main-content">
       <subpage-home v-if="subpage == 'home'" :sitecode="sitecode"/>
       <subpage-observe v-if="subpage == 'observe'" :sitecode="sitecode"/>
       <subpage-targets v-if="subpage == 'targets'" :sitecode="sitecode"/>
@@ -69,9 +67,6 @@
 
   </div>
 
-  </section>
-
-
   <footer class="footer">
     <div class="content has-text-centered">
       <p>
@@ -81,6 +76,9 @@
       </p>
     </div>
   </footer>
+  </section>
+
+
 
 </div></template>
 
@@ -94,6 +92,7 @@ import SubpageObserve from '@/components/SubpageObserve'
 import SubpageTargets from '@/components/SubpageTargets'
 import SubpagePlanning from '@/components/SubpagePlanning'
 import SubpageData from '@/components/SubpageData'
+
 
 export default {
   name: 'ux1',
@@ -129,6 +128,12 @@ export default {
     console.log('From UX1, subpage: '+this.subpage)
     this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
     this.$store.dispatch('images/refresh_latest_images')
+
+    // Make sure the default instruments are selected at the initial load.
+    await this.$store.dispatch('observatory_configuration/update_config')
+    await this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
+    await this.$store.dispatch('instrument_state/updateStatus')
+
     // Get the global configuration for all sites from an api call.
     let apiName = this.$store.getters['dev/api'];
     let path = '/all/config/';
@@ -156,17 +161,17 @@ export default {
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
 
 .menu-column {
-  border-right: var(--light-grey) 1px solid;
+  border-right: #ddd 1px solid;
   width: 220px;
   height: auto;
-  padding-right: 2em;
+  padding: 0 2em;
 }
-.content {
-  padding: 0 4em;
+.main-content {
+  margin: 0 1em;
 }
 
 .left-status-box {
@@ -181,18 +186,18 @@ export default {
 }
 
 .page {
-  --light-grey: #ddd;
-  --mid-grey: #aaa;
-  --dark-grey: #444;
+  min-height: 120vh;
   max-width: 1200px;
   margin: 0 auto; /* center the main div */
-  padding: 0 20px;
+}
+
+footer {
+  position:fixed;
+  bottom: 0;
+  width: 100%;
+
 }
 
 
-#bottom-section {
-  column-span: all;
-  height: 6em;
-}
 
 </style>
