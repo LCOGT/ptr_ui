@@ -413,6 +413,7 @@ export default {
          */
         existingEventSelected(arg) {
             let event = arg.event;
+            console.log(event)
             this.activeEvent.id = event.id,
             this.activeEvent.startStr = event.start.toISOString();
             this.activeEvent.endStr = event.end.toISOString();
