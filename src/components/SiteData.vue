@@ -78,4 +78,8 @@ export default {
 
 <style scoped>
 
+.nav-panel > * {
+  padding-bottom: 1em;
+}
+
 </style>

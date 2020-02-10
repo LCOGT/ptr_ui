@@ -11,7 +11,7 @@ import WeekOfEvents from '@/components/WeekOfEvents'
 import TheCalendar from '@/components/TheCalendar';
 
 export default {
-    name: "SubpagePlanning",
+    name: "SiteCalendar",
     props: ["sitecode"],
     components: { 
         WeekOfEvents,
