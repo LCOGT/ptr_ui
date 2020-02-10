@@ -39,6 +39,22 @@ export default {
                     'anyOtherPropsHere': 'call from key extendedProps of this resource object',
                 },
                 {
+                    'id': 'saf',
+                    'title': 'Apache Ridge Observatory',
+                    'eventColor': '#25662d',
+                    //'eventBackgroundColor': '#ab20fd',
+                    'eventBorderColor': '#25662d',
+                    'eventTextColor': '#fbf8fd',
+                    'eventClassNames': '',
+                    'eventOverlap': false, // defines whether events are allowed to overlap
+                    'eventConstraint': '',
+                    'eventAllow': '',
+                    'businessHours': '',
+                    'children': '',
+                    'parentId': '',
+                    'anyOtherPropsHere': 'call from key extendedProps of this resource object',
+                },
+                {
                     'id': 'other',
                     'title': 'Another Observatory',
                     'eventColor': '#f6903d',
