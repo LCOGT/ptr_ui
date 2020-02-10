@@ -67,6 +67,8 @@
 
   </div>
 
+  </section>
+
   <footer class="footer">
     <div class="content has-text-centered">
       <p>
@@ -76,8 +78,6 @@
       </p>
     </div>
   </footer>
-  </section>
-
 
 
 </div></template>
