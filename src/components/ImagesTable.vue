@@ -7,8 +7,8 @@
             :loading="isLoading"
             :focusable="isFocusable"
             :selected.sync="current_image"
-            paginated="true"
-            per-page="20"
+            :paginated="true"
+            :per-page="20"
             >
 
             <template slot-scope="props">
