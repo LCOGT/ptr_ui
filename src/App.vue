@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <the-menu />
-    <dev-panel /> <!-- Developer testing tools. Not for prodution. -->
+    <!--dev-panel /--> <!-- Developer testing tools. Not for prodution. -->
+
     <router-view></router-view>
 
     <!-- This is the home for the JS9 DOM elements. They are hidden here and only 

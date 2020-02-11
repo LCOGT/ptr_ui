@@ -37,7 +37,7 @@ import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import TheMountControls from '@/components/TheMountControls'
 import ModalSkyChart from '@/components/ModalSkyChart'
 export default {
-    name: "SubpageTargets",
+    name: "SiteTargets",
     props: ["sitecode"],
     components: {
         TheSkyChart,
