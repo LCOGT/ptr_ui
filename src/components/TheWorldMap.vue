@@ -328,7 +328,7 @@ export default {
             </div>
 
             <div class="content">
-              <a class="button is-success" href="site/${sitecode}/home" style="font-weight: bold">Observe here!</a>
+              <a class="button is-success" href="site/${sitecode}/home" style="font-weight: bold">View this site!</a>
             </div>
           </div>
         </div>`

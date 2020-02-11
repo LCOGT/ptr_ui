@@ -10,6 +10,7 @@
         :slotDuration="fc_slotDuration"
         :slotLabelFormat="fc_slotLabelFormat"
         :eventTimeFormat="fc_eventTimeFormat"
+        :timeZone="fc_timeZone"
         :min-time="fc_minTime"
         :max-time="fc_maxTime"
         :scrollTime="fc_scrollTime"
@@ -96,6 +97,20 @@
 
 //}
 
+/*
+TODO: 
+
+  - save events in UTC so that modifications are possible from any timezone.
+    (currently appending -8:00 to indicate PST )
+
+  - retrieve site lat/lon in the twighlight calculator. Don't hardcode!
+
+  - set min/max time (start/end) to a few hours before dusk.
+    use utc offset + site tz offset 
+
+*/
+
+
 export default {
     name: 'TheCalendar',
     components: {
@@ -150,6 +165,7 @@ export default {
         fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
         fc_eventTimeFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr times on events
         fc_slotLabelFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr time on axis labels
+        fc_timeZone: 'local',
         fc_minTime: "12:00:00", // start the day column at noon
         fc_maxTime: "36:00:00", // end the day column at noon for the following day
         fc_scrollTime: "16:00:00", // calendar default view starts at 4pm.
@@ -229,6 +245,7 @@ export default {
                 let msPerDay = 1000*60*60*24
                 let sunEvents = SunCalc.getTimes(new Date(timestamp), latitude, longitude)
                 let nextDayEvents = SunCalc.getTimes(new Date(timestamp+msPerDay),latitude, longitude)
+                let prevDayEvents = SunCalc.getTimes(new Date(timestamp-msPerDay),latitude, longitude)
 
                 let currentDateObj = new Date(timestamp)
 
@@ -238,16 +255,18 @@ export default {
                 let nauticalColor = "rgb(36, 113, 163)"
                 let astronomicalColor = "rgb(26, 82, 118)"
 
-
-                events.daylightAfternoon = {
-                    title: "Afternoon Daylight",
-                    // Start daylight event at noon
-                    start: new Date(timestamp).setHours(12),
-                    end: sunEvents.sunset,
-                    rendering: "background",
-                    backgroundColor: daylightColor,
-                    id: `${currentDateObj.toISOString()}_day_afternoon`,
-                }
+                // This is redundant; replaced by the other daylight event (bottom)
+                //events.daylightAfternoon = {
+                    //title: "Afternoon Daylight",
+                    //// Start daylight event at noon
+                    //start: prevDayEvents.sunrise,
+                    ////start: new Date(timestamp).setHours(12),
+                    ////end: sunEvents.sunset,
+                    //end: prevDayEvents.sunset,
+                    //rendering: "background",
+                    //backgroundColor: daylightColor,
+                    //id: `${currentDateObj.toISOString()}_day_afternoon`,
+                //}
                 events.civilTwighlightDusk = {
                     title: "Civil Twighlight",
                     start: sunEvents.sunset,
@@ -300,7 +319,8 @@ export default {
                 events.daylightMorning = {
                     title: "Morning Daylight",
                     start: nextDayEvents.sunrise,
-                    end: new Date(timestamp).setHours(36),
+                    end: nextDayEvents.sunset,
+                    //end: new Date(new Date(timestamp).setHours(36)),
                     rendering: "background",
                     backgroundColor: daylightColor,
                     id: `${currentDateObj.toISOString()}_day_morning`,
@@ -314,6 +334,7 @@ export default {
             // Compute events for each day. 
             // TODO: don't harcode lat/long info!!
             allDays.map((day) => twighlightEvents.push(...Object.values(oneDayTwighlight(day, 33, -119))))
+            console.log(twighlightEvents.slice(0,8))
 
             // Finish timer
             let t1=performance.now()
