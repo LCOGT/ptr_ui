@@ -1,5 +1,0 @@
-{
-    "tableName": "ptrmockdynamo",
-    "partitionKeyName": "id",
-    "partitionKeyType": "N"
-}

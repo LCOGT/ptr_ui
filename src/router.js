@@ -16,7 +16,7 @@ import btns from './views/btns.vue'
 import imgs from './views/imgs.vue'
 import skymap from './views/skymap.vue'
 import ctrl from './views/ctrl.vue'
-import ux1 from './views/ux1.vue'
+import site from './views/Site.vue'
 import analysis from './views/analysis.vue'
 import { authGuard } from "./auth/authGuard";
 import calendarPage from './views/calendarPage.vue'
@@ -49,18 +49,11 @@ const router = new VueRouter({
     { path: '/calendar', name: 'calendar', component: calendarPage },
     { path: '/jobs', name: 'jobs', component: JobsMonitor},
     {
-      path: '/ux1/:sitecode/:subpage',
-      name: 'ux1',
-      component: ux1,
+      path: '/site/:sitecode/:subpage',
+      name: 'site',
+      component: site,
       props: true,
       beforeEnter: authGuard,
-      //meta: { requiresAuth: true },
-    },
-    {
-      path: '/site/:sitecode',
-      name: 'site',
-      component: Site,
-      props: true,
     },
   ]
 })

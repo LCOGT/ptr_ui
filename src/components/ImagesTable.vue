@@ -1,10 +1,5 @@
 <template>
     <section>
-        <b-field grouped group-multiline>
-            <div class="control">
-                <b-switch v-model="isLoading">Loading state</b-switch>
-            </div>
-        </b-field>
 
         <b-table
             :data="recent_images"
@@ -12,6 +7,8 @@
             :loading="isLoading"
             :focusable="isFocusable"
             :selected.sync="current_image"
+            :paginated="true"
+            :per-page="20"
             >
 
             <template slot-scope="props">
@@ -20,11 +17,11 @@
                 </b-table-column>
 
                 <b-table-column field="right_ascension" label="Right Ascension">
-                    {{ props.row.right_ascension }} 
+                    {{ props.row.right_ascension.toFixed(3) }} 
                 </b-table-column>
 
                 <b-table-column field="declination" label="Declination">
-                    {{ props.row.declination }} 
+                    {{ props.row.declination.toFixed(3) }} 
                 </b-table-column>
 
                 <b-table-column field="exposure_time" label="Exposure Time">
@@ -37,9 +34,7 @@
                 </b-table-column>
 
                 <b-table-column field="observation" label="Observation Time" centered>
-                    <span class="tag is-success">
                         {{ new Date(props.row.capture_date).toUTCString() }}
-                    </span>
                 </b-table-column>
             </template>
 

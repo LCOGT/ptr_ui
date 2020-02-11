@@ -1,6 +1,6 @@
 <template><div>
 
-    <the-dome-cam />
+    <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
 
     <div class="quick-status">
@@ -93,7 +93,7 @@ import { mapGetters } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
 import ImageView from '@/components/ImageView'
 export default {
-    name: "SubpageHome",
+    name: "SiteHome",
     props: ["sitecode"],
     mixins: [commands_mixin],
     components: {
