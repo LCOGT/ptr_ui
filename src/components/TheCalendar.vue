@@ -190,7 +190,17 @@ export default {
             resourceTimeGridPlugin,
         ],
 
-
+        // Temporary Site Geo data. Bad because it's hardcoded.
+        geo: {
+          wmd: {
+            lat: 34.34293028,
+            lon: -119.68112805,
+          },
+          saf: {
+            lat: 35.554444,
+            lon: -105.870278,
+          },
+        },
 
         // URL for the calendar backend api
         backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
@@ -331,9 +341,15 @@ export default {
             // Collect all the events to display here
             let twighlightEvents = []
 
+
             // Compute events for each day. 
-            // TODO: don't harcode lat/long info!!
-            allDays.map((day) => twighlightEvents.push(...Object.values(oneDayTwighlight(day, 33, -119))))
+            allDays.map((day) => twighlightEvents.push(...Object.values(
+              oneDayTwighlight(
+                day, 
+                this.geo[this.calendarSite].lat, 
+                this.geo[this.calendarSite].lon,
+              )
+            )))
             console.log(twighlightEvents.slice(0,8))
 
             // Finish timer
