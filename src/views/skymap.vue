@@ -57,7 +57,7 @@ export default {
     async start() {
 
       this.socket = new ReconnectingWebSocket("wss://zda8hlm9u0.execute-api.us-east-1.amazonaws.com/dev")
-      this.socket.onopen = this.getRecent()
+      //this.socket.onopen = this.getRecent()
       this.socket.onmessage = (message) => {
           let data = JSON.parse(message.data);
           data["messages"].forEach((message) => {
@@ -75,11 +75,23 @@ export default {
           });
       }
 
+      this.siteChat = new ReconnectingWebSocket("wss://urp0eh13o3.execute-api.us-east-1.amazonaws.com/dev?room=wmd&user=tim")
+      this.siteChat.onopen = this.getRecent()
+      this.siteChat.onmessage = (message) => {
+        console.log(message)
+          let data = JSON.parse(message.data);
+          data["messages"].forEach((message) => {
+            //console.log(message)
+            this.messages.push(message)
+          });
+      }
+
     },
 
     getRecent() {
-        let data = {"action": "getRecentMessages"};
-        this.socket.send(JSON.stringify(data));
+        let data = {"action": "getRecentMessages", "body": {"room": "wmd"}};
+        //this.socket.send(JSON.stringify(data));
+        this.siteChat.send(JSON.stringify(data));
     },
     updateStatus() {
       axios.get("https://u5i5c9yhr9.execute-api.us-east-1.amazonaws.com/dev/newstatus")
@@ -88,9 +100,10 @@ export default {
     // Sends a message to the websocket using the text in the post bar
     postMessage() {
       if (this.tosend=='') {return;}
-      let dataToSend = {"action": "sendMessage", "username": this.username, "content":this.tosend};
+      let dataToSend = {"action": "sendMessage", "username": this.username, "content":this.tosend, "room": "wmd"};
       console.log(dataToSend)
-      this.socket.send(JSON.stringify(dataToSend));
+      //this.socket.send(JSON.stringify(dataToSend));
+      this.siteChat.send(JSON.stringify(dataToSend));
       this.tosend=''
     },
 
