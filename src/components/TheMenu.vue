@@ -136,4 +136,7 @@ export default {
 nav {
   height: 5em;
 }
+.navbar {
+  border-radius: 0;
+}
 </style>
