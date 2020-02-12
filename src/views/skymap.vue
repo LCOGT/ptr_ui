@@ -53,6 +53,9 @@ export default {
   mounted() {
     this.start()
   },
+  beforeDestroy() {
+    this.siteChat.close()
+  },
   methods: {
     async start() {
 
@@ -75,7 +78,7 @@ export default {
           });
       }
 
-      this.siteChat = new ReconnectingWebSocket("wss://urp0eh13o3.execute-api.us-east-1.amazonaws.com/dev?room=wmd&user=tim")
+      this.siteChat = new ReconnectingWebSocket("wss://urp0eh13o3.execute-api.us-east-1.amazonaws.com/dev?room=wmd&username=tim")
       this.siteChat.onopen = this.getRecent()
       this.siteChat.onmessage = (message) => {
         console.log(message)
@@ -89,7 +92,7 @@ export default {
     },
 
     getRecent() {
-        let data = {"action": "getRecentMessages", "body": {"room": "wmd"}};
+        let data = {"action": "getRecentMessages", "room": "wmd"};
         //this.socket.send(JSON.stringify(data));
         this.siteChat.send(JSON.stringify(data));
     },

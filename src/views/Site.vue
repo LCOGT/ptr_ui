@@ -38,24 +38,39 @@
 
         </b-menu-list>
       </b-menu>
+
+      <div style="height: 3em;" />
+
+
+      <div class="menu-label"> online users </div>
+      <ul class="online-users-list">
+        <li v-for="(user, idx) in displayedOnlineUsers">
+          <b-icon
+            icon="circle"
+            size="is-small"
+            type="is-success">
+          </b-icon>
+          {{user}}
+        </li>
+      </ul>
+
       <div style="height: 300px"></div>
       <div class="menu-label"> telescope status </div>
       <div class="left-status-box">
-
         <div>
           <p class="heading">Active Site:</p>
           <p class="title">{{active_site}}</p>
         </div>
-
         <div>
           <p class="heading">Active Mount:</p>
           <p class="title">{{active_mount}}</p>
         </div>
-
       </div>
+
     </div>
 
     <div class="column page-content">
+      <site-top-info-panel :sitecode="sitecode" />
       <site-home v-if="subpage == 'home'" :sitecode="sitecode"/>
       <site-observe v-if="subpage == 'observe'" :sitecode="sitecode"/>
       <site-targets v-if="subpage == 'targets'" :sitecode="sitecode"/>
@@ -70,7 +85,7 @@
   </section>
 
   <footer class="footer">
-    <div class="content has-text-centered">
+    <div class="has-text-centered">
       <p>
         You are currently observing from site 
         <span class="is-uppercase" style="color: greenyellow">{{sitecode}}</span> in the 
@@ -84,7 +99,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import axios from 'axios';
 import { commands_mixin } from '../mixins/commands_mixin'
 import CommandButton from '@/components/CommandButton'
 import SiteHome from '@/components/SiteHome'
@@ -92,6 +106,10 @@ import SiteObserve from '@/components/SiteObserve'
 import SiteTargets from '@/components/SiteTargets'
 import SiteCalendar from '@/components/SiteCalendar'
 import SiteData from '@/components/SiteData'
+import SiteTopInfoPanel from '@/components/SiteTopInfoPanel'
+
+import axios from 'axios';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 
 export default {
@@ -103,6 +121,7 @@ export default {
     SiteTargets,
     SiteCalendar,
     SiteData,
+    SiteTopInfoPanel,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin],
@@ -113,6 +132,8 @@ export default {
       cam_repeat: '',
       cam_filter: '',
       cam_bin: '1', 
+      
+      onlineUsersList: [],
 
     }
   },
@@ -121,9 +142,21 @@ export default {
     sitecode: function () {
       this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
       this.$store.dispatch('images/refresh_latest_images')
+
+      // Reopen the chat websocket with the new site.
+      this.siteChat.close()
+      this.openChatWebsocket()
+    },
+
+    // If the user changes, we should update the chat server 
+    username: function() {
+      this.siteChat.close()
+      this.openChatWebsocket()
     }
+
   },
-  async created() {
+  async mounted() {
+
     console.log('From UX1, sitecode: '+this.sitecode)
     console.log('From UX1, subpage: '+this.subpage)
     this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
@@ -147,14 +180,74 @@ export default {
       self.timestamp = parseInt(Date.now() / 1000)
     }, 1000)
 
-    // Set the initial devices for convenience.
-    if (true) {
-      this.selected_site = this.sitecode;
-      console.log('selected site')
-      this.selected_mount = 'mount1';
-      this.selected_telescope = 't1';
-      this.selected_camera = 'cam1';
+
+    let onlineUserURL = `https://327l4vns8i.execute-api.us-east-1.amazonaws.com/dev/onlineusers?room=${encodeURIComponent(this.sitecode)}`
+    let headers = {
+      'Content-Type': 'application/json;charset=UTF-8',
+      'Access-Control-Allow-Origin': '*',
     }
+    axios.get(onlineUserURL).then(response => {
+      console.log(response)
+      this.onlineUsersList = response.data.map(x => x.Username)
+      console.log(this.onlineUsersList)
+    })
+
+    this.openChatWebsocket()
+  },
+  computed: {
+
+    // Get the username from Auth0
+    username() {
+      if (this.$auth.isAuthenticated) {
+        return this.$auth.user.name
+      }
+      return "anonymous"
+    },
+
+    // Format the displayed list of online users
+    displayedOnlineUsers() {
+      let theList = new Set(this.onlineUsersList) // Remove duplicates
+      theList.delete("anonymous")
+      theList.delete(this.username)
+      if (this.username != "anonymous") {
+        theList.add(`${this.username} (me)`)
+      }
+      return theList
+    }
+
+  },
+  beforeDestroy() {
+    this.siteChat.close()
+  },
+  methods: {
+
+    async openChatWebsocket() {
+      let url = "wss://urp0eh13o3.execute-api.us-east-1.amazonaws.com/dev"
+      url += `?room=${encodeURIComponent(this.sitecode)}`
+      url += `&username=${encodeURIComponent(await this.username)}`
+
+      this.siteChat = new ReconnectingWebSocket(url)
+      //this.siteChat.onopen = this.getRecent()
+      this.siteChat.onmessage = (message) => {
+        console.log(message)
+          let data = JSON.parse(message.data);
+
+          // Handle case where incoming message is the online users
+          if ("onlineUsers" in data) {
+            this.onlineUsersList = data.onlineUsers.map(x => x.Username)
+          }
+
+          // Handle case where incoming message is a chat message
+          else {
+            data["messages"].forEach((message) => {
+              //console.log(message)
+              this.messages.push(message)
+            });
+          }
+      }
+
+    }
+
   },
   
 }
@@ -163,6 +256,10 @@ export default {
 
 <style lang="css" scoped>
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
+
+.online-users-list > * {
+  padding-left: 1em;
+}
 
 .menu-column {
   border-right: #ddd 1px solid;
