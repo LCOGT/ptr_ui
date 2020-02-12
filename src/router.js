@@ -53,7 +53,7 @@ const router = new VueRouter({
       name: 'site',
       component: site,
       props: true,
-      beforeEnter: authGuard,
+      //beforeEnter: authGuard,
     },
   ]
 })
