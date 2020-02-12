@@ -13,16 +13,23 @@
             </div>
 
             <div class="message-display" id="message-display">
-                <div v-for="(msg, idx) in messages" v-bind:key="idx">
-                    <div>
-                    <span class="has-text-weight-bold">{{msg.username}}</span>
-                    : {{msg.content}}
-                    </div>
+                <div class="one-message" v-for="(msg, idx) in messages" v-bind:key="idx">
+                    <span 
+                        class="message-username" 
+                        :class=ownMessageClass(msg.username)
+                        v-if="idx==0 || messages[idx-1].username != msg.username">
+                        {{msg.username}}
+                    </span>
+                    <span 
+                        class="message-content"
+                        :class=ownMessageClass(msg.username)>
+                        {{msg.content}}
+                    </span>
                 </div>
             </div>
 
             <div class="input-section">
-                <b-field>
+                <b-field style="width: 100%;">
                     <b-input 
                         size="is-small" 
                         v-model="tosend" 
@@ -42,6 +49,7 @@
 
 
         </b-collapse>
+
     </div>
 </template>
 
@@ -56,7 +64,16 @@ export default {
     props: [ "sitecode", "username" ],
     data() {
         return {
-            messages: [],
+            messages: [
+                //{username: "Tim Beccue", content: "Hello observatory!", timestamp: 1581539579},
+                //{username: "Tim Beccue", content: "Hello two!", timestamp: 1581539579},
+                //{username: "Tim Beccue", content: "Hello three!", timestamp: 1581539579},
+                //{username: "Wayne Rosing", content: "Hello four!", timestamp: 1581539579},
+                //{username: "Wayne Rosing", content: "Hello four!", timestamp: 1581539579},
+                //{username: "Wayne Rosing", content: "Hello four!", timestamp: 1581539579},
+                //{username: "Wayne Rosing", content: "Hello four!", timestamp: 1581539579},
+                //{username: "Tim Beccue", content: "Hello five!", timestamp: 1581539579},
+            ],
             tosend: '', // The text input box for the chat
         }
     },
@@ -85,11 +102,25 @@ export default {
 
     },
     methods: {
+
+
+        // Use this method to check if the message belongs to the current user.
+        // If so, add a class to make the message appear on the right side. 
+        ownMessageClass(messageUsername) {
+            return {
+                'right-align-text': messageUsername == this.username
+            }
+        },
+
+        // Populate a few recent messages when this component loads.
         getRecentMessages() {
             let data = {"action": "getRecentMessages", "room": this.sitecode};
             this.siteChat.send(JSON.stringify(data));
         },
 
+        // A direct api call to get a list of online users at the site. 
+        // This is used when first connecting to the websocket. Subsequent 
+        // changes will be sent over the websocket. 
         getOnlineUsers() {
             let onlineUserURL = `https://327l4vns8i.execute-api.us-east-1.amazonaws.com/dev/onlineusers?room=${encodeURIComponent(this.sitecode)}`
             axios.get(onlineUserURL).then(response => {
@@ -99,6 +130,9 @@ export default {
         },
 
         async openChatWebsocket() {
+
+            // Include the observatory site (abrev) and username as query string
+            // parameters when first connecting to the websocket.
             let url = "wss://urp0eh13o3.execute-api.us-east-1.amazonaws.com/dev"
             url += `?room=${encodeURIComponent(this.sitecode)}`
             url += `&username=${encodeURIComponent(await this.username)}`
@@ -110,16 +144,17 @@ export default {
             this.siteChat.onopen = () => {
                 if (this.messages.length == 0) this.getRecentMessages()
             }
+
             this.siteChat.onmessage = (message) => {
                 let data = JSON.parse(message.data);
 
-                // Handle case where incoming message is the online users
+                // If the incoming message is updating the online users list:
                 if ("onlineUsers" in data) {
                     // Emit the data to parent component
                     this.$emit("whosonline", data.onlineUsers.map(x => x.Username))
                 }
 
-                // Handle case where incoming message is a chat message
+                // If the incoming message is a new chat message.
                 else if ("messages" in data) {
                     data["messages"].forEach((message) => {
                         this.messages.push(message)
@@ -131,7 +166,8 @@ export default {
                 }
             }
         },
-        // Sends a message to the websocket using the text in the post bar
+
+        // Send a message to the websocket
         postMessage() {
             if (this.tosend=='') {return;}
             let dataToSend = {
@@ -155,9 +191,19 @@ export default {
 
 <style scoped>
 .message-display {
+    padding-top: 1em;
     height: 600px;
     overflow-y: auto;
 }
-.input-section {
+.one-message {
+    padding: 0 11.25px;
+    display: flex;
+    flex-direction: column;
+}
+.message-username {
+    font-weight: lighter;
+}
+.right-align-text {
+    text-align:right;
 }
 </style>
