@@ -41,36 +41,23 @@
 
       <div style="height: 3em;" />
 
-
+      <!-- List of online users -->
       <div class="menu-label"> online users </div>
       <ul class="online-users-list">
         <li v-for="(user, idx) in displayedOnlineUsers">
-          <b-icon
-            icon="circle"
-            size="is-small"
-            type="is-success">
-          </b-icon>
+          <b-icon icon="circle" size="is-small" type="is-success" />
           {{user}}
         </li>
       </ul>
+      
+      <div style="height: 3em;" />
 
-      <div style="height: 300px"></div>
-      <div class="menu-label"> telescope status </div>
-      <div class="left-status-box">
-        <div>
-          <p class="heading">Active Site:</p>
-          <p class="title">{{active_site}}</p>
-        </div>
-        <div>
-          <p class="heading">Active Mount:</p>
-          <p class="title">{{active_mount}}</p>
-        </div>
-      </div>
+      <div class="menu-label"> chat </div>
+
 
     </div>
 
     <div class="column page-content">
-      <site-top-info-panel :sitecode="sitecode" />
       <site-home v-if="subpage == 'home'" :sitecode="sitecode"/>
       <site-observe v-if="subpage == 'observe'" :sitecode="sitecode"/>
       <site-targets v-if="subpage == 'targets'" :sitecode="sitecode"/>
@@ -127,11 +114,6 @@ export default {
   mixins: [commands_mixin],
   data () {
     return {
-
-      cam_exposure: '',
-      cam_repeat: '',
-      cam_filter: '',
-      cam_bin: '1', 
       
       onlineUsersList: [],
 
@@ -157,8 +139,6 @@ export default {
   },
   async mounted() {
 
-    console.log('From UX1, sitecode: '+this.sitecode)
-    console.log('From UX1, subpage: '+this.subpage)
     this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
     this.$store.dispatch('images/refresh_latest_images')
 
@@ -172,7 +152,6 @@ export default {
     let path = '/all/config/';
     const config_g = await axios.get(apiName+path);
     this.config_g = config_g
-    console.log(config_g)
 
     // Update timestamp every second (sent with command)
     var self = this;
@@ -216,9 +195,11 @@ export default {
     }
 
   },
+
   beforeDestroy() {
     this.siteChat.close()
   },
+
   methods: {
 
     async openChatWebsocket() {
