@@ -7,8 +7,9 @@
   <div style="height: 3em"></div>
   <div class="columns">
 
+    <!-- Menu for site subpages -->
     <div class="column is-narrow menu-column">
-      <b-menu>
+      <b-menu class="subpage-menu">
         <b-menu-list label="Menu">
             <b-menu-item 
               icon="home" 
@@ -35,11 +36,8 @@
               tag="router-link"
               :to="'/site/' + sitecode + '/calendar'" 
               label="Calendar"></b-menu-item>
-
         </b-menu-list>
       </b-menu>
-
-      <div style="height: 3em;" />
 
       <!-- List of online users -->
       <div class="menu-label"> online users </div>
@@ -50,13 +48,16 @@
         </li>
       </ul>
       
-      <div style="height: 3em;" />
-
-      <div class="menu-label"> chat </div>
-
+      <!-- Chat module. Also feeds online users list. -->
+      <chat-module 
+        :sitecode="sitecode" 
+        :username="username"
+        @whosonline="makeOnlineUsersList" />
 
     </div>
 
+
+    <!-- Primary content of the page. Selects from the various site subpages. -->
     <div class="column page-content">
       <site-home v-if="subpage == 'home'" :sitecode="sitecode"/>
       <site-observe v-if="subpage == 'observe'" :sitecode="sitecode"/>
@@ -64,11 +65,7 @@
       <site-calendar v-if="subpage == 'calendar'" :sitecode="sitecode"/>
       <site-data v-if="subpage == 'data'" :sitecode="sitecode"/>
     </div>
-
-
-
   </div>
-
   </section>
 
   <footer class="footer">
@@ -94,6 +91,7 @@ import SiteTargets from '@/components/SiteTargets'
 import SiteCalendar from '@/components/SiteCalendar'
 import SiteData from '@/components/SiteData'
 import SiteTopInfoPanel from '@/components/SiteTopInfoPanel'
+import ChatModule from '@/components/ChatModule'
 
 import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -109,43 +107,31 @@ export default {
     SiteCalendar,
     SiteData,
     SiteTopInfoPanel,
+    ChatModule,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin],
+
   data () {
     return {
-      
-      onlineUsersList: [],
-
+      displayedOnlineUsers: new Set([]),
     }
   },
+
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
   watch: {
     sitecode: function () {
       this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
       this.$store.dispatch('images/refresh_latest_images')
-
-      // Reopen the chat websocket with the new site.
-      this.siteChat.close()
-      this.openChatWebsocket()
     },
-
-    // If the user changes, we should update the chat server 
-    username: function() {
-      this.siteChat.close()
-      this.openChatWebsocket()
-    }
-
   },
+
   async mounted() {
-
-    this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
-    this.$store.dispatch('images/refresh_latest_images')
-
     // Make sure the default instruments are selected at the initial load.
-    await this.$store.dispatch('observatory_configuration/update_config')
-    await this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
-    await this.$store.dispatch('instrument_state/updateStatus')
+    this.$store.dispatch('observatory_configuration/update_config')
+    this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
+    this.$store.dispatch('instrument_state/updateStatus')
+    this.$store.dispatch('images/refresh_latest_images')
 
     // Get the global configuration for all sites from an api call.
     let apiName = this.$store.getters['dev/api'];
@@ -158,23 +144,9 @@ export default {
     setInterval(function() {
       self.timestamp = parseInt(Date.now() / 1000)
     }, 1000)
-
-
-    let onlineUserURL = `https://327l4vns8i.execute-api.us-east-1.amazonaws.com/dev/onlineusers?room=${encodeURIComponent(this.sitecode)}`
-    let headers = {
-      'Content-Type': 'application/json;charset=UTF-8',
-      'Access-Control-Allow-Origin': '*',
-    }
-    axios.get(onlineUserURL).then(response => {
-      console.log(response)
-      this.onlineUsersList = response.data.map(x => x.Username)
-      console.log(this.onlineUsersList)
-    })
-
-    this.openChatWebsocket()
   },
-  computed: {
 
+  computed: {
     // Get the username from Auth0
     username() {
       if (this.$auth.isAuthenticated) {
@@ -182,55 +154,19 @@ export default {
       }
       return "anonymous"
     },
-
-    // Format the displayed list of online users
-    displayedOnlineUsers() {
-      let theList = new Set(this.onlineUsersList) // Remove duplicates
-      theList.delete("anonymous")
-      theList.delete(this.username)
-      if (this.username != "anonymous") {
-        theList.add(`${this.username} (me)`)
-      }
-      return theList
-    }
-
-  },
-
-  beforeDestroy() {
-    this.siteChat.close()
   },
 
   methods: {
-
-    async openChatWebsocket() {
-      let url = "wss://urp0eh13o3.execute-api.us-east-1.amazonaws.com/dev"
-      url += `?room=${encodeURIComponent(this.sitecode)}`
-      url += `&username=${encodeURIComponent(await this.username)}`
-
-      this.siteChat = new ReconnectingWebSocket(url)
-      //this.siteChat.onopen = this.getRecent()
-      this.siteChat.onmessage = (message) => {
-        console.log(message)
-          let data = JSON.parse(message.data);
-
-          // Handle case where incoming message is the online users
-          if ("onlineUsers" in data) {
-            this.onlineUsersList = data.onlineUsers.map(x => x.Username)
-          }
-
-          // Handle case where incoming message is a chat message
-          else {
-            data["messages"].forEach((message) => {
-              //console.log(message)
-              this.messages.push(message)
-            });
-          }
-      }
-
-    }
+    // Format the displayed list of online users
+    makeOnlineUsersList(listOfUsers) {
+      let theList = new Set(listOfUsers) // Remove duplicates
+      theList.delete("anonymous")
+      theList.delete(this.username)
+      if (this.username != "anonymous") theList.add(`${this.username} (me)`)
+      this.displayedOnlineUsers = theList;
+    },
 
   },
-  
 }
 
 </script>
@@ -238,32 +174,28 @@ export default {
 <style lang="css" scoped>
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
 
-.online-users-list > * {
-  padding-left: 1em;
-}
-
 .menu-column {
   border-right: #ddd 1px solid;
-  width: 220px;
+  width: 300px;
   height: auto;
   padding: 0 2em;
 }
 
-.left-status-box {
-  background-color: #232929;
-  width: 100%;
-  height: 500px;
+.subpage-menu {
+  margin-bottom: 3em;
 }
-.left-status-box > * {
-  vertical-align: center;
-  text-align: center;
-  padding-top: 2em;
+.online-users-list {
+  margin-bottom: 3em;
 }
+.online-users-list > * {
+  padding-left: 1em;
+}
+
+
 .page-content {
   margin: 0 1em;
   margin-bottom: 200px;
 }
-
 .page-view {
   /* min height: screen + footer + visual buffer */
   height: calc(100% - 90%);
@@ -277,7 +209,5 @@ footer {
   width: 100%;
 
 }
-
-
 
 </style>

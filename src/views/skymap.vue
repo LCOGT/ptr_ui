@@ -15,7 +15,12 @@
       </b-field>
 
       <b-field label="to send">
-        <b-input size="is-small" v-model="tosend" @keyup.native.enter="postMessage" autocomplete="off"></b-input>
+        <b-input 
+          size="is-small" 
+          v-model="tosend" 
+          @keyup.native.enter="postMessage" 
+          autocomplete="off">
+        </b-input>
         <div class="button" @click="postMessage">Send</div>
       </b-field>
 
