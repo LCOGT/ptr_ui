@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <b-collapse class="card" :open="true">
+        <b-collapse class="card" :open="!isMobile()">
             <div
             slot="trigger" 
             slot-scope="props"
@@ -103,6 +103,13 @@ export default {
     },
     methods: {
 
+        isMobile() {
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                return true
+            } else {
+                return false
+            }
+        },
 
         // Use this method to check if the message belongs to the current user.
         // If so, add a class to make the message appear on the right side. 

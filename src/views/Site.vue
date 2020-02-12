@@ -8,7 +8,7 @@
   <div class="columns">
 
     <!-- Menu for site subpages -->
-    <div class="column is-narrow menu-column">
+    <div class="column is-narrow is-full-mobile menu-column">
       <b-menu class="subpage-menu">
         <b-menu-list label="Menu">
             <b-menu-item 
@@ -175,7 +175,6 @@ export default {
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
 
 .menu-column {
-  border-right: #ddd 1px solid;
   width: 300px;
   height: auto;
   padding: 0 2em;
