@@ -27,6 +27,7 @@
                         <b-field  label="Site">
                             <b-select v-model="site" placeholder="--" >
                                 <option>wmd</option>
+                                <option>saf</option>
                             </b-select>
                         </b-field>
 

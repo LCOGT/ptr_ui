@@ -2,6 +2,7 @@
 
 <template><div class="page">
   
+  <div class="container">
   <section class="page-view">
 
   <div style="height: 3em"></div>
@@ -67,6 +68,7 @@
     </div>
   </div>
   </section>
+  </div>
 
   <footer class="footer">
     <div class="has-text-centered">
@@ -175,8 +177,7 @@ export default {
 .menu-column {
   width: 300px;
   height: auto;
-  padding: 0 2em;
-  padding-right: 11.25px;
+  padding: 0 auto;
 }
 
 .subpage-menu {
@@ -192,19 +193,17 @@ export default {
 
 .page-content {
   margin-bottom: 200px;
-  margin-right: 1em;
 }
 .page-view {
   /* min height: screen + footer + visual buffer */
   height: calc(100% - 90%);
-  max-width: 1200px;
   margin: 0 auto; /* center the main div */
 }
 
 footer {
   position:fixed;
   bottom: 0;
-  width: 100%;
+  width: 100vw;
   padding: 2em 1em 2em; 
 }
 
