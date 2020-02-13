@@ -90,7 +90,6 @@ import SiteObserve from '@/components/SiteObserve'
 import SiteTargets from '@/components/SiteTargets'
 import SiteCalendar from '@/components/SiteCalendar'
 import SiteData from '@/components/SiteData'
-import SiteTopInfoPanel from '@/components/SiteTopInfoPanel'
 import ChatModule from '@/components/ChatModule'
 
 import axios from 'axios';
@@ -106,7 +105,6 @@ export default {
     SiteTargets,
     SiteCalendar,
     SiteData,
-    SiteTopInfoPanel,
     ChatModule,
   },
   props: ['sitecode', 'subpage'],
@@ -178,6 +176,7 @@ export default {
   width: 300px;
   height: auto;
   padding: 0 2em;
+  padding-right: 11.25px;
 }
 
 .subpage-menu {
@@ -192,8 +191,8 @@ export default {
 
 
 .page-content {
-  margin: 0 1em;
   margin-bottom: 200px;
+  margin-right: 1em;
 }
 .page-view {
   /* min height: screen + footer + visual buffer */
@@ -207,7 +206,6 @@ footer {
   bottom: 0;
   width: 100%;
   padding: 2em 1em 2em; 
-
 }
 
 </style>

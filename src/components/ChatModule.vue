@@ -85,7 +85,6 @@ export default {
     watch: {
         sitecode: function () {
             // Reopen the chat websocket with the new site.
-            console.log("new sitecode in chat componenet")
             this.messages = []
             this.siteChat.close()
             this.openChatWebsocket()
@@ -94,7 +93,6 @@ export default {
 
         // If the user changes, we should update the chat server 
         username: function() {
-            console.log("new username in chat componenet")
             this.siteChat.close()
             this.openChatWebsocket()
             this.getOnlineUsers()
