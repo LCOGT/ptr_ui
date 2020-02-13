@@ -18,7 +18,7 @@
               tag="router-link" 
               :to="'/site/'+sitecode+'/home'"></b-menu-item>
             <b-menu-item 
-              icon="camera" 
+              icon="telescope" 
               tag="router-link"
               :to="'/site/' + sitecode + '/observe'" 
               label="Observe"></b-menu-item>

@@ -42,30 +42,43 @@
     </div>
 
     <!-- Controls in the top row above the main view --> 
-    <div class="controls level is-mobile">
+    <div class="controls">
 
-      <div class="level-left left-controls">
-        <button class="button level-item" @click="toggleAnalysis"> <b-icon icon="tune"></b-icon> </button>
-        <button class="button level-item" @click="setLatestImage">latest</button>
-        <button class="button level-item" @click="setPreviousImage"><b-icon icon="arrow-left-bold" /></button>
-        <button class="button level-item" @click="setNextImage"><b-icon icon="arrow-right-bold" /></button>
-        <b-tooltip label="download fits file" position="is-right" type="is-black">
+        <button class="button" @click="toggleAnalysis"> <b-icon icon="tune"></b-icon> </button>
+        <b-field>
+          <p class="control">
+            <b-tooltip label="latest image" position="is-bottom" type="is-black">
+            <button class="button level-item" @click="setLatestImage">
+            <b-icon icon="chevron-double-left"/></button>
+            </b-tooltip>
+          </p>
+          <p class="control">
+            <b-tooltip label="previous image" position="is-bottom" type="is-black">
+            <button class="button level-item" @click="setPreviousImage">
+            <b-icon icon="chevron-left" /></button>
+            </b-tooltip>
+          </p>
+          <p class="control">
+            <b-tooltip label="next image" position="is-bottom" type="is-black">
+            <button class="button level-item" @click="setNextImage">
+            <b-icon icon="chevron-right" /></button>
+            </b-tooltip>
+          </p>
+        </b-field>
+        <!--b-tooltip label="download fits file" position="is-right" type="is-black">
           <a class="button has-text-white" @click="downloadFits13Url(current_image)">
             <b-icon icon="cloud-download" /></a>
-        </b-tooltip>
-      </div>
+        </b-tooltip-->
 
-      <div class="level-right right-controls">
-        <div class="level-item"> <b-field label="subframe active">
+        <div> <b-field label="subframe active">
               <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
           </b-field> </div>
-        <div class="level-item"> <b-field label="subframe visible">
+        <div> <b-field label="subframe visible">
               <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
           </b-field> </div>
-        <div class="level-item"> <b-field label="crosshairs">
+        <div> <b-field label="crosshairs">
               <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
           </b-field> </div>
-      </div>
 
     </div>
 
@@ -575,10 +588,10 @@ export default {
   display: block;
 }
 .controls {
-  margin: 0 auto;
-  max-width: 768px;
   margin-top: 1em;
-  overflow-x: auto;
+  display: flex;
+  justify-content: space-between;
+  overflow-y: visible;
 }
 
 .image-div {
