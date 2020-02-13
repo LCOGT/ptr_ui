@@ -548,6 +548,7 @@ import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
 import ScriptSettings from '@/components/ScriptSettings'
 import TheDomeCam from '@/components/TheDomeCam'
 import SideInfoPanel from '@/components/SideInfoPanel'
+import ReconnectingWebSocket from 'reconnecting-websocket'
 
 
 export default {
@@ -598,6 +599,20 @@ export default {
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_status_interval = setInterval(this.update_status, 3000)
     this.update_time_interval = setInterval(this.update_time, 1000)
+
+
+    // Listen for new images, and refresh the list when a new image arrives.
+    this.$store.dispatch('images/refresh_latest_images')
+    this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
+    this.imageSubscriber.onmessage = (message) => {
+      let data = JSON.parse(message.data);
+      data["messages"].forEach((message) => {
+        console.log("new image: ",message)
+        // Refresh the image list
+        this.$store.dispatch('images/refresh_latest_images')
+      });
+    }
+
   },
   
   beforeDestroy() {
@@ -614,8 +629,6 @@ export default {
     update_status() {
       // Dispatch the vuex action that refreshes the site status. 
       this.$store.dispatch('instrument_state/updateStatus')
-      // Refresh the image list
-      this.$store.dispatch('images/refresh_latest_images')
     },
 
     update_time() {
