@@ -95,11 +95,15 @@ export default {
                         console.log('ERROR')
                         console.log(error)
                     });
+
+                    /* TESTING new jobs architecture */
                     const options = await this.getConfigWithAuth()
                     console.log('options', options)
                     form.site=this.data.site
                     form.mount=this.data.mount
                     axios.post("https://jobs.photonranch.org/jobs/newjob",form, options).then(console.warn).catch(e => {console.warn(e)})
+                    /* END of testing new jobs architecture */
+
                     break;
                 case 'PUT':
                     axios.put(apiName+path, myInit).then(response => {

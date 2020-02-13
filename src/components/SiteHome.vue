@@ -4,14 +4,14 @@
     <br>
 
     <div class="quick-status">
-        quick telescope status/info 
+        quick telescope status/info will be shown here
     </div>
     <br>
 
     <div style="height: 2em;" />
 
 
-    <div class="tile">
+    <!--div class="tile">
       <div class="tile is-4 is-parent is-vertical">
 
         <article class="tile is-child notification">
@@ -60,7 +60,7 @@
                 @click="isImageModalActive = true" 
                 >
                 <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
-                <img
+                <!--img
                     v-bind:src="current_image.jpg13_url" 
                     class="preview-image" />
             </div>
@@ -68,7 +68,7 @@
             <b-modal :active.sync="isImageModalActive" :width="800">
                 <p class="image">
                     <!--img v-bind:src="current_image.url"-->
-                    <image-view :site="sitecode"/>
+                    <!--image-view :site="sitecode"/>
                 </p>
             </b-modal>
             <br>
@@ -76,7 +76,7 @@
         </article>
 
       </div>
-    </div>
+    </div-->
 
     <br>
 
@@ -122,7 +122,6 @@ export default {
 
 .quick-status {
     background-color: #232929;
-    width: 100%;
     height: 5em;
     text-align: center;
     vertical-align: middle;

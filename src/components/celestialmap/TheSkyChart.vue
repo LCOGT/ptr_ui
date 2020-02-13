@@ -387,14 +387,8 @@ export default {
         }, 
     },
 
-    //beforeDestroy() {
-    //    Celestial.clear()
-    //},
 }
 </script>
 
 <style scoped>
-#celestial-map {
-    width: 100%;
-}
 </style>

@@ -1,506 +1,537 @@
 
 
-<template><div class="wrapper container">
+<template><div class="wrapper container"><div class="columns">
 
-  <button class="button" @click="isDeviceSelectorActive = !isDeviceSelectorActive">Select Devices</button>
-  <div style="height: 1em"/>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Mount</th>
-        <th>Telescope</th>
-        <th>Camera</th>
-        <th>Filter Wheel</th>
-        <th>Focuser</th>
-        <th>Rotator</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>{{active_mount}}</td>
-        <td>{{active_telescope}}</td>
-        <td>{{active_camera}}</td>
-        <td>{{active_filter_wheel}}</td>
-        <td>{{active_focuser}}</td>
-        <td>{{active_rotator}}</td>
-      </tr>
-    </tbody>
-  </table>
+<div class="column is-two-thirds content-column">
 
+  <b-tabs :destroy-on-hide="true" :animated="false">
+    <b-tab-item label="Enclosure">
+      <div class="" style="background: #ff0044; padding: 2em;">
+          <div class="title">Enclosure</div>
 
-  <!-- Select the active devices here -->
-  <b-modal :active.sync="isDeviceSelectorActive" :width="640">
-  <article class="instrument-selection message">
-    <div class="message-header">Device Selection</div>
-    <div class="message-body">
-    <!-- Mount Selection -->
-    <b-field horizontal class="select-device" label="Mount">
-        <b-select 
-          placeholder="choose mount..." 
-          default="" 
-          v-model="active_mount"
-        >
-          <option 
-            v-for="(mount, index) in available_mounts" 
-            v-bind:value="mount"
-            v-bind:key="`mount-${index}`"
-          >
-            {{ mount }}
-          </option>
-        </b-select>
-    </b-field>
+          <command-button :data="enclosure_open_command" style="margin-bottom: 1em;" class="is-small"/>
+          <command-button :data="enclosure_close_command" style="margin-bottom: 1em;" class="is-small"/>
+          <br>
 
-    <!-- Telescope Selection -->
-    <b-field horizontal class="select-device" label="Telescope">
-        <b-select 
-          placeholder="choose telescope..." 
-          default="" 
-          v-model="active_telescope"
-        >
-          <option 
-            v-for="(ota, index) in available_telescopes" 
-            v-bind:value="ota"
-            v-bind:key="`ota-${index}`"
-          >
-            {{ ota }}
-          </option>
-        </b-select>
-    </b-field>
-    
-    <!-- Camera Selection -->
-    <b-field horizontal class="select-device" label="Camera">
-        <b-select 
-          placeholder="choose camera..." 
-          default="" 
-          v-model="active_camera"
-        >
-          <option 
-            v-for="(cam, index) in available_cameras" 
-            v-bind:value="cam"
-            v-bind:key="`cam-${index}`"
-          >
-            {{ cam }}
-          </option>
-        </b-select>
-    </b-field>
+      </div>
 
-    <!-- Filter Wheel Selection -->
-    <b-field horizontal class="select-device" label="Filters">
-        <b-select 
-          placeholder="choose filter wheel..." 
-          default="" 
-          v-model="active_filter_wheel"
-        >
-          <option 
-            v-for="(filter_wheel, index) in available_filter_wheels" 
-            v-bind:value="filter_wheel"
-            v-bind:key="`filter_wheel-${index}`"
-          >
-            {{ filter_wheel }}
-          </option>
-        </b-select>
-    </b-field>
+    </b-tab-item> 
+    <b-tab-item label="Telescope">
+      <div class="" style="background: #ff0044; padding: 2em;">
+          <div class="title">Telescope</div>
 
-    <!-- Focuser Selection -->
-    <b-field horizontal class="select-device" label="Focuser">
-        <b-select 
-          placeholder="choose focuser..." 
-          default="" 
-          v-model="active_focuser"
-        >
-          <option 
-            v-for="(focuser, index) in available_focusers" 
-            v-bind:value="focuser"
-            v-bind:key="`focuser-${index}`"
-          >
-            {{ focuser }}
-          </option>
-        </b-select>
-    </b-field>
-
-    <!-- Rotator Selection -->
-    <b-field horizontal class="select-device" label="Rotator">
-        <b-select 
-          placeholder="choose rotator..." 
-          default="" 
-          v-model="active_rotator"
-        >
-          <option 
-            v-for="(rotator, index) in available_rotators" 
-            v-bind:value="rotator"
-            v-bind:key="`rotator-${index}`"
-          >
-            {{ rotator }}
-          </option>
-        </b-select>
-    </b-field>
-
-    <b-field horizontal class="select-device" label="">
-      <button class="button is-success" @click="isDeviceSelectorActive = false">Submit</button>
-    </b-field>
-  </div>
-
-  </article>
-  </b-modal>
-  
-  <!-- Device control input fields -->
-  <div class="columns">
-
-    <!-- Mount Controls -->
-    <div class="column is-full" style="padding: 0">
-    <div class="" style="background: #ff0044; padding: 2em;">
-        <div class="title">Telescope</div>
-
-        <b-field horizontal label="Ra">
-          <b-input name="subject" size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
-        </b-field>
-        <b-field horizontal label="Dec">
-          <b-input name="subject" size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
-        </b-field>
-
-        <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>
-        <br>
-
-        <b-dropdown aria-role="list" style="width: 100%;" size="is-small">
-          <button class="button is-small" slot="trigger" style="width: 100%;">
-              <span>Slew to...</span>
-              <b-icon icon="menu-down"></b-icon>
-          </button>
-          <b-dropdown-item aria-role="listitem">
-            <command-button :data="mount_slew_chart_command" class="dropdown-button-command is-small"/>
-          </b-dropdown-item>
-          <b-dropdown-item>
-            <command-button :data="mount_screenflat_command" class="dropdown-button-command is-small"/>
-          </b-dropdown-item>
-          <b-dropdown-item>
-            <command-button :data="mount_skyflat_command" class="dropdown-button-command is-small"/>
-          </b-dropdown-item>
-          <b-dropdown-item>
-            <command-button :data="mount_home_command" class="dropdown-button-command is-small"/>
-          </b-dropdown-item>
-          <b-dropdown-item>
-            <command-button :data="mount_park_command" class="dropdown-button-command is-small"/>
-          </b-dropdown-item>
-          <b-dropdown-item>
-            <command-button :data="mount_raSidDec0_command" class="dropdown-button-command is-small"/>
-          </b-dropdown-item>
-          <b-dropdown-item>
-            <command-button :data="mount_stop_command" class="dropdown-button-command is-small"/>
-          </b-dropdown-item>
-        </b-dropdown>
-    </div>
-
-    <div class="status-toggle-bar" @click="isMountStatusVisible = !isMountStatusVisible">toggle status</div>
-    <pre v-if="isMountStatusVisible">
-      <simple-device-status :device_name="active_mount" device_type="Mount" :device_status="mount_state" />
-      <simple-device-status :device_name="active_telescope" device_type="Telescope" :device_status="telescope_state" />
-    </pre>
-
-    </div>
-
-    <!-- Buttons for camera controls -->
-    <div class="column is-full" style="padding: 0">
-    <div style="background:orangered; padding: 2em;">
-        <div class="title">Camera + Filter</div>
-
-        <b-field horizontal label="Expose">
-            <b-field>
-                <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
-                <p class="control"> <span class="button is-static is-small">s</span> </p>
-            </b-field>
-        </b-field>
-
-        <b-field horizontal label="Count">
-            <b-field>
-                <b-numberinput name="subject" type="is-light" min="1" size="is-small" controls-position="compact" v-model="camera_count" autocomplete="off"></b-numberinput>
-            </b-field>
-        </b-field>
-
-
-        <b-field horizontal label="Filter">
-            <!--b-select placeholder="Select filter" v-model="cam_filter" style="width: 100%">
-                <option value="LUMINANCE">luminance</option>
-                <option value="RED">red</option>
-                <option value="GREEN">green</option>
-                <option value="BLUE">blue</option>
-            </b-select-->
-
-            <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" size="is-small" style="width: 100%">
-              <option 
-                v-for="(filter, index) in filter_wheel_options"
-                v-bind:value="filter[0]" 
-                v-bind:selected="index === 0"
-                v-bind:key="index"
-                >
-                {{ filter[0] }}
-              </option>
-            </b-select>
-
-            <div class="buttons has-addons">
-              <command-button :data="filter_wheel_command" style="width: 50%" class="is-small"/>
-              <command-button :data="filter_wheel_home_command" style="width: 50%" class="is-small" />
-            </div>
-        </b-field>
-
-        <b-field horizontal label="Bin" v-if="camera_can_bin">
-          <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
-            <option
-              v-for="(bin_option, index) in camera_bin_options"
-              v-bind:value="bin_option"
-              v-bind:selected="index === 0"
-              v-bind:key="index"
-              >
-              {{ bin_option }}
-            </option>
-          </b-select>
-        </b-field>
-
-        <b-field horizontal label="Area" v-if="camera_areas.length != 0">
-            <b-select 
-              placeholder="Select chip area" 
-              v-model="camera_areas_selection" 
-              style="width: 100%"
-              size="is-small"
-              >
-              <option
-                v-for="(area, index) in camera_areas"
-                v-bind:value="area"
-                v-bind:selected="index === 0"
-                v-bind:key="index"
-                >
-                {{ area }}
-              </option>
-            </b-select>
-        </b-field>
-  
-        <b-field horizontal label="Subframe">
-          <p>{{ subframeIsActive ? "Active" : "Not Active"}}</p>
-          <p>({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
-          <button class="button is-small" v-if="subframeIsActive" @click="function(){subframeIsActive = false}"> deactivate </button>
-          <button class="button is-small" v-if="!subframeIsActive" @click="function(){subframeIsActive = true}"> activate </button>
-        </b-field>
-
-
-        <b-field horizontal label="Image Type">
-          <b-select placeholder="Select image type" v-model="camera_image_type" size="is-small">
-            <option
-              v-for="(image_type, index) in camera_image_type_options"
-              v-bind:value="image_type"
-              v-bind:selected="index === 0"
-              v-bind:key="index"
-              >
-              {{ image_type }}
-            </option>
-          </b-select>
-        </b-field>
-
-        <b-field horizontal label="Dither">
-          <b-checkbox
-            v-model="camera_dither"
-            true-value="on"
-            false-value="off"
-            >
-            {{ camera_dither }}
-          </b-checkbox>
-        </b-field>
-
-        <b-field horizontal label="Hint">
-          <b-input placeholder="a hint for the FITS header..."
-            type="text"
-            min="0"
-            max="64"
-            size="is-small"
-            v-model="camera_hint">
-          </b-input>
-        </b-field>
-
-        <br>
-        <div class="buttons has-addons">
-          <command-button :data="camera_expose_command" style="width: 70%" class="is-small"/>
-          <command-button :data="camera_cancel_command" style="width: 30%" class="is-small"/>
-        </div>
-
-    </div>
-
-    <div style="background:orangered; padding: 2em; margin-top: 10px;">
-        <div class="title">Sequencer</div>
-
-        <b-field label="Script">
-          <b-field>
-            <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
-              <option value="none">none</option>
-              <option value="stop_script">Stop Script</option>
-              <option value="focus_auto">Focus Auto</option>
-              <option value="focus_fine">Focus Fine</option>
-              <option value="focus_vcurve">Focus V-Curve</option>
-              <option value="takeLRGBStack">Take LRGB Stack</option>
-              <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
-              <option value="takeUGRIZSStack">Take ugrizs Stack</option>
-              <option value="takePlanetStack">Take Planet Stack</option>
-              <option value="takeLunarStack">Take Lunar Stack</option>
-              <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
-              <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
-              <option value="take_pre-open_calibrations">Take Pre-open Calibrations</option>
-              <option value="takeSkyFlats">Take SkyFlats</option>
-              <option value="find_field_center">Find Field Center</option>
-              <option value="calibrate_focus_v-curve">Calibrate Focus V-curve</option>
-              <option value="32_target_pointing_run">32 Target Pointing Run</option>
-              <option value="128_target_pointing_run">128 Target Pointing Run</option>
-              <option value="run_using_acp">Run Using ACP</option>
-              <option value="stop_using_acp">Stop Using ACP</option>
-            </b-select>
-            <p class="control">
-              <button 
-                class="button is-light is-small" 
-                :disabled="!scriptHasSettings"
-                @click="isScriptSettingsActive = true"
-                >
-                <b-icon icon="settings"></b-icon>
-              </button>
-            </p>
+          <b-field horizontal label="Ra">
+            <b-input name="subject" size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
           </b-field>
-        </b-field>
+          <b-field horizontal label="Dec">
+            <b-input name="subject" size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
+          </b-field>
 
-        <b-modal :active.sync="isScriptSettingsActive" has-modal-card>
-            <script-settings :script="selected_script" />
-        </b-modal>
+          <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>
+          <br>
 
-        <div class="status-item">
-          <div class="title2">Sequencer Status</div>
-          <pre>{{ sequencer_state }}</pre>
-        </div>
-
-        <div class="buttons has-addons">
-          <button class="button is-small" @click="script_run_command" style="width: 70%;"> run script</button>
-          <button class="button is-small" @click="script_stop_command" style="width: 30%"> stop script</button>
-        </div>
-
-    </div>
-
-    <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">toggle status</div>
-    <pre v-if="isCameraStatusVisible">
-      <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
-      <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
-    </pre>
-
-    </div>
-
-    <!-- Other controls -->
-    <div class="column is-full" style="padding: 0">
-    <div style="background:#ff8800; padding: 2em;">
-        <div class="title">Focuser</div>
-
-          <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
+          <b-dropdown aria-role="list" style="width: 100%;" size="is-small">
             <button class="button is-small" slot="trigger" style="width: 100%;">
-                <span>Focus Action...</span>
+                <span>Slew to...</span>
                 <b-icon icon="menu-down"></b-icon>
             </button>
             <b-dropdown-item aria-role="listitem">
-              <command-button :data="focus_home_command" class="dropdown-button-command"/>
+              <command-button :data="mount_slew_chart_command" class="dropdown-button-command is-small"/>
             </b-dropdown-item>
             <b-dropdown-item>
-              <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
+              <command-button :data="mount_screenflat_command" class="dropdown-button-command is-small"/>
             </b-dropdown-item>
             <b-dropdown-item>
-              <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
+              <command-button :data="mount_skyflat_command" class="dropdown-button-command is-small"/>
             </b-dropdown-item>
             <b-dropdown-item>
-              <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
+              <command-button :data="mount_home_command" class="dropdown-button-command is-small"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="mount_park_command" class="dropdown-button-command is-small"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="mount_raSidDec0_command" class="dropdown-button-command is-small"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="mount_stop_command" class="dropdown-button-command is-small"/>
             </b-dropdown-item>
           </b-dropdown>
-          <br>
-
-          <b-field label="Relative">
-            <b-field>
-              <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
-              <p class="control"> <command-button :data="focus_relative_command" class="is-small"/>  </p><br>
-            </b-field>
-          </b-field>
-
-          <b-field label="Absolute">
-            <b-field>
-              <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
-              <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
-            </b-field>
-          </b-field>
-          <br>
-
-        <div class="title">Rotator</div>
-          <command-button :data="rotate_home_command" class="is-small"/>
-          <br>
-          <b-field label="Relative">
-            <b-field>
-              <b-input expanded size="is-small" name="subject" v-model="rotator_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
-              <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
-            </b-field>
-          </b-field>
-          <b-field label="Absolute">
-            <b-field>
-              <b-input expanded size="is-small" name="subject" v-model="rotator_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
-              <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
-            </b-field>
-          </b-field>
-          <br>
-
-        <div class="title">Flat Screen</div>
-          <b-field label="Brightness">
-            <b-field>
-              <b-input expanded size="is-small" name="subject" v-model="screen_brightness" type="number" :step="1" min="0" max="100" autocomplete="off"></b-input>
-              <command-button :data="screen_on_command" class="is-small control" />
-              <command-button :data="screen_off_command" class="is-small control" /> 
-            </b-field>
-          </b-field>
-
-    </div>
-
-    <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">toggle status</div>
-    <pre v-if="isFocuserStatusVisible">
-      <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
-      <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
-      <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
-    </pre>
-    </div>
-
-    <!-- Verify expected data in this column. -->
-    <div class="column is-full" style="padding: 0">
-      <div style="background: orange; padding: 2em;">
-          <div class="title">Image</div>
-          <button class="button is-small" @click="refresh_latest_image" style="margin-bottom: 1em;">latest image</button>
-          <br>
-          <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
-              <img
-                  v-bind:src="current_image.jpg13_url" 
-                  @click="isImageModalActive = true" 
-                  style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
-          </div>
-          <b-modal :active.sync="isImageModalActive" :width="800">
-              <p class="image">
-                  <image-view :site="active_site" />
-              </p>
-          </b-modal>
-          <div>Filename:</div>
-          <div>{{current_image.base_filename}}</div>
-          <br>
       </div>
-      <div style="background-color: #282f2f; padding: 2em;">
-        <p class="heading">Status Age: </p>
-        <p class="has-text-weight-semibold is-size-5">
+
+      <div class="status-toggle-bar" @click="isMountStatusVisible = !isMountStatusVisible">toggle status</div>
+      <pre v-if="isMountStatusVisible">
+        <simple-device-status :device_name="active_mount" device_type="Mount" :device_status="mount_state" />
+        <simple-device-status :device_name="active_telescope" device_type="Telescope" :device_status="telescope_state" />
+      </pre>
+
+      <div class="choose-target" id="skychart-box">
+        <the-sky-chart />
+      </div>
+
+    </b-tab-item>
+    <b-tab-item label="Camera">
+
+      <div style="background:orangered; padding: 2em;">
+      <div class="title">Camera + Filter</div>
+
+      <b-field horizontal label="Expose">
+          <b-field>
+              <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
+              <p class="control"> <span class="button is-static is-small">s</span> </p>
+          </b-field>
+      </b-field>
+
+      <b-field horizontal label="Count">
+          <b-field>
+              <b-numberinput name="subject" type="is-light" min="1" size="is-small" controls-position="compact" v-model="camera_count" autocomplete="off"></b-numberinput>
+          </b-field>
+      </b-field>
+
+
+      <b-field horizontal label="Filter">
+          <!--b-select placeholder="Select filter" v-model="cam_filter" style="width: 100%">
+              <option value="LUMINANCE">luminance</option>
+              <option value="RED">red</option>
+              <option value="GREEN">green</option>
+              <option value="BLUE">blue</option>
+          </b-select-->
+
+          <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" size="is-small" style="width: 100%">
+            <option 
+              v-for="(filter, index) in filter_wheel_options"
+              v-bind:value="filter[0]" 
+              v-bind:selected="index === 0"
+              v-bind:key="index"
+              >
+              {{ filter[0] }}
+            </option>
+          </b-select>
+
+          <div class="buttons has-addons">
+            <command-button :data="filter_wheel_command" style="width: 50%" class="is-small"/>
+            <command-button :data="filter_wheel_home_command" style="width: 50%" class="is-small" />
+          </div>
+      </b-field>
+
+      <b-field horizontal label="Bin" v-if="camera_can_bin">
+        <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
+          <option
+            v-for="(bin_option, index) in camera_bin_options"
+            v-bind:value="bin_option"
+            v-bind:selected="index === 0"
+            v-bind:key="index"
+            >
+            {{ bin_option }}
+          </option>
+        </b-select>
+      </b-field>
+
+      <b-field horizontal label="Area" v-if="camera_areas.length != 0">
+          <b-select 
+            placeholder="Select chip area" 
+            v-model="camera_areas_selection" 
+            style="width: 100%"
+            size="is-small"
+            >
+            <option
+              v-for="(area, index) in camera_areas"
+              v-bind:value="area"
+              v-bind:selected="index === 0"
+              v-bind:key="index"
+              >
+              {{ area }}
+            </option>
+          </b-select>
+      </b-field>
+
+      <b-field horizontal label="Subframe">
+        <p>{{ subframeIsActive ? "Active" : "Not Active"}}</p>
+        <p>({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
+        <button class="button is-small" v-if="subframeIsActive" @click="function(){subframeIsActive = false}"> deactivate </button>
+        <button class="button is-small" v-if="!subframeIsActive" @click="function(){subframeIsActive = true}"> activate </button>
+      </b-field>
+
+
+      <b-field horizontal label="Image Type">
+        <b-select placeholder="Select image type" v-model="camera_image_type" size="is-small">
+          <option
+            v-for="(image_type, index) in camera_image_type_options"
+            v-bind:value="image_type"
+            v-bind:selected="index === 0"
+            v-bind:key="index"
+            >
+            {{ image_type }}
+          </option>
+        </b-select>
+      </b-field>
+
+      <b-field horizontal label="Dither">
+        <b-checkbox
+          v-model="camera_dither"
+          true-value="on"
+          false-value="off"
+          >
+          {{ camera_dither }}
+        </b-checkbox>
+      </b-field>
+
+      <b-field horizontal label="Hint">
+        <b-input placeholder="a hint for the FITS header..."
+          type="text"
+          min="0"
+          max="64"
+          size="is-small"
+          v-model="camera_hint">
+        </b-input>
+      </b-field>
+
+      <br>
+      <div class="buttons has-addons">
+        <command-button :data="camera_expose_command" style="width: 70%" class="is-small"/>
+        <command-button :data="camera_cancel_command" style="width: 30%" class="is-small"/>
+      </div>
+      </div>
+      <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">toggle status</div>
+      <pre v-if="isCameraStatusVisible">
+        <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
+        <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
+      </pre>
+
+    </b-tab-item>
+    <b-tab-item label="Sequencer">
+
+      <div style="background:orangered; padding: 2em; margin-top: 10px;">
+          <div class="title">Sequencer</div>
+
+          <b-field label="Script">
+            <b-field>
+              <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
+                <option value="none">none</option>
+                <option value="stop_script">Stop Script</option>
+                <option value="focus_auto">Focus Auto</option>
+                <option value="focus_fine">Focus Fine</option>
+                <option value="focus_vcurve">Focus V-Curve</option>
+                <option value="takeLRGBStack">Take LRGB Stack</option>
+                <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
+                <option value="takeUGRIZSStack">Take ugrizs Stack</option>
+                <option value="takePlanetStack">Take Planet Stack</option>
+                <option value="takeLunarStack">Take Lunar Stack</option>
+                <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
+                <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
+                <option value="take_pre-open_calibrations">Take Pre-open Calibrations</option>
+                <option value="takeSkyFlats">Take SkyFlats</option>
+                <option value="find_field_center">Find Field Center</option>
+                <option value="calibrate_focus_v-curve">Calibrate Focus V-curve</option>
+                <option value="32_target_pointing_run">32 Target Pointing Run</option>
+                <option value="128_target_pointing_run">128 Target Pointing Run</option>
+                <option value="run_using_acp">Run Using ACP</option>
+                <option value="stop_using_acp">Stop Using ACP</option>
+              </b-select>
+              <p class="control">
+                <button 
+                  class="button is-light is-small" 
+                  :disabled="!scriptHasSettings"
+                  @click="isScriptSettingsActive = true"
+                  >
+                  <b-icon icon="settings"></b-icon>
+                </button>
+              </p>
+            </b-field>
+          </b-field>
+
+          <b-modal :active.sync="isScriptSettingsActive" has-modal-card>
+              <script-settings :script="selected_script" />
+          </b-modal>
+
+          <div class="status-item">
+            <div class="title2">Sequencer Status</div>
+            <pre>{{ sequencer_state }}</pre>
+          </div>
+
+          <div class="buttons has-addons">
+            <button class="button is-small" @click="script_run_command" style="width: 70%;"> run script</button>
+            <button class="button is-small" @click="script_stop_command" style="width: 30%"> stop script</button>
+          </div>
+
+      </div>
+
+      <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">toggle status</div>
+      <pre v-if="isCameraStatusVisible">
+        <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
+        <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
+      </pre>
+
+    </b-tab-item>
+    <b-tab-item label="Other">
+
+      <div class="column is-full" style="padding: 0">
+      <div style="background:#ff8800; padding: 2em;">
+          <div class="title">Focuser</div>
+
+            <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
+              <button class="button is-small" slot="trigger" style="width: 100%;">
+                  <span>Focus Action...</span>
+                  <b-icon icon="menu-down"></b-icon>
+              </button>
+              <b-dropdown-item aria-role="listitem">
+                <command-button :data="focus_home_command" class="dropdown-button-command"/>
+              </b-dropdown-item>
+              <b-dropdown-item>
+                <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
+              </b-dropdown-item>
+              <b-dropdown-item>
+                <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
+              </b-dropdown-item>
+              <b-dropdown-item>
+                <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
+              </b-dropdown-item>
+            </b-dropdown>
+            <br>
+
+            <b-field label="Relative">
+              <b-field>
+                <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
+                <p class="control"> <command-button :data="focus_relative_command" class="is-small"/>  </p><br>
+              </b-field>
+            </b-field>
+
+            <b-field label="Absolute">
+              <b-field>
+                <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+                <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
+              </b-field>
+            </b-field>
+            <br>
+
+          <div class="title">Rotator</div>
+            <command-button :data="rotate_home_command" class="is-small"/>
+            <br>
+            <b-field label="Relative">
+              <b-field>
+                <b-input expanded size="is-small" name="subject" v-model="rotator_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+                <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
+              </b-field>
+            </b-field>
+            <b-field label="Absolute">
+              <b-field>
+                <b-input expanded size="is-small" name="subject" v-model="rotator_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+                <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
+              </b-field>
+            </b-field>
+            <br>
+
+          <div class="title">Flat Screen</div>
+            <b-field label="Brightness">
+              <b-field>
+                <b-input expanded size="is-small" name="subject" v-model="screen_brightness" type="number" :step="1" min="0" max="100" autocomplete="off"></b-input>
+                <command-button :data="screen_on_command" class="is-small control" />
+                <command-button :data="screen_off_command" class="is-small control" /> 
+              </b-field>
+            </b-field>
+
+      </div>
+
+      <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">toggle status</div>
+      <pre v-if="isFocuserStatusVisible">
+        <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
+        <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
+        <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
+      </pre>
+      </div>
+    </b-tab-item>
+    <b-tab-item icon="settings">
+
+      <button class="button" @click="isDeviceSelectorActive = !isDeviceSelectorActive">Select Devices</button>
+      <div style="height: 1em"/>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Mount</th>
+            <th>Telescope</th>
+            <th>Camera</th>
+            <th>Filter Wheel</th>
+            <th>Focuser</th>
+            <th>Rotator</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{active_mount}}</td>
+            <td>{{active_telescope}}</td>
+            <td>{{active_camera}}</td>
+            <td>{{active_filter_wheel}}</td>
+            <td>{{active_focuser}}</td>
+            <td>{{active_rotator}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Select the active devices here -->
+      <b-modal :active.sync="isDeviceSelectorActive" :width="640">
+      <article class="instrument-selection message">
+        <div class="message-header">Device Selection</div>
+        <div class="message-body">
+        <!-- Mount Selection -->
+        <b-field horizontal class="select-device" label="Mount">
+            <b-select 
+              placeholder="choose mount..." 
+              default="" 
+              v-model="active_mount"
+            >
+              <option 
+                v-for="(mount, index) in available_mounts" 
+                v-bind:value="mount"
+                v-bind:key="`mount-${index}`"
+              >
+                {{ mount }}
+              </option>
+            </b-select>
+        </b-field>
+
+        <!-- Telescope Selection -->
+        <b-field horizontal class="select-device" label="Telescope">
+            <b-select 
+              placeholder="choose telescope..." 
+              default="" 
+              v-model="active_telescope"
+            >
+              <option 
+                v-for="(ota, index) in available_telescopes" 
+                v-bind:value="ota"
+                v-bind:key="`ota-${index}`"
+              >
+                {{ ota }}
+              </option>
+            </b-select>
+        </b-field>
+        
+        <!-- Camera Selection -->
+        <b-field horizontal class="select-device" label="Camera">
+            <b-select 
+              placeholder="choose camera..." 
+              default="" 
+              v-model="active_camera"
+            >
+              <option 
+                v-for="(cam, index) in available_cameras" 
+                v-bind:value="cam"
+                v-bind:key="`cam-${index}`"
+              >
+                {{ cam }}
+              </option>
+            </b-select>
+        </b-field>
+
+        <!-- Filter Wheel Selection -->
+        <b-field horizontal class="select-device" label="Filters">
+            <b-select 
+              placeholder="choose filter wheel..." 
+              default="" 
+              v-model="active_filter_wheel"
+            >
+              <option 
+                v-for="(filter_wheel, index) in available_filter_wheels" 
+                v-bind:value="filter_wheel"
+                v-bind:key="`filter_wheel-${index}`"
+              >
+                {{ filter_wheel }}
+              </option>
+            </b-select>
+        </b-field>
+
+        <!-- Focuser Selection -->
+        <b-field horizontal class="select-device" label="Focuser">
+            <b-select 
+              placeholder="choose focuser..." 
+              default="" 
+              v-model="active_focuser"
+            >
+              <option 
+                v-for="(focuser, index) in available_focusers" 
+                v-bind:value="focuser"
+                v-bind:key="`focuser-${index}`"
+              >
+                {{ focuser }}
+              </option>
+            </b-select>
+        </b-field>
+
+        <!-- Rotator Selection -->
+        <b-field horizontal class="select-device" label="Rotator">
+            <b-select 
+              placeholder="choose rotator..." 
+              default="" 
+              v-model="active_rotator"
+            >
+              <option 
+                v-for="(rotator, index) in available_rotators" 
+                v-bind:value="rotator"
+                v-bind:key="`rotator-${index}`"
+              >
+                {{ rotator }}
+              </option>
+            </b-select>
+        </b-field>
+
+        <b-field horizontal class="select-device" label="">
+          <button class="button is-success" @click="isDeviceSelectorActive = false">Submit</button>
+        </b-field>
+      </div>
+
+      </article>
+      </b-modal>
+
+    </b-tab-item>
+  </b-tabs>
+
+</div>
+
+<div class="column info-column">
+
+  <div style="margin-top: 2em;"/>
+  <side-info-panel :title="'Status'" :startOpen="false">
+    <div slot="title">
+      <p>Status - 
+      <span class="">
         <span v-if="status_age < 15" style="color: lightgreen;"> {{' < 15 seconds old'}} </span>
         <span v-else-if="status_age < 120" style="color: yellow;">{{' < 2 minutes old'}}</span>
         <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+' minutes old'}}</span>
         <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+' hours old'}}</span>
         <span v-else-if="status_age < 18000*86400" style="color:red;">{{(status_age/86400).toFixed(0)+' days old'}}</span>
         <span v-else-if="status_age > 18000*86400" style="color:red;">{{'unavailable'}}</span>
-        </p>
-      </div>
+      </span>
+    </p>
     </div>
+  </side-info-panel>
 
-  </div>
+  <side-info-panel  :title="'Webcam'">
+    <p slot="title">Webcam</p>
+    <the-dome-cam v-if="sitecode=='wmd'"/>
+  </side-info-panel>
 
-  <div class="choose-target">
-    <the-sky-chart />
-  </div>
+  <side-info-panel :startOpen="true" :title="'Image Preview'">
+    <p slot="title">Image Preview</p>
+    <!--button class="button is-small" @click="refresh_latest_image" style="margin-bottom: 1em;">latest image</button-->
+    <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
+        <img
+            v-bind:src="current_image.jpg13_url" 
+            @click="isImageModalActive = true" 
+            style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
+    </div>
+    <b-modal :active.sync="isImageModalActive" :width="800">
+        <p class="image">
+            <image-view :site="active_site" />
+        </p>
+    </b-modal>
+    <div>{{current_image.base_filename}}</div>
+  </side-info-panel>
 
+
+
+</div>
+
+</div>
 </div></template>
 
 <script>
@@ -515,6 +546,8 @@ import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import ImageView from '@/components/ImageView'
 import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
 import ScriptSettings from '@/components/ScriptSettings'
+import TheDomeCam from '@/components/TheDomeCam'
+import SideInfoPanel from '@/components/SideInfoPanel'
 
 
 export default {
@@ -525,6 +558,8 @@ export default {
     ImageView,
     SimpleDeviceStatus,
     ScriptSettings,
+    TheDomeCam,
+    SideInfoPanel,
   },
   mixins: [commands_mixin],
   props: ['sitecode'],
@@ -553,21 +588,11 @@ export default {
     }
   },
 
-  async created() {
+  created() {
 
-    //// Make sure we're using the latest site configuration.
-    // var that = this;
-    //this.$store.dispatch('observatory_configuration/update_config').then(function() {
-
-      //// Default site/device values.
-      //that.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
-      //that.$store.dispatch('instrument_state/updateStatus')
-
-    //}())
-    
-    await this.$store.dispatch('observatory_configuration/update_config')
-    await this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
-    await this.$store.dispatch('instrument_state/updateStatus')
+    this.$store.dispatch('observatory_configuration/update_config')
+    this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
+    this.$store.dispatch('instrument_state/updateStatus')
 
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
@@ -581,6 +606,7 @@ export default {
 
 
   methods: {
+
     /**
     * Update status by requesting data from dynamodb via vuex.
     * This function is called regularly in the `created` lifecycle hook.
@@ -705,6 +731,11 @@ export default {
 </script>
 
 <style scoped>
+.content-column {
+}
+.info-column {
+  margin-top: 2em;
+}
 .panel-content {
   margin: 1em;
 }
@@ -713,17 +744,6 @@ export default {
   background-color: rgba(20,20,20,0.9)
 }
 
-.columns {
-  margin: 0em;
-  flex-wrap: wrap;
-}
-.column {
-  margin: 5px;
-  padding: 2em;
-  margin-top: 4em;
-  display: flex;
-  flex-direction:column;
-}
 .status-toggle-bar {
   height: 1.5em;
   background-color: grey;
@@ -745,14 +765,7 @@ export default {
   flex: 1;
 }
 .choose-target {
-  margin: 1em;
-  padding: 1em;
-  display: grid;
-  grid-template-columns: 1fr 0fr;
-}
-.choose-target-item {
-  height: width;
-  margin: 1em;
+  margin-top: 1em;
 }
 .label {
   color: #dbdee0;
