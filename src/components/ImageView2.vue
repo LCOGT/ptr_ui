@@ -65,10 +65,11 @@
             </b-tooltip>
           </p>
         </b-field>
-        <!--b-tooltip label="download fits file" position="is-right" type="is-black">
+        <b-tooltip label="download fits file" position="is-right" type="is-black">
           <a class="button has-text-white" @click="downloadFits13Url(current_image)">
             <b-icon icon="cloud-download" /></a>
-        </b-tooltip-->
+        </b-tooltip>
+
 
         <div> <b-field label="subframe active">
               <b-switch type="is-info" v-model="subframeIsActive"></b-switch>

@@ -45,7 +45,7 @@
                   <td>{{current_image.airmass || "---"}}</td> </tr>
           </table>
           <div style="height: 1em;"/>
-          <button class="button" @click="getFitsHeader">show full header</button>
+          <button class="button" @click="getFitsHeader">show full fits header</button>
         </div>
       </side-info-panel>
 
