@@ -28,10 +28,11 @@
                 </div>
             </div>
 
-            <div class="input-section">
-                <b-field style="width: 100%;">
+            <div class="input-section" >
+                <b-field>
                     <b-input 
                         size="is-small" 
+                        expanded
                         v-model="tosend" 
                         @keyup.native.enter="postMessage"
                         placeholder="message...">
@@ -197,7 +198,8 @@ export default {
 <style scoped>
 .message-display {
     padding-top: 1em;
-    height: 600px;
+    padding-bottom: 2em;
+    max-height: 600px;
     overflow-y: auto;
 }
 .one-message {
