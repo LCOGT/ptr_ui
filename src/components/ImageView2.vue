@@ -40,11 +40,6 @@
         </div>
           
       </div>
-      <div>
-      {{'brightest star position'}}
-      {{brightest_star_pos_x.toFixed(2)}}
-      {{brightest_star_pos_y.toFixed(2)}}
-      </div>
 
       <!-- Controls in the top row above the main view --> 
       <div class="controls">
