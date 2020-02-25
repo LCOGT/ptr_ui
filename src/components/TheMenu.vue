@@ -41,9 +41,6 @@
                 <b-navbar-item tag="router-link" :to="{ path: '/jobs' }">
                     jobs
                 </b-navbar-item>
-                <b-navbar-item tag="router-link" :to="{ path: '/imgs' }">
-                    images
-                </b-navbar-item>
                 <b-navbar-item tag="router-link" :to="{ path: '/calendar' }">
                     calendar
                 </b-navbar-item>
