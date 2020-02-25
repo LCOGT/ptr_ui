@@ -196,7 +196,7 @@ export default {
 }
 .page-view {
   /* min height: screen + footer + visual buffer */
-  height: calc(100% - 90%);
+  height: 1400px;
   margin: 0 auto; /* center the main div */
 }
 

@@ -13,11 +13,13 @@
                 </a>
             </div>
 
+            <div class="content-slot">
             <slot>
                 <div style="padding: 1em;display: flex; justify-content: center;">
                     <b-icon icon="cake" ></b-icon>
                 </div>
             </slot>
+            </div>
 
         </b-collapse>
     </div>
@@ -33,5 +35,8 @@ export default {
 <style scoped>
 .wrapper {
     margin-bottom: 1em;
+}
+.content-slot {
+    margin: 1em;
 }
 </style>

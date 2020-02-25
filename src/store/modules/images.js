@@ -105,7 +105,7 @@ const actions = {
             await commit('setRecentImages', response)
 
         }).catch(error => {
-            console.log(error)
+            //console.log(error)
         });
     },
 
@@ -114,6 +114,7 @@ const actions = {
      */
     set_current_image({ commit }, image_object) {
         commit('setCurrentImage', image_object)
+
     },
 
     /**

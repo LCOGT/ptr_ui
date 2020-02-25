@@ -199,7 +199,7 @@ export default {
 .message-display {
     padding-top: 1em;
     padding-bottom: 2em;
-    max-height: 600px;
+    max-height: 400px;
     overflow-y: auto;
 }
 .one-message {

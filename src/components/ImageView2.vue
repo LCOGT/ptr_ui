@@ -1,87 +1,92 @@
 <template>
-    <div id="component" v-on:keyup.right="setNextImage" v-on:keyup.left="setPreviousImage" >
-      <div id="image-window" ref="imagewindow">
+  <div id="component" v-on:keyup.right="setNextImage" v-on:keyup.left="setPreviousImage" >
+    <div id="image-window" ref="imagewindow">
 
-    <!-- The main image view -->
-    <div class="image-div" ref="image_div">
+      <!-- The main image view -->
+      <div class="image-div" ref="image_div">
 
-        <svg id='image_svg' ref="svgElement" v-show="!js9IsVisible">
-          <!-- NOTE: image svg width and heigh must be set explicitly to work in firefox -->
-          <!-- These values are changed programatically to work with dynamic window sizes. -->
-          <image 
-            :class="{'image-div-pointer-cross':subframeIsVisible}" 
-            height="1px" width="1px" 
-            ref="image" 
-            :href="current_image.jpg13_url" />
-        </svg>
+          <svg id='image_svg' ref="svgElement" v-show="!js9IsVisible">
+            <!-- NOTE: image svg width and heigh must be set explicitly to work in firefox -->
+            <!-- These values are changed programatically to work with dynamic window sizes. -->
+            <image 
+              :class="{'image-div-pointer-cross':subframeIsVisible}" 
+              height="1px" width="1px" 
+              ref="image" 
+              :href="current_image.jpg13_url" />
+          </svg>
 
-        <div id="js9-window" v-if="js9IsVisible" >
-          <JS9 ref="js9" :include-menu="true" :initial-width="js9width" :initial-height="js9height" />
-        </div>
+          <div id="js9-window" v-if="js9IsVisible" >
+            <JS9 ref="js9" :include-menu="true" :initial-width="js9width" :initial-height="js9height" />
+          </div>
 
-    </div>
-
-    <!-- Row of selectable image thumbnails under the main view. -->
-    <div class="recent_images">
-      <div 
-          class="recent_image" 
-          style="display: flex;"
-          v-for="(item, index) in recent_images" 
-          v-bind:key="index"
-      >
-        <img 
-            style="width: 60px; height: 60px;"
-            v-bind:src="item.jpg13_url"
-            v-bind:title="item.base_filename"
-            v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
-            @click="setActiveImage(item)"
-        >
-        <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
       </div>
-        
-    </div>
 
-    <!-- Controls in the top row above the main view --> 
-    <div class="controls">
+      <!-- Row of selectable image thumbnails under the main view. -->
+      <div class="recent_images">
+        <div 
+            class="recent_image" 
+            style="display: flex;"
+            v-for="(item, index) in recent_images" 
+            v-bind:key="index"
+        >
+          <img 
+              style="width: 60px; height: 60px;"
+              v-bind:src="item.jpg13_url"
+              v-bind:title="item.base_filename"
+              v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
+              @click="setActiveImage(item)"
+          >
+          <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
+        </div>
+          
+      </div>
+      <div>
+      {{'brightest star position'}}
+      {{brightest_star_pos_x.toFixed(2)}}
+      {{brightest_star_pos_y.toFixed(2)}}
+      </div>
 
-        <button class="button" @click="toggleAnalysis"> <b-icon icon="tune"></b-icon> </button>
-        <b-field>
-          <p class="control">
-            <b-tooltip label="latest image" position="is-bottom" type="is-black">
-            <button class="button level-item" @click="setLatestImage">
-            <b-icon icon="chevron-double-left"/></button>
-            </b-tooltip>
-          </p>
-          <p class="control">
-            <b-tooltip label="previous image" position="is-bottom" type="is-black">
-            <button class="button level-item" @click="setPreviousImage">
-            <b-icon icon="chevron-left" /></button>
-            </b-tooltip>
-          </p>
-          <p class="control">
-            <b-tooltip label="next image" position="is-bottom" type="is-black">
-            <button class="button level-item" @click="setNextImage">
-            <b-icon icon="chevron-right" /></button>
-            </b-tooltip>
-          </p>
-        </b-field>
-        <b-tooltip label="download fits file" position="is-right" type="is-black">
-          <a class="button has-text-white" @click="downloadFits13Url(current_image)">
-            <b-icon icon="cloud-download" /></a>
-        </b-tooltip>
+      <!-- Controls in the top row above the main view --> 
+      <div class="controls">
+
+          <button class="button" @click="toggleAnalysis"> <b-icon icon="tune"></b-icon> </button>
+          <b-field>
+            <p class="control">
+              <b-tooltip label="latest image" position="is-bottom" type="is-black">
+              <button class="button level-item" @click="setLatestImage">
+              <b-icon icon="chevron-double-left"/></button>
+              </b-tooltip>
+            </p>
+            <p class="control">
+              <b-tooltip label="previous image" position="is-bottom" type="is-black">
+              <button class="button level-item" @click="setPreviousImage">
+              <b-icon icon="chevron-left" /></button>
+              </b-tooltip>
+            </p>
+            <p class="control">
+              <b-tooltip label="next image" position="is-bottom" type="is-black">
+              <button class="button level-item" @click="setNextImage">
+              <b-icon icon="chevron-right" /></button>
+              </b-tooltip>
+            </p>
+          </b-field>
+          <b-tooltip label="download fits file" position="is-right" type="is-black">
+            <a class="button has-text-white" @click="downloadFits13Url(current_image)">
+              <b-icon icon="cloud-download" /></a>
+          </b-tooltip>
 
 
-        <div> <b-field label="subframe active">
-              <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
-          </b-field> </div>
-        <div> <b-field label="subframe visible">
-              <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
-          </b-field> </div>
-        <div> <b-field label="crosshairs">
-              <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
-          </b-field> </div>
+          <div> <b-field label="subframe active">
+                <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
+            </b-field> </div>
+          <!---div> <b-field label="subframe visible">
+                <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
+            </b-field> </div-->
+          <div> <b-field label="crosshairs">
+                <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
+            </b-field> </div>
 
-    </div>
+      </div>
 
     </div>
   </div>
@@ -104,7 +109,13 @@ export default {
   },
   mixins: [commands_mixin],
   props: {
-    site: String
+    site: String,
+    median_star_pos_x:Number,
+    median_star_pos_y:Number,
+    median_plot_color: String,
+    brightest_star_pos_x:Number,
+    brightest_star_pos_y:Number,
+    brightest_plot_color: String,
   },
   data() {
     return {
@@ -125,7 +136,7 @@ export default {
       // The subframe rectangle svg element
       subframeSVG: '',
       // Toggles whether the subframe is visible or not
-      subframeIsVisible: false,
+      subframeIsVisible:true,
       // Defines when the user is dragging the mouse (for drawing the rectangle)
       mouseIsDown: false,
 
@@ -192,6 +203,14 @@ export default {
       if (this.js9IsVisible) {
         this.js9LoadImage(newVal)
       }
+      this.remove_star_markers()
+    },
+
+    median_star_pos_x: function() {
+      this.draw_star_markers()
+    },
+    median_star_pos_y: function() {
+      this.draw_star_markers()
     },
 
   },
@@ -229,16 +248,28 @@ export default {
 
         .on("mousedown", function() {
 
+          let mClick = d3.mouse(this)
+
           // start drawing a subframe box if subframe mode is active.
           if (that.subframeIsVisible) {
+
+            // Make it visible
+            that.subframeSVG
+              .style("display","block")
+              .attr("class","image-div-pointer-cross")
+
             that.mouseIsDown = true;
-            let mClick = d3.mouse(this)
             that.subframe_x0 = mClick[0] / that.imageWidth
             that.subframe_y0 = mClick[1] / that.imageHeight
             that.subframe_x1 = mClick[0] / that.imageWidth
             that.subframe_y1 = mClick[1] / that.imageHeight
             that.drawSubframe()
           }
+
+          if (that.starProfileToolActive) {
+            that.drawCircle(mClick[0], mClick[1])
+          }
+
         })
 
         .on("mousemove", function() {
@@ -251,20 +282,30 @@ export default {
 
           // if subframe mode is active, and the mouse is dragging, 
           // save the current coordinates and draw them as a rectangle.
-          if (that.subframeIsVisible && that.mouseIsDown) {
+          if (that.subframeIsVisible && that.mouseIsDown && !that.starProfileToolActive) {
             //let mDrag = d3.mouse(this)
             that.subframe_x1 = mDrag[0] / that.imageWidth
             that.subframe_y1 = mDrag[1] / that.imageHeight
             that.drawSubframe()
           }
+
+          if (that.starProfileToolActive && that.mouseIsDown) {
+            that.drawCircle(mDrag[0], mDrag[1])
+          }
+
         })
 
         // Defines the end of a drag event.
         .on("mouseup", function() {
           that.mouseIsDown = false;
-          if(that.subframeIsVisible) {
-            that.subframeIsActive = true;
+          let mouse = d3.mouse(this)
+
+          if(that.subframeIsVisible && !that.starProfileToolActive) {
+            //that.subframeIsActive = true;
             that.subframeDefinedWithFile = that.current_image.base_filename
+          }
+          if (that.starProfileToolActive) {
+            that.drawCircle(mouse[0],mouse[1])
           }
         })
 
@@ -294,10 +335,10 @@ export default {
           d3.event.preventDefault();
         })
 
-      }, 
+    }, 
 
-      // Subframe stuff
-      drawSubframe() {
+    // Subframe stuff
+    drawSubframe() {
       let minX = this.imageWidth * Math.min(this.subframe_x0, this.subframe_x1) 
       let minY = this.imageHeight * Math.min(this.subframe_y0, this.subframe_y1) 
       let width = this.imageWidth * Math.abs(this.subframe_x0 - this.subframe_x1)
@@ -388,6 +429,29 @@ export default {
         });
     },
 
+    drawCircle(pixelX, pixelY) {
+      // Remove any other right click markers on the screen.
+      this.removeCircle();
+
+      // Draw a small cross where user clicks.
+      d3
+        .select(this.image_element)
+        .append("circle")
+        .attr("class", "circle-cursor")
+        .attr("cx", pixelX)
+        .attr("cy", pixelY)
+        .attr("r", "8px")
+        .attr("stroke", "red")
+        .attr("stroke-width", 1)
+        .style("fill", "none");
+    },
+    removeCircle() {
+      d3
+        .select(this.image_element)
+        .selectAll(".circle-cursor")
+        .remove();
+    },
+
     draw_marker(pixelX, pixelY) {
       // Make sure a previous timer doesn't wipe our current right-click marker
       clearTimeout(this.context_marker_timer);
@@ -429,6 +493,119 @@ export default {
       d3
         .select(this.image_element)
         .selectAll(".context-marker")
+        .remove();
+    },
+
+    // The star inspector (see SiteData component) will calculate and plot
+    // radial profiles for the max and median brightest stars detected in the
+    // user-selected region. 
+    //
+    // This function also draws a marker on the actual image to indicate which 
+    // stars are shown in the radial profile plots.
+    draw_star_markers() {
+      this.remove_star_markers()
+
+      let med_x = this.median_star_pos_x * this.imageWidth
+      let med_y = this.median_star_pos_y * this.imageWidth
+      let bri_x = this.brightest_star_pos_x * this.imageWidth
+      let bri_y = this.brightest_star_pos_y * this.imageWidth
+
+      // Draw the crosshairs around the median star
+      d3
+        .select(this.image_element)
+        .append("line")
+        .attr("class", "star-marker")
+        .attr("x1", med_x - 15)
+        .attr("y1", med_y)
+        .attr("x2", med_x - 5)
+        .attr("y2", med_y)
+        .attr("stroke", this.median_plot_color)
+        .attr("stroke-width", 2)
+        .style("fill", "none");
+      d3
+        .select(this.image_element)
+        .append("line")
+        .attr("class", "star-marker")
+        .attr("x1", med_x + 5)
+        .attr("y1", med_y)
+        .attr("x2", med_x + 15)
+        .attr("y2", med_y)
+        .attr("stroke", this.median_plot_color)
+        .attr("stroke-width", 2)
+        .style("fill", "none");
+      d3
+        .select(this.image_element)
+        .append("line")
+        .attr("class", "star-marker")
+        .attr("x1", med_x)
+        .attr("y1", med_y - 15)
+        .attr("x2", med_x)
+        .attr("y2", med_y - 5)
+        .attr("stroke", this.median_plot_color)
+        .attr("stroke-width", 2)
+        .style("fill", "none");
+      d3
+        .select(this.image_element)
+        .append("line")
+        .attr("class", "star-marker")
+        .attr("x1", med_x)
+        .attr("y1", med_y + 5)
+        .attr("x2", med_x)
+        .attr("y2", med_y + 15)
+        .attr("stroke", this.median_plot_color)
+        .attr("stroke-width", 2)
+        .style("fill", "none");
+        
+      // Draw crosshairs around the brightest selected star
+      d3
+        .select(this.image_element)
+        .append("line")
+        .attr("class", "star-marker")
+        .attr("x1", bri_x - 15)
+        .attr("y1", bri_y)
+        .attr("x2", bri_x - 5)
+        .attr("y2", bri_y)
+        .attr("stroke", this.brightest_plot_color)
+        .attr("stroke-width", 2)
+        .style("fill", "none");
+      d3
+        .select(this.image_element)
+        .append("line")
+        .attr("class", "star-marker")
+        .attr("x1", bri_x + 5)
+        .attr("y1", bri_y)
+        .attr("x2", bri_x + 15)
+        .attr("y2", bri_y)
+        .attr("stroke", this.brightest_plot_color)
+        .attr("stroke-width", 2)
+        .style("fill", "none");
+      d3
+        .select(this.image_element)
+        .append("line")
+        .attr("class", "star-marker")
+        .attr("x1", bri_x)
+        .attr("y1", bri_y - 15)
+        .attr("x2", bri_x)
+        .attr("y2", bri_y - 5)
+        .attr("stroke", this.brightest_plot_color)
+        .attr("stroke-width", 2)
+        .style("fill", "none");
+      d3
+        .select(this.image_element)
+        .append("line")
+        .attr("class", "star-marker")
+        .attr("x1", bri_x)
+        .attr("y1", bri_y + 5)
+        .attr("x2", bri_x)
+        .attr("y2", bri_y + 15)
+        .attr("stroke", this.brightest_plot_color)
+        .attr("stroke-width", 2)
+        .style("fill", "none");
+    },
+    remove_star_markers() {
+      d3
+        .select(this.image_element)
+        .selectAll(".star-marker")
         .remove();
     },
 
@@ -601,6 +778,9 @@ export default {
 .image-div-pointer-cross:hover {
   cursor:crosshair;
 }
+.image-div-no-cursor:hover {
+  cursor:none;
+}
 #image_svg {
   width: 100%;
   height: 1px;
@@ -626,6 +806,6 @@ export default {
   flex: 0 0 auto;
 }
 .selected_thumbnail {
-  border: 3px solid gold;
+  border: 3px solid rgb(241, 183, 36);
 }
 </style>
