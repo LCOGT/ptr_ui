@@ -239,8 +239,16 @@ export default {
       }
     },
     mounted(){
-      this.plotMedianStarProfile()
-      this.plotBrightestStarProfile()
+
+      // Draw empty plots for the star profiles
+      this.plotStarProfile([0], 1, "#brightest_star_profile", 
+        {plot_color: "#efea5a"},
+        {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
+
+      this.plotStarProfile([0], 1, "#median_star_profile", 
+        {plot_color: "#209cee"},
+        {title: "Median Star Profile", x_axis_label: "arcseconds"})
+
     },
     methods: {
         getStarProfiles(useSubregion=true) {
@@ -273,19 +281,20 @@ export default {
           this.inspect_image_loading = false;
           this.median_fwhm = '--'
           this.brightest_fwhm = '--'
-          console.warn("problem getting star profiles")
         },
         displayStarProfiles(response) {
           this.inspect_region_loading = false;
           this.inspect_image_loading = false;
-          console.log('the response:')
           console.log(response)
 
+          // Handle the case where no stars are found.
           if (response.data.num_good_stars == 0) {
             console.log('no good stars')
             this.median_fwhm = '--'
             this.brightest_fwhm = '--'
             this.num_good_stars = 0
+
+            // Small popup notification
             // TODO: include a 'tell me more' button with possible reasons for failure.
             this.$buefy.toast.open({
                 message: 'No good stars were found in the selected region.',
@@ -298,20 +307,17 @@ export default {
                     `<p class="image is-4by3">
                         <img src="https://buefy.org/static/img/placeholder-1280x960.png">
                     </p>`
-                  )
-                }
+                  )}
             })
           }
+
+          // Otherwise, do this if good stars were found
           else {
             let med_star = response.data.median_star
             let bright_star = response.data.brightest_star
             let region_coords = response.data.region_coords
 
             // TODO: plot the gaussian curve over the data instead of connecting the dots.
-
-            // Get the star profile data to plot
-            this.median_profile = med_star.radial_profile.map(i => i*med_star.peak)
-            this.brightest_profile = bright_star.radial_profile.map(i => i*bright_star.peak)
 
             // Get the fwhm from the gaussian fit
             this.median_fwhm = (med_star.gaussian_fwhm * med_star.pixscale).toFixed(2) + '"' 
@@ -320,186 +326,145 @@ export default {
             // Get the positions of the stars to show in the image display.
             this.median_relative_pos_x = (med_star.x / med_star.naxis1) + region_coords.x0,
             this.median_relative_pos_y = (med_star.y / med_star.naxis2) + region_coords.y0,
-
             this.brightest_relative_pos_x = (bright_star.x / bright_star.naxis1) + region_coords.x0,
             this.brightest_relative_pos_y = (bright_star.y / bright_star.naxis2) + region_coords.y0,
-
             this.num_good_stars = response.data.num_good_stars
-            this.pixscale = med_star.pixscale
 
-            d3.select("#brightest_star_profile").select("svg").remove()
-            d3.select("#median_star_profile").select("svg").remove()
-            this.plotMedianStarProfile()
-            this.plotBrightestStarProfile()
+            // Plot the median star profile
+            let m_profile = med_star.radial_profile
+            let m_pixscale = med_star.pixscale
+            let m_element_id = "#median_star_profile"
+            let m_formatting = {
+              margin_top: 50,
+              margin_right: 25,
+              margin_bottom: 50,
+              margin_left: 45,
+              plot_color: "#209cee",
+              x_axis_ticks: 8,
+              y_axis_ticks: 5,
+            }
+            let m_labels = {
+              title: "Median Star Profile",
+              x_axis_label: "arcseconds",
+            }
+            this.plotStarProfile(m_profile, m_pixscale, m_element_id, m_formatting, m_labels)
+
+            // Plot the brightest star profile
+            let b_profile = bright_star.radial_profile 
+            let b_pixscale = bright_star.pixscale 
+            let b_element_id = "#brightest_star_profile" 
+            let b_formatting = {
+              margin_top: 50,
+              margin_right: 25,
+              margin_bottom: 50,
+              margin_left: 45,
+              plot_color: "#efea5a",
+              x_axis_ticks: 8,
+              y_axis_ticks: 5,
+            }
+            let b_labels = {
+              title: "Brightest Star Profile",
+              x_axis_label: "arcseconds",
+            }
+            this.plotStarProfile(b_profile, b_pixscale, b_element_id, b_formatting, b_labels)
+
           }
         },
-        plotMedianStarProfile() {
-          // 2. Use the margin convention practice 
-          var margin = {top: 50, right: 25, bottom: 50, left: 25}
-            , width = 200 // Use the window's width 
-            , height = 100; // Use the window's height
+        plotStarProfile( profile, pixscale=1, el_id, formatting_opts, label_options ) {
 
-          // The number of datapoints
-          var n = this.median_profile.length;
+          // Parse the input arguments, and define defaults.
+          const margin = {
+            top: formatting_opts.margin_top || 50,
+            right: formatting_opts.margin_right || 25,
+            bottom: formatting_opts.margin_bottom || 50,
+            left: formatting_opts.margin_left || 45,
+          }
+          const width = formatting_opts.width || 200
+          const height = formatting_opts.height || 100
+          let x_axis_ticks = formatting_opts.x_axis_ticks || 8
+          let y_axis_ticks = formatting_opts.y_axis_ticks || 5
+          let plot_color = formatting_opts.plot_color || "#ff0000"
 
-          // 5. X scale will use the index of our data
-          var xScale = d3.scaleLinear()
-              .domain([0, n-1]) // input
+          let title = label_options.title
+          let x_axis_label = label_options.x_axis_label
+
+          let n = profile.length // The number of datapoints.
+
+
+          // Remove previous plot data
+          d3.select(el_id).select("svg").remove()
+
+          // X scale will use the index of our data, scaled from pix to arcseconds
+          let xScale = d3.scaleLinear()
+              .domain([0, (n-1) * pixscale]) // input
               .range([0, width]); // output
 
-          // 6. Y scale will use the randomly generate number 
-          var yScale = d3.scaleLinear()
-              .domain([0,Math.max(...this.median_profile)]) // input 
+          // Y scale will use the max in the star profile
+          let yScale = d3.scaleLinear()
+              .domain([0,Math.max(...profile)]) // input 
               .range([height, 0]); // output 
 
-          // 7. d3's line generator
-          var line = d3.line()
-              .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+          // d3's line generator
+          // TODO: replace with the gaussian fit instead of connecting the dots.
+          let line = d3.line()
+              .x(function(d, i) { return xScale(i * pixscale); }) // covnert to arcseconds
               .y(function(d) { return yScale(d); }) // set the y values for the line generator 
               .curve(d3.curveMonotoneX) // apply smoothing to the line
 
-          // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
-          //var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
-          //console.log(dataset)
-          var dataset = this.median_profile
-
-          // 1. Add the SVG to the page and employ #2
-          this.svg = d3.select("#median_star_profile").append("svg")
+          // Add the SVG to the page
+          let svg = d3.select(el_id).append("svg")
               .attr("width", width + margin.left + margin.right)
               .attr("height", height + margin.top + margin.bottom)
             .append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-          // 3. Call the x axis in a group tag
-          this.svg.append("g")
+          // Call the x axis in a group tag
+          svg.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + height + ")")
-              .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
+              .call(d3.axisBottom(xScale).ticks(x_axis_ticks)); // Create an axis component with d3.axisBottom
 
-          // 4. Call the y axis in a group tag
-          this.svg.append("g")
+          // Call the y axis in a group tag
+          svg.append("g")
               .attr("class", "y axis")
-              .call(d3.axisLeft(yScale).ticks(4)); // Create an axis component with d3.axisLeft
-
-          // text label for the x axis
-          this.svg.append("text")             
-              .attr("x", width/2)
-              .attr("y",-15)
-              .style("text-anchor", "middle")
-              .style("fill", "#fff")
-              .text("Median Star Profile");
-          // x-axis units: arcseconds
-          this.svg.append("text")             
-              .attr("x", width)
-              .attr("y", height + 30)
-              .style("text-anchor", "middle")
-              .style("font-size", "10px")
-              .style("fill", "#fff")
-              .text("arcseconds");
-
-          // 9. Append the path, bind the data, and call the line generator 
-          this.svg.append("path")
-              .datum(dataset) // 10. Binds data to the line 
-              .style("fill", "none")
-              .style("stroke", this.median_plot_color)
-              .style("stroke-width","2px")
-              .attr("class", "line") // Assign a class for styling 
-              .attr("d", line); // 11. Calls the line generator 
-
-          // 12. Appends a circle for each datapoint 
-          this.svg.selectAll(".dot")
-              .data(dataset)
-            .enter().append("circle") // Uses the enter().append() method
-              .style("stroke", this.median_plot_color)
-              .attr("class", "dot") // Assign a class for styling
-              .attr("cx", function(d, i) { return xScale(i) }) 
-              .attr("cy", function(d) { return yScale(d) })
-              .attr("r", 2);
-        },
-        plotBrightestStarProfile() {
-          // 2. Use the margin convention practice 
-          var margin = {top: 50, right: 25, bottom: 50, left: 25}
-            , width = 200 // Use the window's width 
-            , height = 100; // Use the window's height
-
-          // The number of datapoints
-          var n = this.brightest_profile.length;
-
-          // 5. X scale will use the index of our data
-          var xScale = d3.scaleLinear()
-              .domain([0, (n-1)*this.pixscale]) // input
-              .range([0, width]); // output
-
-          // 6. Y scale will use the randomly generate number 
-          var yScale = d3.scaleLinear()
-              .domain([0,Math.max(...this.brightest_profile)]) // input 
-              .range([height, 0]); // output 
-
-          // 7. d3's line generator
-          let that = this;
-          var line = d3.line()
-              .x(function(d, i) { return xScale(i * 0.85); }) // covnert to arcseconds
-              .y(function(d) { return yScale(d); }) // set the y values for the line generator 
-              .curve(d3.curveMonotoneX) // apply smoothing to the line
-
-          // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
-          //var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
-          //console.log(dataset)
-          var dataset = this.brightest_profile
-
-          // 1. Add the SVG to the page and employ #2
-          this.svg = d3.select("#brightest_star_profile").append("svg")
-              .attr("width", width + margin.left + margin.right)
-              .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-          // 3. Call the x axis in a group tag
-          this.svg.append("g")
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + height + ")")
-              .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
-
-          // 4. Call the y axis in a group tag
-          this.svg.append("g")
-              .attr("class", "y axis")
-              .call(d3.axisLeft(yScale).ticks(4)); // Create an axis component with d3.axisLeft
+              .call(d3.axisLeft(yScale).ticks(y_axis_ticks)); // Create an axis component with d3.axisLeft
               
-          // text label for the x axis
-          this.svg.append("text")             
+          // Draw the plot title
+          svg.append("text")             
               .attr("x", width/2)
               .attr("y",-15)
               .style("text-anchor", "middle")
               .style("fill", "#fff")
-              .text("Brightest Star Profile");
+              .text(title);
 
-          // x-axis units: arcseconds
-          this.svg.append("text")             
+          // Draw the x-axis label
+          svg.append("text")             
               .attr("x", width)
               .attr("y", height + 30)
               .style("text-anchor", "middle")
               .style("font-size", "10px")
               .style("fill", "#fff")
-              .text("arcseconds");
+              .text(x_axis_label);
 
-          // 9. Append the path, bind the data, and call the line generator 
-          this.svg.append("path")
-              .datum(dataset) // 10. Binds data to the line 
+          // Append the path, bind the data, and call the line generator 
+          svg.append("path")
+              .datum(profile) // 10. Binds data to the line 
               .style("fill", "none")
-              .style("stroke", this.brightest_plot_color)
+              .style("stroke", plot_color)
               .style("stroke-width","2px")
               .attr("class", "line") // Assign a class for styling 
               .attr("d", line); // 11. Calls the line generator 
 
-          // 12. Appends a circle for each datapoint 
-          this.svg.selectAll(".dot")
-              .data(dataset)
+          // Appends a circle for each datapoint 
+          svg.selectAll(".dot")
+              .data(profile)
             .enter().append("circle") // Uses the enter().append() method
-              .style("stroke", this.brightest_plot_color)
+              .style("stroke", plot_color)
               .attr("class", "dot") // Assign a class for styling
-              .attr("cx", function(d, i) { return xScale(i * 0.85) }) // convert array index (pixels) to arcsec
+              .attr("cx", function(d, i) { return xScale(i * pixscale) }) // convert array index (pixels) to arcsec
               .attr("cy", function(d) { return yScale(d) })
               .attr("r", 2);
+
         },
         getRegionStats(fitstype, useSubregion=true) {
           let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
