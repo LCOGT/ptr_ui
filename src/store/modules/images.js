@@ -92,6 +92,9 @@ const actions = {
         axios.get(apiName+path).then(async response => {
             response = JSON.parse(response.data)
 
+            // Empty response:
+            if (response.length == 0) { return; }
+
             // If current_image is empty, or if we've switched sites:
             // set current_image to the first element from 'recent_images'. 
             if (!Object.keys(state.current_image).length
@@ -102,7 +105,7 @@ const actions = {
             await commit('setRecentImages', response)
 
         }).catch(error => {
-            console.log(error)
+            //console.log(error)
         });
     },
 
@@ -111,6 +114,7 @@ const actions = {
      */
     set_current_image({ commit }, image_object) {
         commit('setCurrentImage', image_object)
+
     },
 
     /**

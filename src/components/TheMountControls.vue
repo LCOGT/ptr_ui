@@ -1,7 +1,6 @@
 <template>
 <section>
 
-    <div class="title">Mount</div>
 
     <b-field horizontal label="Right Ascension">
         <b-input type="text" name="subject" v-model="slew_ra"></b-input>

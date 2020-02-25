@@ -12,26 +12,12 @@
         </template>
 
         <template slot="start">
-            <b-navbar-item tag="router-link" :to="{ path: '/ctrl' }">
-                ctrl
-            </b-navbar-item>
-            <b-navbar-item tag="router-link" :to="{ path: '/imgs' }">
-                images
-            </b-navbar-item>
-            <b-navbar-item tag="router-link" :to="{ path: '/analysis' }">
-                analysis
-            </b-navbar-item>
-            <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
-                sky
-            </b-navbar-item>
-            <b-navbar-item tag="router-link" :to="{ path: '/calendar' }">
-                calendar
-            </b-navbar-item>
+
             <b-navbar-dropdown label="sites">
                 <template v-for="(site, index) in sites">
                   <router-link 
                     class="navbar-item" 
-                    v-bind:to="'/ux1/' + site.code +'/home'"
+                    v-bind:to="'/site/' + site.code +'/home'"
                     v-bind:key="index"
                     > 
                     {{site.name}} 
@@ -42,12 +28,27 @@
                     About
                 </b-navbar-item>
             </b-navbar-dropdown>
-            <b-navbar-dropdown label="dev">
-                <b-navbar-item tag="router-link" :to="{ path: '/ux1/wmd/home' }">
-                    layout--1
+
+
+
+            <b-navbar-dropdown label="experimental">
+                <b-navbar-item tag="router-link" :to="{ path: '/ctrl' }">
+                    ctrl
                 </b-navbar-item>
-                <b-navbar-item tag="router-link" :to="{ path: '/btns' }">
-                    some buttons
+                <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
+                    chat
+                </b-navbar-item>
+                <b-navbar-item tag="router-link" :to="{ path: '/jobs' }">
+                    jobs
+                </b-navbar-item>
+                <b-navbar-item tag="router-link" :to="{ path: '/imgs' }">
+                    images
+                </b-navbar-item>
+                <b-navbar-item tag="router-link" :to="{ path: '/calendar' }">
+                    calendar
+                </b-navbar-item>
+                <b-navbar-item tag="router-link" :to="{ path: '/analysis' }">
+                    analysis
                 </b-navbar-item>
             </b-navbar-dropdown>
         </template>
@@ -99,7 +100,7 @@ export default {
         },
         {
           code: "saf",
-          name: "Sollee Observatory",
+          name: "Apache Ridge Observatory",
           country: "USA",
           tz: -7,
           lat: 35.55444,
@@ -117,6 +118,8 @@ export default {
 
     // Log the user out
     logout() {
+      // make sure the logout happens before redirect.
+      // otherwise, the redirect check for authentication might log the user back in.
       this.$auth.logout({
         returnTo: window.location.origin
       }).then($router.go)
@@ -132,5 +135,8 @@ export default {
 }
 nav {
   height: 5em;
+}
+.navbar {
+  border-radius: 0;
 }
 </style>
