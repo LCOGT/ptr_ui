@@ -1,20 +1,17 @@
 <template><div>
 
-    <!--week-of-events /-->
     <the-calendar :calendarSite="sitecode" :fc_resources="listOfObservatories"/>
 
 </div></template>
 
 
 <script>
-import WeekOfEvents from '@/components/WeekOfEvents'
 import TheCalendar from '@/components/TheCalendar';
 
 export default {
     name: "SiteCalendar",
     props: ["sitecode"],
     components: { 
-        WeekOfEvents,
         TheCalendar,
     },
     data() {

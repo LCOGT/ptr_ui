@@ -39,7 +39,7 @@ export default {
                 // small popup notification
                 this.$buefy.toast.open({
                     duration: 5000,
-                    message: "Oops! You aren't authorized to do that.",
+                    message: "Oops! You need to be logged in to do that.",
                     position: 'is-bottom',
                     type: 'is-danger' ,
                 })
