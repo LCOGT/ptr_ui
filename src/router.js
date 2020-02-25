@@ -13,7 +13,6 @@ import Site from './views/Site.vue'
 
 // Pages for testing
 import btns from './views/btns.vue'
-import imgs from './views/imgs.vue'
 import skymap from './views/skymap.vue'
 import ctrl from './views/ctrl.vue'
 import site from './views/Site.vue'
@@ -42,7 +41,6 @@ const router = new VueRouter({
     { path: '/profile', name: 'profile', component: Profile, beforeEnter: authGuard,},
     { path: '/about', name: 'about', component: About },
     { path: '/btns', name: 'btns', component: btns },
-    { path: '/imgs', name: 'imgs', component: imgs },
     { path: '/skymap', name: 'skymap', component: skymap },
     { path: '/ctrl', name: 'ctrl', component: ctrl },
     { path: '/analysis', name: 'analysis', component: analysis },
