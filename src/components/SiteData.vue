@@ -189,399 +189,383 @@ import axios from 'axios'
 import * as d3 from 'd3'
 
 export default {
-    name: "SubpageData",
-    props: ["sitecode"],
-    components: {
-        ImageView2,
-        ImagesTable,
-        ImageInfoPanel,
-        ImageNavigationPanel,
-        ImageFilter,
-        Js9Devtools,
-        SideInfoPanel,
+  name: "SubpageData",
+  props: ["sitecode"],
+  components: {
+      ImageView2,
+      ImagesTable,
+      ImageInfoPanel,
+      ImageNavigationPanel,
+      ImageFilter,
+      Js9Devtools,
+      SideInfoPanel,
+  },
+  data() {
+    return {
+      fitsHeader: {},
+      showFitsHeaderModal: false,
+
+      region_info_loading: false,
+      image_info_loading: false,
+
+      ex13_isLoading: false,
+
+      region_min: '--',
+      region_max: '--',
+      region_median: '--',
+      region_mean: '--',
+      region_std: '--',
+
+      num_good_stars: '--',
+      pixscale: 1,
+
+      median_plot_color: '#209cee',
+      median_fwhm: '--',
+      median_profile: [0],
+      median_relative_pos_x: 0,
+      median_relative_pos_y: 0,
+
+      brightest_plot_color: '#efea5a',
+      brightest_fwhm: '--',
+      brightest_profile: [0],
+      brightest_relative_pos_x: 0,
+      brightest_relative_pos_y: 0,
+
+      starProfileToolActive: false,
+      inspect_region_loading: false,
+      inspect_image_loading: false,
+
+
+    }
+  },
+  mounted(){
+    // Draw empty plots for the star profiles
+    this.plotStarProfile([0], 1, "#brightest_star_profile", 
+      {plot_color: "#efea5a"},
+      {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
+
+    this.plotStarProfile([0], 1, "#median_star_profile", 
+      {plot_color: "#209cee"},
+      {title: "Median Star Profile", x_axis_label: "arcseconds"})
+  },
+  methods: {
+    getStarProfiles(useSubregion=true) {
+      let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/starprofiles"
+      let body = {
+        "site": this.sitecode,
+        "base_filename": this.current_image.base_filename,
+        //"region_x0": this.subframe_x0, 
+        //"region_x1": this.subframe_x1,
+        //"region_y0": this.subframe_y0,
+        //"region_y1": this.subframe_y1,
+        "fitstype": "01",
+      }
+
+      if (useSubregion) {
+        this.inspect_region_loading = true;
+        body.region_x0 = this.subframe_x0
+        body.region_x1 = this.subframe_x1
+        body.region_y0 = this.subframe_y0
+        body.region_y1 = this.subframe_y1
+      }
+      else { this.inspect_image_loading = true; }
+
+      axios.post(url, body)
+        .then(response => {this.displayStarProfiles(response)})
+        .catch(response => {this.starProfilesReset(response)})
     },
-    data() {
-      return {
-        fitsHeader: {},
-        showFitsHeaderModal: false,
+    starProfilesReset(response) {
+      this.inspect_region_loading = false;
+      this.inspect_image_loading = false;
+      this.median_fwhm = '--'
+      this.brightest_fwhm = '--'
+    },
+    displayStarProfiles(response) {
+      this.inspect_region_loading = false;
+      this.inspect_image_loading = false;
+      console.log(response)
 
-        region_info_loading: false,
-        image_info_loading: false,
+      // Handle the case where no stars are found.
+      if (response.data.num_good_stars == 0) {
+        console.log('no good stars')
+        this.median_fwhm = '--'
+        this.brightest_fwhm = '--'
+        this.num_good_stars = 0
 
-        ex13_isLoading: false,
+        // Small popup notification
+        // TODO: include a 'tell me more' button with possible reasons for failure.
+        this.$buefy.toast.open({
+            message: 'No good stars were found in the selected region.',
+            type: 'is-warning',
+            position: 'is-top',
+            actionText: 'Tell me more...',
+            duration: 6000,
+            onAction: () => {
+              this.$beufy.toast.open(
+                `<p class="image is-4by3">
+                    <img src="https://buefy.org/static/img/placeholder-1280x960.png">
+                </p>`
+              )}
+        })
+      }
 
-        region_min: '--',
-        region_max: '--',
-        region_median: '--',
-        region_mean: '--',
-        region_std: '--',
+      // Otherwise, do this if good stars were found
+      else {
+        let med_star = response.data.median_star
+        let bright_star = response.data.brightest_star
+        let region_coords = response.data.region_coords
 
-        num_good_stars: '--',
-        pixscale: 1,
+        // TODO: plot the gaussian curve over the data instead of connecting the dots.
 
-        median_plot_color: '#209cee',
-        median_fwhm: '--',
-        median_profile: [0],
-        median_relative_pos_x: 0,
-        median_relative_pos_y: 0,
+        // Get the fwhm from the gaussian fit
+        this.median_fwhm = (med_star.gaussian_fwhm * med_star.pixscale).toFixed(2) + '"' 
+        this.brightest_fwhm = (bright_star.gaussian_fwhm *bright_star.pixscale).toFixed(2) + '"' 
 
-        brightest_plot_color: '#efea5a',
-        brightest_fwhm: '--',
-        brightest_profile: [0],
-        brightest_relative_pos_x: 0,
-        brightest_relative_pos_y: 0,
+        // Get the positions of the stars to show in the image display.
+        this.median_relative_pos_x = (med_star.x / med_star.naxis1) + region_coords.x0,
+        this.median_relative_pos_y = (med_star.y / med_star.naxis2) + region_coords.y0,
+        this.brightest_relative_pos_x = (bright_star.x / bright_star.naxis1) + region_coords.x0,
+        this.brightest_relative_pos_y = (bright_star.y / bright_star.naxis2) + region_coords.y0,
+        this.num_good_stars = response.data.num_good_stars
 
-        starProfileToolActive: false,
-        inspect_region_loading: false,
-        inspect_image_loading: false,
+        // Plot the median star profile
+        let m_profile = med_star.radial_profile
+        let m_pixscale = med_star.pixscale
+        let m_element_id = "#median_star_profile"
+        let m_formatting = {
+          margin_top: 50,
+          margin_right: 25,
+          margin_bottom: 50,
+          margin_left: 45,
+          plot_color: "#209cee",
+          x_axis_ticks: 8,
+          y_axis_ticks: 5,
+        }
+        let m_labels = {
+          title: "Median Star Profile",
+          x_axis_label: "arcseconds",
+        }
+        this.plotStarProfile(m_profile, m_pixscale, m_element_id, m_formatting, m_labels)
 
+        // Plot the brightest star profile
+        let b_profile = bright_star.radial_profile 
+        let b_pixscale = bright_star.pixscale 
+        let b_element_id = "#brightest_star_profile" 
+        let b_formatting = {
+          margin_top: 50,
+          margin_right: 25,
+          margin_bottom: 50,
+          margin_left: 45,
+          plot_color: "#efea5a",
+          x_axis_ticks: 8,
+          y_axis_ticks: 5,
+        }
+        let b_labels = {
+          title: "Brightest Star Profile",
+          x_axis_label: "arcseconds",
+        }
+        this.plotStarProfile(b_profile, b_pixscale, b_element_id, b_formatting, b_labels)
 
       }
     },
-    mounted(){
+    plotStarProfile( profile, pixscale=1, el_id, formatting_opts, label_options ) {
 
-      // Draw empty plots for the star profiles
-      this.plotStarProfile([0], 1, "#brightest_star_profile", 
-        {plot_color: "#efea5a"},
-        {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
+      // Parse the input arguments, and define defaults.
+      const margin = {
+        top: formatting_opts.margin_top || 50,
+        right: formatting_opts.margin_right || 25,
+        bottom: formatting_opts.margin_bottom || 50,
+        left: formatting_opts.margin_left || 45,
+      }
+      const width = formatting_opts.width || 200
+      const height = formatting_opts.height || 100
+      let x_axis_ticks = formatting_opts.x_axis_ticks || 8
+      let y_axis_ticks = formatting_opts.y_axis_ticks || 5
+      let plot_color = formatting_opts.plot_color || "#ff0000"
 
-      this.plotStarProfile([0], 1, "#median_star_profile", 
-        {plot_color: "#209cee"},
-        {title: "Median Star Profile", x_axis_label: "arcseconds"})
+      let title = label_options.title
+      let x_axis_label = label_options.x_axis_label
+
+      let n = profile.length // The number of datapoints.
+
+
+      // Remove previous plot data
+      d3.select(el_id).select("svg").remove()
+
+      // X scale will use the index of our data, scaled from pix to arcseconds
+      let xScale = d3.scaleLinear()
+        .domain([0, (n-1) * pixscale]) // input
+        .range([0, width]); // output
+
+      // Y scale will use the max in the star profile
+      let yScale = d3.scaleLinear()
+        .domain([0,Math.max(...profile)]) // input 
+        .range([height, 0]); // output 
+
+      // d3's line generator
+      // TODO: replace with the gaussian fit instead of connecting the dots.
+      let line = d3.line()
+        .x(function(d, i) { return xScale(i * pixscale); }) // covnert to arcseconds
+        .y(function(d) { return yScale(d); }) // set the y values for the line generator 
+        .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+      // Add the SVG to the page
+      let svg = d3.select(el_id).append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      // Call the x axis in a group tag
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(xScale).ticks(x_axis_ticks)); // Create an axis component with d3.axisBottom
+
+      // Call the y axis in a group tag
+      svg.append("g")
+        .attr("class", "y axis")
+        .call(d3.axisLeft(yScale).ticks(y_axis_ticks)); // Create an axis component with d3.axisLeft
+          
+      // Draw the plot title
+      svg.append("text")             
+        .attr("x", width/2)
+        .attr("y",-15)
+        .style("text-anchor", "middle")
+        .style("fill", "#fff")
+        .text(title);
+
+      // Draw the x-axis label
+      svg.append("text")             
+        .attr("x", width)
+        .attr("y", height + 30)
+        .style("text-anchor", "middle")
+        .style("font-size", "10px")
+        .style("fill", "#fff")
+        .text(x_axis_label);
+
+      // Append the path, bind the data, and call the line generator 
+      svg.append("path")
+        .datum(profile) // 10. Binds data to the line 
+        .style("fill", "none")
+        .style("stroke", plot_color)
+        .style("stroke-width","2px")
+        .attr("class", "line") // Assign a class for styling 
+        .attr("d", line); // 11. Calls the line generator 
+
+      // Appends a circle for each datapoint 
+      svg.selectAll(".dot")
+        .data(profile)
+      .enter().append("circle") // Uses the enter().append() method
+        .style("stroke", plot_color)
+        .attr("class", "dot") // Assign a class for styling
+        .attr("cx", function(d, i) { return xScale(i * pixscale) }) // convert array index (pixels) to arcsec
+        .attr("cy", function(d) { return yScale(d) })
+        .attr("r", 2);
 
     },
-    methods: {
-        getStarProfiles(useSubregion=true) {
-          let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/starprofiles"
-          let body = {
-            "site": this.sitecode,
-            "base_filename": this.current_image.base_filename,
-            //"region_x0": this.subframe_x0, 
-            //"region_x1": this.subframe_x1,
-            //"region_y0": this.subframe_y0,
-            //"region_y1": this.subframe_y1,
-            "fitstype": "01",
-          }
-
-          if (useSubregion) {
-            this.inspect_region_loading = true;
-            body.region_x0 = this.subframe_x0
-            body.region_x1 = this.subframe_x1
-            body.region_y0 = this.subframe_y0
-            body.region_y1 = this.subframe_y1
-          }
-          else { this.inspect_image_loading = true; }
-
-          axios.post(url, body)
-            .then(response => {this.displayStarProfiles(response)})
-            .catch(response => {this.starProfilesReset(response)})
-        },
-        starProfilesReset(response) {
-          this.inspect_region_loading = false;
-          this.inspect_image_loading = false;
-          this.median_fwhm = '--'
-          this.brightest_fwhm = '--'
-        },
-        displayStarProfiles(response) {
-          this.inspect_region_loading = false;
-          this.inspect_image_loading = false;
-          console.log(response)
-
-          // Handle the case where no stars are found.
-          if (response.data.num_good_stars == 0) {
-            console.log('no good stars')
-            this.median_fwhm = '--'
-            this.brightest_fwhm = '--'
-            this.num_good_stars = 0
-
-            // Small popup notification
-            // TODO: include a 'tell me more' button with possible reasons for failure.
-            this.$buefy.toast.open({
-                message: 'No good stars were found in the selected region.',
-                type: 'is-warning',
-                position: 'is-top',
-                actionText: 'Tell me more...',
-                duration: 6000,
-                onAction: () => {
-                  this.$beufy.toast.open(
-                    `<p class="image is-4by3">
-                        <img src="https://buefy.org/static/img/placeholder-1280x960.png">
-                    </p>`
-                  )}
-            })
-          }
-
-          // Otherwise, do this if good stars were found
-          else {
-            let med_star = response.data.median_star
-            let bright_star = response.data.brightest_star
-            let region_coords = response.data.region_coords
-
-            // TODO: plot the gaussian curve over the data instead of connecting the dots.
-
-            // Get the fwhm from the gaussian fit
-            this.median_fwhm = (med_star.gaussian_fwhm * med_star.pixscale).toFixed(2) + '"' 
-            this.brightest_fwhm = (bright_star.gaussian_fwhm *bright_star.pixscale).toFixed(2) + '"' 
-
-            // Get the positions of the stars to show in the image display.
-            this.median_relative_pos_x = (med_star.x / med_star.naxis1) + region_coords.x0,
-            this.median_relative_pos_y = (med_star.y / med_star.naxis2) + region_coords.y0,
-            this.brightest_relative_pos_x = (bright_star.x / bright_star.naxis1) + region_coords.x0,
-            this.brightest_relative_pos_y = (bright_star.y / bright_star.naxis2) + region_coords.y0,
-            this.num_good_stars = response.data.num_good_stars
-
-            // Plot the median star profile
-            let m_profile = med_star.radial_profile
-            let m_pixscale = med_star.pixscale
-            let m_element_id = "#median_star_profile"
-            let m_formatting = {
-              margin_top: 50,
-              margin_right: 25,
-              margin_bottom: 50,
-              margin_left: 45,
-              plot_color: "#209cee",
-              x_axis_ticks: 8,
-              y_axis_ticks: 5,
-            }
-            let m_labels = {
-              title: "Median Star Profile",
-              x_axis_label: "arcseconds",
-            }
-            this.plotStarProfile(m_profile, m_pixscale, m_element_id, m_formatting, m_labels)
-
-            // Plot the brightest star profile
-            let b_profile = bright_star.radial_profile 
-            let b_pixscale = bright_star.pixscale 
-            let b_element_id = "#brightest_star_profile" 
-            let b_formatting = {
-              margin_top: 50,
-              margin_right: 25,
-              margin_bottom: 50,
-              margin_left: 45,
-              plot_color: "#efea5a",
-              x_axis_ticks: 8,
-              y_axis_ticks: 5,
-            }
-            let b_labels = {
-              title: "Brightest Star Profile",
-              x_axis_label: "arcseconds",
-            }
-            this.plotStarProfile(b_profile, b_pixscale, b_element_id, b_formatting, b_labels)
-
-          }
-        },
-        plotStarProfile( profile, pixscale=1, el_id, formatting_opts, label_options ) {
-
-          // Parse the input arguments, and define defaults.
-          const margin = {
-            top: formatting_opts.margin_top || 50,
-            right: formatting_opts.margin_right || 25,
-            bottom: formatting_opts.margin_bottom || 50,
-            left: formatting_opts.margin_left || 45,
-          }
-          const width = formatting_opts.width || 200
-          const height = formatting_opts.height || 100
-          let x_axis_ticks = formatting_opts.x_axis_ticks || 8
-          let y_axis_ticks = formatting_opts.y_axis_ticks || 5
-          let plot_color = formatting_opts.plot_color || "#ff0000"
-
-          let title = label_options.title
-          let x_axis_label = label_options.x_axis_label
-
-          let n = profile.length // The number of datapoints.
-
-
-          // Remove previous plot data
-          d3.select(el_id).select("svg").remove()
-
-          // X scale will use the index of our data, scaled from pix to arcseconds
-          let xScale = d3.scaleLinear()
-              .domain([0, (n-1) * pixscale]) // input
-              .range([0, width]); // output
-
-          // Y scale will use the max in the star profile
-          let yScale = d3.scaleLinear()
-              .domain([0,Math.max(...profile)]) // input 
-              .range([height, 0]); // output 
-
-          // d3's line generator
-          // TODO: replace with the gaussian fit instead of connecting the dots.
-          let line = d3.line()
-              .x(function(d, i) { return xScale(i * pixscale); }) // covnert to arcseconds
-              .y(function(d) { return yScale(d); }) // set the y values for the line generator 
-              .curve(d3.curveMonotoneX) // apply smoothing to the line
-
-          // Add the SVG to the page
-          let svg = d3.select(el_id).append("svg")
-              .attr("width", width + margin.left + margin.right)
-              .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-          // Call the x axis in a group tag
-          svg.append("g")
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + height + ")")
-              .call(d3.axisBottom(xScale).ticks(x_axis_ticks)); // Create an axis component with d3.axisBottom
-
-          // Call the y axis in a group tag
-          svg.append("g")
-              .attr("class", "y axis")
-              .call(d3.axisLeft(yScale).ticks(y_axis_ticks)); // Create an axis component with d3.axisLeft
-              
-          // Draw the plot title
-          svg.append("text")             
-              .attr("x", width/2)
-              .attr("y",-15)
-              .style("text-anchor", "middle")
-              .style("fill", "#fff")
-              .text(title);
-
-          // Draw the x-axis label
-          svg.append("text")             
-              .attr("x", width)
-              .attr("y", height + 30)
-              .style("text-anchor", "middle")
-              .style("font-size", "10px")
-              .style("fill", "#fff")
-              .text(x_axis_label);
-
-          // Append the path, bind the data, and call the line generator 
-          svg.append("path")
-              .datum(profile) // 10. Binds data to the line 
-              .style("fill", "none")
-              .style("stroke", plot_color)
-              .style("stroke-width","2px")
-              .attr("class", "line") // Assign a class for styling 
-              .attr("d", line); // 11. Calls the line generator 
-
-          // Appends a circle for each datapoint 
-          svg.selectAll(".dot")
-              .data(profile)
-            .enter().append("circle") // Uses the enter().append() method
-              .style("stroke", plot_color)
-              .attr("class", "dot") // Assign a class for styling
-              .attr("cx", function(d, i) { return xScale(i * pixscale) }) // convert array index (pixels) to arcsec
-              .attr("cy", function(d) { return yScale(d) })
-              .attr("r", 2);
-
-        },
-        getRegionStats(fitstype, useSubregion=true) {
-          let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
-          //let url = "http://127.0.0.1:5000/lambdacomparison/"
-          //let url = "https://api.photonranch.org/lambdacomparison/"
-          let body = {
-            "site": this.sitecode,
-            "base_filename": this.current_image.base_filename,
-            //"region_x0": this.subframe_x0, 
-            //"region_x1": this.subframe_x1,
-            //"region_y0": this.subframe_y0,
-            //"region_y1": this.subframe_y1,
-            "fitstype": fitstype,
-          }
-          if (useSubregion) {
-            this.region_info_loading = true;
-            body.region_x0 = this.subframe_x0,
-            body.region_x1 = this.subframe_x1,
-            body.region_y0 = this.subframe_y0,
-            body.region_y1 = this.subframe_y1
-          }
-          else { this.image_info_loading = true;}
-          //if (fitstype == "01") { this.ex01_isLoading = true;} // replaced by region_info_loading and image_info_loading
-          if (fitstype == "13") { this.ex13_isLoading = true;}
-          axios.post(url, body)
-            .then(response => {this.displayRegionStats(response, fitstype)})
-            .catch(response => {this.regionStatsReset(fitstype)})
-        },
-        regionStatsReset(fitstype) {
-          //if (fitstype == "01") { this.ex01_isLoading = false;}
-          this.image_info_loading = false;
-          this.region_info_loading = false;
-          if (fitstype == "13") { this.ex13_isLoading = false;}
-          this.region_min = "--"
-          this.region_max = "--"
-          this.region_median = "--"
-          this.region_mean = "--"
-          this.region_std = "--"
-
-        },
-        displayRegionStats(http_response, fitstype) {
-          console.log(http_response)
-          this.image_info_loading = false;
-          this.region_info_loading = false;
-          //if (fitstype == "01") { this.ex01_isLoading = false;}
-          if (fitstype == "13") { this.ex13_isLoading = false;}
-          let data = http_response.data
-          this.region_min = parseFloat(data.min).toFixed(3)
-          this.region_max = parseFloat(data.max).toFixed(3)
-          this.region_median = parseFloat(data.median).toFixed(3)
-          this.region_mean = parseFloat(data.mean).toFixed(3)
-          this.region_std = parseFloat(data.std).toFixed(3)
-        },
-        imagesByUser() {
-            this.$store.dispatch('images/get_user_images')
-        },
-        getFitsHeader() {
-          let url = `https://api.photonranch.org/fitsheader/${this.sitecode}/${this.current_image.base_filename}/`
-          let response = axios.get(url).then(response => {
-              this.fitsHeader = response.data
-          })
-          this.showFitsHeaderModal = true
-        }
+    getRegionStats(fitstype, useSubregion=true) {
+      let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
+      let body = {
+        "site": this.sitecode,
+        "base_filename": this.current_image.base_filename,
+        "fitstype": fitstype,
+      }
+      if (useSubregion) {
+        this.region_info_loading = true;
+        body.region_x0 = this.subframe_x0,
+        body.region_x1 = this.subframe_x1,
+        body.region_y0 = this.subframe_y0,
+        body.region_y1 = this.subframe_y1
+      }
+      else { this.image_info_loading = true;}
+      if (fitstype == "13") { this.ex13_isLoading = true;}
+      axios.post(url, body)
+        .then(response => {this.displayRegionStats(response, fitstype)})
+        .catch(response => {this.regionStatsReset(fitstype)})
     },
-    computed: {
-        //fitsHeader() {
-          //let url = `https://api.photonranch.org/fitsheader/${this.sitecode}/${this.current_image.base_filename}/`
-          //let response = axios.get(url).then(response => {
-              //this.fitsHeader = response.data
-          //})
-        //}
-        captureDate() {
-            return moment.utc(new Date(this.current_image.capture_date)).format('MMMM DD, YYYY')
-        },
-        captureTime() {
-            return moment.utc(new Date(this.current_image.capture_date)).format('HH:mm:ss')
-        },
-        rightAscension() {
-            if (this.current_image.right_ascension){
-                return this.current_image.right_ascension.toFixed(2)
-            }
-            return "---"
-        },
-        declination() {
-            if (this.current_image.declination) {
-                return this.current_image.declination.toFixed(2)
-            }
-            return "---"
-        },
-        ...mapGetters("observatory_configuration", ["available_sites"]),
+    regionStatsReset(fitstype) {
+      //if (fitstype == "01") { this.ex01_isLoading = false;}
+      this.image_info_loading = false;
+      this.region_info_loading = false;
+      if (fitstype == "13") { this.ex13_isLoading = false;}
+      this.region_min = "--"
+      this.region_max = "--"
+      this.region_median = "--"
+      this.region_mean = "--"
+      this.region_std = "--"
 
-        ...mapGetters("images", {
-            recent_images: "recent_images",
-            current_image: "current_image"
-        }),
-
-        active_site: {
-            get() { return this.$store.getters["observatory_configuration/site"]; },
-            set(value) { this.$store.commit("observatory_configuration/setActiveSite", value); }
-        },
-        subframe_x0: {
-            get() { return this.$store.getters['command_params/subframe_x0']},
-            set(val) { this.$store.commit('command_params/subframe_x0', val)},
-        },
-        subframe_y0: {
-            get() { return this.$store.getters['command_params/subframe_y0']},
-            set(val) { this.$store.commit('command_params/subframe_y0', val)},
-        },
-        subframe_x1: {
-            get() { return this.$store.getters['command_params/subframe_x1']},
-            set(val) { this.$store.commit('command_params/subframe_x1', val)},
-        },
-        subframe_y1: {
-            get() { return this.$store.getters['command_params/subframe_y1']},
-            set(val) { this.$store.commit('command_params/subframe_y1', val)},
-        },
     },
+    displayRegionStats(http_response, fitstype) {
+      console.log(http_response)
+      this.image_info_loading = false;
+      this.region_info_loading = false;
+      if (fitstype == "13") { this.ex13_isLoading = false;}
+      let data = http_response.data
+      this.region_min = parseFloat(data.min).toFixed(3)
+      this.region_max = parseFloat(data.max).toFixed(3)
+      this.region_median = parseFloat(data.median).toFixed(3)
+      this.region_mean = parseFloat(data.mean).toFixed(3)
+      this.region_std = parseFloat(data.std).toFixed(3)
+    },
+    imagesByUser() {
+      this.$store.dispatch('images/get_user_images')
+    },
+    getFitsHeader() {
+      let url = `https://api.photonranch.org/fitsheader/${this.sitecode}/${this.current_image.base_filename}/`
+      let response = axios.get(url).then(response => {
+          this.fitsHeader = response.data
+      })
+      this.showFitsHeaderModal = true
+    }
+  },
+  computed: {
+    captureDate() {
+      return moment.utc(new Date(this.current_image.capture_date)).format('MMMM DD, YYYY')
+    },
+    captureTime() {
+      return moment.utc(new Date(this.current_image.capture_date)).format('HH:mm:ss')
+    },
+    rightAscension() {
+      if (this.current_image.right_ascension){
+        return this.current_image.right_ascension.toFixed(2)
+      }
+      return "---"
+    },
+    declination() {
+      if (this.current_image.declination) {
+        return this.current_image.declination.toFixed(2)
+      }
+      return "---"
+    },
+    ...mapGetters("observatory_configuration", ["available_sites"]),
+
+    ...mapGetters("images", {
+      recent_images: "recent_images",
+      current_image: "current_image"
+    }),
+
+    active_site: {
+      get() { return this.$store.getters["observatory_configuration/site"]; },
+      set(value) { this.$store.commit("observatory_configuration/setActiveSite", value); }
+    },
+    subframe_x0: {
+      get() { return this.$store.getters['command_params/subframe_x0']},
+      set(val) { this.$store.commit('command_params/subframe_x0', val)},
+    },
+    subframe_y0: {
+      get() { return this.$store.getters['command_params/subframe_y0']},
+      set(val) { this.$store.commit('command_params/subframe_y0', val)},
+    },
+    subframe_x1: {
+      get() { return this.$store.getters['command_params/subframe_x1']},
+      set(val) { this.$store.commit('command_params/subframe_x1', val)},
+    },
+    subframe_y1: {
+      get() { return this.$store.getters['command_params/subframe_y1']},
+      set(val) { this.$store.commit('command_params/subframe_y1', val)},
+    },
+  },
     
 }
 
@@ -600,16 +584,6 @@ table.info-panel-table { color: #dbdee0; }
 
 .nav-panel > * {
   padding-bottom: 1em;
-}
-
-.line {
-    fill: none;
-    stroke: #ffab00;
-    stroke-width: 3;
-}
-.dot {
-    fill: #ffab00;
-    stroke: #fff;
 }
 
 </style>
