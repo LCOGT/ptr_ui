@@ -11,7 +11,7 @@ const state = {
     mount_dec: '',
 
     // Subframe parameters
-    subframeIsActive: false,
+    subframeIsActive: true,
     subframeDefinedWithFile: '',
     subframe_x0: 0,
     subframe_y0: 0,
