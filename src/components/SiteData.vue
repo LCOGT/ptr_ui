@@ -240,11 +240,11 @@ export default {
   },
   mounted(){
     // Draw empty plots for the star profiles
-    this.plotStarProfile([0], 1, "#brightest_star_profile", 
+    this.plotStarProfile([0], {}, 1, "#brightest_star_profile", 
       {plot_color: "#efea5a"},
       {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
 
-    this.plotStarProfile([0], 1, "#median_star_profile", 
+    this.plotStarProfile([0], {}, 1, "#median_star_profile", 
       {plot_color: "#209cee"},
       {title: "Median Star Profile", x_axis_label: "arcseconds"})
   },
@@ -254,10 +254,6 @@ export default {
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
-        //"region_x0": this.subframe_x0, 
-        //"region_x1": this.subframe_x1,
-        //"region_y0": this.subframe_y0,
-        //"region_y1": this.subframe_y1,
         "fitstype": "01",
       }
 
@@ -330,6 +326,11 @@ export default {
 
         // Plot the median star profile
         let m_profile = med_star.radial_profile
+        let m_gauss = {
+          mean: med_star.gaussian_mean,
+          stddev: med_star.gaussian_stddev,
+          amplitude: med_star.gaussian_amplitude,
+        }
         let m_pixscale = med_star.pixscale
         let m_element_id = "#median_star_profile"
         let m_formatting = {
@@ -345,10 +346,15 @@ export default {
           title: "Median Star Profile",
           x_axis_label: "arcseconds",
         }
-        this.plotStarProfile(m_profile, m_pixscale, m_element_id, m_formatting, m_labels)
+        this.plotStarProfile(m_profile, m_gauss, m_pixscale, m_element_id, m_formatting, m_labels)
 
         // Plot the brightest star profile
         let b_profile = bright_star.radial_profile 
+        let b_gauss = {
+          mean: bright_star.gaussian_mean,
+          stddev: bright_star.gaussian_stddev,
+          amplitude: bright_star.gaussian_amplitude,
+        }
         let b_pixscale = bright_star.pixscale 
         let b_element_id = "#brightest_star_profile" 
         let b_formatting = {
@@ -364,11 +370,11 @@ export default {
           title: "Brightest Star Profile",
           x_axis_label: "arcseconds",
         }
-        this.plotStarProfile(b_profile, b_pixscale, b_element_id, b_formatting, b_labels)
+        this.plotStarProfile(b_profile, b_gauss, b_pixscale, b_element_id, b_formatting, b_labels)
 
       }
     },
-    plotStarProfile( profile, pixscale=1, el_id, formatting_opts, label_options ) {
+    plotStarProfile( profile, gaussian, pixscale=1, el_id, formatting_opts, label_options ) {
 
       // Parse the input arguments, and define defaults.
       const margin = {
@@ -387,6 +393,16 @@ export default {
       let x_axis_label = label_options.x_axis_label
 
       let n = profile.length // The number of datapoints.
+      let x_domain = (n-1) * pixscale // from above, scaled to use units of arcseconds
+
+      // Calculate gaussian fit from the backend-provided parameters
+      let g_mean = gaussian.mean || 0
+      let g_stddev = gaussian.stddev || 0
+      let g_amplitude = gaussian.amplitude || 0
+      let gaussian_dist = x => {
+        return g_amplitude * Math.exp(-0.5 * Math.pow((x - g_mean) / g_stddev, 2))
+      }
+      let gaussian_array = Array(parseInt(x_domain)).fill().map((_,i) => gaussian_dist(i))
 
 
       // Remove previous plot data
@@ -394,7 +410,7 @@ export default {
 
       // X scale will use the index of our data, scaled from pix to arcseconds
       let xScale = d3.scaleLinear()
-        .domain([0, (n-1) * pixscale]) // input
+        .domain([0, x_domain]) // input
         .range([0, width]); // output
 
       // Y scale will use the max in the star profile
@@ -408,6 +424,7 @@ export default {
         .x(function(d, i) { return xScale(i * pixscale); }) // covnert to arcseconds
         .y(function(d) { return yScale(d); }) // set the y values for the line generator 
         .curve(d3.curveMonotoneX) // apply smoothing to the line
+
 
       // Add the SVG to the page
       let svg = d3.select(el_id).append("svg")
@@ -446,7 +463,7 @@ export default {
 
       // Append the path, bind the data, and call the line generator 
       svg.append("path")
-        .datum(profile) // 10. Binds data to the line 
+        .datum(gaussian_array) // 10. Binds data to the line 
         .style("fill", "none")
         .style("stroke", plot_color)
         .style("stroke-width","2px")
