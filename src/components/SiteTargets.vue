@@ -3,21 +3,23 @@
 
 <section>
 
-    <section class="section mount-control-panel">
-            <the-mount-controls :sitecode="sitecode" class="mount-controls"/>
-
-    </section>
 
     <!-- Only show when modal is not open because can't have 2 charts open at once. -->
     <div class="skychart-container">
     <the-sky-chart v-if="isComponentModalActive==false"/>
     </div>
 
-
     <button class="button is-dark is-small"
         @click="isComponentModalActive = true">
         fullscreen
     </button>
+
+    <section class="section mount-control-panel">
+            <the-mount-controls :sitecode="sitecode" class="mount-controls"/>
+
+    </section>
+
+
 
     <b-modal 
         :active.sync="isComponentModalActive"
@@ -37,7 +39,7 @@ import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import TheMountControls from '@/components/TheMountControls'
 import ModalSkyChart from '@/components/ModalSkyChart'
 export default {
-    name: "SubpageTargets",
+    name: "SiteTargets",
     props: ["sitecode"],
     components: {
         TheSkyChart,

@@ -53,6 +53,7 @@ export const commands_mixin = {
             // Get the active device of the requested device type. 
             let device
             switch (device_type) {
+                case 'enclosure': device = this.active_enclosure; break;
                 case 'mount': device = this.active_mount; break;
                 case 'camera': device = this.active_camera; break;
                 case 'filter_wheel': device = this.active_filter_wheel; break;
@@ -228,6 +229,11 @@ export const commands_mixin = {
         // a type together, we need to request the specific device from that 
         // collective state. These properties do that, and handle an undefined 
         // key by returning an empty list.
+        enclosure_state: function() {
+            try {
+                return this.all_enclosure_state[this.active_enclosure]
+            } catch { return {} }
+        },
         mount_state: function() {
             try {
                 return this.all_mount_state[this.active_mount]
@@ -316,14 +322,20 @@ export const commands_mixin = {
         camera_cancel_command () {
             return this.base_command( 'camera', 'stop', 'cancel' )
         },
+        enclosure_open_command () {
+            return this.base_command( 'enclosure', 'open', 'Request Roof to Open')
+        },
+        enclosure_close_command () {
+            return this.base_command( 'enclosure', 'close', 'Request Roof to Close')
+        },
         mount_slew_command () {
             return this.base_command( 'mount', 'go', 'slew to coordinates',
-                { ra: this.mount_ra, dec: this.mount_dec, }
+                { ra: this.mount_ra.toString(), dec: this.mount_dec.toString(), }
             )
         },
         mount_slew_chart_command () {
             return this.base_command( 'mount', 'go', 'slew to chart position',
-                { ra: this.chart_selectedRa, dec: this.chart_selectedDec, }
+                { ra: this.chart_selectedRa.toString(), dec: this.chart_selectedDec.toString(), }
             )
         },
         mount_stop_command () {
@@ -402,7 +414,7 @@ export const commands_mixin = {
         },
         screen_on_command () {
             return this.base_command( 'screen', 'turn_on', 'on',
-                { brightness: this.screen_brightness }
+                { brightness: this.screen_brightness.toString() }
             )
         },
         screen_off_command() {
