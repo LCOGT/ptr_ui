@@ -78,7 +78,7 @@ export default {
                 case 'GET':
                     axios.get(apiName+path, myInit).then(response => {
                         vm.isLoading = false;
-                        console.log(JSON.parse(response.data))
+                        console.log(response.data)
                     }).catch(error => {
                         vm.isLoading = false;
                         console.log(error)
@@ -88,7 +88,7 @@ export default {
                     axios.post(apiName+path, myInit).then(response => {
                         vm.isLoading = false;
                         console.log('SUCCESS')
-                        console.log(JSON.parse(response.data))
+                        console.log(response.data)
                         console.log(myInit)
                     }).catch(error => {
                         vm.isLoading = false;
@@ -101,7 +101,11 @@ export default {
                     console.log('options', options)
                     form.site=this.data.site
                     form.mount=this.data.mount
-                    axios.post("https://jobs.photonranch.org/jobs/newjob",form, options).then(console.warn).catch(e => {console.warn(e)})
+                    console.log(form)
+                    console.log('jobs post')
+                    axios.post("https://jobs.photonranch.org/jobs/newjob",form, options).then(console.log).catch(e => {console.warn(e)})
+                    //console.log('api1 post')
+                    //axios.post("https://api1.photonranch.org/api2/wmd/mount1/command/",{body: form}).then(console.log).catch(e => {console.warn(e)})
                     /* END of testing new jobs architecture */
 
                     break;

@@ -687,7 +687,7 @@ export default {
 
       // Get the global configuration for all sites from an api call.
       let apiName = this.$store.getters['dev/api'];
-      let path = `/fits13_url/${site}/${base_filename}/`;
+      let path = `/fits13_url/${base_filename}/`;
 
       const fits13Url = await axios.get(apiName+path);
       console.log(fits13Url)

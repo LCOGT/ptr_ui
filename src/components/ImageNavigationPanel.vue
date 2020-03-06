@@ -73,13 +73,9 @@ export default {
     };
   },
 
-  beforeMount() {
-    this.$store.dispatch("images/get_user_images");
-  },
-
-  mounted() {
-    this.$store.dispatch("images/get_user_images");
-  },
+  //beforeMount() {
+    //this.$store.dispatch("images/get_user_images");
+  //},
 
   methods: {
     setActiveImage(image) {

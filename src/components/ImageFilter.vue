@@ -156,7 +156,6 @@ export default {
       this.exp_time_max = null;
 
       //Get all images
-      this.$store.dispatch("images/get_user_images");
       this.$store.dispatch("images/refresh_latest_images");
       this.$store.dispatch("images/set_latest_image");
     },

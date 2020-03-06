@@ -81,7 +81,7 @@ const actions = {
 
             // Get the url based on the image filename
             let apiName = rootState.dev.active_api;
-            let path = `/fits13_url/${site}/${base_filename}/`;
+            let path = `/fits13_url/${base_filename}/`;
             axios.get(apiName+path).then(async response => {
                 response = response.data
                 //console.log('response from loadImage: ',response)
@@ -104,7 +104,7 @@ const actions = {
                         // upload to enable server side tasks
                         JS9.UploadFITSFile()
 
-                        console.warn('settign zoom level')
+                        console.warn('setting zoom level')
                         // set zoom level
                         if (zoom) JS9.SetZoom(zoom)
                         if (flip) JS9.SetFlip(flip)

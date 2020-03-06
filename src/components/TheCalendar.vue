@@ -350,7 +350,7 @@ export default {
                 this.geo[this.calendarSite].lon,
               )
             )))
-            console.log(twighlightEvents.slice(0,8))
+            //console.log(twighlightEvents.slice(0,8))
 
             // Finish timer
             let t1=performance.now()
@@ -450,7 +450,7 @@ export default {
          */
         existingEventSelected(arg) {
             let event = arg.event;
-            console.log(event)
+            //console.log(event)
             this.activeEvent.id = event.id,
             this.activeEvent.startStr = event.start.toISOString();
             this.activeEvent.endStr = event.end.toISOString();
@@ -573,8 +573,8 @@ export default {
                 "resourceId":initialEvent.resourceId,
                 "rendering":initialEvent.rendering
             }
-            console.log(theModifiedEvent)
-            console.log(theInitialEvent)
+            //console.log(theModifiedEvent)
+            //console.log(theInitialEvent)
             let body = {
                 originalEvent: theInitialEvent,
                 modifiedEvent: theModifiedEvent,

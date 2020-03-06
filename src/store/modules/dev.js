@@ -5,7 +5,8 @@
 
 // initial state
 const state = {
-    active_api: "https://api.photonranch.org", 
+    //active_api: "https://api.photonranch.org", 
+    active_api: "https://api.photonranch.org/api", 
 }
 
 // getters
