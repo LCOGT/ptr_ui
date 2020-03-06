@@ -70,13 +70,10 @@ export default {
 
             let apiName = this.$store.getters['dev/api'];
             let path = url;
-            let myInit = {
-                body: form,
-            }
 
             switch (http_method.toString()) {
                 case 'GET':
-                    axios.get(apiName+path, myInit).then(response => {
+                    axios.get(apiName+path,form).then(response => {
                         vm.isLoading = false;
                         console.log(response.data)
                     }).catch(error => {
@@ -85,11 +82,10 @@ export default {
                     });
                     break;
                 case 'POST': 
-                    axios.post(apiName+path, myInit).then(response => {
+                    axios.post(apiName+path,form).then(response => {
                         vm.isLoading = false;
                         console.log('SUCCESS')
                         console.log(response.data)
-                        console.log(myInit)
                     }).catch(error => {
                         vm.isLoading = false;
                         console.log('ERROR')
@@ -110,7 +106,7 @@ export default {
 
                     break;
                 case 'PUT':
-                    axios.put(apiName+path, myInit).then(response => {
+                    axios.put(apiName+path,form).then(response => {
                         vm.isLoading = false;
                         console.log(JSON.parse(response.data))
                     }).catch(error => {
