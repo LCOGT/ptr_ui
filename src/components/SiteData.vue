@@ -1,7 +1,7 @@
 <template><section>
     <!--image-view :site="sitecode"/-->
-  <div class="columns">
-    <div class="img-view column is-two-thirds">
+  <div class="columns is-desktop">
+    <div class="img-view column ">
 
       <!-- The actual image view component -->
       <image-view-2 
@@ -17,10 +17,10 @@
 
     </div>
 
-    <div class="nav-panel column ">  
+    <div class="nav-panel column" style="max-width: 350px;">  
 
       <side-info-panel>
-        <p slot="title">selected region</p>
+        <p slot="title">region statistics</p>
         <p>{{current_image.ex13_fits_exists ? "" : "missing small fits"}}</p>
         <p>{{current_image.ex01_fits_exists ? "" : "missing full fits"}}</p>
 
@@ -117,15 +117,15 @@
           <table class="info-panel-table">
               <tr> <td class="info-panel-val" align="right">filename: </td>
                   <td>{{current_image.base_filename}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">capture date: </td>
+              <tr> <td class="info-panel-val" align="right">date: </td>
                   <td>{{captureDate}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">capture time: </td>
+              <tr> <td class="info-panel-val" align="right">time: </td>
                   <td>{{captureTime + " GMT"}}</td> </tr>
               <tr> <td class="info-panel-val" align="right">site: </td>
                   <td>{{current_image.site || "---"}}</td> </tr>
               <div class="blank-row" />
 
-              <tr> <td class="info-panel-val" align="right">exposure [s]: </td>
+              <tr> <td class="info-panel-val" align="right">seconds: </td>
                   <td>{{current_image.exposure_time || "---"}}</td> </tr>
               <tr> <td class="info-panel-val" align="right">filter_used: </td>
                   <td>{{current_image.filter_used || "---"}}</td> </tr>
@@ -221,13 +221,13 @@ export default {
 
       median_plot_color: '#209cee',
       median_fwhm: '--',
-      median_profile: [0],
+      median_profile: [0,0],
       median_relative_pos_x: 0,
       median_relative_pos_y: 0,
 
       brightest_plot_color: '#efea5a',
       brightest_fwhm: '--',
-      brightest_profile: [0],
+      brightest_profile: [0,0],
       brightest_relative_pos_x: 0,
       brightest_relative_pos_y: 0,
 
@@ -383,7 +383,7 @@ export default {
         bottom: formatting_opts.margin_bottom || 50,
         left: formatting_opts.margin_left || 45,
       }
-      const width = formatting_opts.width || 200
+      const width = formatting_opts.width || 180
       const height = formatting_opts.height || 100
       let x_axis_ticks = formatting_opts.x_axis_ticks || 8
       let y_axis_ticks = formatting_opts.y_axis_ticks || 5
@@ -402,7 +402,7 @@ export default {
       let gaussian_dist = x => {
         return g_amplitude * Math.exp(-0.5 * Math.pow((x - g_mean) / g_stddev, 2))
       }
-      let gaussian_array = Array(parseInt(x_domain)).fill().map((_,i) => gaussian_dist(i))
+      let gaussian_array = Array(n).fill().map((_,i) => gaussian_dist(i))
 
 
       // Remove previous plot data
@@ -461,14 +461,18 @@ export default {
         .style("fill", "#fff")
         .text(x_axis_label);
 
-      // Append the path, bind the data, and call the line generator 
-      svg.append("path")
-        .datum(gaussian_array) // 10. Binds data to the line 
-        .style("fill", "none")
-        .style("stroke", plot_color)
-        .style("stroke-width","2px")
-        .attr("class", "line") // Assign a class for styling 
-        .attr("d", line); // 11. Calls the line generator 
+      // Plot the line fit only if the gaussian array is valid, and roughly 
+      // centered over 0.
+      if (gaussian_array[0] && Math.abs(g_mean) < 1) { 
+        // Append the path, bind the data, and call the line generator 
+        svg.append("path")
+          .datum(gaussian_array) // 10. Binds data to the line 
+          .style("fill", "none")
+          .style("stroke", plot_color)
+          .style("stroke-width","2px")
+          .attr("class", "line") // Assign a class for styling 
+          .attr("d", line); // 11. Calls the line generator 
+      }
 
       // Appends a circle for each datapoint 
       svg.selectAll(".dot")
@@ -524,9 +528,6 @@ export default {
       this.region_median = parseFloat(data.median).toFixed(3)
       this.region_mean = parseFloat(data.mean).toFixed(3)
       this.region_std = parseFloat(data.std).toFixed(3)
-    },
-    imagesByUser() {
-      this.$store.dispatch('images/get_user_images')
     },
     getFitsHeader() {
       let url = `https://api.photonranch.org/fitsheader/${this.sitecode}/${this.current_image.base_filename}/`

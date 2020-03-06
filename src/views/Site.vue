@@ -6,10 +6,10 @@
   <section class="page-view">
 
   <div style="height: 3em"></div>
-  <div class="columns">
+  <div class="columns" style="padding: 1em;">
 
     <!-- Menu for site subpages -->
-    <div class="column is-narrow is-full-mobile menu-column">
+    <div class="column menu-column is-one-fifth is-full-mobile">
       <b-menu class="subpage-menu">
         <b-menu-list label="Menu">
             <b-menu-item 
@@ -59,7 +59,7 @@
 
 
     <!-- Primary content of the page. Selects from the various site subpages. -->
-    <div class="column page-content">
+    <div class="column page-content ">
       <site-home v-if="subpage == 'home'" :sitecode="sitecode"/>
       <site-observe v-if="subpage == 'observe'" :sitecode="sitecode"/>
       <site-targets v-if="subpage == 'targets'" :sitecode="sitecode"/>

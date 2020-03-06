@@ -14,10 +14,6 @@
         fullscreen
     </button>
 
-    <section class="section mount-control-panel">
-            <the-mount-controls :sitecode="sitecode" class="mount-controls"/>
-
-    </section>
 
 
 
@@ -36,14 +32,12 @@
 <script>
 
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import TheMountControls from '@/components/TheMountControls'
 import ModalSkyChart from '@/components/ModalSkyChart'
 export default {
     name: "SiteTargets",
     props: ["sitecode"],
     components: {
         TheSkyChart,
-        TheMountControls,
         ModalSkyChart,
     },
     data() {

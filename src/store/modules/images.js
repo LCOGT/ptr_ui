@@ -40,7 +40,7 @@ const actions = {
             response = JSON.parse(response.data)
             commit('setUserImages', response)
         }).catch(error => {
-            console.log(error)
+            console.warn(error)
         });
     },
 
@@ -51,14 +51,20 @@ const actions = {
         console.log(filter_params)
         let apiName = rootState.dev.active_api;
         let path = `/filtered_images`;
-        let body = { params: filter_params}
-        axios.get(apiName+path, body).then(response => {
+        //let url = apiName+path;
+        let body = { 
+            method: "GET",
+            params: filter_params,
+            baseURL: apiName,
+            url: path,
+        }
+        axios(body).then(response => {
             response = response.data
             commit('setUserImages', response)
             let recent_image_list = response.slice(0, 40)
             commit('setRecentImages', recent_image_list)
         }).catch(error => {
-            console.log(error)
+            console.warn(error)
         });
     },
 
@@ -90,7 +96,7 @@ const actions = {
          *  }
          */
         axios.get(apiName+path).then(async response => {
-            response = JSON.parse(response.data)
+            response = response.data
 
             // Empty response:
             if (response.length == 0) { return; }
