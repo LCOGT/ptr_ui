@@ -105,12 +105,21 @@ export default {
   mixins: [commands_mixin],
   props: {
     site: String,
-    median_star_pos_x:Number,
-    median_star_pos_y:Number,
+
+    // median brightness star display
+    median_star_pos_x: Number,
+    median_star_pos_y: Number,
     median_plot_color: String,
-    brightest_star_pos_x:Number,
-    brightest_star_pos_y:Number,
+
+    // brightest saturated star display
+    brightest_star_pos_x: Number,
+    brightest_star_pos_y: Number,
     brightest_plot_color: String,
+
+    // brightest unsaturated star display
+    u_brightest_star_pos_x: Number,
+    u_brightest_star_pos_y: Number,
+    u_brightest_plot_color: String,
   },
   data() {
     return {
@@ -502,18 +511,20 @@ export default {
 
       let med_x = this.median_star_pos_x * this.imageWidth
       let med_y = this.median_star_pos_y * this.imageWidth
+      let ubri_x = this.u_brightest_star_pos_x * this.imageWidth
+      let ubri_y = this.u_brightest_star_pos_y * this.imageWidth
       let bri_x = this.brightest_star_pos_x * this.imageWidth
       let bri_y = this.brightest_star_pos_y * this.imageWidth
 
-      // Draw the crosshairs around the median star
+      // Draw the crosshairs around the brightest unsaturated star
       d3
         .select(this.image_element)
         .append("line")
         .attr("class", "star-marker")
-        .attr("x1", med_x - 15)
-        .attr("y1", med_y)
-        .attr("x2", med_x - 5)
-        .attr("y2", med_y)
+        .attr("x1", ubri_x - 15)
+        .attr("y1", ubri_y)
+        .attr("x2", ubri_x - 5)
+        .attr("y2", ubri_y)
         .attr("stroke", this.median_plot_color)
         .attr("stroke-width", 2)
         .style("fill", "none");
@@ -521,10 +532,10 @@ export default {
         .select(this.image_element)
         .append("line")
         .attr("class", "star-marker")
-        .attr("x1", med_x + 5)
-        .attr("y1", med_y)
-        .attr("x2", med_x + 15)
-        .attr("y2", med_y)
+        .attr("x1", ubri_x + 5)
+        .attr("y1", ubri_y)
+        .attr("x2", ubri_x + 15)
+        .attr("y2", ubri_y)
         .attr("stroke", this.median_plot_color)
         .attr("stroke-width", 2)
         .style("fill", "none");
@@ -532,10 +543,10 @@ export default {
         .select(this.image_element)
         .append("line")
         .attr("class", "star-marker")
-        .attr("x1", med_x)
-        .attr("y1", med_y - 15)
-        .attr("x2", med_x)
-        .attr("y2", med_y - 5)
+        .attr("x1", ubri_x)
+        .attr("y1", ubri_y - 15)
+        .attr("x2", ubri_x)
+        .attr("y2", ubri_y - 5)
         .attr("stroke", this.median_plot_color)
         .attr("stroke-width", 2)
         .style("fill", "none");
@@ -543,10 +554,10 @@ export default {
         .select(this.image_element)
         .append("line")
         .attr("class", "star-marker")
-        .attr("x1", med_x)
-        .attr("y1", med_y + 5)
-        .attr("x2", med_x)
-        .attr("y2", med_y + 15)
+        .attr("x1", ubri_x)
+        .attr("y1", ubri_y + 5)
+        .attr("x2", ubri_x)
+        .attr("y2", ubri_y + 15)
         .attr("stroke", this.median_plot_color)
         .attr("stroke-width", 2)
         .style("fill", "none");
