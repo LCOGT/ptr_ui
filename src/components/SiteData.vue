@@ -9,6 +9,9 @@
         :median_star_pos_x="median_relative_pos_x"
         :median_star_pos_y="median_relative_pos_y"
         :median_plot_color="median_plot_color"
+        :u_brightest_star_pos_x="u_brightest_relative_pos_x"
+        :u_brightest_star_pos_y="u_brightest_relative_pos_y"
+        :u_brightest_plot_color="u_brightest_plot_color"
         :brightest_star_pos_x="brightest_relative_pos_x"
         :brightest_star_pos_y="brightest_relative_pos_y"
         :brightest_plot_color="brightest_plot_color"
@@ -98,13 +101,25 @@
         </button>
         </div>
 
+        <hr>
         <div id="brightest_star_profile" />
+        <table class="info-panel-table">
+            <tr> <td class="info-panel-val" align="right">Half-Flux Diameter: </td>
+                <td>{{brightest_hfd}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">Gaussian FWHM: </td>
+                <td>{{brightest_fwhm}}</td> </tr>
+        </table>
+        <hr>
+        <div id="u_brightest_star_profile" />
+        <table class="info-panel-table">
+            <tr> <td class="info-panel-val" align="right">Half-Flux Diameter: </td>
+                <td>{{u_brightest_hfd}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">Gaussian FWHM: </td>
+                <td>{{u_brightest_fwhm}}</td> </tr>
+        </table>
+        <hr>
         <div id="median_star_profile" />
         <table class="info-panel-table">
-            <tr> <td class="info-panel-val" align="right">brightest fwhm: </td>
-                <td>{{brightest_fwhm}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">median fwhm: </td>
-                <td>{{median_fwhm}}</td> </tr>
             <tr> <td class="info-panel-val" align="right">number of stars detected: </td>
                 <td>{{num_good_stars}}</td> </tr>
         </table>
@@ -221,15 +236,25 @@ export default {
 
       median_plot_color: '#209cee',
       median_fwhm: '--',
+      median_hfd: '--',
       median_profile: [0,0],
       median_relative_pos_x: 0,
       median_relative_pos_y: 0,
 
       brightest_plot_color: '#efea5a',
       brightest_fwhm: '--',
+      brightest_hfd: '--',
       brightest_profile: [0,0],
       brightest_relative_pos_x: 0,
       brightest_relative_pos_y: 0,
+
+      // Unsaturated brightest object
+      u_brightest_plot_color: '#209cee',
+      u_brightest_fwhm: '--',
+      u_brightest_hfd: '--',
+      u_brightest_profile: [0,0],
+      u_brightest_relative_pos_x: 0,
+      u_brightest_relative_pos_y: 0,
 
       starProfileToolActive: false,
       inspect_region_loading: false,
@@ -244,9 +269,9 @@ export default {
       {plot_color: "#efea5a"},
       {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
 
-    this.plotStarProfile([0], {}, 1, "#median_star_profile", 
+    this.plotStarProfile([0], {}, 1, "#u_brightest_star_profile", 
       {plot_color: "#209cee"},
-      {title: "Median Star Profile", x_axis_label: "arcseconds"})
+      {title: "Brightest Unsaturated Star Profile", x_axis_label: "arcseconds"})
   },
   methods: {
     getStarProfiles(useSubregion=true) {
@@ -266,6 +291,7 @@ export default {
       }
       else { this.inspect_image_loading = true; }
 
+      // Request the computed data from our backend
       axios.post(url, body)
         .then(response => {this.displayStarProfiles(response)})
         .catch(response => {this.starProfilesReset(response)})
@@ -275,6 +301,7 @@ export default {
       this.inspect_image_loading = false;
       this.median_fwhm = '--'
       this.brightest_fwhm = '--'
+      this.u_brightest_fwhm = '--'
     },
     displayStarProfiles(response) {
       this.inspect_region_loading = false;
@@ -286,6 +313,7 @@ export default {
         console.log('no good stars')
         this.median_fwhm = '--'
         this.brightest_fwhm = '--'
+        this.u_brightest_fwhm = '--'
         this.num_good_stars = 0
 
         // Small popup notification
@@ -309,6 +337,7 @@ export default {
       else {
         let med_star = response.data.median_star
         let bright_star = response.data.brightest_star
+        let u_bright_star = response.data.brightest_unsaturated
         let region_coords = response.data.region_coords
 
         // TODO: plot the gaussian curve over the data instead of connecting the dots.
@@ -316,12 +345,19 @@ export default {
         // Get the fwhm from the gaussian fit
         this.median_fwhm = (med_star.gaussian_fwhm * med_star.pixscale).toFixed(2) + '"' 
         this.brightest_fwhm = (bright_star.gaussian_fwhm *bright_star.pixscale).toFixed(2) + '"' 
+        this.u_brightest_fwhm = (u_bright_star.gaussian_fwhm *u_bright_star.pixscale).toFixed(2) + '"' 
+
+        this.median_hfd = (med_star.hfd* med_star.pixscale).toFixed(2) + '"' 
+        this.brightest_hfd = (bright_star.hfd*bright_star.pixscale).toFixed(2) + '"' 
+        this.u_brightest_hfd = (u_bright_star.hfd*u_bright_star.pixscale).toFixed(2) + '"' 
 
         // Get the positions of the stars to show in the image display.
         this.median_relative_pos_x = (med_star.x / med_star.naxis1) + region_coords.x0,
         this.median_relative_pos_y = (med_star.y / med_star.naxis2) + region_coords.y0,
         this.brightest_relative_pos_x = (bright_star.x / bright_star.naxis1) + region_coords.x0,
         this.brightest_relative_pos_y = (bright_star.y / bright_star.naxis2) + region_coords.y0,
+        this.u_brightest_relative_pos_x = (u_bright_star.x / u_bright_star.naxis1) + region_coords.x0,
+        this.u_brightest_relative_pos_y = (u_bright_star.y / u_bright_star.naxis2) + region_coords.y0,
         this.num_good_stars = response.data.num_good_stars
 
         // Plot the median star profile
@@ -346,7 +382,8 @@ export default {
           title: "Median Star Profile",
           x_axis_label: "arcseconds",
         }
-        this.plotStarProfile(m_profile, m_gauss, m_pixscale, m_element_id, m_formatting, m_labels)
+        //this.plotStarProfile(m_profile, m_gauss, m_pixscale, m_element_id, m_formatting, m_labels)
+
 
         // Plot the brightest star profile
         let b_profile = bright_star.radial_profile 
@@ -371,6 +408,30 @@ export default {
           x_axis_label: "arcseconds",
         }
         this.plotStarProfile(b_profile, b_gauss, b_pixscale, b_element_id, b_formatting, b_labels)
+
+        // Plot the brightest unsaturated star profile
+        let ub_profile = u_bright_star.radial_profile 
+        let ub_gauss = {
+          mean: u_bright_star.gaussian_mean,
+          stddev: u_bright_star.gaussian_stddev,
+          amplitude: u_bright_star.gaussian_amplitude,
+        }
+        let ub_pixscale = u_bright_star.pixscale 
+        let ub_element_id = "#u_brightest_star_profile" 
+        let ub_formatting = {
+          margin_top: 50,
+          margin_right: 25,
+          margin_bottom: 50,
+          margin_left: 45,
+          plot_color: "#209cee",
+          x_axis_ticks: 8,
+          y_axis_ticks: 5,
+        }
+        let ub_labels = {
+          title: "Brightest Unsaturated Star Profile",
+          x_axis_label: "arcseconds",
+        }
+        this.plotStarProfile(ub_profile, ub_gauss, ub_pixscale, ub_element_id, ub_formatting, ub_labels)
 
       }
     },
@@ -530,7 +591,7 @@ export default {
       this.region_std = parseFloat(data.std).toFixed(3)
     },
     getFitsHeader() {
-      let url = `https://api.photonranch.org/fitsheader/${this.sitecode}/${this.current_image.base_filename}/`
+      let url = `https://api.photonranch.org/api/fitsheader/${this.current_image.base_filename}/`
       let response = axios.get(url).then(response => {
           this.fitsHeader = response.data
       })

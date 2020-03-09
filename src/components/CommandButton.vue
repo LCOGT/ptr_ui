@@ -100,8 +100,6 @@ export default {
                     console.log(form)
                     console.log('jobs post')
                     axios.post("https://jobs.photonranch.org/jobs/newjob",form, options).then(console.log).catch(e => {console.warn(e)})
-                    //console.log('api1 post')
-                    //axios.post("https://api1.photonranch.org/api2/wmd/mount1/command/",{body: form}).then(console.log).catch(e => {console.warn(e)})
                     /* END of testing new jobs architecture */
 
                     break;
