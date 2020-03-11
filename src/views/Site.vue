@@ -118,11 +118,29 @@ export default {
     }
   },
 
+  created () {
+
+    // Listen for new images, and refresh the list when a new image arrives.
+    this.$store.dispatch('images/refresh_latest_images')
+    this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
+    this.imageSubscriber.onmessage = (message) => {
+      let data = JSON.parse(message.data);
+      data["messages"].forEach((message) => {
+        console.log("new image: ",message)
+        // Refresh the image list
+        this.$store.dispatch('images/refresh_latest_images')
+        //this.$store.dispatch('images/set_latest_image')
+      });
+    }
+
+  },
+
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
   watch: {
     sitecode: function () {
       this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
       this.$store.dispatch('images/refresh_latest_images')
+      //this.$store.dispatch('images/set_latest_image')
     },
   },
 
@@ -165,6 +183,7 @@ export default {
       if (this.username != "anonymous") theList.add(`${this.username} (me)`)
       this.displayedOnlineUsers = theList;
     },
+
 
   },
 }
