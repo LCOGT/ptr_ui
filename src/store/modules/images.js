@@ -92,7 +92,6 @@ const actions = {
          *      "exposure_time": str,
          *      "airmass": str,
          *      "jpg13_url": str,
-         *      "fits13_url": str,
          *  }
          */
         axios.get(apiName+path).then(async response => {
@@ -101,14 +100,8 @@ const actions = {
             // Empty response:
             if (response.length == 0) { return; }
 
-            // If current_image is empty, or if we've switched sites:
-            // set current_image to the first element from 'recent_images'. 
-            if (!Object.keys(state.current_image).length
-                || state.current_image.site != response[0].site) {
-                commit('setCurrentImage', response[0])
-            }
-
-            await commit('setRecentImages', response)
+            commit('setCurrentImage', response[0])
+            commit('setRecentImages', response)
 
         }).catch(error => {
             //console.log(error)
@@ -126,7 +119,7 @@ const actions = {
     /**
      * Set the current image to the most recent one in recent_images.
      */
-    set_latest_image({ commit, state }) {
+    set_latest_image({ commit, dispatch, state }) {
         let the_current_image = state.recent_images[0]
         commit('setCurrentImage', the_current_image)
     },
@@ -160,7 +153,7 @@ const actions = {
 }
 
 const mutations = {
-    setCurrentImage(state, the_current_image) { state.current_image = the_current_image },
+    setCurrentImage(state, the_current_image) { state.current_image = the_current_image; console.log(the_current_image)},
     setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setUserImages(state, user_images_list) { state.user_images = user_images_list },
 }

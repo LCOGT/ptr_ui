@@ -600,19 +600,6 @@ export default {
     this.update_status_interval = setInterval(this.update_status, 3000)
     this.update_time_interval = setInterval(this.update_time, 1000)
 
-
-    // Listen for new images, and refresh the list when a new image arrives.
-    this.$store.dispatch('images/refresh_latest_images')
-    this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
-    this.imageSubscriber.onmessage = (message) => {
-      let data = JSON.parse(message.data);
-      data["messages"].forEach((message) => {
-        console.log("new image: ",message)
-        // Refresh the image list
-        this.$store.dispatch('images/refresh_latest_images')
-      });
-    }
-
   },
   
   beforeDestroy() {
