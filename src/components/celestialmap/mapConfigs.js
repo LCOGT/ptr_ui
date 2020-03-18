@@ -3,8 +3,8 @@ import helpers from '@/utils/helpers'
 var configs = {
 
     /* TODO: lat-lon temporary fix with hardcoded value. Get these from state. */
-    lat: 34,//$('#static-state').data('lat');
-    lon: -119,//$('#static-state').data('lon');
+    //lat: 34,//$('#static-state').data('lat');
+    //lon: -119,//$('#static-state').data('lon');
 
     config: {
         width: 0,     // Default width, 0 = full parent width; height is determined by projection

@@ -6,14 +6,18 @@
         </div>
     </div>
 
+
     <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
+
 
     <leaflet-map 
         name="leafmap"
         :latitude="latitude"
         :longitude="longitude"
+        v-if="Object.keys(config).length>0"
     ></leaflet-map>
+
 
     <!-- This is a temporary solution only. Does not scale. -->
     <!-- Add ClearDarkSky charts to site homepage -->
@@ -26,6 +30,7 @@
         <img src="https://www.cleardarksky.com/c/LmyRdgObNMcsk.gif?c=1594801"></a>
     </div>
 
+
     <div class="quick-status">
         quick telescope status/info will be shown here
     </div>
@@ -35,11 +40,10 @@
 
 
     <br>
-
-    <br>
     <!--the-device-selectors /-->
 
-</div></template>
+</div>
+</template>
 
 
 <script>
@@ -52,7 +56,7 @@ import LeafletMap from '@/components/LeafletMap'
 
 export default {
     name: "SiteHome",
-    props: ["sitecode"],
+    props: ["config", "sitecode"],
     mixins: [commands_mixin],
     components: {
         TheDeviceSelectors,
@@ -63,26 +67,16 @@ export default {
     data () {
         return {
             isImageModalActive: false,
-            latitude: -1,
-            longitude: -1,
+            latitude: 0,
+            longitude: 0,
         }
     },
     watch: {
-        sitecode: function() {
-
-            // Update lat and long to use with map
-            this.$store.dispatch('observatory_configuration/update_config').then(() => {
-                this.latitude = this.$store.getters['observatory_configuration/site_latitude']
-                this.longitude = this.$store.getters['observatory_configuration/site_longitude']
-            })
+        config: function() {
+            // New config (new site) should rerender map with updated location.
+            this.latitude = this.config.latitude
+            this.longitude = this.config.longitude
         },
-    },
-    beforeCreate() {
-        // Update lat and long to use with map
-        this.$store.dispatch('observatory_configuration/update_config').then(() => {
-            this.latitude = this.$store.getters['observatory_configuration/site_latitude']
-            this.longitude = this.$store.getters['observatory_configuration/site_longitude']
-        })
     },
     computed: {
         ...mapGetters('images', [

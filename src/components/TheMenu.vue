@@ -13,15 +13,13 @@
 
         <template slot="start">
 
-            <b-navbar-dropdown label="sites">
+            <b-navbar-dropdown label="sites" :close-on-click="true">
                 <template v-for="(site, index) in sites">
-                  <router-link 
-                    class="navbar-item" 
-                    v-bind:to="'/site/' + site.code +'/home'"
-                    v-bind:key="index"
-                    > 
-                    {{site.name}} 
-                  </router-link>
+                  <b-navbar-item tag="router-link" 
+                    :to="{ path: '/site/' + site.code + '/home'}"
+                    v-bind:key="index">
+                    {{site.name}}
+                  </b-navbar-item>
                 </template>
                 <hr class="navbar-divider">
                 <b-navbar-item tag="router-link" :to="{ path: '/about' }">

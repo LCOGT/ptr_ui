@@ -66,7 +66,7 @@
       </pre>
 
       <div class="choose-target" id="skychart-box">
-        <the-sky-chart />
+        <the-sky-chart :siteConfig="config" v-if="Object.keys(config).length>0" />
       </div>
 
     </b-tab-item>
@@ -533,7 +533,8 @@
 </div>
 
 </div>
-</div></template>
+</div>
+</template>
 
 <script>
 import { mapGetters } from 'vuex'
@@ -565,7 +566,7 @@ export default {
     SideInfoPanel,
   },
   mixins: [commands_mixin],
-  props: ['sitecode'],
+  props: ['config', 'sitecode'],
   data () {
     return {
 
@@ -593,9 +594,9 @@ export default {
 
   created() {
 
-    this.$store.dispatch('observatory_configuration/update_config')
-    this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
-    this.$store.dispatch('instrument_state/updateStatus')
+    //this.$store.dispatch('observatory_configuration/update_config')
+    //this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
+    //this.$store.dispatch('instrument_state/updateStatus')
 
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
@@ -606,6 +607,7 @@ export default {
   
   beforeDestroy() {
     clearInterval(this.update_status_interval)
+    clearInterval(this.update_time_interval)
   },
 
 
@@ -767,8 +769,6 @@ export default {
 </script>
 
 <style scoped>
-.content-column {
-}
 .info-column {
   margin-top: 2em;
 }

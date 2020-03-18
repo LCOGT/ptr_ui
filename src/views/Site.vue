@@ -1,6 +1,7 @@
 
 
-<template><div class="page">
+<template>
+<div class="page">
   
   <div class="container">
   <section class="page-view">
@@ -44,8 +45,10 @@
       <div class="menu-label"> online users </div>
       <ul class="online-users-list">
         <li v-for="(user, idx) in displayedOnlineUsers">
-          <b-icon icon="circle" size="is-small" type="is-success" />
-          {{user}}
+          <div v-bind:key="idx">
+            <b-icon icon="circle" size="is-small" type="is-success"/>
+            {{user}}
+          </div>
         </li>
       </ul>
       
@@ -60,11 +63,11 @@
 
     <!-- Primary content of the page. Selects from the various site subpages. -->
     <div class="column page-content ">
-      <site-home v-if="subpage == 'home'" :sitecode="sitecode"/>
-      <site-observe v-if="subpage == 'observe'" :sitecode="sitecode"/>
-      <site-targets v-if="subpage == 'targets'" :sitecode="sitecode"/>
-      <site-calendar v-if="subpage == 'calendar'" :sitecode="sitecode"/>
-      <site-data v-if="subpage == 'data'" :sitecode="sitecode"/>
+      <site-home v-if="subpage == 'home'" :config="config" :sitecode="sitecode"/>
+      <site-observe v-if="subpage == 'observe'" :config="config" :sitecode="sitecode"/>
+      <site-targets v-if="subpage == 'targets'" :config="config" :sitecode="sitecode"/>
+      <site-calendar v-if="subpage == 'calendar'" :config="config" :sitecode="sitecode"/>
+      <site-data v-if="subpage == 'data'" :config="config" :sitecode="sitecode"/>
     </div>
   </div>
   </section>
@@ -81,7 +84,8 @@
   </footer>
 
 
-</div></template>
+</div>
+</template>
 
 <script>
 import { mapGetters } from 'vuex'
@@ -115,12 +119,15 @@ export default {
   data () {
     return {
       displayedOnlineUsers: new Set([]),
+      config: {},
     }
   },
 
   created () {
 
-    // Listen for new images, and refresh the list when a new image arrives.
+
+
+    // Listen for new images on websocket, and refresh the list when a new image arrives.
     this.$store.dispatch('images/refresh_latest_images')
     this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
     this.imageSubscriber.onmessage = (message) => {
@@ -141,6 +148,8 @@ export default {
       this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
       this.$store.dispatch('images/refresh_latest_images')
       //this.$store.dispatch('images/set_latest_image')
+
+      this.getSiteConfig()
     },
   },
 
@@ -151,11 +160,8 @@ export default {
     this.$store.dispatch('instrument_state/updateStatus')
     this.$store.dispatch('images/refresh_latest_images')
 
-    // Get the global configuration for all sites from an api call.
-    let apiName = this.$store.getters['dev/api'];
-    let path = '/all/config/';
-    const config_g = await axios.get(apiName+path);
-    this.config_g = config_g
+    // Get the site configuration
+    this.getSiteConfig()
 
     // Update timestamp every second (sent with command)
     var self = this;
@@ -183,6 +189,14 @@ export default {
       if (this.username != "anonymous") theList.add(`${this.username} (me)`)
       this.displayedOnlineUsers = theList;
     },
+
+    async getSiteConfig() {
+      let baseUrl = this.$store.getters['dev/api'];
+      let path = `/${this.sitecode}/config`
+      let response = await axios.get(baseUrl + path)
+      this.config = response.data.configuration
+      console.log(`${this.sitecode} config: `,this.config)
+    }
 
   }
 }
