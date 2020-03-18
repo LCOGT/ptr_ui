@@ -208,6 +208,7 @@ export default {
     flex-direction: column;
 }
 .message-username {
+    padding-top: 10px;
     font-weight: lighter;
 }
 .right-align-text {
