@@ -1,7 +1,19 @@
 <template><div>
 
+    <div class="level site-welcome-text">
+        <div class="level-item">
+        Welcome to {{sitecode.toUpperCase()}}
+        </div>
+    </div>
+
     <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
+
+    <leaflet-map 
+        name="leafmap"
+        :latitude="latitude"
+        :longitude="longitude"
+    ></leaflet-map>
 
     <div class="quick-status">
         quick telescope status/info will be shown here
@@ -10,73 +22,6 @@
 
     <div style="height: 2em;" />
 
-
-    <!--div class="tile">
-      <div class="tile is-4 is-parent is-vertical">
-
-        <article class="tile is-child notification">
-            <p class="title is-4">1. Choose a target</p>
-            <br>
-            <b-field label="Search for a target">
-                    <b-input placeholder="target name or position"></b-input>
-            </b-field>
-            <p class="control">
-                <button class="button is-primary">Search</button>
-            </p>
-        </article>
-
-        <article class="tile is-child notification">
-            <p class="title is-4">2. Expose an image</p>
-            <br>
-            <b-field label="Expose">
-                <b-field>
-                    <b-input name="subject" value="5.0"></b-input>
-                    <p class="control"> <span class="button is-static">seconds</span> </p>
-                </b-field>
-            </b-field>
-            <b-field label="Filter">
-                <b-select placeholder="Select filter" value="color">
-                    <option value="Color (RGB)">color</option>
-                    <option value="Luminance">luminance</option>
-                    <option value="Red">red</option>
-                    <option value="Green">green</option>
-                    <option value="Blue">blue</option>
-                </b-select>
-            </b-field>
-            <p class="control">
-                <button class="button is-primary">Expose</button>
-            </p>
-
-        </article>
-
-      </div>
-      <div class="tile is-parent">
-
-        <article class="tile is-child notification">
-            <p class="title is-4">3. See the results!</p>
-            <br>
-            <div 
-                style="width:100%;height:0; padding-top:100%;position:relative; background:grey;"
-                @click="isImageModalActive = true" 
-                >
-                <!--img  src="<imgUrl>" style="position:absolute; top:0; left:0; width:100%;"-->
-                <!--img
-                    v-bind:src="current_image.jpg13_url" 
-                    class="preview-image" />
-            </div>
-
-            <b-modal :active.sync="isImageModalActive" :width="800">
-                <p class="image">
-                    <!--img v-bind:src="current_image.url"-->
-                    <!--image-view :site="sitecode"/>
-                </p>
-            </b-modal>
-            <br>
-            <div>File: {{current_image.base_filename}} </div>
-        </article>
-
-      </div>
-    </div-->
 
     <br>
 
@@ -92,6 +37,8 @@ import TheDomeCam from '@/components/TheDomeCam'
 import { mapGetters } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
 import ImageView from '@/components/ImageView'
+import LeafletMap from '@/components/LeafletMap'
+
 export default {
     name: "SiteHome",
     props: ["sitecode"],
@@ -100,11 +47,31 @@ export default {
         TheDeviceSelectors,
         TheDomeCam,
         ImageView,
+        LeafletMap,
     },
     data () {
         return {
             isImageModalActive: false,
+            latitude: -1,
+            longitude: -1,
         }
+    },
+    watch: {
+        sitecode: function() {
+
+            // Update lat and long to use with map
+            this.$store.dispatch('observatory_configuration/update_config').then(() => {
+                this.latitude = this.$store.getters['observatory_configuration/site_latitude']
+                this.longitude = this.$store.getters['observatory_configuration/site_longitude']
+            })
+        },
+    },
+    beforeCreate() {
+        // Update lat and long to use with map
+        this.$store.dispatch('observatory_configuration/update_config').then(() => {
+            this.latitude = this.$store.getters['observatory_configuration/site_latitude']
+            this.longitude = this.$store.getters['observatory_configuration/site_longitude']
+        })
     },
     computed: {
         ...mapGetters('images', [
@@ -120,6 +87,9 @@ export default {
 
 <style scoped>
 
+.site-welcome-text {
+    font: 64px "Share Tech Mono", monospace;
+}
 .quick-status {
     background-color: #232929;
     height: 5em;

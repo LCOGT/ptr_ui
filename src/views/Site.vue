@@ -184,39 +184,6 @@ export default {
       this.displayedOnlineUsers = theList;
     },
 
-    async getConfigWithAuth() {
-        let token, configWithAuth;
-        try {
-            token = await this.$auth.getTokenSilently(); 
-        } catch(err) {
-            console.error(err)
-            console.warn('Did not acquire the needed token. Stopping request.')
-            
-            // small popup notification
-            this.$buefy.toast.open({
-                duration: 5000,
-                message: "Oops! You need to be logged in to do that.",
-                position: 'is-bottom',
-                type: 'is-danger' ,
-            })
-            //return {}
-        }
-
-        return {
-            'headers': {
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${token}`
-            }
-        }
-    },
-    async authPing() {
-      let url = 'https://api.photonranch.org/test/ping/timspathparam' 
-      let opts = await this.getConfigWithAuth()
-      console.log(opts)
-
-      axios.post(url,{},opts).then(console.log).catch(e => console.warn)
-    },
   }
 }
 

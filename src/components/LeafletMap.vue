@@ -9,19 +9,26 @@
 import nite from '@/utils/nite-overlay'
 export default {
   name: 'LeafletMap',
-  props: ['name'],
+  props: ['name', 'latitude', 'longitude'],
   data () {
     return {
       mapName: this.name + '-map',
       map: null,
       tileLayer: null,
-      layers: [
-      ]
+      layers: []
     }
   },
   mounted () {
     this.initMap()
-    this.initLayers()
+  },
+  watch: {
+    latitude: function () {
+      this.recenterMap()
+    },
+    longitude: function () {
+      this.recenterMap()
+    },
+
   },
   methods: {
     initMap () {
@@ -36,7 +43,7 @@ export default {
         maxZoom: 19,
         attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
         apiKey: OWM_API_KEY,
-        opacity: 0.5
+        opacity: 0.9
       })
       var owm_wind = L.tileLayer('http://{s}.tile.openweathermap.org/map/wind/{z}/{x}/{y}.png?appid={apiKey}', {
         maxZoom: 19,
@@ -67,26 +74,30 @@ export default {
         'Temperature': owm_temp
       }
 
-      map = L.map(this.mapName, {
-        center: new L.LatLng(0, 0),
-        zoom: 2.3,
+      this.map = L.map(this.mapName, {
+        center: new L.LatLng(this.latitude, this.longitude),
+        zoom: 7,
         layers: [googleMaps, owm_clouds]
       })
 
-      var layerControl = L.control.layers(baseMaps, overlays, { collapsed: false }).addTo(map)
+      var layerControl = L.control.layers(baseMaps, overlays, { collapsed: false }).addTo(this.map)
       nite.init()
 
-      // this.map = L.map(this.mapName).setView([34.4, -116.7], 8);
-      // this.tileLayer = L.tileLayer(
-      //    'https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png',
-      //    {
-      //        maxZoom: 18,
-      //        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>',
-      //    }
-      // );
-      // this.tileLayer.addTo(this.map);
+      //this.map = L.map(this.mapName).setView([this.latitude, this.longitude], 8);
+      //this.tileLayer = L.tileLayer(
+        //'https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png',
+        //{
+            //maxZoom: 10,
+            //attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>',
+        //}
+      //);
+      //this.tileLayer.addTo(this.map);
+
     },
-    initLayers () {}
+
+    recenterMap() {
+      this.map.setView([this.latitude, this.longitude])
+    },
   }
 }
 
@@ -94,8 +105,8 @@ export default {
 
 <style scoped>
     .leaflet-map {
-        width: 100vw;
-        height: 50vw;
+        width: 100%;
+        height: 400px;
         background-color: grey;
         margin: 20px auto;
         max-height: 90vh;
