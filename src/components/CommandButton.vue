@@ -43,6 +43,7 @@ export default {
                     position: 'is-bottom',
                     type: 'is-danger' ,
                 })
+                //return {}
             }
 
             return {
