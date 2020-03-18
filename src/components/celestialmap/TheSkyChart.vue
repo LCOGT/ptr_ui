@@ -20,6 +20,7 @@ import { mapGetters } from 'vuex'
 
 export default {
     name: 'TheSkyChart',
+    props: ["siteConfig"],
     data () {
         return {
             mapClickedX: -1,
@@ -326,26 +327,35 @@ export default {
 
     },
     mounted() {
-        this.$store.dispatch('instrument_state/updateStatus')
+        //this.$store.dispatch('instrument_state/updateStatus')
         this.$nextTick(function () {
             this.handleClick();
             this.initializePointer();
             this.update_chart();
-            Celestial.display(mapConfigs.config);
+            let config = mapConfigs.config
+            config.center = [helpers.hour2degree(helpers.siderealTime(parseFloat(this.siteConfig.longitude))), parseFloat(this.siteConfig.latitude), 0]
+            Celestial.display(config);
         })
     },
 
 
-   // watch: {
-   //     site_latitude(newLat) {
-   //         Celestial.rotate({center:[helpers.hour2degree(helpers.siderealTime(this.site_longitude)), this.site_latitude, 0]})
-   //         Celestial.redraw()
-   //     },
-   //     site_longitude(newLon) {
-   //         Celestial.rotate({center:[helpers.hour2degree(helpers.siderealTime(this.site_longitude)), this.site_latitude, 0]})
-   //         Celestial.redraw()
-   //     }
-   // },
+    watch: {
+        //siteConfig() {
+            //console.log('New site config in skymap')
+            //Celestial.rotate({
+                //center: [
+                    //helpers.hour2degree(helpers.siderealTime(this.siteConfig.longitude)), 
+                    //this.siteConfig.latitude, 
+                    //0
+                //]
+            //})
+            //Celestial.redraw()
+        //},
+        //site_longitude(newLon) {
+            //Celestial.rotate({center:[helpers.hour2degree(helpers.siderealTime(this.site_longitude)), this.site_latitude, 0]})
+            //Celestial.redraw()
+        //}
+    },
 
     computed: {
         ...mapGetters('skyChart', {

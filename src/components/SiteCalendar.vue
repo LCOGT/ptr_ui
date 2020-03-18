@@ -2,7 +2,8 @@
 
     <the-calendar :calendarSite="sitecode" :fc_resources="listOfObservatories"/>
 
-</div></template>
+</div>
+</template>
 
 
 <script>
@@ -10,7 +11,7 @@ import TheCalendar from '@/components/TheCalendar';
 
 export default {
     name: "SiteCalendar",
-    props: ["sitecode"],
+    props: ["config", "sitecode"],
     components: { 
         TheCalendar,
     },

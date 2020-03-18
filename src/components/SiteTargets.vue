@@ -6,10 +6,12 @@
 
     <!-- Only show when modal is not open because can't have 2 charts open at once. -->
     <div class="skychart-container">
-    <the-sky-chart v-if="isComponentModalActive==false"/>
+        <!-- Note: only render once the config is populated (needs lat/long to load) -->
+        <the-sky-chart :siteConfig="config" v-if="Object.keys(config).length>0"/>
     </div>
 
     <button class="button is-dark is-small"
+        style="display:none;"
         @click="isComponentModalActive = true">
         fullscreen
     </button>
@@ -24,8 +26,6 @@
     </b-modal>
 
 </section>
-
-
 </template>
 
 
@@ -35,7 +35,7 @@ import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import ModalSkyChart from '@/components/ModalSkyChart'
 export default {
     name: "SiteTargets",
-    props: ["sitecode"],
+    props: ["config", "sitecode"],
     components: {
         TheSkyChart,
         ModalSkyChart,

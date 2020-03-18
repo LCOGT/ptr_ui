@@ -186,7 +186,8 @@
   </b-modal>
 
 
-</section></template>
+</section>
+</template>
 
 
 <script>
@@ -205,7 +206,7 @@ import * as d3 from 'd3'
 
 export default {
   name: "SubpageData",
-  props: ["sitecode"],
+  props: ["config", "sitecode"],
   components: {
       ImageView2,
       ImagesTable,

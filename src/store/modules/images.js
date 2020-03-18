@@ -153,7 +153,7 @@ const actions = {
 }
 
 const mutations = {
-    setCurrentImage(state, the_current_image) { state.current_image = the_current_image; console.log(the_current_image)},
+    setCurrentImage(state, the_current_image) { state.current_image = the_current_image; },
     setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setUserImages(state, user_images_list) { state.user_images = user_images_list },
 }
