@@ -183,11 +183,6 @@ export default {
       }
       return "anonymous"
     },
-    configIsLoaded() {
-      console.log(this.config.site)
-      console.log('configIsLoaded? ', Object.keys(this.config).length > 0)
-      return Object.keys(this.config).length > 0;
-    },
   },
 
   methods: {
