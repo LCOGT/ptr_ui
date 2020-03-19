@@ -71,6 +71,10 @@ export default {
             longitude: 0,
         }
     },
+    mounted() {
+        this.latitude = this.config.latitude
+        this.longitude = this.config.longitude
+    },
     watch: {
         config: function() {
             // New config (new site) should rerender map with updated location.
