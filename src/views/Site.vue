@@ -62,6 +62,8 @@
 
 
     <!-- Primary content of the page. Selects from the various site subpages. -->
+    <!-- Note: wait for parent (this component) to mount before loading child components. 
+    Otherwise, props may initially load as null. -->
     <div class="column page-content ">
       <site-home v-if="subpage == 'home' && siteIsMounted" :config="config" :sitecode="sitecode"/>
       <site-observe v-if="subpage == 'observe' && siteIsMounted" :config="config" :sitecode="sitecode"/>
