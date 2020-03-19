@@ -63,11 +63,11 @@
 
     <!-- Primary content of the page. Selects from the various site subpages. -->
     <div class="column page-content ">
-      <site-home v-if="subpage == 'home'" :config="config" :sitecode="sitecode"/>
-      <site-observe v-if="subpage == 'observe'" :config="config" :sitecode="sitecode"/>
-      <site-targets v-if="subpage == 'targets'" :config="config" :sitecode="sitecode"/>
-      <site-calendar v-if="subpage == 'calendar'" :config="config" :sitecode="sitecode"/>
-      <site-data v-if="subpage == 'data'" :config="config" :sitecode="sitecode"/>
+      <site-home v-if="subpage == 'home' && siteIsMounted" :config="config" :sitecode="sitecode"/>
+      <site-observe v-if="subpage == 'observe' && siteIsMounted" :config="config" :sitecode="sitecode"/>
+      <site-targets v-if="subpage == 'targets' && siteIsMounted" :config="config" :sitecode="sitecode"/>
+      <site-calendar v-if="subpage == 'calendar' && siteIsMounted" :config="config" :sitecode="sitecode"/>
+      <site-data v-if="subpage == 'data' && siteIsMounted" :config="config" :sitecode="sitecode"/>
     </div>
   </div>
   </section>
@@ -120,13 +120,13 @@ export default {
     return {
       displayedOnlineUsers: new Set([]),
       config: {},
+
+      // Config prop might be null, so children should wait until this component is mounted
+      siteIsMounted: false, 
     }
   },
 
   created () {
-
-
-
     // Listen for new images on websocket, and refresh the list when a new image arrives.
     this.$store.dispatch('images/refresh_latest_images')
     this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
@@ -147,21 +147,26 @@ export default {
     sitecode: function () {
       this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
       this.$store.dispatch('images/refresh_latest_images')
-      //this.$store.dispatch('images/set_latest_image')
 
       this.getSiteConfig()
     },
   },
 
+  async beforeMount() {
+    // Get the site configuration
+    this.getSiteConfig()
+  },
+
   async mounted() {
+
+    this.siteIsMounted = true; // child components are ready to render now
+
     // Make sure the default instruments are selected at the initial load.
     this.$store.dispatch('observatory_configuration/update_config')
     this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
     this.$store.dispatch('instrument_state/updateStatus')
     this.$store.dispatch('images/refresh_latest_images')
 
-    // Get the site configuration
-    this.getSiteConfig()
 
     // Update timestamp every second (sent with command)
     var self = this;
@@ -177,6 +182,11 @@ export default {
         return this.$auth.user.name
       }
       return "anonymous"
+    },
+    configIsLoaded() {
+      console.log(this.config.site)
+      console.log('configIsLoaded? ', Object.keys(this.config).length > 0)
+      return Object.keys(this.config).length > 0;
     },
   },
 
@@ -196,7 +206,8 @@ export default {
       let response = await axios.get(baseUrl + path)
       this.config = response.data.configuration
       console.log(`${this.sitecode} config: `,this.config)
-    }
+    },
+
 
   }
 }
