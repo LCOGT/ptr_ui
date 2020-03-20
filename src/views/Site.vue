@@ -123,12 +123,18 @@ export default {
       displayedOnlineUsers: new Set([]),
       config: {},
 
+      // Websocket for status updates
+      status_ws: '',
+
       // Config prop might be null, so children should wait until this component is mounted
       siteIsMounted: false, 
+
+      deviceStatus: {},
     }
   },
 
   created () {
+
     // Listen for new images on websocket, and refresh the list when a new image arrives.
     this.$store.dispatch('images/refresh_latest_images')
     this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
@@ -142,6 +148,21 @@ export default {
       });
     }
 
+    let status_ws_url = 'wss://2q5zz6ppch.execute-api.us-east-1.amazonaws.com/dev'
+    status_ws_url += `?site=${encodeURIComponent(this.sitecode)}`
+    this.status_ws= new ReconnectingWebSocket(status_ws_url)
+    this.status_ws.onmessage = (message) => {
+      let data = JSON.parse(message.data);
+      let statusType = data.statusType
+      let status = data.status
+      let status_timestamp = data.server_timestamp_ms
+
+      if (statusType == "deviceStatus"){
+        this.deviceStatus = status
+      }
+
+    }
+
   },
 
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
@@ -150,7 +171,11 @@ export default {
       this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
       this.$store.dispatch('images/refresh_latest_images')
 
+      // Load the config for the new site
       this.getSiteConfig()
+
+      // Change status subscriptions to the new site
+      this.updateStatusSubscriptionSite(this.sitecode)
     },
   },
 
@@ -203,6 +228,11 @@ export default {
       let response = await axios.get(baseUrl + path)
       this.config = response.data.configuration
       console.log(`${this.sitecode} config: `,this.config)
+    },
+
+    // The status websocket will only send status updates from the subscribed site.
+    updateStatusSubscriptionSite(site) {
+      this.status_ws.send(JSON.stringify({"action": "updateSubscriberSite", "site": site}))
     },
 
 
