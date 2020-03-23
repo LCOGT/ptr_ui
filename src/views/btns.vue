@@ -53,7 +53,6 @@
         <button class="button" @click="calculations">altaz calcs</button>
         <button class="button" @click="testWCS">wcs function</button>
         <button class="button" @click="getLastCommand">last cmd (mnt1)</button>
-        <button class="button" @click="updateStatus">update status</button>
     </div>
     
   </div>
@@ -269,24 +268,6 @@ export default {
       });
     },
 
-    /**
-     * Regularly send a status update to site1. For testing.
-     * Status contains a parked=true entry, as well as a changing timestamp.
-     */
-    updateStatus() {
-
-        let apiName = this.api;
-        let path = '/site1/status/';
-        let myInit = {
-          body: {"parked": "true", "timestamp": Date.now().toString() }
-        }
-        axios.put(apiName+path, myInit).then(response => {
-          console.log('updated status: ');
-          console.log(response);
-        }).catch(error => {
-          console.log(error.response)
-        });
-    },
   },
 
   computed: {

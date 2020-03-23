@@ -14,6 +14,10 @@
           <br>
 
       </div>
+      <div class="status-toggle-bar" @click="isEnclosureStatusVisible = !isEnclosureStatusVisible">toggle status</div>
+      <pre v-if="isEnclosureStatusVisible">
+        <simple-device-status :device_name="active_enclosure" device_type="enclosure" :device_status="enclosure_state" />
+      </pre>
 
     </b-tab-item> 
     <b-tab-item label="Telescope">
@@ -566,7 +570,7 @@ export default {
     SideInfoPanel,
   },
   mixins: [commands_mixin],
-  props: ['config', 'sitecode'],
+  props: ['config', 'deviceStatus', 'sitecode'],
   data () {
     return {
 
@@ -585,42 +589,27 @@ export default {
 
       isDeviceSelectorActive: false,
 
+      isEnclosureStatusVisible: false,
       isMountStatusVisible: false,
       isCameraStatusVisible: false,
       isFocuserStatusVisible: false,
+
 
     }
   },
 
   created() {
 
-    //this.$store.dispatch('observatory_configuration/update_config')
-    //this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
-    //this.$store.dispatch('instrument_state/updateStatus')
-
-    // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
-    this.update_status_interval = setInterval(this.update_status, 3000)
     this.update_time_interval = setInterval(this.update_time, 1000)
-
   },
   
   beforeDestroy() {
-    clearInterval(this.update_status_interval)
     clearInterval(this.update_time_interval)
   },
 
 
   methods: {
-
-    /**
-    * Update status by requesting data from dynamodb via vuex.
-    * This function is called regularly in the `created` lifecycle hook.
-    */
-    update_status() {
-      // Dispatch the vuex action that refreshes the site status. 
-      this.$store.dispatch('instrument_state/updateStatus')
-    },
 
     update_time() {
       this.local_timestamp= Date.now()
@@ -681,8 +670,67 @@ export default {
       'scriptHasSettings',
     ]),
 
+    ...mapGetters('observatory_configuration', [
+      'enclosure',
+      'mount',
+      'telescope',
+      'camera',
+      'filter_wheel',
+      'focuser',
+      'rotator',
+      'screen',
+    ]),
+
+      
+
+    enclosure_state() {
+        try {
+            return this.deviceStatus.enclosure[this.enclosure]
+        } catch { return {} }
+    },
+    mount_state() {
+        try {
+            return this.deviceStatus.mount[this.mount]
+        } catch { return {} }
+    },
+    telescope_state() {
+        try {
+            return this.deviceStatus.telescope[this.telescope]
+        } catch(error) { return {} }
+    },
+    camera_state() {
+        try {
+            return this.deviceStatus.camera[this.camera]
+        } catch(error) { console.log(error); return {} }
+    },
+    filter_wheel_state () {
+        try {
+            return this.deviceStatus.filter_wheel[this.filter_wheel]
+        } catch(error) { return {} }
+    },
+    focuser_state() {
+        try {
+            return this.deviceStatus.focuser[this.focuser]
+        } catch(error) { return {} }
+    },
+    rotator_state() {
+        try {
+            return this.deviceStatus.rotator[this.rotator]
+        } catch(error) { return {} }
+    },
+    screen_state () {
+        try {
+            return this.deviceStatus.screen[this.screen]
+        } catch(error) { return {} }
+    },
+    sequencer_state () {
+        try {
+            return this.deviceStatus.sequencer
+        } catch(error) { return {} }
+    },
+
     status_age() {
-      let status_timestamp = this.$store.getters['instrument_state/timestamp']
+      let status_timestamp = this.deviceStatus.timestamp
       return (this.local_timestamp/1000 - status_timestamp).toFixed(1)
     },
 

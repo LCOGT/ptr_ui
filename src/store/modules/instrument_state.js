@@ -42,6 +42,7 @@ const getters = {
 // actions
 const actions = {
     updateStatus({ commit, rootState}) {
+        return
 
         // Get the active site from the observatory_configuration module
         let site = rootState.observatory_configuration.selected_site;

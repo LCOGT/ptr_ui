@@ -56,7 +56,7 @@ import LeafletMap from '@/components/LeafletMap'
 
 export default {
     name: "SiteHome",
-    props: ["config", "sitecode"],
+    props: ["config", "deviceStatus", "sitecode"],
     mixins: [commands_mixin],
     components: {
         TheDeviceSelectors,

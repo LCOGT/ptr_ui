@@ -206,7 +206,7 @@ import * as d3 from 'd3'
 
 export default {
   name: "SubpageData",
-  props: ["config", "sitecode"],
+  props: ["config", "deviceStatus", "sitecode"],
   components: {
       ImageView2,
       ImagesTable,

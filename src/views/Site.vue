@@ -65,11 +65,36 @@
     <!-- Note: wait for parent (this component) to mount before loading child components. 
     Otherwise, props may initially load as null. -->
     <div class="column page-content ">
-      <site-home v-if="subpage == 'home' && siteIsMounted" :config="config" :sitecode="sitecode"/>
-      <site-observe v-if="subpage == 'observe' && siteIsMounted" :config="config" :sitecode="sitecode"/>
-      <site-targets v-if="subpage == 'targets' && siteIsMounted" :config="config" :sitecode="sitecode"/>
-      <site-calendar v-if="subpage == 'calendar' && siteIsMounted" :config="config" :sitecode="sitecode"/>
-      <site-data v-if="subpage == 'data' && siteIsMounted" :config="config" :sitecode="sitecode"/>
+      <site-home 
+        v-if="subpage == 'home' && siteIsMounted" 
+        :config="config" 
+        :sitecode="sitecode"
+        :deviceStatus="deviceStatus"
+      />
+      <site-observe 
+        v-if="subpage == 'observe' && siteIsMounted" 
+        :config="config" 
+        :sitecode="sitecode"
+        :deviceStatus="deviceStatus"
+      />
+      <site-targets 
+        v-if="subpage == 'targets' && siteIsMounted" 
+        :config="config" 
+        :sitecode="sitecode"
+        :deviceStatus="deviceStatus"
+      />
+      <site-calendar 
+        v-if="subpage == 'calendar' && siteIsMounted" 
+        :config="config" 
+        :sitecode="sitecode"
+        :deviceStatus="deviceStatus"
+      />
+      <site-data 
+        v-if="subpage == 'data' && siteIsMounted" 
+        :config="config" 
+        :sitecode="sitecode"
+        :deviceStatus="deviceStatus"
+      />
     </div>
   </div>
   </section>
@@ -129,7 +154,22 @@ export default {
       // Config prop might be null, so children should wait until this component is mounted
       siteIsMounted: false, 
 
-      deviceStatus: {},
+      deviceStatus: {
+        /*
+        mount: {},
+        telescope: {},
+        camera: {},
+        filter_wheel: {},
+        focuser: {},
+        rotator: {},
+        screen: {},
+        sequencer: {},
+        observingConditions: {},
+        timestamp: {},
+        */
+      },
+      weatherStatus: {},
+
     }
   },
 
@@ -148,6 +188,7 @@ export default {
       });
     }
 
+    // Connect to websocket to get state of devices/weather
     let status_ws_url = 'wss://2q5zz6ppch.execute-api.us-east-1.amazonaws.com/dev'
     status_ws_url += `?site=${encodeURIComponent(this.sitecode)}`
     this.status_ws= new ReconnectingWebSocket(status_ws_url)
@@ -160,8 +201,14 @@ export default {
       if (statusType == "deviceStatus"){
         this.deviceStatus = status
       }
-
     }
+
+    // Load initial status
+    this.getSiteDeviceStatus()
+
+    // Get the site configuration
+    this.getSiteConfig()
+
 
   },
 
@@ -176,13 +223,12 @@ export default {
 
       // Change status subscriptions to the new site
       this.updateStatusSubscriptionSite(this.sitecode)
+
+      // Get status for the new site.
+      this.getSiteDeviceStatus()
     },
   },
 
-  async beforeMount() {
-    // Get the site configuration
-    this.getSiteConfig()
-  },
 
   async mounted() {
 
@@ -191,9 +237,7 @@ export default {
     // Make sure the default instruments are selected at the initial load.
     this.$store.dispatch('observatory_configuration/update_config')
     this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
-    this.$store.dispatch('instrument_state/updateStatus')
     this.$store.dispatch('images/refresh_latest_images')
-
 
     // Update timestamp every second (sent with command)
     var self = this;
@@ -230,14 +274,19 @@ export default {
       console.log(`${this.sitecode} config: `,this.config)
     },
 
-    // The status websocket will only send status updates from the subscribed site.
+    async getSiteDeviceStatus() {
+      let url = `https://status.photonranch.org/status/${this.sitecode}/device_status`
+      let response = await axios.get(url)
+      this.deviceStatus = response.data.Item.status
+    },
+
+    // Changes the site that the status websocket recieves updates for.
     updateStatusSubscriptionSite(site) {
       this.status_ws.send(JSON.stringify({"action": "updateSubscriberSite", "site": site}))
     },
 
-
-  }
 }
+  }
 
 </script>
 

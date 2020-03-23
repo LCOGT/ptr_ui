@@ -20,7 +20,7 @@ import { mapGetters } from 'vuex'
 
 export default {
     name: 'TheSkyChart',
-    props: ["siteConfig"],
+    props: ["deviceStatus", "siteConfig"],
     data () {
         return {
             mapClickedX: -1,
@@ -327,7 +327,6 @@ export default {
 
     },
     mounted() {
-        //this.$store.dispatch('instrument_state/updateStatus')
         this.$nextTick(function () {
             this.handleClick();
             this.initializePointer();
@@ -362,10 +361,7 @@ export default {
             selectedRa: 'selectedRa',
             selectedDec: 'selectedDec',
         }),
-        ...mapGetters('instrument_state', {
-            all_mount_state: 'mount',
-            all_telescope_state: 'telescope',
-
+        ...mapGetters('skyChart', {
             star_types: 'star_types',
             star_mags: 'star_mags',
             dso_types: 'dso_types',
@@ -375,9 +371,20 @@ export default {
             active_site: 'site',
             active_mount: 'mount',
             active_telescope: 'telescope',
-            site_latitude: 'site_latitude',
-            site_longitude: 'site_longitude',
         }),
+
+        all_mount_state() {
+            return this.deviceStatus.mount
+        },
+        all_telescope_state() {
+            return this.deviceStatus.telescope
+        },
+        site_latitude() {
+            return this.siteConfig.latitude
+        },
+        site_longitude() {
+            return this.siteConfig.longitude
+        },
 
         mountRa () {
             try {
