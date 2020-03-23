@@ -3,6 +3,7 @@
 
 <section>
 
+    <!--pre>{{deviceStatus.mount}}</pre-->
 
     <!-- Only show when modal is not open because can't have 2 charts open at once. -->
     <div class="skychart-container">
@@ -35,7 +36,7 @@ import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import ModalSkyChart from '@/components/ModalSkyChart'
 export default {
     name: "SiteTargets",
-    props: ["config", "sitecode"],
+    props: ["config", "deviceStatus", "sitecode"],
     components: {
         TheSkyChart,
         ModalSkyChart,

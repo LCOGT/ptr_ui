@@ -5,7 +5,8 @@
         <td class="is-size-7">  {{name}}:  </td><td class="is-size-7">{{value}}</td>
         </tr>
     </table>
-</section></template>
+</section>
+</template>
 
 <script>
 export default {

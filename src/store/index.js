@@ -9,7 +9,6 @@ import script_settings from './modules/script_settings'
 import dev from './modules/dev'
 import js9 from './modules/js9'
 import command_params from './modules/command_params'
-import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
