@@ -94,19 +94,6 @@ export const commands_mixin = {
 
     computed: {
 
-        // Getters from the instrument_state vuex module. 
-        // Observatory instrument status is saved here.
-        ...mapGetters('instrument_state', {
-            all_mount_state: 'mount',
-            all_telescope_state: 'telescope',
-            all_camera_state: 'camera',
-            all_filter_wheel_state: 'filter_wheel',
-            all_focuser_state: 'focuser',
-            all_rotator_state: 'rotator',
-            all_screen_state: 'screen',
-            all_sequencer_state: 'sequencer',
-        }),
-
         // Getters from the observatory_configuration vuex module.
         // Available devices and currently active devices are stored here.
         ...mapGetters('observatory_configuration', [
@@ -225,55 +212,6 @@ export const commands_mixin = {
             set(value) { this.$store.commit('observatory_configuration/setActiveScreen', value) }
         },
 
-        // Since the vuex instrument_state getters return state for all devices of
-        // a type together, we need to request the specific device from that 
-        // collective state. These properties do that, and handle an undefined 
-        // key by returning an empty list.
-        enclosure_state: function() {
-            try {
-                return this.all_enclosure_state[this.active_enclosure]
-            } catch { return {} }
-        },
-        mount_state: function() {
-            try {
-                return this.all_mount_state[this.active_mount]
-            } catch { return {} }
-        },
-        telescope_state: function() {
-            try {
-                return this.all_telescope_state[this.active_telescope]
-            } catch(error) { return {} }
-        },
-        camera_state: function() {
-            try {
-                return this.all_camera_state[this.active_camera]
-            } catch(error) { console.log(error); return {} }
-        },
-        filter_wheel_state: function() {
-            try {
-                return this.all_filter_wheel_state[this.active_filter_wheel]
-            } catch(error) { return {} }
-        },
-        focuser_state: function() {
-            try {
-                return this.all_focuser_state[this.active_focuser]
-            } catch(error) { return {} }
-        },
-        rotator_state: function() {
-            try {
-                return this.all_rotator_state[this.active_rotator]
-            } catch(error) { return {} }
-        },
-        screen_state: function () {
-            try {
-                return this.all_screen_state[this.active_screen]
-            } catch(error) { return {} }
-        },
-        sequencer_state: function () {
-            try {
-                return this.all_sequencer_state.sequencer
-            } catch(error) { return {} }
-        },
 
         command_url: function () {
             return `/${this.active_site}/${this.active_mount}/command/`
