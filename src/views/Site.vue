@@ -176,6 +176,7 @@ export default {
   created () {
 
     // Listen for new images on websocket, and refresh the list when a new image arrives.
+    // Note: this happens for a new image on any site, not just the one being viewed.
     this.$store.dispatch('images/refresh_latest_images')
     this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
     this.imageSubscriber.onmessage = (message) => {
