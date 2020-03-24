@@ -599,11 +599,9 @@ export default {
   },
 
   created() {
-
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_time_interval = setInterval(this.update_time, 1000)
   },
-  
   beforeDestroy() {
     clearInterval(this.update_time_interval)
   },
@@ -634,7 +632,6 @@ export default {
                 position: 'is-bottom',
                 type: 'is-danger' ,
             })
-            //return {}
         }
 
         return {
