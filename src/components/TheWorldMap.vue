@@ -1,6 +1,7 @@
 <template>
     <span>
         <div class="google-map" :id="mapName"></div>
+        <button class="button" @click="updateSunPosition">update sun pos</button>
     </span>
 </template>
 
@@ -13,8 +14,15 @@ export default {
   props: ['name'],
   data: function () {
     return {
+
+      // The google map object
+      map: '',
+
       mapName: this.name + '-map',
       infoWindows: [],
+
+      // The marker depicting the sun's position
+      sunMapMarker: '',
     }
   },
   mounted: function () {
@@ -221,15 +229,17 @@ export default {
       ]
     }
 
-    const map = new google.maps.Map(element, options)
+    // Create the google maps object
+    this.map = new google.maps.Map(element, options)
 
+    // Fetch the list of sites to display on the map
     let sites = this.getSitesForMap()
 
+    // For each site, draw a marker with a popup (on click) to visit the site.
     sites.forEach(site => {
-
       var marker = new google.maps.Marker({
         position: { lat: site.geo.latitude, lng: site.geo.longitude },
-        map: map,
+        map: this.map,
         title: site.name
       })
       let siteInfoWindow = new google.maps.InfoWindow({
@@ -238,54 +248,53 @@ export default {
       this.infoWindows.push(siteInfoWindow)
       marker.addListener('click', () => {
         this.infoWindows.map(x => x.close())
-        siteInfoWindow.open(map, marker)
+        siteInfoWindow.open(this.map, marker)
       })
-
     })
 
-    //var marker = new google.maps.Marker({
-      //position: { lat: 34.7, lng: -120.0 },
-      //map: map,
-      //title: 'Sedgwick'
-    //})
-    //var contentString = '<div id="content">' +
-            //'<div id="siteNotice" style="width: auto;">' +
-            //'</div>' +
-            //'<img src="https://www.independent.com/wp-content/uploads/2016/08/30/20160811_LCOGT_Sedgwick_009.jpg" style="width: 200px;"></img>' +
-            //'<div id="bodyContent">' +
-            //'<p>Sedgwick</p>' +
-            //'</div>' +
-            //'</div>'
+    // Draw the daylight regions, and update every few seconds.
+    nite.init(this.map)
+    this.updateTwighlightInterval = setInterval(function () { nite.refresh() }, 10000) // every 10s
 
-    //var infowindow = new google.maps.InfoWindow({
-      //content: this.renderSiteContent("West Mountain Drive Observatory", "wmd")
-    //})
-    //marker.addListener('click', () => {
-      //infowindow.open(map, marker)
-    //})
+    // Get position of the sun and display on map, and update every few seconds.
+    this.drawSunMarker()
+    this.updateSunInterval = setInterval(this.updateSunPosition, 10000)
 
-    nite.init(map)
-    setInterval(function () { nite.refresh() }, 10000) // every 10s
-
-    // Get position of the sun and display on map.
-    var sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
-    var sun_shape = new google.maps.Marker({
-      position: sun_pos,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 8,
-        fillColor: 'gold',
-        fillOpacity: 0.7,
-        strokeColor: 'gold',
-        strokeWeight: 3,
-        strokeOpacity: 0.8
-      },
-      title: 'Sun',
-      map: map
-    })
   },
+  beforeDestroy() {
+    // Remove the looping intervals that update the sun and daylight regions on the map.
+    clearInterval(this.updateTwighlightInterval)
+    clearInterval(this.updateSunInterval)
+  },
+  
   methods: {
 
+    // Draw the sun for the first time
+    drawSunMarker() {
+      let sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
+      this.sunMapMarker = new google.maps.Marker({
+        position: sun_pos,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: 'gold',
+          fillOpacity: 0.7,
+          strokeColor: 'gold',
+          strokeWeight: 3,
+          strokeOpacity: 0.8
+        },
+        title: 'Sun',
+        map: this.map
+      })
+    },
+
+    // Reposition the sun to its current position
+    updateSunPosition() {
+      var sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
+      this.sunMapMarker.setPosition(sun_pos)
+    },
+
+    // Return the list of sites to render on the map. 
     getSitesForMap() {
       let sites = [
         //{
