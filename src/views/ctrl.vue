@@ -488,7 +488,8 @@
     <the-sky-chart />
   </div>
 
-</div></template>
+</div>
+</template>
 
 <script>
 import { mapGetters } from 'vuex'
@@ -535,6 +536,19 @@ export default {
   },
 
   async created() {
+    this.$buefy.dialog.alert({
+      title: 'This page is no longer supported.',
+      message: 'Please use <code>/site/&#60;sitecode&#62;/observe</code> instead: <br><br>' +
+        `<a class="" href="/site/wmd/observe"><button class="button" style="margin-right: 5px;">wmd</button></a>`+
+        `<a class="" href="/site/saf/observe"><button class="button">saf</button></a>`,
+      type: 'is-danger',
+      hasIcon: true,
+      icon: 'times-circle',
+      iconPack: 'fa',
+      ariaRole: 'alertdialog',
+      ariaModal: true
+    })
+ 
     var that = this;
 
     //// Make sure we're using the latest site configuration.
@@ -547,12 +561,12 @@ export default {
     //}())
     
     await this.$store.dispatch('observatory_configuration/update_config')
-    await this.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
-    await this.$store.dispatch('instrument_state/updateStatus')
+    //await this.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
+    //await this.$store.dispatch('instrument_state/updateStatus')
 
     // Every two seconds, we refresh the site status.
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
-    this.update_status_interval = setInterval(this.update_status, 3000)
+    //this.update_status_interval = setInterval(this.update_status, 3000)
     this.update_time_interval = setInterval(this.update_time, 1000)
 
 
