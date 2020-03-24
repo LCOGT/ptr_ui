@@ -520,8 +520,6 @@ export default {
     return {
 
       // This is a setInterval object initialized in `created()`. 
-      // Fetches status every few seconds.
-      update_status_interval: 2000,
       local_timestamp: Date.now(),
 
       // Controls the toggle for image preview modal.
@@ -536,6 +534,8 @@ export default {
   },
 
   async created() {
+
+    // Warn that this is an old unsupported page.
     this.$buefy.dialog.alert({
       title: 'This page is no longer supported.',
       message: 'Please use <code>/site/&#60;sitecode&#62;/observe</code> instead: <br><br>' +
@@ -549,26 +549,11 @@ export default {
       ariaModal: true
     })
  
-    var that = this;
-
-    //// Make sure we're using the latest site configuration.
-    //this.$store.dispatch('observatory_configuration/update_config').then(function() {
-
-      //// Default site/device values.
-      //that.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
-      //that.$store.dispatch('instrument_state/updateStatus')
-
-    //}())
-    
     await this.$store.dispatch('observatory_configuration/update_config')
-    //await this.$store.dispatch('observatory_configuration/set_default_active_devices', 'wmd')
-    //await this.$store.dispatch('instrument_state/updateStatus')
 
-    // Every two seconds, we refresh the site status.
+    // Every second, update the current time (to compute status age).
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
-    //this.update_status_interval = setInterval(this.update_status, 3000)
     this.update_time_interval = setInterval(this.update_time, 1000)
-
 
     this.$store.dispatch('images/refresh_latest_images')
 
@@ -586,7 +571,7 @@ export default {
   },
   
   beforeDestroy() {
-    clearInterval(this.update_status_interval)
+    clearInterval(this.update_time_interval)
   },
 
 
