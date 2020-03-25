@@ -6,11 +6,12 @@
   <div class="container">
   <section class="page-view">
 
-  <div style="height: 3em"></div>
+  <div style="height: 1em"></div>
   <div class="columns" style="padding: 1em;">
 
-    <!-- Menu for site subpages -->
-    <div class="column menu-column is-one-fifth is-full-mobile">
+    <div class="column menu-column is-one-fifth is-hidden-touch">
+
+      <!-- Site menu for desktop or larger. Replaces bottom menu. -->
       <b-menu class="subpage-menu">
         <b-menu-list label="Menu">
             <b-menu-item 
@@ -100,7 +101,7 @@
   </section>
   </div>
 
-  <footer class="footer">
+  <footer class="footer is-hidden-touch">
     <div class="has-text-centered">
       <p>
         You are currently observing from site 
@@ -109,6 +110,62 @@
       </p>
     </div>
   </footer>
+
+  <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
+  <div class="mobile-menu is-hidden-desktop">
+    <div class="level is-mobile">
+
+      <b-tooltip label="Home" type="is-dark" class="level-item">
+        <b-button tag="router-link"
+          class="mobile-menu-button level-item"
+          size="is-large"
+          :to="'/site/'+sitecode+'/home'"
+          icon-right="home"
+          type="is-text">
+        </b-button>
+      </b-tooltip>
+
+      <b-tooltip label="Observe" type="is-dark" class="level-item">
+        <b-button tag="router-link"
+          class="mobile-menu-button level-item"
+          size="is-large"
+          :to="'/site/'+sitecode+'/observe'"
+          icon-right="telescope"
+          type="is-text">
+        </b-button>
+      </b-tooltip>
+      
+      <b-tooltip label="Target Explorer" type="is-dark" class="level-item">
+        <b-button tag="router-link"
+          class="mobile-menu-button level-item"
+          size="is-large"
+          :to="'/site/'+sitecode+'/targets'"
+          icon-right="target"
+          type="is-text">
+        </b-button>
+      </b-tooltip>
+
+      <b-tooltip label="Data Analysis" type="is-dark" class="level-item">
+        <b-button tag="router-link"
+          class="mobile-menu-button level-item"
+          size="is-large"
+          :to="'/site/'+sitecode+'/data'"
+          icon-right="folder-multiple-image"
+          type="is-text">
+        </b-button>
+      </b-tooltip>
+
+      <b-tooltip label="Calendar" type="is-dark" class="level-item">
+        <b-button tag="router-link"
+          class="mobile-menu-button level-item"
+          size="is-large"
+          :to="'/site/'+sitecode+'/calendar'"
+          icon-right="calendar"
+          type="is-text">
+        </b-button>
+      </b-tooltip>
+    </div>
+  </div>
 
 
 </div>
@@ -291,8 +348,10 @@ export default {
 
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
+@import "../style/_variables.scss";
+
 
 .menu-column {
   width: 300px;
@@ -310,6 +369,27 @@ export default {
   padding-left: 1em;
 }
 
+.mobile-menu {
+  border-top: 1px solid lighten($dark, 3);
+  background-color: $dark;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+.mobile-menu-button.level-item {
+  background-color:hsla(0,0,0,0);
+  border: none;
+  border-radius: 0;
+  color:grey;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  
+}
+.mobile-menu-button.is-active.router-link-active.is-large.is-text {
+  background-color:hsla(0,0,0,0);
+  color:white;
+  box-shadow: none;
+}
 
 .page-content {
   margin-bottom: 200px;
@@ -321,10 +401,12 @@ export default {
 }
 
 footer {
-  position:fixed;
+  display:none;
+  position:absolute;
   bottom: 0;
   width: 100vw;
   padding: 2em 1em 2em; 
 }
+
 
 </style>

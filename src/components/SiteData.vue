@@ -1,6 +1,6 @@
 <template><section>
     <!--image-view :site="sitecode"/-->
-  <div class="columns is-desktop">
+  <div class="columns is-touch">
     <div class="img-view column ">
 
       <!-- The actual image view component -->
