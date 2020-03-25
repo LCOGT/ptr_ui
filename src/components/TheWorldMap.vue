@@ -1,7 +1,6 @@
 <template>
     <span>
         <div class="google-map" :id="mapName"></div>
-        <button class="button" @click="updateSunPosition">update sun pos</button>
     </span>
 </template>
 
