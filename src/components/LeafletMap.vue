@@ -110,5 +110,6 @@ export default {
         background-color: grey;
         margin: 20px auto;
         max-height: 90vh;
+        z-index: 1;
     }
 </style>

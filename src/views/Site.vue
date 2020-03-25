@@ -7,7 +7,7 @@
   <section class="page-view">
 
   <div style="height: 1em"></div>
-  <div class="columns" style="padding: 1em;">
+  <div class="columns" style="margin: 1em;">
 
     <div class="column menu-column is-one-fifth is-hidden-touch">
 
@@ -375,6 +375,7 @@ export default {
   position: fixed;
   bottom: 0;
   width: 100%;
+  z-index: 10;
 }
 .mobile-menu-button.level-item {
   background-color:hsla(0,0,0,0);
