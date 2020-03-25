@@ -31,9 +31,6 @@
     </div>
 
 
-    <div class="quick-status">
-        quick telescope status/info will be shown here
-    </div>
     <br>
 
     <div style="height: 2em;" />

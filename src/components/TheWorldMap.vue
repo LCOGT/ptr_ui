@@ -1,5 +1,5 @@
 <template>
-    <span>
+    <span style="z-index: 1;">
         <div class="google-map" :id="mapName"></div>
     </span>
 </template>
@@ -353,5 +353,6 @@ export default {
     height: 50vh;
     background-color: grey;
     max-height: 90vh;
+    z-index: 1;
 }
 </style>
