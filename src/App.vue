@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <the-menu />
+    <the-menu :global_config="global_config"/>
     <!--dev-panel /--> <!-- Developer testing tools. Not for prodution. -->
 
     <router-view></router-view>
@@ -22,6 +22,7 @@
 import TheMenu from '@/components/TheMenu.vue'
 import DevPanel from '@/components/DevPanel.vue'
 import JS9 from "@/components/JS9";
+import axios from 'axios'
 
  
 export default {
@@ -31,7 +32,15 @@ export default {
     DevPanel,
     JS9,
   },
-  created() {
+  data() {
+    return {
+      global_config: {},
+    }
+  },
+  async created() {
+    let response = await axios.get('https://api.photonranch.org/api/all/config')
+    this.global_config = response.data
+    console.log(this.config)
     this.$store.dispatch('observatory_configuration/update_config')
   },
 }

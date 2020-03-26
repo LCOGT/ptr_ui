@@ -14,11 +14,11 @@
         <template slot="start">
 
             <b-navbar-dropdown label="sites" :close-on-click="true">
-                <template v-for="(site, index) in sites">
+                <template v-for="(site, index) in available_sites">
                   <b-navbar-item tag="router-link" 
-                    :to="{ path: '/site/' + site.code + '/home'}"
+                    :to="{ path: '/site/' + site+ '/home'}"
                     v-bind:key="index">
-                    {{site.name}}
+                    {{global_config[site].name}}
                   </b-navbar-item>
                 </template>
                 <hr class="navbar-divider">
@@ -81,29 +81,36 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "TheMenu",
+  props: ["global_config"],
   data() {
-    return {
-      sites: [
-        {
-          code: "wmd",
-          name: "West Mountain Drive",
-          country: "USA",
-          tz: -8,
-          lat: 34,
-          lng: -119,
-          elevation: 0 // meters
-        },
-        {
-          code: "saf",
-          name: "Apache Ridge Observatory",
-          country: "USA",
-          tz: -7,
-          lat: 35.55444,
-          lng: -105.870277,
-          elevation: 2201
-        }
-      ]
-    };
+    return {}
+    //return {
+      //sites: [
+        //{
+          //code: "wmd",
+          //name: "West Mountain Drive",
+          //country: "USA",
+          //tz: -8,
+          //lat: 34,
+          //lng: -119,
+          //elevation: 0 // meters
+        //},
+        //{
+          //code: "saf",
+          //name: "Apache Ridge Observatory",
+          //country: "USA",
+          //tz: -7,
+          //lat: 35.55444,
+          //lng: -105.870277,
+          //elevation: 2201
+        //}
+      //]
+    //};
+  },
+  computed: {
+    ...mapGetters('observatory_configuration', [
+      'available_sites'
+    ])
   },
   methods: {
     // Log the user in with Auth0

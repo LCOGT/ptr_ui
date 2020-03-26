@@ -83,25 +83,29 @@ export default {
                     });
                     break;
                 case 'POST': 
-                    axios.post(apiName+path,form).then(response => {
-                        vm.isLoading = false;
-                        console.log('SUCCESS')
-                        console.log(response.data)
-                    }).catch(error => {
-                        vm.isLoading = false;
-                        console.log('ERROR')
-                        console.log(error)
-                    });
 
                     /* TESTING new jobs architecture */
                     const options = await this.getConfigWithAuth()
-                    console.log('options', options)
                     form.site=this.data.site
                     form.mount=this.data.mount
-                    console.log(form)
-                    console.log('jobs post')
-                    axios.post("https://jobs.photonranch.org/jobs/newjob",form, options).then(console.log).catch(e => {console.warn(e)})
+                    axios.post("https://jobs.photonranch.org/jobs/newjob",form, options).then(response => {
+                        vm.isLoading = false
+                        console.log(response.data)
+                        this.$emit('jobPost', response.data)
+                    }).catch(e => {
+                        console.warn(e)
+                    })
                     /* END of testing new jobs architecture */
+
+
+                    // The old command endpoint
+                    axios.post(apiName+path,form).then(response => {
+                        vm.isLoading = false;
+                        console.log('SUCCESS with old command api endpoint: ', response.data)
+                    }).catch(error => {
+                        vm.isLoading = false;
+                        console.log('ERROR with old command api endpoint: ', error)
+                    });
 
                     break;
                 case 'PUT':

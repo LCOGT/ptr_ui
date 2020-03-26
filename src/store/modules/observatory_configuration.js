@@ -322,6 +322,20 @@ const actions = {
                 commit('setActiveTelescope', 'telescope1')
                 dispatch('setActiveTelescope', 'telescope1')
             }
+            if (site=="sim_site") {
+                commit('setActiveSite', site)
+                commit('setActiveEnclosure', 'enclosure1')
+                commit('setActiveMount', 'mount1')
+                commit('setActiveTelescope', 'telescope1')
+                dispatch('setActiveTelescope', 'telescope1')
+            }
+            if (site=="ALI-sim") {
+                commit('setActiveSite', site)
+                commit('setActiveEnclosure', 'enclosure1')
+                commit('setActiveMount', 'mount1')
+                commit('setActiveTelescope', 'telescope1')
+                dispatch('setActiveTelescope', 'telescope1')
+            }
             resolve()
         })
     },
