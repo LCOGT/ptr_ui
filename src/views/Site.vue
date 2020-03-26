@@ -65,37 +65,14 @@
     <!-- Primary content of the page. Selects from the various site subpages. -->
     <!-- Note: wait for parent (this component) to mount before loading child components. 
     Otherwise, props may initially load as null. -->
-    <div class="column page-content ">
-      <site-home 
-        v-if="subpage == 'home' && siteIsMounted" 
+    <div class="column page-content">
+      <component 
+        v-bind:is="`site-${subpage}`"
+        v-if="configIsLoaded"
         :config="config" 
         :sitecode="sitecode"
         :deviceStatus="deviceStatus"
-      />
-      <site-observe 
-        v-if="subpage == 'observe' && siteIsMounted" 
-        :config="config" 
-        :sitecode="sitecode"
-        :deviceStatus="deviceStatus"
-      />
-      <site-targets 
-        v-if="subpage == 'targets' && siteIsMounted" 
-        :config="config" 
-        :sitecode="sitecode"
-        :deviceStatus="deviceStatus"
-      />
-      <site-calendar 
-        v-if="subpage == 'calendar' && siteIsMounted" 
-        :config="config" 
-        :sitecode="sitecode"
-        :deviceStatus="deviceStatus"
-      />
-      <site-data 
-        v-if="subpage == 'data' && siteIsMounted" 
-        :config="config" 
-        :sitecode="sitecode"
-        :deviceStatus="deviceStatus"
-      />
+        />
     </div>
   </div>
   </section>
@@ -209,7 +186,7 @@ export default {
       status_ws: '',
 
       // Config prop might be null, so children should wait until this component is mounted
-      siteIsMounted: false, 
+      configIsLoaded: false, 
 
       deviceStatus: {
         /*
@@ -268,6 +245,7 @@ export default {
     this.getSiteConfig()
 
 
+
   },
 
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
@@ -290,7 +268,6 @@ export default {
 
   async mounted() {
 
-    this.siteIsMounted = true; // child components are ready to render now
 
     // Make sure the default instruments are selected at the initial load.
     this.$store.dispatch('observatory_configuration/update_config')
@@ -302,6 +279,8 @@ export default {
     setInterval(function() {
       self.timestamp = parseInt(Date.now() / 1000)
     }, 1000)
+
+    this.siteIsMounted = true; // child components are ready to render now
   },
 
   computed: {
@@ -327,9 +306,11 @@ export default {
     async getSiteConfig() {
       let baseUrl = this.$store.getters['dev/api'];
       let path = `/${this.sitecode}/config`
-      let response = await axios.get(baseUrl + path)
-      this.config = response.data.configuration
-      console.log(`${this.sitecode} config: `,this.config)
+      let response = axios.get(baseUrl + path).then(response => {
+        this.config = response.data.configuration
+        this.configIsLoaded = true;
+        console.log(`${this.sitecode} config: `,this.config)
+      })
     },
 
     async getSiteDeviceStatus() {
@@ -382,8 +363,8 @@ export default {
   border: none;
   border-radius: 0;
   color:grey;
-  padding-top: 1em;
-  padding-bottom: 1em;
+  padding-top: 1.5em;
+  padding-bottom: 2.5em;
   
 }
 .mobile-menu-button.is-active.router-link-active.is-large.is-text {

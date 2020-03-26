@@ -97,7 +97,8 @@
     <div/>
     </b-field>
 
-</section></template>
+</section>
+</template>
 
 <script>
 import moment from 'moment';

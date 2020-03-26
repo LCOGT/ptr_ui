@@ -296,7 +296,7 @@
             <b-field label="Relative">
               <b-field>
                 <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
-                <p class="control"> <command-button :data="focus_relative_command" class="is-small"/>  </p><br>
+                <p class="control"> <command-button :data="focus_relative_command" class="is-small" @jobPost="focuserJobPost"/>  </p><br>
               </b-field>
             </b-field>
 
@@ -384,7 +384,7 @@
               v-model="active_mount"
             >
               <option 
-                v-for="(mount, index) in available_mounts" 
+                v-for="(mount, index) in Object.keys(config.mount)" 
                 v-bind:value="mount"
                 v-bind:key="`mount-${index}`"
               >
@@ -401,7 +401,7 @@
               v-model="active_telescope"
             >
               <option 
-                v-for="(ota, index) in available_telescopes" 
+                v-for="(ota, index) in Object.keys(config.telescope)" 
                 v-bind:value="ota"
                 v-bind:key="`ota-${index}`"
               >
@@ -418,7 +418,7 @@
               v-model="active_camera"
             >
               <option 
-                v-for="(cam, index) in available_cameras" 
+                v-for="(cam, index) in Object.keys(config.camera)" 
                 v-bind:value="cam"
                 v-bind:key="`cam-${index}`"
               >
@@ -435,7 +435,7 @@
               v-model="active_filter_wheel"
             >
               <option 
-                v-for="(filter_wheel, index) in available_filter_wheels" 
+                v-for="(filter_wheel, index) in Object.keys(config.filter_wheel)" 
                 v-bind:value="filter_wheel"
                 v-bind:key="`filter_wheel-${index}`"
               >
@@ -452,7 +452,7 @@
               v-model="active_focuser"
             >
               <option 
-                v-for="(focuser, index) in available_focusers" 
+                v-for="(focuser, index) in Object.keys(config.focuser)" 
                 v-bind:value="focuser"
                 v-bind:key="`focuser-${index}`"
               >
@@ -469,7 +469,7 @@
               v-model="active_rotator"
             >
               <option 
-                v-for="(rotator, index) in available_rotators" 
+                v-for="(rotator, index) in Object.keys(config.rotator)" 
                 v-bind:value="rotator"
                 v-bind:key="`rotator-${index}`"
               >
@@ -510,12 +510,12 @@
     <button class="button" @click="authPing">auth ping</button>
   </side-info-panel>
 
-  <side-info-panel  :title="'Webcam'">
+  <side-info-panel>
     <p slot="title">Webcam</p>
     <the-dome-cam v-if="sitecode=='wmd'"/>
   </side-info-panel>
 
-  <side-info-panel :startOpen="true" :title="'Image Preview'">
+  <side-info-panel :startOpen="true">
     <p slot="title">Image Preview</p>
     <!--button class="button is-small" @click="refresh_latest_image" style="margin-bottom: 1em;">latest image</button-->
     <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
@@ -530,6 +530,11 @@
         </p>
     </b-modal>
     <div>{{current_image.base_filename}}</div>
+  </side-info-panel>
+
+  <side-info-panel :startOpen="true">
+    <p slot="title">Job Status</p>
+    <pre>{{focuserJobs}}</pre>
   </side-info-panel>
 
 
@@ -594,6 +599,11 @@ export default {
       isCameraStatusVisible: false,
       isFocuserStatusVisible: false,
 
+      // testign job status
+      focuserStatus: 'nothing yet',
+      jobSub: '', //ws connection
+
+      focuserJobs: {},
 
     }
   },
@@ -601,6 +611,25 @@ export default {
   created() {
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_time_interval = setInterval(this.update_time, 1000)
+
+    // This websocket subscribes to changes in job status
+    this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
+    this.jobsSub.onmessage = (message) => {
+      let newJob = JSON.parse(message.data)
+      console.log(newJob)
+      if (newJob.ulid in Object.keys(this.focuserJobs)) {
+        this.focuserJobs[newJob.ulid].status = newJob.statusId.split("#")[0]
+      }
+      else {
+        let jobStatus = {
+          "status": newJob.statusId.split("#")[0],
+          "deviceType": newJob.deviceType,
+        }
+        this.focuserJobs[newJob.ulid] = jobStatus
+      }
+      this.focuserStatus = newJob
+      //this.$set(this.jobIds, newJob.ulid, newJob)
+    }
   },
   beforeDestroy() {
     clearInterval(this.update_time_interval)
@@ -608,6 +637,15 @@ export default {
 
 
   methods: {
+
+    focuserJobPost(data) {
+      console.log('focuser job post: ',data)
+      let statusItem = {
+        "status": data.statusId.split("#")[0],
+        "deviceType": data.deviceType,
+      }
+      this.focuserJobs[data.ulid] = statusItem
+    },
 
     update_time() {
       this.local_timestamp= Date.now()
@@ -617,6 +655,7 @@ export default {
       this.$store.dispatch('images/set_latest_image')
     },
 
+    // Get axios request config object (the headers) with auth token
     async getConfigWithAuth() {
         let token, configWithAuth;
         try {
