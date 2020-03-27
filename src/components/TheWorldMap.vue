@@ -6,11 +6,12 @@
 
 <script>
 import nite from '@/utils/nite-overlay'
+import axios from 'axios'
 // import test1 from '@/utils/test';
 
 export default {
   name: 'TheWorldMap',
-  props: ['name'],
+  props: ['name', 'g_config'],
   data: function () {
     return {
 
@@ -24,7 +25,7 @@ export default {
       sunMapMarker: '',
     }
   },
-  mounted: function () {
+  async mounted () {
     const element = document.getElementById(this.mapName)
     const options = {
       zoom: 2,
@@ -232,17 +233,17 @@ export default {
     this.map = new google.maps.Map(element, options)
 
     // Fetch the list of sites to display on the map
-    let sites = this.getSitesForMap()
+    let sites = await this.getSitesForMap()
 
     // For each site, draw a marker with a popup (on click) to visit the site.
     sites.forEach(site => {
       var marker = new google.maps.Marker({
-        position: { lat: site.geo.latitude, lng: site.geo.longitude },
+        position: { lat: site.latitude, lng: site.longitude },
         map: this.map,
         title: site.name
       })
       let siteInfoWindow = new google.maps.InfoWindow({
-        content: this.renderSiteContent(site.name, site.sitecode)
+        content: this.renderSiteContent(site.name, site.site)
       })
       this.infoWindows.push(siteInfoWindow)
       marker.addListener('click', () => {
@@ -294,33 +295,19 @@ export default {
     },
 
     // Return the list of sites to render on the map. 
-    getSitesForMap() {
-      let sites = [
-        //{
-          //"name": "Sedgwick Observatory",
-          //"geo": {
-            //"latitude": 34.691499,
-            //"longitude": -120.042252
-          //},
-          //"sitecode": "sqa",
-        //},
-        {
-          "name": "Apache Ridge Observatory",
-          "geo": {
-            "latitude": 35.554444,
-            "longitude": -105.870278,
-          },
-          "sitecode": "saf",
-        },
-        {
-          "name": "West Mountain Drive Observatory",
-          "geo": {
-            "latitude": 34.34293028,
-            "longitude": -119.68112805,
-          },
-          "sitecode": "wmd",
+    async getSitesForMap() {
+      let sites = []
+      let resp = await axios.get('https://api.photonranch.org/api/all/config')
+      let data = resp.data
+      Object.keys(data).forEach(site => {
+        let s = {
+          "name":data[site].name.toString(),
+          "site": data[site].site.toString(),
+          "latitude":  parseFloat(data[site].latitude),
+          "longitude": parseFloat(data[site].longitude),
         }
-      ]
+        sites.push(s)
+      })
       return sites
     },
 
