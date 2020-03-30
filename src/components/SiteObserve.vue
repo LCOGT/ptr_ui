@@ -498,7 +498,7 @@
     <div slot="title">
       <p>Status - 
       <span class="">
-        <span v-if="status_age < 15" style="color: lightgreen;"> {{' < 15 seconds old'}} </span>
+        <span v-if="status_age < 10" style="color: lightgreen;"> {{' < 10 seconds old'}} </span>
         <span v-else-if="status_age < 120" style="color: yellow;">{{' < 2 minutes old'}}</span>
         <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+' minutes old'}}</span>
         <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+' hours old'}}</span>
