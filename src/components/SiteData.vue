@@ -22,7 +22,47 @@
 
     <div class="nav-panel column" style="max-width: 350px;">  
 
+      <!-- Basic image info and a button to reveal the full fits header -->
       <side-info-panel>
+        <p class="level" slot="title">
+          Image Info 
+          <b-button class="button " outlined style="margin-left: 1em;" @click="getFitsHeader">show fits header</b-button>
+        </p>
+        <div style="margin: 1em;">
+          <table class="info-panel-table">
+              <tr> <td class="info-panel-val" align="right">filename: </td>
+                  <td>{{current_image.base_filename}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">date: </td>
+                  <td>{{captureDate}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">time: </td>
+                  <td>{{captureTime + " GMT"}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">site: </td>
+                  <td>{{current_image.site || "---"}}</td> </tr>
+              <div class="blank-row" />
+
+              <tr> <td class="info-panel-val" align="right">seconds: </td>
+                  <td>{{current_image.exposure_time || "---"}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">filter_used: </td>
+                  <td>{{current_image.filter_used || "---"}}</td> </tr>
+              <div class="blank-row" />
+
+              <tr> <td class="info-panel-val" align="right">right ascension: </td>
+                  <td>{{rightAscension}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">declination: </td>
+                  <td>{{declination}}</td> </tr>
+
+              <tr> <td class="info-panel-val" align="right">altitude: </td>
+                  <td>{{current_image.altitude || "---"}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">azimuth: </td>
+                  <td>{{current_image.azimuth || "---"}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">airmass: </td>
+                  <td>{{current_image.airmass || "---"}}</td> </tr>
+          </table>
+          <div style="height: 1em;"/>
+        </div>
+      </side-info-panel>
+
+      <side-info-panel :startOpen="false">
         <p slot="title">region statistics</p>
         <p>{{current_image.ex13_fits_exists ? "" : "missing small fits"}}</p>
         <p>{{current_image.ex01_fits_exists ? "" : "missing full fits"}}</p>
@@ -80,7 +120,7 @@
         </table>
       </side-info-panel>
 
-      <side-info-panel>
+      <side-info-panel :startOpen="false">
         <p slot="title">star inspector</p>
 
         <div style="display:flex; justify-items: space-between;">
@@ -125,47 +165,10 @@
         </table>
       </side-info-panel>
 
-      <!-- Basic image info and a button to reveal the full fits header -->
-      <side-info-panel>
-        <p slot="title">Image Info</p>
-        <div style="margin: 1em;">
-          <table class="info-panel-table">
-              <tr> <td class="info-panel-val" align="right">filename: </td>
-                  <td>{{current_image.base_filename}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">date: </td>
-                  <td>{{captureDate}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">time: </td>
-                  <td>{{captureTime + " GMT"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">site: </td>
-                  <td>{{current_image.site || "---"}}</td> </tr>
-              <div class="blank-row" />
 
-              <tr> <td class="info-panel-val" align="right">seconds: </td>
-                  <td>{{current_image.exposure_time || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">filter_used: </td>
-                  <td>{{current_image.filter_used || "---"}}</td> </tr>
-              <div class="blank-row" />
-
-              <tr> <td class="info-panel-val" align="right">right ascension: </td>
-                  <td>{{rightAscension}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">declination: </td>
-                  <td>{{declination}}</td> </tr>
-
-              <tr> <td class="info-panel-val" align="right">altitude: </td>
-                  <td>{{current_image.altitude || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">azimuth: </td>
-                  <td>{{current_image.azimuth || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">airmass: </td>
-                  <td>{{current_image.airmass || "---"}}</td> </tr>
-          </table>
-          <div style="height: 1em;"/>
-          <button class="button" @click="getFitsHeader">show full fits header</button>
-        </div>
-      </side-info-panel>
-
-      <js9-devtools/>
+      <!--js9-devtools/-->
       <image-filter/>
-      <image-navigation-panel/>
+      <!--image-navigation-panel/-->
     </div>
 
   </div>
@@ -173,7 +176,7 @@
 
   <!-- Modal popup window showing the full fits header. -->
   <b-modal :active.sync="showFitsHeaderModal" >
-    <div class="card" style="height: 80vh; overflow-y: auto;">
+    <div class="card" style="height: 80vh; width:auto; overflow-y: auto;">
       <div class="card-content">
         <table class="info-panel-table">
           <tr v-for="(v,k) in fitsHeader"> 
