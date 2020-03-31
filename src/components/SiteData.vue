@@ -1,8 +1,9 @@
-<template><section>
-    <!--image-view :site="sitecode"/-->
-  <div class="columns is-touch">
-    <div class="img-view column ">
+<template>
+  <section>
 
+  <div class="columns is-touch">
+
+    <div class="img-view column ">
       <!-- The actual image view component -->
       <image-view-2 
         :site="active_site" 
@@ -16,10 +17,9 @@
         :brightest_star_pos_y="brightest_relative_pos_y"
         :brightest_plot_color="brightest_plot_color"
         />
-      <!--j-s9 /-->
-
     </div>
 
+    <!-- Collapsible panels on the right of the image --> 
     <div class="nav-panel column" style="max-width: 350px;">  
 
       <!-- Basic image info and a button to reveal the full fits header -->
@@ -65,6 +65,7 @@
       </side-info-panel>
 
 
+      <!-- image statistics -->
       <side-info-panel :startOpen="false">
         <p slot="title">region statistics</p>
 
@@ -76,47 +77,35 @@
           Use full resolution file (slower!)
         </b-switch>
 
-        <p>{{current_image.ex13_fits_exists ? "" : "missing small fits"}}</p>
-        <p>{{current_image.ex01_fits_exists ? "" : "missing full fits"}}</p>
+        <p class="warning-text">{{current_image.ex13_fits_exists ? "" : "missing small fits"}}</p>
+        <p class="warning-text">{{current_image.ex01_fits_exists ? "" : "missing full fits"}}</p>
 
-        <div style="display: flex; justify-items: space-between;">
-        <b-tooltip 
-          label="The full raw .fits file is large and may take over 10 seconds." 
-          position="is-top" 
-          multilined
-          type="is-black">
-          <button 
-            class="button" 
-            :class="{'is-loading':region_info_loading}"
-            :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
-            @click="getRegionStats(true)">
-            inspect region
-          </button>
-        </b-tooltip>
-        <div style="width: 10px;" />
-        <button 
-          class="button" 
-          :class="{'is-loading':image_info_loading}"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
-          @click="getRegionStats(false)">
-          inspect image
-        </button>
-        <!--button 
-          class="button" 
-          :class="{'is-loading': ex13_isLoading}"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
-          :loading="ex13_isLoading"
-          @click="getRegionStats('13')">
-          get region stats (EX13)
-        </button-->
-        </div>
-      <!-- 
-        <p>{{subframe_x0}}</p>
-        <p>{{subframe_x1}}</p>
-        <p>{{subframe_y0}}</p>
-        <p>{{subframe_y1}}</p>
-        -->
-       
+        <b-field>
+          <p class="control">
+            <b-tooltip 
+              label="Only inspect the selected region (red rectangle)." 
+              position="is-top" 
+              multilined
+              type="is-black">
+              <button 
+                class="button" 
+                :class="{'is-loading':region_info_loading}"
+                :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
+                @click="getRegionStats(true)">
+                inspect region
+              </button>
+            </b-tooltip>
+          </p>
+          <p class="control">
+            <button 
+              class="button" 
+              :class="{'is-loading':image_info_loading}"
+              :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
+              @click="getRegionStats(false)">
+              inspect image
+            </button>
+          </p>
+        </b-field>
 
         <table class="info-panel-table">
             <tr> <td class="info-panel-val" align="right">min: </td>
@@ -132,6 +121,7 @@
         </table>
       </side-info-panel>
 
+      <!-- star inspector -->
       <side-info-panel :startOpen="false">
         <p slot="title">star inspector</p>
 
@@ -143,23 +133,26 @@
           Use full resolution file (slower!)
         </b-switch>
 
-        <div style="display:flex; justify-items: space-between;">
-        <button 
-          class="button" 
-          :class="{'is-loading': inspect_region_loading}"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
-          @click="getStarProfiles">
-          inspect region
-        </button>
-        <div style="width: 10px;"/>
-        <button 
-          class="button" 
-          :class="{'is-loading': inspect_image_loading}"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
-          @click="getStarProfiles(false)">
-          inspect image
-        </button>
-        </div>
+        <b-field>
+          <p class="control">
+            <button 
+              class="button" 
+              :class="{'is-loading': inspect_region_loading}"
+              :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
+              @click="getStarProfiles">
+              inspect region
+            </button>
+          </p>
+          <p class="control">
+            <button 
+              class="button" 
+              :class="{'is-loading': inspect_image_loading}"
+              :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
+              @click="getStarProfiles(false)">
+              inspect image
+            </button>
+          </p>
+        </b-field>
 
         <hr>
         <div id="brightest_star_profile" />
@@ -251,7 +244,7 @@ export default {
 
       // Analysize the full sized raw file (default is 768px reduced file)
       imageStatsLargeFile: false,
-      starInspectorLargeFile: false,
+      starInspectorLargeFile: true,
 
       region_min: '--',
       region_max: '--',
@@ -693,6 +686,11 @@ table.info-panel-table { color: #dbdee0; }
 
 .nav-panel > * {
   padding-bottom: 1em;
+}
+
+.warning-text {
+  color: #f1b70e;
+  background-color: black;
 }
 
 </style>
