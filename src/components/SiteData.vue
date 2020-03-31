@@ -23,11 +23,13 @@
     <div class="nav-panel column" style="max-width: 350px;">  
 
       <!-- Basic image info and a button to reveal the full fits header -->
-      <side-info-panel>
+      <side-info-panel :startOpen="true">
+
         <p class="level" slot="title">
           Image Info 
           <b-button class="button " outlined style="margin-left: 1em;" @click="getFitsHeader">show fits header</b-button>
         </p>
+
         <div style="margin: 1em;">
           <table class="info-panel-table">
               <tr> <td class="info-panel-val" align="right">filename: </td>
@@ -62,8 +64,18 @@
         </div>
       </side-info-panel>
 
+
       <side-info-panel :startOpen="false">
         <p slot="title">region statistics</p>
+
+        <b-switch 
+          class="is-small" 
+          type="is-info" 
+          style="margin-bottom: 1em;"
+          v-model="imageStatsLargeFile">
+          Use full resolution file (slower!)
+        </b-switch>
+
         <p>{{current_image.ex13_fits_exists ? "" : "missing small fits"}}</p>
         <p>{{current_image.ex01_fits_exists ? "" : "missing full fits"}}</p>
 
@@ -77,7 +89,7 @@
             class="button" 
             :class="{'is-loading':region_info_loading}"
             :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
-            @click="getRegionStats('01', true)">
+            @click="getRegionStats(true)">
             inspect region
           </button>
         </b-tooltip>
@@ -86,7 +98,7 @@
           class="button" 
           :class="{'is-loading':image_info_loading}"
           :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
-          @click="getRegionStats('01', false)">
+          @click="getRegionStats(false)">
           inspect image
         </button>
         <!--button 
@@ -122,6 +134,14 @@
 
       <side-info-panel :startOpen="false">
         <p slot="title">star inspector</p>
+
+        <b-switch 
+          class="is-small" 
+          type="is-info" 
+          style="margin-bottom: 1em;"
+          v-model="starInspectorLargeFile">
+          Use full resolution file (slower!)
+        </b-switch>
 
         <div style="display:flex; justify-items: space-between;">
         <button 
@@ -229,6 +249,10 @@ export default {
 
       ex13_isLoading: false,
 
+      // Analysize the full sized raw file (default is 768px reduced file)
+      imageStatsLargeFile: false,
+      starInspectorLargeFile: false,
+
       region_min: '--',
       region_max: '--',
       region_median: '--',
@@ -283,7 +307,7 @@ export default {
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
-        "fitstype": "01",
+        "fitstype": this.starInspectorLargeFile ? "01" : "13",
       }
 
       if (useSubregion) {
@@ -550,7 +574,9 @@ export default {
         .attr("r", 2);
 
     },
-    getRegionStats(fitstype, useSubregion=true) {
+    getRegionStats(useSubregion=true) {
+
+      let fitstype = this.imageStatsLargeFile ? "01" : "13" // Determine the size of the image to analyze.
       let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
       let body = {
         "site": this.sitecode,
