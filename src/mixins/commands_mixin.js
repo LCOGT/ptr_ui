@@ -331,7 +331,7 @@ export const commands_mixin = {
         },
         filter_wheel_command () {
             return this.base_command( 'filter_wheel', 'set_name', 'apply',
-                { filter_name: this.filter_wheel_options_selection},
+                { filter: this.filter_wheel_options_selection},
             )
         },
         filter_wheel_home_command () {
