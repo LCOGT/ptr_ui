@@ -245,7 +245,9 @@ export const commands_mixin = {
             }
 
             // If active, add subframe parameters.
-            if (this.subframeIsActive) {
+            // Also ignore if active but subframe parameters specify the whole image [(0,0),(1,1)]. 
+            if (this.subframeIsActive || !(this.subframe_x0 + this.subframe_y0 
+                    + this.subframe_x1 + this.subframe_y1 == 2)) {
                 opt_params["subframe"] = {
                     "definedOnThisFile": this.subframeDefinedWithFile,
                     "x0": this.subframe_x0.toString(),
@@ -331,7 +333,7 @@ export const commands_mixin = {
         },
         filter_wheel_command () {
             return this.base_command( 'filter_wheel', 'set_name', 'apply',
-                { filter: this.filter_wheel_options_selection},
+                { filter_name: this.filter_wheel_options_selection},
             )
         },
         filter_wheel_home_command () {
