@@ -248,10 +248,10 @@ export const commands_mixin = {
             if (this.subframeIsActive) {
                 opt_params["subframe"] = {
                     "definedOnThisFile": this.subframeDefinedWithFile,
-                    "x0": this.subframe_x0,
-                    "y0": this.subframe_y0,
-                    "x1": this.subframe_x1,
-                    "y1": this.subframe_y1,
+                    "x0": this.subframe_x0.toString(),
+                    "y0": this.subframe_y0.toString(),
+                    "x1": this.subframe_x1.toString(),
+                    "y1": this.subframe_y1.toString(),
                 }
             }
             return this.base_command( 'camera', 'expose', 'expose', 
