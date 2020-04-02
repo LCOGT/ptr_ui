@@ -246,8 +246,9 @@ export const commands_mixin = {
 
             // If active, add subframe parameters.
             // Also ignore if active but subframe parameters specify the whole image [(0,0),(1,1)]. 
-            if (this.subframeIsActive || !(this.subframe_x0 + this.subframe_y0 
+            if (this.subframeIsActive && !(this.subframe_x0 + this.subframe_y0 
                     + this.subframe_x1 + this.subframe_y1 == 2)) {
+                        console.log(this.subframe_x0 + this.subframe_y0 + this.subframe_x1 + this.subframe_y1 == 2)
                 opt_params["subframe"] = {
                     "definedOnThisFile": this.subframeDefinedWithFile,
                     "x0": this.subframe_x0.toString(),
