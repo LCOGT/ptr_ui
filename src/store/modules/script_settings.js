@@ -170,15 +170,13 @@ const actions = {
      */
     script_run_command({ getters, rootState }) {
 
-        // API parameters
-        let apiName = rootState.dev.active_api;
-        let site = rootState.observatory_configuration.selected_site;
-        let mount = rootState.observatory_configuration.selected_mount;
-        let path = `/${site}/${mount}/command/`
+        let url = `https://jobs.photonranch.org/jobs/newjob`
 
         // Command to send
         let script_name = getters.selectedScript
         let command = {
+            site: rootState.observatory_configuration.selected_site,
+            mount: rootState.observatory_configuration.selected_mount,
             device: 'sequencer',
             instance: 'sequencer',
             timestamp: parseInt(Date.now() / 1000),
@@ -191,7 +189,7 @@ const actions = {
         }
         
         // Send the command and log the output
-        axios.post(apiName+path, {body:command}).then(response => {
+        axios.post(url, command).then(response => {
             response = response.data
             console.log(response)
             console.log(command)
