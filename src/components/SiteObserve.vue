@@ -496,14 +496,13 @@
   <div style="margin-top: 2em;"/>
   <side-info-panel :title="'Status'" :startOpen="false">
     <div slot="title">
-      <p>Status - 
+      <p>Status Age - 
       <span class="">
-        <span v-if="status_age < 10" style="color: lightgreen;"> {{' < 10 seconds old'}} </span>
-        <span v-else-if="status_age < 120" style="color: yellow;">{{' < 2 minutes old'}}</span>
-        <span v-else-if="status_age < 3600" style="color:red;">{{(status_age/60).toFixed(0)+' minutes old'}}</span>
-        <span v-else-if="status_age < 86400" style="color:red;">{{(status_age/3600).toFixed(0)+' hours old'}}</span>
-        <span v-else-if="status_age < 18000*86400" style="color:red;">{{(status_age/86400).toFixed(0)+' days old'}}</span>
-        <span v-else-if="status_age > 18000*86400" style="color:red;">{{'unavailable'}}</span>
+        <span v-if="status_age < 60" style="color: lightgreen;"> {{status_age_seconds}}</span>
+        <span v-else-if="status_age < 3600" style="color: yellow;">{{status_age_minutes}}</span>
+        <span v-else-if="status_age < 86400" style="color:red;">{{status_age_hours}}</span>
+        <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
+        <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
       </span>
     </p>
     </div>
@@ -716,6 +715,34 @@ export default {
       'rotator',
       'screen',
     ]),
+
+    status_age_days() {
+      let timestring = ''
+      let days = parseInt(this.status_age / 86400)
+      let hours = parseInt((this.status_age % 86400) / 3600)
+      timestring += days + 'd ' 
+      timestring += hours + 'h '
+      return timestring
+    },
+    status_age_hours() {
+      let timestring = ''
+      let hours = parseInt(this.status_age / 3600)
+      let minutes = parseInt((this.status_age % 3600) / 60)
+      timestring += hours + 'h ' 
+      timestring += minutes + 'm '
+      return timestring
+    },
+    status_age_minutes() {
+      let timestring = ''
+      let minutes = parseInt(this.status_age / 60)
+      let seconds = parseInt(this.status_age % 60)
+      timestring += minutes += 'm '
+      timestring += seconds += 's '
+      return timestring
+    },
+    status_age_seconds() {
+      return parseInt(this.status_age) + 's '
+    },
 
       
 
