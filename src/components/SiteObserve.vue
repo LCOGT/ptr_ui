@@ -500,6 +500,7 @@
       <span class="">
         <span v-if="status_age < 60" style="color: lightgreen;"> {{status_age_seconds}}</span>
         <span v-else-if="status_age < 3600" style="color: yellow;">{{status_age_minutes}}</span>
+        <span v-else-if="status_age < 6000" style="color:red;">{{status_age_minutes}}</span>
         <span v-else-if="status_age < 86400" style="color:red;">{{status_age_hours}}</span>
         <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
         <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
