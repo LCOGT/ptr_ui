@@ -9,7 +9,7 @@
   <div style="height: 1em"></div>
   <div class="columns" style="margin: 1em;">
 
-    <div class="column menu-column is-one-fifth is-hidden-touch">
+    <div class="column menu-column is-one-fifth is-hidden-touch is-hidden-desktop-only">
 
       <!-- Site menu for desktop or larger. Replaces bottom menu. -->
       <b-menu class="subpage-menu">
@@ -89,7 +89,7 @@
   </footer>
 
   <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
-  <div class="mobile-menu is-hidden-desktop">
+  <div class="mobile-menu is-hidden-widescreen">
     <div class="level is-mobile">
 
       <b-tooltip label="Home" type="is-dark" class="level-item">

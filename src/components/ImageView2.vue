@@ -320,7 +320,6 @@ export default {
       let bounds = this.d3_image_element.node().getBoundingClientRect()
       let imageWidth = bounds.width
       let imageHeight = bounds.height
-      console.log(imageWidth, imageHeight)
 
       // log the current mouse coordinates
       this.mouseX = mDrag[0]
@@ -348,7 +347,6 @@ export default {
 
     // Subframe stuff
     drawSubframe() {
-      console.log('drawing subframe')
       let minX = this.imageWidth * Math.min(this.subframe_x0, this.subframe_x1) 
       let minY = this.imageHeight * Math.min(this.subframe_y0, this.subframe_y1) 
       let width = this.imageWidth * Math.abs(this.subframe_x0 - this.subframe_x1)
