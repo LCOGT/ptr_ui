@@ -5,19 +5,20 @@
       <!-- The main image view -->
       <div class="image-div" ref="image_div">
 
-          <svg id='image_svg' ref="svgElement" v-show="!js9IsVisible">
-            <!-- NOTE: image svg width and heigh must be set explicitly to work in firefox -->
-            <!-- These values are changed programatically to work with dynamic window sizes. -->
-            <image 
-              :class="{'image-div-pointer-cross':subframeIsVisible}" 
-              height="1px" width="1px" 
-              ref="image" 
-              :href="current_image.jpg13_url" />
-          </svg>
+        <svg 
+          id='image_svg' 
+          ref="svgElement" 
+          :class="{'image-div-pointer-cross':subframeIsVisible}" 
+          v-show="!js9IsVisible"/>
 
-          <div id="js9-window" v-if="js9IsVisible" >
-            <JS9 ref="js9" :include-menu="true" :initial-width="js9width" :initial-height="js9height" />
-          </div>
+        <img
+          id="main-image"
+          ref="image" 
+          :src="current_image.jpg13_url" />
+
+        <div id="js9-window" v-if="js9IsVisible" >
+          <JS9 ref="js9" :include-menu="true" :initial-width="js9width" :initial-height="js9height" />
+        </div>
 
       </div>
 
@@ -127,6 +128,7 @@ export default {
       active_image: "",
 
       image_element: "#image_svg",
+      d3_image_element: '', // the d3 selection of this.image_element
 
       // Width of image in UI
       imageWidth: 1,
@@ -225,14 +227,18 @@ export default {
 
   methods: {
 
+
     init() {
+
+      this.d3_image_element = d3.select(this.image_element)
+
       let that = this;
 
       // Initialize subframe rectangle
-      const rect = [{"x":0, "y":0}]
+      const rect1 = [{"x":0, "y":0}]
       d3.select(this.image_element)
         .selectAll("subframeBox")
-        .data(rect)
+        .data(rect1)
         .join("rect")
           .attr("id", "subframeSVG")
           .attr("x", d => d.x)
@@ -245,104 +251,104 @@ export default {
           .style("fill", "none")
           .style("cursor", "crosshair")
 
-      that.subframeSVG = d3.select("#subframeSVG")
+      this.subframeSVG = d3.select("#subframeSVG")
 
       // Event actions to perform on the image window element
-      d3.select(this.image_element)
-
-        .on("mousedown", function() {
-
-          let mClick = d3.mouse(this)
-
-          // start drawing a subframe box if subframe mode is active.
-          if (that.subframeIsVisible) {
-
-            // Make it visible
-            that.subframeSVG
-              .style("display","block")
-              .attr("class","image-div-pointer-cross")
-
-            that.mouseIsDown = true;
-            that.subframe_x0 = mClick[0] / that.imageWidth
-            that.subframe_y0 = mClick[1] / that.imageHeight
-            that.subframe_x1 = mClick[0] / that.imageWidth
-            that.subframe_y1 = mClick[1] / that.imageHeight
-            that.drawSubframe()
-          }
-
-          if (that.starProfileToolActive) {
-            that.drawCircle(mClick[0], mClick[1])
-          }
-
-        })
-
-        .on("mousemove", function() {
-          // coordinates of current mouse position
-          let mDrag = d3.mouse(this)
-
-          // log the current mouse coordinates
-          that.mouseX = mDrag[0]
-          that.mouseY = mDrag[1]
-
-          // if subframe mode is active, and the mouse is dragging, 
-          // save the current coordinates and draw them as a rectangle.
-          if (that.subframeIsVisible && that.mouseIsDown && !that.starProfileToolActive) {
-            //let mDrag = d3.mouse(this)
-            that.subframe_x1 = mDrag[0] / that.imageWidth
-            that.subframe_y1 = mDrag[1] / that.imageHeight
-            that.drawSubframe()
-          }
-
-          if (that.starProfileToolActive && that.mouseIsDown) {
-            that.drawCircle(mDrag[0], mDrag[1])
-          }
-
-        })
-
-        // Defines the end of a drag event.
-        .on("mouseup", function() {
-          that.mouseIsDown = false;
-          let mouse = d3.mouse(this)
-
-          if(that.subframeIsVisible && !that.starProfileToolActive) {
-            //that.subframeIsActive = true;
-            that.subframeDefinedWithFile = that.current_image.base_filename
-          }
-          if (that.starProfileToolActive) {
-            that.drawCircle(mouse[0],mouse[1])
-          }
-        })
-
-        // Respond to right clicks
-        .on("contextmenu", function(data, index) {
-          let position = d3.mouse(this);
-          console.log("right click!");
-          that.draw_marker(position[0], position[1]);
-          Snackbar.open({
-            duration: that.right_click_ttl,
-            message:
-              "Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.",
-            type: "is-warning",
-            position: "is-bottom-left",
-            actionText: "Slew",
-            queue: false,
-            onAction: () => {
-              console.log("slew to " + position[0]/that.imageWidth + ", " + position[1]/that.imageHeight);
-              that.send_pixels_center_command(
-                position,
-                that.current_image.base_filename
-              );
-            }
-          });
-
-          // Don't open the usual right-click menu
-          d3.event.preventDefault();
-        })
-
+      this.d3_image_element
+        .on("mousedown", this.handleMouseDown) 
+        .on("mousemove", this.handleMouseMove)
+        .on("mouseup", this.handleMouseUp)
+        .on("contextmenu", this.handleContextMenu)
     }, 
+
+    handleContextMenu(data, index) {
+      let position = d3.mouse(this.d3_image_element.node());
+      this.draw_marker(position[0], position[1]);
+      Snackbar.open({
+        duration: this.right_click_ttl,
+        message:
+          "Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.",
+        type: "is-warning",
+        position: "is-bottom-left",
+        actionText: "Slew",
+        queue: false,
+        onAction: () => {
+          console.log("slew to " + position[0]/ this.imageWidth + ", " + position[1]/ this.imageHeight);
+          this.send_pixels_center_command(
+            position,
+            this.current_image.base_filename
+          );
+        }
+      });
+      // Don't open the usual right-click menu
+      d3.event.preventDefault();
+    },
+
+    handleMouseDown() {
+      d3.event.preventDefault();
+
+      let mClick = d3.mouse(this.d3_image_element.node())
+
+      // Calculate image dimensions
+      let bounds = this.d3_image_element.node().getBoundingClientRect()
+      let imageWidth = bounds.width
+      let imageHeight = bounds.height
+
+
+      // start drawing a subframe box if subframe mode is active.
+      if (this.subframeIsVisible) {
+
+        // Make it visible
+        this.subframeSVG
+          .style("display","block")
+          .attr("class","image-div-pointer-cross")
+
+        this.mouseIsDown = true;
+        this.subframe_x0 = mClick[0] / imageWidth
+        this.subframe_y0 = mClick[1] / imageHeight
+        this.subframe_x1 = mClick[0] / imageWidth
+        this.subframe_y1 = mClick[1] / imageHeight
+        this.drawSubframe()
+      }
+    },
+
+    handleMouseMove() {
+      // coordinates of current mouse position
+      let mDrag = d3.mouse(this.d3_image_element.node())
+
+      // Calculate image dimensions
+      let bounds = this.d3_image_element.node().getBoundingClientRect()
+      let imageWidth = bounds.width
+      let imageHeight = bounds.height
+      console.log(imageWidth, imageHeight)
+
+      // log the current mouse coordinates
+      this.mouseX = mDrag[0]
+      this.mouseY = mDrag[1]
+
+      // if subframe mode is active, and the mouse is dragging, 
+      // save the current coordinates and draw them as a rectangle.
+      if (this.subframeIsVisible && this.mouseIsDown) {
+        this.subframe_x1 = mDrag[0] /imageWidth
+        this.subframe_y1 = mDrag[1] /imageHeight
+
+
+        this.drawSubframe()
+      }
+    },
+
+    handleMouseUp(context) {
+      this.mouseIsDown = false;
+      let mouse = d3.mouse(this.d3_image_element.node())
+      if(this.subframeIsVisible) {
+        //that.subframeIsActive = true;
+        this.subframeDefinedWithFile = this.current_image.base_filename
+      }
+    },
 
     // Subframe stuff
     drawSubframe() {
+      console.log('drawing subframe')
       let minX = this.imageWidth * Math.min(this.subframe_x0, this.subframe_x1) 
       let minY = this.imageHeight * Math.min(this.subframe_y0, this.subframe_y1) 
       let width = this.imageWidth * Math.abs(this.subframe_x0 - this.subframe_x1)
@@ -372,12 +378,16 @@ export default {
         let svgRect = this.$refs.svgElement.getBoundingClientRect();
         let imageEl = this.$refs.image
 
+        // If nothing changed, we're done.
+        if (this.js9width==svgRect.width && this.js9height==svgRect.width) {
+          return;
+        }
         // This is fed to js9 just before displaying to set the matching size. 
         this.js9width=svgRect.width
         this.js9height=svgRect.width
 
         imageEl.setAttribute("width", svgRect.width)
-        imageEl.setAttribute("height", svgRect.width)
+        imageEl.setAttribute("height", "100%")
         // Resize the svg
         // WARNING: this may have bugs if image is not a square.
         // See the final line of this function (imageEl.setAtt...).
@@ -386,6 +396,7 @@ export default {
         this.imageHeight = imageRect.height
       }
       
+      this.draw_star_markers()
       this.drawSubframe()
     },
 
@@ -410,14 +421,6 @@ export default {
           optional_params: opt_params
         }
       };
-      // Old code
-      //let basecommand = this.base_command(
-      //"mount",
-      //"center_on_pixels",
-      //"center_on_pixels",
-      //req_params,
-      //opt_params
-      //);
       let apiName = this.$store.getters["dev/api"];
       let url = theCommand.url;
       let body = { body: theCommand.form };
@@ -779,23 +782,28 @@ export default {
 }
 
 .image-div {
-  padding-bottom: 1em;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
+
+#main-image {
+  width: 100%;
+  height: 100%;
+}
+#image_svg {
+  position:absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .image-div-pointer-cross:hover {
   cursor:crosshair;
 }
 .image-div-no-cursor:hover {
   cursor:none;
-}
-#image_svg {
-  width: 100%;
-  height: 1px;
-  margin-bottom: 100%;
-  overflow: visible;
-}
-#image_svg image {
-  width: inherit;
-  height: auto;
 }
 
 .recent_images {
