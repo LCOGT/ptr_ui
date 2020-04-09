@@ -73,6 +73,12 @@
         :sitecode="sitecode"
         :deviceStatus="deviceStatus"
         />
+      <status-overview 
+        :config="config"
+        :sitecode="sitecode"  
+        :deviceStatus="deviceStatus" 
+        style="margin:0"/>
+      <div class="spacer" style="height: 2em;" />
     </div>
   </div>
   </section>
@@ -158,6 +164,7 @@ import SiteTargets from '@/components/SiteTargets'
 import SiteCalendar from '@/components/SiteCalendar'
 import SiteData from '@/components/SiteData'
 import ChatModule from '@/components/ChatModule'
+import StatusOverview from '@/components/StatusOverview'
 
 import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -173,6 +180,7 @@ export default {
     SiteCalendar,
     SiteData,
     ChatModule,
+    StatusOverview,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin],

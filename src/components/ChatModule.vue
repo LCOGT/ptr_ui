@@ -38,12 +38,13 @@
                         placeholder="message...">
                     </b-input>
                     <p class="control">
-                        <b-button 
-                            class="button is-primary is-small" 
+                        <button 
+                            class="button is-dark is-small" 
+                            style="background-color: #444;"
                             @click="postMessage" 
                             @keyup.native.enter="postMessage">
                             send
-                        </b-button>
+                        </button>
                     </p>
                 </b-field>
             </div>
