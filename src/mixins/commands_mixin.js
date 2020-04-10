@@ -27,6 +27,7 @@ export const commands_mixin = {
                 'NeAr flat', 
                 'ThAr flat', 
                 'solar flat',
+                'experimental',
             ],
 
         }
