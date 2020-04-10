@@ -377,7 +377,7 @@ export default {
         let imageEl = this.$refs.image
 
         // If nothing changed, we're done.
-        if (this.js9width==svgRect.width && this.js9height==svgRect.width) {
+        if (this.js9width==svgRect.width && this.js9height==svgRect.height) {
           return;
         }
         // This is fed to js9 just before displaying to set the matching size. 
