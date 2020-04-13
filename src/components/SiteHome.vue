@@ -6,11 +6,11 @@
         </div>
     </div>
 
-    <status-overview 
+    <!--status-overview 
         :config="config"
         :sitecode="sitecode"  
         :deviceStatus="deviceStatus" 
-    style="margin:0"/>
+    style="margin:0"/-->
     <div class="spacer" style="height: 2em;" />
 
     <the-dome-cam v-if="sitecode=='wmd'"/>

@@ -1,62 +1,58 @@
 <template>
     
-    <div class="status-flex" style="overflow-x: auto">
+    <div class="status-flex">
         <div class="status-entry">
-            <div class="key">Status Age:</div>
-            <div class="val">
-                <span v-if="status_age < 60" style="color: lightgreen;"> {{status_age_seconds}}</span>
-                <span v-else-if="status_age < 600" style="color:yellow;">{{status_age_minutes}}</span>
-                <span v-else-if="status_age < 3600" style="color:red;">{{status_age_minutes}}</span>
-                <span v-else-if="status_age < 86400" style="color:red;">{{status_age_hours}}</span>
-                <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
-                <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
+            <div class="col">
+                <div class="key">Status Age:</div>
+            </div>
+            <div class="col">
+                <div class="val">
+                    <span v-if="status_age < 60" style="color: lightgreen;"> {{status_age_seconds}}</span>
+                    <span v-else-if="status_age < 600" style="color:yellow;">{{status_age_minutes}}</span>
+                    <span v-else-if="status_age < 3600" style="color:red;">{{status_age_minutes}}</span>
+                    <span v-else-if="status_age < 86400" style="color:red;">{{status_age_hours}}</span>
+                    <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
+                    <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
+                </div>
             </div>
         </div>
 
         <div class="spacer"/>
 
         <div class="status-entry">
-            <div class="key">LST:</div>
-            <div class="val">{{decimalToHHMMSS(lmst)}}</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">UTC:</div>
-            <div class="val">{{new Date().toUTCString().split(' ')[4]}}</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">Enclosure:</div>
-            <div class="val">{{enclosure_state.shutter_status}}</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">User:</div>
-            <div class="val">--</div>
+            <div class="col">
+                <div class="key">LST:</div>
+                <div class="key">UTC:</div>
+                <div class="key">Enclosure:</div>
+                <div class="key">User:</div>
+            </div>
+            <div class="col">
+                <div class="val">{{decimalToHHMMSS(lmst)}}</div>
+                <div class="val">{{new Date().toUTCString().split(' ')[4]}}</div>
+                <div class="val">{{enclosure_state.shutter_status}}</div>
+                <div class="val">--</div>
+            </div>
         </div>
 
         <div class="spacer"/>
 
         <div class="status-entry">
-            <div class="key">RA:</div>
-            <div class="val">{{decimalToHHMMSS(telescope_state.right_ascension)}}</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">Dec:</div>
-            <div class="val">{{decimalToHHMMSS(telescope_state.declination)}}</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">Ha:</div>
-            <div class="val">--</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">Alt:</div>
-            <div class="val">{{telescope_state.altitude}}</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">Az:</div>
-            <div class="val">{{telescope_state.azimuth}}</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">Airmass:</div>
-            <div class="val">{{telescope_state.airmass}}</div>
+            <div class="col">
+                <div class="key">RA:</div>
+                <div class="key">Dec:</div>
+                <div class="key">Ha:</div>
+                <div class="key">Alt:</div>
+                <div class="key">Az:</div>
+                <div class="key">Airmass:</div>
+            </div>
+            <div class="col">
+                <div class="val">{{decimalToHHMMSS(telescope_state.right_ascension)}}</div>
+                <div class="val">{{decimalToHHMMSS(telescope_state.declination)}}</div>
+                <div class="val">--</div>
+                <div class="val">{{telescope_state.altitude}}</div>
+                <div class="val">{{telescope_state.azimuth}}</div>
+                <div class="val">{{telescope_state.airmass}}</div>
+            </div>
         </div>
     </div>
 
@@ -229,30 +225,31 @@ export default {
 <style scoped>
 .status-flex {
     padding: 0px 0;
-    background-color: #151718;
+    background-color: #1e2223;
     display:flex;
+    flex-direction:column;
     flex-wrap:nowrap;
     z-index:10;
     font-family: "Helvetica";
 }
-.status-header {
-  font-weight: bold;
-  text-align: center;
-  padding: 3px 0;
-  margin-bottom: 5px;
-  background-color: #4f5f5f;
-  word-break:keep-all;
-}
 .status-entry {
   display:flex;
-  flex-direction:column;
+  flex-direction:row;
+  flex-wrap:wrap;
   padding: 0 0px;
+  width: 100%;
 }
-.status-entry .key{
+.col {
+    flex-direction: column;
+    width: 50%;
+}
+.status-entry .key {
   color:silver;
   padding: 0 8px;
-  background-color: #383f3f;
   white-space: nowrap;
+  margin-bottom: 3px;
+  text-align: right;
+  flex-grow:1;
 }
 .status-entry .val{
   color: greenyellow;
@@ -260,10 +257,11 @@ export default {
   padding: 0 8px;
   margin-bottom: 3px;
   white-space: nowrap;
+  flex-grow:1;
 }
 
 .spacer {
-    width:10px;
+    height:10px;
 }
 
 </style>
