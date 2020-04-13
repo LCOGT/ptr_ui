@@ -148,6 +148,19 @@
           </div>
         </div>
 
+        <div class="status-items">
+          <div class="keys">
+            <div class="key">Camera status: </div>
+            <div class="key">Filter: </div>
+            <div class="key">Filter Wheel: </div>
+          </div>
+          <div class="keys">
+            <div class="val">{{camera_state.status}}</div>
+            <div class="val">{{filter_wheel_state.filter_name}}</div>
+            <div class="val">{{parseTrueFalse(filter_wheel_state.wheel_is_moving) ? "moving" : "idle"}}</div>
+          </div>
+        </div>
+
         <b-field horizontal label="Expose">
             <b-field>
                 <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
@@ -1658,6 +1671,7 @@ export default {
   padding: 0 8px;
   margin-bottom: 3px;
   background-color: #283030;
+  white-space: nowrap;
 }
 .val{
   color: greenyellow;

@@ -231,7 +231,7 @@ export default {
     padding: 0px 0;
     background-color: #151718;
     display:flex;
-    flex-wrap:wrap;
+    flex-wrap:nowrap;
 }
 .status-header {
   font-weight: bold;
@@ -239,6 +239,7 @@ export default {
   padding: 3px 0;
   margin-bottom: 5px;
   background-color: #4f5f5f;
+  word-break:keep-all;
 }
 .status-entry {
   display:flex;
@@ -249,12 +250,14 @@ export default {
   color:silver;
   padding: 0 8px;
   background-color: #383f3f;
+  white-space: nowrap;
 }
 .status-entry .val{
   color: greenyellow;
   background-color: black;
   padding: 0 8px;
   margin-bottom: 3px;
+  white-space: nowrap;
 }
 
 .spacer {
