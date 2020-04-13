@@ -50,10 +50,6 @@
         <div class="column camera-status">
             <div class="status-header">camera</div>
             <div class="status-entry">
-                <div class="key">Filter:</div>
-                <div class="val">{{filter_wheel_state.filter_name}}</div>
-            </div>
-            <div class="status-entry">
                 <div class="key">Binning:</div>
                 <div class="val">--</div>
             </div>
@@ -158,14 +154,14 @@ export default {
     computed: {
 
         ...mapGetters('observatory_configuration', [
-        'enclosure',
-        'mount',
-        'telescope',
-        'camera',
-        'filter_wheel',
-        'focuser',
-        'rotator',
-        'screen',
+            'enclosure',
+            'mount',
+            'telescope',
+            'camera',
+            'filter_wheel',
+            'focuser',
+            'rotator',
+            'screen',
         ]),
 
         status_age_days() {

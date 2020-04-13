@@ -678,11 +678,11 @@ export default {
 
     toggleAnalysis() {
       if (this.js9IsVisible) {
-        this.js9IsVisible= false;
+        this.js9IsVisible = false;
         this.init()
       } else {
         this.js9LoadImage(this.current_image)
-        this.js9IsVisible= true;
+        this.js9IsVisible = true;
       }
     },
 

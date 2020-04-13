@@ -40,7 +40,7 @@ export default {
   async created() {
     let response = await axios.get('https://api.photonranch.org/api/all/config')
     this.global_config = response.data
-    console.log(this.config)
+    console.log(this.global_config)
     this.$store.dispatch('observatory_configuration/update_config')
   },
 }

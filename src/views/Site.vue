@@ -7,11 +7,6 @@
   <section class="page-view">
 
   <div style="height: 1em"></div>
-    <!--status-overview 
-        :config="config"
-        :sitecode="sitecode"  
-        :deviceStatus="deviceStatus" 
-    style="margin:0"/-->
   <div class="columns" style="margin: 1em;">
 
     <div class="column menu-column is-one-fifth is-hidden-touch is-hidden-desktop-only">
@@ -64,6 +59,17 @@
         :username="username"
         @whosonline="makeOnlineUsersList" />
 
+      <div style="height:3em;"/>
+
+      <side-info-panel>
+        <p slot="title">{{sitecode}} status</p>
+        <status-overview-3
+          :config="config"
+          :sitecode="sitecode"  
+          :deviceStatus="deviceStatus" 
+          />
+      </side-info-panel>
+
     </div>
 
 
@@ -99,6 +105,7 @@
       :config="config"
       :sitecode="sitecode"  
       :deviceStatus="deviceStatus" 
+      class="is-mobile is-hidden-widescreen"
       style="margin:0;"/>
     <div class="level is-mobile is-hidden-widescreen">
 
@@ -170,6 +177,8 @@ import SiteData from '@/components/SiteData'
 import ChatModule from '@/components/ChatModule'
 import StatusOverview from '@/components/StatusOverview'
 import StatusOverview2 from '@/components/StatusOverview2'
+import StatusOverview3 from '@/components/StatusOverview3'
+import SideInfoPanel from '@/components/SideInfoPanel'
 
 import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -187,6 +196,8 @@ export default {
     ChatModule,
     StatusOverview,
     StatusOverview2,
+    StatusOverview3,
+    SideInfoPanel,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin],
