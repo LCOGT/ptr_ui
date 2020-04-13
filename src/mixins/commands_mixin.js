@@ -89,6 +89,11 @@ export const commands_mixin = {
         script_stop_command() {
             this.$store.dispatch('script_stop_command')
         },
+        focus_relative_command_args(microns) {
+            return this.base_command( 'focuser', 'move_relative', 'focus',
+                { position: microns.toString(), }
+            )
+        },
 
     },
 

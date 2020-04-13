@@ -7,6 +7,11 @@
   <section class="page-view">
 
   <div style="height: 1em"></div>
+    <!--status-overview 
+        :config="config"
+        :sitecode="sitecode"  
+        :deviceStatus="deviceStatus" 
+    style="margin:0"/-->
   <div class="columns" style="margin: 1em;">
 
     <div class="column menu-column is-one-fifth is-hidden-touch is-hidden-desktop-only">
@@ -73,12 +78,6 @@
         :sitecode="sitecode"
         :deviceStatus="deviceStatus"
         />
-      <status-overview 
-        :config="config"
-        :sitecode="sitecode"  
-        :deviceStatus="deviceStatus" 
-        style="margin:0"/>
-      <div class="spacer" style="height: 2em;" />
     </div>
   </div>
   </section>
@@ -95,8 +94,13 @@
   </footer>
 
   <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
-  <div class="mobile-menu is-hidden-widescreen">
-    <div class="level is-mobile">
+  <div class="mobile-menu ">
+    <status-overview-2
+        :config="config"
+        :sitecode="sitecode"  
+        :deviceStatus="deviceStatus" 
+    style="position:sticky; margin:0; padding: 10px 0;"/>
+    <div class="level is-mobile is-hidden-widescreen">
 
       <b-tooltip label="Home" type="is-dark" class="level-item">
         <b-button tag="router-link"
@@ -165,6 +169,7 @@ import SiteCalendar from '@/components/SiteCalendar'
 import SiteData from '@/components/SiteData'
 import ChatModule from '@/components/ChatModule'
 import StatusOverview from '@/components/StatusOverview'
+import StatusOverview2 from '@/components/StatusOverview2'
 
 import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -181,6 +186,7 @@ export default {
     SiteData,
     ChatModule,
     StatusOverview,
+    StatusOverview2,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin],
@@ -359,8 +365,7 @@ export default {
 }
 
 .mobile-menu {
-  border-top: 1px solid lighten($dark, 3);
-  background-color: $dark;
+  background-color: darken($dark, 3);
   position: fixed;
   bottom: 0;
   width: 100%;
