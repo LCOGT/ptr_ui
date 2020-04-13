@@ -11,8 +11,8 @@
     :deviceStatus="deviceStatus" 
   style="margin:0"/-->
 
-  <div class="b-tabs" style="position: relative; z-index: 9;">
-    <b-dropdown>
+  <div class="b-tabs" style="position: relative;">
+    <b-dropdown :trap-focus="true" :append-to-body="true">
       <a
         slot="trigger"
         role="button">
@@ -21,7 +21,8 @@
       <b-dropdown-item custom style="position;absolute; width:100%" label="Enclosure" >
         <div class="instrument-control-title-bar">
           <div class="title">Enclosure</div>
-          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+          <div class="device-instance-subtitle tag is-small is-light" 
+            @click="isDeviceSelectorActive = !isDeviceSelectorActive">
             {{active_enclosure}}
           </div>
         </div>
@@ -259,6 +260,16 @@
             false-value="off"
             >
             {{ camera_dither }}
+          </b-checkbox>
+        </b-field>
+
+        <b-field horizontal label="Extract">
+          <b-checkbox
+            v-model="camera_extract"
+            true-value="on"
+            false-value="off"
+            >
+            {{ camera_extract }}
           </b-checkbox>
         </b-field>
 
@@ -585,7 +596,7 @@
     </b-dropdown>
 
     <!-- Select the active devices here -->
-    <b-modal :active.sync="isDeviceSelectorActive" :width="640">
+    <b-modal :active.sync="isDeviceSelectorActive" :width="640" :can-cancel="true">
       <article class="instrument-selection message">
         <div class="message-header">Device Selection</div>
         <div class="message-body">
@@ -872,6 +883,16 @@
           false-value="off"
           >
           {{ camera_dither }}
+        </b-checkbox>
+      </b-field>
+
+      <b-field horizontal label="Extract">
+        <b-checkbox
+          v-model="camera_extract"
+          true-value="on"
+          false-value="off"
+          >
+          {{ camera_extract }}
         </b-checkbox>
       </b-field>
 
@@ -1572,6 +1593,10 @@ export default {
     camera_dither: {
         get() { return this.$store.getters['command_params/camera_dither'] },
         set(val) {this.$store.commit('command_params/camera_dither', val)}
+    },
+    camera_extract: {
+        get() { return this.$store.getters['command_params/camera_extract'] },
+        set(val) {this.$store.commit('command_params/camera_extract', val)}
     },
     camera_image_type: {
         get() { return this.$store.getters['command_params/camera_image_type'] },

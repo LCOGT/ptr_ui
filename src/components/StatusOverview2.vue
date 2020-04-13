@@ -232,6 +232,7 @@ export default {
     background-color: #151718;
     display:flex;
     flex-wrap:nowrap;
+    z-index:10;
 }
 .status-header {
   font-weight: bold;

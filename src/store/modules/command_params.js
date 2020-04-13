@@ -25,6 +25,7 @@ const state = {
     camera_area: null, 
     camera_bin: '', 
     camera_dither: 'off',
+    camera_extract: 'on',
     camera_image_type: 'light',
 
     filter_wheel_options_selection: '',
@@ -56,6 +57,7 @@ const getters = {
     camera_count: state => state.camera_count,
     camera_bin: state => state.camera_bin,
     camera_dither: state => state.camera_dither,
+    camera_extract: state => state.camera_extract,
     camera_image_type: state => state.camera_image_type,
 
     filter_wheel_options_selection: state => state.filter_wheel_options_selection,
@@ -97,6 +99,7 @@ const mutations = {
     camera_count (state, val) { state.camera_count = val; },
     camera_bin (state, val) { state.camera_bin = val; },
     camera_dither (state, val) { state.camera_dither = val; },
+    camera_extract (state, val) { state.camera_extract = val; },
     camera_image_type (state, val) { state.camera_image_type = val; },
 
     filter_wheel_options_selection(state, val) { state.filter_wheel_options_selection = val; },
