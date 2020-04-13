@@ -96,10 +96,10 @@
   <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
   <div class="mobile-menu ">
     <status-overview-2
-        :config="config"
-        :sitecode="sitecode"  
-        :deviceStatus="deviceStatus" 
-    style="position:sticky; margin:0; padding: 10px 0;"/>
+      :config="config"
+      :sitecode="sitecode"  
+      :deviceStatus="deviceStatus" 
+      style="margin:0;"/>
     <div class="level is-mobile is-hidden-widescreen">
 
       <b-tooltip label="Home" type="is-dark" class="level-item">
