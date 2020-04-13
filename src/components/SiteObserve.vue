@@ -180,6 +180,16 @@
         </b-checkbox>
       </b-field>
 
+      <b-field horizontal label="Extract">
+        <b-checkbox
+          v-model="camera_extract"
+          true-value="on"
+          false-value="off"
+          >
+          {{ camera_extract }}
+        </b-checkbox>
+      </b-field>
+
       <b-field horizontal label="Hint">
         <b-input placeholder="a hint for the FITS header..."
           type="text"
@@ -842,6 +852,10 @@ export default {
     camera_dither: {
         get() { return this.$store.getters['command_params/camera_dither'] },
         set(val) {this.$store.commit('command_params/camera_dither', val)}
+    },
+    camera_extract: {
+        get() { return this.$store.getters['command_params/camera_extract'] },
+        set(val) {this.$store.commit('command_params/camera_extract', val)}
     },
     camera_image_type: {
         get() { return this.$store.getters['command_params/camera_image_type'] },
