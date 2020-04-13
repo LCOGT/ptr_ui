@@ -13,8 +13,6 @@
     style="margin:0"/>
     <div class="spacer" style="height: 2em;" />
 
-    <pre>{{deviceStatus}}</pre>
-
     <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
 
