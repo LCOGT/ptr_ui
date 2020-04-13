@@ -5,80 +5,120 @@
   
 <div class="content-column">
 
+  <!--status-overview-2
+    :config="config"
+    :sitecode="sitecode"  
+    :deviceStatus="deviceStatus" 
+  style="margin:0"/-->
+
   <div class="b-tabs" style="position: relative; z-index: 9;">
     <b-dropdown>
       <a
         slot="trigger"
         role="button">
-        <div class="button is-text" style="border-bottom: 2px white solid; text-align: center;">Enclosure</div>
+        <div class="button is-text">Enclosure</div>
       </a>
-    <b-dropdown-item custom style="position;absolute; width:100%" label="Enclosure" >
-      <div style="width:100%">
+      <b-dropdown-item custom style="position;absolute; width:100%" label="Enclosure" >
+        <div class="instrument-control-title-bar">
           <div class="title">Enclosure</div>
+          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+            {{active_enclosure}}
+          </div>
+        </div>
 
-          <command-button :data="enclosure_open_command" style="margin-bottom: 1em;" class="is-small"/>
-          <command-button :data="enclosure_close_command" style="margin-bottom: 1em;" class="is-small"/>
-          <br>
+        <div class="status-items">
+          <div class="keys">
+            <div class="key">Enclosure:</div>
+            <div class="key">Shutter:</div>
+          </div>
+          <div class="keys">
+            <div class="val">{{enclosure_state.shutter_status}}</div>
+            <div class="val">{{parseTrueFalse(enclosure_state.shutter_slewing) ? "slewing" : "idle" }}</div>
+          </div>
+        </div>
 
-      </div>
-      <div class="status-toggle-bar" @click="isEnclosureStatusVisible = !isEnclosureStatusVisible">toggle status</div>
-      <pre v-if="isEnclosureStatusVisible">
-        <simple-device-status :device_name="active_enclosure" device_type="enclosure" :device_status="enclosure_state" />
-      </pre>
+        <command-button :data="enclosure_open_command" style="margin-bottom: 1em;" class="is-small"/>
+        <command-button :data="enclosure_close_command" style="margin-bottom: 1em;" class="is-small"/>
+        <br>
 
-    </b-dropdown-item> 
+        <div class="status-toggle-bar" @click="isEnclosureStatusVisible = !isEnclosureStatusVisible">toggle status</div>
+        <pre v-if="isEnclosureStatusVisible">
+          <simple-device-status :device_name="active_enclosure" device_type="enclosure" :device_status="enclosure_state" />
+        </pre>
+
+      </b-dropdown-item> 
     </b-dropdown>
-
-
 
     <b-dropdown>
       <a
         slot="trigger"
         role="button">
-        <div class="button is-text" style="border-bottom: 2px white solid; text-align: center;">Telescope</div>
+        <div class="button is-text" >Telescope</div>
       </a>
       <b-dropdown-item custom label="Telescope">
-        <div>
-            <div class="title">Telescope</div>
 
-            <b-field horizontal label="Ra">
-              <b-input name="subject" size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
-            </b-field>
-            <b-field horizontal label="Dec">
-              <b-input name="subject" size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
-            </b-field>
-
-            <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>
-            <br>
-
-            <b-dropdown aria-role="list" style="width: 100%;" size="is-small">
-              <button class="button is-small" slot="trigger" style="width: 100%;">
-                  <span>Slew to...</span>
-                  <b-icon icon="menu-down"></b-icon>
-              </button>
-              <b-dropdown-item aria-role="listitem">
-                <command-button :data="mount_slew_chart_command" class="dropdown-button-command is-small"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="mount_screenflat_command" class="dropdown-button-command is-small"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="mount_skyflat_command" class="dropdown-button-command is-small"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="mount_home_command" class="dropdown-button-command is-small"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="mount_park_command" class="dropdown-button-command is-small"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="mount_raSidDec0_command" class="dropdown-button-command is-small"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="mount_stop_command" class="dropdown-button-command is-small"/>
-              </b-dropdown-item>
-            </b-dropdown>
+        <div class="instrument-control-title-bar">
+          <div class="title">Telescope</div>
+          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+            {{active_mount}}
+          </div>
+          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+            {{active_telescope}}
+          </div>
         </div>
+
+        <div class="status-items">
+            <div class="keys">
+              <div class="key">Ra:</div>
+              <div class="key">Dec:</div>
+              <div class="key">Alt:</div>
+              <div class="key">Az:</div>
+            </div>
+            <div class="keys">
+              <div class="val">{{decimalToHHMMSS(telescope_state.right_ascension)}}</div>
+              <div class="val">{{decimalToHHMMSS(telescope_state.declination)}}</div>
+              <div class="val">{{(telescope_state.altitude)}}</div>
+              <div class="val">{{(telescope_state.azimuth)}}</div>
+            </div>
+        </div>
+
+        <b-field horizontal label="Ra">
+          <b-input name="subject" size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
+        </b-field>
+        <b-field horizontal label="Dec">
+          <b-input name="subject" size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
+        </b-field>
+
+        <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>
+        <br>
+
+        <b-dropdown aria-role="list" style="width: 100%;" size="is-small">
+          <button class="button is-small" slot="trigger" style="width: 100%;">
+              <span>Slew to...</span>
+              <b-icon icon="menu-down"></b-icon>
+          </button>
+          <b-dropdown-item aria-role="listitem">
+            <command-button :data="mount_slew_chart_command" class="dropdown-button-command is-small"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_screenflat_command" class="dropdown-button-command is-small"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_skyflat_command" class="dropdown-button-command is-small"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_home_command" class="dropdown-button-command is-small"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_park_command" class="dropdown-button-command is-small"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_raSidDec0_command" class="dropdown-button-command is-small"/>
+          </b-dropdown-item>
+          <b-dropdown-item>
+            <command-button :data="mount_stop_command" class="dropdown-button-command is-small"/>
+          </b-dropdown-item>
+        </b-dropdown>
 
         <div class="status-toggle-bar" @click="isMountStatusVisible = !isMountStatusVisible">toggle status</div>
         <pre v-if="isMountStatusVisible">
@@ -86,9 +126,6 @@
           <simple-device-status :device_name="active_telescope" device_type="Telescope" :device_status="telescope_state" />
         </pre>
 
-        <div class="choose-target" id="skychart-box">
-          <the-sky-chart :siteConfig="config" v-if="Object.keys(config).length>0" />
-        </div>
 
       </b-dropdown-item>
     </b-dropdown>
@@ -97,11 +134,19 @@
       <a
         slot="trigger"
         role="button">
-        <div class="button is-text" style="border-bottom: 2px white solid; text-align: center;">Camera</div>
+        <div class="button is-text">Camera</div>
       </a>
       <b-dropdown-item custom label="Camera">
-        <div>
-        <div class="title">Camera + Filter</div>
+
+        <div class="instrument-control-title-bar">
+          <div class="title">Camera</div>
+          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+            {{active_camera}}
+          </div>
+          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+            {{active_filter_wheel}}
+          </div>
+        </div>
 
         <b-field horizontal label="Expose">
             <b-field>
@@ -219,7 +264,6 @@
           <command-button :data="camera_expose_command" style="width: 70%" class="is-small"/>
           <command-button :data="camera_cancel_command" style="width: 30%" class="is-small"/>
         </div>
-        </div>
         <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">toggle status</div>
         <pre v-if="isCameraStatusVisible">
           <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
@@ -233,12 +277,14 @@
       <a
         slot="trigger"
         role="button">
-        <div class="button is-text" style="border-bottom: 2px white solid; text-align: center;">Sequencer</div>
+        <div class="button is-text">Sequencer</div>
       </a>
       <b-dropdown-item custom label="Sequencer">
 
-        <div >
-            <div class="title">Sequencer</div>
+        <div>
+            <div class="instrument-control-title-bar">
+              <div class="title">Sequencer</div>
+            </div>
 
             <b-field label="Script">
               <b-field>
@@ -305,55 +351,89 @@
       <a
         slot="trigger"
         role="button">
-        <div class="button is-text" style="border-bottom: 2px white solid; text-align: center;">Focuser</div>
+        <div class="button is-text">Focuser</div>
       </a>
       <b-dropdown-item custom label="Focuser">
 
-        <div class="column is-full" style="padding: 0">
-        <div>
-            <div class="title">Focuser</div>
-
-              <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
-                <button class="button is-small" slot="trigger" style="width: 100%;">
-                    <span>Focus Action...</span>
-                    <b-icon icon="menu-down"></b-icon>
-                </button>
-                <b-dropdown-item aria-role="listitem">
-                  <command-button :data="focus_home_command" class="dropdown-button-command"/>
-                </b-dropdown-item>
-                <b-dropdown-item>
-                  <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
-                </b-dropdown-item>
-                <b-dropdown-item>
-                  <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
-                </b-dropdown-item>
-                <b-dropdown-item>
-                  <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
-                </b-dropdown-item>
-              </b-dropdown>
-              <br>
-
-              <b-field label="Relative">
-                <b-field>
-                  <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
-                  <p class="control"> <command-button :data="focus_relative_command" class="is-small" @jobPost="focuserJobPost"/>  </p><br>
-                </b-field>
-              </b-field>
-
-              <b-field label="Absolute">
-                <b-field>
-                  <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
-                  <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
-                </b-field>
-              </b-field>
-              <br>
+        <div class="instrument-control-title-bar">
+          <div class="title">Focuser</div>
+          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+            {{active_focuser}}
+          </div>
         </div>
 
-        <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">toggle status</div>
-        <pre v-if="isRotatorStatusVisible">
+          <div class="status-items">
+              <div class="keys">
+                <div class="key">Focus:</div>
+                <div class="key">Temp:</div>
+                <div class="key">Status:</div>
+              </div>
+              <div class="keys">
+                <div class="val">{{focuser_state.focus_position}}	&mu;m</div>
+                <div class="val">{{focuser_state.focus_temperature}} &#8451;</div>
+                <div class="val">{{focuser_state.focus_moving.toLowerCase()=="true" ? "moving" : "idle"}}</div>
+              </div>
+          </div>
+
+          <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
+            <button class="button is-small" slot="trigger" style="width: 100%;">
+                <span>Focus Action...</span>
+                <b-icon icon="menu-down"></b-icon>
+            </button>
+            <b-dropdown-item aria-role="listitem">
+              <command-button :data="focus_home_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+          </b-dropdown>
+          <br>
+
+          <b-field label="Relative">
+            <b-field>
+              <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="focus_relative_command" class="is-small" @jobPost="focuserJobPost"/>  </p><br>
+            </b-field>
+          </b-field>
+          <b-field>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-100'])"> -100 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-10'])"> -10 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-1'])"> -1 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+1'])"> +1 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+10'])"> +10 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+100'])"> +100 </button>
+            </p>
+          </b-field>
+
+          <b-field label="Absolute">
+            <b-field>
+              <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
+            </b-field>
+          </b-field>
+          <br>
+
+        <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">toggle full status</div>
+        <pre v-if="isFocuserStatusVisible">
           <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
         </pre>
-        </div>
       </b-dropdown-item>
     </b-dropdown>
 
@@ -361,37 +441,47 @@
       <a
         slot="trigger"
         role="button">
-        <div class="button is-text" style="border-bottom: 2px white solid; text-align: center;">Rotator</div>
+        <div class="button is-text">Rotator</div>
       </a>
       <b-dropdown-item custom label="Rotator">
 
-        <div class="column is-full" style="padding: 0">
-        <div>
-
-            <div class="title">Rotator</div>
-              <command-button :data="rotate_home_command" class="is-small"/>
-              <br>
-              <b-field label="Relative">
-                <b-field>
-                  <b-input expanded size="is-small" name="subject" v-model="rotator_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
-                  <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
-                </b-field>
-              </b-field>
-              <b-field label="Absolute">
-                <b-field>
-                  <b-input expanded size="is-small" name="subject" v-model="rotator_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
-                  <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
-                </b-field>
-              </b-field>
-              <br>
-
+        <div class="instrument-control-title-bar">
+          <div class="title">Rotator</div>
+          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+            {{active_rotator}}
+          </div>
         </div>
+
+        <div class="status-items">
+          <div class="keys">
+            <div class="key">Position:</div>
+            <div class="key">Activity:</div>
+          </div>
+          <div class="keys">
+            <div class="val">{{rotator_state.position_angle}} &deg;</div>
+            <div class="val">{{parseTrueFalse(rotator_state.rotator_moving) ? "rotating" : "idle" }}</div>
+          </div>
+        </div>
+
+        <command-button :data="rotate_home_command" class="is-small" style="width:100%; margin-bottom:1em;"/>
+        <b-field label="Relative">
+          <b-field>
+            <b-input expanded size="is-small" name="subject" v-model="rotator_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+            <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
+          </b-field>
+        </b-field>
+        <b-field label="Absolute">
+          <b-field>
+            <b-input expanded size="is-small" name="subject" v-model="rotator_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+            <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
+          </b-field>
+        </b-field>
+        <br>
 
         <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">toggle status</div>
         <pre v-if="isFocuserStatusVisible">
           <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
         </pre>
-        </div>
       </b-dropdown-item>
     </b-dropdown>
 
@@ -399,25 +489,48 @@
       <a
         slot="trigger"
         role="button">
-        <div class="button is-text" style="border-bottom: 2px white solid; text-align: center;">Screen</div>
+        <div class="button is-text">Screen</div>
       </a>
       <b-dropdown-item custom label="Screen">
+        <div class="instrument-control-title-bar">
+          <div class="title">Screen</div>
+          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+            {{active_screen}}
+          </div>
+        </div>
 
-        <div class="column is-full" style="padding: 0">
-            <div class="title">Flat Screen</div>
-              <b-field label="Brightness">
-                <b-field>
-                  <b-input expanded size="is-small" name="subject" v-model="screen_brightness" type="number" :step="1" min="0" max="100" autocomplete="off"></b-input>
-                  <command-button :data="screen_on_command" class="is-small control" />
-                  <command-button :data="screen_off_command" class="is-small control" /> 
-                </b-field>
-              </b-field>
+        <div class="status-items">
+          <div class="keys">
+            <div class="key">Status:</div>
+            <div class="key">Brightness:</div>
+          </div>
+          <div class="keys">
+            <div class="val">{{screen_state.dark_setting.split(' ')[2]}}</div>
+            <div class="val">{{screen_state.bright_setting}} &#37;</div>
+          </div>
+        </div>
 
-        <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">toggle status</div>
+        <b-field label="Brightness">
+          <b-field>
+            <b-input 
+              expanded 
+              size="is-small" 
+              name="subject" 
+              v-model="screen_brightness" 
+              type="number" 
+              :step="1" 
+              min="0" 
+              max="100" 
+              autocomplete="off" />
+              <p class="control"> <command-button :data="screen_on_command" class="is-small control" /> </p>
+              <p class="control"> <command-button :data="screen_off_command" class="is-small control" /> </p>
+          </b-field>
+        </b-field>
+
+        <div class="status-toggle-bar" @click="isScreenStatusVisible = !isScreenStatusVisible">toggle status</div>
         <pre v-if="isScreenStatusVisible">
           <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
         </pre>
-        </div>
       </b-dropdown-item>
     </b-dropdown>
 
@@ -425,7 +538,7 @@
       <a
         slot="trigger"
         role="button">
-        <div class="button is-text" style="border-bottom: 2px white solid; text-align: center;">Settings</div>
+        <div class="button is-text">Settings</div>
       </a>
       <b-dropdown-item custom icon="settings">
 
@@ -454,11 +567,15 @@
           </tbody>
         </table>
 
-        <!-- Select the active devices here -->
-        <b-modal :active.sync="isDeviceSelectorActive" :width="640">
-        <article class="instrument-selection message">
-          <div class="message-header">Device Selection</div>
-          <div class="message-body">
+
+      </b-dropdown-item>
+    </b-dropdown>
+
+    <!-- Select the active devices here -->
+    <b-modal :active.sync="isDeviceSelectorActive" :width="640">
+      <article class="instrument-selection message">
+        <div class="message-header">Device Selection</div>
+        <div class="message-body">
           <!-- Mount Selection -->
           <b-field horizontal class="select-device" label="Mount">
               <b-select 
@@ -565,13 +682,8 @@
             <button class="button is-success" @click="isDeviceSelectorActive = false">Submit</button>
           </b-field>
         </div>
-
-        </article>
-        </b-modal>
-
-      </b-dropdown-item>
-    </b-dropdown>
-
+      </article>
+    </b-modal>
 
 
   <b-tabs style="display:none" :destroy-on-hide="true" :animated="false">
@@ -1143,6 +1255,7 @@ import ScriptSettings from '@/components/ScriptSettings'
 import TheDomeCam from '@/components/TheDomeCam'
 import SideInfoPanel from '@/components/SideInfoPanel'
 import SiteData from '@/components/SiteData'
+import StatusOverview2 from '@/components/StatusOverview2'
 
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
@@ -1159,6 +1272,7 @@ export default {
     TheDomeCam,
     SideInfoPanel,
     SiteData,
+    StatusOverview2,
   },
   mixins: [commands_mixin],
   props: ['config', 'deviceStatus', 'sitecode'],
@@ -1226,6 +1340,25 @@ export default {
 
   methods: {
 
+    // Alternative to the command_button component
+    async postCommand(formCreatorFunction, args) {
+
+      let form = formCreatorFunction(...args).form
+      let url = 'https://jobs.photonranch.org/jobs/newjob'
+
+      form.timestamp = parseInt(Date.now() / 1000)
+
+      const options = await this.getConfigWithAuth()
+      form.site = this.sitecode
+      form.mount = this.active_mount
+      axios.post(url,form, options).then(response => {
+          console.log(response.data)
+          this.$emit('jobPost', response.data)
+      }).catch(e => {
+          console.warn(e)
+      })
+    },
+
     focuserJobPost(data) {
       console.log('focuser job post: ',data)
       let statusItem = {
@@ -1238,9 +1371,39 @@ export default {
     update_time() {
       this.local_timestamp= Date.now()
     },
+  
+    parseTrueFalse(str) {
+      if (str.toLowerCase()=="true") {return true}
+      if (str.toLowerCase()=="false") {return false}
+      console.error("Could not parse true or false. Check for bad behavior.")
+      console.log(str)
+      return false
+    },
 
     refresh_latest_image() {
       this.$store.dispatch('images/set_latest_image')
+    },
+
+    decimalToHHMMSS(time) {
+        // prevent return value of NaN:NaN:NaN
+        if (typeof parseFloat(time) != "number") {return '--:--:--'}
+
+        // -1.00 should translate to -01:00:00
+        let negative = false;
+        if (parseFloat(time) < 0) { negative = true }
+        time = Math.abs(time)
+
+        let hhmmss = ''
+        let h, m, s;
+        h = parseInt(time)
+        m = parseInt(60 * (time - h))
+        s = parseInt(3600 * (time - h) % 60)
+        if (h<10) { h = '0'+h}
+        if (m<10) { m = '0'+m}
+        if (s<10) { s = '0'+s}
+        if (negative) {h = '-'+h}
+        hhmmss = `${h}:${m}:${s}`
+        return hhmmss
     },
 
     // Get axios request config object (the headers) with auth token
@@ -1440,6 +1603,22 @@ export default {
   background-color: #1e2223;
 }
 
+.instrument-control-title-bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:nowrap;
+}
+.instrument-control-title-bar > .title {
+  word-break:keep-all;
+  padding-right: 10px;
+}
+.device-instance-subtitle {
+  margin-bottom:22.5px /* match the margin of .title elements */
+}
+.device-instance-subtitle:hover {
+  cursor:pointer;
+}
 
 .content-column {
   width: 100%;
@@ -1456,9 +1635,41 @@ export default {
   background-color: rgba(20,20,20,0.9)
 }
 
+.status-items {
+  margin:15px 0;
+  display:flex;
+  width:100%;
+}
+
+.keys {
+  flex-direction:column;
+}
+.status-header {
+  font-weight: bold;
+  text-align: center;
+  padding: 3px 0;
+  margin-bottom: 5px;
+  background-color: #283030;
+}
+.key {
+  text-align: right;
+  padding-right: 10px;
+  color:silver;
+  padding: 0 8px;
+  margin-bottom: 3px;
+  background-color: #283030;
+}
+.val{
+  color: greenyellow;
+  background-color: black;
+  padding: 0 8px;
+  margin-bottom: 3px;
+}
+
 .status-toggle-bar {
   height: 1.5em;
-  background-color: grey;
+  background-color:#161a1a;
+  text-align: center;
 }
 .status-toggle-bar:hover {
   cursor: pointer;

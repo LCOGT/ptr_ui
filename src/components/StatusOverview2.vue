@@ -1,70 +1,7 @@
 <template>
     
-    <div class="columns component is-mobile" style="overflow-x: auto">
-        <div class="column obsevatory-status" style="display:flex; flex-direction: column;">
-            <div class="status-header">observatory - {{sitecode}}</div>
-            <div class="status-entry">
-                <div class="key">LST:</div>
-                <div class="val">{{decimalToHHMMSS(lmst)}}</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">UTC:</div>
-                <div class="val">{{new Date().toUTCString().split(' ')[4]}}</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">Enclosure:</div>
-                <div class="val">{{enclosure_state.shutter_status}}</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">User:</div>
-                <div class="val">--</div>
-            </div>
-        </div>
-        <div class="column telescope-status">
-            <div class="status-header">telescope</div>
-            <div class="status-entry">
-                <div class="key">RA:</div>
-                <div class="val">{{decimalToHHMMSS(telescope_state.right_ascension)}}</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">Dec:</div>
-                <div class="val">{{decimalToHHMMSS(telescope_state.declination)}}</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">Ha:</div>
-                <div class="val">--</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">Alt:</div>
-                <div class="val">{{telescope_state.altitude}}</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">Az:</div>
-                <div class="val">{{telescope_state.azimuth}}</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">Airmass:</div>
-                <div class="val">{{telescope_state.airmass}}</div>
-            </div>
-        </div>
-        <div class="column camera-status">
-            <div class="status-header">camera</div>
-            <div class="status-entry">
-                <div class="key">Filter:</div>
-                <div class="val">{{filter_wheel_state.filter_name}}</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">Binning:</div>
-                <div class="val">--</div>
-            </div>
-            <div class="status-entry">
-                <div class="key">Temp:</div>
-                <div class="val">--</div>
-            </div>
-        </div>
-        <div class="column activity-status">
-            <div class="status-header">Activity</div>
-            <div class="status-entry">
+    <div class="status-flex" style="overflow-x: auto">
+        <div class="status-entry">
             <div class="key">Status Age:</div>
             <div class="val">
                 <span v-if="status_age < 60" style="color: lightgreen;"> {{status_age_seconds}}</span>
@@ -74,15 +11,52 @@
                 <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
                 <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
             </div>
-            </div>
-            <div class="status-entry">
-            <div class="key">Target:</div>
+        </div>
+
+        <div class="spacer"/>
+
+        <div class="status-entry">
+            <div class="key">LST:</div>
+            <div class="val">{{decimalToHHMMSS(lmst)}}</div>
+        </div>
+        <div class="status-entry">
+            <div class="key">UTC:</div>
+            <div class="val">{{new Date().toUTCString().split(' ')[4]}}</div>
+        </div>
+        <div class="status-entry">
+            <div class="key">Enclosure:</div>
+            <div class="val">{{enclosure_state.shutter_status}}</div>
+        </div>
+        <div class="status-entry">
+            <div class="key">User:</div>
             <div class="val">--</div>
-            </div>
-            <div class="status-entry">
-            <div class="key">Script:</div>
-            <div class="val"> n/a </div>
-            </div>
+        </div>
+
+        <div class="spacer"/>
+
+        <div class="status-entry">
+            <div class="key">RA:</div>
+            <div class="val">{{decimalToHHMMSS(telescope_state.right_ascension)}}</div>
+        </div>
+        <div class="status-entry">
+            <div class="key">Dec:</div>
+            <div class="val">{{decimalToHHMMSS(telescope_state.declination)}}</div>
+        </div>
+        <div class="status-entry">
+            <div class="key">Ha:</div>
+            <div class="val">--</div>
+        </div>
+        <div class="status-entry">
+            <div class="key">Alt:</div>
+            <div class="val">{{telescope_state.altitude}}</div>
+        </div>
+        <div class="status-entry">
+            <div class="key">Az:</div>
+            <div class="val">{{telescope_state.azimuth}}</div>
+        </div>
+        <div class="status-entry">
+            <div class="key">Airmass:</div>
+            <div class="val">{{telescope_state.airmass}}</div>
         </div>
     </div>
 
@@ -253,32 +227,38 @@ export default {
 </script>
 
 <style scoped>
-.component {
-    background-color: #1e2223;
+.status-flex {
+    padding: 0px 0;
+    background-color: #151718;
+    display:flex;
+    flex-wrap:wrap;
 }
-
 .status-header {
   font-weight: bold;
   text-align: center;
   padding: 3px 0;
   margin-bottom: 5px;
-  background-color: #283030;
+  background-color: #4f5f5f;
 }
 .status-entry {
   display:flex;
+  flex-direction:column;
+  padding: 0 0px;
 }
 .status-entry .key{
-  text-align: right;
-  padding-right: 10px;
-  width: 50%;
   color:silver;
+  padding: 0 8px;
+  background-color: #383f3f;
 }
 .status-entry .val{
   color: greenyellow;
   background-color: black;
-  width: 50%;
-  padding-left: 8px;
+  padding: 0 8px;
   margin-bottom: 3px;
+}
+
+.spacer {
+    width:10px;
 }
 
 </style>
