@@ -149,6 +149,7 @@ export const commands_mixin = {
             'camera_count',
             'camera_bin',
             'camera_dither',
+            'camera_extract',
             'camera_image_type',
 
             'filter_wheel_options_selection',
@@ -236,6 +237,7 @@ export const commands_mixin = {
                 filter: this.filter_wheel_options_selection,
                 size: this.camera_areas_selection,
                 dither: this.camera_dither,
+                extract: this.camera_extract,
                 size: this.camera_areas_selection,
                 username: this.username, // from auth0
             }
