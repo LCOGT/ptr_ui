@@ -185,7 +185,26 @@
     </div>
 
   </div>
-  <images-table style="margin-top: 3em;"/>
+
+  <b-collapse class="card" position="is-top" :open="false" style="padding:0">
+    <div
+      slot="trigger" 
+      slot-scope="props"
+      class="card-header"
+      >
+      <p class="card-header-title">
+          Table of images
+      </p>
+      <a class="card-header-icon">
+          <b-icon
+              :icon="props.open ? 'menu-down' : 'menu-up'">
+          </b-icon>
+      </a>
+    </div>
+    <div class="card-content" style="padding:0">
+      <images-table style="margin-top: 3em;"/>
+    </div>
+  </b-collapse>
 
   <!-- Modal popup window showing the full fits header. -->
   <b-modal :active.sync="showFitsHeaderModal" >
