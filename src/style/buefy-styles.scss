@@ -2,7 +2,7 @@
 @import "~bulma/sass/utilities/_all";
 
 // Set your colors
-$primary: #6f6f6f;
+$primary: #4099FF;
 $primary-invert: findColorInvert($primary);
 $twitter: #4099FF;
 $twitter-invert: findColorInvert($twitter);
@@ -34,14 +34,20 @@ $pre-background: $dark;
 $pre: $dark-invert;
 
 
-// Dark Colors
-//$body-background-color: $grey-dark;
-//$text: $grey-light;
+$link: $primary;
+$link-hover: lighten($link, 5);
+$link-focus: darken($link, 5);
+$link-active: darken($link, 5);
+$link-focus-border: $grey-light;
 
-//$background: $grey-darker;
-//$body-background-color: $black;
-//$body-color: $light;
-//$text: $light;
+// Dark Colors
+$body-background-color: $grey-dark;
+$text: $grey-light;
+
+$background: $grey-darker;
+$body-background-color: $black;
+$body-color: $light;
+$text: $light;
 
 // Import Bulma and Buefy styles
 

@@ -59,6 +59,25 @@
         :username="username"
         @whosonline="makeOnlineUsersList" />
 
+      <div style="height:3em;"/>
+
+      <side-info-panel>
+        <p slot="title">{{sitecode}} weather</p>
+        <weather-status-vertical
+          :config="config"
+          :sitecode="sitecode"  
+          :deviceStatus="deviceStatus" 
+          />
+      </side-info-panel>
+      <side-info-panel>
+        <p slot="title">{{sitecode}} status</p>
+        <status-overview-3
+          :config="config"
+          :sitecode="sitecode"  
+          :deviceStatus="deviceStatus" 
+          />
+      </side-info-panel>
+
     </div>
 
 
@@ -89,8 +108,14 @@
   </footer>
 
   <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
-  <div class="mobile-menu is-hidden-widescreen">
-    <div class="level is-mobile">
+  <div class="mobile-menu ">
+    <status-overview-2
+      :config="config"
+      :sitecode="sitecode"  
+      :deviceStatus="deviceStatus" 
+      class="is-mobile is-hidden-widescreen"
+      style="margin:0;"/>
+    <div class="level is-mobile is-hidden-widescreen">
 
       <b-tooltip label="Home" type="is-dark" class="level-item">
         <b-button tag="router-link"
@@ -158,6 +183,11 @@ import SiteTargets from '@/components/SiteTargets'
 import SiteCalendar from '@/components/SiteCalendar'
 import SiteData from '@/components/SiteData'
 import ChatModule from '@/components/ChatModule'
+import StatusOverview from '@/components/StatusOverview'
+import StatusOverview2 from '@/components/StatusOverview2'
+import StatusOverview3 from '@/components/StatusOverview3'
+import SideInfoPanel from '@/components/SideInfoPanel'
+import WeatherStatusVertical from '@/components/WeatherStatusVertical'
 
 import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -173,6 +203,11 @@ export default {
     SiteCalendar,
     SiteData,
     ChatModule,
+    StatusOverview,
+    StatusOverview2,
+    StatusOverview3,
+    SideInfoPanel,
+    WeatherStatusVertical,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin],
@@ -351,8 +386,7 @@ export default {
 }
 
 .mobile-menu {
-  border-top: 1px solid lighten($dark, 3);
-  background-color: $dark;
+  background-color: darken($dark, 3);
   position: fixed;
   bottom: 0;
   width: 100%;

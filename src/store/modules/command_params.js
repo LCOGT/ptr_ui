@@ -25,7 +25,11 @@ const state = {
     camera_area: null, 
     camera_bin: '', 
     camera_dither: 'off',
+<<<<<<< HEAD
     camera_extract: 'on', // requested by Wayne for SEP related tests 20200413
+=======
+    camera_extract: 'on',
+>>>>>>> feature/observing-ui
     camera_image_type: 'light',
 
     filter_wheel_options_selection: '',
