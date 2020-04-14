@@ -174,6 +174,11 @@ export default {
                 return this.deviceStatus.enclosure[this.enclosure]
             } catch { return {} }
         },
+        weather_state() {
+            try {
+                return this.deviceStatus.observing_conditions[this.weather]
+            } catch { return {} }
+        },
         mount_state() {
             try {
                 return this.deviceStatus.mount[this.mount]

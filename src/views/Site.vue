@@ -62,6 +62,14 @@
       <div style="height:3em;"/>
 
       <side-info-panel>
+        <p slot="title">{{sitecode}} weather</p>
+        <weather-status-vertical
+          :config="config"
+          :sitecode="sitecode"  
+          :deviceStatus="deviceStatus" 
+          />
+      </side-info-panel>
+      <side-info-panel>
         <p slot="title">{{sitecode}} status</p>
         <status-overview-3
           :config="config"
@@ -179,6 +187,7 @@ import StatusOverview from '@/components/StatusOverview'
 import StatusOverview2 from '@/components/StatusOverview2'
 import StatusOverview3 from '@/components/StatusOverview3'
 import SideInfoPanel from '@/components/SideInfoPanel'
+import WeatherStatusVertical from '@/components/WeatherStatusVertical'
 
 import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -198,6 +207,7 @@ export default {
     StatusOverview2,
     StatusOverview3,
     SideInfoPanel,
+    WeatherStatusVertical,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin],

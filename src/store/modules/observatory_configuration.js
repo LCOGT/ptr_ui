@@ -24,6 +24,7 @@ var initial_state = function() {
         selected_filter_wheel: '',
         selected_camera: '',
         selected_screen: '',
+        selected_weather: '',
 
         camera_areas_selection: '',
         filter_wheel_options_selection: '',
@@ -55,6 +56,7 @@ const state = {
     selected_filter_wheel: '',
     selected_camera: '',
     selected_screen: '',
+    selected_weather:'',
 
 }
 
@@ -101,6 +103,11 @@ const getters = {
             ? Object.keys(state.global_config[state.selected_site]["screen"] || [])
             : []
     },
+    available_weather: state =>  {
+        return (state.did_config_load_yet && state.is_site_selected)
+            ? Object.keys(state.global_config[state.selected_site]["observing_conditions"] || [])
+            : []
+    },
 
     site: state => state.selected_site,
     enclosure: state => state.selected_enclosure,
@@ -111,6 +118,7 @@ const getters = {
     filter_wheel: state => state.selected_filter_wheel,
     camera: state => state.selected_camera,
     screen: state => state.selected_screen,
+    weather: state => state.selected_weather,
 
 
     /* Getters for specific device attributes (implemented here as needed) */
@@ -310,6 +318,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             if (site=="wmd") {
                 commit('setActiveSite', site)
+                commit('setActiveWeather', 'wx1')
                 commit('setActiveEnclosure', 'enclosure1')
                 commit('setActiveMount', 'mount1')
                 commit('setActiveTelescope', 'telescope1')
@@ -317,6 +326,7 @@ const actions = {
             }
             if (site=="saf") {
                 commit('setActiveSite', site)
+                commit('setActiveWeather', 'observing_conditions1')
                 commit('setActiveEnclosure', 'enclosure1')
                 commit('setActiveMount', 'mount1')
                 commit('setActiveTelescope', 'telescope1')
@@ -404,6 +414,7 @@ const mutations = {
     setActiveFilterWheel(state, filter_wheel) { state.selected_filter_wheel = filter_wheel },
     setActiveCamera(state, camera) { state.selected_camera = camera },
     setActiveScreen(state, screen) { state.selected_screen = screen },
+    setActiveWeather(state, weather) { state.selected_weather = weather},
 
 }
 
