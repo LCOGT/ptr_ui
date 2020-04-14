@@ -6,6 +6,12 @@
         </div>
     </div>
 
+    <!--status-overview 
+        :config="config"
+        :sitecode="sitecode"  
+        :deviceStatus="deviceStatus" 
+    style="margin:0"/-->
+    <div class="spacer" style="height: 2em;" />
 
     <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
@@ -50,6 +56,7 @@ import { mapGetters } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
 import ImageView from '@/components/ImageView'
 import LeafletMap from '@/components/LeafletMap'
+import StatusOverview from '@/components/StatusOverview'
 
 export default {
     name: "SiteHome",
@@ -60,6 +67,7 @@ export default {
         TheDomeCam,
         ImageView,
         LeafletMap,
+        StatusOverview,
     },
     data () {
         return {

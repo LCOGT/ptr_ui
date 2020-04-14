@@ -223,6 +223,8 @@ export default {
 
   mounted() {
     this.init()
+
+    this.init()
   },
 
   methods: {
@@ -231,6 +233,7 @@ export default {
     init() {
 
       this.d3_image_element = d3.select(this.image_element)
+
 
       let that = this;
 
@@ -329,7 +332,7 @@ export default {
       // save the current coordinates and draw them as a rectangle.
       if (this.subframeIsVisible && this.mouseIsDown) {
         this.subframe_x1 = mDrag[0] /imageWidth
-        this.subframe_y1 = mDrag[1] /imageHeight
+        this.subframe_y1 = mDrag[1] /imageWidth
 
 
         this.drawSubframe()
@@ -343,6 +346,7 @@ export default {
         //that.subframeIsActive = true;
         this.subframeDefinedWithFile = this.current_image.base_filename
       }
+      this.drawSubframe()
     },
 
     // Subframe stuff
@@ -385,7 +389,7 @@ export default {
         this.js9height=svgRect.width
 
         imageEl.setAttribute("width", svgRect.width)
-        imageEl.setAttribute("height", "100%")
+        imageEl.setAttribute("height", svgRect.height)
         // Resize the svg
         // WARNING: this may have bugs if image is not a square.
         // See the final line of this function (imageEl.setAtt...).
@@ -674,11 +678,11 @@ export default {
 
     toggleAnalysis() {
       if (this.js9IsVisible) {
-        this.js9IsVisible= false;
+        this.js9IsVisible = false;
         this.init()
       } else {
         this.js9LoadImage(this.current_image)
-        this.js9IsVisible= true;
+        this.js9IsVisible = true;
       }
     },
 
