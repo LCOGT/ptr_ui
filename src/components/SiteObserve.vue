@@ -273,94 +273,6 @@
             true-value="on"
             false-value="off"
             >
-<<<<<<< HEAD
-            {{ image_type }}
-          </option>
-        </b-select>
-      </b-field>
-
-      <b-field horizontal label="Dither">
-        <b-checkbox
-          v-model="camera_dither"
-          true-value="on"
-          false-value="off"
-          >
-          {{ camera_dither }}
-        </b-checkbox>
-      </b-field>
-
-      <b-field horizontal label="Extract">
-        <b-checkbox
-          v-model="camera_extract"
-          true-value="on"
-          false-value="off"
-          >
-          {{ camera_extract }}
-        </b-checkbox>
-      </b-field>
-
-      <b-field horizontal label="Hint">
-        <b-input placeholder="a hint for the FITS header..."
-          type="text"
-          min="0"
-          max="64"
-          size="is-small"
-          v-model="camera_hint">
-        </b-input>
-      </b-field>
-
-      <br>
-      <div class="buttons has-addons">
-        <command-button :data="camera_expose_command" style="width: 70%" class="is-small"/>
-        <command-button :data="camera_cancel_command" style="width: 30%" class="is-small"/>
-      </div>
-      </div>
-      <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">toggle status</div>
-      <pre v-if="isCameraStatusVisible">
-        <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
-        <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
-      </pre>
-
-    </b-tab-item>
-    <b-tab-item label="Sequencer">
-
-      <div style="background:orangered; padding: 2em; margin-top: 10px;">
-          <div class="title">Sequencer</div>
-
-          <b-field label="Script">
-            <b-field>
-              <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
-                <option value="none">none</option>
-                <option value="stop_script">Stop Script</option>
-                <option value="focus_auto">Focus Auto</option>
-                <option value="focus_fine">Focus Fine</option>
-                <option value="focus_vcurve">Focus V-Curve</option>
-                <option value="takeLRGBStack">Take LRGB Stack</option>
-                <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
-                <option value="takeUGRIZSStack">Take ugrizs Stack</option>
-                <option value="takePlanetStack">Take Planet Stack</option>
-                <option value="takeLunarStack">Take Lunar Stack</option>
-                <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
-                <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
-                <option value="take_pre-open_calibrations">Take Pre-open Calibrations</option>
-                <option value="takeSkyFlats">Take SkyFlats</option>
-                <option value="find_field_center">Find Field Center</option>
-                <option value="calibrate_focus_v-curve">Calibrate Focus V-curve</option>
-                <option value="32_target_pointing_run">32 Target Pointing Run</option>
-                <option value="128_target_pointing_run">128 Target Pointing Run</option>
-                <option value="run_using_acp">Run Using ACP</option>
-                <option value="stop_using_acp">Stop Using ACP</option>
-              </b-select>
-              <p class="control">
-                <button 
-                  class="button is-light is-small" 
-                  :disabled="!scriptHasSettings"
-                  @click="isScriptSettingsActive = true"
-                  >
-                  <b-icon icon="settings"></b-icon>
-                </button>
-              </p>
-=======
             {{ camera_dither }}
           </b-checkbox>
         </b-field>
@@ -446,7 +358,6 @@
                   </button>
                 </p>
               </b-field>
->>>>>>> feature/observing-ui
             </b-field>
 
             <b-modal :active.sync="isScriptSettingsActive" has-modal-card>
