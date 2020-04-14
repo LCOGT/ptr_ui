@@ -1,5 +1,4 @@
 <template>
-    <section>
 
         <b-table
             :data="recent_images"
@@ -9,6 +8,7 @@
             :selected.sync="current_image"
             :paginated="true"
             :per-page="20"
+            class="no-margin"
             >
 
             <template slot-scope="props">
@@ -52,7 +52,6 @@
                 </section>
             </template>
         </b-table>
-    </section>
 </template>
 
 <script>
