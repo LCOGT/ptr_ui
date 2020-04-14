@@ -4,9 +4,9 @@
 
         <div class="status-entry">
             <div class="col">
-                <div class="key">Weather Status:</div>
+                <div class="key">Status Age:</div>
+                <div class="key">Weather ok:</div>
                 <div class="key">Open Ok:</div>
-                <div class="key">Time to open</div>
             </div>
             <div class="col">
                 <div class="val">
@@ -17,8 +17,8 @@
                     <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
                     <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
                 </div>
-                <div class="val">{{weather_state.open_possible}}</div>
-                <div class="val">{{weather_state.time_to_open}}</div>
+                <div class="val">{{weather_state.wx_ok || '-'}}</div>
+                <div class="val">{{weather_state.open_ok || '-'}}</div>
             </div>
         </div>
 
@@ -33,21 +33,27 @@
                 <div class="key">Dewpoint:</div>
                 <div class="key">Wind:</div>
                 <div class="key">Airmass: </div>
-                <div class="key">Sky mag (calc): </div>
                 <div class="key">Brightness</div>
+                <div class="key">Meas. mpsas:</div>
             </div>
             <div class="col">
-                <div class="val">{{enclosure_state.shutter_status}}</div>
-                <div class="val">{{weather_state.sky_temp}} &deg;C</div>
-                <div class="val">{{weather_state.temperature}} &deg;C</div>
-                <div class="val">{{weather_state.humidity}} %</div>
-                <div class="val">{{weather_state.dewpoint}} &deg;C</div>
-                <div class="val">{{weather_state['wind_km/h']}} km/h</div>
-                <div class="val">{{telescope_state.airmass}}</div>
-                <div class="val">{{weather_state.calc_sky_lux}}</div>
-                <div class="val">{{weather_state.brightness_hz}} hz</div>
+                <div class="val">{{enclosure_state.shutter_status || '-'}}</div>
+                <div class="val">{{weather_state.sky_temp_C || '-'}} &deg;C</div>
+                <div class="val">{{weather_state.temperature_C || '-'}} &deg;C</div>
+                <div class="val">{{weather_state['humidity_%'] || '-'}} %</div>
+                <div class="val">{{weather_state.dewpoint_C || '-'}} &deg;C</div>
+                <div class="val">{{weather_state['wind_m/s'] || '-'}} m/s</div>
+                <div class="val">{{telescope_state.airmass || '-'}}</div>
+                <div class="val">{{weather_state.brightness_hz || '-'}} hz</div>
+                <div class="val">{{weather_state.meas_sky_mpsas || '-'}} hz</div>
             </div>
         </div>
+        <div style="height:10px;"/>
+        <div class="status-toggle-bar" @click="isWeatherStatusVisible = !isWeatherStatusVisible">complete status</div>
+        <pre v-if="isWeatherStatusVisible">
+          <simple-device-status :device_name="weather" device_type="Weather" :device_status="weather_state" />
+        </pre>
+        <!--pre>{{weather_state}}</pre-->
     </div>
 
 </template>
@@ -55,8 +61,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import helpers from '@/utils/helpers'
+import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
 export default {
     props: ['config', 'deviceStatus', 'sitecode'],
+    components: {
+        SimpleDeviceStatus,
+    },
     data () {
         return {
             // This is a setInterval object initialized in `created()`. 
@@ -67,6 +77,8 @@ export default {
             // Sidereal time
             lmst: '--',
             lmst_interval: '',
+
+            isWeatherStatusVisible: false,
         }
     },
     mounted() {
@@ -262,6 +274,16 @@ export default {
 
 .spacer {
     height:10px;
+}
+
+/* This is for the expandable complete weather status */
+.status-toggle-bar {
+  height: 1.5em;
+  background-color:#161a1a;
+  text-align: center;
+}
+.status-toggle-bar:hover {
+  cursor: pointer;
 }
 
 </style>

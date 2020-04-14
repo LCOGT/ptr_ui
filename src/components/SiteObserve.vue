@@ -31,10 +31,12 @@
           <div class="keys">
             <div class="key">Enclosure:</div>
             <div class="key">Shutter:</div>
+            <div class="key">Open ok</div>
           </div>
           <div class="keys">
             <div class="val">{{enclosure_state.shutter_status}}</div>
             <div class="val">{{parseTrueFalse(enclosure_state.shutter_slewing) ? "slewing" : "idle" }}</div>
+            <div class="val">{{weather_state.open_ok || '-'}}</div>
           </div>
         </div>
 
@@ -993,6 +995,7 @@ export default {
       'focuser',
       'rotator',
       'screen',
+      'weather',
     ]),
 
 
@@ -1060,6 +1063,11 @@ export default {
         try {
             return this.deviceStatus.screen[this.screen]
         } catch(error) { return {} }
+    },
+    weather_state() {
+        try {
+            return this.deviceStatus.observing_conditions[this.weather]
+        } catch { return {} }
     },
     sequencer_state () {
         try {
