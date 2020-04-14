@@ -1,10 +1,12 @@
 <template>
     
     <div class="status-flex">
+
         <div class="status-entry">
             <div class="col">
-                <div class="key">Status Age:</div>
-                <div class="key">Enclosure:</div>
+                <div class="key">Weather Status:</div>
+                <div class="key">Open Ok:</div>
+                <div class="key">Time to open</div>
             </div>
             <div class="col">
                 <div class="val">
@@ -15,47 +17,37 @@
                     <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
                     <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
                 </div>
+                <div class="val">{{weather_state.open_possible}}</div>
+                <div class="val">{{weather_state.time_to_open}}</div>
+            </div>
+        </div>
+
+        <div class="spacer"/>
+
+        <div class="status-entry">
+            <div class="col">
+                <div class="key">Enclosure:</div>
+                <div class="key">Sky Temp:</div>
+                <div class="key">Air Temp:</div>
+                <div class="key">Humidity:</div>
+                <div class="key">Dewpoint:</div>
+                <div class="key">Wind:</div>
+                <div class="key">Airmass: </div>
+                <div class="key">Sky mag (calc): </div>
+                <div class="key">Brightness</div>
+            </div>
+            <div class="col">
                 <div class="val">{{enclosure_state.shutter_status}}</div>
-            </div>
-        </div>
-
-        <div class="spacer"/>
-
-        <div class="status-entry">
-            <div class="col">
-                <div class="key">LST:</div>
-                <div class="key">UTC:</div>
-                <div class="key">User:</div>
-            </div>
-            <div class="col">
-                <div class="val">{{decimalToHHMMSS(lmst)}}</div>
-                <div class="val">{{new Date().toUTCString().split(' ')[4]}}</div>
-                <div class="val">--</div>
-            </div>
-        </div>
-
-        <div class="spacer"/>
-
-        <div class="status-entry">
-            <div class="col">
-                <div class="key">RA:</div>
-                <div class="key">Dec:</div>
-                <div class="key">Ha:</div>
-                <div class="key">Alt:</div>
-                <div class="key">Az:</div>
-                <div class="key">Airmass:</div>
-            </div>
-            <div class="col">
-                <div class="val">{{decimalToHHMMSS(telescope_state.right_ascension)}}</div>
-                <div class="val">{{decimalToHHMMSS(telescope_state.declination)}}</div>
-                <div class="val">{{decimalToHHMMSS(hour_angle)}}</div>
-                <div class="val">{{telescope_state.altitude}}</div>
-                <div class="val">{{telescope_state.azimuth}}</div>
+                <div class="val">{{weather_state.sky_temp}} &deg;C</div>
+                <div class="val">{{weather_state.temperature}} &deg;C</div>
+                <div class="val">{{weather_state.humidity}} %</div>
+                <div class="val">{{weather_state.dewpoint}} &deg;C</div>
+                <div class="val">{{weather_state['wind_km/h']}} km/h</div>
                 <div class="val">{{telescope_state.airmass}}</div>
+                <div class="val">{{weather_state.calc_sky_lux}}</div>
+                <div class="val">{{weather_state.brightness_hz}} hz</div>
             </div>
         </div>
-        <!--pre>{{deviceStatus}}</pre-->
-
     </div>
 
 </template>
@@ -140,30 +132,6 @@ export default {
             'screen',
             'weather',
         ]),
-
-        // single status items
-        mount_activity() {
-            let activity = "idle"
-
-            if (this.parseTrueFalse(this.mount_state.is_parked)) {
-                activity = "parked"
-            }
-            else if (this.parseTrueFalse(this.mount_state.is_tracking)) {
-                activity = "tracking"
-            }
-            else if (this.parsetrueFalse(this.mount_state.is_slewing)) {
-                activity = "slewing"
-            }
-            return activity
-        },
-        hour_angle() {
-            let ha = this.lmst - this.telescope_state.right_ascension
-            if (ha < 0) {
-                ha += 24 // hours, since we're in decimal
-            }
-            return ha
-        },
-
 
         status_age_days() {
             let timestring = ''
