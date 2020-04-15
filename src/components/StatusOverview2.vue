@@ -44,7 +44,7 @@
         </div>
         <div class="status-entry">
             <div class="key">Ha:</div>
-            <div class="val">--</div>
+            <div class="val">{{(telescope_state.sidereal_time - telescope_state.right_ascension).toFixed(3)}}</div>
         </div>
         <div class="status-entry">
             <div class="key">Alt:</div>

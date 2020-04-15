@@ -68,7 +68,7 @@
           <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
             {{active_telescope}}
           </div>
-        </div>
+        </div>>
 
         <div class="columns">
           <div class="status-items column">
@@ -92,7 +92,7 @@
                 <div class="key">Activity:</div>
               </div>
               <div class="keys">
-                <div class="val">{{decimalToHHMMSS(hour_angle)}}</div>
+                <div class="val">{{(hour_angle)}}</div>
                 <div class="val">{{telescope_state.airmass}}</div>
                 <div class="val">{{mount_activity}}</div>
               </div>
@@ -1016,8 +1016,12 @@ export default {
     },
     hour_angle() {
       let ha = this.telescope_state.sidereal_time - this.telescope_state.right_ascension
-      if (ha < 0) {
+      if (ha < -12) {
         ha += 24 // hours, since we're in decimal
+      }
+      ha = ha.toFixed(3)
+      if (ha > 0) {
+        ha = '+'+ha
       }
       return ha
     },
