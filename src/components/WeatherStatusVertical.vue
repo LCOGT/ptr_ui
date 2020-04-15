@@ -44,7 +44,7 @@
                 <div class="val">{{weather_state.dewpoint_C || '-'}} &deg;C</div>
                 <div class="val">{{weather_state['wind_m/s'] || '-'}} m/s</div>
                 <div class="val">{{telescope_state.airmass || '-'}}</div>
-                <div class="val">{{weather_state.brightness_hz || '-'}} hz</div>
+                <div class="val">{{weather_state.calc_sky_lux || '-'}} lux</div>
                 <div class="val">{{weather_state.meas_sky_mpsas || '-'}} hz</div>
             </div>
         </div>

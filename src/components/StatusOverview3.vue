@@ -48,13 +48,13 @@
             <div class="col">
                 <div class="val">{{decimalToHHMMSS(telescope_state.right_ascension)}}</div>
                 <div class="val">{{decimalToHHMMSS(telescope_state.declination)}}</div>
-                <div class="val">{{decimalToHHMMSS(hour_angle)}}</div>
+                <div class="val">{{hour_angle}}</div>
                 <div class="val">{{telescope_state.altitude}}</div>
                 <div class="val">{{telescope_state.azimuth}}</div>
                 <div class="val">{{telescope_state.airmass}}</div>
             </div>
         </div>
-        <!--pre>{{deviceStatus}}</pre-->
+        <pre>{{telescope_state}}</pre>
 
     </div>
 
@@ -157,9 +157,13 @@ export default {
             return activity
         },
         hour_angle() {
-            let ha = this.lmst - this.telescope_state.right_ascension
-            if (ha < 0) {
+            let ha = this.telescope_state.sidereal_time - this.telescope_state.right_ascension
+            if (ha < -12) {
                 ha += 24 // hours, since we're in decimal
+            }
+            ha = ha.toFixed(3)
+            if (ha > 0) {
+                ha = '+'+ha
             }
             return ha
         },

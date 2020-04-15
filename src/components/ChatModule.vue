@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <b-collapse class="card" :open="!isMobile()">
+        <b-collapse class="card" :open="false">
             <div
             slot="trigger" 
             slot-scope="props"
