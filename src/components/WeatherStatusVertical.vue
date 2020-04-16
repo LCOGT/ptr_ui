@@ -37,7 +37,7 @@
                 <div class="key">Meas. mpsas:</div>
             </div>
             <div class="col">
-                <div class="val">{{enclosure_state.shutter_status || '-'}}</div>
+                <div class="val">{{(enclosure_state && enclosure_state.shutter_status) || '-'}}</div>
                 <div class="val">{{weather_state.sky_temp_C || '-'}} &deg;C</div>
                 <div class="val">{{weather_state.temperature_C || '-'}} &deg;C</div>
                 <div class="val">{{weather_state['humidity_%'] || '-'}} %</div>
@@ -174,12 +174,12 @@ export default {
         },
         enclosure_state() {
             try {
-                return this.deviceStatus.enclosure[this.enclosure]
-            } catch { return {} }
+                return this.deviceStatus.enclosure[this.enclosure] || {}
+            } catch { console.warn('bad enclosure state'); return {} }
         },
         weather_state() {
             try {
-                return this.deviceStatus.observing_conditions[this.weather]
+                return this.deviceStatus.observing_conditions[this.weather] || {}
             } catch { return {} }
         },
         mount_state() {

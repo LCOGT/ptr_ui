@@ -15,7 +15,7 @@
                     <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
                     <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
                 </div>
-                <div class="val">{{enclosure_state.shutter_status}}</div>
+                <div class="val">{{(enclosure_state && enclosure_state.shutter_status) || '-'}}</div>
             </div>
         </div>
 
@@ -54,7 +54,13 @@
                 <div class="val">{{telescope_state.airmass}}</div>
             </div>
         </div>
-        <pre>{{telescope_state}}</pre>
+        <div style="height:10px;"/>
+        <div class="status-toggle-bar" @click="isSiteStatusVisible = !isSiteStatusVisible">complete status</div>
+        <pre v-if="isSiteStatusVisible">
+          <simple-device-status :device_name="''" device_type="Site" :device_status="deviceStatus" />
+        </pre>
+        <!--pre>{{telescope_state}}</pre-->
+
 
     </div>
 
@@ -63,8 +69,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import helpers from '@/utils/helpers'
+import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
 export default {
     props: ['config', 'deviceStatus', 'sitecode'],
+    components: {
+        SimpleDeviceStatus,
+    },
     data () {
         return {
             // This is a setInterval object initialized in `created()`. 
@@ -75,6 +85,8 @@ export default {
             // Sidereal time
             lmst: '--',
             lmst_interval: '',
+
+            isSiteStatusVisible: false,
         }
     },
     mounted() {
@@ -198,13 +210,13 @@ export default {
         },
         enclosure_state() {
             try {
-                return this.deviceStatus.enclosure[this.enclosure]
-            } catch { return {} }
+                return this.deviceStatus.enclosure[this.enclosure] || {}
+            } catch { console.log('eclosure state catch'); return {} }
         },
         weather_state() {
             try {
-                return this.deviceStatus.observing_conditions[this.weather]
-            } catch { return {} }
+                return this.deviceStatus.observing_conditions[this.weather] || {}
+            } catch { console.log('wx state catch'); return {} }
         },
         mount_state() {
             try {
@@ -300,4 +312,13 @@ export default {
     height:10px;
 }
 
+/* This is for the expandable complete site status */
+.status-toggle-bar {
+  height: 1.5em;
+  background-color:#161a1a;
+  text-align: center;
+}
+.status-toggle-bar:hover {
+  cursor: pointer;
+}
 </style>

@@ -25,7 +25,7 @@
         </div>
         <div class="status-entry">
             <div class="key">Enclosure:</div>
-            <div class="val">{{enclosure_state.shutter_status}}</div>
+            <div class="val">{{(enclosure_state && enclosure_state.shutter_status) || '-'}}</div>
         </div>
         <div class="status-entry">
             <div class="key">User:</div>
@@ -171,12 +171,12 @@ export default {
         },
         enclosure_state() {
             try {
-                return this.deviceStatus.enclosure[this.enclosure]
+                return this.deviceStatus.enclosure[this.enclosure] || {}
             } catch { return {} }
         },
         weather_state() {
             try {
-                return this.deviceStatus.observing_conditions[this.weather]
+                return this.deviceStatus.observing_conditions[this.weather] || {}
             } catch { return {} }
         },
         mount_state() {

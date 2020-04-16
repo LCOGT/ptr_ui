@@ -278,12 +278,14 @@ export const commands_mixin = {
         },
         mount_slew_command () {
             return this.base_command( 'mount', 'go', 'slew to coordinates',
-                { ra: this.mount_ra.toString(), dec: this.mount_dec.toString(), }
+                { ra: this.mount_ra.toString(), dec: this.mount_dec.toString(), },
+                { object: this.mount_object }
             )
         },
         mount_slew_chart_command () {
             return this.base_command( 'mount', 'go', 'slew to chart position',
-                { ra: this.chart_selectedRa.toString(), dec: this.chart_selectedDec.toString(), }
+                { ra: this.chart_selectedRa.toString(), dec: this.chart_selectedDec.toString(), },
+                { object: this.mount_object }
             )
         },
         mount_stop_command () {

@@ -105,6 +105,9 @@
         <b-field horizontal label="Dec">
           <b-input name="subject" size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
         </b-field>
+        <b-field horizontal label="Object">
+          <b-input name="subject" size="is-small" v-model="mount_object" autocomplete="off"></b-input>
+        </b-field>
 
         <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>
         <br>
@@ -330,6 +333,8 @@
               <b-field>
                 <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
                   <option value="none">none</option>
+                  <option value="run_with_maxim_camera">Run w/Maxim Camera</option>
+                  <option value="run_with_ascom_camera">Run w/Ascom Camera</option>
                   <option value="stop_script">Stop Script</option>
                   <option value="focus_auto">Focus Auto</option>
                   <option value="focus_fine">Focus Fine</option>
@@ -909,6 +914,7 @@ export default {
     },
   
     parseTrueFalse(str) {
+      if (str == undefined) { console.warn('undefined str'); return false}
       if (str.toLowerCase()=="true") {return true}
       if (str.toLowerCase()=="false") {return false}
       console.error("Could not parse true or false. Check for bad behavior.")
@@ -1030,12 +1036,12 @@ export default {
 
     enclosure_state() {
         try {
-            return this.deviceStatus.enclosure[this.enclosure]
+            return this.deviceStatus.enclosure[this.enclosure] || {}
         } catch { return {} }
     },
     mount_state() {
         try {
-            return this.deviceStatus.mount[this.mount]
+            return this.deviceStatus.mount[this.mount] || {}
         } catch { return {} }
     },
     telescope_state() {
@@ -1070,7 +1076,7 @@ export default {
     },
     weather_state() {
         try {
-            return this.deviceStatus.observing_conditions[this.weather]
+            return this.deviceStatus.observing_conditions[this.weather] || {}
         } catch { return {} }
     },
     sequencer_state () {
@@ -1098,6 +1104,10 @@ export default {
     mount_dec: {
         get() { return this.$store.getters['command_params/mount_dec']},
         set(val) { this.$store.commit('command_params/mount_dec', val)},
+    },
+    mount_object: {
+        get() { return this.$store.getters['command_params/mount_object']},
+        set(val) { this.$store.commit('command_params/mount_object', val)},
     },
 
     subframeIsActive: {

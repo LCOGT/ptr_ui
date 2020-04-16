@@ -7,8 +7,9 @@
 const state = {
 
     // Mount parameters
-    mount_ra: '',
-    mount_dec: '',
+    mount_ra: ' ',
+    mount_dec: ' ',
+    mount_object: ' ',
 
     // Subframe parameters
     subframeIsActive: false,
@@ -43,6 +44,7 @@ const getters = {
 
     mount_ra: state => state.mount_ra,
     mount_dec: state => state.mount_dec,
+    mount_object: state => state.mount_object,
 
     subframeIsActive: state => state.subframeIsActive,
     subframeDefinedWithFile: state => state.subframeDefinedWithFile,
@@ -85,6 +87,7 @@ const mutations = {
 
     mount_ra(state, val) { state.mount_ra = val; },
     mount_dec(state, val) { state.mount_dec = val; },
+    mount_object(state, val) { state.mount_object = val; },
 
     subframeIsActive (state, val) { state.subframeIsActive = val },
     subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },
