@@ -83,8 +83,6 @@
 
 
 
-        <button class="button" @click=" telescopeModal = !telescopeModal">click for modal</button>
-        {{telescopeModal}}
 
 
 
@@ -155,6 +153,8 @@
             <command-button :data="mount_stop_command" class="dropdown-button-command is-small"/>
           </b-dropdown-item>
         </b-dropdown>
+
+        <button class="button is-warning" style="margin:1em 0;" @click=" telescopeModal = !telescopeModal">view skychart</button>
 
         <div class="status-toggle-bar" @click="isMountStatusVisible = !isMountStatusVisible">toggle status</div>
         <pre v-if="isMountStatusVisible">

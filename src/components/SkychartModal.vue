@@ -12,7 +12,7 @@
             <the-sky-chart :siteConfig="config" v-if="Object.keys(config).length>0"/>
         </div>
 
-        <div>
+        <div class="non-skychart-container">
         
             
             <div class="columns">
@@ -44,15 +44,18 @@
             </div>
             </div>
 
+            <div class="aladin-container">
+                <aladin-lite />
+            </div>
+
 
         </div>
-    <button class="button" @click="$parent.close()">close</button>
 
-    <div class="aladin-container">
-        <aladin-lite />
-    </div>
 
     </div>
+        <div class="sticky-buttons">
+            <button class="button is-warning" @click="$parent.close()">close</button>
+        </div>
 
 
 </section>
@@ -176,6 +179,7 @@ $background-color: #151718;
 .modal-container {
     display:flex;
     align-items:center;
+    position:relative;
 }
 
 .skychart-container {
@@ -183,8 +187,19 @@ $background-color: #151718;
     height: $skychart-dim;
 }
 
+.non-skychart-container {
+    display:flex;
+}
+
 .aladin-container {
     width:100%;
+    min-width:200px;
+}
+
+
+.sticky-buttons {
+    position:absolute;
+    bottom:0;
 }
 
 .mount-control-panel {
@@ -237,7 +252,7 @@ $background-color: #151718;
     .skychart-container{
         width:90vw;
         height:90vw;
-        background-color:red;
+        /*background-color:red;*/
     }
 }
 @media (orientation:landscape) {
@@ -247,7 +262,11 @@ $background-color: #151718;
     .skychart-container{
         width: 90vh;
         height:90vh;
-        background-color:blue;
+        /*background-color:blue;*/
+    }
+    .non-skychart-container {
+        flex-direction:column;
+        flex-grow:1;
     }
 }
 </style>
