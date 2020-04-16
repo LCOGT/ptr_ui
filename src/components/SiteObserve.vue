@@ -333,12 +333,12 @@
               <b-field>
                 <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
                   <option value="none">none</option>
-                  <option value="run_with_maxim_camera">Run w/Maxim Camera</option>
-                  <option value="run_with_ascom_camera">Run w/Ascom Camera</option>
-                  <option value="stop_script">Stop Script</option>
-                  <option value="focus_auto">Focus Auto</option>
-                  <option value="focus_fine">Focus Fine</option>
-                  <option value="focus_vcurve">Focus V-Curve</option>
+                  <option value="stopScript">Stop Script</option>
+                  <option value="findFieldCenter">Find Field Center</option>
+                  <option value="calibrateAtFieldCenter">Calibrate at Field Center</option>
+                  <option value="focusAuto">Focus Auto</option>
+                  <option value="focusFine">Focus Fine</option>
+                  <option value="focusVcurve">Focus V-Curve</option>
                   <option value="takeLRGBStack">Take LRGB Stack</option>
                   <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
                   <option value="takeUGRIZSStack">Take ugrizs Stack</option>
@@ -346,14 +346,15 @@
                   <option value="takeLunarStack">Take Lunar Stack</option>
                   <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
                   <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
-                  <option value="take_pre-open_calibrations">Take Pre-open Calibrations</option>
-                  <option value="takeSkyFlats">Take SkyFlats</option>
-                  <option value="find_field_center">Find Field Center</option>
-                  <option value="calibrate_focus_v-curve">Calibrate Focus V-curve</option>
-                  <option value="32_target_pointing_run">32 Target Pointing Run</option>
-                  <option value="128_target_pointing_run">128 Target Pointing Run</option>
-                  <option value="run_using_acp">Run Using ACP</option>
-                  <option value="stop_using_acp">Stop Using ACP</option>
+                  <option value="genSkyFlatMasters">Gen Sky Flat Masters</option>
+                  <option value="genCalibrations">Gen Calibrations</option>
+                  <option value="calibrateFocusVcurve">Calibrate Focus V-curve</option>
+                  <option value="32TargetPointingRun">32 Target Pointing Run</option>
+                  <option value="128TargetPointingRun">128 Target Pointing Run</option>
+                  <option value="runWithMaximCamera">Run w/Maxim Camera</option>
+                  <option value="runWithAscomCamera">Run w/Ascom Camera</option>
+                  <option value="runUsingAcp">Run Using ACP</option>
+                  <option value="stopUsingAcp">Stop Using ACP</option>
                 </b-select>
                 <p class="control">
                   <button 
