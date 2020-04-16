@@ -4,12 +4,20 @@
 
   
 <div class="content-column">
-
-  <!--status-overview-2
-    :config="config"
-    :sitecode="sitecode"  
-    :deviceStatus="deviceStatus" 
-  style="margin:0"/-->
+        <b-modal :active.sync="telescopeModal"
+                trap-focus
+                :can-cancel="['escape']"
+                scroll="clip"
+                full-screen
+                style="z-index:1000;"
+                 >
+          <skychart-modal
+            style="background-color:#151718; overflow-y:auto; height: 100%;padding: 2em;"
+            :config="config" 
+            :sitecode="sitecode"
+            :deviceStatus="deviceStatus"
+            />
+        </b-modal>
 
   <div class="b-tabs" style="position: relative;">
     <b-dropdown :trap-focus="true" :append-to-body="true">
@@ -52,7 +60,7 @@
       </b-dropdown-item> 
     </b-dropdown>
 
-    <b-dropdown>
+    <b-dropdown :append-to-body="true">
       <a
         slot="trigger"
         role="button">
@@ -62,13 +70,24 @@
 
         <div class="instrument-control-title-bar">
           <div class="title">Telescope</div>
-          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+          <div 
+            class="device-instance-subtitle tag is-small is-light" 
+            @click="isDeviceSelectorActive = !isDeviceSelectorActive">
             {{active_mount}}
           </div>
           <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
             {{active_telescope}}
           </div>
         </div>>
+
+
+
+
+        <button class="button" @click=" telescopeModal = !telescopeModal">click for modal</button>
+        {{telescopeModal}}
+
+
+
 
         <div class="columns">
           <div class="status-items column">
@@ -797,7 +816,9 @@ import ScriptSettings from '@/components/ScriptSettings'
 import TheDomeCam from '@/components/TheDomeCam'
 import SideInfoPanel from '@/components/SideInfoPanel'
 import SiteData from '@/components/SiteData'
+import SkychartModal from '@/components/SkychartModal'
 import StatusOverview2 from '@/components/StatusOverview2'
+import ImagesTable from '@/components/ImagesTable'
 
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
@@ -814,7 +835,9 @@ export default {
     TheDomeCam,
     SideInfoPanel,
     SiteData,
+    SkychartModal,
     StatusOverview2,
+    ImagesTable,
   },
   mixins: [commands_mixin],
   props: ['config', 'deviceStatus', 'sitecode'],
@@ -848,6 +871,10 @@ export default {
       jobSub: '', //ws connection
 
       focuserJobs: {},
+
+
+      // Full screen modal for sky map and mount commands
+      telescopeModal: false,
 
     }
   },
