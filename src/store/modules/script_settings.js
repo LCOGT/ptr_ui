@@ -157,7 +157,7 @@ const getters = {
     takeLunarStack_numFrames: state => state.takeLunarStack.numFrames,
 
     takeSkyFlats: state => state.takeSkyFlats,
-    takeSkyFlats: state => state.takeSkyFlats.numFrames,
+    takeSkyFlats_numFrames: state => state.takeSkyFlats.numFrames,
 
 }
 
@@ -331,7 +331,7 @@ const mutations = {
 
     takeLunarStack_numFrames(state, val) { state.takeLunarStack.numFrames = val },
 
-    takeSkyFlats(state, val) { state.takeSkyFlats.numFrames = val },
+    takeSkyFlats_numFrames(state, val) { state.takeSkyFlats.numFrames = val },
 }
 
 export default {
