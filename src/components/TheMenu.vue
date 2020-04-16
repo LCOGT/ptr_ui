@@ -17,7 +17,8 @@
                 <template v-for="(site, index) in available_sites">
                   <b-navbar-item tag="router-link" 
                     :to="{ path: '/site/' + site+ '/home'}"
-                    v-bind:key="index">
+                    v-bind:key="index"
+                    v-if="global_config[site]">
                     {{global_config[site].name}}
                   </b-navbar-item>
                 </template>
@@ -140,5 +141,6 @@ nav {
 }
 .navbar {
   border-radius: 0;
+  z-index:10; /* so the navbar doesn't cover fullscreen modals */
 }
 </style>
