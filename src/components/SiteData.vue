@@ -202,7 +202,7 @@
       </a>
     </div>
     <div class="card-content" style="padding:0">
-      <images-table style="margin-top: 3em;"/>
+      <images-table/>
     </div>
   </b-collapse>
 
