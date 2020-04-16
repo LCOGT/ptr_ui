@@ -16,7 +16,6 @@
     <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
 
-
     <leaflet-map 
         name="leafmap"
         :latitude="latitude"
