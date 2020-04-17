@@ -23,7 +23,7 @@
                     <p class="control">
                         <span class="button is-static">Ra</span>
                     </p>
-                    <b-input name="subject" v-model="mount_ra" autocomplete="off"></b-input>
+                    <b-input name="subject" type="search" icon-clickable v-model="mount_ra" autocomplete="off"></b-input>
                     </b-field>
                 </b-field>
 
@@ -32,7 +32,7 @@
                     <p class="control">
                         <span class="button is-static">Dec</span>
                     </p>
-                    <b-input name="subject" v-model="mount_dec" autocomplete="off"></b-input>
+                    <b-input name="subject" type="search" icon-clickable v-model="mount_dec" autocomplete="off"></b-input>
                     </b-field>
                 </b-field>
 
