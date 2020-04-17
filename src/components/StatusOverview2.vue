@@ -17,7 +17,7 @@
 
         <div class="status-entry">
             <div class="key">LST:</div>
-            <div class="val">{{decimalToHHMMSS(lmst)}}</div>
+            <div class="val">{{(lmst)}}</div>
         </div>
         <div class="status-entry">
             <div class="key">UTC:</div>
@@ -36,11 +36,11 @@
 
         <div class="status-entry">
             <div class="key">RA:</div>
-            <div class="val">{{decimalToHHMMSS(telescope_state.right_ascension)}}</div>
+            <div class="val">{{(telescope_state.right_ascension)}}</div>
         </div>
         <div class="status-entry">
             <div class="key">Dec:</div>
-            <div class="val">{{decimalToHHMMSS(telescope_state.declination)}}</div>
+            <div class="val">{{(telescope_state.declination)}}</div>
         </div>
         <div class="status-entry">
             <div class="key">Ha:</div>

@@ -24,6 +24,8 @@ var helpers = {
         var d, h, m, s;
         var UT;
 
+        lon = parseFloat(lon)
+
 
         // Calculate days since J2000
         today_date = new Date();

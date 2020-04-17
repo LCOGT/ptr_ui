@@ -9,7 +9,7 @@
                 :can-cancel="['escape']"
                 scroll="clip"
                 full-screen
-                style="z-index:1000;"
+                style="z-index:100;"
                  >
           <skychart-modal
             style="background-color:#151718; overflow-y:auto; height: 100%;padding: 2em;"
@@ -80,13 +80,6 @@
           </div>
         </div>>
 
-
-
-
-
-
-
-
         <div class="columns">
           <div class="status-items column">
               <div class="keys">
@@ -96,8 +89,8 @@
                 <div class="key">Az:</div>
               </div>
               <div class="keys">
-                <div class="val">{{decimalToHHMMSS(telescope_state.right_ascension)}}</div>
-                <div class="val">{{decimalToHHMMSS(telescope_state.declination)}}</div>
+                <div class="val">{{parseFloat(telescope_state.right_ascension).toFixed(4)}}</div>
+                <div class="val">{{parseFloat(telescope_state.declination).toFixed(4)}}</div>
                 <div class="val">{{(telescope_state.altitude)}}</div>
                 <div class="val">{{(telescope_state.azimuth)}}</div>
               </div>
@@ -157,7 +150,7 @@
           </b-dropdown-item>
         </b-dropdown>
 
-        <button class="button is-warning" style="margin:1em 0;" @click=" telescopeModal = !telescopeModal">view skychart</button>
+        <button class="button is-primary" style="width:100%; margin:1em 0;" @click=" telescopeModal = !telescopeModal">view skychart</button>
 
         <div class="status-toggle-bar" @click="isMountStatusVisible = !isMountStatusVisible">toggle status</div>
         <pre v-if="isMountStatusVisible">

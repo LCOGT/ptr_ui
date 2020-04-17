@@ -212,6 +212,13 @@ var configs = {
             //stroke:"#e74c3c"
             stroke: '#df2437'
             //stroke: "#48c9b0"
+        },
+        telescope_crosshair: {
+            width: 1.5,
+            //stroke:"#e74c3c"
+            stroke: 'greenyellow'
+            //stroke: "#48c9b0"
+
         }
     },
 

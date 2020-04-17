@@ -28,6 +28,7 @@ const actions = {
     setSelected({ commit }, data) {
         commit('selectedRa', data[0]),
         commit('selectedDec', data[1])
+        Celestial.redraw()
     },
 
     redrawMap(){

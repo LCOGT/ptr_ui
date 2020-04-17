@@ -4,7 +4,8 @@
         v-on:click="handleClick(data.url, data.form, data.http_method)" 
         v-bind:class="{ 'is-loading': isLoading }"
         :disabled="isDisabled"
-        >{{ data.name }}
+        >
+        <slot name="title"> {{ data.name }} </slot>
     </a>
 </template>
 
