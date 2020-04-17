@@ -358,7 +358,6 @@ export default {
 
     watch: {
         all_mount_state(newVal) {
-            console.log('map redrawing due to new mount state')
             Celestial.redraw()
         },
 
