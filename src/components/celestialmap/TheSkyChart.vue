@@ -6,7 +6,7 @@
             celestial.js file is included. And they are set to be invisible anyways. -->
         <!--div id="celestial-form" style="display:none;"></div-->
         <!--div id="celestial-date" style="width:0"></div-->
-        <button class="button" @click="rotate">recenter</button>
+        <!--button class="button" @click="rotate">recenter</button-->
         <!--button class="button" @click="zoom">zoom</button-->
         <!--button class="button" @click="animateZoom">zoom2</button-->
    </div> 
@@ -25,6 +25,8 @@ export default {
         return {
             mapClickedX: -1,
             mapClickedY: -1,
+
+            updateMapCenterInterval: '',
         }
     },
     methods: {
@@ -284,6 +286,7 @@ export default {
                     Celestial.context.closePath();
                     Celestial.context.stroke();
                 }
+                Celestial.setStyle(styles.telescope_crosshair);
                 Celestial.Canvas.symbol()
                     .type("cross-circle")
                     .size(220)
@@ -302,7 +305,16 @@ export default {
         },
 
         rotate() {
-            Celestial.rotate({center:[helpers.hour2degree(helpers.siderealTime(this.site_longitude)), this.site_latitude, 0]})
+
+            // make sure we dont' get an infinite loop due to bad params
+            let a = helpers.hour2degree(helpers.siderealTime(this.site_longitude))
+            let b = this.site_latitude
+            if (!a && !b) {
+                console.warn('bad skymap rotate parameters: ',a,b)
+                return;
+            }
+            
+            Celestial.rotate({center:[a, b, 0]})
             Celestial.redraw()
         },
 
@@ -335,25 +347,28 @@ export default {
             config.center = [helpers.hour2degree(helpers.siderealTime(parseFloat(this.siteConfig.longitude))), parseFloat(this.siteConfig.latitude), 0]
             Celestial.display(config);
         })
+
+        // Update the center of the map every minute
+        this.updateMapCenterInterval = setInterval(this.rotate, 60000)
+    },
+    beforeDestroy() {
+        clearInterval(this.updateMapCenterInterval)
     },
 
 
     watch: {
-        //siteConfig() {
-            //console.log('New site config in skymap')
-            //Celestial.rotate({
-                //center: [
-                    //helpers.hour2degree(helpers.siderealTime(this.siteConfig.longitude)), 
-                    //this.siteConfig.latitude, 
-                    //0
-                //]
-            //})
-            //Celestial.redraw()
-        //},
-        //site_longitude(newLon) {
-            //Celestial.rotate({center:[helpers.hour2degree(helpers.siderealTime(this.site_longitude)), this.site_latitude, 0]})
-            //Celestial.redraw()
-        //}
+        all_mount_state(newVal) {
+            console.log('map redrawing due to new mount state')
+            Celestial.redraw()
+        },
+
+        // Update the chart if the mount command coordinates are changed
+        cmd_ra() {
+            this.$store.dispatch('skyChart/setSelected', [this.cmd_ra, this.cmd_dec])
+        },
+        cmd_dec() {
+            this.$store.dispatch('skyChart/setSelected', [this.cmd_ra, this.cmd_dec])
+        },
     },
 
     computed: {
@@ -402,6 +417,16 @@ export default {
                 return -1
             }
         }, 
+
+        // mount command parameters
+        cmd_ra: {
+            get() { return this.$store.getters['command_params/mount_ra']},
+            set(val) { this.$store.commit('command_params/mount_ra', val)},
+        },
+        cmd_dec: {
+            get() { return this.$store.getters['command_params/mount_dec']},
+            set(val) { this.$store.commit('command_params/mount_dec', val)},
+        },
     },
 
 }
