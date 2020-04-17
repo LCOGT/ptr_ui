@@ -28,7 +28,7 @@
                 <div class="key">User:</div>
             </div>
             <div class="col">
-                <div class="val">{{(lmst)}}</div>
+                <div class="val">{{decimalToHHMMSS(lmst)}}</div>
                 <div class="val">{{new Date().toUTCString().split(' ')[4]}}</div>
                 <div class="val">--</div>
             </div>
@@ -46,8 +46,8 @@
                 <div class="key">Airmass:</div>
             </div>
             <div class="col">
-                <div class="val">{{(telescope_state.right_ascension)}}</div>
-                <div class="val">{{(telescope_state.declination)}}</div>
+                <div class="val">{{parseFloat(telescope_state.right_ascension).toFixed(4)}}</div>
+                <div class="val">{{parseFloat(telescope_state.declination).toFixed(4)}}</div>
                 <div class="val">{{hour_angle}}</div>
                 <div class="val">{{telescope_state.altitude}}</div>
                 <div class="val">{{telescope_state.azimuth}}</div>
