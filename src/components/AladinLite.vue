@@ -38,10 +38,6 @@ export default {
 
         // Default: load aladin on m33, but use coords in mount fields if possible.
         let target = "M33"
-        console.log('initRa')
-        console.log(this.initRa)
-        console.log(parseFloat(this.initRa))
-        console.log(isNaN(parseFloat(this.initRa)))
         if (parseFloat(this.initRa) && parseFloat(this.initDec)) {
             console.log('chaging target')
             target = `${15*this.initRa} ${this.initDec}`
