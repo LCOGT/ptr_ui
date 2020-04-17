@@ -138,7 +138,6 @@ export default {
     data() {
         return {
             isComponentModalActive: false,
-
         }
     },
     methods: {

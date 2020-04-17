@@ -9,7 +9,7 @@
                 :can-cancel="['escape']"
                 scroll="clip"
                 full-screen
-                style="z-index:100;"
+                style="z-index:1000;"
                  >
           <skychart-modal
             style="background-color:#151718; overflow-y:auto; height: 100%;padding: 2em;"
@@ -79,6 +79,13 @@
             {{active_telescope}}
           </div>
         </div>>
+
+
+
+
+
+
+
 
         <div class="columns">
           <div class="status-items column">
