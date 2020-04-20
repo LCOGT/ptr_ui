@@ -1,7 +1,6 @@
+<template>
 
-
-<template><div class="wrapper container">
-
+<div class="wrapper container">
   
 <div class="content-column">
         <b-modal :active.sync="telescopeModal"
@@ -78,13 +77,7 @@
           <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
             {{active_telescope}}
           </div>
-        </div>>
-
-
-
-
-
-
+        </div>
 
 
         <div class="columns">
@@ -374,8 +367,9 @@
                     <option value="genSkyFlatMasters">Gen Sky Flat Masters</option>
                     <option value="genCalibrations">Gen Calibrations</option>
                     <option value="calibrateFocusVcurve">Calibrate Focus V-curve</option>
-                    <option value="32TargetPointingRun">32 Target Pointing Run</option>
-                    <option value="128TargetPointingRun">128 Target Pointing Run</option>
+                    <!--option value="32TargetPointingRun">32 Target Pointing Run</option-->
+                    <!--option value="128TargetPointingRun">128 Target Pointing Run</option-->
+                    <option value="pointingRun">Pointing Run</option>
                     <option value="runWithMaximCamera">Run w/Maxim Camera</option>
                     <option value="runWithAscomCamera">Run w/Ascom Camera</option>
                     <option value="runUsingAcp">Run Using ACP</option>
@@ -576,7 +570,7 @@
               <div class="key">Brightness:</div>
             </div>
             <div class="keys">
-              <div class="val">{{screen_state.dark_setting.split(' ')[2]}}</div>
+              <div class="val">{{screen_state.dark_setting && screen_state.dark_setting.split(' ')[2]}}</div>
               <div class="val">{{screen_state.bright_setting}} &#37;</div>
             </div>
           </div>
@@ -805,93 +799,93 @@
     </div>
 
   </div>
-  </template>
+</template>
 
-  <script>
-  import { mapGetters } from 'vuex'
-  import { commands_mixin } from '../mixins/commands_mixin'
-  import helpers from '@/utils/helpers'
-  import store from '../store/index'
+<script>
+import { mapGetters } from 'vuex'
+import { commands_mixin } from '../mixins/commands_mixin'
+import helpers from '@/utils/helpers'
+import store from '../store/index'
 
-  // Components
-  import CommandButton from '@/components/CommandButton'
-  import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-  import ImageView from '@/components/ImageView'
-  import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
-  import ScriptSettings from '@/components/ScriptSettings'
-  import TheDomeCam from '@/components/TheDomeCam'
-  import SideInfoPanel from '@/components/SideInfoPanel'
-  import SiteData from '@/components/SiteData'
-  import SkychartModal from '@/components/SkychartModal'
-  import StatusOverview2 from '@/components/StatusOverview2'
-  import ImagesTable from '@/components/ImagesTable'
+// Components
+import CommandButton from '@/components/CommandButton'
+import TheSkyChart from '@/components/celestialmap/TheSkyChart'
+import ImageView from '@/components/ImageView'
+import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
+import ScriptSettings from '@/components/ScriptSettings'
+import TheDomeCam from '@/components/TheDomeCam'
+import SideInfoPanel from '@/components/SideInfoPanel'
+import SiteData from '@/components/SiteData'
+import SkychartModal from '@/components/SkychartModal'
+import StatusOverview2 from '@/components/StatusOverview2'
+import ImagesTable from '@/components/ImagesTable'
 
-  import ReconnectingWebSocket from 'reconnecting-websocket'
-  import axios from 'axios';
-
-
-  export default {
-    name: 'SiteObserve',
-    components: {
-      CommandButton,
-      TheSkyChart,
-      ImageView,
-      SimpleDeviceStatus,
-      ScriptSettings,
-      TheDomeCam,
-      SideInfoPanel,
-      SiteData,
-      SkychartModal,
-      StatusOverview2,
-      ImagesTable,
-    },
-    mixins: [commands_mixin],
-    props: ['config', 'deviceStatus', 'sitecode'],
-    data () {
-      return {
-
-        // This is a setInterval object initialized in `created()`. 
-        // Fetches status every few seconds.
-        update_status_interval: 2000,
-        local_timestamp: Date.now(),
-
-        // Controls the toggle for image preview modal.
-        isImageModalActive: false,
-
-        // Toggles the script settings visiblity
-        isScriptSettingsActive: false,
-
-        testSubframeIsActive: false,
-
-        isDeviceSelectorActive: false,
-
-        isEnclosureStatusVisible: false,
-        isMountStatusVisible: false,
-        isCameraStatusVisible: false,
-        isFocuserStatusVisible: false,
-        isRotatorStatusVisible: false,
-        isScreenStatusVisible: false,
-
-        // testign job status
-        focuserStatus: 'nothing yet',
-        jobSub: '', //ws connection
-
-        focuserJobs: {},
+import ReconnectingWebSocket from 'reconnecting-websocket'
+import axios from 'axios';
 
 
-        // Full screen modal for sky map and mount commands
-        telescopeModal: false,
+export default {
+  name: 'SiteObserve',
+  components: {
+    CommandButton,
+    TheSkyChart,
+    ImageView,
+    SimpleDeviceStatus,
+    ScriptSettings,
+    TheDomeCam,
+    SideInfoPanel,
+    SiteData,
+    SkychartModal,
+    StatusOverview2,
+    ImagesTable,
+  },
+  mixins: [commands_mixin],
+  props: ['config', 'deviceStatus', 'sitecode'],
+  data () {
+    return {
 
-      }
-    },
+      // This is a setInterval object initialized in `created()`. 
+      // Fetches status every few seconds.
+      update_status_interval: 2000,
+      local_timestamp: Date.now(),
 
-    created() {
-      // This interval is stopped in the `beforeDestroy` lifecycle hook.
-      this.update_time_interval = setInterval(this.update_time, 1000)
+      // Controls the toggle for image preview modal.
+      isImageModalActive: false,
 
-      // This websocket subscribes to changes in job status
-      this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
-      this.jobsSub.onmessage = (message) => {
+      // Toggles the script settings visiblity
+      isScriptSettingsActive: false,
+
+      testSubframeIsActive: false,
+
+      isDeviceSelectorActive: false,
+
+      isEnclosureStatusVisible: false,
+      isMountStatusVisible: false,
+      isCameraStatusVisible: false,
+      isFocuserStatusVisible: false,
+      isRotatorStatusVisible: false,
+      isScreenStatusVisible: false,
+
+      // testign job status
+      focuserStatus: 'nothing yet',
+      jobSub: '', //ws connection
+
+      focuserJobs: {},
+
+
+      // Full screen modal for sky map and mount commands
+      telescopeModal: false,
+
+    }
+  },
+
+  created() {
+    // This interval is stopped in the `beforeDestroy` lifecycle hook.
+    this.update_time_interval = setInterval(this.update_time, 1000)
+
+    // This websocket subscribes to changes in job status
+    this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
+    this.jobsSub.onmessage = (message) => {
       let newJob = JSON.parse(message.data)
       console.log(newJob)
       if (newJob.ulid in Object.keys(this.focuserJobs)) {
@@ -1080,32 +1074,32 @@
     },
     telescope_state() {
         try {
-            return this.deviceStatus.telescope[this.telescope]
+            return this.deviceStatus.telescope[this.telescope] || {}
         } catch(error) { return {} }
     },
     camera_state() {
         try {
-            return this.deviceStatus.camera[this.camera]
+            return this.deviceStatus.camera[this.camera] || {}
         } catch(error) { console.log(error); return {} }
     },
     filter_wheel_state () {
         try {
-            return this.deviceStatus.filter_wheel[this.filter_wheel]
+            return this.deviceStatus.filter_wheel[this.filter_wheel] || {}
         } catch(error) { return {} }
     },
     focuser_state() {
         try {
-            return this.deviceStatus.focuser[this.focuser]
+            return this.deviceStatus.focuser[this.focuser] || {}
         } catch(error) { return {} }
     },
     rotator_state() {
         try {
-            return this.deviceStatus.rotator[this.rotator]
+            return this.deviceStatus.rotator[this.rotator] || {}
         } catch(error) { return {} }
     },
     screen_state () {
         try {
-            return this.deviceStatus.screen[this.screen]
+            return this.deviceStatus.screen[this.screen] || {}
         } catch(error) { return {} }
     },
     weather_state() {

@@ -16,6 +16,7 @@
             <take-lunar-stack v-if="script=='takeLunarStack'" />
             <take-planet-stack v-if="script=='takePlanetStack'" />
             <take-sky-flats v-if="script=='takeSkyFlats'" />
+            <pointing-run v-if="script=='pointingRun'" />
         </section>
         <!--hr style="border-bottom: silver 4px solid; margin-bottom: 2em;"-->
         <section class="modal-card-foot">
@@ -36,6 +37,7 @@ import TakeNarrowbandStack from '@/components/ScriptSettings/TakeNarrowbandStack
 import TakePlanetStack from '@/components/ScriptSettings/TakePlanetStack'
 import TakeLunarStack from '@/components/ScriptSettings/TakeLunarStack'
 import TakeSkyFlats from '@/components/ScriptSettings/TakeSkyFlats'
+import PointingRun from '@/components/ScriptSettings/PointingRun'
 export default {
     name: 'ScriptSettings',
     components: {
@@ -47,6 +49,7 @@ export default {
         TakePlanetStack,
         TakeLunarStack,
         TakeSkyFlats,
+        PointingRun,
     },
     props: {
         'script': String,
