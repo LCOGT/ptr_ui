@@ -17,7 +17,7 @@
 
         <div class="status-entry">
             <div class="key">LST:</div>
-            <div class="val">{{(lmst)}}</div>
+            <div class="val">{{decimalToHHMMSS(lmst)}}</div>
         </div>
         <div class="status-entry">
             <div class="key">UTC:</div>

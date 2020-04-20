@@ -12,7 +12,7 @@
                 style="z-index:1000;"
                  >
           <skychart-modal
-            style="background-color:#151718; overflow-y:auto; height: 100%;padding: 2em;"
+            style="background-color:#151718; overflow-y:auto; height: 100%;"
             :config="config" 
             :sitecode="sitecode"
             :deviceStatus="deviceStatus"
@@ -129,7 +129,7 @@
             </b-field>
           </b-field>
           <b-field horizontal label="Object">
-            <b-input name="subject" size="is-small" v-model="mount_object" autocomplete="off"></b-input>
+            <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_object" autocomplete="off"></b-input>
           </b-field>
 
           <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>

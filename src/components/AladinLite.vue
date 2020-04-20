@@ -74,18 +74,21 @@ export default {
     methods: {
 
         submit_simbad_query() {
-            console.log('Submitting simbad query for: ', this.simbad_query)
-            this.aladin.gotoObject(this.simbad_query, {success: this.sendCoordinatesToSkychart});
+            this.aladin.gotoObject(this.simbad_query, {success: () => {
+                this.sendCoordinatesToSkychart(); // update the sky chart 
+                this.mount_object = this.simbad_query; // save the searched object to mount_object to send with command.
+            }
+            });
         },
 
         sendCoordinatesToSkychart() {
             var [aladin_ra, aladin_dec] = this.aladin.getRaDec();
             aladin_ra = aladin_ra / 15;
 
-            console.log(aladin_ra, aladin_dec)
             this.$store.dispatch('skyChart/setSelected', [aladin_ra, aladin_dec] )
             this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(4))
             this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
+            this.$store.commit('command_params/mount_object', ' ') // clear teh mount_object entry
         }, 
 
 
@@ -104,10 +107,28 @@ export default {
                 let raHours = eq[0] > 0 ? eq[0] / 15 : (eq[0] / 15) + 24
                 this.$store.commit('command_params/mount_ra', raHours.toFixed(4))
                 this.$store.commit('command_params/mount_dec', eq[1].toFixed(4))
+                this.$store.commit('command_params/mount_object', ' ') // clear the mount_object entry
             }
 
 
         },
+    },
+    watch: {
+        // Update the aladin view if the coordinates change. 
+        mount_ra() {
+            console.log('moving aladin')
+            let ra = parseFloat(this.mount_ra) * 15
+            let dec = parseFloat(this.mount_dec)
+            this.aladin.gotoRaDec(ra, dec)
+        },
+        mount_dec() {
+            console.log('moving aladin')
+            let ra = parseFloat(this.mount_ra) * 15
+            let dec = parseFloat(this.mount_dec)
+            this.aladin.gotoRaDec(ra, dec)
+
+        },
+
     },
 
     computed: {
@@ -121,6 +142,10 @@ export default {
         mount_dec: {
             get() { return this.$store.getters['command_params/mount_dec']},
             set(val) { this.$store.commit('command_params/mount_dec', val)},
+        },
+        mount_object: {
+            get() { return this.$store.getters['command_params/mount_object']},
+            set(val) { this.$store.commit('command_params/mount_object', val)},
         },
 
     },
