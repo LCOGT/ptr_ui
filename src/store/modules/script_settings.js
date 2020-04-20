@@ -60,6 +60,12 @@ const defaults = {
         return {
             numFrames: 15,
         }
+    },
+    pointingRun() {
+        return {
+            gridType: "medium",
+            numGridRuns: 1,
+        }
     }
 }
 
@@ -77,6 +83,7 @@ const state = {
     takePlanetStack: defaults.takePlanetStack(),
     takeLunarStack: defaults.takeLunarStack(),
     takeSkyFlats: defaults.takeSkyFlats(),
+    pointingRun: defaults.pointingRun(),
 
     // If a script is not in this list, the UI settings button will be disabled.
     scriptsWithSettings: [
@@ -88,6 +95,7 @@ const state = {
         'takePlanetStack',
         'takeLunarStack',
         'takeSkyFlats',
+        'pointingRun',
     ],
 
     // This is used to fetch a user-friendly name in the UI.
@@ -100,6 +108,7 @@ const state = {
         genBiasDarkMaster: 'Generate Bias/Dark Master',
         genScreenFlatMasters: 'Generate Screen-Flat Masters',
         takeSkyFlats: 'Take Sky-Flats',
+        pointingRun: 'Pointing Run',
     },
 }
 
@@ -158,6 +167,9 @@ const getters = {
 
     takeSkyFlats: state => state.takeSkyFlats,
     takeSkyFlats_numFrames: state => state.takeSkyFlats.numFrames,
+
+    pointingRun_gridType: state => state.pointingRun.gridType,
+    pointingRun_numGridRuns: state => state.pointingRun.numGridRuns,
 
 }
 
@@ -332,6 +344,9 @@ const mutations = {
     takeLunarStack_numFrames(state, val) { state.takeLunarStack.numFrames = val },
 
     takeSkyFlats_numFrames(state, val) { state.takeSkyFlats.numFrames = val },
+
+    pointingRun_gridType(state, val) { state.pointingRun.gridType = val },
+    pointingRun_numGridRuns(state, val) { state.pointingRun.numGridRuns = val },
 }
 
 export default {

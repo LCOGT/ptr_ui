@@ -225,7 +225,7 @@ export default {
         },
         telescope_state() {
             try {
-                return this.deviceStatus.telescope[this.telescope]
+                return this.deviceStatus.telescope[this.telescope] || {}
             } catch(error) { return {} }
         },
         camera_state() {
