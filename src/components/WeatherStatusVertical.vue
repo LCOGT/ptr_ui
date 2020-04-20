@@ -32,8 +32,7 @@
                 <div class="key">Humidity:</div>
                 <div class="key">Dewpoint:</div>
                 <div class="key">Wind:</div>
-                <div class="key">Airmass: </div>
-                <div class="key">Brightness</div>
+                <div class="key">Bright lux</div>
                 <div class="key">Meas. mpsas:</div>
             </div>
             <div class="col">
@@ -43,9 +42,8 @@
                 <div class="val">{{weather_state['humidity_%'] || '-'}} %</div>
                 <div class="val">{{weather_state.dewpoint_C || '-'}} &deg;C</div>
                 <div class="val">{{weather_state['wind_m/s'] || '-'}} m/s</div>
-                <div class="val">{{telescope_state.airmass || '-'}}</div>
                 <div class="val">{{weather_state.calc_sky_lux || '-'}}</div>
-                <div class="val">{{weather_state.meas_sky_mpsas || '-'}} hz</div>
+                <div class="val">{{weather_state.meas_sky_mpsas || '-'}}</div>
             </div>
         </div>
         <div style="height:10px;"/>

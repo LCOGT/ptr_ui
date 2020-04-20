@@ -1,47 +1,98 @@
 <template>
 
 
-<section>
+<div style="padding:0;">
 
 
-    <div class="modal-container">
+    <div class="sticky-buttons">
 
-        <div class="sticky-buttons">
-            <b-button class="button is-danger" @click="$parent.close()">
-                <b-icon
+        <b-button 
+            class="button is-danger is-hidden-tablet" 
+            @click="$parent.close()">
+            <b-icon
+                pack="mdi"
+                icon="close"
+                size="is-small"/>
+        </b-button>
+        <b-button 
+            class="button is-danger is-hidden-mobile" 
+            @click="$parent.close()">
+            <b-icon
                 pack="mdi"
                 icon="close"
                 size="is-medium"/>
-            </b-button>
+        </b-button>
 
-            <div style="flex-grow:1"/>
-
-            <div style="flex-grow: 0;display:flex; justify-content:flex-end;">
-
-                <b-field style="margin-right: 10px;flex-basis:160px; flex:0 1 180px;" >
+        <div class="is-hidden-tablet" style="display:flex; align-items:center;" >
+            <div style="flex-grow: 0;display:flex; flex-direction:column;justify-content:flex-end;">
+                <b-field style="margin-right: 10px; flex:0 1; width: 150px;" >
                     <b-field>
                     <p class="control">
-                        <span class="button is-static">Ra</span>
+                        <span style="width: 42px;" class="button is-static is-small">Ra</span>
                     </p>
-                    <b-input name="subject" type="search" icon-clickable v-model="mount_ra" autocomplete="off"></b-input>
+                    <b-input name="subject" size="is-small" type="search" icon-clickable v-model="mount_ra" autocomplete="off"></b-input>
                     </b-field>
                 </b-field>
-
-                <b-field style="margin-right: 10px;flex-basis:160px; flex:0 1 180px;" >
+                <b-field style="margin-right: 10px; flex:0 1; width: 150px;" >
                     <b-field>
-                    <p class="control">
-                        <span class="button is-static">Dec</span>
-                    </p>
-                    <b-input name="subject" type="search" icon-clickable v-model="mount_dec" autocomplete="off"></b-input>
+                        <p class="control">
+                            <span style="width: 42px;" class="button is-static is-small">Dec</span>
+                        </p>
+                        <b-input name="subject" size="is-small" type="search" icon-clickable v-model="mount_dec" autocomplete="off"></b-input>
                     </b-field>
                 </b-field>
-
-                <command-button :data="mount_slew_command" style="margin-right: 10px;" class="is-success">
-                    <p slot="title">Go</p>
-                </command-button>
-
+                <b-field style="margin-right: 10px; flex:0 1; width: 150px;" >
+                    <b-field>
+                        <p class="control">
+                            <span style="width: 42px;" class="button is-static is-small">Obj</span>
+                        </p>
+                        <b-input name="subject" size="is-small" type="search" icon-clickable v-model="mount_object" autocomplete="off"></b-input>
+                    </b-field>
+                </b-field>
             </div>
+            <command-button :data="mount_slew_command" style="" class="is-success">
+                <p slot="title">Go</p>
+            </command-button>
         </div>
+
+        <div class="is-hidden-mobile" style="flex-grow: 0;display:flex; justify-content:flex-end;">
+
+            <b-field style="margin-right: 10px;flex-basis:160px; flex:0 1 180px;" >
+                <b-field>
+                    <p class="control">
+                        <span style="width: 42px;" class="button is-static is-medium">Obj</span>
+                    </p>
+                    <b-input name="subject" size="is-medium" type="search" icon-clickable v-model="mount_object" autocomplete="off"></b-input>
+                </b-field>
+            </b-field>
+
+            <b-field style="margin-right: 10px;flex-basis:160px; flex:0 1 180px;" >
+                <b-field>
+                <p class="control">
+                    <span class="button is-static is-medium">Ra</span>
+                </p>
+                <b-input name="subject" size="is-medium" type="search" icon-clickable v-model="mount_ra" autocomplete="off"></b-input>
+                </b-field>
+            </b-field>
+
+            <b-field style="margin-right: 10px;flex-basis:160px; flex:0 1 180px;" >
+                <b-field>
+                <p class="control">
+                    <span class="button is-static is-medium">Dec</span>
+                </p>
+                <b-input name="subject" size="is-medium" type="search" icon-clickable v-model="mount_dec" autocomplete="off"></b-input>
+                </b-field>
+            </b-field>
+
+
+            <command-button :data="mount_slew_command" style="margin-right: 10px;" class="is-success is-medium">
+                <p slot="title">Go</p>
+            </command-button>
+
+        </div>
+    </div>
+
+    <div class="modal-container container">
 
         <!-- Only show when modal is not open because can't have 2 charts open at once. -->
         <div class="skychart-container" >
@@ -53,8 +104,7 @@
 
         <div class="status-bar">
 
-            <div class="columns">
-            <div class="status-items column">
+            <div class="status-items">
                 <div class="keys">
                     <div class="key">Ra:</div>
                     <div class="key">Dec:</div>
@@ -64,7 +114,7 @@
                     <div class="val">{{(telescope_state.declination)}}</div>
                 </div>
             </div>
-            <div class="status-items column">
+            <div class="status-items">
                 <div class="keys">
                     <div class="key">Alt:</div>
                     <div class="key">Az:</div>
@@ -74,7 +124,7 @@
                     <div class="val">{{(telescope_state.azimuth)}}</div>
                 </div>
             </div>
-            <div class="status-items column">
+            <div class="status-items">
                 <div class="keys">
                     <div class="key">Ha:</div>
                     <div class="key">Airmass:</div>
@@ -84,7 +134,7 @@
                     <div class="val">{{telescope_state.airmass}}</div>
                 </div>
             </div>
-            <div class="status-items column">
+            <div class="status-items">
                 <div class="keys">
                     <div class="key">Activity:</div>
                     <div class="key">Enclosure:</div>
@@ -93,7 +143,6 @@
                     <div class="val">{{mount_activity}}</div>
                     <div class="val">{{enclosure_state.shutter_status}}</div>
                 </div>
-            </div>
             </div>
 
         </div>
@@ -109,7 +158,7 @@
 
 
 
-</section>
+</div>
 </template>
 
 
@@ -221,6 +270,10 @@ export default {
             get() { return this.$store.getters['command_params/mount_dec']},
             set(val) { this.$store.commit('command_params/mount_dec', val)},
         },
+        mount_object: {
+            get() { return this.$store.getters['command_params/mount_object']},
+            set(val) { this.$store.commit('command_params/mount_object', val)},
+        },
 
     },
 
@@ -240,10 +293,10 @@ $background-color: #151718;
 }
 
 .modal-container {
+    padding:2em;
     display:flex;
     align-items:center;
     position:relative;
-    margin-top: 55px;
 }
 
 .skychart-container {
@@ -259,6 +312,7 @@ $background-color: #151718;
     width:100%;
     min-width:200px;
     min-height:200px;
+    max-height:50vh;
 }
 
 
@@ -266,11 +320,10 @@ $background-color: #151718;
     background-color:#1e2223;
     width:100%;
     overflow-x:hidden;
-    position:fixed;
-    top: 0;
-    left:0;
     z-index:5;
     display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 .sticky-buttons > * {
     margin: 0.5em 1em;
@@ -280,7 +333,7 @@ $background-color: #151718;
     margin-bottom: 1em;
     display:flex;
     justify-content:space-between;
-    padding: 1em;
+    flex-wrap:wrap;
 }
 
 .mount-control-panel {
@@ -297,7 +350,7 @@ $background-color: #151718;
 
 .status-items {
     display:flex;
-    margin-right: 10px;
+    margin-bottom: 1em;
 }
 .keys {
     display:flex;
@@ -312,7 +365,6 @@ $background-color: #151718;
 }
 .key {
     text-align: right;
-    padding-right: 10px;
     color:silver;
     padding: 0 8px;
     margin-bottom: 3px;
@@ -343,17 +395,19 @@ $background-color: #151718;
 }
 @media (orientation:landscape) {
     .modal-container {
-        flex-direction:row;
+        display:grid;
+        grid-template-columns: 70% 30%;
+        grid-gap: 3em;
     }
     .skychart-container{
-        width: 90vh;
-        height:90vh;
+        flex:2 0 500px;
         /*background-color:blue;*/
     }
     .non-skychart-container {
+        display:flex;
         flex-direction:column;
-        height: 90vh;
-        flex:1;
+        flex-wrap: wrap;
+        flex:1 0 auto;
     }
     .aladin-container-1 {
         flex:1;
