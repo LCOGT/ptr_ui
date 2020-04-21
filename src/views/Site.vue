@@ -269,6 +269,7 @@ export default {
       let status_timestamp = data.server_timestamp_ms
 
       status.server_timestamp_ms = data.server_timestamp_ms
+      console.log(status)
 
       if (statusType == "deviceStatus"){
         this.deviceStatus = status
@@ -353,7 +354,9 @@ export default {
     async getSiteDeviceStatus() {
       let url = `https://status.photonranch.org/status/${this.sitecode}/device_status`
       let response = await axios.get(url)
-      this.deviceStatus = response.data.Item.status
+      let status = response.data.Item.status
+      status.server_timestamp_ms = response.data.Item.server_timestamp_ms
+      this.deviceStatus = status
     },
 
     // Changes the site that the status websocket recieves updates for.
