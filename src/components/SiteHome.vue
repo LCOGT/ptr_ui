@@ -6,8 +6,6 @@
         </div>
     </div>
 
-    <div>{{deviceStatus}}</div>
-
     <!--status-overview 
         :config="config"
         :sitecode="sitecode"  
