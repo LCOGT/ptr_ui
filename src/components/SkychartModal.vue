@@ -396,7 +396,7 @@ $background-color: #151718;
 @media (orientation:landscape) {
     .modal-container {
         display:grid;
-        grid-template-columns: 70% 30%;
+        grid-template-columns: 7fr 3fr;
         grid-gap: 3em;
     }
     .skychart-container{
