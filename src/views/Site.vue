@@ -268,6 +268,8 @@ export default {
       let status = data.status
       let status_timestamp = data.server_timestamp_ms
 
+      status.server_timestamp_ms = data.server_timestamp_ms
+
       if (statusType == "deviceStatus"){
         this.deviceStatus = status
       }

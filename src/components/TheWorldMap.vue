@@ -1,7 +1,6 @@
 <template>
     <span style="z-index: 1;">
         <div class="google-map" :id="mapName"></div>
-        <button class="button" @click="redrawMapSites">redraw</button>
     </span>
 </template>
 

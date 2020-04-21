@@ -220,8 +220,8 @@ export default {
             } catch(error) { return {} }
         },
         status_age() {
-            let status_timestamp = this.deviceStatus.timestamp
-            return (this.local_timestamp/1000 - status_timestamp).toFixed(1)
+            let status_timestamp = this.deviceStatus.server_timestamp_ms
+            return ((this.local_timestamp - status_timestamp)/1000).toFixed(1)
         },
     },
 
