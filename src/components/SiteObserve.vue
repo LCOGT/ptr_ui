@@ -412,7 +412,7 @@
         </b-dropdown-item>
       </b-dropdown>
 
-      <b-dropdown>
+      <b-dropdown v-if="isCmdTabsExpanded">
         <a
           slot="trigger"
           role="button">
@@ -502,7 +502,7 @@
         </b-dropdown-item>
       </b-dropdown>
 
-      <b-dropdown>
+      <b-dropdown v-if="isCmdTabsExpanded">
         <a
           slot="trigger"
           role="button">
@@ -550,7 +550,7 @@
         </b-dropdown-item>
       </b-dropdown>
 
-      <b-dropdown>
+      <b-dropdown v-if="isCmdTabsExpanded">
         <a
           slot="trigger"
           role="button">
@@ -599,7 +599,7 @@
         </b-dropdown-item>
       </b-dropdown>
 
-      <b-dropdown>
+      <b-dropdown v-if="isCmdTabsExpanded">
         <a
           slot="trigger"
           role="button">
@@ -635,6 +635,8 @@
 
         </b-dropdown-item>
       </b-dropdown>
+
+      <a style="color:#4099ff;" class="button is-text" @click="isCmdTabsExpanded = !isCmdTabsExpanded"> {{isCmdTabsExpanded ? " << less" : "more >>"}}</a>
 
       <!-- Select the active devices here -->
       <b-modal :active.sync="isDeviceSelectorActive" :width="640" :can-cancel="true">
@@ -851,6 +853,8 @@ export default {
 
       // Controls the toggle for image preview modal.
       isImageModalActive: false,
+
+      isCmdTabsExpanded: false,
 
       // Toggles the script settings visiblity
       isScriptSettingsActive: false,
@@ -1212,6 +1216,9 @@ export default {
 
 .b-tabs{
   background-color: #1e2223;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
 }
 
 .instrument-control-title-bar {
