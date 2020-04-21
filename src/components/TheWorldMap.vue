@@ -1,6 +1,7 @@
 <template>
     <span style="z-index: 1;">
         <div class="google-map" :id="mapName"></div>
+        <button class="button" @click="redrawMapSites">redraw</button>
     </span>
 </template>
 
@@ -232,25 +233,9 @@ export default {
     // Create the google maps object
     this.map = new google.maps.Map(element, options)
 
-    // Fetch the list of sites to display on the map
-    let sites = await this.getSitesForMap()
-
-    // For each site, draw a marker with a popup (on click) to visit the site.
-    sites.forEach(site => {
-      var marker = new google.maps.Marker({
-        position: { lat: site.latitude, lng: site.longitude },
-        map: this.map,
-        title: site.name
-      })
-      let siteInfoWindow = new google.maps.InfoWindow({
-        content: this.renderSiteContent(site.name, site.site)
-      })
-      this.infoWindows.push(siteInfoWindow)
-      marker.addListener('click', () => {
-        this.infoWindows.map(x => x.close())
-        siteInfoWindow.open(this.map, marker)
-      })
-    })
+    // Draw observatories with colors to denote weather/open status
+    this.redrawMapSites()
+    this.updateSiteColorInterval = setInterval(this.redrawMapSites, 10000)
 
     // Draw the daylight regions, and update every few seconds.
     nite.init(this.map)
@@ -265,6 +250,7 @@ export default {
     // Remove the looping intervals that update the sun and daylight regions on the map.
     clearInterval(this.updateTwighlightInterval)
     clearInterval(this.updateSunInterval)
+    clearInterval(this.updateSiteColorInterval)
   },
   
   methods: {
@@ -311,23 +297,145 @@ export default {
       return sites
     },
 
-    renderSiteContent(name, sitecode) {
-      let contentString = `
-        <div class="card" style="max-width: 200px">
-          <div class="card-content">
-            <div class="media">
-              <div class="media-content">
-                <p class="title is-4">${name}</p>
-                <p class="subtitle is-6">site code: ${sitecode}</p>
+    renderSiteContent(name, sitecode, openStatus) {
+
+      let weather_status = ` 
+        <div class="status-entry">
+            <div class="col">
+              <div class="key">Status</div>
+            </div>
+            <div class="col">
+              <div class="val">
+                <span style="color:${openStatus.status_age_s > 60 ? 'red' : 'greenyellow'}"> 
+                ${openStatus.status_age_s > 60 ? 'Offline' : 'Online'} 
+                </span>
               </div>
             </div>
+        </div>
+        `
 
-            <div class="content">
-              <a class="button is-success" href="site/${sitecode}/home" style="font-weight: bold">View this site!</a>
+      if (openStatus.hasWeatherStatus && openStatus.status_age_s < 60) {
+        weather_status = `
+          <div class="status-entry">
+              <div class="col">
+                <div class="key">Status</div>
+                <div class="key">Weather:</div>
+                <div class="key">Can open:</div>
+              </div>
+              <div class="col">
+                <div class="val">
+                  <span style="color:${openStatus.status_age_s > 60 ? 'red' : 'greenyellow'}">
+                  ${openStatus.status_age_s > 60 ? 'Offline' : 'Online'}
+                  </span>
+                </div>
+                <div class="val">
+                  <span style="color:${openStatus.weather_ok ? 'greenyellow' : 'red'}">
+                  ${openStatus.weather_ok ? "Good" : "Not good"}
+                  </span>
+                </div>
+                <div class="val">
+                  <span style="color:${openStatus.open_ok ? 'greenyellow' : 'red'}">
+                  ${openStatus.open_ok ? "Yes" : "No"}</div>
+                    </span>
+                </div>
             </div>
-          </div>
-        </div>`
-      return contentString
+        `
+        }
+
+        let style = `
+        <style>
+          .status-entry {
+            display:flex;
+            flex-direction:row;
+            flex-wrap:wrap;
+            padding: 0 0px;
+            width: 100%;
+          }
+          .col {
+              flex-direction: column;
+              width: 50%;
+          }
+          .status-entry .key {
+            color:silver;
+            padding: 0 8px;
+            white-space: nowrap;
+            margin-bottom: 3px;
+            text-align: right;
+            flex-grow:1;
+          }
+          .status-entry .val{
+            color: greenyellow;
+            background-color: black;
+            padding: 0 8px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            flex-grow:1;
+          }
+        </style>
+        `
+
+        let contentString = `
+
+          ${style}
+
+          <div class="card" style="max-width: 200px">
+            <div class="card-content">
+              <div class="media">
+                <div class="media-content">
+                  <p class="title is-4">${name}</p>
+                  <p class="subtitle is-6">site code: ${sitecode}</p>
+                </div>
+              </div>
+          
+              ${weather_status}
+
+              <div class="content">
+                <a class="button is-success" href="site/${sitecode}/home" style="font-weight: bold; margin-top: 1em;">View this site!</a>
+              </div>
+            </div>
+          </div>`
+        return contentString
+    },
+
+    async getSiteOpenStatus() {
+      let resp = await axios.get(`https://status.photonranch.org/status/allopenstatus`)
+      return resp.data
+    },
+
+    getSiteMapColor(siteOpenStatus) {
+      if (parseFloat(siteOpenStatus.status_age_s) > 60) { return 'red' }
+      if (!siteOpenStatus.hasWeatherStatus) { return 'yellow'}
+      if (siteOpenStatus.weather_ok && siteOpenStatus.open_ok) {return 'green'}
+      if (siteOpenStatus.weather_ok || siteOpenStatus.open_ok) {return 'yellow'}
+      return 'yellow'
+    },
+
+    async redrawMapSites() {
+      // Fetch the list of sites to display on the map
+      let sites = await this.getSitesForMap()
+      let sitesOpenStatus = await this.getSiteOpenStatus()
+
+
+      // For each site, draw a marker with a popup (on click) to visit the site.
+      sites.forEach(site => {
+        let icon_color = this.getSiteMapColor(sitesOpenStatus[site.site])
+        var marker = new google.maps.Marker({
+          position: { lat: site.latitude, lng: site.longitude },
+          map: this.map,
+          icon: {
+            url: `http://maps.google.com/mapfiles/ms/icons/${icon_color}-dot.png`
+          },
+          title: site.name
+        })
+        let siteInfoWindow = new google.maps.InfoWindow({
+          content: this.renderSiteContent(site.name, site.site, sitesOpenStatus[site.site])
+        })
+        this.infoWindows.push(siteInfoWindow)
+        marker.addListener('click', () => {
+          this.infoWindows.map(x => x.close())
+          siteInfoWindow.open(this.map, marker)
+        })
+      })
     },
 
   },
