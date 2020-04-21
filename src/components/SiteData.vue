@@ -262,7 +262,7 @@ export default {
       ex13_isLoading: false,
 
       // Analysize the full sized raw file (default is 768px reduced file)
-      imageStatsLargeFile: false,
+      imageStatsLargeFile: true,
       starInspectorLargeFile: true,
 
       region_min: '--',

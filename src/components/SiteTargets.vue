@@ -4,11 +4,26 @@
 <section>
 
     <!--pre>{{deviceStatus.mount}}</pre-->
+    <b-modal :active.sync="telescopeModal"
+            trap-focus
+            :can-cancel="['escape']"
+            scroll="clip"
+            full-screen
+            style="z-index:100;"
+            >
+        <skychart-modal
+            style="background-color:#151718; overflow-y:auto; height: 100%;"
+            :config="config" 
+            :sitecode="sitecode"
+            :deviceStatus="deviceStatus"
+        />
+    </b-modal>
 
     <!-- Only show when modal is not open because can't have 2 charts open at once. -->
     <div class="skychart-container">
         <!-- Note: only render once the config is populated (needs lat/long to load) -->
         <the-sky-chart :siteConfig="config" v-if="Object.keys(config).length>0"/>
+        
     </div>
 
     <button class="button is-dark is-small"
@@ -33,17 +48,17 @@
 <script>
 
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import ModalSkyChart from '@/components/ModalSkyChart'
+import SkychartModal from '@/components/SkychartModal'
 export default {
     name: "SiteTargets",
     props: ["config", "deviceStatus", "sitecode"],
     components: {
         TheSkyChart,
-        ModalSkyChart,
+        SkychartModal,
     },
     data() {
         return {
-            isComponentModalActive: false,
+            telescopeModal: false,
         }
     },
     methods: {
