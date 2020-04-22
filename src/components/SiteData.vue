@@ -27,7 +27,7 @@
 
         <p class="level" slot="title">
           Image Info 
-          <b-button class="button " outlined style="margin-left: 1em;" @click="getFitsHeader">show fits header</b-button>
+          <b-button class="button " outlined style="margin-left: 1em;" @click="showFitsHeader">show fits header</b-button>
         </p>
 
         <div style="margin: 1em;">
@@ -208,22 +208,43 @@
 
   <!-- Modal popup window showing the full fits header. -->
   <b-modal :active.sync="showFitsHeaderModal" >
-    <div class="card" style="height: 80vh; width:auto; overflow-y: auto;">
+    <div class="card" style="min-height: 100vh;">
       <div class="card-content">
-      <p class="title">{{current_image.base_filename}}</p>
+        <div class="level">
+          <div class=" level-left"> 
+            <figure class="level-item image is-64x64">
+              <img :src="current_image.jpg13_url">
+            </figure>
+            <p class="title" style="overflow-wrap: anywhere; margin-left: 10px;">{{current_image.base_filename}}</p>
+          </div>
+          <div class="level-right">
+            <b-field>
+              <p class="control">
+                <button class="button" @click="$store.dispatch('images/set_next_image')">prev</button>
+              </p>
+              <p class="control">
+                <button class="button" @click="$store.dispatch('images/set_previous_image')">next</button>
+              </p>
+            </b-field>
+          </div>
+          </div>
 
-
-
-        <!-- NOTE: make this into a searchable buefy table -->
-
-
+        <b-table
+            :mobile-cards="false" 
+            :narrowed="true"
+            :data="fitsHeaderTable"
+            :columns="columns"
+            style="width: auto; flex:0"
+            :loading="headerIsLoading"
+            >
+        </b-table>
       
-        <table class="info-panel-table">
+        <!--table class="info-panel-table">
           <tr v-for="(v,k) in fitsHeader" v-bind:key="k"> 
             <td class="info-panel-val" align="right">{{k}}: </td>
             <td>{{v}}</td> 
           </tr>
-        </table>
+        </table-->
       </div>
     </div>
   </b-modal>
@@ -263,6 +284,20 @@ export default {
     return {
       fitsHeader: {},
       showFitsHeaderModal: false,
+      headerIsLoading: false,
+      columns: [
+        {
+            field: 'key',
+            label: 'key',
+            width: '100',
+            searchable: true,
+        },
+        {
+            field: 'val',
+            label: 'value',
+            searchable: true,
+        },
+      ],
 
       region_info_loading: false,
       image_info_loading: false,
@@ -640,15 +675,38 @@ export default {
       this.region_mean = parseFloat(data.mean).toFixed(3)
       this.region_std = parseFloat(data.std).toFixed(3)
     },
-    getFitsHeader() {
+    refreshFitsHeader() {
+      this.headerIsLoading = true 
       let url = `https://api.photonranch.org/api/fitsheader/${this.current_image.base_filename}/`
       let response = axios.get(url).then(response => {
-          this.fitsHeader = response.data
+        this.fitsHeader = response.data
+      }).finally(() => {
+        this.headerIsLoading = false
       })
+    },
+    showFitsHeader() {
+      this.refreshFitsHeader()
       this.showFitsHeaderModal = true
     }
   },
+  watch: {
+    current_image() {
+      if (this.showFitsHeaderModal) this.refreshFitsHeader(); 
+    },
+  },
   computed: {
+
+    fitsHeaderTable() {
+      let tableData = []
+      for (const property in this.fitsHeader) {
+        tableData.push({
+          key: property.toLowerCase(),
+          val: this.fitsHeader[property]
+        })
+      }
+      return tableData
+    },
+
     captureDate() {
       return moment.utc(new Date(this.current_image.capture_date)).format('MMMM DD, YYYY')
     },
