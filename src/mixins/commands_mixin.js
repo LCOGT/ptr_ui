@@ -276,6 +276,16 @@ export const commands_mixin = {
         enclosure_close_command () {
             return this.base_command( 'enclosure', 'close', 'Request Roof to Close')
         },
+        enclosure_manual_command () {
+            return this.base_command( 'enclosure', 'setManual', 'Set enclosure mode: manual',
+                {},
+                { username: this.username })
+        },
+        enclosure_auto_command () {
+            return this.base_command( 'enclosure', 'setAuto', 'Set enclosure mode: auto',
+                {},
+                { username: this.username })
+        },
         mount_slew_command () {
             return this.base_command( 'mount', 'go', 'slew to coordinates',
                 { ra: this.mount_ra.toString(), dec: this.mount_dec.toString(), },

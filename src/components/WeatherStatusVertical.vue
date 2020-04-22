@@ -26,24 +26,26 @@
 
         <div class="status-entry">
             <div class="col">
-                <div class="key">Enclosure:</div>
-                <div class="key">Sky Temp:</div>
-                <div class="key">Air Temp:</div>
-                <div class="key">Humidity:</div>
-                <div class="key">Dewpoint:</div>
-                <div class="key">Wind:</div>
-                <div class="key">Bright lux</div>
-                <div class="key">Meas. mpsas:</div>
+                <div class="key" v-if="enclosure_state.enclosure_status">Enclosure:</div>
+                <div class="key" v-if="weather_state.sky_temp_C">Sky Temp:</div>
+                <div class="key" v-if="weather_state.temperature_C">Air Temp:</div>
+                <div class="key" v-if="weather_state['humidity_%']">Humidity:</div>
+                <div class="key" v-if="weather_state.dewpoint_C">Dewpoint:</div>
+                <div class="key" v-if="weather_state['wind_m/s']">Wind:</div>
+                <div class="key" v-if="weather_state.calc_HSI_lux">Surface</div>
+                <div class="key" v-if="weather_state.ambient_light">Ambient</div>
+                <div class="key" v-if="weather_state.meas_sky_mpsas">Meas. mpsas:</div>
             </div>
             <div class="col">
-                <div class="val">{{(enclosure_state && enclosure_state.shutter_status) || '-'}}</div>
-                <div class="val">{{weather_state.sky_temp_C || '-'}} &deg;C</div>
-                <div class="val">{{weather_state.temperature_C || '-'}} &deg;C</div>
-                <div class="val">{{weather_state['humidity_%'] || '-'}} %</div>
-                <div class="val">{{weather_state.dewpoint_C || '-'}} &deg;C</div>
-                <div class="val">{{weather_state['wind_m/s'] || '-'}} m/s</div>
-                <div class="val">{{weather_state.calc_sky_lux || '-'}}</div>
-                <div class="val">{{weather_state.meas_sky_mpsas || '-'}}</div>
+                <div class="val" v-if="enclosure_state.enclosure_status" >{{(enclosure_state.enclosure_status) || '-'}}</div>
+                <div class="val" v-if="weather_state.sky_temp_C" >{{weather_state.sky_temp_C || '-'}} &deg;C</div>
+                <div class="val" v-if="weather_state.temperature_C" >{{weather_state.temperature_C || '-'}} &deg;C</div>
+                <div class="val" v-if="weather_state['humidity_%']" >{{weather_state['humidity_%'] || '-'}} %</div>
+                <div class="val" v-if="weather_state.dewpoint_C" >{{weather_state.dewpoint_C || '-'}} &deg;C</div>
+                <div class="val" v-if="weather_state['wind_m/s']" >{{weather_state['wind_m/s'] || '-'}} m/s</div>
+                <div class="val" v-if="weather_state.calc_HSI_lux" >{{weather_state.calc_HSI_lux || '-'}} lux</div>
+                <div class="val" v-if="weather_state.ambient_light" >{{weather_state.ambient_light || '-'}}</div>
+                <div class="val" v-if="weather_state.meas_sky_mpsas" >{{weather_state.meas_sky_mpsas || '-'}}</div>
             </div>
         </div>
         <div style="height:10px;"/>

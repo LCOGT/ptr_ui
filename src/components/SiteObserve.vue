@@ -34,24 +34,45 @@
           </div>
         </div>
 
+        <div class="val">{{enclosure_state.enclosure_message}}</div>
+
         <div class="status-items">
           <div class="keys">
+            <div class="key">Mode:</div>
             <div class="key">Enclosure:</div>
-            <div class="key">Shutter:</div>
             <div class="key">Open ok</div>
           </div>
           <div class="keys">
-            <div class="val">{{enclosure_state.shutter_status}}</div>
-            <div class="val">{{parseTrueFalse(enclosure_state.shutter_slewing) ? "slewing" : "idle" }}</div>
+            <div class="val">{{enclosure_state.enclosure_mode}}</div>
+            <div class="val">{{enclosure_state.enclosure_status || enclosure_state.shutter_status || enclosure_state.roof_status}}</div>
             <div class="val">{{weather_state.open_ok || '-'}}</div>
           </div>
         </div>
 
-        <command-button :data="enclosure_open_command" style="margin-bottom: 1em;" class="is-small"/>
-        <command-button :data="enclosure_close_command" style="margin-bottom: 1em;" class="is-small"/>
+        <command-button 
+          admin
+          v-if="userIsAdmin && enclosure_state.enclosure_mode.toLowerCase() != 'manual'" 
+          :data="enclosure_manual_command" 
+          style="margin-bottom: 1em; width: 100%;" 
+          />
+        <command-button 
+          admin
+          v-if="userIsAdmin && enclosure_state.enclosure_mode.toLowerCase() != 'automatic'" 
+          :data="enclosure_auto_command" 
+          style="margin-bottom: 1em; width: 100%;" 
+          />
+
+        <b-field>
+          <p class="control">
+            <command-button :data="enclosure_open_command" style="margin-bottom: 1em;" class="is-small"/>
+          </p>
+          <p class="control">
+            <command-button :data="enclosure_close_command" style="margin-bottom: 1em;" class="is-small"/>
+          </p>
+        </b-field>
         <br>
 
-        <div class="status-toggle-bar" @click="isEnclosureStatusVisible = !isEnclosureStatusVisible">toggle status</div>
+        <div class="status-toggle-bar" @click="isEnclosureStatusVisible = !isEnclosureStatusVisible">{{isEnclosureStatusVisible ? 'collapse status' : 'expand status'}}</div>
         <pre v-if="isEnclosureStatusVisible">
           <simple-device-status :device_name="active_enclosure" device_type="enclosure" :device_status="enclosure_state" />
         </pre>
@@ -158,7 +179,9 @@
 
           <button class="button is-primary" style="width:100%; margin:1em 0;" @click=" telescopeModal = !telescopeModal">view skychart</button>
 
-          <div class="status-toggle-bar" @click="isMountStatusVisible = !isMountStatusVisible">toggle status</div>
+          <div class="status-toggle-bar" @click="isMountStatusVisible = !isMountStatusVisible">
+            {{ isMountStatusVisible ? 'collapse status' : 'expand status'}}
+          </div>
           <pre v-if="isMountStatusVisible">
             <simple-device-status :device_name="active_mount" device_type="Mount" :device_status="mount_state" />
             <simple-device-status :device_name="active_telescope" device_type="Telescope" :device_status="telescope_state" />
@@ -325,7 +348,9 @@
             <command-button :data="camera_expose_command" style="width: 70%" class="is-small"/>
             <command-button :data="camera_cancel_command" style="width: 30%" class="is-small"/>
           </div>
-          <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">toggle status</div>
+          <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">
+            {{ isCameraStatusVisible ? 'collapse status' : 'expand status'}}
+          </div>
           <pre v-if="isCameraStatusVisible">
             <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
             <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
@@ -403,7 +428,9 @@
 
           </div>
 
-          <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">toggle status</div>
+          <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">
+            {{ isCameraStatusVisible ? 'collapse status' : 'expand status' }}
+          </div>
           <pre v-if="isCameraStatusVisible">
             <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
             <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
@@ -495,7 +522,9 @@
             </b-field>
             <br>
 
-          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">toggle full status</div>
+          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">
+            {{ isFocuserStatusVisible ? 'collapse status' : 'expand status' }}
+          </div>
           <pre v-if="isFocuserStatusVisible">
             <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
           </pre>
@@ -543,7 +572,9 @@
           </b-field>
           <br>
 
-          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">toggle status</div>
+          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">
+            {{ isFocuserStatusVisible ? 'collapse status' : 'expand status' }}
+          </div>
           <pre v-if="isFocuserStatusVisible">
             <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
           </pre>
@@ -592,7 +623,9 @@
             </b-field>
           </b-field>
 
-          <div class="status-toggle-bar" @click="isScreenStatusVisible = !isScreenStatusVisible">toggle status</div>
+          <div class="status-toggle-bar" @click="isScreenStatusVisible = !isScreenStatusVisible">
+            {{ isScreenStatusVisible ? 'collapse status' : 'expand status' }}
+          </div>
           <pre v-if="isScreenStatusVisible">
             <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
           </pre>
@@ -1016,6 +1049,16 @@ export default {
   },
 
   computed: {
+
+    userIsAdmin() {
+      try {
+        let user = this.$auth.user 
+        let roles = user['https://photonranch.org/user_metadata'].roles
+        return roles.includes('admin')
+      } catch {
+        return false
+      }
+    },
 
     ...mapGetters('images', [
       'current_image',
