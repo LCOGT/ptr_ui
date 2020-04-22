@@ -42,15 +42,15 @@
                   <td>{{current_image.site || "---"}}</td> </tr>
               <div class="blank-row" />
 
-              <tr> <td class="info-panel-val" align="right">seconds: </td>
-                  <td>{{current_image.exposure_time || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">filter_used: </td>
+              <tr> <td class="info-panel-val" align="right">exposure: </td>
+                  <td>{{current_image.exposure_time || "---"}} s</td> </tr>
+              <tr> <td class="info-panel-val" align="right">filter: </td>
                   <td>{{current_image.filter_used || "---"}}</td> </tr>
               <div class="blank-row" />
 
-              <tr> <td class="info-panel-val" align="right">right ascension: </td>
+              <tr> <td class="info-panel-val" align="right">RA: </td>
                   <td>{{rightAscension}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">declination: </td>
+              <tr> <td class="info-panel-val" align="right">Dec: </td>
                   <td>{{declination}}</td> </tr>
 
               <tr> <td class="info-panel-val" align="right">altitude: </td>

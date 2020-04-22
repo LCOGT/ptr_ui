@@ -2,7 +2,7 @@
     <a 
         class="button" 
         v-on:click="handleClick(data.url, data.form, data.http_method)" 
-        v-bind:class="{ 'is-loading': isLoading }"
+        v-bind:class="{ 'is-loading': isLoading, 'is-admin': admin }"
         :disabled="isDisabled"
         >
         <slot name="title"> {{ data.name }} </slot>
@@ -21,6 +21,9 @@ export default {
         'isDisabled': {
             type: Boolean,
             default: false,
+        },
+        'admin': {
+            type: Boolean,
         },
     },
     data () {
@@ -147,4 +150,9 @@ export default {
 </script>
 
 <style scoped>
+
+.is-admin {
+    background-color: rgba(68, 0, 255, 0.164);
+    border-color: rgba(76, 0, 255, 0.541);
+}
 </style>
