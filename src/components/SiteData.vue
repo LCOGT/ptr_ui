@@ -210,8 +210,16 @@
   <b-modal :active.sync="showFitsHeaderModal" >
     <div class="card" style="height: 80vh; width:auto; overflow-y: auto;">
       <div class="card-content">
+      <p class="title">{{current_image.base_filename}}</p>
+
+
+
+        <!-- NOTE: make this into a searchable buefy table -->
+
+
+      
         <table class="info-panel-table">
-          <tr v-for="(v,k) in fitsHeader"> 
+          <tr v-for="(v,k) in fitsHeader" v-bind:key="k"> 
             <td class="info-panel-val" align="right">{{k}}: </td>
             <td>{{v}}</td> 
           </tr>

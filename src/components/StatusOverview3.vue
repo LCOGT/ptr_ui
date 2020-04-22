@@ -211,12 +211,12 @@ export default {
         enclosure_state() {
             try {
                 return this.deviceStatus.enclosure[this.enclosure] || {}
-            } catch { console.log('eclosure state catch'); return {} }
+            } catch { return {} }
         },
         weather_state() {
             try {
                 return this.deviceStatus.observing_conditions[this.weather] || {}
-            } catch { console.log('wx state catch'); return {} }
+            } catch { return {} }
         },
         mount_state() {
             try {
@@ -231,7 +231,7 @@ export default {
         camera_state() {
             try {
                 return this.deviceStatus.camera[this.camera]
-            } catch(error) { console.log(error); return {} }
+            } catch(error) { return {} }
         },
         filter_wheel_state () {
             try {

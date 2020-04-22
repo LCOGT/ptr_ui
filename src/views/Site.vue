@@ -269,7 +269,6 @@ export default {
       let status_timestamp = data.server_timestamp_ms
 
       status.server_timestamp_ms = data.server_timestamp_ms
-      console.log(status)
 
       if (statusType == "deviceStatus"){
         this.deviceStatus = status
