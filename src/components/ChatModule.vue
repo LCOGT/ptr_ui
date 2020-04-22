@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <b-collapse class="card" :open.sync="chatIsOpen" @open="unreadMessages=0">
+        <b-collapse class="card" :open.sync="chatIsOpen" @open="readAllMessages">
             <div
             slot="trigger" 
             slot-scope="props"
@@ -8,8 +8,8 @@
             role="button" >
                 <p class="card-header-title"> 
                     Chat 
-                    <span v-if="unreadMessages>0" style="margin-left: 1em;" class="unread-count">
-                        {{unreadMessages}}
+                    <span v-if="unreadMessageCount > 0" style="margin-left: 1em;" class="unread-count">
+                        {{unreadMessageCount}}
                     </span>
                 </p>
                 <a class="card-header-icon">
@@ -78,16 +78,13 @@ export default {
 
             chatIsOpen: false,
 
-            unreadMessages: 0,
-            loadingPeriod: true,
+            unreadMessageCount: 0,
         }
     },
     created() {
         this.openChatWebsocket()
         this.getOnlineUsers()
 
-        // Don't register any unread messages for the first 5 seconds
-        setTimeout(() => {this.loadingPeriod=false}, 5000)
     },
     // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
     watch: {
@@ -98,6 +95,7 @@ export default {
             this.siteChat.close()
             this.openChatWebsocket()
             this.getOnlineUsers()
+            this.unreadMessageCount = this.calculateUnreadMessages()
         },
 
         // If the user changes, we should update the chat server 
@@ -106,9 +104,17 @@ export default {
             this.siteChat.close()
             this.openChatWebsocket()
             this.getOnlineUsers()
+            this.unreadMessageCount = this.calculateUnreadMessages()
         }
 
     },
+
+    computed: {
+        userLastSeenMessageTimestamp() {
+            return this.getLastSeenTimestamp(this.username)
+        },
+    },
+
     methods: {
 
         isMobile() {
@@ -144,6 +150,66 @@ export default {
             })
         },
 
+        /**
+         *  Get the timestamp of the latest message seen by a user.
+         *  Retrieve the value from localstorage, or set it to the current time
+         *  (so all messages are read by default on a new computer).
+         */
+        getLastSeenTimestamp(username) {
+            // If a user is not logged in, all messages should register as 'read'.
+            if (this.username == "anonymous") {
+                return Infinity
+            }
+
+            // Get the timestamp for the message last seen by the user
+            let key = `${username}_lastSeenMessageTime`
+            let cachedTimestamp = localStorage.getItem(key)
+
+            // If nothing has been set before, set it to the current time.
+            if (null == cachedTimestamp) {
+                let now_s = parseInt(Date.now()/1000)
+                this.setLastSeenTimestamp(username, now_s)
+                return now_s
+
+            // Use the value in localstorage if it exists.
+            } else {
+                return cachedTimestamp
+            }
+        },
+
+        /**
+         *  Set the last seen message time for a user in localstorage.
+         */
+        setLastSeenTimestamp(username, timestamp_s) {
+            if (username == "anonymous") {
+                return;
+            } else {
+                let key = `${username}_lastSeenMessageTime`
+                localStorage.setItem(key,timestamp_s)
+            }
+        },
+
+        /**
+         *  Return the number of messages that haven't been read by the current
+         *  user.
+         */
+        calculateUnreadMessages() {
+            let lastSeenTimestamp = this.getLastSeenTimestamp(this.username)
+            let count = 0
+            for (const m in this.messages) {
+                if (this.messages[m].timestamp > lastSeenTimestamp) {
+                    count += 1; 
+                }
+            }
+            return count
+        },
+
+        readAllMessages() {
+            let lastReadTime = this.messages.slice(-1)[0].timestamp
+            this.setLastSeenTimestamp(this.username, lastReadTime)
+            this.unreadMessageCount = this.calculateUnreadMessages()
+        },
+
         async openChatWebsocket() {
 
             // Include the observatory site (abrev) and username as query string
@@ -173,8 +239,8 @@ export default {
                 else if ("messages" in data) {
                     data["messages"].forEach((message) => {
                         this.messages.push(message)
-                        if (!this.chatIsOpen && !this.loadingPeriod) {
-                            this.unreadMessages += 1;
+                        if (!this.chatIsOpen && message.timestamp > this.getLastSeenTimestamp(this.username)) {
+                            this.unreadMessageCount = this.calculateUnreadMessages(this.username);
                         }
                     });
 
