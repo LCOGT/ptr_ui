@@ -946,7 +946,7 @@ export default {
     },
   
     parseTrueFalse(str) {
-      if (str == undefined) { console.warn('undefined str'); return false}
+      if (str == undefined) { console.warn('Could not parse t/f: undefined string'); return false}
       if (str.toLowerCase()=="true") {return true}
       if (str.toLowerCase()=="false") {return false}
       console.error("Could not parse true or false. Check for bad behavior.")
