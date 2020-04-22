@@ -1,12 +1,17 @@
 <template>
     <div class="wrapper">
-        <b-collapse class="card" :open="false">
+        <b-collapse class="card" :open.sync="chatIsOpen" @open="unreadMessages=0">
             <div
             slot="trigger" 
             slot-scope="props"
             class="card-header"
             role="button" >
-                <p class="card-header-title"> Chat </p>
+                <p class="card-header-title"> 
+                    Chat 
+                    <span v-if="unreadMessages>0" style="margin-left: 1em;" class="unread-count">
+                        {{unreadMessages}}
+                    </span>
+                </p>
                 <a class="card-header-icon">
                     <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"/>
                 </a>
@@ -68,26 +73,28 @@ export default {
         return {
             messages: [
                 //{username: "Tim Beccue", content: "Hello observatory!", timestamp: 1581539579},
-                //{username: "Tim Beccue", content: "Hello two!", timestamp: 1581539579},
-                //{username: "Tim Beccue", content: "Hello three!", timestamp: 1581539579},
-                //{username: "Wayne Rosing", content: "Hello four!", timestamp: 1581539579},
-                //{username: "Wayne Rosing", content: "Hello four!", timestamp: 1581539579},
-                //{username: "Wayne Rosing", content: "Hello four!", timestamp: 1581539579},
-                //{username: "Wayne Rosing", content: "Hello four!", timestamp: 1581539579},
-                //{username: "Tim Beccue", content: "Hello five!", timestamp: 1581539579},
             ],
             tosend: '', // The text input box for the chat
+
+            chatIsOpen: false,
+
+            unreadMessages: 0,
+            loadingPeriod: true,
         }
     },
     created() {
         this.openChatWebsocket()
         this.getOnlineUsers()
+
+        // Don't register any unread messages for the first 5 seconds
+        setTimeout(() => {this.loadingPeriod=false}, 5000)
     },
     // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
     watch: {
         sitecode: function () {
             // Reopen the chat websocket with the new site.
             this.messages = []
+            this.unreadMessages = 0
             this.siteChat.close()
             this.openChatWebsocket()
             this.getOnlineUsers()
@@ -95,6 +102,7 @@ export default {
 
         // If the user changes, we should update the chat server 
         username: function() {
+            this.unreadMessages = 0
             this.siteChat.close()
             this.openChatWebsocket()
             this.getOnlineUsers()
@@ -165,6 +173,9 @@ export default {
                 else if ("messages" in data) {
                     data["messages"].forEach((message) => {
                         this.messages.push(message)
+                        if (!this.chatIsOpen && !this.loadingPeriod) {
+                            this.unreadMessages += 1;
+                        }
                     });
 
                     // Scroll to the bottom to see the new message.
@@ -214,5 +225,23 @@ export default {
 }
 .right-align-text {
     text-align:right;
+}
+.unread-count {
+    /* Center the content */
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    /* Colors */
+    background-color: rgba(255, 0, 0, 0.795);
+    color: #FFF;
+
+    /* Rounded border */
+    border-radius: 9999px;
+    height: 20px;
+    width: 20px;
+
+    /* Font */
+    font-size: 0.8em;
 }
 </style>
