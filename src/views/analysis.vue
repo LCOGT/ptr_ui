@@ -99,7 +99,7 @@ export default {
 
     // Set the default site for convenience
     this.active_site = "wmd";
-    this.$store.dispatch("observatory_configuration/update_config");
+    this.$store.dispatch("site_config/update_config");
     this.$store.commit('js9/instanceIsVisible', true)
   },
 
@@ -132,7 +132,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters("observatory_configuration", ["available_sites"]),
+    ...mapGetters("site_config", ["available_sites"]),
 
     ...mapGetters("images", {
       recent_images: "recent_images",
@@ -144,8 +144,8 @@ export default {
     ]),
 
     active_site: {
-      get() { return this.$store.getters["observatory_configuration/site"]; },
-      set(value) { this.$store.commit("observatory_configuration/setActiveSite", value); }
+      get() { return this.$store.getters["site_config/site"]; },
+      set(value) { this.$store.commit("site_config/setActiveSite", value); }
     }
   }
 };

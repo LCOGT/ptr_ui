@@ -19,6 +19,9 @@
         </b-modal>
 
   <div class="b-tabs" style="position: relative;">
+
+    <!--div>{{$store.getters['site_config/available_device']('telescope')}}</div-->
+
     <b-dropdown :trap-focus="true" :append-to-body="true">
       <a
         slot="trigger"
@@ -1101,7 +1104,7 @@ export default {
       'scriptHasSettings',
     ]),
 
-    ...mapGetters('observatory_configuration', [
+    ...mapGetters('site_config', [
       'enclosure',
       'mount',
       'telescope',

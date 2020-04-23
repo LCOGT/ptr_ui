@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import auth from './modules/auth'
-import observatory_configuration from './modules/observatory_configuration'
+import site_config from './modules/site_config'
 import skyChart from './modules/skyChart'
 import images from './modules/images'
 import script_settings from './modules/script_settings'
@@ -23,7 +23,7 @@ export default new Vuex.Store({
     ],
     modules: {
         auth,
-        observatory_configuration,
+        site_config,
         skyChart,
         images,
         script_settings,

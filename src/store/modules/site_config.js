@@ -7,7 +7,7 @@
 import axios from 'axios'
 
 var initial_state = function() {
-    console.log('initializing observatory_configuration state')
+    console.log('initializing site_config state')
     let apiName = this.$store.getters['dev/api'];
     let path = '/all/config/';
     let state = {
@@ -63,58 +63,13 @@ const state = {
 
 
 const getters = {
-    available_sites: state => Object.keys(state.global_config),
-    available_enclosures: state =>  {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["enclosure"] || [])
-            : []
-    },
-    available_mounts: state => {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["mount"] || []) 
-            : []
-    },
-    available_telescopes: state =>  {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["telescope"] || []) 
-            : []
-    },
-    available_rotators: state =>  {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["rotator"] || [])
-            : []
-    },
-    available_focusers: state =>  {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["focuser"] || [])
-            : []
-    },
-    available_filter_wheels: state =>  {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["filter_wheel"] || [])
-            : []
-    },
-    available_cameras: state =>  {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["camera"] || [])
-            : []
-    },
-    available_screens: state =>  {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["screen"] || [])
-            : []
-    },
-    available_weather: state =>  {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["observing_conditions"] || [])
-            : []
-    },
-    available_sequencers: state =>  {
-        return (state.did_config_load_yet && state.is_site_selected)
-            ? Object.keys(state.global_config[state.selected_site]["sequencer"] || [])
-            : []
-    },
 
+    available_device: 
+        state => deviceType => Object.keys(state.global_config[state.selected_site][deviceType]),
+
+    available_sites: state => Object.keys(state.global_config),
+
+    // These are the active devices.
     site: state => state.selected_site,
     enclosure: state => state.selected_enclosure,
     mount: state => state.selected_mount,

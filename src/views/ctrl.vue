@@ -549,7 +549,7 @@ export default {
       ariaModal: true
     })
  
-    await this.$store.dispatch('observatory_configuration/update_config')
+    await this.$store.dispatch('site_config/update_config')
 
     // Every second, update the current time (to compute status age).
     // This interval is stopped in the `beforeDestroy` lifecycle hook.

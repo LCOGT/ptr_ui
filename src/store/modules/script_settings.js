@@ -187,8 +187,8 @@ const actions = {
         // Command to send
         let script_name = getters.selectedScript
         let command = {
-            site: rootState.observatory_configuration.selected_site,
-            mount: rootState.observatory_configuration.selected_mount,
+            site: rootState.site_config.selected_site,
+            mount: rootState.site_config.selected_mount,
             device: 'sequencer',
             instance: 'sequencer',
             timestamp: parseInt(Date.now() / 1000),
@@ -237,8 +237,8 @@ const actions = {
 
         // API parameters
         let apiName = rootState.dev.active_api;
-        let site = rootState.observatory_configuration.selected_site;
-        let mount = rootState.observatory_configuration.selected_mount;
+        let site = rootState.site_config.selected_site;
+        let mount = rootState.site_config.selected_mount;
         let path = `/${site}/${mount}/command/`
 
         // Command to send

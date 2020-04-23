@@ -73,7 +73,7 @@ const actions = {
      */
     async refresh_latest_images({ commit, state, rootState }) {
 
-        let site = rootState.observatory_configuration.selected_site;
+        let site = rootState.site_config.selected_site;
         let apiName = rootState.dev.active_api;
         let querySize = 40; // How many images to get
         let path = `/${site}/latest_images/${querySize}/`;

@@ -15,7 +15,7 @@
                     <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
                     <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
                 </div>
-                <div class="val">{{(enclosure_state && enclosure_state.roof_status || enclosure_state.dome_status) || '-'}}</div>
+                <div class="val">{{(enclosure_state && enclosure_state.roof_status || enclosure_state.dome_status || enclosure_state.shutter_status) || '-'}}</div>
             </div>
         </div>
 
@@ -152,7 +152,7 @@ export default {
             }
         },
 
-        ...mapGetters('observatory_configuration', [
+        ...mapGetters('site_config', [
             'enclosure',
             'mount',
             'telescope',

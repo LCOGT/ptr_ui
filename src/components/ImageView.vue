@@ -142,7 +142,7 @@ export default {
     };
   },
   created() {
-    this.$store.commit("observatory_configuration/setActiveSite", this.site);
+    this.$store.commit("site_config/setActiveSite", this.site);
     this.$store.dispatch("images/refresh_latest_images");
 
     // Keep the displayed image element width and height in sync.
@@ -160,7 +160,7 @@ export default {
 
   watch: {
     site: function(newVal, oldVal) {
-      this.$store.commit("observatory_configuration/setActiveSite", newVal);
+      this.$store.commit("site_config/setActiveSite", newVal);
       this.$store.dispatch("images/refresh_latest_images");
     },
 
@@ -522,10 +522,10 @@ export default {
   computed: {
     active_site: {
       get() {
-        return this.$store.getters["observatory_configuration/site"];
+        return this.$store.getters["site_config/site"];
       },
       set(value) {
-        this.$store.commit("observatory_configuration/setActiveSite", value);
+        this.$store.commit("site_config/setActiveSite", value);
       }
     },
 
