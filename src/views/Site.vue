@@ -289,6 +289,7 @@ export default {
   watch: {
     sitecode: function () {
       this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
+      this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
       this.$store.dispatch('images/refresh_latest_images')
 
       // Load the config for the new site
