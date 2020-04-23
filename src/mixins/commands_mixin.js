@@ -73,6 +73,7 @@ export const commands_mixin = {
                 form: {
                     device: device_type,
                     instance: device,
+                    user: this.username,
                     timestamp: parseInt(Date.now() / 1000),
                     action: action,
                     required_params: req_params || {},
@@ -80,6 +81,7 @@ export const commands_mixin = {
                 }
             }
 
+            console.log(the_base_command)
             return the_base_command
 
         },
