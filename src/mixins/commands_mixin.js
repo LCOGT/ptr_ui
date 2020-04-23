@@ -61,7 +61,7 @@ export const commands_mixin = {
                 case 'rotator': device = this.active_rotator; break;
                 case 'focuser': device = this.active_focuser; break;
                 case 'screen': device = this.active_screen; break;
-                case 'sequencer': device = 'sequencer'; break;
+                case 'sequencer': device = this.active_sequencer; break;
             }
 
             let the_base_command = {
@@ -81,7 +81,6 @@ export const commands_mixin = {
                 }
             }
 
-            console.log(the_base_command)
             return the_base_command
 
         },
@@ -114,6 +113,7 @@ export const commands_mixin = {
             'available_filter_wheels',
             'available_cameras',
             'available_screens',
+            'available_sequencers',
 
             // Device specific properties
             'focuser_reference',
@@ -219,6 +219,14 @@ export const commands_mixin = {
         active_screen: {
             get() { return this.$store.getters['observatory_configuration/screen'] },
             set(value) { this.$store.commit('observatory_configuration/setActiveScreen', value) }
+        },
+        active_weather: {
+            get() { return this.$store.getters['observatory_configuration/weather'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveWeather', value) }
+        },
+        active_sequencer: {
+            get() { return this.$store.getters['observatory_configuration/sequencer'] },
+            set(value) { this.$store.commit('observatory_configuration/setActiveSequencer', value) }
         },
 
 

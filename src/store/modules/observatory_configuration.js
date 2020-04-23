@@ -57,6 +57,7 @@ const state = {
     selected_camera: '',
     selected_screen: '',
     selected_weather:'',
+    selected_sequencer:'',
 
 }
 
@@ -108,6 +109,11 @@ const getters = {
             ? Object.keys(state.global_config[state.selected_site]["observing_conditions"] || [])
             : []
     },
+    available_sequencers: state =>  {
+        return (state.did_config_load_yet && state.is_site_selected)
+            ? Object.keys(state.global_config[state.selected_site]["sequencer"] || [])
+            : []
+    },
 
     site: state => state.selected_site,
     enclosure: state => state.selected_enclosure,
@@ -119,6 +125,7 @@ const getters = {
     camera: state => state.selected_camera,
     screen: state => state.selected_screen,
     weather: state => state.selected_weather,
+    sequencer: state => state.selected_sequencer,
 
 
     /* Getters for specific device attributes (implemented here as needed) */
@@ -318,7 +325,8 @@ const actions = {
         return new Promise((resolve, reject) => {
             if (site=="wmd") {
                 commit('setActiveSite', site)
-                commit('setActiveWeather', 'wx1')
+                commit('setActiveWeather', 'observing_conditions1')
+                commit('setActiveSequencer', 'sequencer1')
                 commit('setActiveEnclosure', 'enclosure1')
                 commit('setActiveMount', 'mount1')
                 commit('setActiveTelescope', 'telescope1')
@@ -327,6 +335,7 @@ const actions = {
             if (site=="saf") {
                 commit('setActiveSite', site)
                 commit('setActiveWeather', 'observing_conditions1')
+                commit('setActiveSequencer', 'sequencer1')
                 commit('setActiveEnclosure', 'enclosure1')
                 commit('setActiveMount', 'mount1')
                 commit('setActiveTelescope', 'telescope1')
@@ -415,6 +424,7 @@ const mutations = {
     setActiveCamera(state, camera) { state.selected_camera = camera },
     setActiveScreen(state, screen) { state.selected_screen = screen },
     setActiveWeather(state, weather) { state.selected_weather = weather},
+    setActiveSequencer(state, sequencer) { state.selected_sequencer = sequencer},
 
 }
 
