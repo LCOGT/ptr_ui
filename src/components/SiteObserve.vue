@@ -100,6 +100,8 @@
           </div>
         </div>
 
+        <div class="val" v-if="mount_state.message">{{mount_state.message}}</div>
+        <div class="val" v-if="telescope_state.message">{{telescope_state.message}}</div>
 
         <div class="columns">
           <div class="status-items column">
@@ -179,7 +181,7 @@
             </b-dropdown-item>
           </b-dropdown>
 
-          <button class="button is-primary" style="width:100%; margin:1em 0;" @click=" telescopeModal = !telescopeModal">view skychart</button>
+          <b-button class="button" style="width:100%; margin:1em 0;" @click=" telescopeModal = !telescopeModal" icon-right="arrow-top-right">view skychart</b-button>
 
           <div class="status-toggle-bar" @click="isMountStatusVisible = !isMountStatusVisible">
             {{ isMountStatusVisible ? 'collapse status' : 'expand status'}}
@@ -210,6 +212,8 @@
               {{active_filter_wheel}}
             </div>
           </div>
+
+          <div class="val" v-if="camera_state.message">{{camera_state.message}}</div>
 
           <div class="status-items">
             <div class="keys">
@@ -376,6 +380,8 @@
             </div>
           </div>
 
+            <div class="val" v-if="focuser_state.message">{{focuser_state.message}}</div>
+
             <div class="status-items">
                 <div class="keys">
                   <div class="key">Focus:</div>
@@ -462,72 +468,79 @@
         <b-dropdown-item custom label="Sequencer">
 
           <div>
-              <div class="instrument-control-title-bar">
-                <div class="title">Sequencer</div>
-              </div>
+            <div class="instrument-control-title-bar">
+              <div class="title">Sequencer</div>
+            </div>
 
-              <b-field label="Script">
-                <b-field>
-                  <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
-                    <option value="none">none</option>
-                    <option value="stopScript">Stop Script</option>
-                    <option value="findFieldCenter">Find Field Center</option>
-                    <option value="calibrateAtFieldCenter">Calibrate at Field Center</option>
-                    <option value="focusAuto">Focus Auto</option>
-                    <option value="focusFine">Focus Fine</option>
-                    <option value="focusVcurve">Focus V-Curve</option>
-                    <option value="takeLRGBStack">Take LRGB Stack</option>
-                    <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
-                    <option value="takeUGRIZSStack">Take ugrizs Stack</option>
-                    <option value="takePlanetStack">Take Planet Stack</option>
-                    <option value="takeLunarStack">Take Lunar Stack</option>
-                    <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
-                    <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
-                    <option value="genSkyFlatMasters">Gen Sky Flat Masters</option>
-                    <option value="genCalibrations">Gen Calibrations</option>
-                    <option value="calibrateFocusVcurve">Calibrate Focus V-curve</option>
-                    <!--option value="32TargetPointingRun">32 Target Pointing Run</option-->
-                    <!--option value="128TargetPointingRun">128 Target Pointing Run</option-->
-                    <option value="pointingRun">Pointing Run</option>
-                    <option value="runWithMaximCamera">Run w/Maxim Camera</option>
-                    <option value="runWithAscomCamera">Run w/Ascom Camera</option>
-                    <option value="runUsingAcp">Run Using ACP</option>
-                    <option value="stopUsingAcp">Stop Using ACP</option>
-                  </b-select>
-                  <p class="control">
-                    <button 
-                      class="button is-light is-small" 
-                      :disabled="!scriptHasSettings"
-                      @click="isScriptSettingsActive = true"
-                      >
-                      <b-icon icon="settings"></b-icon>
-                    </button>
-                  </p>
-                </b-field>
+            <div class="val" v-if="focuser_state.message">{{focuser_state.message}}</div>
+
+            <div class="status-items">
+                <div class="keys">
+                  <div class="key">Script:</div>
+                  <div class="key">Busy:</div>
+                </div>
+                <div class="keys">
+                  <div class="val">{{sequencer_state.active_script}}</div>
+                  <div class="val">{{sequencer_state.sequencer_busy}}</div>
+                </div>
+            </div>
+
+            <b-field label="Script">
+              <b-field>
+                <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
+                  <option value="none">none</option>
+                  <option value="stopScript">Stop Script</option>
+                  <option value="findFieldCenter">Find Field Center</option>
+                  <option value="calibrateAtFieldCenter">Calibrate at Field Center</option>
+                  <option value="focusAuto">Focus Auto</option>
+                  <option value="focusFine">Focus Fine</option>
+                  <option value="focusVcurve">Focus V-Curve</option>
+                  <option value="takeLRGBStack">Take LRGB Stack</option>
+                  <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
+                  <option value="takeUGRIZSStack">Take ugrizs Stack</option>
+                  <option value="takePlanetStack">Take Planet Stack</option>
+                  <option value="takeLunarStack">Take Lunar Stack</option>
+                  <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
+                  <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
+                  <option value="genSkyFlatMasters">Gen Sky Flat Masters</option>
+                  <option value="genCalibrations">Gen Calibrations</option>
+                  <option value="calibrateFocusVcurve">Calibrate Focus V-curve</option>
+                  <!--option value="32TargetPointingRun">32 Target Pointing Run</option-->
+                  <!--option value="128TargetPointingRun">128 Target Pointing Run</option-->
+                  <option value="pointingRun">Pointing Run</option>
+                  <option value="runWithMaximCamera">Run w/Maxim Camera</option>
+                  <option value="runWithAscomCamera">Run w/Ascom Camera</option>
+                  <option value="runUsingAcp">Run Using ACP</option>
+                  <option value="stopUsingAcp">Stop Using ACP</option>
+                </b-select>
+                <p class="control">
+                  <button 
+                    class="button is-light is-small" 
+                    :disabled="!scriptHasSettings"
+                    @click="isScriptSettingsActive = true"
+                    >
+                    <b-icon icon="settings"></b-icon>
+                  </button>
+                </p>
               </b-field>
+            </b-field>
 
-              <b-modal :active.sync="isScriptSettingsActive" has-modal-card>
-                  <script-settings :script="selected_script" />
-              </b-modal>
+            <b-modal :active.sync="isScriptSettingsActive" has-modal-card>
+                <script-settings :script="selected_script" />
+            </b-modal>
 
-              <div class="status-item">
-                <div class="title2">Sequencer Status</div>
-                <pre>{{ sequencer_state }}</pre>
-              </div>
-
-              <div class="buttons has-addons">
-                <button class="button is-small" @click="script_run_command" style="width: 70%;"> run script</button>
-                <button class="button is-small" @click="script_stop_command" style="width: 30%"> stop script</button>
-              </div>
+            <div class="buttons has-addons" style="margin-bottom: 10px;">
+              <button class="button is-small" @click="script_run_command" style="width: 50%;"> run script</button>
+              <button class="button is-small" @click="script_stop_command" style="width: 50%"> stop script</button>
+            </div>
 
           </div>
 
-          <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">
-            {{ isCameraStatusVisible ? 'collapse status' : 'expand status' }}
+          <div class="status-toggle-bar" @click="isSequencerStatusVisible = !isSequencerStatusVisible">
+            {{ isSequencerStatusVisible ? 'collapse status' : 'expand status' }}
           </div>
-          <pre v-if="isCameraStatusVisible">
-            <simple-device-status :device_name="active_camera" device_type="Camera" :device_status="camera_state" />
-            <simple-device-status :device_name="active_filter_wheel" device_type="Filter Wheel" :device_status="filter_wheel_state" />
+          <pre v-if="isSequencerStatusVisible">
+            <simple-device-status :device_name="'sequencer'" device_type="Sequencer" :device_status="sequencer_state" />
           </pre>
 
         </b-dropdown-item>
@@ -905,6 +918,7 @@ export default {
       isFocuserStatusVisible: false,
       isRotatorStatusVisible: false,
       isScreenStatusVisible: false,
+      isSequencerStatusVisible: false,
 
       // testign job status
       focuserStatus: 'nothing yet',
@@ -1159,7 +1173,7 @@ export default {
     },
     sequencer_state () {
         try {
-            return this.deviceStatus.sequencer
+            return this.deviceStatus.sequencer['sequencer'] || {}
         } catch(error) { return {} }
     },
 
