@@ -381,7 +381,7 @@ export default {
             dso_types: 'dso_types',
             dso_mags: 'dso_mags',
         }),
-        ...mapGetters('observatory_configuration', {
+        ...mapGetters('site_config', {
             active_site: 'site',
             active_mount: 'mount',
             active_telescope: 'telescope',

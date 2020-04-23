@@ -725,7 +725,7 @@ export default {
       }
       return "---"
     },
-    ...mapGetters("observatory_configuration", ["available_sites"]),
+    ...mapGetters("site_config", ["available_sites"]),
 
     ...mapGetters("images", {
       recent_images: "recent_images",
@@ -733,8 +733,8 @@ export default {
     }),
 
     active_site: {
-      get() { return this.$store.getters["observatory_configuration/site"]; },
-      set(value) { this.$store.commit("observatory_configuration/setActiveSite", value); }
+      get() { return this.$store.getters["site_config/site"]; },
+      set(value) { this.$store.commit("site_config/setActiveSite", value); }
     },
     subframe_x0: {
       get() { return this.$store.getters['command_params/subframe_x0']},

@@ -288,8 +288,8 @@ export default {
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
   watch: {
     sitecode: function () {
-      this.$store.commit('observatory_configuration/setActiveSite', this.sitecode)
-      this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
+      this.$store.commit('site_config/setActiveSite', this.sitecode)
+      this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
       this.$store.dispatch('images/refresh_latest_images')
 
       // Load the config for the new site
@@ -308,8 +308,8 @@ export default {
 
 
     // Make sure the default instruments are selected at the initial load.
-    this.$store.dispatch('observatory_configuration/update_config')
-    this.$store.dispatch('observatory_configuration/set_default_active_devices', this.sitecode)
+    this.$store.dispatch('site_config/update_config')
+    this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
     this.$store.dispatch('images/refresh_latest_images')
 
     // Update timestamp every second (sent with command)

@@ -101,19 +101,11 @@ export const commands_mixin = {
 
     computed: {
 
-        // Getters from the observatory_configuration vuex module.
+        // Getters from the site_config vuex module.
         // Available devices and currently active devices are stored here.
-        ...mapGetters('observatory_configuration', [
+        ...mapGetters('site_config', [
+            'available_device',
             'available_sites',
-            'available_enclosures',
-            'available_mounts',
-            'available_telescopes',
-            'available_rotators',
-            'available_focusers',
-            'available_filter_wheels',
-            'available_cameras',
-            'available_screens',
-            'available_sequencers',
 
             // Device specific properties
             'focuser_reference',
@@ -181,52 +173,52 @@ export const commands_mixin = {
         },
 
         // The `selected_${device}` computed properties are used for two way
-        // binding between vuex (observatory_configuration module) and the device 
+        // binding between vuex (site_config module) and the device 
         // selection inputs. 
         active_site: {
-            get() { return this.$store.getters['observatory_configuration/site'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveSite', value) }
+            get() { return this.$store.getters['site_config/site'] },
+            set(value) { this.$store.commit('site_config/setActiveSite', value) }
         },
         active_enclosure: {
-            get() { return this.$store.getters['observatory_configuration/enclosure'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveEnclosure', value) }
+            get() { return this.$store.getters['site_config/enclosure'] },
+            set(value) { this.$store.commit('site_config/setActiveEnclosure', value) }
         },
         active_mount: {
-            get() { return this.$store.getters['observatory_configuration/mount'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveMount', value) }
+            get() { return this.$store.getters['site_config/mount'] },
+            set(value) { this.$store.commit('site_config/setActiveMount', value) }
         },
         active_telescope: {
-            get() { return this.$store.getters['observatory_configuration/telescope'] },
-            //set(value) { this.$store.commit('observatory_configuration/setActiveTelescope', value) }
-            set(value) { this.$store.dispatch('observatory_configuration/setActiveTelescope', value) }
+            get() { return this.$store.getters['site_config/telescope'] },
+            //set(value) { this.$store.commit('site_config/setActiveTelescope', value) }
+            set(value) { this.$store.dispatch('site_config/setActiveTelescope', value) }
         },
         active_rotator: {
-            get() { return this.$store.getters['observatory_configuration/rotator'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveRotator', value) }
+            get() { return this.$store.getters['site_config/rotator'] },
+            set(value) { this.$store.commit('site_config/setActiveRotator', value) }
         },
         active_focuser: {
-            get() { return this.$store.getters['observatory_configuration/focuser'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveFocuser', value) }
+            get() { return this.$store.getters['site_config/focuser'] },
+            set(value) { this.$store.commit('site_config/setActiveFocuser', value) }
         },
         active_filter_wheel: {
-            get() { return this.$store.getters['observatory_configuration/filter_wheel'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveFilterWheel', value) }
+            get() { return this.$store.getters['site_config/filter_wheel'] },
+            set(value) { this.$store.commit('site_config/setActiveFilterWheel', value) }
         },
         active_camera: {
-            get() { return this.$store.getters['observatory_configuration/camera'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveCamera', value) }
+            get() { return this.$store.getters['site_config/camera'] },
+            set(value) { this.$store.commit('site_config/setActiveCamera', value) }
         },
         active_screen: {
-            get() { return this.$store.getters['observatory_configuration/screen'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveScreen', value) }
+            get() { return this.$store.getters['site_config/screen'] },
+            set(value) { this.$store.commit('site_config/setActiveScreen', value) }
         },
         active_weather: {
-            get() { return this.$store.getters['observatory_configuration/weather'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveWeather', value) }
+            get() { return this.$store.getters['site_config/weather'] },
+            set(value) { this.$store.commit('site_config/setActiveWeather', value) }
         },
         active_sequencer: {
-            get() { return this.$store.getters['observatory_configuration/sequencer'] },
-            set(value) { this.$store.commit('observatory_configuration/setActiveSequencer', value) }
+            get() { return this.$store.getters['site_config/sequencer'] },
+            set(value) { this.$store.commit('site_config/setActiveSequencer', value) }
         },
 
 

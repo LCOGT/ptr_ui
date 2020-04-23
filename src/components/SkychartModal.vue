@@ -200,7 +200,7 @@ export default {
     },
     computed: {
 
-        ...mapGetters('observatory_configuration', [
+        ...mapGetters('site_config', [
             'enclosure',
             'mount',
             'telescope',
