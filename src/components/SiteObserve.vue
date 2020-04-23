@@ -106,24 +106,26 @@
               <div class="keys">
                 <div class="key">Ra:</div>
                 <div class="key">Dec:</div>
-                <div class="key">Alt:</div>
                 <div class="key">Az:</div>
+                <div class="key">Alt:</div>
               </div>
               <div class="keys">
                 <div class="val">{{parseFloat(telescope_state.right_ascension).toFixed(4)}}</div>
                 <div class="val">{{parseFloat(telescope_state.declination).toFixed(4)}}</div>
-                <div class="val">{{(telescope_state.altitude)}}</div>
                 <div class="val">{{(telescope_state.azimuth)}}</div>
+                <div class="val">{{(telescope_state.altitude)}}</div>
               </div>
           </div>
           <div class="status-items column">
               <div class="keys">
                 <div class="key">Ha:</div>
+                <div class="key">Zenith Dist:</div>
                 <div class="key">Airmass:</div>
                 <div class="key">Activity:</div>
               </div>
               <div class="keys">
                 <div class="val">{{(hour_angle)}}</div>
+                <div class="val">{{telescope_state.zenith_distance}}</div>
                 <div class="val">{{telescope_state.airmass}}</div>
                 <div class="val">{{mount_activity}}</div>
               </div>
@@ -363,6 +365,98 @@
         <a
           slot="trigger"
           role="button">
+          <div class="button is-text">Focuser</div>
+        </a>
+        <b-dropdown-item custom label="Focuser">
+
+          <div class="instrument-control-title-bar">
+            <div class="title">Focuser</div>
+            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+              {{active_focuser}}
+            </div>
+          </div>
+
+            <div class="status-items">
+                <div class="keys">
+                  <div class="key">Focus:</div>
+                  <div class="key">Temp:</div>
+                  <div class="key">Status:</div>
+                </div>
+                <div class="keys">
+                  <div class="val">{{focuser_state.focus_position}}	&mu;m</div>
+                  <div class="val">{{focuser_state.focus_temperature}} &#8451;</div>
+                  <div class="val">{{focuser_state.focus_moving.toLowerCase()=="true" ? "moving" : "idle"}}</div>
+                </div>
+            </div>
+
+            <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
+              <button class="button is-small" slot="trigger" style="width: 100%;">
+                  <span>Focus Action...</span>
+                  <b-icon icon="menu-down"></b-icon>
+              </button>
+              <b-dropdown-item aria-role="listitem">
+                <command-button :data="focus_home_command" class="dropdown-button-command"/>
+              </b-dropdown-item>
+              <b-dropdown-item>
+                <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
+              </b-dropdown-item>
+              <b-dropdown-item>
+                <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
+              </b-dropdown-item>
+              <b-dropdown-item>
+                <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
+              </b-dropdown-item>
+            </b-dropdown>
+            <br>
+
+            <b-field label="Relative">
+              <b-field>
+                <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
+                <p class="control"> <command-button :data="focus_relative_command" class="is-small" @jobPost="focuserJobPost"/>  </p><br>
+              </b-field>
+            </b-field>
+            <b-field>
+              <p class="control">
+                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['-300'])"> -300 </button>
+              </p>
+              <p class="control">
+                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['-100'])"> -100 </button>
+              </p>
+              <p class="control">
+                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['-30'])"> -30 </button>
+              </p>
+              <p class="control">
+                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['+30'])"> +30 </button>
+              </p>
+              <p class="control">
+                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['+100'])"> +100 </button>
+              </p>
+              <p class="control">
+                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['+300'])"> +300 </button>
+              </p>
+            </b-field>
+
+            <b-field label="Absolute">
+              <b-field>
+                <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+                <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
+              </b-field>
+            </b-field>
+            <br>
+
+          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">
+            {{ isFocuserStatusVisible ? 'collapse status' : 'expand status' }}
+          </div>
+          <pre v-if="isFocuserStatusVisible">
+            <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
+          </pre>
+        </b-dropdown-item>
+      </b-dropdown>
+
+      <b-dropdown>
+        <a
+          slot="trigger"
+          role="button">
           <div class="button is-text">Sequencer</div>
         </a>
         <b-dropdown-item custom label="Sequencer">
@@ -439,97 +533,6 @@
         </b-dropdown-item>
       </b-dropdown>
 
-      <b-dropdown v-if="isCmdTabsExpanded">
-        <a
-          slot="trigger"
-          role="button">
-          <div class="button is-text">Focuser</div>
-        </a>
-        <b-dropdown-item custom label="Focuser">
-
-          <div class="instrument-control-title-bar">
-            <div class="title">Focuser</div>
-            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
-              {{active_focuser}}
-            </div>
-          </div>
-
-            <div class="status-items">
-                <div class="keys">
-                  <div class="key">Focus:</div>
-                  <div class="key">Temp:</div>
-                  <div class="key">Status:</div>
-                </div>
-                <div class="keys">
-                  <div class="val">{{focuser_state.focus_position}}	&mu;m</div>
-                  <div class="val">{{focuser_state.focus_temperature}} &#8451;</div>
-                  <div class="val">{{focuser_state.focus_moving.toLowerCase()=="true" ? "moving" : "idle"}}</div>
-                </div>
-            </div>
-
-            <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
-              <button class="button is-small" slot="trigger" style="width: 100%;">
-                  <span>Focus Action...</span>
-                  <b-icon icon="menu-down"></b-icon>
-              </button>
-              <b-dropdown-item aria-role="listitem">
-                <command-button :data="focus_home_command" class="dropdown-button-command"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
-              </b-dropdown-item>
-            </b-dropdown>
-            <br>
-
-            <b-field label="Relative">
-              <b-field>
-                <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
-                <p class="control"> <command-button :data="focus_relative_command" class="is-small" @jobPost="focuserJobPost"/>  </p><br>
-              </b-field>
-            </b-field>
-            <b-field>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['-100'])"> -100 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['-10'])"> -10 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['-1'])"> -1 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['+1'])"> +1 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['+10'])"> +10 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['+100'])"> +100 </button>
-              </p>
-            </b-field>
-
-            <b-field label="Absolute">
-              <b-field>
-                <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
-                <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
-              </b-field>
-            </b-field>
-            <br>
-
-          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">
-            {{ isFocuserStatusVisible ? 'collapse status' : 'expand status' }}
-          </div>
-          <pre v-if="isFocuserStatusVisible">
-            <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
-          </pre>
-        </b-dropdown-item>
-      </b-dropdown>
 
       <b-dropdown v-if="isCmdTabsExpanded">
         <a
