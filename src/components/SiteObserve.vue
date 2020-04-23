@@ -472,7 +472,7 @@
               <div class="title">Sequencer</div>
             </div>
 
-            <div class="val" v-if="focuser_state.message">{{focuser_state.message}}</div>
+            <div class="val" v-if="sequencer_state.message">{{sequencer_state.message}}</div>
 
             <div class="status-items">
                 <div class="keys">
@@ -540,7 +540,7 @@
             {{ isSequencerStatusVisible ? 'collapse status' : 'expand status' }}
           </div>
           <pre v-if="isSequencerStatusVisible">
-            <simple-device-status :device_name="'sequencer'" device_type="Sequencer" :device_status="sequencer_state" />
+            <simple-device-status :device_name="active_sequencer" device_type="Sequencer" :device_status="sequencer_state" />
           </pre>
 
         </b-dropdown-item>
@@ -790,6 +790,23 @@
                     v-bind:key="`rotator-${index}`"
                   >
                     {{ rotator }}
+                  </option>
+                </b-select>
+            </b-field>
+
+            <!-- Sequencer Selection -->
+            <b-field horizontal class="select-device" label="Sequencer">
+                <b-select 
+                  placeholder="choose sequencer..." 
+                  default="" 
+                  v-model="active_sequencer"
+                >
+                  <option 
+                    v-for="(sequencer, index) in Object.keys(config.sequencer)" 
+                    v-bind:value="sequencer"
+                    v-bind:key="`sequencer-${index}`"
+                  >
+                    {{ sequencer }}
                   </option>
                 </b-select>
             </b-field>
@@ -1094,6 +1111,7 @@ export default {
       'rotator',
       'screen',
       'weather',
+      'sequencer',
     ]),
 
 
@@ -1173,7 +1191,7 @@ export default {
     },
     sequencer_state () {
         try {
-            return this.deviceStatus.sequencer['sequencer'] || {}
+            return this.deviceStatus.sequencer[this.sequencer] || {}
         } catch(error) { return {} }
     },
 

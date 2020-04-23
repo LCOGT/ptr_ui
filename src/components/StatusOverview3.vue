@@ -15,7 +15,7 @@
                     <span v-else-if="status_age < 18000*86400" style="color:red;">{{status_age_days}}</span>
                     <span v-else-if="status_age > 18000*86400" style="color:red;">unavailable</span>
                 </div>
-                <div class="val">{{(enclosure_state && enclosure_state.shutter_status) || '-'}}</div>
+                <div class="val">{{(enclosure_state && enclosure_state.roof_status || enclosure_state.dome_status) || '-'}}</div>
             </div>
         </div>
 
@@ -30,7 +30,7 @@
             <div class="col">
                 <div class="val">{{decimalToHHMMSS(lmst)}}</div>
                 <div class="val">{{new Date().toUTCString().split(' ')[4]}}</div>
-                <div class="val">--</div>
+                <div class="val">{{username}}</div>
             </div>
         </div>
 
@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import { getInstance } from '../auth/index' // get user object: getInstance().user
 import { mapGetters } from 'vuex'
 import helpers from '@/utils/helpers'
 import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
@@ -140,6 +141,16 @@ export default {
 
     },
     computed: {
+
+        // Get username if user is logged in
+        username() {
+            if (getInstance().user) {
+                return getInstance().user.name
+            }
+            else {
+                return 'anonymous'
+            }
+        },
 
         ...mapGetters('observatory_configuration', [
             'enclosure',
