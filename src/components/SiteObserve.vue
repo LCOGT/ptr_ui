@@ -520,7 +520,7 @@
                   <button 
                     class="button is-light is-small" 
                     :disabled="!scriptHasSettings"
-                    @click="isScriptSettingsActive = true"
+                    @click="isScriptSettingsActive = !isScriptSettingsActive"
                     >
                     <b-icon icon="settings"></b-icon>
                   </button>
@@ -528,9 +528,9 @@
               </b-field>
             </b-field>
 
-            <b-modal :active.sync="isScriptSettingsActive" has-modal-card>
-                <script-settings :script="selected_script" />
-            </b-modal>
+          <div v-if="isScriptSettingsActive">
+            <script-settings :show="scriptHasSettings" :script="selected_script" />
+          </div>
 
             <div class="buttons has-addons" style="margin-bottom: 10px;">
               <button class="button is-small" @click="script_run_command" style="width: 50%;"> run script</button>
@@ -538,6 +538,7 @@
             </div>
 
           </div>
+
 
           <div class="status-toggle-bar" @click="isSequencerStatusVisible = !isSequencerStatusVisible">
             {{ isSequencerStatusVisible ? 'collapse status' : 'expand status' }}

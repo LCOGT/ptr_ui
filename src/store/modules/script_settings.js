@@ -1,7 +1,17 @@
 //import { API } from 'aws-amplify'
 import axios from 'axios'
 import { SnackbarProgrammatic as Snackbar } from 'buefy';
+import { getInstance } from '../../auth/index' // get user object: getInstance().user
 
+// Get username if user is logged in
+function username() {
+    if (getInstance().user) {
+        return getInstance().user.name
+    }
+    else {
+        return 'anonymous'
+    }
+}
 
 // These default values (organized per script) are used to initialize values,
 // and also used when the user wishes to revert back to defaults.
@@ -15,6 +25,10 @@ const defaults = {
             numOfDark2: 0,
             coldMap: true,
             hotMap: true,
+            bin1: true,
+            bin2: false,
+            bin3: false,
+            bin4: false,
         }
     },
     genScreenFlatMasters() {
@@ -35,6 +49,8 @@ const defaults = {
         return {
             numFrames: 1,
             skipL: false,
+            exposureTime: 30,
+            useSloane: false,
         }
     },
     takeO3HaS2N2Stack() {
@@ -44,6 +60,11 @@ const defaults = {
             skipHa: false,
             skipS2: false,
             skipN2: false,
+            addRGB: false, 
+            addCR: false,
+            addSloane: false,
+            addL: false,
+            exposureTime: 30,
         }
     },
     takePlanetStack() {
@@ -134,6 +155,10 @@ const getters = {
     genBiasDarkMaster_numOfDark2: state => state.genBiasDarkMaster.numOfDark2, 
     genBiasDarkMaster_coldMap: state => state.genBiasDarkMaster.coldMap, 
     genBiasDarkMaster_hotMap: state => state.genBiasDarkMaster.hotMap, 
+    genBiasDarkMaster_bin1: state => state.genBiasDarkMaster.bin1, 
+    genBiasDarkMaster_bin2: state => state.genBiasDarkMaster.bin2, 
+    genBiasDarkMaster_bin3: state => state.genBiasDarkMaster.bin3, 
+    genBiasDarkMaster_bin4: state => state.genBiasDarkMaster.bin4, 
 
     genScreenFlatMasters: state => state.genScreenFlatMasters,
     genScreenFlatMasters_numFrames: 
@@ -151,6 +176,8 @@ const getters = {
     takeLRGBStack: state => state.takeLRGBStack,
     takeLRGBStack_numFrames: state => state.takeLRGBStack.numFrames,
     takeLRGBStack_skipL: state => state.takeLRGBStack.skipL,
+    takeLRGBStack_exposureTime: state => state.takeLRGBStack.exposureTime,
+    takeLRGBStack_useSloane: state => state.takeLRGBStack.useSloane,
 
     takeO3HaS2N2Stack: state => state.takeO3HaS2N2Stack,
     takeO3HaS2N2Stack_numFrames: state => state.takeO3HaS2N2Stack.numFrames,
@@ -158,6 +185,11 @@ const getters = {
     takeO3HaS2N2Stack_skipHa: state => state.takeO3HaS2N2Stack.skipHa,
     takeO3HaS2N2Stack_skipS2: state => state.takeO3HaS2N2Stack.skipS2,
     takeO3HaS2N2Stack_skipN2: state => state.takeO3HaS2N2Stack.skipN2,
+    takeO3HaS2N2Stack_addRGB: state => state.takeO3HaS2N2Stack.addRGB,
+    takeO3HaS2N2Stack_addCR: state => state.takeO3HaS2N2Stack.addCR,
+    takeO3HaS2N2Stack_addSloane: state => state.takeO3HaS2N2Stack.addSloane,
+    takeO3HaS2N2Stack_addL: state => state.takeO3HaS2N2Stack.addL,
+    takeO3HaS2N2Stack_exposureTime: state => state.takeO3HaS2N2Stack.exposureTime,
 
     takePlanetStack: state => state.takePlanetStack,
     takePlanetStack_numFrames: state => state.takePlanetStack.numFrames,
@@ -190,7 +222,8 @@ const actions = {
             site: rootState.site_config.selected_site,
             mount: rootState.site_config.selected_mount,
             device: 'sequencer',
-            instance: 'sequencer',
+            instance: rootState.site_config.selected_sequencer,
+            user: username(),
             timestamp: parseInt(Date.now() / 1000),
             action: 'run',
             required_params: {
@@ -321,6 +354,10 @@ const mutations = {
     genBiasDarkMaster_numOfDark2(state, val) { state.genBiasDarkMaster.numOfDark2= val },
     genBiasDarkMaster_coldMap(state, val) { state.genBiasDarkMaster.coldMap= val },
     genBiasDarkMaster_hotMap(state, val) { state.genBiasDarkMaster.hotMap= val },
+    genBiasDarkMaster_bin1(state, val) { state.genBiasDarkMaster.bin1 = val },
+    genBiasDarkMaster_bin2(state, val) { state.genBiasDarkMaster.bin2 = val },
+    genBiasDarkMaster_bin3(state, val) { state.genBiasDarkMaster.bin3 = val },
+    genBiasDarkMaster_bin4(state, val) { state.genBiasDarkMaster.bin4 = val },
 
     genScreenFlatMasters_numFrames(state, val) { state.genScreenFlatMasters.numFrames = val },
     genScreenFlatMasters_gainCalc(state, val) { state.genScreenFlatMasters.gainCalc= val },
@@ -332,12 +369,19 @@ const mutations = {
 
     takeLRGBStack_numFrames(state, val) { state.takeLRGBStack.numFrames = val },
     takeLRGBStack_skipL(state, val) { state.takeLRGBStack.skipL = val },
+    takeLRGBStack_exposureTime(state, val) { state.takeLRGBStack.exposureTime = val },
+    takeLRGBStack_useSloane(state, val) { state.takeLRGBStack.useSloane = val },
 
     takeO3HaS2N2Stack_numFrames(state, val) { state.takeO3HaS2N2Stack.numFrames = val },
     takeO3HaS2N2Stack_skipO3(state, val) { state.takeO3HaS2N2Stack.skipO3 = val },
     takeO3HaS2N2Stack_skipHa(state, val) { state.takeO3HaS2N2Stack.skipHa = val },
     takeO3HaS2N2Stack_skipS2(state, val) { state.takeO3HaS2N2Stack.skipS2 = val },
     takeO3HaS2N2Stack_skipN2(state, val) { state.takeO3HaS2N2Stack.skipN2 = val },
+    takeO3HaS2N2Stack_addRGB(state, val) { state.takeO3HaS2N2Stack.addRGB = val },
+    takeO3HaS2N2Stack_addCR(state, val) { state.takeO3HaS2N2Stack.addCR = val },
+    takeO3HaS2N2Stack_addSloane(state, val) { state.takeO3HaS2N2Stack.addSloane = val },
+    takeO3HaS2N2Stack_addL(state, val) { state.takeO3HaS2N2Stack.addL = val },
+    takeO3HaS2N2Stack_exposureTime(state, val) { state.takeO3HaS2N2Stack.exposureTime = val },
 
     takePlanetStack_numFrames(state, val) { state.takePlanetStack.numFrames = val },
 

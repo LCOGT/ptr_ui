@@ -5,6 +5,16 @@
                 <b-numberinput 
                     v-model="numFrames" 
                     type="is-light" 
+                    size="is-small"
+                    controls-position="compact" 
+                    min="0">
+                </b-numberinput>
+            </b-field>
+            <b-field label="Exposure Time (s)">
+                <b-numberinput 
+                    v-model="exposureTime" 
+                    type="is-light" 
+                    size="is-small"
                     controls-position="compact" 
                     min="0">
                 </b-numberinput>
@@ -14,9 +24,13 @@
             <b-field>
                 <b-checkbox v-model="skipL">Skip Luminance</b-checkbox>
             </b-field>
+            <b-field>
+                <b-checkbox v-model="useSloane">Use Sloane</b-checkbox>
+            </b-field>
         </div>
     </div>
-</section></template>
+</section>
+</template>
 
 <script>
 export default {
@@ -28,8 +42,16 @@ export default {
             set(val) { this.$store.commit('takeLRGBStack_numFrames', val) }
         },
         skipL: {
-            get() { return this.$store.getters['takeLRGBStack_skipU'] },
-            set(val) { this.$store.commit('takeLRGBStack_skipU', val) }
+            get() { return this.$store.getters['takeLRGBStack_skipL'] },
+            set(val) { this.$store.commit('takeLRGBStack_skipL', val) }
+        },
+        exposureTime: {
+            get() { return this.$store.getters['takeLRGBStack_exposureTime'] },
+            set(val) { this.$store.commit('takeLRGBStack_exposureTime', val) }
+        },
+        useSloane: {
+            get() { return this.$store.getters['takeLRGBStack_useSloane'] },
+            set(val) { this.$store.commit('takeLRGBStack_useSloane', val) }
         },
     }
 }
