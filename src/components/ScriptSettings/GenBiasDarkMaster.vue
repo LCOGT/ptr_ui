@@ -25,7 +25,7 @@
         </div>
         <div class="field">
             <div class="control">
-                <b-numberinput v-model="numOfBias" type="is-light" controls-position="compact" min="0" class="inputfield"></b-numberinput>
+                <b-numberinput size="is-small" v-model="numOfBias" type="is-light" controls-position="compact" min="0" class="inputfield"></b-numberinput>
             </div>
         </div>
     </div>
@@ -38,8 +38,8 @@
         </div>
         <div class="field">
             <b-field class="inputfield">
-                <b-input v-model="darkTime" name="subject" autocomplete="off"></b-input>
-                <p class="control"> <span class="button is-static">s</span> </p>
+                <b-input size="is-small" v-model="darkTime" name="subject" autocomplete="off"></b-input>
+                <p class="control"> <span class="button is-small is-static">s</span> </p>
             </b-field>
         </div>
     </div>
@@ -50,7 +50,7 @@
         </div>
         <div class="field">
             <div class="control">
-                <b-numberinput  class="inputfield" v-model="numOfDark" type="is-light" controls-position="compact" min="0" ></b-numberinput>
+                <b-numberinput size="is-small" class="inputfield" v-model="numOfDark" type="is-light" controls-position="compact" min="0" ></b-numberinput>
             </div>
         </div>
     </div>
@@ -63,8 +63,8 @@
         </div>
         <div class="field">
             <b-field class="inputfield">
-                <b-input v-model="dark2Time" name="subject" autocomplete="off"></b-input>
-                <p class="control"> <span class="button is-static">s</span> </p>
+                <b-input size="is-small" v-model="dark2Time" name="subject" autocomplete="off"></b-input>
+                <p class="control"> <span class="button is-small is-static">s</span> </p>
             </b-field>
         </div>
     </div>
@@ -75,7 +75,7 @@
         </div>
         <div class="field">
             <div class="control">
-                <b-numberinput  class="inputfield" v-model="numOfDark2" type="is-light" controls-position="compact" min="0" ></b-numberinput>
+                <b-numberinput size="is-small" class="inputfield" v-model="numOfDark2" type="is-light" controls-position="compact" min="0" ></b-numberinput>
             </div>
         </div>
     </div>
@@ -83,12 +83,22 @@
     <hr>
 
     <div class="field-group">
-        <b-field horizontal position="is-left" >
+        <b-field >
             <b-checkbox v-model="coldMap">Cold Map</b-checkbox>
             <b-checkbox v-model="hotMap">Hot Map</b-checkbox>
         </b-field>
     </div>
-</section></template>
+
+    <div class="field-group">
+        <b-field >
+            <b-checkbox v-model="bin1">Bin 1</b-checkbox>
+            <b-checkbox v-model="bin2">Bin 2</b-checkbox>
+            <b-checkbox v-model="bin3">Bin 3</b-checkbox>
+            <b-checkbox v-model="bin4">Bin 4</b-checkbox>
+        </b-field>
+    </div>
+</section>
+</template>
 
 <script>
 export default {
@@ -124,6 +134,22 @@ export default {
             get() { return this.$store.getters['genBiasDarkMaster_hotMap'] },
             set(val) { this.$store.commit('genBiasDarkMaster_hotMap', val) }
         },
+        bin1: {
+            get() { return this.$store.getters['genBiasDarkMaster_bin1'] },
+            set(val) { this.$store.commit('genBiasDarkMaster_bin1', val) }
+        },
+        bin2: {
+            get() { return this.$store.getters['genBiasDarkMaster_bin2'] },
+            set(val) { this.$store.commit('genBiasDarkMaster_bin2', val) }
+        },
+        bin3: {
+            get() { return this.$store.getters['genBiasDarkMaster_bin3'] },
+            set(val) { this.$store.commit('genBiasDarkMaster_bin3', val) }
+        },
+        bin4: {
+            get() { return this.$store.getters['genBiasDarkMaster_bin4'] },
+            set(val) { this.$store.commit('genBiasDarkMaster_bin4', val) }
+        },
     }
 }
 </script>
@@ -133,7 +159,7 @@ export default {
     width: 200px;
 }
 .field-group {
-    padding-right: 2em;
-    padding-bottom: 0.5em;
+    padding-right: 10px;
+    padding-bottom: 2em;
 }
 </style>

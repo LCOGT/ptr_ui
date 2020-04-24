@@ -1,13 +1,9 @@
 <template>
-    <div class="the-settings card modal-card">
-        <section class="modal-card-head">
-            <div>
-            <p class="">settings: </p> 
-            <span class="heading is-light is-size-4 is-family-monospace">{{getReadableName(script)}}</span>
-            </div>
-        </section>
+    <div class="the-settings" :class="{'is-hidden': !show}">
+        <!--p class="">settings: </p-->
+        <!--div class="heading is-light is-size-4 is-family-monospace">{{getReadableName(script)}}</div-->
         <!--hr style="border-bottom: silver 4px solid; margin-bottom: 2em;"-->
-        <section class="modal-card-body">
+        <section>
             <gen-screen-flat-masters v-if="script=='genScreenFlatMasters'"/>
             <gen-bias-dark-master v-if="script=='genBiasDarkMaster'"/>
             <take-u-g-r-i-z-s-stack v-if="script=='takeUGRIZSStack'"/>
@@ -19,12 +15,7 @@
             <pointing-run v-if="script=='pointingRun'" />
         </section>
         <!--hr style="border-bottom: silver 4px solid; margin-bottom: 2em;"-->
-        <section class="modal-card-foot">
-            <div class="level" style="width: 100%;">
-                <button class="button is-light" @click="revertDefaultSettings">Revert To Default</button>
-                <button class="button" @click="script_run_command">Run Script</button>
-            </div>
-        </section>
+        <b-button class="button is-light is-small" @click="revertDefaultSettings">Revert To Default</b-button>
     </div>
 </template>
 
@@ -53,6 +44,7 @@ export default {
     },
     props: {
         'script': String,
+        'show': Boolean,
     },
     created() {
         console.log(this.readableNames)
@@ -86,15 +78,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.modal-card {
-    width: auto;
-}
-.modal-container {
-    display:flex;
+.is-hidden {
+    visibility:hidden;
 }
 .the-settings {
-    width: fit-content;
     background-color: #282f2f;
-    padding: 2em;
+    padding: 10px;
+    border-radius:5px;
+    margin-bottom: 10px;
 }
 </style>
