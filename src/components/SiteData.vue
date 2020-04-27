@@ -6,7 +6,7 @@
     <div class="img-view column ">
       <!-- The actual image view component -->
       <image-view-2 
-        :site="active_site" 
+        :site="sitecode" 
         :median_star_pos_x="median_relative_pos_x"
         :median_star_pos_y="median_relative_pos_y"
         :median_plot_color="median_plot_color"
@@ -270,7 +270,7 @@ import * as d3 from 'd3'
 
 export default {
   name: "SubpageData",
-  props: ["config", "deviceStatus", "sitecode"],
+  props: ["deviceStatus", "sitecode"],
   components: {
       ImageView2,
       ImagesTable,
@@ -725,17 +725,13 @@ export default {
       }
       return "---"
     },
-    ...mapGetters("site_config", ["available_sites"]),
+    ...mapGetters("site_config", ["site_config", "available_sites"]),
 
     ...mapGetters("images", {
       recent_images: "recent_images",
       current_image: "current_image"
     }),
 
-    active_site: {
-      get() { return this.$store.getters["site_config/site"]; },
-      set(value) { this.$store.commit("site_config/setActiveSite", value); }
-    },
     subframe_x0: {
       get() { return this.$store.getters['command_params/subframe_x0']},
       set(val) { this.$store.commit('command_params/subframe_x0', val)},

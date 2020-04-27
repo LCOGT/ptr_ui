@@ -64,8 +64,13 @@ const state = {
 
 const getters = {
 
-    available_device: 
-        state => deviceType => Object.keys(state.global_config[state.selected_site][deviceType]),
+    available_devices: 
+        state => (deviceType, site) => {
+            if(state.global_config && Object.keys(state.global_config).length != 0) {
+                return Object.keys(state.global_config[site][deviceType])
+            }
+            else { return [] }
+        },
 
     available_sites: state => Object.keys(state.global_config),
 
@@ -136,7 +141,6 @@ const getters = {
             return 1.0
         }
     },
-
 
 
     rotator_min: state => {
@@ -239,128 +243,13 @@ const getters = {
             return false
         }
     },
+
     
     all_telescopes: state => state.global_config[state.selected_site]['telescope'],
 
     global_config: state => state.global_config,
-    is_config_loaded: state => state.did_config_load_yet,
+    site_config: state => sitecode => state.global_config[sitecode] || {},
 }
-
-const actions = {
-
-    /**
-     * This action gets the most recent config from AWS, which applies to all 
-     * observatories in the network. 
-     */
-    update_config({ commit, getters, rootState }) {
-        return new Promise((resolve, reject) => {
-            let apiName = rootState.dev.active_api;
-            let path = '/all/config/';
-            axios.get(apiName+path).then(response => {
-                // Save the config to this vuex module.
-                commit('setGlobalConfig', response.data)
-
-                resolve()
-
-            }).catch(error => {
-                console.log(error)
-                reject()
-            });
-        })
-    },
-
-    async set_default_filter_option({ commit, getters }) {
-        await commit('command_params/filter_wheel_options_selection', 
-                getters.filter_wheel_options[0],
-                {root: true},
-            )
-    },
-
-    async set_default_active_devices({ commit, dispatch }, site) {
-        return new Promise((resolve, reject) => {
-            if (site=="wmd") {
-                commit('setActiveSite', site)
-                commit('setActiveWeather', 'observing_conditions1')
-                commit('setActiveSequencer', 'sequencer1')
-                commit('setActiveEnclosure', 'enclosure1')
-                commit('setActiveMount', 'mount1')
-                commit('setActiveTelescope', 'telescope1')
-                dispatch('setActiveTelescope', 'telescope1')
-            }
-            if (site=="saf") {
-                commit('setActiveSite', site)
-                commit('setActiveWeather', 'observing_conditions1')
-                commit('setActiveSequencer', 'sequencer1')
-                commit('setActiveEnclosure', 'enclosure1')
-                commit('setActiveMount', 'mount1')
-                commit('setActiveTelescope', 'telescope1')
-                dispatch('setActiveTelescope', 'telescope1')
-            }
-            if (site=="sim_site") {
-                commit('setActiveSite', site)
-                commit('setActiveEnclosure', 'enclosure1')
-                commit('setActiveMount', 'mount1')
-                commit('setActiveTelescope', 'telescope1')
-                dispatch('setActiveTelescope', 'telescope1')
-            }
-            if (site=="ALI-sim") {
-                commit('setActiveSite', site)
-                commit('setActiveEnclosure', 'enclosure1')
-                commit('setActiveMount', 'mount1')
-                commit('setActiveTelescope', 'telescope1')
-                dispatch('setActiveTelescope', 'telescope1')
-            }
-            resolve()
-        })
-    },
-
-    setActiveTelescope({ commit, getters, dispatch, rootGetters }, telescope_name) {
-        dispatch('update_config').then(response => {
-            commit('setActiveTelescope', telescope_name)
-
-            let telescopes = getters.all_telescopes
-            let telescope_config =telescopes[telescope_name]
-
-            let rotator_name = telescope_config.rotator_name
-            let camera_name = telescope_config.camera_name
-            let screen_name = telescope_config.screen_name
-            let focuser_name = telescope_config.focuser_name
-            let filter_wheel_name = telescope_config.filter_wheel_name
-            commit('setActiveCamera', camera_name)
-            commit('setActiveFocuser', focuser_name)
-            commit('setActiveRotator', rotator_name)
-            commit('setActiveFilterWheel',filter_wheel_name)
-            commit('setActiveScreen', screen_name)
-
-            // Set initial values in command fields
-            if (rootGetters['command_params/filter_wheel_options_selection'] == '') {
-                let filterSelection= getters.filter_wheel_options[0][0]
-                commit('command_params/filter_wheel_options_selection', 
-                        filterSelection,
-                        {root: true},
-                    )
-            }
-
-            if (rootGetters['command_params/camera_areas_selection'] == '') {
-                let areaSelection = getters.camera_areas[0]
-                commit('command_params/camera_areas_selection', 
-                        areaSelection,
-                        {root: true},
-                    )
-            }
-
-            if (rootGetters['command_params/camera_bin'] == '' && getters.camera_can_bin) { 
-                let bin_selection = getters.camera_bin_options[0]
-                commit('command_params/camera_bin', 
-                        bin_selection,
-                        {root: true},
-                    )
-            }
-        })
-    }
-
-}
-
 const mutations = {
     setGlobalConfig(state, config) { 
         state.global_config = config;
@@ -382,6 +271,75 @@ const mutations = {
     setActiveSequencer(state, sequencer) { state.selected_sequencer = sequencer},
 
 }
+
+const actions = {
+
+    /**
+     * This action gets the most recent config from AWS, which applies to all 
+     * observatories in the network. 
+     */
+    update_config({ commit, dispatch, rootState }) {
+        let apiName = rootState.dev.active_api;
+        let path = '/all/config/';
+        return axios.get(apiName+path).then(response => {
+            commit('setGlobalConfig', response.data)
+        }).catch(error => {
+            console.log(error)
+        });
+    },
+
+    set_default_filter_option({ commit, getters }) {
+        commit('command_params/filter_wheel_options_selection', 
+                getters.filter_wheel_options[0],
+                {root: true},
+            )
+    },
+
+    set_default_active_devices({ state, commit, getters, rootGetters}, site) {
+        let defaults = state.global_config[site].defaults
+
+        commit('setActiveSite', site)
+        commit('setActiveWeather', defaults.observing_conditions)
+        commit('setActiveEnclosure', defaults.enclosure)
+        commit('setActiveMount', defaults.mount)
+        commit('setActiveTelescope', defaults.telescope)
+        commit('setActiveCamera', defaults.camera)
+        commit('setActiveFilterWheel', defaults.filter_wheel)
+        commit('setActiveFocuser', defaults.focuser)
+        commit('setActiveRotator', defaults.rotator)
+        commit('setActiveSequencer', defaults.sequencer)
+        commit('setActiveScreen', defaults.screen)
+
+        // Set initial values in command fields
+        if (rootGetters['command_params/filter_wheel_options_selection'] == '') {
+            let filterSelection= getters.filter_wheel_options[0][0]
+            commit('command_params/filter_wheel_options_selection', 
+                    filterSelection,
+                    {root: true},
+                )
+        }
+
+        if (rootGetters['command_params/camera_areas_selection'] == '') {
+            let areaSelection = getters.camera_areas[0]
+            commit('command_params/camera_areas_selection', 
+                    areaSelection,
+                    {root: true},
+                )
+        }
+
+        if (rootGetters['command_params/camera_bin'] == '' && getters.camera_can_bin) { 
+            let bin_selection = getters.camera_bin_options[0]
+            commit('command_params/camera_bin', 
+                    bin_selection,
+                    {root: true},
+                )
+        }
+    },
+
+
+}
+
+
 
 export default {
     namespaced: true,

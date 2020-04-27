@@ -205,6 +205,63 @@ const getters = {
 
 }
 
+// vuex mutations
+const mutations = {
+
+    selectedScript(state, script) { state.selectedScript = script },
+
+    // Set a script param defined by the script_name, script_param, and val. 
+    // Set these three key/val pairs in 'payload'. 
+    generalScriptParam(state, payload) {
+        state[payload.script_name][payload.script_param] = payload.val
+    },
+
+    genBiasDarkMaster_numOfBias(state, val) { state.genBiasDarkMaster.numOfBias = val },
+    genBiasDarkMaster_darkTime(state, val) { state.genBiasDarkMaster.darkTime= val },
+    genBiasDarkMaster_numOfDark(state, val) { state.genBiasDarkMaster.numOfDark= val },
+    genBiasDarkMaster_dark2Time(state, val) { state.genBiasDarkMaster.dark2Time= val },
+    genBiasDarkMaster_numOfDark2(state, val) { state.genBiasDarkMaster.numOfDark2= val },
+    genBiasDarkMaster_coldMap(state, val) { state.genBiasDarkMaster.coldMap= val },
+    genBiasDarkMaster_hotMap(state, val) { state.genBiasDarkMaster.hotMap= val },
+    genBiasDarkMaster_bin1(state, val) { state.genBiasDarkMaster.bin1 = val },
+    genBiasDarkMaster_bin2(state, val) { state.genBiasDarkMaster.bin2 = val },
+    genBiasDarkMaster_bin3(state, val) { state.genBiasDarkMaster.bin3 = val },
+    genBiasDarkMaster_bin4(state, val) { state.genBiasDarkMaster.bin4 = val },
+
+    genScreenFlatMasters_numFrames(state, val) { state.genScreenFlatMasters.numFrames = val },
+    genScreenFlatMasters_gainCalc(state, val) { state.genScreenFlatMasters.gainCalc= val },
+    genScreenFlatMasters_shutterCompensation(state, val) { state.genScreenFlatMasters.shutterCompensation= val },
+
+    takeUGRIZSStack_numFrames(state, val) { state.takeUGRIZSStack.numFrames = val },
+    takeUGRIZSStack_skipU(state, val) { state.takeUGRIZSStack.skipU= val },
+    takeUGRIZSStack_skipZS(state, val) { state.takeUGRIZSStack.skipZS= val },
+
+    takeLRGBStack_numFrames(state, val) { state.takeLRGBStack.numFrames = val },
+    takeLRGBStack_skipL(state, val) { state.takeLRGBStack.skipL = val },
+    takeLRGBStack_exposureTime(state, val) { state.takeLRGBStack.exposureTime = val },
+    takeLRGBStack_useSloane(state, val) { state.takeLRGBStack.useSloane = val },
+
+    takeO3HaS2N2Stack_numFrames(state, val) { state.takeO3HaS2N2Stack.numFrames = val },
+    takeO3HaS2N2Stack_skipO3(state, val) { state.takeO3HaS2N2Stack.skipO3 = val },
+    takeO3HaS2N2Stack_skipHa(state, val) { state.takeO3HaS2N2Stack.skipHa = val },
+    takeO3HaS2N2Stack_skipS2(state, val) { state.takeO3HaS2N2Stack.skipS2 = val },
+    takeO3HaS2N2Stack_skipN2(state, val) { state.takeO3HaS2N2Stack.skipN2 = val },
+    takeO3HaS2N2Stack_addRGB(state, val) { state.takeO3HaS2N2Stack.addRGB = val },
+    takeO3HaS2N2Stack_addCR(state, val) { state.takeO3HaS2N2Stack.addCR = val },
+    takeO3HaS2N2Stack_addSloane(state, val) { state.takeO3HaS2N2Stack.addSloane = val },
+    takeO3HaS2N2Stack_addL(state, val) { state.takeO3HaS2N2Stack.addL = val },
+    takeO3HaS2N2Stack_exposureTime(state, val) { state.takeO3HaS2N2Stack.exposureTime = val },
+
+    takePlanetStack_numFrames(state, val) { state.takePlanetStack.numFrames = val },
+
+    takeLunarStack_numFrames(state, val) { state.takeLunarStack.numFrames = val },
+
+    takeSkyFlats_numFrames(state, val) { state.takeSkyFlats.numFrames = val },
+
+    pointingRun_gridType(state, val) { state.pointingRun.gridType = val },
+    pointingRun_numGridRuns(state, val) { state.pointingRun.numGridRuns = val },
+}
+
 // vuex actions
 const actions = {
 
@@ -336,62 +393,6 @@ const actions = {
 
 }
 
-// vuex mutations
-const mutations = {
-
-    selectedScript(state, script) { state.selectedScript = script },
-
-    // Set a script param defined by the script_name, script_param, and val. 
-    // Set these three key/val pairs in 'payload'. 
-    generalScriptParam(state, payload) {
-        state[payload.script_name][payload.script_param] = payload.val
-    },
-
-    genBiasDarkMaster_numOfBias(state, val) { state.genBiasDarkMaster.numOfBias = val },
-    genBiasDarkMaster_darkTime(state, val) { state.genBiasDarkMaster.darkTime= val },
-    genBiasDarkMaster_numOfDark(state, val) { state.genBiasDarkMaster.numOfDark= val },
-    genBiasDarkMaster_dark2Time(state, val) { state.genBiasDarkMaster.dark2Time= val },
-    genBiasDarkMaster_numOfDark2(state, val) { state.genBiasDarkMaster.numOfDark2= val },
-    genBiasDarkMaster_coldMap(state, val) { state.genBiasDarkMaster.coldMap= val },
-    genBiasDarkMaster_hotMap(state, val) { state.genBiasDarkMaster.hotMap= val },
-    genBiasDarkMaster_bin1(state, val) { state.genBiasDarkMaster.bin1 = val },
-    genBiasDarkMaster_bin2(state, val) { state.genBiasDarkMaster.bin2 = val },
-    genBiasDarkMaster_bin3(state, val) { state.genBiasDarkMaster.bin3 = val },
-    genBiasDarkMaster_bin4(state, val) { state.genBiasDarkMaster.bin4 = val },
-
-    genScreenFlatMasters_numFrames(state, val) { state.genScreenFlatMasters.numFrames = val },
-    genScreenFlatMasters_gainCalc(state, val) { state.genScreenFlatMasters.gainCalc= val },
-    genScreenFlatMasters_shutterCompensation(state, val) { state.genScreenFlatMasters.shutterCompensation= val },
-
-    takeUGRIZSStack_numFrames(state, val) { state.takeUGRIZSStack.numFrames = val },
-    takeUGRIZSStack_skipU(state, val) { state.takeUGRIZSStack.skipU= val },
-    takeUGRIZSStack_skipZS(state, val) { state.takeUGRIZSStack.skipZS= val },
-
-    takeLRGBStack_numFrames(state, val) { state.takeLRGBStack.numFrames = val },
-    takeLRGBStack_skipL(state, val) { state.takeLRGBStack.skipL = val },
-    takeLRGBStack_exposureTime(state, val) { state.takeLRGBStack.exposureTime = val },
-    takeLRGBStack_useSloane(state, val) { state.takeLRGBStack.useSloane = val },
-
-    takeO3HaS2N2Stack_numFrames(state, val) { state.takeO3HaS2N2Stack.numFrames = val },
-    takeO3HaS2N2Stack_skipO3(state, val) { state.takeO3HaS2N2Stack.skipO3 = val },
-    takeO3HaS2N2Stack_skipHa(state, val) { state.takeO3HaS2N2Stack.skipHa = val },
-    takeO3HaS2N2Stack_skipS2(state, val) { state.takeO3HaS2N2Stack.skipS2 = val },
-    takeO3HaS2N2Stack_skipN2(state, val) { state.takeO3HaS2N2Stack.skipN2 = val },
-    takeO3HaS2N2Stack_addRGB(state, val) { state.takeO3HaS2N2Stack.addRGB = val },
-    takeO3HaS2N2Stack_addCR(state, val) { state.takeO3HaS2N2Stack.addCR = val },
-    takeO3HaS2N2Stack_addSloane(state, val) { state.takeO3HaS2N2Stack.addSloane = val },
-    takeO3HaS2N2Stack_addL(state, val) { state.takeO3HaS2N2Stack.addL = val },
-    takeO3HaS2N2Stack_exposureTime(state, val) { state.takeO3HaS2N2Stack.exposureTime = val },
-
-    takePlanetStack_numFrames(state, val) { state.takePlanetStack.numFrames = val },
-
-    takeLunarStack_numFrames(state, val) { state.takeLunarStack.numFrames = val },
-
-    takeSkyFlats_numFrames(state, val) { state.takeSkyFlats.numFrames = val },
-
-    pointingRun_gridType(state, val) { state.pointingRun.gridType = val },
-    pointingRun_numGridRuns(state, val) { state.pointingRun.numGridRuns = val },
-}
 
 export default {
     state,

@@ -97,7 +97,7 @@
         <!-- Only show when modal is not open because can't have 2 charts open at once. -->
         <div class="skychart-container" >
             <!-- Note: only render once the config is populated (needs lat/long to load) -->
-            <the-sky-chart :deviceStatus="deviceStatus" :siteConfig="config" v-if="Object.keys(config).length>0"/>
+            <the-sky-chart :deviceStatus="deviceStatus" />
         </div>
 
         <div class="non-skychart-container">
@@ -116,12 +116,12 @@
             </div>
             <div class="status-items">
                 <div class="keys">
-                    <div class="key">Alt:</div>
                     <div class="key">Az:</div>
+                    <div class="key">Alt:</div>
                 </div>
                 <div class="keys">
-                    <div class="val">{{(telescope_state.altitude)}}</div>
                     <div class="val">{{(telescope_state.azimuth)}}</div>
+                    <div class="val">{{(telescope_state.altitude)}}</div>
                 </div>
             </div>
             <div class="status-items">
@@ -141,7 +141,7 @@
                 </div>
                 <div class="keys">
                     <div class="val">{{mount_activity}}</div>
-                    <div class="val">{{enclosure_state.shutter_status}}</div>
+                    <div class="val">{{enclosure_state.shutter_status || enclosure_state.roof_status}}</div>
                 </div>
             </div>
 
@@ -175,7 +175,7 @@ import StatusOverview2 from '@/components/StatusOverview2'
 
 export default {
     name: "SiteTargets",
-    props: ["config", "deviceStatus", "sitecode"],
+    props: ["deviceStatus", "sitecode"],
     mixins: [commands_mixin],
     components: {
         CommandButton,
@@ -201,6 +201,7 @@ export default {
     computed: {
 
         ...mapGetters('site_config', [
+            'site_config',
             'enclosure',
             'mount',
             'telescope',

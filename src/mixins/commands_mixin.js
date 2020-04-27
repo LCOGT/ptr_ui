@@ -7,6 +7,10 @@
 import { mapGetters } from 'vuex'
 import { getInstance } from '../auth/index' // get user object: getInstance().user
 
+// Change empty strings to 'empty'. 
+function emptyString(s) {
+    return s == '' ? 'empty' : s;
+}
 
 export const commands_mixin = {
 
@@ -104,7 +108,7 @@ export const commands_mixin = {
         // Getters from the site_config vuex module.
         // Available devices and currently active devices are stored here.
         ...mapGetters('site_config', [
-            'available_device',
+            'available_devices',
             'available_sites',
 
             // Device specific properties
@@ -151,6 +155,10 @@ export const commands_mixin = {
             'camera_extract',
             'camera_image_type',
 
+            'camera_cooling',
+            'camera_temperature',
+            'camera_de_ice_cooling',
+
             'filter_wheel_options_selection',
 
             'focuser_relative',
@@ -189,8 +197,8 @@ export const commands_mixin = {
         },
         active_telescope: {
             get() { return this.$store.getters['site_config/telescope'] },
-            //set(value) { this.$store.commit('site_config/setActiveTelescope', value) }
-            set(value) { this.$store.dispatch('site_config/setActiveTelescope', value) }
+            set(value) { this.$store.commit('site_config/setActiveTelescope', value) }
+            //set(value) { this.$store.dispatch('site_config/setActiveTelescope', value) }
         },
         active_rotator: {
             get() { return this.$store.getters['site_config/rotator'] },
@@ -255,7 +263,7 @@ export const commands_mixin = {
             }
 
             // If active, add subframe parameters.
-            // Also ignore if active but subframe parameters specify the whole image [(0,0),(1,1)] (the sum should == 2). 
+            // Also ignore if active but subframe params specify the whole image [(0,0),(1,1)] (the sum should == 2). 
             if (this.subframeIsActive && !(this.subframe_x0 + this.subframe_y0 
                     + this.subframe_x1 + this.subframe_y1 == 2)) {
                 opt_params["subframe"] = {
@@ -289,15 +297,21 @@ export const commands_mixin = {
                 { username: this.username })
         },
         mount_slew_command () {
+            let ra = emptyString(this.mount_ra.toString())
+            let dec = emptyString(this.mount_dec.toString())
+            let obj = emptyString(this.mount_object.toString())
             return this.base_command( 'mount', 'go', 'slew to coordinates',
-                { ra: this.mount_ra.toString(), dec: this.mount_dec.toString(), },
-                { object: this.mount_object }
+                { ra: ra, dec: dec, },
+                { object: obj }
             )
         },
         mount_slew_chart_command () {
+            let ra = emptyString(this.chart_selectedRa.toString())
+            let dec = emptyString(this.chart_selectedDec.toString())
+            let obj = emptyString(this.mount_object.toString())
             return this.base_command( 'mount', 'go', 'slew to chart position',
-                { ra: this.chart_selectedRa.toString(), dec: this.chart_selectedDec.toString(), },
-                { object: this.mount_object }
+                { ra: ra, dec: dec, },
+                { object: obj, }
             )
         },
         mount_stop_command () {
@@ -320,13 +334,15 @@ export const commands_mixin = {
             return this.base_command( 'mount', 'ra=sid, dec=0', 'ra=sid, dec=0')
         },
         focus_relative_command () {
+            let focus_relative = emptyString(this.focuser_relative.toString())
             return this.base_command( 'focuser', 'move_relative', 'focus',
-                { position: this.focuser_relative.toString(), }
+                { position: focus_relative, }
             )
         },
         focus_absolute_command () {
+            let focus_abs = emptyString(this.focuser_absolute.toString())
             return this.base_command( 'focuser', 'move_absolute', 'focus',
-                { position:(this.focuser_absolute).toString() } 
+                { position: focus_abs, } 
             )
         },
         focus_auto_command () {
@@ -365,18 +381,21 @@ export const commands_mixin = {
             return this.base_command( 'rotator', 'home', 'home' )
         },
         rotate_relative_command () {
+            let rotate_relative = emptyString(this.rotator_relative.toString())
             return this.base_command( 'rotator', 'move_relative', 'rotate',
-                { position: this.rotator_relative.toString() } 
+                { position: rotate_relative } 
             )
         },
         rotate_absolute_command () {
+            let rotator_absolute = emptyString(this.rotator_absolute)
             return this.base_command( 'rotator', 'move_absolute', 'rotate',
-                { position: (((parseFloat(this.rotator_absolute) % 360) + 360) % 360).toString() } // avoid negative results (since -5 % 360 = -5)
+                { position: (((parseFloat(rotator_absolute) % 360) + 360) % 360).toString() } // avoid negative results (since -5 % 360 = -5)
             )
         },
         screen_on_command () {
+            let screen_brightness = emptyString(this.screen_brightness.toString())
             return this.base_command( 'screen', 'turn_on', 'on',
-                { brightness: this.screen_brightness.toString() }
+                { brightness:screen_brightness }
             )
         },
         screen_off_command() {

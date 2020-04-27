@@ -11,7 +11,7 @@ import TheCalendar from '@/components/TheCalendar';
 
 export default {
     name: "SiteCalendar",
-    props: ["config", "deviceStatus", "sitecode"],
+    props: ["deviceStatus", "sitecode"],
     components: { 
         TheCalendar,
     },

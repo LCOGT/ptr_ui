@@ -75,7 +75,7 @@ export default {
       }
 
       this.map = L.map(this.mapName, {
-        center: new L.LatLng(this.latitude, this.longitude),
+        center: new L.LatLng(this.latitude || 0, this.longitude || 0),
         zoom: 7,
         layers: [googleMaps, owm_clouds]
       })

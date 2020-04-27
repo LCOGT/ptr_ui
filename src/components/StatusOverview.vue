@@ -88,7 +88,7 @@
 import { mapGetters } from 'vuex'
 import helpers from '@/utils/helpers'
 export default {
-    props: ['config', 'deviceStatus', 'sitecode'],
+    props: ['deviceStatus', 'sitecode'],
     data () {
         return {
             // This is a setInterval object initialized in `created()`. 
@@ -104,7 +104,7 @@ export default {
     mounted() {
         // This interval is stopped in the `beforeDestroy` lifecycle hook.
         this.update_time_interval = setInterval(this.update_time, 1000)
-        this.lmst_interval = setInterval(() => this.lmst = helpers.siderealTime(parseFloat(this.config.longitude)), 1000)
+        this.lmst_interval = setInterval(() => this.lmst = helpers.siderealTime(parseFloat(this.site_config(this.sitecode).longitude)), 1000)
     },
     beforeDestroy() {
         clearInterval(this.update_time_interval)
@@ -154,6 +154,7 @@ export default {
     computed: {
 
         ...mapGetters('site_config', [
+            'site_config',
             'enclosure',
             'mount',
             'telescope',

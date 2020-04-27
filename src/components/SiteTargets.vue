@@ -13,7 +13,6 @@
             >
         <skychart-modal
             style="background-color:#151718; overflow-y:auto; height: 100%;"
-            :config="config" 
             :sitecode="sitecode"
             :deviceStatus="deviceStatus"
         />
@@ -22,24 +21,12 @@
     <!-- Only show when modal is not open because can't have 2 charts open at once. -->
     <div class="skychart-container">
         <!-- Note: only render once the config is populated (needs lat/long to load) -->
-        <the-sky-chart :siteConfig="config" v-if="Object.keys(config).length>0"/>
+        <the-sky-chart :deviceStatus="deviceStatus"/>
         
     </div>
 
-    <button class="button is-dark is-small"
-        style="display:none;"
-        @click="isComponentModalActive = true">
-        fullscreen
-    </button>
 
 
-
-
-    <b-modal 
-        :active.sync="isComponentModalActive"
-        :can-cancel="true">
-        <modal-sky-chart />
-    </b-modal>
 
 </section>
 </template>
@@ -49,9 +36,10 @@
 
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import SkychartModal from '@/components/SkychartModal'
+import { mapGetters } from 'vuex'
 export default {
     name: "SiteTargets",
-    props: ["config", "deviceStatus", "sitecode"],
+    props: ["deviceStatus", "sitecode"],
     components: {
         TheSkyChart,
         SkychartModal,
@@ -61,7 +49,8 @@ export default {
             telescopeModal: false,
         }
     },
-    methods: {
+    computed: {
+        ...mapGetters('site_config', ['site_config'])
     },
     
 }
