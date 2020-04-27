@@ -12,15 +12,12 @@
                  >
           <skychart-modal
             style="background-color:#151718; overflow-y:auto; height: 100%;"
-            :config="config" 
             :sitecode="sitecode"
             :deviceStatus="deviceStatus"
             />
         </b-modal>
 
   <div class="b-tabs" style="position: relative;">
-
-    <!--div>{{$store.getters['site_config/available_device']('telescope')}}</div-->
 
     <b-dropdown :trap-focus="true" :append-to-body="true">
       <a
@@ -246,12 +243,6 @@
 
 
           <b-field horizontal label="Filter">
-              <!--b-select placeholder="Select filter" v-model="cam_filter" style="width: 100%">
-                  <option value="LUMINANCE">luminance</option>
-                  <option value="RED">red</option>
-                  <option value="GREEN">green</option>
-                  <option value="BLUE">blue</option>
-              </b-select-->
 
               <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" size="is-small" style="width: 100%">
                 <option 
@@ -394,7 +385,7 @@
                 <div class="keys">
                   <div class="val">{{focuser_state.focus_position}}	&mu;m</div>
                   <div class="val">{{focuser_state.focus_temperature}} &#8451;</div>
-                  <div class="val">{{focuser_state.focus_moving.toLowerCase()=="true" ? "moving" : "idle"}}</div>
+                  <div class="val">{{parseTrueFalse(focuser_state.focus_moving) ? "moving" : "idle"}}</div>
                 </div>
             </div>
 
@@ -652,40 +643,69 @@
         </b-dropdown-item>
       </b-dropdown>
 
+        
+
       <b-dropdown v-if="isCmdTabsExpanded">
         <a
           slot="trigger"
           role="button">
           <div class="button is-text">Settings</div>
         </a>
-        <b-dropdown-item custom icon="settings">
+        <b-dropdown-item custom label="custom" style="margin: 0; padding: 0">
+          <article class="instrument-selection message">
+            <div class="message-header">Device Selection</div>
+            <div class="message-body">
+          <div>
 
-          <button class="button" @click="isDeviceSelectorActive = !isDeviceSelectorActive">Select Devices</button>
-          <div style="height: 1em"/>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Mount</th>
-                <th>Telescope</th>
-                <th>Camera</th>
-                <th>Filter Wheel</th>
-                <th>Focuser</th>
-                <th>Rotator</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{active_mount}}</td>
-                <td>{{active_telescope}}</td>
-                <td>{{active_camera}}</td>
-                <td>{{active_filter_wheel}}</td>
-                <td>{{active_focuser}}</td>
-                <td>{{active_rotator}}</td>
-              </tr>
-            </tbody>
-          </table>
+                <b-field 
+                  horizontal 
+                  v-for="(instrument, idx) in [
+                    'mount',
+                    'telescope',
+                    'camera',
+                    'filter_wheel',
+                    'focuser', 
+                    'rotator',
+                    'sequencer',
+                  ]"
+                  v-bind:key="idx"
+                  class="select-device" :label="instrument">
+
+                    <b-select 
+                      :placeholder="`choose ${instrument}...`"
+                      v-model="self['active_'+instrument]"
+                    >
+
+                      <option 
+                        v-for="(val, index) in available_devices(instrument, sitecode)" 
+                        v-bind:value="val"
+                        v-bind:key="`ota-${index}`"
+                      >
+                        {{ val }}
+                      </option>
+                    </b-select>
+                </b-field>
 
 
+              <b-field horizontal class="select-device" label="">
+                <button class="button is-success" @click="setDefaultDevices" >Defaults</button>
+              </b-field>
+            </div>
+          </div>
+          </article>
+
+
+        </b-dropdown-item>
+      </b-dropdown>
+
+      <b-dropdown v-if="isCmdTabsExpanded && userIsAdmin" position="is-bottom-left">
+        <a
+          slot="trigger"
+          role="button">
+          <div class="button is-text">Site Config</div>
+        </a>
+        <b-dropdown-item custom label="custom" style="max-width: 50em">
+          <pre>{{JSON.stringify(site_config(this.sitecode), null,2)}}</pre>
         </b-dropdown-item>
       </b-dropdown>
 
@@ -696,124 +716,35 @@
         <article class="instrument-selection message">
           <div class="message-header">Device Selection</div>
           <div class="message-body">
-            <!-- Mount Selection -->
-            <b-field horizontal class="select-device" label="Mount">
-                <b-select 
-                  placeholder="choose mount..." 
-                  default="" 
-                  v-model="active_mount"
-                >
-                  <option 
-                    v-for="(mount, index) in Object.keys(config.mount)" 
-                    v-bind:value="mount"
-                    v-bind:key="`mount-${index}`"
-                  >
-                    {{ mount }}
-                  </option>
-                </b-select>
-            </b-field>
 
-            <!-- Telescope Selection -->
-            <b-field horizontal class="select-device" label="Telescope">
-                <b-select 
-                  placeholder="choose telescope..." 
-                  default="" 
-                  v-model="active_telescope"
-                >
-                  <option 
-                    v-for="(ota, index) in Object.keys(config.telescope)" 
-                    v-bind:value="ota"
-                    v-bind:key="`ota-${index}`"
-                  >
-                    {{ ota }}
-                  </option>
-                </b-select>
-            </b-field>
-            
-            <!-- Camera Selection -->
-            <b-field horizontal class="select-device" label="Camera">
-                <b-select 
-                  placeholder="choose camera..." 
-                  default="" 
-                  v-model="active_camera"
-                >
-                  <option 
-                    v-for="(cam, index) in Object.keys(config.camera)" 
-                    v-bind:value="cam"
-                    v-bind:key="`cam-${index}`"
-                  >
-                    {{ cam }}
-                  </option>
-                </b-select>
-            </b-field>
+              <b-field horizontal 
+                v-for="(instrument, idx) in [
+                  'mount',
+                  'telescope',
+                  'camera',
+                  'filter_wheel',
+                  'focuser', 
+                  'rotator',
+                  'sequencer',
+                ]"
+                v-bind:key="idx"
+                class="select-device" :label="instrument">
 
-            <!-- Filter Wheel Selection -->
-            <b-field horizontal class="select-device" label="Filters">
-                <b-select 
-                  placeholder="choose filter wheel..." 
-                  default="" 
-                  v-model="active_filter_wheel"
-                >
-                  <option 
-                    v-for="(filter_wheel, index) in Object.keys(config.filter_wheel)" 
-                    v-bind:value="filter_wheel"
-                    v-bind:key="`filter_wheel-${index}`"
+                  <b-select 
+                    :placeholder="`choose ${instrument}...`"
+                    v-model="self['active_'+instrument]"
                   >
-                    {{ filter_wheel }}
-                  </option>
-                </b-select>
-            </b-field>
 
-            <!-- Focuser Selection -->
-            <b-field horizontal class="select-device" label="Focuser">
-                <b-select 
-                  placeholder="choose focuser..." 
-                  default="" 
-                  v-model="active_focuser"
-                >
-                  <option 
-                    v-for="(focuser, index) in Object.keys(config.focuser)" 
-                    v-bind:value="focuser"
-                    v-bind:key="`focuser-${index}`"
-                  >
-                    {{ focuser }}
-                  </option>
-                </b-select>
-            </b-field>
+                    <option 
+                      v-for="(val, index) in available_devices(instrument, sitecode)" 
+                      v-bind:value="val"
+                      v-bind:key="`ota-${index}`"
+                    >
+                      {{ val }}
+                    </option>
+                  </b-select>
+              </b-field>
 
-            <!-- Rotator Selection -->
-            <b-field horizontal class="select-device" label="Rotator">
-                <b-select 
-                  placeholder="choose rotator..." 
-                  default="" 
-                  v-model="active_rotator"
-                >
-                  <option 
-                    v-for="(rotator, index) in Object.keys(config.rotator)" 
-                    v-bind:value="rotator"
-                    v-bind:key="`rotator-${index}`"
-                  >
-                    {{ rotator }}
-                  </option>
-                </b-select>
-            </b-field>
-
-            <!-- Sequencer Selection -->
-            <b-field horizontal class="select-device" label="Sequencer">
-                <b-select 
-                  placeholder="choose sequencer..." 
-                  default="" 
-                  v-model="active_sequencer"
-                >
-                  <option 
-                    v-for="(sequencer, index) in Object.keys(config.sequencer)" 
-                    v-bind:value="sequencer"
-                    v-bind:key="`sequencer-${index}`"
-                  >
-                    {{ sequencer }}
-                  </option>
-                </b-select>
-            </b-field>
 
             <b-field horizontal class="select-device" label="">
               <button class="button is-success" @click="isDeviceSelectorActive = false">Submit</button>
@@ -830,9 +761,9 @@
   <div class="spacer" style="height: 2em;" />
 
 
+
   <site-data 
     :sitecode="sitecode" 
-    :config="config" 
     :deviceStatus="deviceStatus"
     />
 
@@ -895,7 +826,6 @@ import ImagesTable from '@/components/ImagesTable'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
 
-
 export default {
   name: 'SiteObserve',
   components: {
@@ -912,9 +842,16 @@ export default {
     ImagesTable,
   },
   mixins: [commands_mixin],
-  props: ['config', 'deviceStatus', 'sitecode'],
+  props: ['deviceStatus', 'sitecode'],
   data () {
     return {
+
+      self: this,
+
+      selectInstruments: [
+        {name: 'telescope', model: 'active_telescope'},
+        {name: 'camera', model: 'active_camera'},
+      ],
 
       // This is a setInterval object initialized in `created()`. 
       // Fetches status every few seconds.
@@ -1016,12 +953,14 @@ export default {
       this.local_timestamp= Date.now()
     },
   
-    parseTrueFalse(str) {
-      if (str == undefined) { console.warn('Could not parse t/f: undefined string'); return false}
-      if (str.toLowerCase()=="true") {return true}
-      if (str.toLowerCase()=="false") {return false}
+    parseTrueFalse(s) {
+      if (undefined == s) { 
+        return false; 
+      }
+      else if (s.toLowerCase()=="true") {return true}
+      else if (s.toLowerCase()=="false") {return false}
       console.error("Could not parse true or false. Check for bad behavior.")
-      console.log(str)
+      console.log(s)
       return false
     },
 
@@ -1106,6 +1045,9 @@ export default {
     ]),
 
     ...mapGetters('site_config', [
+      'site_config',
+      'available_devices',
+
       'enclosure',
       'mount',
       'telescope',
@@ -1166,7 +1108,7 @@ export default {
     camera_state() {
         try {
             return this.deviceStatus.camera[this.camera] || {}
-        } catch(error) { console.log(error); return {} }
+        } catch(error) { return {} }
     },
     filter_wheel_state () {
         try {
@@ -1331,7 +1273,6 @@ export default {
   margin: 1em;
 }
 .instrument-selection {
-  margin: 1em;
   background-color: rgba(20,20,20,0.9)
 }
 

@@ -82,7 +82,7 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "TheMenu",
-  props: ["global_config"],
+  //props: ["global_config"],
   data() {
     return {}
     //return {
@@ -110,7 +110,8 @@ export default {
   },
   computed: {
     ...mapGetters('site_config', [
-      'available_sites'
+      'available_sites', 
+      'global_config'
     ])
   },
   methods: {

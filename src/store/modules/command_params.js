@@ -7,9 +7,9 @@
 const state = {
 
     // Mount parameters
-    mount_ra: ' ',
-    mount_dec: ' ',
-    mount_object: ' ',
+    mount_ra: '',
+    mount_dec: '',
+    mount_object: '',
 
     // Subframe parameters
     subframeIsActive: false,
@@ -28,6 +28,10 @@ const state = {
     camera_dither: 'off',
     camera_extract: 'on', // requested by Wayne for SEP related tests 20200413
     camera_image_type: 'light',
+
+    camera_cooling: 'off',
+    camera_temperature: -20,
+    camera_de_ice_cooling: false,
 
     filter_wheel_options_selection: '',
 
@@ -62,6 +66,10 @@ const getters = {
     camera_extract: state => state.camera_extract,
     camera_image_type: state => state.camera_image_type,
 
+    camera_cooling: state => state.camera_cooling,
+    camera_temperature: state => state.camera_temperature,
+    camera_de_ice_cooling: state => state.camera_de_ice_cooling,
+
     filter_wheel_options_selection: state => state.filter_wheel_options_selection,
 
     focuser_relative: state => state.focuser_relative,
@@ -72,15 +80,6 @@ const getters = {
 
     screen_brightness: state => state.screen_brightness,
 
-}
-
-const actions = {
-    // This action does nothing. It exists for easy reference.
-    empty({ commit }, payload) {
-        console.log('action called from command_params')
-        //console.log(payload)
-        //commit('mutation_name', value)
-    },
 }
 
 const mutations = {
@@ -105,6 +104,10 @@ const mutations = {
     camera_extract (state, val) { state.camera_extract = val; },
     camera_image_type (state, val) { state.camera_image_type = val; },
 
+    camera_cooling (state, val) { state.camera_cooling = val; },
+    camera_temperature (state, val) { state.camera_temperature = val; },
+    camera_de_ice_cooling (state, val) { state.camera_de_ice_cooling = val; },
+
     filter_wheel_options_selection(state, val) { state.filter_wheel_options_selection = val; },
 
     focuser_relative(state, val) { state.focuser_relative = val; },
@@ -114,6 +117,15 @@ const mutations = {
     rotator_absolute(state, val) { state.rotator_absolute = val; },
 
     screen_brightness(state, val) { state.screen_brightness = val; },
+}
+
+const actions = {
+    // This action does nothing. It exists for easy reference.
+    empty({ commit }, payload) {
+        console.log('action called from command_params')
+        //console.log(payload)
+        //commit('mutation_name', value)
+    },
 }
 
 export default {

@@ -6,11 +6,6 @@
         </div>
     </div>
 
-    <!--status-overview 
-        :config="config"
-        :sitecode="sitecode"  
-        :deviceStatus="deviceStatus" 
-    style="margin:0"/-->
     <div class="spacer" style="height: 2em;" />
 
     <the-dome-cam v-if="sitecode=='wmd'"/>
@@ -20,7 +15,6 @@
         name="leafmap"
         :latitude="latitude"
         :longitude="longitude"
-        v-if="Object.keys(config).length>0"
     ></leaflet-map>
 
 
@@ -36,13 +30,10 @@
     </div>
 
 
-    <br>
 
     <div style="height: 2em;" />
 
 
-    <br>
-    <!--the-device-selectors /-->
 
 </div>
 </template>
@@ -59,7 +50,7 @@ import StatusOverview from '@/components/StatusOverview'
 
 export default {
     name: "SiteHome",
-    props: ["config", "deviceStatus", "sitecode"],
+    props: ["deviceStatus", "sitecode"],
     mixins: [commands_mixin],
     components: {
         TheDeviceSelectors,
@@ -68,28 +59,12 @@ export default {
         LeafletMap,
         StatusOverview,
     },
-    data () {
-        return {
-            isImageModalActive: false,
-            latitude: 0,
-            longitude: 0,
-        }
-    },
-    mounted() {
-        this.latitude = this.config.latitude
-        this.longitude = this.config.longitude
-    },
-    watch: {
-        config: function() {
-            // New config (new site) should rerender map with updated location.
-            this.latitude = this.config.latitude
-            this.longitude = this.config.longitude
-        },
-    },
     computed: {
-        ...mapGetters('images', [
-        'current_image',
-        ]),
+        ...mapGetters('images', ['current_image']),
+        ...mapGetters('site_config', ['site_config']),
+
+        latitude() { return this.site_config(this.sitecode).latitude },
+        longitude() { return this.site_config(this.sitecode).longitude },
     }
     
     

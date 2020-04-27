@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <the-menu :global_config="global_config"/>
+    <the-menu />
     <!--dev-panel /--> <!-- Developer testing tools. Not for prodution. -->
 
     <router-view></router-view>
@@ -32,15 +32,7 @@ export default {
     DevPanel,
     JS9,
   },
-  data() {
-    return {
-      global_config: {},
-    }
-  },
   async created() {
-    let response = await axios.get('https://api.photonranch.org/api/all/config')
-    this.global_config = response.data
-    console.log(this.global_config)
     this.$store.dispatch('site_config/update_config')
   },
 }

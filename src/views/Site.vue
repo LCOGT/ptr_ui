@@ -64,7 +64,6 @@
       <side-info-panel>
         <p slot="title">{{sitecode}} weather</p>
         <weather-status-vertical
-          :config="config"
           :sitecode="sitecode"  
           :deviceStatus="deviceStatus" 
           />
@@ -72,7 +71,6 @@
       <side-info-panel>
         <p slot="title">{{sitecode}} status</p>
         <status-overview-3
-          :config="config"
           :sitecode="sitecode"  
           :deviceStatus="deviceStatus" 
           />
@@ -87,8 +85,6 @@
     <div class="column page-content">
       <component 
         v-bind:is="`site-${subpage}`"
-        v-if="configIsLoaded"
-        :config="config" 
         :sitecode="sitecode"
         :deviceStatus="deviceStatus"
         />
@@ -110,7 +106,6 @@
   <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
   <div class="mobile-menu ">
     <status-overview-2
-      :config="config"
       :sitecode="sitecode"  
       :deviceStatus="deviceStatus" 
       class="is-mobile is-hidden-widescreen"
@@ -174,7 +169,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
 import CommandButton from '@/components/CommandButton'
 import SiteHome from '@/components/SiteHome'
@@ -215,13 +210,9 @@ export default {
   data () {
     return {
       displayedOnlineUsers: new Set([]),
-      config: {},
 
       // Websocket for status updates
       status_ws: '',
-
-      // Config prop might be null, so children should wait until this component is mounted
-      configIsLoaded: false, 
 
       deviceStatus: {
         /*
@@ -242,7 +233,9 @@ export default {
     }
   },
 
-  created () {
+  async created () {
+
+    await this.setDefaultDevices()
 
     // Listen for new images on websocket, and refresh the list when a new image arrives.
     // Note: this happens for a new image on any site, not just the one being viewed.
@@ -278,8 +271,6 @@ export default {
     // Load initial status
     this.getSiteDeviceStatus()
 
-    // Get the site configuration
-    this.getSiteConfig()
 
 
 
@@ -288,29 +279,21 @@ export default {
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
   watch: {
     sitecode: function () {
-      this.$store.commit('site_config/setActiveSite', this.sitecode)
-      this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
-      this.$store.dispatch('images/refresh_latest_images')
 
-      // Load the config for the new site
-      this.getSiteConfig()
+      this.setDefaultDevices()
 
       // Change status subscriptions to the new site
       this.updateStatusSubscriptionSite(this.sitecode)
 
       // Get status for the new site.
       this.getSiteDeviceStatus()
+
+      this.$store.dispatch('images/refresh_latest_images')
     },
   },
 
 
   async mounted() {
-
-
-    // Make sure the default instruments are selected at the initial load.
-    this.$store.dispatch('site_config/update_config')
-    this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
-    this.$store.dispatch('images/refresh_latest_images')
 
     // Update timestamp every second (sent with command)
     var self = this;
@@ -322,6 +305,9 @@ export default {
   },
 
   computed: {
+
+    ...mapState('site_config', ['site_config', 'global_config']),
+
     // Get the username from Auth0
     username() {
       if (this.$auth.isAuthenticated) {
@@ -341,14 +327,13 @@ export default {
       this.displayedOnlineUsers = theList;
     },
 
-    async getSiteConfig() {
-      let baseUrl = this.$store.getters['dev/api'];
-      let path = `/${this.sitecode}/config`
-      let response = axios.get(baseUrl + path).then(response => {
-        this.config = response.data.configuration
-        this.configIsLoaded = true;
-        console.log(`${this.sitecode} config: `,this.config)
-      })
+    /**
+     * Set the default devices for this site.
+     * First, update the config. Then use the config to specify devices.
+     */
+    async setDefaultDevices() {
+      await this.$store.dispatch('site_config/update_config')
+      this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
     },
 
     async getSiteDeviceStatus() {

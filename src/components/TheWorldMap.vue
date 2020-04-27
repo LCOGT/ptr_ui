@@ -7,11 +7,12 @@
 <script>
 import nite from '@/utils/nite-overlay'
 import axios from 'axios'
+import { mapState } from 'vuex'
 // import test1 from '@/utils/test';
 
 export default {
   name: 'TheWorldMap',
-  props: ['name', 'g_config'],
+  props: ['name', ],
   data: function () {
     return {
 
@@ -233,7 +234,6 @@ export default {
     this.map = new google.maps.Map(element, options)
 
     // Draw observatories with colors to denote weather/open status
-    this.redrawMapSites()
     this.updateSiteColorInterval = setInterval(this.redrawMapSites, 10000)
 
     // Draw the daylight regions, and update every few seconds.
@@ -277,23 +277,6 @@ export default {
     updateSunPosition() {
       var sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
       this.sunMapMarker.setPosition(sun_pos)
-    },
-
-    // Return the list of sites to render on the map. 
-    async getSitesForMap() {
-      let sites = []
-      let resp = await axios.get('https://api.photonranch.org/api/all/config')
-      let data = resp.data
-      Object.keys(data).forEach(site => {
-        let s = {
-          "name":data[site].name.toString(),
-          "site": data[site].site.toString(),
-          "latitude":  parseFloat(data[site].latitude),
-          "longitude": parseFloat(data[site].longitude),
-        }
-        sites.push(s)
-      })
-      return sites
     },
 
     renderSiteContent(name, sitecode, openStatus) {
@@ -396,11 +379,6 @@ export default {
         return contentString
     },
 
-    async getSiteOpenStatus() {
-      let resp = await axios.get(`https://status.photonranch.org/status/allopenstatus`)
-      return resp.data
-    },
-
     getSiteMapColor(siteOpenStatus) {
       if (parseFloat(siteOpenStatus.status_age_s) > 60) { return 'red' }
       if (!siteOpenStatus.hasWeatherStatus) { return 'yellow'}
@@ -409,11 +387,15 @@ export default {
       return 'yellow'
     },
 
+    async getSiteOpenStatus() {
+      let resp = await axios.get(`https://status.photonranch.org/status/allopenstatus`)
+      return resp.data
+    },
+
     async redrawMapSites() {
       // Fetch the list of sites to display on the map
-      let sites = await this.getSitesForMap()
       let sitesOpenStatus = await this.getSiteOpenStatus()
-
+      let sites = this.sitesForMap
 
       // For each site, draw a marker with a popup (on click) to visit the site.
       sites.forEach(site => {
@@ -438,6 +420,30 @@ export default {
     },
 
   },
+
+  watch: {
+    sitesForMap() {
+      this.redrawMapSites()
+    }
+  },
+  
+  computed: {
+    ...mapState('site_config', ['global_config']),
+
+    sitesForMap() {
+      let sites = []
+      Object.keys(this.global_config).forEach(site => {
+        let s = {
+          "name":this.global_config[site].name.toString(),
+          "site":this.global_config[site].site.toString(),
+          "latitude":  parseFloat(this.global_config[site].latitude),
+          "longitude": parseFloat(this.global_config[site].longitude),
+        }
+        sites.push(s)
+      })
+      return sites
+    }
+  }
 }
 </script>
 

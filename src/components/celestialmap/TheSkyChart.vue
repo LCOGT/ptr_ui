@@ -20,7 +20,7 @@ import { mapGetters } from 'vuex'
 
 export default {
     name: 'TheSkyChart',
-    props: ["deviceStatus", "siteConfig"],
+    props: ["deviceStatus"],
     data () {
         return {
             mapClickedX: -1,
@@ -344,7 +344,7 @@ export default {
             this.initializePointer();
             this.update_chart();
             let config = mapConfigs.config
-            config.center = [helpers.hour2degree(helpers.siderealTime(parseFloat(this.siteConfig.longitude))), parseFloat(this.siteConfig.latitude), 0]
+            config.center = [helpers.hour2degree(helpers.siderealTime(parseFloat(this.site_longitude))), parseFloat(this.site_latitude), 0]
             Celestial.display(config);
         })
 
@@ -364,6 +364,12 @@ export default {
         // Update the chart if the mount command coordinates are changed
         cmd_ra() {
             this.$store.dispatch('skyChart/setSelected', [this.cmd_ra, this.cmd_dec])
+        },
+        site_latitude() {
+            this.rotate()
+        },
+        site_longitude() {
+            this.rotate()
         },
         cmd_dec() {
             this.$store.dispatch('skyChart/setSelected', [this.cmd_ra, this.cmd_dec])
@@ -386,6 +392,11 @@ export default {
             active_mount: 'mount',
             active_telescope: 'telescope',
         }),
+        ...mapGetters('site_config', [
+            'site_config',
+            'site_latitude',
+            'site_longitude',
+        ]),
 
         all_mount_state() {
             return this.deviceStatus.mount
@@ -393,12 +404,12 @@ export default {
         all_telescope_state() {
             return this.deviceStatus.telescope
         },
-        site_latitude() {
-            return this.siteConfig.latitude
-        },
-        site_longitude() {
-            return this.siteConfig.longitude
-        },
+        //site_latitude() {
+            //return this.siteConfig.latitude
+        //},
+        //site_longitude() {
+            //return this.siteConfig.longitude
+        //},
 
         mountRa () {
             try {
