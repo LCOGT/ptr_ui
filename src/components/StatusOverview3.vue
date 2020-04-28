@@ -23,34 +23,19 @@
 
         <div class="status-entry">
             <div class="col">
-                <div class="key">LST:</div>
-                <div class="key">UTC:</div>
-                <div class="key">User:</div>
-            </div>
-            <div class="col">
-                <div class="val">{{decimalToHHMMSS(lmst)}}</div>
-                <div class="val">{{new Date().toUTCString().split(' ')[4]}}</div>
-                <div class="val">{{username}}</div>
-            </div>
-        </div>
-
-        <div class="spacer"/>
-
-        <div class="status-entry">
-            <div class="col">
                 <div class="key">RA:</div>
                 <div class="key">Dec:</div>
                 <div class="key">Ha:</div>
-                <div class="key">Alt:</div>
                 <div class="key">Az:</div>
+                <div class="key">Alt:</div>
                 <div class="key">Airmass:</div>
             </div>
             <div class="col">
                 <div class="val">{{parseFloat(telescope_state.right_ascension).toFixed(4)}}</div>
                 <div class="val">{{parseFloat(telescope_state.declination).toFixed(4)}}</div>
                 <div class="val">{{hour_angle}}</div>
-                <div class="val">{{telescope_state.altitude}}</div>
                 <div class="val">{{telescope_state.azimuth}}</div>
+                <div class="val">{{telescope_state.altitude}}</div>
                 <div class="val">{{telescope_state.airmass}}</div>
             </div>
         </div>

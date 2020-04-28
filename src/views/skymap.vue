@@ -64,15 +64,6 @@ export default {
   methods: {
     async start() {
 
-      this.socket = new ReconnectingWebSocket("wss://zda8hlm9u0.execute-api.us-east-1.amazonaws.com/dev")
-      //this.socket.onopen = this.getRecent()
-      this.socket.onmessage = (message) => {
-          let data = JSON.parse(message.data);
-          data["messages"].forEach((message) => {
-            //console.log(message)
-            this.messages.push(message)
-          });
-      };
 
       this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
       this.imageSubscriber.onmessage = (message) => {

@@ -16,20 +16,8 @@
         <div class="spacer"/>
 
         <div class="status-entry">
-            <div class="key">LST:</div>
-            <div class="val">{{decimalToHHMMSS(lmst)}}</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">UTC:</div>
-            <div class="val">{{new Date().toUTCString().split(' ')[4]}}</div>
-        </div>
-        <div class="status-entry">
             <div class="key">Enclosure:</div>
-            <div class="val">{{(enclosure_state && enclosure_state.shutter_status) || '-'}}</div>
-        </div>
-        <div class="status-entry">
-            <div class="key">User:</div>
-            <div class="val">--</div>
+            <div class="val">{{(enclosure_state && enclosure_state.shutter_status || enclosure_state.roof_status) || '-'}}</div>
         </div>
 
         <div class="spacer"/>
@@ -47,12 +35,12 @@
             <div class="val">{{(telescope_state.sidereal_time - telescope_state.right_ascension).toFixed(3)}}</div>
         </div>
         <div class="status-entry">
-            <div class="key">Alt:</div>
-            <div class="val">{{telescope_state.altitude}}</div>
-        </div>
-        <div class="status-entry">
             <div class="key">Az:</div>
             <div class="val">{{telescope_state.azimuth}}</div>
+        </div>
+        <div class="status-entry">
+            <div class="key">Alt:</div>
+            <div class="val">{{telescope_state.altitude}}</div>
         </div>
         <div class="status-entry">
             <div class="key">Airmass:</div>

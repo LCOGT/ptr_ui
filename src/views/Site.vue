@@ -271,9 +271,10 @@ export default {
     // Load initial status
     this.getSiteDeviceStatus()
 
+  },
 
-
-
+  beforeDestroy() {
+    this.$store.dispatch('site_config/remove_active_site')
   },
 
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
