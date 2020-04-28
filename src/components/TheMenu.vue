@@ -3,7 +3,7 @@
 
         <template slot="brand">
             <b-navbar-item tag="router-link" class="menu-title" :to="{ path: '/' }">
-                photon ranch
+                {{menu_name}}
                 <!--img
                     src="img/icons/logo-via-logohub.png"
                     alt="photon ranch observatory"
@@ -111,8 +111,17 @@ export default {
   computed: {
     ...mapGetters('site_config', [
       'available_sites', 
-      'global_config'
-    ])
+      'global_config',
+      'site',
+    ]),
+
+    menu_name() {
+      let siteName = 'photon ranch'
+      if (this.site != '') { 
+         siteName += ' - ' + this.site.toUpperCase()
+      }
+      return siteName
+    }
   },
   methods: {
     // Log the user in with Auth0

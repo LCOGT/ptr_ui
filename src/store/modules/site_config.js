@@ -336,6 +336,20 @@ const actions = {
         }
     },
 
+    remove_active_site({commit}) {
+        commit('setActiveSite','')
+        commit('setActiveWeather', '')
+        commit('setActiveEnclosure', '')
+        commit('setActiveMount','')
+        commit('setActiveTelescope','')
+        commit('setActiveCamera', '')
+        commit('setActiveFilterWheel', '')
+        commit('setActiveFocuser', '')
+        commit('setActiveRotator', '')
+        commit('setActiveSequencer', '')
+        commit('setActiveScreen', '')
+    },
+
 
 }
 

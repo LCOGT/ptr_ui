@@ -20,7 +20,7 @@
     </div>
 
     <!-- Collapsible panels on the right of the image --> 
-    <div class="nav-panel column" style="max-width: 350px;">  
+    <div class="nav-panel column" style="max-width: 300px;">  
 
       <!-- Basic image info and a button to reveal the full fits header -->
       <side-info-panel :startOpen="true">
@@ -53,10 +53,10 @@
               <tr> <td class="info-panel-val" align="right">Dec: </td>
                   <td>{{declination}}</td> </tr>
 
-              <tr> <td class="info-panel-val" align="right">altitude: </td>
-                  <td>{{current_image.altitude || "---"}}</td> </tr>
               <tr> <td class="info-panel-val" align="right">azimuth: </td>
                   <td>{{current_image.azimuth || "---"}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">altitude: </td>
+                  <td>{{current_image.altitude || "---"}}</td> </tr>
               <tr> <td class="info-panel-val" align="right">airmass: </td>
                   <td>{{current_image.airmass || "---"}}</td> </tr>
           </table>
