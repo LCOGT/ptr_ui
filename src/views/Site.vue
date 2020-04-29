@@ -47,8 +47,8 @@
       <ul class="online-users-list">
         <li v-for="(user, idx) in displayedOnlineUsers">
           <div v-bind:key="idx">
-            <b-icon icon="circle" size="is-small" type="is-success"/>
-            {{user}}
+            <!--b-icon icon="circle" size="is-small" type="is-success"/-->
+            <span style="font-weight:lighter;">{{user}}</span>
           </div>
         </li>
       </ul>
@@ -61,20 +61,23 @@
 
       <div style="height:3em;"/>
 
-      <side-info-panel>
+      <status-panel-vertical
+        :sitecode="sitecode"
+        :fullStatus="weather_state"
+        :statusList="buildWeatherStatus"
+        :statusAge="status_age"
+        >
         <p slot="title">{{sitecode}} weather</p>
-        <weather-status-vertical
-          :sitecode="sitecode"  
-          :deviceStatus="deviceStatus" 
-          />
-      </side-info-panel>
-      <side-info-panel>
+      </status-panel-vertical>
+
+      <status-panel-vertical
+        :sitecode="sitecode"
+        :fullStatus="deviceStatus"
+        :statusList="buildGeneralStatus"
+        :statusAge="status_age"
+        >
         <p slot="title">{{sitecode}} status</p>
-        <status-overview-3
-          :sitecode="sitecode"  
-          :deviceStatus="deviceStatus" 
-          />
-      </side-info-panel>
+      </status-panel-vertical>
 
     </div>
 
@@ -170,7 +173,6 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import { commands_mixin } from '../mixins/commands_mixin'
 import CommandButton from '@/components/CommandButton'
 import SiteHome from '@/components/SiteHome'
 import SiteObserve from '@/components/SiteObserve'
@@ -183,10 +185,13 @@ import StatusOverview2 from '@/components/StatusOverview2'
 import StatusOverview3 from '@/components/StatusOverview3'
 import SideInfoPanel from '@/components/SideInfoPanel'
 import WeatherStatusVertical from '@/components/WeatherStatusVertical'
+import StatusPanelVertical from '@/components/StatusPanelVertical'
 
 import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
+import { commands_mixin } from '../mixins/commands_mixin'
+import { status_mixin } from '../mixins/status_mixin'
 
 export default {
   name: 'Site',
@@ -203,9 +208,10 @@ export default {
     StatusOverview3,
     SideInfoPanel,
     WeatherStatusVertical,
+    StatusPanelVertical,
   },
   props: ['sitecode', 'subpage'],
-  mixins: [commands_mixin],
+  mixins: [commands_mixin, status_mixin],
 
   data () {
     return {
@@ -230,6 +236,16 @@ export default {
       },
       weatherStatus: {},
 
+
+      flatSampleStatuss: [
+          {"name": "enclosure", "val": "open"},
+          {"name": "temp", "val": "5"},
+          {"name": "spacer", "val": "spacer"},
+          {"name": "wind", "val": "15m/s"},
+          {"name": "age", "val": "seconds"},
+          {"name": "age", "val": "seconds"},
+      ],
+
     }
   },
 
@@ -251,25 +267,9 @@ export default {
       });
     }
 
-    // Connect to websocket to get state of devices/weather
-    let status_ws_url = 'wss://2q5zz6ppch.execute-api.us-east-1.amazonaws.com/dev'
-    status_ws_url += `?site=${encodeURIComponent(this.sitecode)}`
-    this.status_ws= new ReconnectingWebSocket(status_ws_url)
-    this.status_ws.onmessage = (message) => {
-      let data = JSON.parse(message.data);
-      let statusType = data.statusType
-      let status = data.status
-      let status_timestamp = data.server_timestamp_ms
-
-      status.server_timestamp_ms = data.server_timestamp_ms
-
-      if (statusType == "deviceStatus"){
-        this.deviceStatus = status
-      }
-    }
 
     // Load initial status
-    this.getSiteDeviceStatus()
+    //this.getSiteDeviceStatus()
 
   },
 
@@ -283,11 +283,11 @@ export default {
 
       this.setDefaultDevices()
 
-      // Change status subscriptions to the new site
-      this.updateStatusSubscriptionSite(this.sitecode)
+      //// Change status subscriptions to the new site
+      //this.updateStatusSubscriptionSite(this.sitecode)
 
-      // Get status for the new site.
-      this.getSiteDeviceStatus()
+      //// Get status for the new site.
+      //this.getSiteDeviceStatus()
 
       this.$store.dispatch('images/refresh_latest_images')
     },
@@ -316,6 +316,24 @@ export default {
       }
       return "anonymous"
     },
+    ...mapGetters('site_config', [
+        'site_config',
+        'enclosure',
+        'mount',
+        'telescope',
+        'camera',
+        'filter_wheel',
+        'focuser',
+        'rotator',
+        'screen',
+        'weather',
+    ]),
+
+    weather_state() {
+        try {
+            return this.deviceStatus.observing_conditions[this.weather] || {}
+        } catch { return {} }
+    },
   },
 
   methods: {
@@ -337,18 +355,7 @@ export default {
       this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
     },
 
-    async getSiteDeviceStatus() {
-      let url = `https://status.photonranch.org/status/${this.sitecode}/device_status`
-      let response = await axios.get(url)
-      let status = response.data.Item.status
-      status.server_timestamp_ms = response.data.Item.server_timestamp_ms
-      this.deviceStatus = status
-    },
 
-    // Changes the site that the status websocket recieves updates for.
-    updateStatusSubscriptionSite(site) {
-      this.status_ws.send(JSON.stringify({"action": "updateSubscriberSite", "site": site}))
-    },
 
 }
   }
@@ -370,7 +377,7 @@ export default {
   margin-bottom: 3em;
 }
 .online-users-list {
-  margin-bottom: 3em;
+  margin-bottom: 20px;
 }
 .online-users-list > * {
   padding-left: 1em;

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import auth from './modules/auth'
 import site_config from './modules/site_config'
+import site_status from './modules/site_status'
 import skyChart from './modules/skyChart'
 import images from './modules/images'
 import script_settings from './modules/script_settings'
@@ -24,6 +25,7 @@ export default new Vuex.Store({
     modules: {
         auth,
         site_config,
+        site_status,
         skyChart,
         images,
         script_settings,
