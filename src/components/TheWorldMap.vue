@@ -28,7 +28,7 @@ export default {
   },
   async mounted() {
 
-    let sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
+    let sun_pos = { lat: nite.calculatePositionOfSun().lat(), lng: nite.calculatePositionOfSun().lng() }
     
     const element = document.getElementById(this.mapName)
     const options = {
@@ -279,6 +279,11 @@ export default {
 
     // Reposition the sun to its current position
     updateSunPosition() {
+
+      // Pan to the center of the night region. Disabled for now because it 
+      // interrupts the user if they pan around.  
+      //this.map.panTo(nite.calculatePositionOfSun(new Date()));
+
       var sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
       this.sunMapMarker.setPosition(sun_pos)
     },
