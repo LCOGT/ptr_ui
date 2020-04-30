@@ -36,28 +36,17 @@
 
         <div class="val">{{enclosure_state.enclosure_message}}</div>
 
-        <div class="status-items">
-          <div class="keys">
-            <div class="key">Mode:</div>
-            <div class="key">Enclosure:</div>
-            <div class="key">Open ok</div>
-          </div>
-          <div class="keys">
-            <div class="val">{{enclosure_state.enclosure_mode}}</div>
-            <div class="val">{{enclosure_state.enclosure_status || enclosure_state.shutter_status || enclosure_state.roof_status}}</div>
-            <div class="val">{{weather_state.open_ok || '-'}}</div>
-          </div>
-        </div>
+        <status-panel-grid :statusList="buildEnclosureTabStatus" />
 
         <command-button 
           admin
-          v-if="userIsAdmin && enclosure_state.enclosure_mode.toLowerCase() != 'manual'" 
+          v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Manual'" 
           :data="enclosure_manual_command" 
           style="margin-bottom: 1em; width: 100%;" 
           />
         <command-button 
           admin
-          v-if="userIsAdmin && enclosure_state.enclosure_mode.toLowerCase() != 'automatic'" 
+          v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Automatic'" 
           :data="enclosure_auto_command" 
           style="margin-bottom: 1em; width: 100%;" 
           />
@@ -100,38 +89,12 @@
           </div>
         </div>
 
-        <div class="val" v-if="mount_state.message">{{mount_state.message}}</div>
-        <div class="val" v-if="telescope_state.message">{{telescope_state.message}}</div>
+        <div class="val" v-if="mount_state && mount_state.message && mount_state.message != '-'">{{mount_state.message}}</div>
+        <div class="val" v-if="telescope_state && telescope_state.message && telescope_state.message != '-'">{{telescope_state.message}}</div>
 
         <div class="columns">
-          <div class="status-items column">
-              <div class="keys">
-                <div class="key">Ra:</div>
-                <div class="key">Dec:</div>
-                <div class="key">Az:</div>
-                <div class="key">Alt:</div>
-              </div>
-              <div class="keys">
-                <div class="val">{{parseFloat(telescope_state.right_ascension).toFixed(4)}}</div>
-                <div class="val">{{parseFloat(telescope_state.declination).toFixed(4)}}</div>
-                <div class="val">{{(telescope_state.azimuth)}}</div>
-                <div class="val">{{(telescope_state.altitude)}}</div>
-              </div>
-          </div>
-          <div class="status-items column">
-              <div class="keys">
-                <div class="key">Ha:</div>
-                <div class="key">Zenith Dist:</div>
-                <div class="key">Airmass:</div>
-                <div class="key">Activity:</div>
-              </div>
-              <div class="keys">
-                <div class="val">{{(hour_angle)}}</div>
-                <div class="val">{{telescope_state.zenith_distance}}</div>
-                <div class="val">{{telescope_state.airmass}}</div>
-                <div class="val">{{mount_activity}}</div>
-              </div>
-          </div>
+          <status-panel-grid class="column" :statusList="buildTelescopeTabStatus1"/>
+          <status-panel-grid class="column" :statusList="buildTelescopeTabStatus2"/>
         </div>
 
         <b-field horizontal label="Ra">
@@ -213,20 +176,10 @@
             </div>
           </div>
 
-          <div class="val" v-if="camera_state.message">{{camera_state.message}}</div>
+          <div class="val" v-if="camera_state && camera_state.message">{{camera_state.message}}</div>
 
-          <div class="status-items">
-            <div class="keys">
-              <div class="key">Camera status: </div>
-              <div class="key">Filter: </div>
-              <div class="key">Filter Wheel: </div>
-            </div>
-            <div class="keys">
-              <div class="val">{{camera_state.status}}</div>
-              <div class="val">{{filter_wheel_state.filter_name}}</div>
-              <div class="val">{{parseTrueFalse(filter_wheel_state.wheel_is_moving) ? "moving" : "idle"}}</div>
-            </div>
-          </div>
+          <status-panel-grid :statusList="buildCameraTabStatus" />
+
 
           <b-field horizontal label="Expose">
               <b-field>
@@ -374,75 +327,63 @@
             </div>
           </div>
 
-            <div class="val" v-if="focuser_state.message">{{focuser_state.message}}</div>
+          <div class="val" v-if="focuser_state && focuser_state.message">{{focuser_state.message}}</div>
+          <status-panel-grid :statusList="buildFocuserTabStatus" />
 
-            <div class="status-items">
-                <div class="keys">
-                  <div class="key">Focus:</div>
-                  <div class="key">Temp:</div>
-                  <div class="key">Status:</div>
-                </div>
-                <div class="keys">
-                  <div class="val">{{focuser_state.focus_position}}	&mu;m</div>
-                  <div class="val">{{focuser_state.focus_temperature}} &#8451;</div>
-                  <div class="val">{{parseTrueFalse(focuser_state.focus_moving) ? "moving" : "idle"}}</div>
-                </div>
-            </div>
+          <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
+            <button class="button is-small" slot="trigger" style="width: 100%;">
+                <span>Focus Action...</span>
+                <b-icon icon="menu-down"></b-icon>
+            </button>
+            <b-dropdown-item aria-role="listitem">
+              <command-button :data="focus_home_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+            <b-dropdown-item>
+              <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
+            </b-dropdown-item>
+          </b-dropdown>
+          <br>
 
-            <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
-              <button class="button is-small" slot="trigger" style="width: 100%;">
-                  <span>Focus Action...</span>
-                  <b-icon icon="menu-down"></b-icon>
-              </button>
-              <b-dropdown-item aria-role="listitem">
-                <command-button :data="focus_home_command" class="dropdown-button-command"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
-              </b-dropdown-item>
-              <b-dropdown-item>
-                <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
-              </b-dropdown-item>
-            </b-dropdown>
-            <br>
-
-            <b-field label="Relative">
-              <b-field>
-                <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
-                <p class="control"> <command-button :data="focus_relative_command" class="is-small" @jobPost="focuserJobPost"/>  </p><br>
-              </b-field>
-            </b-field>
+          <b-field label="Relative">
             <b-field>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['-300'])"> -300 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['-100'])"> -100 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['-30'])"> -30 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['+30'])"> +30 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['+100'])"> +100 </button>
-              </p>
-              <p class="control">
-                  <button class="button is-small" @click="postCommand(focus_relative_command_args,['+300'])"> +300 </button>
-              </p>
+              <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="focus_relative_command" class="is-small" @jobPost="focuserJobPost"/>  </p><br>
             </b-field>
+          </b-field>
+          <b-field>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-300'])"> -300 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-100'])"> -100 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-30'])"> -30 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+30'])"> +30 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+100'])"> +100 </button>
+            </p>
+            <p class="control">
+                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+300'])"> +300 </button>
+            </p>
+          </b-field>
 
-            <b-field label="Absolute">
-              <b-field>
-                <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
-                <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
-              </b-field>
+          <b-field label="Absolute">
+            <b-field>
+              <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
             </b-field>
-            <br>
+          </b-field>
+          <br>
 
           <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">
             {{ isFocuserStatusVisible ? 'collapse status' : 'expand status' }}
@@ -461,74 +402,60 @@
         </a>
         <b-dropdown-item custom label="Sequencer">
 
-          <div>
-            <div class="instrument-control-title-bar">
-              <div class="title">Sequencer</div>
-            </div>
+          <div class="instrument-control-title-bar">
+            <div class="title">Sequencer</div>
+          </div>
 
-            <div class="val" v-if="sequencer_state.message">{{sequencer_state.message}}</div>
+          <div class="val" v-if="sequencer_state && sequencer_state.message">{{sequencer_state.message}}</div>
+          <status-panel-grid :statusList="buildSequencerTabStatus" />
 
-            <div class="status-items">
-                <div class="keys">
-                  <div class="key">Script:</div>
-                  <div class="key">Busy:</div>
-                </div>
-                <div class="keys">
-                  <div class="val">{{sequencer_state.active_script}}</div>
-                  <div class="val">{{sequencer_state.sequencer_busy}}</div>
-                </div>
-            </div>
-
-            <b-field label="Script">
-              <b-field>
-                <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
-                  <option value="none">none</option>
-                  <option value="stopScript">Stop Script</option>
-                  <option value="findFieldCenter">Find Field Center</option>
-                  <option value="calibrateAtFieldCenter">Calibrate at Field Center</option>
-                  <option value="focusAuto">Focus Auto</option>
-                  <option value="focusFine">Focus Fine</option>
-                  <option value="focusVcurve">Focus V-Curve</option>
-                  <option value="takeLRGBStack">Take LRGB Stack</option>
-                  <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
-                  <option value="takeUGRIZSStack">Take ugrizs Stack</option>
-                  <option value="takePlanetStack">Take Planet Stack</option>
-                  <option value="takeLunarStack">Take Lunar Stack</option>
-                  <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
-                  <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
-                  <option value="genSkyFlatMasters">Gen Sky Flat Masters</option>
-                  <option value="genCalibrations">Gen Calibrations</option>
-                  <option value="calibrateFocusVcurve">Calibrate Focus V-curve</option>
-                  <!--option value="32TargetPointingRun">32 Target Pointing Run</option-->
-                  <!--option value="128TargetPointingRun">128 Target Pointing Run</option-->
-                  <option value="pointingRun">Pointing Run</option>
-                  <option value="runWithMaximCamera">Run w/Maxim Camera</option>
-                  <option value="runWithAscomCamera">Run w/Ascom Camera</option>
-                  <option value="runUsingAcp">Run Using ACP</option>
-                  <option value="stopUsingAcp">Stop Using ACP</option>
-                </b-select>
-                <p class="control">
-                  <button 
-                    class="button is-light is-small" 
-                    :disabled="!scriptHasSettings"
-                    @click="isScriptSettingsActive = !isScriptSettingsActive"
-                    >
-                    <b-icon icon="settings"></b-icon>
-                  </button>
-                </p>
-              </b-field>
+          <b-field label="Script">
+            <b-field>
+              <b-select value="none" v-model="selected_script" style="width: 100;" size="is-small">
+                <option value="none">none</option>
+                <option value="stopScript">Stop Script</option>
+                <option value="findFieldCenter">Find Field Center</option>
+                <option value="calibrateAtFieldCenter">Calibrate at Field Center</option>
+                <option value="focusAuto">Focus Auto</option>
+                <option value="focusFine">Focus Fine</option>
+                <option value="focusVcurve">Focus V-Curve</option>
+                <option value="takeLRGBStack">Take LRGB Stack</option>
+                <option value="takeO3HaS2N2Stack">Take O3HaS2N2 Stack</option>
+                <option value="takeUGRIZSStack">Take ugrizs Stack</option>
+                <option value="takePlanetStack">Take Planet Stack</option>
+                <option value="takeLunarStack">Take Lunar Stack</option>
+                <option value="genBiasDarkMaster">Gen Bias/Dark Master</option>
+                <option value="genScreenFlatMasters">Gen Screen Flat Masters</option>
+                <option value="genSkyFlatMasters">Gen Sky Flat Masters</option>
+                <option value="genCalibrations">Gen Calibrations</option>
+                <option value="calibrateFocusVcurve">Calibrate Focus V-curve</option>
+                <option value="pointingRun">Pointing Run</option>
+                <option value="runWithMaximCamera">Run w/Maxim Camera</option>
+                <option value="runWithAscomCamera">Run w/Ascom Camera</option>
+                <option value="runUsingAcp">Run Using ACP</option>
+                <option value="stopUsingAcp">Stop Using ACP</option>
+              </b-select>
+              <p class="control">
+                <button 
+                  class="button is-light is-small" 
+                  :disabled="!scriptHasSettings"
+                  @click="isScriptSettingsActive = !isScriptSettingsActive"
+                  >
+                  <b-icon icon="settings"></b-icon>
+                </button>
+              </p>
             </b-field>
+          </b-field>
 
           <div v-if="isScriptSettingsActive">
             <script-settings :show="scriptHasSettings" :script="selected_script" />
           </div>
 
-            <div class="buttons has-addons" style="margin-bottom: 10px;">
-              <button class="button is-small" @click="script_run_command" style="width: 50%;"> run script</button>
-              <button class="button is-small" @click="script_stop_command" style="width: 50%"> stop script</button>
-            </div>
-
+          <div class="buttons has-addons" style="margin-bottom: 10px;">
+            <button class="button is-small" @click="script_run_command" style="width: 50%;"> run script</button>
+            <button class="button is-small" @click="script_stop_command" style="width: 50%"> stop script</button>
           </div>
+
 
 
           <div class="status-toggle-bar" @click="isSequencerStatusVisible = !isSequencerStatusVisible">
@@ -557,16 +484,7 @@
             </div>
           </div>
 
-          <div class="status-items">
-            <div class="keys">
-              <div class="key">Position:</div>
-              <div class="key">Activity:</div>
-            </div>
-            <div class="keys">
-              <div class="val">{{rotator_state.position_angle}} &deg;</div>
-              <div class="val">{{parseTrueFalse(rotator_state.rotator_moving) ? "rotating" : "idle" }}</div>
-            </div>
-          </div>
+          <status-panel-grid :statusList="buildRotatorTabStatus" />
 
           <command-button :data="rotate_home_command" class="is-small" style="width:100%; margin-bottom:1em;"/>
           <b-field label="Relative">
@@ -606,16 +524,7 @@
             </div>
           </div>
 
-          <div class="status-items">
-            <div class="keys">
-              <div class="key">Status:</div>
-              <div class="key">Brightness:</div>
-            </div>
-            <div class="keys">
-              <div class="val">{{screen_state.dark_setting && screen_state.dark_setting.split(' ')[2]}}</div>
-              <div class="val">{{screen_state.bright_setting}} &#37;</div>
-            </div>
-          </div>
+          <status-panel-grid :statusList="buildScreenTabStatus" />
 
           <b-field label="Brightness">
             <b-field>
@@ -807,6 +716,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
+import { status_mixin } from '../mixins/status_mixin'
 import helpers from '@/utils/helpers'
 import store from '../store/index'
 
@@ -822,6 +732,7 @@ import SiteData from '@/components/SiteData'
 import SkychartModal from '@/components/SkychartModal'
 import StatusOverview2 from '@/components/StatusOverview2'
 import ImagesTable from '@/components/ImagesTable'
+import StatusPanelGrid from '@/components/StatusPanelGrid'
 
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
@@ -840,9 +751,10 @@ export default {
     SkychartModal,
     StatusOverview2,
     ImagesTable,
+    StatusPanelGrid,
   },
-  mixins: [commands_mixin],
-  props: ['deviceStatus', 'sitecode'],
+  mixins: [commands_mixin, status_mixin],
+  props: ['sitecode'],
   data () {
     return {
 
@@ -938,7 +850,7 @@ export default {
 
       form.timestamp = parseInt(Date.now() / 1000)
 
-      const options = await this.getConfigWithAuth()
+      const options = await this.getAuthHeader()
       form.site = this.sitecode
       form.mount = this.active_mount
       axios.post(url,form, options).then(response => {
@@ -977,30 +889,8 @@ export default {
       this.$store.dispatch('images/set_latest_image')
     },
 
-    decimalToHHMMSS(time) {
-        // prevent return value of NaN:NaN:NaN
-        if (typeof parseFloat(time) != "number") {return '--:--:--'}
-
-        // -1.00 should translate to -01:00:00
-        let negative = false;
-        if (parseFloat(time) < 0) { negative = true }
-        time = Math.abs(time)
-
-        let hhmmss = ''
-        let h, m, s;
-        h = parseInt(time)
-        m = parseInt(60 * (time - h))
-        s = parseInt(3600 * (time - h) % 60)
-        if (h<10) { h = '0'+h}
-        if (m<10) { m = '0'+m}
-        if (s<10) { s = '0'+s}
-        if (negative) {h = '-'+h}
-        hhmmss = `${h}:${m}:${s}`
-        return hhmmss
-    },
-
     // Get axios request config object (the headers) with auth token
-    async getConfigWithAuth() {
+    async getAuthHeader() {
         let token, configWithAuth;
         try {
             token = await this.$auth.getTokenSilently(); 
@@ -1069,87 +959,7 @@ export default {
       'sequencer',
     ]),
 
-
-    // single status items
-    mount_activity() {
-      let activity = "idle"
-
-      if (this.parseTrueFalse(this.mount_state.is_parked)) {
-        activity = "parked"
-      }
-      else if (this.parseTrueFalse(this.mount_state.is_tracking)) {
-        activity = "tracking"
-      }
-      else if (this.parseTrueFalse(this.mount_state.is_slewing)) {
-        activity = "slewing"
-      }
-      return activity
-    },
-    hour_angle() {
-      let ha = this.telescope_state.sidereal_time - this.telescope_state.right_ascension
-      if (ha < -12) {
-        ha += 24 // hours, since we're in decimal
-      }
-      ha = ha.toFixed(3)
-      if (ha > 0) {
-        ha = '+'+ha
-      }
-      return ha
-    },
-
       
-
-    enclosure_state() {
-        try {
-            return this.deviceStatus.enclosure[this.enclosure] || {}
-        } catch { return {} }
-    },
-    mount_state() {
-        try {
-            return this.deviceStatus.mount[this.mount] || {}
-        } catch { return {} }
-    },
-    telescope_state() {
-        try {
-            return this.deviceStatus.telescope[this.telescope] || {}
-        } catch(error) { return {} }
-    },
-    camera_state() {
-        try {
-            return this.deviceStatus.camera[this.camera] || {}
-        } catch(error) { return {} }
-    },
-    filter_wheel_state () {
-        try {
-            return this.deviceStatus.filter_wheel[this.filter_wheel] || {}
-        } catch(error) { return {} }
-    },
-    focuser_state() {
-        try {
-            return this.deviceStatus.focuser[this.focuser] || {}
-        } catch(error) { return {} }
-    },
-    rotator_state() {
-        try {
-            return this.deviceStatus.rotator[this.rotator] || {}
-        } catch(error) { return {} }
-    },
-    screen_state () {
-        try {
-            return this.deviceStatus.screen[this.screen] || {}
-        } catch(error) { return {} }
-    },
-    weather_state() {
-        try {
-            return this.deviceStatus.observing_conditions[this.weather] || {}
-        } catch { return {} }
-    },
-    sequencer_state () {
-        try {
-            return this.deviceStatus.sequencer[this.sequencer] || {}
-        } catch(error) { return {} }
-    },
-
     status_age() {
       let status_timestamp = this.deviceStatus.timestamp
       return (this.local_timestamp/1000 - status_timestamp).toFixed(1)
@@ -1285,37 +1095,6 @@ export default {
   background-color: rgba(20,20,20,0.9)
 }
 
-.status-items {
-  margin:15px 0;
-  display:flex;
-  width:100%;
-}
-
-.keys {
-  flex-direction:column;
-}
-.status-header {
-  font-weight: bold;
-  text-align: center;
-  padding: 3px 0;
-  margin-bottom: 5px;
-  background-color: #283030;
-}
-.key {
-  text-align: right;
-  padding-right: 10px;
-  color:silver;
-  padding: 0 8px;
-  margin-bottom: 3px;
-  background-color: #283030;
-  white-space: nowrap;
-}
-.val{
-  color: greenyellow;
-  background-color: black;
-  padding: 0 8px;
-  margin-bottom: 3px;
-}
 
 .status-toggle-bar {
   height: 1.5em;
@@ -1324,19 +1103,6 @@ export default {
 }
 .status-toggle-bar:hover {
   cursor: pointer;
-}
-.status {
-  margin: 1em;
-  padding: 1em;
-  min-height: 5em;
-  /*background:lightskyblue;*/
-  display: flex;
-  border-bottom: solid grey 1px;
-  flex-wrap: wrap;
-}
-.status-item {
-  margin: 1em;
-  flex: 1;
 }
 .choose-target {
   margin-top: 1em;
@@ -1351,17 +1117,6 @@ export default {
 .dropdown-button-command:hover {
   color:grey;
   font:bolder;
-}
-
-.modal-dialog {
-    max-width: 100%;
-    margin: 0;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 110vh;
-    display: flex;
 }
 
 </style>

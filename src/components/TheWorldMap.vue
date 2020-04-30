@@ -26,7 +26,7 @@ export default {
       sunMapMarker: '',
     }
   },
-  async mounted () {
+  async mounted() {
     const element = document.getElementById(this.mapName)
     const options = {
       zoom: 2,
@@ -234,6 +234,7 @@ export default {
     this.map = new google.maps.Map(element, options)
 
     // Draw observatories with colors to denote weather/open status
+    this.redrawMapSites()
     this.updateSiteColorInterval = setInterval(this.redrawMapSites, 10000)
 
     // Draw the daylight regions, and update every few seconds.

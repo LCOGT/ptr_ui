@@ -184,7 +184,6 @@ import StatusOverview from '@/components/StatusOverview'
 import StatusOverview2 from '@/components/StatusOverview2'
 import StatusOverview3 from '@/components/StatusOverview3'
 import SideInfoPanel from '@/components/SideInfoPanel'
-import WeatherStatusVertical from '@/components/WeatherStatusVertical'
 import StatusPanelVertical from '@/components/StatusPanelVertical'
 
 import axios from 'axios';
@@ -207,7 +206,6 @@ export default {
     StatusOverview2,
     StatusOverview3,
     SideInfoPanel,
-    WeatherStatusVertical,
     StatusPanelVertical,
   },
   props: ['sitecode', 'subpage'],
@@ -234,7 +232,6 @@ export default {
         timestamp: {},
         */
       },
-      weatherStatus: {},
 
 
       flatSampleStatuss: [
@@ -329,11 +326,6 @@ export default {
         'weather',
     ]),
 
-    weather_state() {
-        try {
-            return this.deviceStatus.observing_conditions[this.weather] || {}
-        } catch { return {} }
-    },
   },
 
   methods: {
