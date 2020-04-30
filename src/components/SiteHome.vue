@@ -11,11 +11,15 @@
     <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
 
-    <leaflet-map 
+    <!--leaflet-map 
         name="leafmap"
         :latitude="latitude"
         :longitude="longitude"
-    ></leaflet-map>
+    ></leaflet-map-->
+
+    <div style="width: 100%; height: 500px; margin-bottom: 1em;">
+        <iframe style="width: 100%; height: 100%;" :src="`https://embed.windy.com/embed2.html?lat=${latitude}&lon=${longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${latitude}&detailLon=${longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`" frameborder="0"></iframe>
+    </div>
 
 
     <!-- This is a temporary solution only. Does not scale. -->

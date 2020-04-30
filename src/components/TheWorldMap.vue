@@ -27,10 +27,13 @@ export default {
     }
   },
   async mounted() {
+
+    let sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
+    
     const element = document.getElementById(this.mapName)
     const options = {
       zoom: 2,
-      center: new google.maps.LatLng(0, 0),
+      center: new google.maps.LatLng(sun_pos.lat, sun_pos.lng + 180),
       styles: [
         {
           'featureType': 'poi',
