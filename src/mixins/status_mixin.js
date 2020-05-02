@@ -152,6 +152,17 @@ export const status_mixin = {
                 {"name": "HA", "val": this.hour_angle},
             ]
         },
+        buildTargetPageStatus() {
+            let status = []
+            status.push({"name": "Ra", "val": this.ra})
+            status.push({"name": "Dec", "val": this.dec})
+            status.push({"name": "Azimuth", "val": this.azimuth})
+            status.push({"name": "Altitude", "val": this.altitude})
+            status.push({"name": "Airmass", "val": this.airmass})
+            status.push({"name": "Activity", "val": this.mount_activity})
+            status.push({"name": "Enclosure", "val": this.enclosure_status}) 
+            return status
+        },
         buildEnclosureTabStatus() {
             let status = []
             if (this.enclosure_mode != '-'){ status.push({"name": "Mode", "val": this.enclosure_mode}) }
@@ -362,6 +373,8 @@ export const status_mixin = {
         },
         mount_activity() {
             let activity = "idle"
+
+            if (!this.mount_state) {return "offline"}
 
             if (this.parseTrueFalse(this.mount_state.is_parked)) {
                 activity = "parked"

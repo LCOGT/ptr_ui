@@ -1,165 +1,83 @@
 <template>
-
-
 <section>
-    <div class="sticky-buttons">
 
+    <div class="page-layout">
 
-        <div class="is-hidden-tablet" style="display:flex; align-items:center;" >
-            <div style="flex-grow: 0;display:flex; flex-direction:column;justify-content:flex-end;">
-                <b-field style="margin-right: 10px; flex:0 1; width: 150px;" >
-                    <b-field>
-                    <p class="control">
-                        <span style="width: 42px;" class="button is-static is-small">Ra</span>
-                    </p>
-                    <b-input name="subject" size="is-small" type="search" icon-clickable v-model="mount_ra" autocomplete="off"></b-input>
-                    </b-field>
-                </b-field>
-                <b-field style="margin-right: 10px; flex:0 1; width: 150px;" >
+        <div class="parameters-box">
+            <div style="display:flex; flex-direction:column; width: 100%;">
+                <b-field>
                     <b-field>
                         <p class="control">
-                            <span style="width: 42px;" class="button is-static is-small">Dec</span>
+                            <span style="width: 42px;" class="button is-static">Ra</span>
                         </p>
-                        <b-input name="subject" size="is-small" type="search" icon-clickable v-model="mount_dec" autocomplete="off"></b-input>
+                        <b-input 
+                            expanded 
+                            name="subject" 
+                            type="search" 
+                            icon-clickable 
+                            v-model="mount_ra" 
+                            autocomplete="off" />
                     </b-field>
                 </b-field>
-                <b-field style="margin-right: 10px; flex:0 1; width: 150px;" >
+                <b-field>
                     <b-field>
                         <p class="control">
-                            <span style="width: 42px;" class="button is-static is-small">Obj</span>
+                            <span style="width: 42px;" class="button is-static">Dec</span>
                         </p>
-                        <b-input name="subject" size="is-small" type="search" icon-clickable v-model="mount_object" autocomplete="off"></b-input>
+                        <b-input 
+                            expanded
+                            name="subject" 
+                            type="search" 
+                            icon-clickable 
+                            v-model="mount_dec" 
+                            autocomplete="off" />
                     </b-field>
                 </b-field>
+
+                <div style="
+                        width: 100%; 
+                        height:1px;
+                        margin-bottom:10px; 
+                        border-bottom: 1px solid grey;"/>
+
+                <b-field >
+                    <b-field>
+                        <p class="control">
+                            <span style="width: 42px;" class="button is-static">Obj</span>
+                        </p>
+                        <b-input 
+                            expanded 
+                            name="subject" 
+                            type="search" 
+                            icon-clickable 
+                            v-model="mount_object" 
+                            autocomplete="off" />
+                    </b-field>
+                </b-field>
+                <command-button :data="mount_slew_command" style="" class="is-success">
+                    <p slot="title">Point Telescope</p>
+                </command-button>
             </div>
-            <command-button :data="mount_slew_command" style="" class="is-success">
-                <p slot="title">Go</p>
-            </command-button>
         </div>
 
-        <div class="is-hidden-mobile" style="flex-grow: 0;display:flex; justify-content:flex-end;">
+        <div class="ptr-aladin-parent-div">
+            <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
+        </div>
 
-            <b-field style="margin-right: 10px;flex-basis:160px; flex:0 1 180px;" >
+        <div class="query-box">
+            <b-field label="Search for objects...">
                 <b-field>
-                    <p class="control">
-                        <span style="width: 42px;" class="button is-static is-medium">Obj</span>
-                    </p>
-                    <b-input name="subject" size="is-medium" type="search" icon-clickable v-model="mount_object" autocomplete="off"></b-input>
+                    <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
                 </b-field>
             </b-field>
-
-            <b-field style="margin-right: 10px;flex-basis:160px; flex:0 1 180px;" >
-                <b-field>
-                <p class="control">
-                    <span class="button is-static is-medium">Ra</span>
-                </p>
-                <b-input name="subject" size="is-medium" type="search" icon-clickable v-model="mount_ra" autocomplete="off"></b-input>
-                </b-field>
-            </b-field>
-
-            <b-field style="margin-right: 10px;flex-basis:160px; flex:0 1 180px;" >
-                <b-field>
-                <p class="control">
-                    <span class="button is-static is-medium">Dec</span>
-                </p>
-                <b-input name="subject" size="is-medium" type="search" icon-clickable v-model="mount_dec" autocomplete="off"></b-input>
-                </b-field>
-            </b-field>
-
-
-            <command-button :data="mount_slew_command" style="margin-right: 10px;" class="is-success is-medium">
-                <p slot="title">Go</p>
-            </command-button>
-
-        </div>
-    </div>
-
-    <div class="modal-container container">
-
-        <!-- Only show when modal is not open because can't have 2 charts open at once. -->
-        <div class="skychart-container" >
-            <!-- Note: only render once the config is populated (needs lat/long to load) -->
-            <the-sky-chart :deviceStatus="deviceStatus" />
-        </div>
-
-        <div class="non-skychart-container">
-
-        <div class="status-bar">
-
-            <div class="status-items">
-                <div class="keys">
-                    <div class="key">Ra:</div>
-                    <div class="key">Dec:</div>
-                </div>
-                <div class="keys">
-                    <div class="val">{{(telescope_state.right_ascension)}}</div>
-                    <div class="val">{{(telescope_state.declination)}}</div>
-                </div>
-            </div>
-            <div class="status-items">
-                <div class="keys">
-                    <div class="key">Az:</div>
-                    <div class="key">Alt:</div>
-                </div>
-                <div class="keys">
-                    <div class="val">{{(telescope_state.azimuth)}}</div>
-                    <div class="val">{{(telescope_state.altitude)}}</div>
-                </div>
-            </div>
-            <div class="status-items">
-                <div class="keys">
-                    <div class="key">Ha:</div>
-                    <div class="key">Airmass:</div>
-                </div>
-                <div class="keys">
-                    <div class="val">{{(hour_angle)}}</div>
-                    <div class="val">{{telescope_state.airmass}}</div>
-                </div>
-            </div>
-            <div class="status-items">
-                <div class="keys">
-                    <div class="key">Activity:</div>
-                    <div class="key">Enclosure:</div>
-                </div>
-                <div class="keys">
-                    <div class="val">{{mount_activity}}</div>
-                    <div class="val">{{enclosure_state.shutter_status || enclosure_state.roof_status}}</div>
-                </div>
-            </div>
-
-        </div>
-            <div class="aladin-container-1">
-                <aladin-lite :initRa="mount_ra" :initDec="mount_dec" />
-            </div>
-        
-            
-
+            <button style="width: 100%;" class="button" @click="submit_simbad_query">search</button>
         </div>
 
     </div>
 
-    <!--pre>{{deviceStatus.mount}}</pre-->
-    <b-modal :active.sync="telescopeModal"
-            trap-focus
-            :can-cancel="['escape']"
-            scroll="clip"
-            full-screen
-            style="z-index:100;"
-            >
-        <skychart-modal
-            style="background-color:#151718; overflow-y:auto; height: 100%;"
-            :sitecode="sitecode"
-            :deviceStatus="deviceStatus"
-        />
-    </b-modal>
-
-    <!-- Only show when modal is not open because can't have 2 charts open at once. -->
-    <div class="skychart-container">
-        <!-- Note: only render once the config is populated (needs lat/long to load) -->
-        <the-sky-chart :deviceStatus="deviceStatus"/>
-        
+    <div class="skychart-box">
     </div>
-
+        <the-sky-chart :deviceStatus="deviceStatus" />
 
 
 
@@ -168,38 +86,131 @@
 
 
 <script>
-
-import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import SkychartModal from '@/components/SkychartModal'
-import AladinLite from '@/components/AladinLite'
-import StatusOverview2 from '@/components/StatusOverview2'
 import { mapGetters } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
+import { status_mixin } from '../mixins/status_mixin'
+import helpers from '@/utils/helpers'
+
+import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import CommandButton from '@/components/CommandButton'
+import Celestial from '@/components/celestialmap/celestial'
+
 export default {
     name: "SiteTargets",
-    props: ["deviceStatus", "sitecode"],
+    props: [ "sitecode"],
+    mixins: [commands_mixin,status_mixin],
     components: {
         CommandButton,
         TheSkyChart,
-        SkychartModal,
-        AladinLite,
-        StatusOverview2,
     },
     data() {
         return {
+            aladin: '',
+            mapEl: '',
+
+            simbad_query: '',
+
             telescopeModal: false,
             isComponentModalActive: false,
         }
     },
+
+    mounted(){
+
+        this.$loadScript("https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js")
+            .then(() => {
+                console.log('Aladin script has finished loading.')
+
+                // Default: load aladin on m33, but use coords in mount fields if possible.
+                let target = "M33"
+                if (parseFloat(this.ra) && parseFloat(this.dec)) {
+                    console.log('changing target')
+                    target = `${15*this.ra} ${this.dec}`
+                }
+
+                // Initialize Aladin
+                this.aladin = A.aladin('#aladin-lite-div', {
+                    survey: "P/DSS2/color", 
+                    fov:1, 
+                    target: target, 
+                    cooFrame: "ICRSd", 
+                    showFullscreenControl: false, 
+                    showGotoControl: false, 
+                    showSimbadPointerControl: true
+                });
+                // cheap way to sync the skymap and mount coordinates to the aladin view.
+                setTimeout(this.sendCoordinatesToSkychart, 1000) 
+            })
+            .catch(() => {
+                console.log('failed to load Aladin')
+            });
+
+        // Clicking on the sky chart should update the Aladin view.
+        this.mapEl = document.getElementById("celestial-map")
+        this.mapEl.addEventListener('mousedown', this.handleMapClick)
+        this.mapEl.addEventListener('mouseup', this.handleMapClick)
+    },
+
+    beforeDestroy() {
+        // Remove event listeners when we're done with this component.
+        this.mapEl.removeEventListener('mousedown', this.handleMapClick)
+        this.mapEl.removeEventListener('mouseup', this.handleMapClick)
+    },
+
     methods: {
-        parseTrueFalse(str) {
-            if (str.toLowerCase()=="true") {return true}
-            if (str.toLowerCase()=="false") {return false}
-            console.error("Could not parse true or false. Check for bad behavior.")
-            console.log(str)
-            return false
+
+        submit_simbad_query() {
+            this.aladin.gotoObject(this.simbad_query, {success: () => {
+                this.sendCoordinatesToSkychart(); // update the sky chart 
+                this.mount_object = this.simbad_query; // save the searched object to mount_object to send with command.
+            }
+            });
         },
+
+        sendCoordinatesToSkychart() {
+            var [aladin_ra, aladin_dec] = this.aladin.getRaDec();
+            aladin_ra = aladin_ra / 15;
+
+            this.$store.dispatch('skyChart/setSelected', [aladin_ra, aladin_dec] )
+            this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(4))
+            this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
+            this.$store.commit('command_params/mount_object', ' ') // clear teh mount_object entry
+        }, 
+
+        handleMapClick(e) {
+            let dim = document.getElementById('celestial-map').getBoundingClientRect()
+            let cx = e.clientX - dim['x']
+            let cy = e.clientY - dim['y']
+            let eq = Celestial.mapProjection.invert([cx, cy])
+
+            // Only update other things if the click was registered on the visible map.
+            if (Celestial.clip(eq)) {
+                this.aladin.gotoRaDec(eq[0], eq[1])
+
+                // convert from degrees to positive hours
+                let raHours = eq[0] > 0 ? eq[0] / 15 : (eq[0] / 15) + 24
+                this.$store.commit('command_params/mount_ra', raHours.toFixed(4))
+                this.$store.commit('command_params/mount_dec', eq[1].toFixed(4))
+                this.$store.commit('command_params/mount_object', ' ') // clear the mount_object entry
+            }
+
+        },
+    },
+    watch: {
+        // Update the aladin view if the coordinates change. 
+        mount_ra() {
+            console.log('moving aladin')
+            let ra = parseFloat(this.mount_ra) * 15
+            let dec = parseFloat(this.mount_dec)
+            this.aladin.gotoRaDec(ra, dec)
+        },
+        mount_dec() {
+            console.log('moving aladin')
+            let ra = parseFloat(this.mount_ra) * 15
+            let dec = parseFloat(this.mount_dec)
+            this.aladin.gotoRaDec(ra, dec)
+        },
+
     },
     computed: {
 
@@ -216,55 +227,6 @@ export default {
             'weather',
         ]),
 
-
-        // single status items
-        mount_activity() {
-        let activity = "idle"
-
-        if (this.parseTrueFalse(this.mount_state.is_parked)) {
-            activity = "parked"
-        }
-        else if (this.parseTrueFalse(this.mount_state.is_tracking)) {
-            activity = "tracking"
-        }
-        else if (this.parseTrueFalse(this.mount_state.is_slewing)) {
-            activity = "slewing"
-        }
-        return activity
-        },
-        hour_angle() {
-            let ha = this.telescope_state.sidereal_time - this.telescope_state.right_ascension
-            if (ha < -12) {
-                ha += 24 // hours, since we're in decimal
-            }
-            ha = ha.toFixed(3)
-            if (ha < 0) {
-                ha = '-'+ha
-            }
-            else {
-                ha = '+'+ha
-            }
-            return ha
-        },
-
-        
-
-        enclosure_state() {
-            try {
-                return this.deviceStatus.enclosure[this.enclosure] || {}
-            } catch { return {} }
-        },
-        mount_state() {
-            try {
-                return this.deviceStatus.mount[this.mount]
-            } catch { return {} }
-        },
-        telescope_state() {
-            try {
-                return this.deviceStatus.telescope[this.telescope]
-            } catch(error) { return {} }
-        },
-
         // command_params
         mount_ra: {
             get() { return this.$store.getters['command_params/mount_ra']},
@@ -278,166 +240,52 @@ export default {
             get() { return this.$store.getters['command_params/mount_object']},
             set(val) { this.$store.commit('command_params/mount_object', val)},
         },
-
     },
-
-    
     
 }
 
 </script>
 
 
-<style lang="scss" scoped>
+<style scoped>
+@import "https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css";
 
-$skychart-dim: 100%;
-
-
-.skychart-container {
-    width: $skychart-dim;
-    height: $skychart-dim;
+.page-layout{
+    height: min-content;
+    display:flex ;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
 }
-
-.mount-control-panel {
+.parameters-box {
+    padding-top: 20px;
+    margin: 10px;
     display: flex;
-    flex-direction: horizontal;
+    min-width: 150px;
+    flex: 1 0 min-content;
+}
+#aladin-lite-div {
+    min-height: 250px;
     width: 100%;
-    background-color: rgb(44, 49, 49);
-    margin-bottom: 40px;
+    height: 250px;
 }
-
-.mount-controls {
-    width: 250px;
-}
-$background-color: #151718;
-
-.animation-content .modal-content {
-    background-color:hotpink;
-}
-
-.modal-container {
-    padding:2em;
-    display:flex;
-    align-items:center;
-    position:relative;
-}
-
-.skychart-container {
-    width: $skychart-dim;
-    height: $skychart-dim;
-}
-
-.non-skychart-container {
-    display:flex;
-}
-
-.aladin-container-1 {
-    width:100%;
-    min-width:200px;
-    min-height:200px;
-    max-height:50vh;
-}
-
-
-.sticky-buttons {
-    background-color:#1e2223;
-    width:100%;
-    overflow-x:hidden;
-    z-index:5;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-.sticky-buttons > * {
-    margin: 0.5em 1em;
-}
-
-.status-bar {
-    margin-bottom: 1em;
-    display:flex;
-    justify-content:space-between;
-    flex-wrap:wrap;
-}
-
-.mount-control-panel {
-    display: flex;
-    flex-direction: row;
+.ptr-aladin-parent-div {
+    margin: 10px;
+    min-width: 100px;
+    min-height: 100px;
     width: 100%;
-    background-color: rgb(44, 49, 49);
-    margin-bottom: 40px;
+    height: 100%;
+    flex: 3 0 200px;
+    background-color:grey;
 }
-
-.mount-controls {
-    width: 250px;
+.query-box {
+    padding-top: 10px;
+    margin: 10px;
+    min-width: 150px;
+    flex: 1 0 min-content;
 }
-
-.status-items {
-    display:flex;
-    margin-bottom: 1em;
-}
-.keys {
-    display:flex;
-    flex-direction:column;
-}
-.status-header {
-    font-weight: bold;
-    text-align: center;
-    padding: 3px 0;
-    margin-bottom: 5px;
-    background-color: #283030;
-}
-.key {
-    text-align: right;
-    color:silver;
-    padding: 0 8px;
-    margin-bottom: 3px;
-    background-color: #283030;
-    white-space: nowrap;
-}
-.val{
-  color: greenyellow;
-  background-color: black;
-  padding: 0 8px;
-  margin-bottom: 3px;
-}
-
-@media (orientation: portrait) {
-    .modal-container {
-        flex-direction:column;
-    }
-    .skychart-container{
-        width:90vw;
-        height:90vw;
-        /*background-color:red;*/
-    }
-    .non-skychart-container {
-        width: 90vw;
-        flex-wrap:wrap;
-        margin-bottom:3em;
-    }
-}
-@media (orientation:landscape) {
-    .modal-container {
-        display:grid;
-        grid-template-columns: 7fr 3fr;
-        grid-gap: 3em;
-    }
-    .skychart-container{
-        flex: 2 0 700px;
-        /*background-color:blue;*/
-    }
-    .non-skychart-container {
-        display:flex;
-        flex-direction:column;
-        flex-wrap: wrap;
-        flex:1 0 auto;
-    }
-    .aladin-container-1 {
-        flex:1;
-    }
-    .mount-status {
-        flex: 0;
-    }
+.skychart-box {
+    width: 100%;
+    height: 100%;
 }
 
 </style>
