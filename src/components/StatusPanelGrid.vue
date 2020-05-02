@@ -37,11 +37,14 @@ export default {
 
 <style scoped>
 .status-grid {
+    font-size: 12px;
     display:grid;
     grid-auto-flow:column;
     grid-template-columns: max-content max-content;
     padding: 1em;
     grid-row-gap: 3px;
+    width: 100%;
+    overflow: hidden;
 }
 .key {
   color:silver;
