@@ -50,7 +50,6 @@ import { mapGetters } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
 import ImageView from '@/components/ImageView'
 import LeafletMap from '@/components/LeafletMap'
-import StatusOverview from '@/components/StatusOverview'
 
 export default {
     name: "SiteHome",
@@ -61,7 +60,6 @@ export default {
         TheDomeCam,
         ImageView,
         LeafletMap,
-        StatusOverview,
     },
     computed: {
         ...mapGetters('images', ['current_image']),

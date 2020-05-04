@@ -1,19 +1,14 @@
 <template>
 
-            <div class="status-grid" >
+            <div class="status-row" >
                 <div 
                     v-for="(item,key) in statusList"
                     v-bind:key="`k-${key}`"
-                    class="key"
                     :class="{'spacer': item.val=='spacer'}"
-                    >{{item.name}}</div>
-                <div 
-                    v-for="(item,key) in statusList"
-                    v-bind:key="`v-${key}`"
-                    class="val"
-                    :class="{'spacer': item.val=='spacer'}"
-                    :style="customStyle(item)"
-                    >{{item.val}}</div>
+                    >
+                    <div class="key">{{item.name}}</div>
+                    <div class="val" :style="customStyle(item)">{{item.val}}</div>
+                </div>
             </div>
 </template>
 
@@ -36,18 +31,17 @@ export default {
 </script>
 
 <style scoped>
-.status-grid {
-    font-size: 12px;
-    display:grid;
-    grid-auto-flow:column;
-    grid-template-columns: max-content max-content;
+.status-row{
+    font-size: 14px;
+    display:flex;
     padding: 1em;
-    grid-row-gap: 3px;
     width: 100%;
     overflow: hidden;
+    overflow-x: auto;
 }
 .key {
   color:silver;
+  background-color: #383f3f;
   padding: 0 8px;
   white-space: nowrap;
   text-align: right;
@@ -64,6 +58,7 @@ export default {
 .spacer {
     display: inline-block;
     height: 1em; 
+    width: 1em;
     visibility: hidden;
 }
 </style>
