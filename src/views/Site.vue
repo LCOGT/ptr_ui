@@ -61,23 +61,23 @@
 
       <div style="height:3em;"/>
 
-      <status-panel-vertical
+      <status-panel-collapsible
         :sitecode="sitecode"
         :fullStatus="weather_state"
         :statusList="buildWeatherStatus"
         :statusAge="status_age"
         >
         <p slot="title">{{sitecode}} weather</p>
-      </status-panel-vertical>
+      </status-panel-collapsible>
 
-      <status-panel-vertical
+      <status-panel-collapsible
         :sitecode="sitecode"
         :fullStatus="deviceStatus"
         :statusList="buildGeneralStatus"
         :statusAge="status_age"
         >
         <p slot="title">{{sitecode}} status</p>
-      </status-panel-vertical>
+      </status-panel-collapsible>
 
     </div>
 
@@ -106,13 +106,14 @@
     </div>
   </footer>
 
+
   <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
   <div class="mobile-menu ">
-    <status-overview-2
-      :sitecode="sitecode"  
-      :deviceStatus="deviceStatus" 
+    <status-row
+      :statusList="buildGeneralStatus" 
       class="is-mobile is-hidden-widescreen"
-      style="margin:0;"/>
+      style="margin: 0; padding: 0; background-color: #151718;"
+      :statusAge="status_age" />
     <div class="level is-mobile is-hidden-widescreen">
 
       <b-tooltip label="Home" type="is-dark" class="level-item">
@@ -180,11 +181,9 @@ import SiteTargets from '@/components/SiteTargets'
 import SiteCalendar from '@/components/SiteCalendar'
 import SiteData from '@/components/SiteData'
 import ChatModule from '@/components/ChatModule'
-import StatusOverview from '@/components/StatusOverview'
-import StatusOverview2 from '@/components/StatusOverview2'
-import StatusOverview3 from '@/components/StatusOverview3'
 import SideInfoPanel from '@/components/SideInfoPanel'
-import StatusPanelVertical from '@/components/StatusPanelVertical'
+import StatusPanelCollapsible from '@/components/StatusPanelCollapsible'
+import StatusRow from '@/components/StatusRow'
 
 import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -202,11 +201,9 @@ export default {
     SiteCalendar,
     SiteData,
     ChatModule,
-    StatusOverview,
-    StatusOverview2,
-    StatusOverview3,
     SideInfoPanel,
-    StatusPanelVertical,
+    StatusPanelCollapsible,
+    StatusRow,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin, status_mixin],

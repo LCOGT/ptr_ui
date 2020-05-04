@@ -36,7 +36,7 @@
 
         <div class="val">{{enclosure_state.enclosure_message}}</div>
 
-        <status-panel-grid :statusList="buildEnclosureTabStatus" />
+        <status-column :statusList="buildEnclosureTabStatus" />
 
         <command-button 
           admin
@@ -93,8 +93,8 @@
         <div class="val" v-if="telescope_state && telescope_state.message && telescope_state.message != '-'">{{telescope_state.message}}</div>
 
         <div class="columns">
-          <status-panel-grid class="column" :statusList="buildTelescopeTabStatus1"/>
-          <status-panel-grid class="column" :statusList="buildTelescopeTabStatus2"/>
+          <status-column class="column" :statusList="buildTelescopeTabStatus1"/>
+          <status-column class="column" :statusList="buildTelescopeTabStatus2"/>
         </div>
 
         <b-field horizontal label="Ra">
@@ -178,7 +178,7 @@
 
           <div class="val" v-if="camera_state && camera_state.message">{{camera_state.message}}</div>
 
-          <status-panel-grid :statusList="buildCameraTabStatus" />
+          <status-column :statusList="buildCameraTabStatus" />
 
 
           <b-field horizontal label="Expose">
@@ -328,7 +328,7 @@
           </div>
 
           <div class="val" v-if="focuser_state && focuser_state.message">{{focuser_state.message}}</div>
-          <status-panel-grid :statusList="buildFocuserTabStatus" />
+          <status-column :statusList="buildFocuserTabStatus" />
 
           <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
             <button class="button is-small" slot="trigger" style="width: 100%;">
@@ -407,7 +407,7 @@
           </div>
 
           <div class="val" v-if="sequencer_state && sequencer_state.message">{{sequencer_state.message}}</div>
-          <status-panel-grid :statusList="buildSequencerTabStatus" />
+          <status-column :statusList="buildSequencerTabStatus" />
 
           <b-field label="Script">
             <b-field>
@@ -484,7 +484,7 @@
             </div>
           </div>
 
-          <status-panel-grid :statusList="buildRotatorTabStatus" />
+          <status-column :statusList="buildRotatorTabStatus" />
 
           <command-button :data="rotate_home_command" class="is-small" style="width:100%; margin-bottom:1em;"/>
           <b-field label="Relative">
@@ -524,7 +524,7 @@
             </div>
           </div>
 
-          <status-panel-grid :statusList="buildScreenTabStatus" />
+          <status-column :statusList="buildScreenTabStatus" />
 
           <b-field label="Brightness">
             <b-field>
@@ -730,9 +730,8 @@ import TheDomeCam from '@/components/TheDomeCam'
 import SideInfoPanel from '@/components/SideInfoPanel'
 import SiteData from '@/components/SiteData'
 import SkychartModal from '@/components/SkychartModal'
-import StatusOverview2 from '@/components/StatusOverview2'
 import ImagesTable from '@/components/ImagesTable'
-import StatusPanelGrid from '@/components/StatusPanelGrid'
+import StatusColumn from '@/components/StatusColumn'
 
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
@@ -749,9 +748,8 @@ export default {
     SideInfoPanel,
     SiteData,
     SkychartModal,
-    StatusOverview2,
     ImagesTable,
-    StatusPanelGrid,
+    StatusColumn,
   },
   mixins: [commands_mixin, status_mixin],
   props: ['sitecode'],

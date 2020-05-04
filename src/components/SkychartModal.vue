@@ -171,7 +171,6 @@ import CommandButton from '@/components/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import ModalSkyChart from '@/components/ModalSkyChart'
 import AladinLite from '@/components/AladinLite'
-import StatusOverview2 from '@/components/StatusOverview2'
 
 export default {
     name: "SiteTargets",
@@ -182,7 +181,6 @@ export default {
         TheSkyChart,
         ModalSkyChart,
         AladinLite,
-        StatusOverview2,
     },
     data() {
         return {

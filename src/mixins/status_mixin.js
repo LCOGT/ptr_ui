@@ -140,6 +140,9 @@ export const status_mixin = {
         buildGeneralStatus() {
             return [
                 {"name": "Status Age", ...this.status_age_display},
+                
+                {"name": "spacer", "val": "spacer"},
+
                 {"name": "Enclosure", "val": this.enclosure_status},
 
                 {"name": "spacer", "val": "spacer"},
@@ -475,7 +478,9 @@ export const status_mixin = {
             } catch(error) { return {} }
         },
         camera_status() {
-            return this.camera_state.status || '-'
+            try {
+                return this.camera_state.status || '-'
+            } catch(error) { return '-' }
         },
 
 

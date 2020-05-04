@@ -15,7 +15,7 @@
                 </a>
             </div>
 
-            <status-panel-grid :statusList="statusList" />
+            <status-column :statusList="statusList" />
 
             <div style="height:10px;"/>
             <div class="status-toggle-bar" @click="isFullStatusVisible = !isFullStatusVisible">expanded status</div>
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import StatusPanelGrid from '@/components/StatusPanelGrid'
+import StatusColumn from '@/components/StatusColumn'
 export default {
     props: {
         'statusAge': Number, 
@@ -42,7 +42,7 @@ export default {
         'statusList': Array,
     },
     components: {
-        StatusPanelGrid,
+        StatusColumn,
     },
     data () {
         return {
