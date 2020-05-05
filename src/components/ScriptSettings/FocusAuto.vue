@@ -1,0 +1,76 @@
+<template>
+<section>
+    <b-field horizontal label="target">
+        <b-field>
+            <b-radio-button size="is-small" v-model="target"
+                native-value="near_tycho_star">
+                Near Tycho Star
+            </b-radio-button>
+            <b-radio-button size="is-small" v-model="target"
+                native-value="use_field">
+                Use Field
+            </b-radio-button>
+        </b-field>
+    </b-field>
+    <b-field horizontal label="bin">
+        <b-field>
+            <b-radio-button size="is-small"  v-model="bin"
+                :native-value="1">
+                1
+            </b-radio-button>
+            <b-radio-button size="is-small" v-model="bin"
+                :native-value="2">
+                2
+            </b-radio-button>
+            <b-radio-button size="is-small" v-model="bin"
+                :native-value="4">
+                4
+            </b-radio-button>
+        </b-field>
+    </b-field>
+    <b-field horizontal label="area">
+        <b-field>
+            <b-radio-button size="is-small" v-model="area"
+                :native-value="1">
+                100%
+            </b-radio-button>
+
+            <b-radio-button size="is-small" v-model="area"
+                :native-value=".7">
+                70%
+            </b-radio-button>
+            <b-radio-button size="is-small" v-model="area"
+                :native-value=".5">
+                50% 
+            </b-radio-button>
+        </b-field>
+    </b-field>
+    <div style="height: 1em;"/>
+</section>
+</template>
+
+<script>
+export default {
+    computed: {
+        target: {
+            get() { return this.$store.getters['focusAuto_target'] },
+            set(val) { this.$store.commit('focusAuto_target', val) }
+        },
+        bin: {
+            get() { return this.$store.getters['focusAuto_bin'] },
+            set(val) { this.$store.commit('focusAuto_bin', val) }
+        },
+        area: {
+            get() { return this.$store.getters['focusAuto_area'] },
+            set(val) { this.$store.commit('focusAuto_area', val) }
+        },
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+.field-group {
+    padding-right: 2em;
+    padding-bottom: 1em;
+}
+</style>

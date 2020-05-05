@@ -401,6 +401,7 @@
           <div class="button is-text">Sequencer</div>
         </a>
         <b-dropdown-item custom label="Sequencer">
+          <div style="width: 275px;"/>
 
           <div class="instrument-control-title-bar">
             <div class="title">Sequencer</div>
@@ -452,8 +453,8 @@
           </div>
 
           <div class="buttons has-addons" style="margin-bottom: 10px;">
-            <button class="button is-small" @click="script_run_command" style="width: 50%;"> run script</button>
-            <button class="button is-small" @click="script_stop_command" style="width: 50%"> stop script</button>
+            <b-button class="button is-small is-success" @click="script_run_command" style="width: 65%;"> run script</b-button>
+            <b-button class="button is-small" @click="script_stop_command" style="width: 35%"> stop script</b-button>
           </div>
 
 

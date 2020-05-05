@@ -13,9 +13,12 @@
             <take-planet-stack v-if="script=='takePlanetStack'" />
             <take-sky-flats v-if="script=='takeSkyFlats'" />
             <pointing-run v-if="script=='pointingRun'" />
+            <focus-auto v-if="script=='focusAuto'" />
+            <focus-fine v-if="script=='focusFine'" />
+            <focus-vcurve v-if="script=='focusVcurve'" />
         </section>
         <!--hr style="border-bottom: silver 4px solid; margin-bottom: 2em;"-->
-        <b-button class="button is-light is-small" @click="revertDefaultSettings">Revert To Default</b-button>
+        <b-button class="button is-text is-small" @click="revertDefaultSettings">Revert To Default</b-button>
     </div>
 </template>
 
@@ -29,6 +32,9 @@ import TakePlanetStack from '@/components/ScriptSettings/TakePlanetStack'
 import TakeLunarStack from '@/components/ScriptSettings/TakeLunarStack'
 import TakeSkyFlats from '@/components/ScriptSettings/TakeSkyFlats'
 import PointingRun from '@/components/ScriptSettings/PointingRun'
+import FocusAuto from '@/components/ScriptSettings/FocusAuto'
+import FocusFine from '@/components/ScriptSettings/FocusFine'
+import FocusVcurve from '@/components/ScriptSettings/FocusVcurve'
 export default {
     name: 'ScriptSettings',
     components: {
@@ -41,6 +47,9 @@ export default {
         TakeLunarStack,
         TakeSkyFlats,
         PointingRun,
+        FocusAuto,
+        FocusFine,
+        FocusVcurve,
     },
     props: {
         'script': String,

@@ -87,7 +87,28 @@ const defaults = {
             gridType: "medium",
             numGridRuns: 1,
         }
-    }
+    },
+    focusAuto() {
+        return {
+            target: "near_tycho_star", // alternative: 'use_field'
+            bin: 1, // integer: 1, 2, or 4
+            area: 1, // percent, from 0 to 1
+        }
+    },
+    focusFine() {
+        return {
+            target: "near_tycho_star", // alternative: 'use_field'
+            bin: 1, // integer: 1, 2, or 4
+            area: 1, // percent, from 0 to 1
+        }
+    },
+    focusVcurve() {
+        return {
+            target: "near_tycho_star", // alternative: 'use_field'
+            bin: 1, // integer: 1, 2, or 4
+            area: 1, // percent, from 0 to 1
+        }
+    },
 }
 
 // initial vuex state
@@ -105,6 +126,9 @@ const state = {
     takeLunarStack: defaults.takeLunarStack(),
     takeSkyFlats: defaults.takeSkyFlats(),
     pointingRun: defaults.pointingRun(),
+    focusAuto: defaults.focusAuto(),
+    focusFine: defaults.focusFine(),
+    focusVcurve: defaults.focusVcurve(),
 
     // If a script is not in this list, the UI settings button will be disabled.
     scriptsWithSettings: [
@@ -117,6 +141,9 @@ const state = {
         'takeLunarStack',
         'takeSkyFlats',
         'pointingRun',
+        'focusAuto',
+        'focusFine',
+        'focusVcurve',
     ],
 
     // This is used to fetch a user-friendly name in the UI.
@@ -130,6 +157,9 @@ const state = {
         genScreenFlatMasters: 'Generate Screen-Flat Masters',
         takeSkyFlats: 'Take Sky-Flats',
         pointingRun: 'Pointing Run',
+        focusAuto: 'Focus Auto',
+        focusFine: 'Focus Fine',
+        focusVcurve: 'Focus V-Curve',
     },
 }
 
@@ -203,6 +233,18 @@ const getters = {
     pointingRun_gridType: state => state.pointingRun.gridType,
     pointingRun_numGridRuns: state => state.pointingRun.numGridRuns,
 
+    focusAuto_target: state => state.focusAuto.target,
+    focusAuto_bin: state => state.focusAuto.bin,
+    focusAuto_area: state => state.focusAuto.area,
+
+    focusFine_target: state => state.focusFine.target,
+    focusFine_bin: state => state.focusFine.bin,
+    focusFine_area: state => state.focusFine.area,
+
+    focusVcurve_target: state => state.focusVcurve.target,
+    focusVcurve_bin: state => state.focusVcurve.bin,
+    focusVcurve_area: state => state.focusVcurve.area,
+
 }
 
 // vuex mutations
@@ -260,6 +302,18 @@ const mutations = {
 
     pointingRun_gridType(state, val) { state.pointingRun.gridType = val },
     pointingRun_numGridRuns(state, val) { state.pointingRun.numGridRuns = val },
+
+    focusAuto_target(state, val) { state.focusAuto.target = val },
+    focusAuto_bin(state, val) { state.focusAuto.bin = val },
+    focusAuto_area(state, val) { state.focusAuto.area = val },
+
+    focusFine_target(state, val) { state.focusFine.target = val },
+    focusFine_bin(state, val) { state.focusFine.bin = val },
+    focusFine_area(state, val) { state.focusFine.area = val },
+
+    focusVcurve_target(state, val) { state.focusVcurve.target = val },
+    focusVcurve_bin(state, val) { state.focusVcurve.bin = val },
+    focusVcurve_area(state, val) { state.focusVcurve.area = val },
 }
 
 // vuex actions
