@@ -250,10 +250,9 @@ export const commands_mixin = {
                 count: this.camera_count.toString(),
                 bin: this.camera_bin,
                 filter: this.filter_wheel_options_selection,
-                size: this.camera_areas_selection,
+                area: this.camera_areas_selection,
                 dither: this.camera_dither,
                 extract: this.camera_extract,
-                size: this.camera_areas_selection,
                 username: this.username, // from auth0
             }
 

@@ -60,7 +60,8 @@
         </div>
     </b-modal>
 
-</div> </template>
+</div> 
+</template>
 
 <script>
 
@@ -69,6 +70,7 @@
     import moment from 'moment';
     import titleGenerator from '@/utils/titleGenerator';
     import SunCalc from 'suncalc';
+    import {mapGetters} from 'vuex'
 
     import CalendarEventEditor from "@/components/CalendarEventEditor";
     import CalendarEventCreator from "@/components/CalendarEventCreator";
@@ -80,12 +82,16 @@
     import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
     import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
     import bootstrapPlugin from '@fullcalendar/bootstrap';
+    //import momentTimezonePlugin from '@fullcalendar/moment-timezone';
+    //import { toMoment } from '@fullcalendar/moment'; // only for formatting
+
 
     // must manually include stylesheets for each plugin
     import "@fullcalendar/core/main.css";
     import "@fullcalendar/daygrid/main.css";
     import "@fullcalendar/timegrid/main.css";
     import "@fullcalendar/resource-timeline/main.css";
+
 
     /* TODO:
 
@@ -137,7 +143,11 @@ export default {
         },
         fc_selectable() { // whether to let user click and drag to select a time range.
             return this.$auth.isAuthenticated
-        }
+        },
+        ...mapGetters('site_config', [
+          'site_latitude',
+          'site_longitude',
+        ]),
     },
 
     data: function() { return {
@@ -188,19 +198,8 @@ export default {
             bootstrapPlugin,
             resourceTimelinePlugin,
             resourceTimeGridPlugin,
+            //momentTimezonePlugin,
         ],
-
-        // Temporary Site Geo data. Bad because it's hardcoded.
-        geo: {
-          wmd: {
-            lat: 34.34293028,
-            lon: -119.68112805,
-          },
-          saf: {
-            lat: 35.554444,
-            lon: -105.870278,
-          },
-        },
 
         // URL for the calendar backend api
         backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
@@ -222,7 +221,6 @@ export default {
         // Displays loading spinner when calendar is fetching.
         fc_isLoading(val) { this.isLoading = val; },
 
-        // TODO: remove hardcoded lat/long
         async getTwighlightEvents(info) {
 
             // Timer start
@@ -346,8 +344,8 @@ export default {
             allDays.map((day) => twighlightEvents.push(...Object.values(
               oneDayTwighlight(
                 day, 
-                this.geo[this.calendarSite].lat, 
-                this.geo[this.calendarSite].lon,
+                this.site_latitude,
+                this.site_longitude,
               )
             )))
             //console.log(twighlightEvents.slice(0,8))

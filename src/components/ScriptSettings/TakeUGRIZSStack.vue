@@ -3,6 +3,7 @@
         <div class="field-group">
             <b-field label="No. of Frames">
                 <b-numberinput 
+                    size="is-small"
                     v-model="numFrames" 
                     type="is-light" 
                     controls-position="compact" 
