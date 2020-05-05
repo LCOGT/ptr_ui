@@ -31,16 +31,16 @@
     <b-field horizontal label="area">
         <b-field>
             <b-radio-button size="is-small" v-model="area"
-                :native-value="1">
+                native-value="100%">
                 100%
             </b-radio-button>
 
             <b-radio-button size="is-small" v-model="area"
-                :native-value=".7">
-                70%
+                native-value="71%">
+                71%
             </b-radio-button>
             <b-radio-button size="is-small" v-model="area"
-                :native-value=".5">
+                native-value="50%">
                 50% 
             </b-radio-button>
         </b-field>

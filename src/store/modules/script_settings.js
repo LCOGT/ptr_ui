@@ -92,21 +92,21 @@ const defaults = {
         return {
             target: "near_tycho_star", // alternative: 'use_field'
             bin: 1, // integer: 1, 2, or 4
-            area: 1, // percent, from 0 to 1
+            area: "100%", // percent, from 0 to 1
         }
     },
     focusFine() {
         return {
             target: "near_tycho_star", // alternative: 'use_field'
             bin: 1, // integer: 1, 2, or 4
-            area: 1, // percent, from 0 to 1
+            area: "100%", // percent, from 0 to 1
         }
     },
     focusVcurve() {
         return {
             target: "near_tycho_star", // alternative: 'use_field'
             bin: 1, // integer: 1, 2, or 4
-            area: 1, // percent, from 0 to 1
+            area: "100%", // percent, from 0 to 1
         }
     },
 }
