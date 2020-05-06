@@ -170,7 +170,7 @@ export default {
         fc_header: { // define the top row of buttons
             left: 'prev,next today',
             center: 'title',
-            right: 'resourceTimelineTenDay,resourceTimeGridDay,dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            right: 'dayGridMonth,timeGridWeek,listWeek'
         },
         fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
         fc_eventTimeFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr times on events

@@ -3,7 +3,7 @@
 
   <div class="columns is-touch">
 
-    <div class="img-view column ">
+    <div class="img-view column" style="padding: 0; margin: 1em;">
       <!-- The actual image view component -->
       <image-view-2 
         :site="sitecode" 

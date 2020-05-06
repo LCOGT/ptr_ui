@@ -76,7 +76,7 @@ export default {
         base_filename: newVal.base_filename,
         site: newVal.site,
         zoom: 'toFit',
-        flip: 'y'
+        //flip: 'y'
       }
       this.$store.dispatch('js9/loadImage', loadOptions)
     },
