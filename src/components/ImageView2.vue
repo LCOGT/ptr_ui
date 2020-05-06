@@ -14,6 +14,7 @@
         <img
           id="main-image"
           ref="image" 
+          v-show="!js9IsVisible"
           :src="current_image.jpg13_url" />
 
         <div id="js9-window" v-if="js9IsVisible" >
@@ -392,7 +393,6 @@ export default {
         imageEl.setAttribute("height", svgRect.height)
         // Resize the svg
         // WARNING: this may have bugs if image is not a square.
-        // See the final line of this function (imageEl.setAtt...).
         let imageRect = this.$refs.image.getBoundingClientRect();
         this.imageWidth = imageRect.width
         this.imageHeight = imageRect.height

@@ -1,7 +1,5 @@
 
-//import { API } from 'aws-amplify'
 import axios from 'axios'
-
 
 // initial state
 const state = {
