@@ -1,5 +1,7 @@
 <template> <div class="calendar-container">
 
+    <!--button class="level-item button is-danger" @click="refreshCalendarView">refresh</button-->
+
     <FullCalendar
         class="demo-app-calendar"
         ref="fullCalendar"
@@ -21,6 +23,7 @@
         :editable="fc_editable"
         :weekends="fc_weekends"
         :nowIndicator="fc_nowIndicator"
+        :now="fc_now"
         :progressiveEventRendering="fc_progressiveEventRendering"
         :aspect-ratio="fc_aspectRatio"
         :themeSystem="fc_themeSystem"
@@ -82,8 +85,8 @@
     import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
     import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
     import bootstrapPlugin from '@fullcalendar/bootstrap';
-    //import momentTimezonePlugin from '@fullcalendar/moment-timezone';
-    //import { toMoment } from '@fullcalendar/moment'; // only for formatting
+    import momentTimezonePlugin from '@fullcalendar/moment-timezone';
+    import { toMoment } from '@fullcalendar/moment'; // only for formatting
 
 
     // must manually include stylesheets for each plugin
@@ -131,7 +134,43 @@ export default {
         // Resources for fullcalendar (in our case they are observatories)
         'fc_resources'
     ],
+
+    mounted() {
+      console.log('timezone: '+ this.$refs.fullCalendar.getApi().dateEnv.timeZone)
+      console.log('mounted')
+      this.refreshCalendarView()
+    },
+
+    watch: {
+        calendarSite: function(val){
+            console.log(`site changed to ${val}`)
+            this.refreshCalendarView()
+        },
+        global_config() {
+          this.refreshCalendarView()
+        },
+    },
+
+
     computed: {
+        fc_timeZone() {
+          let tz = {
+            "wmd": "America/Los_Angeles",
+            "saf": "America/Denver",
+            "ALI-sim": "Asia/Kashgar",
+          }
+          return  tz[this.calendarSite]
+          //return 'local'
+          //return 'America/Los_Angeles'
+          //return "UTC"
+        },
+
+        fc_now() {
+          console.log(moment('2020-05-07T22:25:00').add('3', 'hours'))
+          return moment().tz(this.fc_timeZone).format()
+          //return moment('2020-05-07T23:25:00').add('3', 'hours')
+        },
+
         // Return the list of sources that feed fullCalendar with events
         fc_eventSources: function() {
             return [
@@ -145,9 +184,12 @@ export default {
             return this.$auth.isAuthenticated
         },
         ...mapGetters('site_config', [
+          'site_config',
+          'global_config',
           'site_latitude',
           'site_longitude',
         ]),
+
     },
 
     data: function() { return {
@@ -170,12 +212,12 @@ export default {
         fc_header: { // define the top row of buttons
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek'
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
         },
         fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
         fc_eventTimeFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr times on events
         fc_slotLabelFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr time on axis labels
-        fc_timeZone: 'local',
+        //fc_timeZone: 'Asia/Kashgar',
         fc_minTime: "12:00:00", // start the day column at noon
         fc_maxTime: "36:00:00", // end the day column at noon for the following day
         fc_scrollTime: "16:00:00", // calendar default view starts at 4pm.
@@ -198,7 +240,7 @@ export default {
             bootstrapPlugin,
             resourceTimelinePlugin,
             resourceTimeGridPlugin,
-            //momentTimezonePlugin,
+            momentTimezonePlugin,
         ],
 
         // URL for the calendar backend api
@@ -225,6 +267,7 @@ export default {
 
             // Timer start
             let t0=performance.now()
+            //console.log('info: ', info)
 
             // Get the time range we need to display in the UI.
             let firstDay = info.start.valueOf()
@@ -233,6 +276,7 @@ export default {
             // List all the days we'll need to display
             let allDays = []
             let msPerDay = 1000*60*60*24
+
             // Generate events for 60 days before the start time to 60 days after.
             // This is to prevent the loading flicker when changing weeks.
             // note: this still only takes ~5ms to compute.
@@ -241,7 +285,6 @@ export default {
                 allDays.push(day+3700000)
             }
 
-            //console.log('info: ', info)
             //console.log('allDays: ', allDays)
 
             // Generate the twighlight events (in proper fullCalendar format)
@@ -339,22 +382,24 @@ export default {
             // Collect all the events to display here
             let twighlightEvents = []
 
+            let site_lat = parseFloat(this.site_config(this.calendarSite)['latitude'])
+            let site_lng = parseFloat(this.site_config(this.calendarSite)['longitude'])
+
 
             // Compute events for each day. 
             allDays.map((day) => twighlightEvents.push(...Object.values(
               oneDayTwighlight(
                 day, 
-                this.site_latitude,
-                this.site_longitude,
+                site_lat,
+                site_lng,
               )
             )))
-            //console.log(twighlightEvents.slice(0,8))
 
             // Finish timer
             let t1=performance.now()
             let twighlightComputeTime = t1-t0
             if (twighlightComputeTime > 100) {
-                console.warn('Time to make astro twighlight: ', twighlightComputeTime.toFixed(2)+'ms')
+                console.warn('Slow computation of astro twighlight: ', twighlightComputeTime.toFixed(2)+'ms')
             }
 
             return twighlightEvents
@@ -430,9 +475,10 @@ export default {
         /**
          *  This is run when a user clicks on the calendar to create a new event.
          */
-        newEventSelected(arg){ 
-            this.activeEvent.startStr = arg.startStr;
-            this.activeEvent.endStr = arg.endStr;
+        newEventSelected(event){ 
+            //console.log(event)
+            this.activeEvent.startStr = moment(event.startStr).utc().format()
+            this.activeEvent.endStr = moment(event.endStr).utc().format()
             this.activeEvent.title = titleGenerator.makeTitle()
             this.activeEvent.creator = this.$auth.user.name
             this.activeEvent.id = this.makeUniqueID()
@@ -440,6 +486,7 @@ export default {
             this.activeEvent.resourceId = this.calendarSite
             this.activeEvent.creator_id = this.$auth.user.sub
 
+            console.log('actie event: ', this.activeEvent)
             this.isNewEvent = true; // setting for the modal event editor
             this.eventEditorIsActive= true;
         },
@@ -450,8 +497,8 @@ export default {
             let event = arg.event;
             //console.log(event)
             this.activeEvent.id = event.id,
-            this.activeEvent.startStr = event.start.toISOString();
-            this.activeEvent.endStr = event.end.toISOString();
+            this.activeEvent.startStr = moment(event.start).format();
+            this.activeEvent.endStr = moment(event.end).format();
             this.activeEvent.title = event.title;
             this.activeEvent.creator = event.extendedProps.creator
             this.activeEvent.site = event.extendedProps.site
@@ -469,6 +516,7 @@ export default {
          * When the user clicks submit, event details are sent to the backend.
          */
         async submitButtonClicked(newEvent) {
+          //console.log('new event creation: ', newEvent)
 
             // Make request headers and include token. 
             // Requires user to be logged in.
@@ -477,8 +525,8 @@ export default {
             let url = `${this.backendUrl}/dev/newevent`
             let eventToPost = {
                 "event_id": newEvent.id,
-                "start": newEvent.startStr,
-                "end": newEvent.endStr,
+                "start": moment(newEvent.startStr).utc().format(),
+                "end": moment(newEvent.endStr).utc().format(),
                 "creator": newEvent.creator,
                 "creator_id": newEvent.creator_id,
                 "site": newEvent.site,
@@ -520,9 +568,10 @@ export default {
         async deleteButtonClicked(eventToDelete) {
             let config = await this.getConfigWithAuth();
             let url = `${this.backendUrl}/dev/delete`
+            //console.log('event to delete: ', eventToDelete)
             let body = {
                 "event_id": eventToDelete.id,
-                "start": moment(eventToDelete.startStr).format(),
+                "start": moment(eventToDelete.startStr).utc().format(),
             }
             let res = await axios.post(url, body, config)
                 .then(res => {
@@ -551,8 +600,8 @@ export default {
             let url = `${this.backendUrl}/dev/modifyevent`
             let theModifiedEvent = {
                 "event_id":modifiedEvent.id,
-                "start": moment(modifiedEvent.startStr).format(),
-                "end":  moment(modifiedEvent.endStr).format(),
+                "start": moment(modifiedEvent.startStr).utc().format(),
+                "end":  moment(modifiedEvent.endStr).utc().format(),
                 "creator":modifiedEvent.creator,
                 "creator_id":modifiedEvent.creator_id,
                 "site":modifiedEvent.site,
@@ -562,8 +611,8 @@ export default {
             }
             let theInitialEvent = {
                 "event_id":initialEvent.id,
-                "start": moment(initialEvent.startStr).format(),
-                "end": moment(initialEvent.endStr).format(),
+                "start": moment(initialEvent.startStr).utc().format(),
+                "end": moment(initialEvent.endStr).utc().format(),
                 "creator":initialEvent.creator,
                 "creator_id":initialEvent.creator_id,
                 "site":initialEvent.site,
@@ -632,13 +681,6 @@ export default {
         },
     },
 
-    watch: {
-        calendarSite: function(val){
-            console.log(`site changed to ${val}`)
-            this.refreshCalendarView()
-        }
-    },
-
 };
 </script>
 
@@ -667,7 +709,6 @@ export default {
 
 .calendar-container {
   margin: 0 auto;
-  max-width: 900px;
 }
 
 
