@@ -117,8 +117,8 @@ export default {
             deleteIsLoading: false,
 
             id: this.eventDetails.id,
-            startStr: moment(this.eventDetails.startStr).format(),
-            endStr: moment(this.eventDetails.endStr).format(),
+            startStr: moment(this.eventDetails.startStr).utc().format(),
+            endStr: moment(this.eventDetails.endStr).utc().format(),
             title: this.eventDetails.title,
             creator: this.eventDetails.creator,
             creator_id: this.eventDetails.creator_id,
@@ -127,9 +127,25 @@ export default {
 
         }
     },
+    mounted() {
+        this.startStr = moment(this.eventDetails.startStr).tz(this.timezone).format()
+        this.endStr = moment(this.eventDetails.endStr).tz(this.timezone).format()
+    },
     computed: {
+        timezone() {
+          let tz = {
+            "wmd": "America/Los_Angeles",
+            "saf": "America/Denver",
+            "ALI-sim": "Asia/Kashgar",
+          }
+          return  tz[this.eventDetails.site]
+          //return 'local'
+          //return 'America/Los_Angeles'
+          //return "UTC"
+        },
         nightOf() {
-            return moment(this.eventDetails.startStr).format('dddd, MMMM D, YYYY')
+            console.log(moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY'))
+            return moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY')
         },
         startTimeOptions() {
             let startTimes = [] 
@@ -138,7 +154,7 @@ export default {
             const range = 2 // hours
 
             // The value in the middle of our array
-            let middleTime = moment(this.eventDetails.startStr)
+            let middleTime = moment(this.eventDetails.startStr).tz(this.timezone)
             // The first time in the array. 
             let startOption = middleTime.subtract(range, 'h')
 
@@ -163,7 +179,7 @@ export default {
             const range = 2 // hours
 
             // The value in the middle of our array
-            let middleTime = moment(this.eventDetails.endStr)
+            let middleTime = moment(this.eventDetails.endStr).tz(this.timezone)
             // The first time in the array. 
             let endOption = middleTime.subtract(range, 'h')
 
@@ -182,13 +198,13 @@ export default {
             return endTimes
         },
         eventDuration() {
-            let start = moment(this.startStr)
-            let end = moment(this.endStr)
+            let start = moment.tz(this.startStr, this.timezone)
+            let end = moment.tz(this.endStr, this.timezone)
             let duration = moment.duration(end.diff(start))
             return `(${duration.hours()}h, ${duration.minutes()}m)`
         },
         modifiedEvent() {
-            return {
+            let m_event = {
                 id: this.id,
                 startStr: this.startStr,
                 endStr: this.endStr,
@@ -198,6 +214,8 @@ export default {
                 site: this.site,
                 resourceId: this.resourceId,
             }
+            console.log('modified event: ', m_event)
+            return m_event
         }
     },
     methods: {
