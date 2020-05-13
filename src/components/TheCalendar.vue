@@ -1,6 +1,9 @@
 <template> <div class="calendar-container">
 
     <!--button class="level-item button is-danger" @click="refreshCalendarView">refresh</button-->
+    <!--button class="level-item button is-danger" @click="refreshIfUserIsScheduled">refresh current user is scheduled</button-->
+    <!--button class="level-item button is-danger" @click="ping">ping</button-->
+    <!--div>{{currentUserScheduled}}</div-->
 
     <FullCalendar
         class="demo-app-calendar"
@@ -257,9 +260,13 @@ export default {
 
         isLoading: false,
 
+        currentUserScheduled: false,
+
     }},
 
     methods: {
+
+      
         // Displays loading spinner when calendar is fetching.
         fc_isLoading(val) { this.isLoading = val; },
 
@@ -512,6 +519,29 @@ export default {
         /*===================================================/
         Calendar CRUD
         /===================================================*/
+        /**testing */
+        async refreshIfUserIsScheduled() {
+          // Make request headers and include token. 
+          // Requires user to be logged in.
+          let header = await this.getConfigWithAuth();
+          let url = `${this.backendUrl}/dev/is-user-scheduled`
+          let user_id = this.$auth.user.sub
+          let body = {
+            "user_id": user_id,
+            "site": this.calendarSite,
+            "time": moment().utc().format()
+          }
+          let response = await axios.post(url, body, header)
+          console.log('userIsScheduled response: ',response)
+          this.currentUserScheduled = response.data
+        },
+        async ping() {
+          let url = 'https://api.photonranch.org/api/ping/helloping'
+          let header = await this.getConfigWithAuth();
+          let body = {}
+          console.log(await axios.post(url, body, header))
+        },
+
         /**
          * When the user clicks submit, event details are sent to the backend.
          */

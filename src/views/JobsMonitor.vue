@@ -102,14 +102,15 @@ export default {
       form.mount="mount1"
       form.instance="camera1"
       console.log(form)
-      axios.post("https://jobs.photonranch.org/jobs/newjob",form, options)
+      const url = `${this.$store.state.dev.jobs_api}/newjob?site=${form.site}`
+      axios.post(url, form, options)
         .then(console.log)
         .catch(console.warn)
     },
 
     getJobs() {
       let that = this
-      let url = 'https://jobs.photonranch.org/jobs/getrecentjobs'
+      const url = `${this.$store.state.dev.jobs_api}/getrecentjobs`
       let body = {
         "site": "wmd",
         "timeRange": 86400*1000*24/24

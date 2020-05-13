@@ -840,23 +840,46 @@ export default {
       await this.$store.dispatch('site_config/update_config')
       this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
     },
+    handleNotAuthorizedResponse(error) {
+        if (error.response) {
+            // Request made and server responded
+            console.log("error message", error.response.data);
+            console.log("error status", error.response.status);
+            console.log("error headers", error.response.headers);
+            // small popup notification describing error
+            this.$buefy.toast.open({
+                duration: 5000,
+                message: `${error.response.status} error: ${error.response.data}`,
+                position: 'is-bottom',
+                type: 'is-danger' ,
+            })
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.warn("The request was made but no response was received.")
+            console.log(error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.warn("Something happened in setting up the request that triggered an error.")
+            console.log('Error', error.message);
+        }
+    },
 
     // Alternative to the command_button component
     async postCommand(formCreatorFunction, args) {
 
+      const options = await this.getAuthHeader()
       let form = formCreatorFunction(...args).form
-      let url = 'https://jobs.photonranch.org/jobs/newjob'
+      const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.sitecode}`
 
       form.timestamp = parseInt(Date.now() / 1000)
-
-      const options = await this.getAuthHeader()
       form.site = this.sitecode
       form.mount = this.active_mount
+
       axios.post(url,form, options).then(response => {
           console.log(response.data)
           this.$emit('jobPost', response.data)
       }).catch(e => {
-          console.warn(e)
+          this.handleNotAuthorizedResponse(e)
       })
     },
 
