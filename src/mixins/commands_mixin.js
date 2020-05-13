@@ -70,14 +70,13 @@ export const commands_mixin = {
 
             let the_base_command = {
                 name: name, // used for naming the button
-                url: `/${this.active_site}/${this.active_mount}/command/`,
                 site: this.active_site,
                 mount: this.active_mount,
-                http_method: 'POST',
                 form: {
                     device: device_type,
                     instance: device,
-                    user: this.username,
+                    user_name: this.username,
+                    user_id: this.user_id,
                     timestamp: parseInt(Date.now() / 1000),
                     action: action,
                     required_params: req_params || {},
@@ -174,6 +173,14 @@ export const commands_mixin = {
         username() {
             if (getInstance().user) {
                 return getInstance().user.name
+            }
+            else {
+                return 'anonymous'
+            }
+        },
+        user_id() {
+            if (getInstance().user) {
+                return getInstance().user.sub
             }
             else {
                 return 'anonymous'

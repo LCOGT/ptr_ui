@@ -12,6 +12,14 @@ function username() {
         return 'anonymous'
     }
 }
+function user_id() {
+    if (getInstance().user) {
+        return getInstance().user.sub
+    }
+    else {
+        return 'anonymous'
+    }
+}
 
 // These default values (organized per script) are used to initialize values,
 // and also used when the user wishes to revert back to defaults.
@@ -325,7 +333,7 @@ const actions = {
      */
     script_run_command({ getters, rootState }) {
 
-        let url = `https://jobs.photonranch.org/jobs/newjob`
+        const url = `${this.$store.state.dev.jobs_api}/newjob?site=${rootState.site_config.selected_site}`
 
         // Command to send
         let script_name = getters.selectedScript
@@ -334,7 +342,8 @@ const actions = {
             mount: rootState.site_config.selected_mount,
             device: 'sequencer',
             instance: rootState.site_config.selected_sequencer,
-            user: username(),
+            user_name: username(),
+            user_id: user_id(),
             timestamp: parseInt(Date.now() / 1000),
             action: 'run',
             required_params: {
