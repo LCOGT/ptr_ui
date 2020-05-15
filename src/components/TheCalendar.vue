@@ -3,6 +3,7 @@
     <!--button class="level-item button is-danger" @click="refreshCalendarView">refresh</button-->
     <!--button class="level-item button is-danger" @click="refreshIfUserIsScheduled">refresh current user is scheduled</button-->
     <!--button class="level-item button is-danger" @click="ping">ping</button-->
+    <!--button class="level-item button is-danger" @click="updateNowIndicator">refresh</button-->
     <!--div>{{currentUserScheduled}}</div-->
 
     <FullCalendar
@@ -32,6 +33,7 @@
         :themeSystem="fc_themeSystem"
         :schedulerLicenseKey="fc_schedulerLicenseKey"
         :eventSources="fc_eventSources"
+        :eventRender="fc_eventRender"
         :resources="fc_resources"
         :plugins="fc_plugins"
 
@@ -142,6 +144,10 @@ export default {
       console.log('timezone: '+ this.$refs.fullCalendar.getApi().dateEnv.timeZone)
       console.log('mounted')
       this.refreshCalendarView()
+      this.nowIndicatorInterval = setInterval(this.updateNowIndicator, 1000)
+    },
+    destroyed() {
+      clearInterval(this.nowIndicatorInterval)
     },
 
     watch: {
@@ -169,18 +175,18 @@ export default {
         },
 
         fc_now() {
-          console.log(moment('2020-05-07T22:25:00').add('3', 'hours'))
           return moment().tz(this.fc_timeZone).format()
-          //return moment('2020-05-07T23:25:00').add('3', 'hours')
         },
 
         // Return the list of sources that feed fullCalendar with events
-        fc_eventSources: function() {
+        fc_eventSources() {
             return [
                 // Astronomical twighlight events (computed locally)
                 { events: this.getTwighlightEvents },
                 // Events from dynamodb backend
                 { events: this.fetchSiteEvents },
+                // Now Indicator
+                { events: this.getNowIndicator },
             ]
         },
         fc_selectable() { // whether to let user click and drag to select a time range.
@@ -215,7 +221,7 @@ export default {
         fc_header: { // define the top row of buttons
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            right: 'dayGridMonth,timeGridWeek,listWeek'
         },
         fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
         fc_eventTimeFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr times on events
@@ -229,7 +235,7 @@ export default {
         fc_unselectAuto: false, // whether clicking elsewhere closes the current selection
         fc_editable: true, // whether events on calendar can be modified
         fc_weekends: true, // whether to show weekends in week view
-        fc_nowIndicator: true, // whether to draw line indicating current time in grid views.
+        fc_nowIndicator:false, // whether to draw line indicating current time in grid views.
         fc_progressiveEventRendering: true,
         fc_aspectRatio: 1.2, // calendar window width/height
         fc_themeSystem: 'bootstrap', // uses bootstrap css (see <style> below)
@@ -265,10 +271,41 @@ export default {
     }},
 
     methods: {
+      foo() {
+        console.warn('bar')
+      },
+
+      async updateNowIndicator() {
+        this.fc_eventRender()
+      },
+
+      async getNowIndicator(info) {
+        let now = [{
+          start: moment().utc().format(),
+          end: moment().utc().add('1', 'minutes').format(),
+          rendering: "background",
+          backgroundColor:"#ff0000",
+          borderColor: "#ff0000",
+          id: `fc-custom-now-indicator`,
+          classNames: ["fc-now-indicator","fc-now-indicator-line"]
+        }]
+        return now
+      },
+
+      fc_eventRender() {
+        let n = document.getElementsByClassName("fc-now-indicator")[0]
+        if(n){
+          //n.style['z-index'] = 15
+          n.parentElement.style["z-index"] = "auto"
+        }
+      },
 
       
         // Displays loading spinner when calendar is fetching.
-        fc_isLoading(val) { this.isLoading = val; },
+
+        fc_isLoading(val) { 
+          this.isLoading = val; 
+        },
 
         async getTwighlightEvents(info) {
 
@@ -308,10 +345,15 @@ export default {
                 let currentDateObj = new Date(timestamp)
 
                 // The event colors for the calendar
-                let daylightColor = "rgb(129, 212, 250)"
-                let civilColor = "rgb(52, 152, 219)"
-                let nauticalColor = "rgb(36, 113, 163)"
-                let astronomicalColor = "rgb(26, 82, 118)"
+                //let daylightColor = "rgb(129, 212, 250)"
+                //let civilColor = "rgb(52, 152, 219)"
+                //let nauticalColor = "rgb(36, 113, 163)"
+                //let astronomicalColor = "rgb(26, 82, 118)"
+
+                let daylightColor = "#81D4FA"
+                let civilColor = "#1B9FD8"
+                let nauticalColor = "#166EA9"
+                let astronomicalColor = "#084165"
 
                 // This is redundant; replaced by the other daylight event (bottom)
                 //events.daylightAfternoon = {
@@ -408,7 +450,6 @@ export default {
             if (twighlightComputeTime > 100) {
                 console.warn('Slow computation of astro twighlight: ', twighlightComputeTime.toFixed(2)+'ms')
             }
-
             return twighlightEvents
         },
 
@@ -469,7 +510,7 @@ export default {
         },
 
         // Used when exiting event editor modals. Clear selections, close modal, and refresh events.
-        refreshCalendarView() {
+        async refreshCalendarView() {
             let calendarApi = this.$refs.fullCalendar.getApi();
             calendarApi.unselect();
             calendarApi.refetchEvents();
@@ -706,7 +747,6 @@ export default {
                 }
                 return fObj
             })
-            //console.log('formatted_events: ', formatted_events)
             return formatted_events
         },
     },
@@ -719,10 +759,14 @@ export default {
 
 /* the line showing the current time */
 .fc-now-indicator.fc-now-indicator-line {
-  border-color: rgba(255, 0, 0, 0.5);
+  border-color: rgb(255, 0, 0);
+  z-index: 15;
+  opacity: 1;
 }
 .fc-now-indicator.fc-now-indicator-arrow {
-  border-color: rgba(255, 0, 0, 0.5);
+  border-color: rgb(255, 0, 0);
+  z-index: 15;
+  opacity: 1;
 }
 /*@import url("https://bootswatch.com/4/darkly/bootstrap.min.css");*/
 .demo-app {

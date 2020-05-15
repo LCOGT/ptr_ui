@@ -2,7 +2,7 @@
     <b-field horizontal >
         <p class="is-family-secondary is-size-2 has-text-weight-bold">Make a Reservation</p>
     </b-field>
-    <b-field horizontal label="Owner">
+    <b-field horizontal label="User">
         <p class="is-family-primary">{{eventDetails.creator}}</p>
     </b-field>
 

@@ -1,6 +1,19 @@
 <template><div>
 
-    <div>The time at {{sitecode}} is: {{siteTime}}</div>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item" style="display:flex; flex-direction:column; align-items: flex-start;">
+                <div>Time at {{sitecode.toUpperCase()}}:</div>
+                <div class="time-display">{{siteTime}}</div>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item" style="display:flex; flex-direction:column; align-items: flex-start;">
+                <div>UTC Time:</div>
+                <div class="time-display">{{utcTime}}</div>
+            </div>
+        </div>
+    </div>
     <the-calendar :calendarSite="sitecode" :fc_resources="listOfObservatories"/>
 
 </div>
@@ -20,11 +33,12 @@ export default {
     },
     data() {
         return {
-            localTime: '',
-            siteTime: '',
+            localTime: '-',
+            siteTime: '-',
+            utcTime: '-',
         }
     },
-    mounted() {
+    created() {
         this.timeInterval = setInterval(this.updateTime, 1000)
         window.moment = moment; // use moment lib in browser devtools
     },
@@ -33,8 +47,9 @@ export default {
     },
     methods: {
         updateTime() {
-            this.localTime = moment().format('dddd, MMM D, kk:m')
-            this.siteTime = moment().tz(this.timezone).format('dddd, MMM D YYYY, k:m')
+            this.localTime = moment().format('MMM D, kk:m')
+            this.siteTime = moment().tz(this.timezone).format('MMM D, kk:m')
+            this.utcTime = moment().utc().format('MMM D, kk:m')
         },
     },
     computed: {
@@ -55,10 +70,7 @@ export default {
         listOfObservatories() {
             let all_obs = []
             for (let a_site in this.global_config) {
-                console.log('a_site: ',a_site)
-                console.log(this.global_config)
                 let o = this.global_config[a_site]
-                console.log('o: ', o)
                 all_obs.push({
                     'id': o.site,
                     'title': o.name,
@@ -76,7 +88,6 @@ export default {
                     'anyOtherPropsHere': 'call from key extendedProps of this resource object',
                 })
             }
-            console.log(all_obs)
             return all_obs
         },
     },
@@ -87,4 +98,7 @@ export default {
 
 
 <style scoped>
+.time-display {
+    font-size: 1.3em;
+}
 </style>
