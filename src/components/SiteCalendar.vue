@@ -47,9 +47,9 @@ export default {
     },
     methods: {
         updateTime() {
-            this.localTime = moment().format('MMM D, kk:m')
-            this.siteTime = moment().tz(this.timezone).format('MMM D, kk:m')
-            this.utcTime = moment().utc().format('MMM D, kk:m')
+            this.localTime = moment().format('MMM D, kk:mm')
+            this.siteTime = moment().tz(this.timezone).format('MMM D, kk:mm')
+            this.utcTime = moment().utc().format('MMM D, kk:mm')
         },
     },
     computed: {

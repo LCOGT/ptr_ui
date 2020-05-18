@@ -20,6 +20,23 @@ function user_id() {
         return 'anonymous'
     }
 }
+// Get axios request config object (the headers) with auth token
+async function getAuthHeader() {
+    let token, configWithAuth;
+    try {
+        token = await getInstance().getTokenSilently(); 
+    } catch(err) {
+        console.error(err)
+        console.warn('Did not acquire the needed token. Stopping request.')
+    }
+    return {
+        'headers': {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Access-Control-Allow-Origin': '*',
+            'Authorization': `Bearer ${token}`
+        }
+    }
+}
 
 // These default values (organized per script) are used to initialize values,
 // and also used when the user wishes to revert back to defaults.
@@ -331,9 +348,10 @@ const actions = {
      *  Send a command to the observatory to stop any current running script.
      *  The command is sent to a specific mount at the site (like all commands).
      */
-    script_run_command({ getters, rootState }) {
+    async script_run_command({ getters, rootState }) {
 
-        const url = `${this.$store.state.dev.jobs_api}/newjob?site=${rootState.site_config.selected_site}`
+        const url = `${rootState.dev.jobs_api}/newjob?site=${rootState.site_config.selected_site}`
+        const header = await getAuthHeader()
 
         // Command to send
         let script_name = getters.selectedScript
@@ -354,7 +372,7 @@ const actions = {
         }
         
         // Send the command and log the output
-        axios.post(url, command).then(response => {
+        axios.post(url, command, header).then(response => {
             response = response.data
             console.log(response)
             console.log(command)
@@ -386,18 +404,22 @@ const actions = {
      *  Send a command to the observatory to stop any current running script.
      *  The command is sent to a specific mount at the site (like all commands).
      */
-    script_stop_command({ rootState }) {
+    async script_stop_command({ rootState }) {
 
         // API parameters
-        let apiName = rootState.dev.active_api;
+        const url = `${rootState.dev.jobs_api}/newjob`//?site=${rootState.site_config.selected_site}`
+        const header = await getAuthHeader()
+        console.log(header)
         let site = rootState.site_config.selected_site;
         let mount = rootState.site_config.selected_mount;
-        let path = `/${site}/${mount}/command/`
 
         // Command to send
         let command = {
+            site: rootState.site_config.selected_site,
             device: 'sequencer',
             instance: 'sequencer',
+            user_name: username(),
+            user_id: user_id(),
             timestamp: parseInt(Date.now() / 1000),
             action: 'stop',
             required_params: {},
@@ -405,7 +427,7 @@ const actions = {
         }
 
         // Send the command and log the output
-        axios.post(apiName+path, {body: command}).then(response => {
+        axios.post(url, command, header).then(response => {
             response = response.data
             console.log(response)
             // Small UI success notification
