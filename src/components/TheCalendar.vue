@@ -144,10 +144,10 @@ export default {
       console.log('timezone: '+ this.$refs.fullCalendar.getApi().dateEnv.timeZone)
       console.log('mounted')
       this.refreshCalendarView()
-      this.nowIndicatorInterval = setInterval(this.updateNowIndicator, 1000)
+      this.nowIndicatorTimeInteval = setInterval( this.updateNowIndicator, 300000)
     },
     destroyed() {
-      clearInterval(this.nowIndicatorInterval)
+      clearInterval(this.nowIndicatorTimeInterval)
     },
 
     watch: {
@@ -162,6 +162,9 @@ export default {
 
 
     computed: {
+        fullCalendarApi() {
+          return this.$refs.fullCalendar.getApi();
+        },
         fc_timeZone() {
           let tz = {
             "wmd": "America/Los_Angeles",
@@ -276,7 +279,8 @@ export default {
       },
 
       async updateNowIndicator() {
-        this.fc_eventRender()
+        this.fullCalendarApi.unselect();
+        this.fullCalendarApi.refetchEvents();
       },
 
       async getNowIndicator(info) {
