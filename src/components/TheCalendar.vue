@@ -43,10 +43,15 @@
     />
 
     <div class="level">
-        <div class="level-left"/>
+        <div class="level-left">
+          <div class="level-item">
+            <button class="button" style="opacity: 0;">padding only</button>
+          </div>
+        </div>
         <div class="level-right">
-        <div class="level-item"/>
-        <button v-if="isLoading" class="level-item button is-text is-loading">loading</button>
+          <div class="level-item">
+            <button v-if="isLoading" class="level-item button is-text is-loading">loading</button>
+          </div>
         </div>
     </div>
 
