@@ -8,6 +8,7 @@ import script_settings from './modules/script_settings'
 import dev from './modules/dev'
 import js9 from './modules/js9'
 import command_params from './modules/command_params'
+import user_data from './modules/user_data'
 
 Vue.use(Vuex)
 
@@ -22,13 +23,14 @@ export default new Vuex.Store({
         //})
     ],
     modules: {
-        auth,
         site_config,
+        command_params,
+        script_settings,
         skyChart,
         images,
-        script_settings,
+        user_data,
         dev,
-        command_params,
         js9,
+        auth,
     },
 })

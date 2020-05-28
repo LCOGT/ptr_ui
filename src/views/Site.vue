@@ -32,8 +32,8 @@
             <b-menu-item 
               icon="folder-multiple-image"
               tag="router-link"
-              :to="'/site/' + sitecode + '/data'" 
-              label="Data & Images"></b-menu-item>
+              :to="'/site/' + sitecode + '/projects'" 
+              label="Projects"></b-menu-item>
             <b-menu-item 
               icon="calendar"
               tag="router-link"
@@ -146,11 +146,11 @@
         </b-button>
       </b-tooltip>
 
-      <b-tooltip label="Data Analysis" type="is-dark" class="level-item">
+      <b-tooltip label="Projects" type="is-dark" class="level-item">
         <b-button tag="router-link"
           class="mobile-menu-button level-item"
           size="is-large"
-          :to="'/site/'+sitecode+'/data'"
+          :to="'/site/'+sitecode+'/projects'"
           icon-right="folder-multiple-image"
           type="is-text">
         </b-button>
@@ -179,6 +179,7 @@ import SiteHome from '@/components/SiteHome'
 import SiteObserve from '@/components/SiteObserve'
 import SiteTargets from '@/components/SiteTargets'
 import SiteCalendar from '@/components/SiteCalendar'
+import SiteProjects from '@/components/SiteProjects'
 import SiteData from '@/components/SiteData'
 import ChatModule from '@/components/ChatModule'
 import SideInfoPanel from '@/components/SideInfoPanel'
@@ -199,6 +200,7 @@ export default {
     SiteObserve,
     SiteTargets,
     SiteCalendar,
+    SiteProjects,
     SiteData,
     ChatModule,
     SideInfoPanel,
