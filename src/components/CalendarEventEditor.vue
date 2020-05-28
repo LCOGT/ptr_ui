@@ -124,6 +124,7 @@ export default {
             creator_id: this.eventDetails.creator_id,
             site: this.eventDetails.site,
             resourceId: this.eventDetails.resourceId,
+            project_id: this.eventDetails.project_id,
 
         }
     },
@@ -213,6 +214,7 @@ export default {
                 creator_id: this.creator_id,
                 site: this.site,
                 resourceId: this.resourceId,
+                project_id: this.project_id,
             }
             console.log('modified event: ', m_event)
             return m_event

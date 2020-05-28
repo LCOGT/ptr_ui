@@ -542,6 +542,7 @@ export default {
             this.activeEvent.site = this.calendarSite
             this.activeEvent.resourceId = this.calendarSite
             this.activeEvent.creator_id = this.$auth.user.sub
+            this.activeEvent.project_id = "none"
 
             console.log('actie event: ', this.activeEvent)
             this.isNewEvent = true; // setting for the modal event editor
@@ -560,6 +561,7 @@ export default {
             this.activeEvent.creator = event.extendedProps.creator
             this.activeEvent.site = event.extendedProps.site
             this.activeEvent.resourceId = event.getResources()[0].id
+            this.activeEvent.project_id = event.extendedProps.project_id
 
             this.isNewEvent = false; // setting for the modal event editor
             this.eventEditorIsActive= true
@@ -612,6 +614,7 @@ export default {
                 "site": newEvent.site,
                 "title": newEvent.title,
                 "resourceId": newEvent.resourceId,
+                "project_id": newEvent.project_id,
                 "rendering": newEvent.rendering
             }
             axios.post(url, eventToPost, config)
@@ -687,6 +690,7 @@ export default {
                 "site":modifiedEvent.site,
                 "title":modifiedEvent.title,
                 "resourceId":modifiedEvent.resourceId,
+                "project_id":modifiedEvent.project_id,
                 "rendering":modifiedEvent.rendering
             }
             let theInitialEvent = {
@@ -698,6 +702,7 @@ export default {
                 "site":initialEvent.site,
                 "title":initialEvent.title,
                 "resourceId":initialEvent.resourceId,
+                "project_id":initialEvent.project_id,
                 "rendering":initialEvent.rendering
             }
             //console.log(theModifiedEvent)
@@ -752,6 +757,7 @@ export default {
                 'creator': obj.creator,
                 'site': obj.site,
                 'resourceId': obj.resourceId,
+                'project_id': obj.project_id,
                 'rendering': obj.rendering,
                 }
                 return fObj
