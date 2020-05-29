@@ -43,13 +43,14 @@
                     add
                 </button-->
                 <b-dropdown
+                    v-if="props.row.project_id=='none'"
                     :scrollable="true"
                     :max-height="400"
                     multiple
                     v-model="user_projects"
                     aria-role="list"
                 >
-                    <button class="button is-primary" type="button" slot="trigger">
+                    <button disabled class="button is-primary" type="button" slot="trigger">
                         <template>
                             <span>add</span>
                         </template>
@@ -68,6 +69,7 @@
                     </b-dropdown-item>
                 </b-dropdown>
             </b-table-column>
+
 
 
 
