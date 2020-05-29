@@ -29,6 +29,17 @@
                 {{ props.row.object.dec }} 
             </b-table-column>
 
+            <b-table-column field="delete" label="">
+                <button 
+                    class="button is-danger is-small" 
+                    @click="$store.dispatch('user_data/deleteProject', props.row.project_id)" 
+                    >
+                    <span class="icon is-small ">
+                        <i class="mdi mdi-delete mdi-24px"></i>
+                    </span>
+                </button>
+            </b-table-column>
+
             <!--b-table-column field="fits_download" label="Fits Download">
                 <a :href="props.row.fits13_url">download</a>
             </b-table-column>

@@ -11,37 +11,67 @@
             <b-input class="project-input" v-model="project_name"></b-input>
         </b-field>
 
+        <b-field    
+            label="Run during reservations"
+            >
+            <b-dropdown
+                v-model="project_events"
+                multiple
+                aria-role="list">
+
+                <button class="button is-light" type="button" slot="trigger">
+                    <span>Selected Events ({{ project_events.length }})</span>
+                    <b-icon icon="menu-down"></b-icon>
+                </button>
+
+                <b-dropdown-item 
+                    v-for="(event, index) in user_events" 
+                    :key="index"
+                    :value="event" 
+                    aria-role="listitem">
+                    <span>{{event.title}}</span>
+                </b-dropdown-item>
+
+            </b-dropdown>
+        </b-field>
+
         <b-field 
+            horizontal
             label="Object" 
             :type="{'is-danger': warn.object}"
             >
             <b-field>
-            <b-input class="project-input" v-model="object"></b-input>
+            <b-input 
+                style="max-width: 100px;"
+                class="project-input" 
+                v-model="object"></b-input>
             <p class="control">
                 <b-button class="button" type="is-text" outlined @click="getCoordinatesFromObject">Get Coordinates</b-button>
             </p>
         </b-field>
         </b-field>
         <b-field 
+            horizontal
             label="RA" 
             :type="{'is-danger': warn.ra}"
             >
-            <b-input class="project-input" v-model="ra"></b-input>
+            <b-input 
+                class="project-input" 
+                style="max-width: 100px;"
+                v-model="ra"></b-input>
         </b-field>
         <b-field 
+            horizontal
             label="Dec" 
             :type="{'is-danger': warn.dec}"
             >
-            <b-input class="project-input" v-model="dec"></b-input>
+            <b-input 
+            style="max-width: 100px;"
+                class="project-input" 
+                v-model="dec"></b-input>
         </b-field>
 
-        <button 
-            class="button is-text"
-            @click="showAdvancedInputs = !showAdvancedInputs"
-            style="margin-bottom: 15px;"
-            >
-            {{showAdvancedInputs ? "hide" : "show"}} advanced
-        </button>
+        <br>
 
         <b-field 
             v-if="showAdvancedInputs"
@@ -74,6 +104,14 @@
             >
             <b-input class="project-input" v-model="lunar_phase_max"></b-input>
         </b-field>
+        <button 
+            class="button is-text"
+            @click="showAdvancedInputs = !showAdvancedInputs"
+            style="margin-bottom: 15px;"
+            >
+            {{showAdvancedInputs ? "hide" : "show"}} advanced
+        </button>
+
     </section>
 
     <section class="column">
@@ -128,7 +166,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapGetters, mapState} from 'vuex'
 import axios from 'axios'
 import moment from 'moment'
 
@@ -144,7 +182,8 @@ export default {
             showAdvancedInputs: false,
 
             project_name: '',
-            
+            project_events: [],
+
             object: '',
             ra: '', 
             dec: '',
@@ -180,9 +219,37 @@ export default {
                 lunar_phase_max: false,
             },
 
+            calendarBaseUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev',
+
         }
     },
     methods: {
+
+        async getAuthRequestHeader() {
+            let token, configWithAuth;
+            try {
+                token = await this.$auth.getTokenSilently(); 
+            } catch(err) {
+                console.error(err)
+                console.warn('Did not acquire the needed token. Stopping request.')
+                
+                // small popup notification
+                this.$buefy.toast.open({
+                    duration: 5000,
+                    message: "Oops! You aren't authorized to do that.",
+                    position: 'is-bottom',
+                    type: 'is-danger' ,
+                })
+            }
+
+            return {
+                'headers': {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${token}`
+                }
+            }
+        },
 
         getCoordinatesFromObject() {
             console.log(`This function should get coordinates for ${this.object}`)
@@ -236,6 +303,24 @@ export default {
             Object.keys(this.warn).forEach(k => this.warn[k] = false)
         },
 
+        async addProjectToCalendarEvents(project_id, project_events) {
+            console.log(`Adding ${project_id} to project events: `, project_events)
+            let url = this.calendarBaseUrl + '/add-projects-to-events'
+            let body = {
+                "project_id": project_id,
+                "events": project_events.map(e => ({"event_id": e.event_id, "start": e.start})),
+            }
+            console.log(body)
+            let header = await this.getAuthRequestHeader()
+
+            axios.post(url, body, header).then(response => {
+                console.log(response)
+            }).catch(err => {
+                console.log('error: ',err)
+            })
+
+        },
+
         saveNewProject() {
 
 
@@ -267,15 +352,20 @@ export default {
             // Make sure all warnings are false, otherwise don't create the project.
             if (Object.values(this.warn).every(x => !x)) {
                 axios.post(url, project).then(console.log)
+                this.addProjectToCalendarEvents(project_id, this.project_events)
+                this.project_events = []
 
                 setTimeout(this.getUserProjects,3000)
+                setTimeout(this.getUserEvents,3000)
             }
         },
 
         getUserProjects() {
-            console.log('getting user projects')
             this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
-        }
+        },
+        getUserEvents() {
+            this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
+        },
     },
     watch: {
     },
@@ -284,6 +374,10 @@ export default {
             'site_config',
             'global_config',
         ]), 
+        ...mapState('user_data', [
+            'user_events',
+            'user_projects',
+        ]),
         user() {
             return this.$auth.user
         },
