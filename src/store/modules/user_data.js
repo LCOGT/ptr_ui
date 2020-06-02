@@ -129,7 +129,33 @@ const actions = {
             console.log(err)
         })
 
-    }
+    },
+
+    updateProjectInEvent({dispatch}, {event, project_id}) {
+        /* arg 'event' is the event object we want to update. Must include 'event_id' and 'start' */
+
+        let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com'
+        url += '/dev/add-projects-to-events'
+
+        const header = {
+            'headers': {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Access-Control-Allow-Origin': '*',
+            }
+        }
+        let body = {
+            "project_id": project_id,
+            "events": [event],
+        }
+        console.log(body)
+        axios.post(url, body, header).then(async response => {
+            let user = await getInstance().user.sub
+            dispatch('fetchUserEvents', user)
+            console.log(response.data)
+        }).catch(err => {
+            console.log("error fetching user events: ", err)
+        })
+    },
 
 }
 

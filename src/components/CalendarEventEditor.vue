@@ -40,6 +40,26 @@
         </b-select>
     </b-field>
 
+    <b-field    
+        label="Project"
+        horizontal
+        >
+
+        <b-select v-model="project_id">
+
+            <option value="none">none</option>
+            <option
+                v-for="(project, index) in user_projects" 
+                :key="index"
+                :value="project.project_id" 
+                aria-role="listitem">
+                <span>{{getProjectName(project.project_id)}}</span>
+            </option>
+
+        </b-select>
+    </b-field>
+
+
     <b-field horizontal>
         {{eventDuration}}
     </b-field>
@@ -102,6 +122,7 @@
 
 <script>
 import moment from 'moment';
+import {mapState} from 'vuex'
 
 export default {
     name: 'CalendarEventEditor',
@@ -133,6 +154,9 @@ export default {
         this.endStr = moment(this.eventDetails.endStr).tz(this.timezone).format()
     },
     computed: {
+        ...mapState('user_data', [
+            'user_projects',
+        ]),
         timezone() {
           let tz = {
             "wmd": "America/Los_Angeles",
@@ -221,6 +245,9 @@ export default {
         }
     },
     methods: {
+        getProjectName(project_id) {
+            return project_id.split('#')[0]
+        },
         handleSubmit() {
             this.submitIsLoading = true;
             this.$emit('submit', this.modifiedEvent)

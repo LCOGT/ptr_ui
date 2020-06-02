@@ -19,7 +19,7 @@
 
     <!--button class="button" @click="getUserEvents">get user events</button-->
 
-    <p class="subtitle">Future events for {{user.name}}</p>
+    <p class="subtitle">Future events for {{username}}</p>
     <user-events-table :user="user" />
 
 </div>
@@ -75,6 +75,12 @@ export default {
 
         user() {
             return this.$auth.user
+        },
+        username() {
+            if (this.$auth.isAuthenticated) {
+                return this.$auth.user.name
+            }
+            return '-'
         },
 
         timezone() {

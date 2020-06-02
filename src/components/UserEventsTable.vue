@@ -8,6 +8,7 @@
         :paginated="true"
         :per-page="20"
         class="no-margin"
+        @click="setActiveEvent"
         >
         <template slot-scope="props">
             <b-table-column field="site" label="site" sortable>
@@ -35,30 +36,43 @@
             </b-table-column>
 
             <b-table-column field="project" label="projects">
-                {{ props.row.project_id=="none" ? '' : props.row.project_id}} 
                 <!--button 
                     v-if="props.row.project_id=='none'"
                     class="button is-small is-success"
                     >
                     add
                 </button-->
+
                 <b-dropdown
-                    v-if="props.row.project_id=='none'"
                     :scrollable="true"
                     :max-height="400"
-                    multiple
-                    v-model="user_projects"
                     aria-role="list"
+
                 >
-                    <button disabled class="button is-primary" type="button" slot="trigger">
+                    <button 
+                        class="button is-primary" 
+                        :class="{'is-loading': props.row.event_id == activeEvent.event_id && setProjectButtonIsLoading}"
+                        type="button" 
+                        slot="trigger">
                         <template>
-                            <span>add</span>
+                            <span>{{ props.row.project_id=="none" ? '' : props.row.project_id.split('#')[0]}} </span>
                         </template>
                         <b-icon icon="menu-down"></b-icon>
                     </button>
 
                     <b-dropdown-item 
+                        @click="setProjectId('none')"
+                        value="none"
+                        >
+                        <div class="media">
+                            <div class="media-content">
+                                <h3>none</h3>
+                            </div>
+                        </div>
+                    </b-dropdown-item>
+                    <b-dropdown-item 
                         v-for="(p, index) in user_projects"
+                        @click="setProjectId(p.project_id)"
                         :key="index"
                         :value="p.project_id" aria-role="listitem">
                         <div class="media">
@@ -138,6 +152,11 @@ export default {
             isFocusable:true,
             isLoading: false,
             isSelectable: true,
+            
+            activeEvent: 'hi',
+            setProjectButtonIsLoading: false,
+            
+
 
             //user_events: [],
         }
@@ -162,6 +181,23 @@ export default {
 
     },
     methods: {
+        setActiveEvent(row) {
+            console.log(row)
+            this.activeEvent =row
+        },
+        setProjectId(project_id) {
+            console.log(project_id)
+            this.setProjectButtonIsLoading = true;
+            let payload = {
+                "event": this.activeEvent,
+                "project_id": project_id,
+            }
+            this.$store.dispatch('user_data/updateProjectInEvent', payload).then(response => {
+                this.setProjectButtonIsLoading = false;
+            }).catch(err => {
+                this.setProjectButtonIsLoading = false;
+            })
+        },
         getProjectName(project_id) {
             if (project_id === undefined) { return ''}
             return project_id.split('#')[0]
