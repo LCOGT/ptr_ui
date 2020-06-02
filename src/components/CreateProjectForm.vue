@@ -12,7 +12,7 @@
         </b-field>
 
         <b-field    
-            label="Run during reservations"
+            label="Run during these reserved events:"
             >
             <b-dropdown
                 v-model="project_events"
@@ -24,16 +24,29 @@
                     <b-icon icon="menu-down"></b-icon>
                 </button>
 
+                <b-dropdown-item disabled> events with no project</b-dropdown-item>
+                <b-dropdown-item separator />
                 <b-dropdown-item 
-                    v-for="(event, index) in user_events" 
-                    :key="index"
+                    v-for="(event, index) in user_events_with_projects" 
+                    :key="`with-project-${index}`"
                     :value="event" 
                     aria-role="listitem">
-                    <span>{{event.title}}</span>
+                        <span> {{event.title}} </span>
+                </b-dropdown-item>
+                <b-dropdown-item separator />
+                <b-dropdown-item disabled> events with existing projects (will be replaced)</b-dropdown-item>
+                <b-dropdown-item separator />
+                <b-dropdown-item 
+                    v-for="(event, index) in user_events_without_projects" 
+                    :key="`without-project-${index}`"
+                    :value="event" 
+                    aria-role="listitem">
+                        <span> {{`${event.title} (${event.project_id.split('#')[0]})`}} </span>
                 </b-dropdown-item>
 
             </b-dropdown>
         </b-field>
+        <br>
 
         <b-field 
             horizontal
@@ -159,7 +172,13 @@
     </section>
     </div>
 
-    <button class="button is-success is-outlined" @click="saveNewProject">Create Project</button>
+    <b-tooltip :label="!$auth.isAuthenticated ? 'You must be logged in to create a project.' : ''">
+    <button 
+        class="button is-success is-outlined"
+        @click="saveNewProject"
+        :disabled="!$auth.isAuthenticated"
+        >Create Project</button>
+    </b-tooltip>
 
 
 </div>
@@ -378,6 +397,12 @@ export default {
             'user_events',
             'user_projects',
         ]),
+        user_events_with_projects() {
+            return this.user_events.filter(event => event.project_id == "none")
+        },
+        user_events_without_projects() {
+            return this.user_events.filter(event => event.project_id != "none")
+        },
         user() {
             return this.$auth.user
         },
