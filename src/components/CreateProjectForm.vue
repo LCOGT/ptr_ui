@@ -105,6 +105,16 @@
         </b-field>
         <b-field 
             v-if="showAdvancedInputs"
+            label="User Diffuser">
+            <b-checkbox v-model="use_diffuser"></b-checkbox>
+        </b-field>
+        <b-field 
+            v-if="showAdvancedInputs"
+            label="Prefer Bessel">
+            <b-checkbox v-model="prefer_bessel"></b-checkbox>
+        </b-field>
+        <b-field 
+            v-if="showAdvancedInputs"
             label="Min Lunar Dist." 
             :type="{'is-danger': warn.lunar_dist_min}"
             >
@@ -222,6 +232,8 @@ export default {
             frequent_autofocus: false,
 
             dither: false,
+            use_diffuser: false,
+            prefer_bessel: false,
             lunar_dist_min: 0,
             lunar_phase_max: 1,
 
@@ -234,6 +246,8 @@ export default {
                 dec: false,
                 pa: false,
                 dither: false,
+                user_diffuser: false,
+                prefer_bessel: false,
                 lunar_dist_min: false,
                 lunar_phase_max: false,
             },
@@ -307,8 +321,15 @@ export default {
             this.exposures_index += 1;
         },
 
-        checkFormForBlankValues() {
+        verifyForm() {
             if (this.project_name === '') { this.warn.project_name = true }
+            if (this.project_name.includes('#')) {
+                this.warn.project_name = true;
+                this.$buefy.toast.open({
+                    message: "Please avoid '#' in the project name",
+                    type: "is-danger"
+                })
+            }
             if (this.object === '') { this.warn.object = true }
             if (this.ra === '') { this.warn.ra = true }
             if (this.dec === '') { this.warn.dec = true }
@@ -344,7 +365,7 @@ export default {
 
 
             this.resetInputWarnings()
-            this.checkFormForBlankValues()
+            this.verifyForm()
 
             let url = this.projects_api_url+'/new-project'
 
@@ -363,6 +384,9 @@ export default {
                 settings: {
                     position_angle: this.pa,
                     autofocus: this.autofocus,
+                    dither: this.dither,
+                    use_diffucser: this.use_diffuser,
+                    prefer_bessel: this.prefer_bessel,
                 },
                 completed: [],
                 remaining: this.exposures.filter(e => e.active),
