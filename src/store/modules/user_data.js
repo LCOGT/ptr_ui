@@ -77,7 +77,8 @@ const actions = {
     fetchUserEvents({ commit }, user_id) {
         commit('user_events_is_loading', true)
 
-        let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com'
+        //let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com'
+        let url = 'https://calendar.photonranch.org'
         url += '/dev/user-events-ending-after-time'
 
         const header = {
@@ -134,7 +135,8 @@ const actions = {
     updateProjectInEvent({dispatch}, {event, project_id}) {
         /* arg 'event' is the event object we want to update. Must include 'event_id' and 'start' */
 
-        let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com'
+        //let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com'
+        let url = 'https://calendar.photonranch.org'
         url += '/dev/add-projects-to-events'
 
         const header = {

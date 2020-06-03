@@ -144,7 +144,8 @@ export default {
             utcTime: '-',
 
             // URL for the calendar backend api
-            backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
+            //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
+            backendUrl: 'https://calendar.photonranch.org',
 
             // Events Table Settings
             isEmpty: true,

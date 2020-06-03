@@ -7,25 +7,24 @@
         :focusable="isFocusable"
         :paginated="true"
         :per-page="20"
-        custom-detail-row
         detailed
-        class="no-margin"
+        class="my-table no-margin"
         >
         <template slot-scope="props">
 
-            <b-table-column field="name" label="project name">
+            <b-table-column field="project_name" label="project name">
                 {{ props.row.project_id.split('#')[0] }} 
             </b-table-column>
 
-            <b-table-column field="object" label="object">
+            <b-table-column field="object.name" label="object">
                 {{ props.row.object.name }}
             </b-table-column>
 
-            <b-table-column field="ra" label="ra" sortable>
+            <b-table-column field="object.ra" label="ra" sortable>
                 {{ props.row.object.ra }} 
             </b-table-column>
 
-            <b-table-column field="dec" label="dec">
+            <b-table-column field="object.dec" label="dec">
                 {{ props.row.object.dec }} 
             </b-table-column>
 
@@ -47,11 +46,6 @@
             <b-table-column field="observation" label="Observation Time" centered>
                     {{ new Date(props.row.capture_date).toUTCString() }}
             </b-table-column-->
-        </template>
-        <template slot="detail" slot-scope="props">
-            <div>
-            <pre>{{props.row}}</pre>
-            </div>
         </template>
 
         <template slot="bottom-left">
@@ -78,6 +72,11 @@
                     <p>Nothing here.</p>
                 </div>
             </section>
+        </template>
+        <template slot="detail" slot-scope="props" class="has-background-color-dark">
+            <div>
+            <pre>{{props.row}}</pre>
+            </div>
         </template>
     </b-table>
 
@@ -159,5 +158,15 @@ export default {
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
+
+// Fix buefy's default white detail background color
+.my-table {
+    /deep/ .table {
+        /deep/ tr.detail {
+            background-color: #1e2223;
+            box-shadow: none;
+        }
+    }
+}
 </style>

@@ -151,17 +151,34 @@
             </b-field>
             <b-field :label="n==1 ? 'Filter' : ''">
                 <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].filter">
-                    <option value="air"> air </option>
-                    <option value="dark"> dark </option>
-                    <option value="L"> L </option>
-                    <option value="R"> R </option>
-                    <option value="G"> G </option>
-                    <option value="B"> B </option>
+                    <option value="Lum"> Lum </option>
+                    <option value="Red"> Red </option>
+                    <option value="Green"> Green </option>
+                    <option value="Blue"> Blue </option>
+                    <option value="NIR"> NIR </option>
                     <option value="O3"> O3 </option>
                     <option value="Ha"> Ha </option>
                     <option value="N2"> N2 </option>
                     <option value="S2"> S2 </option>
                     <option value="CR"> CR </option>
+                    <option value="EXO"> EXO </option>
+                    <option value="W"> W </option>
+                    <option value="air"> air </option>
+                    <option value="clear"> clear </option>
+                    <option value="silica"> silica </option>
+                    <option value="u_prime"> u' </option>
+                    <option value="g_prime"> g' </option>
+                    <option value="r_prime"> r' </option>
+                    <option value="i_prime"> i' </option>
+                    <option value="zs"> zs </option>
+                    <option value="z_prime"> z' </option>
+                    <option value="Y"> Y </option>
+                    <option value="U"> U </option>
+                    <option value="B"> B </option>
+                    <option value="V"> V </option>
+                    <option value="Rc"> Rc </option>
+                    <option value="Ic"> Ic </option>
+                    <option value="dark"> dark </option>
                 </b-select>
             </b-field>
             <b-field :label="n==1 ? 'Bin' : ''">
@@ -224,7 +241,7 @@ export default {
                     active: true,
                     count: 1,
                     exposure: 0,
-                    filter: 'L',
+                    filter: 'Lum',
                     bin: 1,
                 },
             ],
@@ -252,7 +269,8 @@ export default {
                 lunar_phase_max: false,
             },
 
-            calendarBaseUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev',
+            //calendarBaseUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev',
+            calendarBaseUrl: 'https://calendar.photonranch.org/dev',
 
         }
     },
