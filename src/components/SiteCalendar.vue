@@ -19,7 +19,7 @@
 
     <!--button class="button" @click="getUserEvents">get user events</button-->
 
-    <p class="subtitle">Future events for {{username}}</p>
+    <p class="subtitle">Upcoming reservations for {{username}}</p>
     <user-events-table :user="user" />
 
 </div>
@@ -47,7 +47,8 @@ export default {
             utcTime: '-',
 
             // URL for the calendar backend api
-            backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
+            //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
+            backendUrl: 'https://calendar.photonranch.org',
         }
     },
     created() {
@@ -100,7 +101,7 @@ export default {
                 all_obs.push({
                     'id': o.site,
                     'title': o.name,
-                    'eventColor': '#7d12ff',
+                    'eventColor': '#4e1199',
                     //'eventBackgroundColor': '#ab20fd',
                     'eventBorderColor': '#200589',
                     'eventTextColor': '#fbf8fd',

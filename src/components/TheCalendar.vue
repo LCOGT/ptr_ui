@@ -207,6 +207,7 @@ export default {
           'site_longitude',
         ]),
 
+
     },
 
     data: function() { return {
@@ -261,7 +262,8 @@ export default {
         ],
 
         // URL for the calendar backend api
-        backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
+        //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
+        backendUrl: 'https://calendar.photonranch.org',
 
         // this informs what buttons appear in the modal event editor
         isNewEvent: false,
@@ -727,6 +729,14 @@ export default {
         /*===================================================/
         Fetching Calendar Events
         /===================================================*/
+
+        /**
+         * The event color should reflect whether it is owned by the user.
+         */
+        eventColor() {
+
+        },
+
         async fetchSiteEvents(fetchInfo) {
 
             // TODO: we don't want to define the site from the select box
@@ -755,10 +765,15 @@ export default {
                 'id': obj.event_id,
                 'title': obj.title,
                 'creator': obj.creator,
+                'creator_id': obj.creator_id,
                 'site': obj.site,
                 'resourceId': obj.resourceId,
                 'project_id': obj.project_id,
                 'rendering': obj.rendering,
+                }
+                if (this.$auth.isAuthenticated && fObj.creator_id == this.$auth.user.sub) {
+                  fObj.backgroundColor = '#933bff'
+                  //fObj.borderColor = '#4099ff'
                 }
                 return fObj
             })
