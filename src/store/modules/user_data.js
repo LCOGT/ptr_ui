@@ -58,7 +58,7 @@ const actions = {
     async fetchUserProjects({ commit }, user_id) {
         commit('user_projects_is_loading', true)
 
-        let url = 'https://a85vsflfd2.execute-api.us-east-1.amazonaws.com/dev'
+        let url = 'https://projects.photonranch.org/dev'
         url += '/get-user-projects'
         
         let header = await getAuthRequestHeader()
@@ -77,7 +77,6 @@ const actions = {
     fetchUserEvents({ commit }, user_id) {
         commit('user_events_is_loading', true)
 
-        //let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com'
         let url = 'https://calendar.photonranch.org'
         url += '/dev/user-events-ending-after-time'
 
@@ -101,13 +100,16 @@ const actions = {
         })
     },
 
-    async deleteProject({ dispatch }, project_id) {
-        let url = 'https://a85vsflfd2.execute-api.us-east-1.amazonaws.com/dev'
-        url += '/delete-project-by-id'
+    async deleteProject({ dispatch }, {project_name, created}) {
+        let url = 'https://projects.photonranch.org/dev'
+        url += '/delete-project'
         
         let header = await getAuthRequestHeader()
 
-        let body = {project_id: project_id}
+        let body = {
+            project_name:project_name,
+            created: created
+        }
 
         axios.post(url, body, header).then(async response => {
             console.log(response)
@@ -115,7 +117,7 @@ const actions = {
             dispatch('fetchUserProjects', user)
             Toast.open({
                 duration: 5000,
-                message: "Successfully deleted project "+project_id.split('#')[0],
+                message: "Successfully deleted project "+project_name,
                 position: 'is-bottom',
                 type: 'is-info' ,
             })
@@ -129,13 +131,11 @@ const actions = {
             console.log('error deleting project ', err)
             console.log(err)
         })
-
     },
 
-    updateProjectInEvent({dispatch}, {event, project_id}) {
+    updateProjectInEvent({dispatch}, {event, project_name, project_created}) {
         /* arg 'event' is the event object we want to update. Must include 'event_id' and 'start' */
 
-        //let url = 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com'
         let url = 'https://calendar.photonranch.org'
         url += '/dev/add-projects-to-events'
 
@@ -145,6 +145,7 @@ const actions = {
                 'Access-Control-Allow-Origin': '*',
             }
         }
+        let project_id = (project_name=="none") ? "none" : `${project_name}#${project_created}`
         let body = {
             "project_id": project_id,
             "events": [event],

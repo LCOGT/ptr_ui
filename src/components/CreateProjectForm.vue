@@ -224,7 +224,8 @@ export default {
     data() {
         return {
 
-            projects_api_url: 'https://a85vsflfd2.execute-api.us-east-1.amazonaws.com/dev',
+            //projects_api_url: 'https://a85vsflfd2.execute-api.us-east-1.amazonaws.com/dev',
+            projects_api_url: 'https://projects.photonranch.org/dev',
             showAdvancedInputs: false,
 
             project_name: '',
@@ -361,11 +362,10 @@ export default {
             Object.keys(this.warn).forEach(k => this.warn[k] = false)
         },
 
-        async addProjectToCalendarEvents(project_id, project_events) {
-            console.log(`Adding ${project_id} to project events: `, project_events)
+        async addProjectToCalendarEvents(project_name, project_created, project_events) {
             let url = this.calendarBaseUrl + '/add-projects-to-events'
             let body = {
-                "project_id": project_id,
+                "project_id": `${project_name}#${project_created}`,
                 "events": project_events.map(e => ({"event_id": e.event_id, "start": e.start})),
             }
             console.log(body)
@@ -387,11 +387,8 @@ export default {
 
             let url = this.projects_api_url+'/new-project'
 
-            // project_id is format: <project_name>#<utc_milliseconds>
-            let project_id = `${this.project_name}#${moment().valueOf()}`
-
             let project = {
-                project_id: project_id,
+                project_name: this.project_name,
                 created: moment().valueOf(),
                 user_id: this.user.sub,
                 object: {
@@ -410,10 +407,11 @@ export default {
                 remaining: this.exposures.filter(e => e.active),
             }
 
+
             // Make sure all warnings are false, otherwise don't create the project.
             if (Object.values(this.warn).every(x => !x)) {
                 axios.post(url, project).then(console.log)
-                this.addProjectToCalendarEvents(project_id, this.project_events)
+                this.addProjectToCalendarEvents(project.project_name, project.created, this.project_events)
                 this.project_events = []
 
                 setTimeout(this.getUserProjects,3000)

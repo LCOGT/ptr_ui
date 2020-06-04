@@ -45,15 +45,15 @@
         horizontal
         >
 
-        <b-select v-model="project_id">
+        <b-select v-model="project_name_and_created">
 
             <option value="none">none</option>
             <option
                 v-for="(project, index) in user_projects" 
                 :key="index"
-                :value="project.project_id" 
+                :value="`${project.project_name}#${project.created}`" 
                 aria-role="listitem">
-                <span>{{getProjectName(project.project_id)}}</span>
+                <span>{{project.project_name}}</span>
             </option>
 
         </b-select>
@@ -145,7 +145,7 @@ export default {
             creator_id: this.eventDetails.creator_id,
             site: this.eventDetails.site,
             resourceId: this.eventDetails.resourceId,
-            project_id: this.eventDetails.project_id,
+            project_name_and_created: this.eventDetails.project_id,
 
         }
     },
@@ -238,16 +238,13 @@ export default {
                 creator_id: this.creator_id,
                 site: this.site,
                 resourceId: this.resourceId,
-                project_id: this.project_id,
+                project_name_and_created: this.project_name_and_created,
             }
             console.log('modified event: ', m_event)
             return m_event
         }
     },
     methods: {
-        getProjectName(project_id) {
-            return project_id.split('#')[0]
-        },
         handleSubmit() {
             this.submitIsLoading = true;
             this.$emit('submit', this.modifiedEvent)

@@ -61,7 +61,7 @@
                     </button>
 
                     <b-dropdown-item 
-                        @click="setProjectId('none')"
+                        @click="setProjectId('none', 0)"
                         value="none"
                         >
                         <div class="media">
@@ -72,12 +72,12 @@
                     </b-dropdown-item>
                     <b-dropdown-item 
                         v-for="(p, index) in user_projects"
-                        @click="setProjectId(p.project_id)"
+                        @click="setProjectId(p.project_name, p.created)"
                         :key="index"
-                        :value="p.project_id" aria-role="listitem">
+                        :value="p.project_name" aria-role="listitem">
                         <div class="media">
                             <div class="media-content">
-                                <h3>{{p.project_id.split('#')[0]}}</h3>
+                                <h3>{{p.project_name}}</h3>
                             </div>
                         </div>
                     </b-dropdown-item>
@@ -186,22 +186,18 @@ export default {
             console.log(row)
             this.activeEvent =row
         },
-        setProjectId(project_id) {
-            console.log(project_id)
+        setProjectId(project_name, created) {
             this.setProjectButtonIsLoading = true;
             let payload = {
                 "event": this.activeEvent,
-                "project_id": project_id,
+                "project_name": project_name,
+                "project_created": created,
             }
             this.$store.dispatch('user_data/updateProjectInEvent', payload).then(response => {
                 this.setProjectButtonIsLoading = false;
             }).catch(err => {
                 this.setProjectButtonIsLoading = false;
             })
-        },
-        getProjectName(project_id) {
-            if (project_id === undefined) { return ''}
-            return project_id.split('#')[0]
         },
         displayUtcTime(time) {
             return moment(time).utc().format("MMM D, kk:mm")
@@ -223,31 +219,6 @@ export default {
             var s = Math.floor(d.asHours()) + moment.utc(ms).format(":mm");
             return s
         },
-        //getUserEvents() {
-            //this.isLoading = true
-            //const url = `${this.backendUrl}/dev/user-events-ending-after-time`
-            //let time = moment().utc().format()
-            //let user = this.$auth.user.sub
-
-            //const header = {
-                //'headers': {
-                    //'Content-Type': 'application/json;charset=UTF-8',
-                    //'Access-Control-Allow-Origin': '*',
-                //}
-            //}
-            //let body = {
-                //"time": time,
-                //"user_id": user,
-            //}
-            //axios.post(url, body, header).then(response => {
-                //this.isLoading = false
-                //this.user_events = response.data
-            //}).catch(err => {
-                //this.isLoading = false
-                //console.log("error fetching user events: ", err)
-            //})
-
-        //},
     },
     computed: {
         ...mapGetters('site_config', [
