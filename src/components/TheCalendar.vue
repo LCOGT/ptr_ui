@@ -758,7 +758,7 @@ export default {
             let resp = await axios.post(url, body, options)
 
             // Format the returned items to work nicely with fullcalendar.
-            let formatted_events = resp.data.table_response.Items.map(obj => {
+            let formatted_events = resp.data.map(obj => {
                 let fObj = {
                 'start': obj.start,
                 'end': obj.end,

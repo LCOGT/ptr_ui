@@ -13,7 +13,7 @@
         <template slot-scope="props">
 
             <b-table-column field="project_name" label="project name">
-                {{ props.row.project_id.split('#')[0] }} 
+                {{ props.row.project_name }} 
             </b-table-column>
 
             <b-table-column field="object.name" label="object">
@@ -31,7 +31,7 @@
             <b-table-column field="delete" label="">
                 <button 
                     class="button is-danger is-small" 
-                    @click="$store.dispatch('user_data/deleteProject', props.row.project_id)" 
+                    @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created': props.row.created})" 
                     >
                     <span class="icon is-small ">
                         <i class="mdi mdi-delete mdi-24px"></i>
