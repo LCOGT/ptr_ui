@@ -163,6 +163,10 @@ export default {
         global_config() {
           this.refreshCalendarView()
         },
+        user() {
+          console.log('user changed; refresh calendar view')
+          this.refreshCalendarView()
+        },
     },
 
 
@@ -206,6 +210,10 @@ export default {
           'site_latitude',
           'site_longitude',
         ]),
+
+        user() {
+          return this.$auth.user
+        },
 
 
     },

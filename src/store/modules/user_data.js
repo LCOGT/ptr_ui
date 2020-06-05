@@ -100,7 +100,7 @@ const actions = {
         })
     },
 
-    async deleteProject({ dispatch }, {project_name, created}) {
+    async deleteProject({ dispatch }, {project_name,created_at}) {
         let url = 'https://projects.photonranch.org/dev'
         url += '/delete-project'
         
@@ -108,7 +108,7 @@ const actions = {
 
         let body = {
             project_name:project_name,
-            created: created
+            created_at: created_at
         }
 
         axios.post(url, body, header).then(async response => {
@@ -133,7 +133,7 @@ const actions = {
         })
     },
 
-    updateProjectInEvent({dispatch}, {event, project_name, project_created}) {
+    updateProjectInEvent({dispatch}, {event, project_name,created_at}) {
         /* arg 'event' is the event object we want to update. Must include 'event_id' and 'start' */
 
         let url = 'https://calendar.photonranch.org'
@@ -145,7 +145,7 @@ const actions = {
                 'Access-Control-Allow-Origin': '*',
             }
         }
-        let project_id = (project_name=="none") ? "none" : `${project_name}#${project_created}`
+        let project_id = (project_name=="none") ? "none" : `${project_name}#${created_at}`
         let body = {
             "project_id": project_id,
             "events": [event],
