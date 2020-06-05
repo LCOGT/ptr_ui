@@ -51,7 +51,7 @@
             <option
                 v-for="(project, index) in user_projects" 
                 :key="index"
-                :value="`${project.project_name}#${project.created}`" 
+                :value="`${project.project_name}#${project.created_at}`" 
                 aria-role="listitem">
                 <span>{{project.project_name}}</span>
             </option>

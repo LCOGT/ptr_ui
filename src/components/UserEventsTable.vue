@@ -72,7 +72,7 @@
                     </b-dropdown-item>
                     <b-dropdown-item 
                         v-for="(p, index) in user_projects"
-                        @click="setProjectId(p.project_name, p.created)"
+                        @click="setProjectId(p.project_name, p.created_at)"
                         :key="index"
                         :value="p.project_name" aria-role="listitem">
                         <div class="media">
@@ -186,12 +186,12 @@ export default {
             console.log(row)
             this.activeEvent =row
         },
-        setProjectId(project_name, created) {
+        setProjectId(project_name, created_at) {
             this.setProjectButtonIsLoading = true;
             let payload = {
                 "event": this.activeEvent,
                 "project_name": project_name,
-                "project_created": created,
+                "created_at": created_at,
             }
             this.$store.dispatch('user_data/updateProjectInEvent', payload).then(response => {
                 this.setProjectButtonIsLoading = false;
