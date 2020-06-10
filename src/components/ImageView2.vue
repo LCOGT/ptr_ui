@@ -46,7 +46,7 @@
       <!-- Controls in the top row above the main view --> 
       <div class="controls">
 
-          <button class="button" @click="toggleAnalysis"> <b-icon icon="tune"></b-icon> </button>
+          <button class="button" @click="toggleAnalysis">JS9</button>
           <b-field>
             <p class="control">
               <b-tooltip label="latest image" position="is-bottom" type="is-black">

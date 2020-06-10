@@ -238,7 +238,7 @@ export default {
                 creator_id: this.creator_id,
                 site: this.site,
                 resourceId: this.resourceId,
-                project_name_and_created: this.project_name_and_created,
+                project_id: this.project_name_and_created,
             }
             console.log('modified event: ', m_event)
             return m_event

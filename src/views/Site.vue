@@ -85,14 +85,13 @@
     <!-- Primary content of the page. Selects from the various site subpages. -->
     <!-- Note: wait for parent (this component) to mount before loading child components. 
     Otherwise, props may initially load as null. -->
-    <div class="column page-content">
       <component 
+        style="width: 100%"
         v-bind:is="`site-${subpage}`"
         :sitecode="sitecode"
         :deviceStatus="deviceStatus"
         />
     </div>
-  </div>
   </section>
   </div>
 
@@ -362,6 +361,7 @@ export default {
   width: 300px;
   height: auto;
   padding: 0 auto;
+  margin-right: 40px;
 }
 
 .subpage-menu {
