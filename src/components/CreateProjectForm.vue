@@ -1,10 +1,7 @@
 <template>
 <div>
     <h1 class="title">Create a project</h1>
-     <b-tabs type="is-boxed">
-        <b-tab-item label="Single Target">
-            <div class="columns">
-            <section class="column">
+
                 <b-field 
                     label="Project Name" 
                     :type="{'is-danger': warn.project_name}"
@@ -12,144 +9,68 @@
                     <b-input class="project-input" v-model="project_name"></b-input>
                 </b-field>
 
-                <b-field    
-                    label="Run during these reserved events:"
-                    >
-                    <b-dropdown
-                        v-model="project_events"
-                        multiple
-                        aria-role="list">
 
-                        <button class="button is-light" type="button" slot="trigger">
-                            <span>Selected Events ({{ project_events.length }})</span>
-                            <b-icon icon="menu-down"></b-icon>
-                        </button>
 
-                        <b-dropdown-item disabled> events with no project</b-dropdown-item>
-                        <b-dropdown-item separator />
-                        <b-dropdown-item 
-                            v-for="(event, index) in user_events_with_projects" 
-                            :key="`with-project-${index}`"
-                            :value="event" 
-                            aria-role="listitem">
-                                <span> {{event.title}} </span>
-                        </b-dropdown-item>
-                        <b-dropdown-item separator />
-                        <b-dropdown-item disabled> events with existing projects (will be replaced)</b-dropdown-item>
-                        <b-dropdown-item separator />
-                        <b-dropdown-item 
-                            v-for="(event, index) in user_events_without_projects" 
-                            :key="`without-project-${index}`"
-                            :value="event" 
-                            aria-role="listitem">
-                                <span> {{`${event.title} (${event.project_id.split('#')[0]})`}} </span>
-                        </b-dropdown-item>
+     <b-tabs type="is-boxed">
 
-                    </b-dropdown>
-                </b-field>
-                <br>
+        <b-tab-item label="Targets">
+                <div v-for="n in targets_index" v-bind:key="n" class="target-row">
 
-                <b-field 
-                    horizontal
-                    label="Object" 
-                    :type="{'is-danger': warn.object}"
-                    >
-                    <b-field>
-                    <b-input 
-                        style="max-width: 100px;"
-                        class="project-input" 
-                        v-model="object"></b-input>
-                    <p class="control">
-                        <b-button class="button" type="is-text" outlined @click="getCoordinatesFromObject">Get Coordinates</b-button>
-                    </p>
-                </b-field>
-                </b-field>
-                <b-field 
-                    horizontal
-                    label="RA" 
-                    :type="{'is-danger': warn.ra}"
-                    >
-                    <b-input 
-                        class="project-input" 
-                        style="max-width: 100px;"
-                        v-model="ra"></b-input>
-                </b-field>
-                <b-field 
-                    horizontal
-                    label="Dec" 
-                    :type="{'is-danger': warn.dec}"
-                    >
-                    <b-input 
-                    style="max-width: 100px;"
-                        class="project-input" 
-                        v-model="dec"></b-input>
-                </b-field>
+                    <b-field :label="' '">
+                        <b-checkbox v-model="targets[n-1].active"></b-checkbox>
+                    </b-field>
 
-                <br>
+                    <b-field :label="n==1 ? 'Name' : ''" style="width: 130px;">
+                        <b-field>
+                            <b-input 
+                                :disabled="!targets[n-1].active"
+                                style="max-width: 150px;"
+                                class="project-input" 
+                                v-model="targets[n-1].name"></b-input>
+                            <p class="control">
+                                <b-button class="button" type="is-light" @click="getCoordinatesFromName(n-1)"><b-icon icon="magnify"/></b-button>
+                            </p>
+                        </b-field>
+                    </b-field>
 
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Position Angle" 
-                    :type="{'is-danger': warn.pa}"
-                    >
-                    <b-input class="project-input" type="number" min="-360" max="360" v-model="pa"/>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Autofocus">
-                    <b-checkbox v-model="frequent_autofocus">focus more frequently</b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Dither">
-                    <b-checkbox v-model="dither"></b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="User Diffuser">
-                    <b-checkbox v-model="use_diffuser"></b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Prefer Bessel">
-                    <b-checkbox v-model="prefer_bessel"></b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Enhance Photometry">
-                    <b-checkbox v-model="enhance_photometry"></b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Max Airmass" 
-                    :type="{'is-danger': warn.max_airmass}"
-                    >
-                    <b-input class="project-input" v-model="max_airmass"></b-input>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Min Lunar Dist." 
-                    :type="{'is-danger': warn.lunar_dist_min}"
-                    >
-                    <b-input class="project-input" v-model="lunar_dist_min"></b-input>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Max Lunar Phase" 
-                    :type="{'is-danger': warn.lunar_phase_max}"
-                    >
-                    <b-input class="project-input" v-model="lunar_phase_max"></b-input>
-                </b-field>
-                <button 
-                    class="button is-text"
-                    @click="showAdvancedInputs = !showAdvancedInputs"
-                    style="margin-bottom: 15px;"
-                    >
-                    {{showAdvancedInputs ? "hide" : "show"}} advanced
-                </button>
+                    <b-field 
+                        :type="{'is-danger': warn.ra}"
+                        :label="n==1 ? 'RA' : ''"
+                        style="width: 100px;"
+                        >
+                        <b-input 
+                            :disabled="!targets[n-1].active" 
+                            v-model="targets[n-1].ra"/>
+                    </b-field>
 
-            </section>
+                    <b-field 
+                        :type="{'is-danger': warn.dec}"
+                        :label="n==1 ? 'Dec' : ''"
+                        style="width: 100px;"
+                        >
+                        <b-input 
+                            :disabled="!targets[n-1].active" 
+                            v-model="targets[n-1].dec"/>
+                    </b-field>
 
+                    <b-field 
+                        :type="{'is-danger': warn.dec}"
+                        :label="n==1 ? 'Photometric Pref.' : ''"
+                        style="width: 140px;"
+                        >
+                        <b-input 
+                            :disabled="!targets[n-1].active" 
+                            v-model="targets[n-1].photometric_preference"/>
+                    </b-field>
+
+                    <div></div>
+
+                </div>
+                <button class="button" @click="newTargetRow">add another target</button>
+        </b-tab-item>
+        <b-tab-item label="Settings">
+
+            <div class="columns">
             <section class="column">
 
                 <div v-for="n in exposures_index" v-bind:key="n" class="exposure-row">
@@ -207,19 +128,77 @@
                 <button class="button" @click="newExposureRow">add row</button>
                 <div/>
             </section>
+            <section class="column">
+                <button 
+                    class="button is-text"
+                    @click="showAdvancedInputs = !showAdvancedInputs"
+                    style="margin-bottom: 15px;"
+                    >
+                    {{showAdvancedInputs ? "hide" : "show"}} advanced
+                </button>
+
+                <br>
+
+                <b-field 
+                    v-if="showAdvancedInputs"
+                    label="Position Angle" 
+                    :type="{'is-danger': warn.pa}"
+                    >
+                    <b-input class="project-input" type="number" min="-360" max="360" v-model="pa"/>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
+                    label="Autofocus">
+                    <b-checkbox v-model="frequent_autofocus">focus more frequently</b-checkbox>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
+                    label="Dither">
+                    <b-checkbox v-model="dither"></b-checkbox>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
+                    label="User Diffuser">
+                    <b-checkbox v-model="use_diffuser"></b-checkbox>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
+                    label="Prefer Bessel">
+                    <b-checkbox v-model="prefer_bessel"></b-checkbox>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
+                    label="Enhance Photometry">
+                    <b-checkbox v-model="enhance_photometry"></b-checkbox>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
+                    label="Max Airmass" 
+                    :type="{'is-danger': warn.max_airmass}"
+                    >
+                    <b-input class="project-input" v-model="max_airmass"></b-input>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
+                    label="Min Lunar Dist." 
+                    :type="{'is-danger': warn.lunar_dist_min}"
+                    >
+                    <b-input class="project-input" v-model="lunar_dist_min"></b-input>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
+                    label="Max Lunar Phase" 
+                    :type="{'is-danger': warn.lunar_phase_max}"
+                    >
+                    <b-input class="project-input" v-model="lunar_phase_max"></b-input>
+                </b-field>
+
+            </section>
+
             </div>
 
         </b-tab-item>
-        <b-tab-item label="Multi Target">
-            <div class="columns">
-            <section class="column">
-                <b-field 
-                    label="Project Name" 
-                    :type="{'is-danger': warn.project_name}"
-                    >
-                    <b-input class="project-input" v-model="project_name"></b-input>
-                </b-field>
-
+        <b-tab-item label="Scheduling">
                 <b-field    
                     label="Run during these reserved events:"
                     >
@@ -255,169 +234,6 @@
 
                     </b-dropdown>
                 </b-field>
-                <br>
-
-                <b-field 
-                    horizontal
-                    label="Object" 
-                    :type="{'is-danger': warn.object}"
-                    >
-                    <b-field>
-                    <b-input 
-                        style="max-width: 100px;"
-                        class="project-input" 
-                        v-model="object"></b-input>
-                    <p class="control">
-                        <b-button class="button" type="is-text" outlined @click="getCoordinatesFromObject">Get Coordinates</b-button>
-                    </p>
-                </b-field>
-                </b-field>
-                <b-field 
-                    horizontal
-                    label="RA" 
-                    :type="{'is-danger': warn.ra}"
-                    >
-                    <b-input 
-                        class="project-input" 
-                        style="max-width: 100px;"
-                        v-model="ra"></b-input>
-                </b-field>
-                <b-field 
-                    horizontal
-                    label="Dec" 
-                    :type="{'is-danger': warn.dec}"
-                    >
-                    <b-input 
-                    style="max-width: 100px;"
-                        class="project-input" 
-                        v-model="dec"></b-input>
-                </b-field>
-
-                <br>
-
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Position Angle" 
-                    :type="{'is-danger': warn.pa}"
-                    >
-                    <b-input class="project-input" type="number" min="-360" max="360" v-model="pa"/>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Autofocus">
-                    <b-checkbox v-model="frequent_autofocus">focus more frequently</b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Dither">
-                    <b-checkbox v-model="dither"></b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="User Diffuser">
-                    <b-checkbox v-model="use_diffuser"></b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Prefer Bessel">
-                    <b-checkbox v-model="prefer_bessel"></b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Enhance Photometry">
-                    <b-checkbox v-model="enhance_photometry"></b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Max Airmass" 
-                    :type="{'is-danger': warn.max_airmass}"
-                    >
-                    <b-input class="project-input" v-model="max_airmass"></b-input>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Min Lunar Dist." 
-                    :type="{'is-danger': warn.lunar_dist_min}"
-                    >
-                    <b-input class="project-input" v-model="lunar_dist_min"></b-input>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Max Lunar Phase" 
-                    :type="{'is-danger': warn.lunar_phase_max}"
-                    >
-                    <b-input class="project-input" v-model="lunar_phase_max"></b-input>
-                </b-field>
-                <button 
-                    class="button is-text"
-                    @click="showAdvancedInputs = !showAdvancedInputs"
-                    style="margin-bottom: 15px;"
-                    >
-                    {{showAdvancedInputs ? "hide" : "show"}} advanced
-                </button>
-
-            </section>
-
-            <section class="column">
-
-                <div v-for="n in exposures_index" v-bind:key="n" class="exposure-row">
-                    <b-field label=" ">
-                        <b-checkbox v-model="exposures[n-1].active"></b-checkbox>
-                    </b-field>
-                    <b-field :label="n==1 ? 'Count' : ''" style="width: 130px;">
-                        <b-input :disabled="!exposures[n-1].active" type="number" min="1" v-model="exposures[n-1].count"/>
-                    </b-field>
-                    <b-field :label="n==1 ? 'Exposure [s]' : ''">
-                        <b-input :disabled="!exposures[n-1].active" type="number" min="0" v-model="exposures[n-1].exposure"/>
-                    </b-field>
-                    <b-field :label="n==1 ? 'Filter' : ''">
-                        <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].filter">
-                            <option value="Lum"> Lum </option>
-                            <option value="Red"> Red </option>
-                            <option value="Green"> Green </option>
-                            <option value="Blue"> Blue </option>
-                            <option value="NIR"> NIR </option>
-                            <option value="O3"> O3 </option>
-                            <option value="Ha"> Ha </option>
-                            <option value="N2"> N2 </option>
-                            <option value="S2"> S2 </option>
-                            <option value="CR"> CR </option>
-                            <option value="EXO"> EXO </option>
-                            <option value="W"> W </option>
-                            <option value="air"> air </option>
-                            <option value="clear"> clear </option>
-                            <option value="silica"> silica </option>
-                            <option value="u_prime"> u' </option>
-                            <option value="g_prime"> g' </option>
-                            <option value="r_prime"> r' </option>
-                            <option value="i_prime"> i' </option>
-                            <option value="zs"> zs </option>
-                            <option value="z_prime"> z' </option>
-                            <option value="Y"> Y </option>
-                            <option value="U"> U </option>
-                            <option value="B"> B </option>
-                            <option value="V"> V </option>
-                            <option value="Rc"> Rc </option>
-                            <option value="Ic"> Ic </option>
-                            <option value="dark"> dark </option>
-                        </b-select>
-                    </b-field>
-                    <b-field :label="n==1 ? 'Bin' : ''">
-                        <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].bin">
-                            <option value="1"> 1 </option>
-                            <option value="2"> 2 </option>
-                            <option value="3"> 3 </option>
-                            <option value="4"> 4 </option>
-                        </b-select>
-                    </b-field>
-                    <div></div>
-                </div>
-                <button class="button" @click="newExposureRow">add row</button>
-                <div/>
-            </section>
-            </div>
-
-
         </b-tab-item>
     </b-tabs>
 
@@ -438,11 +254,15 @@
 import {mapGetters, mapState} from 'vuex'
 import axios from 'axios'
 import moment from 'moment'
+import SideInfoPanel from '@/components/SideInfoPanel'
+import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 
 export default {
     name: "CreateProjectForm",
     props: ["sitecode"],
     components: { 
+        SideInfoPanel,
+        TheSkyChart,
     },
     data() {
         return {
@@ -453,6 +273,8 @@ export default {
 
             project_name: '',
             project_events: [],
+
+            target_type: 'single',
 
             object: '',
             ra: '', 
@@ -467,6 +289,17 @@ export default {
                     exposure: 0,
                     filter: 'Lum',
                     bin: 1,
+                },
+            ],
+
+            targets_index: 1,
+            targets: [
+                {
+                    active: true,
+                    name: '',
+                    ra: '',
+                    dec: '',
+                    photometric_preference: 1,
                 },
             ],
 
@@ -529,10 +362,10 @@ export default {
             }
         },
 
-        getCoordinatesFromObject() {
-            console.log(`This function should get coordinates for ${this.object}`)
-            let query_script = `query id ${this.object}\\nhd 100`
-            let url = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame.jsonp?object=" + encodeURIComponent(this.object);
+        getCoordinatesFromName(target_index) {
+            console.log(`This function should get coordinates for ${this.targets[target_index].name}`)
+            let query_script = `query id ${this.targets[target_index].name}\\nhd 100`
+            let url = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame.jsonp?object=" + encodeURIComponent(this.targets[target_index].name);
 
             axios.get(url).then( response => {
                 let result = JSON.parse(response.data.slice(10,-3))
@@ -540,13 +373,13 @@ export default {
                 if (!result.Target.Resolver || !result.Target.Resolver.jradeg || !result.Target.Resolver.jdedeg) {
                     console.log('failed')
                     this.$buefy.toast.open({
-                        message: "Could not resolve object with name "+this.object,
+                        message: "Could not resolve object with name "+this.targets[target_index].name,
                         type: "is-danger"
                     })
                 }
-                this.ra = (result.Target.Resolver.jradeg / 15).toFixed(4) // degrees to decimal hours
-                this.dec = result.Target.Resolver.jdedeg.toFixed(4)
-                this.object = result.Target.Resolver.oname
+                this.targets[target_index].ra = (result.Target.Resolver.jradeg / 15).toFixed(4) // degrees to decimal hours
+                this.targets[target_index].dec = result.Target.Resolver.jdedeg.toFixed(4)
+                this.targets[target_index].name= result.Target.Resolver.oname
             })
         },
 
@@ -565,6 +398,21 @@ export default {
             // Show one additional row
             this.exposures_index += 1;
         },
+        newTargetRow() {
+
+            // Add another object to the list of targets
+            // Do this first to keep reactivity.
+            this.targets.push({
+                active: true,
+                name: '',
+                ra: '', 
+                dec: '',
+                photometric_preference: this.targets_index + 1,
+            })
+
+            // Show one additional row
+            this.targets_index += 1;
+        },
 
         verifyForm() {
             if (this.project_name === '') { this.warn.project_name = true }
@@ -575,10 +423,10 @@ export default {
                     type: "is-danger"
                 })
             }
-            if (this.object === '') { this.warn.object = true }
-            if (this.ra === '') { this.warn.ra = true }
-            if (this.dec === '') { this.warn.dec = true }
-            if (this.pa === '') { this.warn.pa = true }
+            //if (this.object === '') { this.warn.object = true }
+            //if (this.ra === '') { this.warn.ra = true }
+            //if (this.dec === '') { this.warn.dec = true }
+            //if (this.pa === '') { this.warn.pa = true }
             //if (this.dither == '') { this.warn.dither = true }
             //if (this.lunar_dist_min == '') { this.warn.lunar_dist_min = true }
             //if (this.lunar_phase_max == '') { this.warn.lunar_phase_max = true }
@@ -624,24 +472,37 @@ export default {
                 project_name: this.project_name,
                 created_at: moment().utc().format(),
                 user_id: this.user.sub,
-                object: {
-                    name: this.object,
-                    ra: this.ra,
-                    dec: this.dec,
-                },
-                settings: {
-                    position_angle: this.pa,
-                    autofocus: this.autofocus,
-                    dither: this.dither,
+                project_constraints: {
+                    max_airmass: this.max_airmass,
                     use_diffuser: this.use_diffuser,
                     prefer_bessel: this.prefer_bessel,
-                    max_airmass: this.max_airmass,
+                    dither: this.dither,
                 },
-                completed: [],
-                remaining: remaining
-                //this.exposures.filter(e => e.active),
+
+                // List of objects (targets in the project)
+                project_targets: this.targets
+                        .filter(t => t.active)
+                        .map(({active, ...stuff_to_keep}) => stuff_to_keep),
+
+                // List of objects (exposures to complete for each target).
+                exposures: this.exposures
+                        .filter(e => e.active)
+                        .map(({active, ...stuff_to_keep}) => stuff_to_keep),
+
+                // Nested arrays such that
+                // remaining[target_index][exposure_index] = number of remaining exposures
+                remaining: this.targets
+                        .map(t => this.exposures.map(e => e.count)),
+
+                // Empty nested arrays such that
+                // project_data[target_index][exposure_index] = [array of filenames]
+                project_data: this.targets.map(t => this.exposures.map(e => [])),
+
+                scheduled_with_events: this.project_events.map(e => ({id: e.event_id, name: e.title}))
+
             }
 
+            console.log('project: ', project)
 
             // Make sure all warnings are false, otherwise don't create the project.
             if (Object.values(this.warn).every(x => !x)) {
@@ -695,6 +556,14 @@ export default {
     align-items:center;
 }
 .exposure-row > * {
+    margin-right: 8px;
+}
+.target-row {
+    display: flex;
+    flex-direction: row;
+    align-items:center;
+}
+.target-row > * {
     margin-right: 8px;
 }
 </style>

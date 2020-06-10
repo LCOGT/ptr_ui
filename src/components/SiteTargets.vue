@@ -1,5 +1,5 @@
 <template>
-<section>
+<section class="site-targets">
 
     <div class="page-layout">
 
@@ -76,8 +76,8 @@
     </div>
 
     <div class="skychart-box">
-    </div>
         <the-sky-chart :deviceStatus="deviceStatus" />
+    </div>
 
 
 
@@ -249,6 +249,10 @@ export default {
 
 <style scoped>
 @import "https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css";
+
+.site-targets {
+    width: 100%;
+}
 
 .page-layout{
     height: min-content;

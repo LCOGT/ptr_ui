@@ -1,5 +1,5 @@
 <template>
-<div style="margin-left: 2em;">
+<div>
 
     <create-project-form :sitecode="sitecode" />
     <div style='height: 50px;' />

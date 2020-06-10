@@ -17,21 +17,21 @@
             </b-table-column>
 
             <b-table-column field="object.name" label="object">
-                {{ props.row.object.name }}
+                {{ props.row.project_targets[0].name }}
             </b-table-column>
 
             <b-table-column field="object.ra" label="ra" sortable>
-                {{ props.row.object.ra }} 
+                {{ props.row.project_targets[0].ra }} 
             </b-table-column>
 
             <b-table-column field="object.dec" label="dec">
-                {{ props.row.object.dec }} 
+                {{ props.row.project_targets[0].dec }} 
             </b-table-column>
 
             <b-table-column field="delete" label="">
                 <button 
                     class="button is-danger is-small" 
-                    @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created': props.row.created})" 
+                    @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created_at': props.row.created_at})" 
                     >
                     <span class="icon is-small ">
                         <i class="mdi mdi-delete mdi-24px"></i>

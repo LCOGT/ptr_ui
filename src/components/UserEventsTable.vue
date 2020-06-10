@@ -56,6 +56,7 @@
                         slot="trigger">
                         <template>
                             <span>{{ props.row.project_id=="none" ? '' : props.row.project_id.split('#')[0]}} </span>
+                            <!--span>{{props.row.project_id}}</span-->
                         </template>
                         <b-icon icon="menu-down"></b-icon>
                     </button>
