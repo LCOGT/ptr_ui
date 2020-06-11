@@ -219,7 +219,7 @@
                             :key="`with-project-${index}`"
                             :value="event" 
                             aria-role="listitem">
-                                <span> {{event.title}} </span>
+                                <span> {{event.title}} - {{event.site}} </span>
                         </b-dropdown-item>
                         <b-dropdown-item separator />
                         <b-dropdown-item disabled> events with existing projects (will be replaced)</b-dropdown-item>
@@ -229,7 +229,7 @@
                             :key="`without-project-${index}`"
                             :value="event" 
                             aria-role="listitem">
-                                <span> {{`${event.title} (${event.project_id.split('#')[0]})`}} </span>
+                                <span> {{`${event.title} (${event.project_id.split('#')[0]}) - ${event.site}`}} </span>
                         </b-dropdown-item>
 
                     </b-dropdown>
