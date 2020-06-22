@@ -20,8 +20,11 @@ if (process.env.NODE_ENV === 'production') {
     },
     updatefound () {
       console.log('New content is downloading.')
+    },
+    updated () {
+      console.log('New content is available; please refresh.')
       Snackbar.open({
-        duration: 5000,
+        indefinite: true,
         message: 'Site update is available.',
         type: 'is-success',
         position: 'is-bottom-right',
@@ -31,9 +34,6 @@ if (process.env.NODE_ENV === 'production') {
           window.location.reload(true)
         }
       })
-    },
-    updated () {
-      console.log('New content is available; please refresh.')
     },
     offline () {
       console.log('No internet connection found. App is running in offline mode.')
