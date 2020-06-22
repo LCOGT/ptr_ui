@@ -1,6 +1,7 @@
 {
   "name": "photon ranch",
   "short_name": "ptr",
+  "description": "this is the manifest description",
   "icons": [
     {
       "src": "./img/icons/android-chrome-192x192.png",
