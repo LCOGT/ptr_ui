@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 
 import { register } from 'register-service-worker'
+import { SnackbarProgrammatic as Snackbar } from 'buefy'
+
 
 if (process.env.NODE_ENV === 'production') {
   register(`${process.env.BASE_URL}service-worker.js`, {
@@ -18,6 +20,17 @@ if (process.env.NODE_ENV === 'production') {
     },
     updatefound () {
       console.log('New content is downloading.')
+      Snackbar.open({
+        duration: 5000,
+        message: 'Site update is available.',
+        type: 'is-success',
+        position: 'is-bottom-right',
+        actionText: 'Update now',
+        queue: false,
+        onAction: () => {
+          window.location.reload(true)
+        }
+      })
     },
     updated () {
       console.log('New content is available; please refresh.')
