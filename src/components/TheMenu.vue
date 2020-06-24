@@ -7,7 +7,7 @@
               <span v-if="site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp</span>
               <span v-if="site!=''" class="is-hidden-tablet">&nbsp&nbsp<b-icon icon="home"/>&nbsp</span>
               <span v-if="site!=''" style="margin: 0;" class="subtitle">>&nbsp{{site.toUpperCase()}}</span>
-              <span>&nbspv4</span>
+              <!--span>&nbspv5</span-->
                 <!--img
                     src="img/icons/logo-via-logohub.png"
                     alt="photon ranch observatory"
