@@ -77,6 +77,15 @@
                     <b-field label=" ">
                         <b-checkbox v-model="exposures[n-1].active"></b-checkbox>
                     </b-field>
+                    <b-field :label="n==1 ? 'Imtype' : ''">
+                        <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].imtype">
+                            <option value="light"> light </option>
+                            <option value="dark"> dark </option>
+                            <option value="skyflat"> skyflat </option>
+                            <option value="screenflat"> screenflat </option>
+                            <option value="bias"> bias </option>
+                        </b-select>
+                    </b-field>
                     <b-field :label="n==1 ? 'Count' : ''" style="width: 130px;">
                         <b-input :disabled="!exposures[n-1].active" type="number" min="1" v-model="exposures[n-1].count"/>
                     </b-field>
@@ -123,6 +132,13 @@
                             <option value="4"> 4 </option>
                         </b-select>
                     </b-field>
+                    <b-field :label="n==1 ? 'Dither' : ''">
+                        <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].dither">
+                            <option value="yes"> yes </option>
+                            <option value="no"> no </option>
+                            <option v-for="i in 25" :key="i-1" :value="i-1"> {{i-1}}</option>
+                        </b-select>
+                    </b-field>
                     <div></div>
                 </div>
                 <button class="button" @click="newExposureRow">add row</button>
@@ -150,11 +166,6 @@
                     v-if="showAdvancedInputs"
                     label="Autofocus">
                     <b-checkbox v-model="frequent_autofocus">focus more frequently</b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Dither">
-                    <b-checkbox v-model="dither"></b-checkbox>
                 </b-field>
                 <b-field 
                     v-if="showAdvancedInputs"
@@ -286,9 +297,11 @@ export default {
                 {
                     active: true,
                     count: 1,
+                    imtype: "light",
                     exposure: 0,
                     filter: 'Lum',
                     bin: 1,
+                    dither: 'no',
                 },
             ],
 
@@ -305,7 +318,6 @@ export default {
 
             frequent_autofocus: false,
 
-            dither: false,
             use_diffuser: false,
             prefer_bessell: false,
             max_airmass: 2.0,
@@ -321,7 +333,6 @@ export default {
                 ra: false,
                 dec: false,
                 pa: false,
-                dither: false,
                 user_diffuser: false,
                 prefer_bessell: false,
                 max_airmass: false,
@@ -390,9 +401,11 @@ export default {
             this.exposures.push({
                 active: true,
                 count: 1,
+                imtype: 'light',
                 exposure: 0, 
                 filter: 'Lum',
                 bin: 1,
+                dither: 'no',
             })
 
             // Show one additional row
