@@ -20,6 +20,7 @@ import analysis from './views/analysis.vue'
 import { authGuard } from "./auth/authGuard";
 import calendarPage from './views/calendarPage.vue'
 import JobsMonitor from './views/JobsMonitor.vue'
+import axios from 'axios'
 
 
 Vue.use(VueRouter)
@@ -57,6 +58,22 @@ const router = new VueRouter({
 })
 
 export default router
+
+//router.afterEach(async (to, fVrom, next) => {
+  ////window.location.reload(true)
+  //axios({
+    //method: 'get',
+    //url: '/manifest.json',
+    //contentType:    'application/json; charset=utf-8',
+    //dataType:       'json',
+    //cache:          false
+  //}).then((data, textStatus, jqxhr)=>{
+    //console.log(data)
+    //console.log(data.headers.value)
+    //console.log(textStatus)
+    //console.log(jqxhr)
+  //})
+//})
 
 //router.beforeEach(async (to, from , next) => {
   //if(to.meta.requiresAuth) {

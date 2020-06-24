@@ -91,7 +91,7 @@
                             <option value="Blue"> Blue </option>
                             <option value="NIR"> NIR </option>
                             <option value="O3"> O3 </option>
-                            <option value="Ha"> Ha </option>
+                            <option value="Ha"> HA </option>
                             <option value="N2"> N2 </option>
                             <option value="S2"> S2 </option>
                             <option value="CR"> CR </option>
@@ -100,12 +100,12 @@
                             <option value="air"> air </option>
                             <option value="clear"> clear </option>
                             <option value="silica"> silica </option>
-                            <option value="u_prime"> u' </option>
-                            <option value="g_prime"> g' </option>
-                            <option value="r_prime"> r' </option>
-                            <option value="i_prime"> i' </option>
+                            <option value="up"> u' </option>
+                            <option value="gp"> g' </option>
+                            <option value="rp"> r' </option>
+                            <option value="ip"> i' </option>
                             <option value="zs"> zs </option>
-                            <option value="z_prime"> z' </option>
+                            <option value="zp"> z' </option>
                             <option value="Y"> Y </option>
                             <option value="U"> U </option>
                             <option value="B"> B </option>
@@ -163,8 +163,8 @@
                 </b-field>
                 <b-field 
                     v-if="showAdvancedInputs"
-                    label="Prefer Bessel">
-                    <b-checkbox v-model="prefer_bessel"></b-checkbox>
+                    label="Prefer Bessell">
+                    <b-checkbox v-model="prefer_bessell"></b-checkbox>
                 </b-field>
                 <b-field 
                     v-if="showAdvancedInputs"
@@ -307,7 +307,7 @@ export default {
 
             dither: false,
             use_diffuser: false,
-            prefer_bessel: false,
+            prefer_bessell: false,
             max_airmass: 2.0,
             enhance_photometry: false,
             lunar_dist_min: 0,
@@ -323,7 +323,7 @@ export default {
                 pa: false,
                 dither: false,
                 user_diffuser: false,
-                prefer_bessel: false,
+                prefer_bessell: false,
                 max_airmass: false,
                 lunar_dist_min: false,
                 lunar_phase_max: false,
@@ -475,7 +475,7 @@ export default {
                 project_constraints: {
                     max_airmass: this.max_airmass,
                     use_diffuser: this.use_diffuser,
-                    prefer_bessel: this.prefer_bessel,
+                    prefer_bessell: this.prefer_bessell,
                     dither: this.dither,
                 },
 
