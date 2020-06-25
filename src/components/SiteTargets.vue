@@ -3,6 +3,19 @@
 
     <div class="page-layout">
 
+        <div class="query-box">
+            <b-field label="Search for objects...">
+                <b-field>
+                    <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
+                </b-field>
+            </b-field>
+            <button style="width: 100%;" class="button" @click="submit_simbad_query">search</button>
+        </div>
+
+        <div class="ptr-aladin-parent-div">
+            <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
+        </div>
+
         <div class="parameters-box">
             <div style="display:flex; flex-direction:column; width: 100%;">
                 <b-field>
@@ -58,19 +71,6 @@
                     <p slot="title">Point Telescope</p>
                 </command-button>
             </div>
-        </div>
-
-        <div class="ptr-aladin-parent-div">
-            <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
-        </div>
-
-        <div class="query-box">
-            <b-field label="Search for objects...">
-                <b-field>
-                    <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
-                </b-field>
-            </b-field>
-            <button style="width: 100%;" class="button" @click="submit_simbad_query">search</button>
         </div>
 
     </div>
