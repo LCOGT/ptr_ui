@@ -505,7 +505,7 @@ export default {
                 // Nested arrays such that
                 // remaining[target_index][exposure_index] = number of remaining exposures
                 remaining: this.targets
-                        .map(t => this.exposures.map(e => e.count)),
+                        .map(t => this.exposures.map(e => parseInt(e.count))),
 
                 // Empty nested arrays such that
                 // project_data[target_index][exposure_index] = [array of filenames]
