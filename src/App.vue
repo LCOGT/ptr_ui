@@ -27,7 +27,6 @@ export default {
   name: 'App',
   components: {
     TheMenu,
-    DevPanel,
     JS9,
   },
   async created() {
