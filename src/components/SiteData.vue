@@ -5,7 +5,7 @@
 
     <div class="img-view column" style="padding: 0; margin: 1em;">
       <!-- The actual image view component -->
-      <image-view-2 
+      <image-view 
         :site="sitecode" 
         :median_star_pos_x="median_relative_pos_x"
         :median_star_pos_y="median_relative_pos_y"
@@ -256,7 +256,7 @@
 
 <script>
 
-import ImageView2 from '@/components/ImageView2'
+import ImageView from '@/components/ImageView'
 import ImagesTable from '@/components/ImagesTable'
 import Js9Devtools from "@/components/Js9Devtools";
 import ImageNavigationPanel from "@/components/ImageNavigationPanel";
@@ -272,7 +272,7 @@ export default {
   name: "SubpageData",
   props: ["deviceStatus", "sitecode"],
   components: {
-      ImageView2,
+      ImageView,
       ImagesTable,
       ImageInfoPanel,
       ImageNavigationPanel,

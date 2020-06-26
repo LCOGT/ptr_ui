@@ -677,40 +677,6 @@
     :deviceStatus="deviceStatus"
     />
 
-
-  <div class="info-column" style="display: none">
-
-    <div style="margin-top: 2em;"/>
-
-    <side-info-panel>
-      <p slot="title">Webcam</p>
-      <the-dome-cam v-if="sitecode=='wmd'"/>
-    </side-info-panel>
-
-    <side-info-panel :startOpen="true">
-      <p slot="title">Image Preview</p>
-      <!--button class="button is-small" @click="refresh_latest_image" style="margin-bottom: 1em;">latest image</button-->
-      <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
-          <img
-              v-bind:src="current_image.jpg_url" 
-              @click="isImageModalActive = true" 
-              style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
-      </div>
-      <b-modal :active.sync="isImageModalActive" :width="800">
-          <p class="image">
-              <image-view :site="active_site" />
-          </p>
-      </b-modal>
-      <div>{{current_image.base_filename}}</div>
-    </side-info-panel>
-
-    <side-info-panel :startOpen="true">
-      <p slot="title">Job Status</p>
-      <pre>{{focuserJobs}}</pre>
-    </side-info-panel>
-
-    </div>
-
   </div>
 </template>
 
@@ -724,7 +690,6 @@ import store from '../store/index'
 // Components
 import CommandButton from '@/components/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import ImageView from '@/components/ImageView'
 import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
 import ScriptSettings from '@/components/ScriptSettings'
 import TheDomeCam from '@/components/TheDomeCam'
@@ -742,7 +707,6 @@ export default {
   components: {
     CommandButton,
     TheSkyChart,
-    ImageView,
     SimpleDeviceStatus,
     ScriptSettings,
     TheDomeCam,

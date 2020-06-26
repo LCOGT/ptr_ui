@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import ImageView from "@/components/ImageView";
 import { mapGetters, mapState } from "vuex";
 import Js9Devtools from "@/components/Js9Devtools";
 import ImageNavigationPanel from "@/components/ImageNavigationPanel";
@@ -72,7 +71,6 @@ import JS9 from "@/components/JS9";
 export default {
   name: "analysis",
   components: {
-    ImageView,
     ImageNavigationPanel,
     ImageFilter,
     Js9Devtools,
