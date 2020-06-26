@@ -39,7 +39,7 @@
             :class="{'image-div-pointer-cross':subframeIsVisible}" 
             height="1px" width="1px" 
             ref="image" 
-            :href="current_image.jpg13_url" />
+            :href="current_image.jpg_url" />
         </svg>
 
         <div id="js9-window" v-if="js9IsVisible" >
@@ -63,7 +63,7 @@
       >
         <img 
             style="width: 60px; height: 60px;"
-            v-bind:src="item.jpg13_url"
+            v-bind:src="item.jpg_url"
             v-bind:title="item.base_filename"
             v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
             @click="setActiveImage(item)"
@@ -506,7 +506,7 @@ export default {
 
       // Get the global configuration for all sites from an api call.
       let apiName = this.$store.getters['dev/api'];
-      let path = `/fits13_url/${base_filename}/`;
+      let path = `/fits10_url/${base_filename}/`;
 
       const fits13Url = await axios.get(apiName+path);
       console.log(fits13Url)

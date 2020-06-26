@@ -79,7 +79,7 @@ const actions = {
 
             // Get the url based on the image filename
             let apiName = rootState.dev.active_api;
-            let path = `/fits13_url/${base_filename}/`;
+            let path = `/fits10_url/${base_filename}/`;
             axios.get(apiName+path).then(async response => {
                 response = response.data
                 //console.log('response from loadImage: ',response)
