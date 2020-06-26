@@ -1,6 +1,3 @@
-/**
- *  This module stores state related to development tools. 
- */
 
 import axios from "axios"
 import moment from "moment"

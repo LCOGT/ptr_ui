@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <the-menu />
-    <!--dev-panel /--> <!-- Developer testing tools. Not for prodution. -->
 
     <router-view></router-view>
 
@@ -20,7 +19,6 @@
 
 <script>
 import TheMenu from '@/components/TheMenu.vue'
-import DevPanel from '@/components/DevPanel.vue'
 import JS9 from "@/components/JS9";
 import axios from 'axios'
 

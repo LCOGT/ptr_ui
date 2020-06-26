@@ -86,7 +86,6 @@
     import {mapGetters} from 'vuex'
 
     import CalendarEventEditor from "@/components/CalendarEventEditor";
-    import CalendarEventCreator from "@/components/CalendarEventCreator";
 
     import FullCalendar from "@fullcalendar/vue";
     import dayGridPlugin from "@fullcalendar/daygrid";
@@ -135,7 +134,6 @@ export default {
     components: {
         FullCalendar, // make the <FullCalendar> tag available
         CalendarEventEditor,
-        CalendarEventCreator,
     },
     props: [
         // The active site (resource) disaplyed in the calendar
