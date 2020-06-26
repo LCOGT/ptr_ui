@@ -21,7 +21,7 @@ export const commands_mixin = {
             camera_image_type_options: [
                 'light', 
                 'quick',
-                'toss', 
+                'test image', 
                 'bias', 
                 'dark', 
                 'screen flat', 
