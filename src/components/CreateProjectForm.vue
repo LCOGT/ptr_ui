@@ -70,8 +70,8 @@
         </b-tab-item>
         <b-tab-item label="Settings">
 
-            <div class="columns">
-            <section class="column">
+                
+            <section class="columnn">
 
                 <div v-for="n in exposures_index" v-bind:key="n" class="exposure-row">
                     <b-field label=" ">
@@ -87,10 +87,18 @@
                         </b-select>
                     </b-field>
                     <b-field :label="n==1 ? 'Count' : ''" style="width: 130px;">
-                        <b-input :disabled="!exposures[n-1].active" type="number" min="1" v-model="exposures[n-1].count"/>
+                        <b-input 
+                            :disabled="!exposures[n-1].active" 
+                            type="number" 
+                            min="1" 
+                            v-model="exposures[n-1].count"/>
                     </b-field>
                     <b-field :label="n==1 ? 'Exposure [s]' : ''">
-                        <b-input :disabled="!exposures[n-1].active" type="number" min="0" v-model="exposures[n-1].exposure"/>
+                        <b-input 
+                            :disabled="!exposures[n-1].active" 
+                            type="number" 
+                            min="0" 
+                            v-model="exposures[n-1].exposure"/>
                     </b-field>
                     <b-field :label="n==1 ? 'Filter' : ''">
                         <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].filter">
@@ -139,12 +147,18 @@
                             <option v-for="i in 25" :key="i-1" :value="i-1"> {{i-1}}</option>
                         </b-select>
                     </b-field>
+                    <b-field :label="n==1 ? 'Defocus' : ''">
+                        <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].defocus">
+                            <option v-for="i in 6" :key="i-1" :value="i-1"> {{i-1}}</option>
+                            <option value="diffuser"> diffuser </option>
+                        </b-select>
+                    </b-field>
                     <div></div>
                 </div>
                 <button class="button" @click="newExposureRow">add row</button>
                 <div/>
             </section>
-            <section class="column">
+            <section class="columnn">
                 <button 
                     class="button is-text"
                     @click="showAdvancedInputs = !showAdvancedInputs"
@@ -166,11 +180,6 @@
                     v-if="showAdvancedInputs"
                     label="Autofocus">
                     <b-checkbox v-model="frequent_autofocus">focus more frequently</b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="User Diffuser">
-                    <b-checkbox v-model="use_diffuser"></b-checkbox>
                 </b-field>
                 <b-field 
                     v-if="showAdvancedInputs"
@@ -206,7 +215,6 @@
 
             </section>
 
-            </div>
 
         </b-tab-item>
         <b-tab-item label="Scheduling">
@@ -302,6 +310,7 @@ export default {
                     filter: 'Lum',
                     bin: 1,
                     dither: 'no',
+                    defocus: 0,
                 },
             ],
 
@@ -318,7 +327,6 @@ export default {
 
             frequent_autofocus: false,
 
-            use_diffuser: false,
             prefer_bessell: false,
             max_airmass: 2.0,
             enhance_photometry: false,
@@ -340,7 +348,6 @@ export default {
                 lunar_phase_max: false,
             },
 
-            //calendarBaseUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com/dev',
             calendarBaseUrl: 'https://calendar.photonranch.org/dev',
 
         }
@@ -406,6 +413,7 @@ export default {
                 filter: 'Lum',
                 bin: 1,
                 dither: 'no',
+                defocus: 0,
             })
 
             // Show one additional row
@@ -487,9 +495,13 @@ export default {
                 user_id: this.user.sub,
                 project_constraints: {
                     max_airmass: this.max_airmass,
-                    use_diffuser: this.use_diffuser,
                     prefer_bessell: this.prefer_bessell,
-                    dither: this.dither,
+                    lunar_dist_min: this.lunar_dist_min,
+                    lunar_phase_max: this.lunar_phase_max,
+                    enhance_photometry: this.enhance_photometry,
+                    frequent_autofocus: this.frequent_autofocus,
+                    pa: this.pa,
+                    
                 },
 
                 // List of objects (targets in the project)

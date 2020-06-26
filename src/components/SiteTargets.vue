@@ -56,10 +56,10 @@
                 <b-field >
                     <b-field>
                         <p class="control">
-                            <span style="width: 42px;" class="button is-static">Obj</span>
+                            <span style="width: 110px;" class="button is-static">Pointing Note</span>
                         </p>
                         <b-input 
-                            expanded 
+                            style="width: calc(100% - 42px);"
                             name="subject" 
                             type="search" 
                             icon-clickable 
@@ -264,7 +264,8 @@ export default {
     padding-top: 20px;
     margin: 10px;
     display: flex;
-    min-width: 150px;
+    min-width: 250px;
+    max-width: 300px;
     flex: 1 0 min-content;
 }
 #aladin-lite-div {
