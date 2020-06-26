@@ -35,9 +35,6 @@
 
 
             <b-navbar-dropdown label="experimental">
-                <b-navbar-item tag="router-link" :to="{ path: '/ctrl' }">
-                    ctrl
-                </b-navbar-item>
                 <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
                     chat
                 </b-navbar-item>
