@@ -706,11 +706,16 @@ export default {
 
       // Get the global configuration for all sites from an api call.
       let apiName = this.$store.getters['dev/api'];
-      let path = `/fits10_url/${base_filename}/`;
 
-      const fits13Url = await axios.get(apiName+path);
-      console.log(fits13Url)
-      return fits13Url.data;
+      let path = '/download';
+      let body = {
+        object_name: `${base_filename}-EX10.fits.bz2`,
+      }
+      console.log('url: ', apiName+path)
+      const smallFitsURL = await axios.post(apiName+path, body);
+
+      console.log(smallFitsURL.data)
+      return smallFitsURL.data;
     },
 
     async downloadFits13Url(image) {

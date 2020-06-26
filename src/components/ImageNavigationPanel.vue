@@ -43,7 +43,6 @@
                                     dec: {{item.declination.toFixed(2)}}
                                 </p>
                             </div>
-                            <!--a class="is-text has-text-white" :href="item.fits10_url" download>download fits</a-->
                         </div>
                     </div>
                 </div>
