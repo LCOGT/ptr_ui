@@ -25,14 +25,10 @@ if (process.env.NODE_ENV === 'production') {
       console.log('New content is available; please refresh.')
       Snackbar.open({
         indefinite: true,
-        message: 'Site update is available.',
+        message: 'New content is available. Please shift-reload to update.',
         type: 'is-success',
         position: 'is-bottom-right',
-        actionText: 'Update now',
         queue: false,
-        onAction: () => {
-          window.location.reload(true)
-        }
       })
     },
     offline () {
