@@ -456,7 +456,7 @@
           <br>
           <div style="width:100%;height:0; padding-top:100%;position:relative; background-fill: yellow;">
               <img
-                  v-bind:src="current_image.jpg13_url" 
+                  v-bind:src="current_image.jpg_url" 
                   @click="isImageModalActive = true" 
                   style="width: 100%; background-color: grey; cursor: pointer; position: absolute; top:0; left:0" />
           </div>

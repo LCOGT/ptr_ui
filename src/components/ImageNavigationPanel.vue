@@ -26,7 +26,7 @@
                     <div v-bind:id="item.image_id" class="img-record level" v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"  @click="setActiveImage(item)">
                         <div class="image">
                             <img 
-                                v-bind:src="item.jpg13_url"
+                                v-bind:src="item.jpg_url"
                                 v-bind:title="item.base_filename"
                                 alt="Preview Not Available"
                             >
@@ -43,7 +43,7 @@
                                     dec: {{item.declination.toFixed(2)}}
                                 </p>
                             </div>
-                            <!--a class="is-text has-text-white" :href="item.fits13_url" download>download fits</a-->
+                            <!--a class="is-text has-text-white" :href="item.fits10_url" download>download fits</a-->
                         </div>
                     </div>
                 </div>

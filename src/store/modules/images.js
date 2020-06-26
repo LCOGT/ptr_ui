@@ -25,24 +25,6 @@ const getters = {
 }
 
 const actions = {
-    /**
-     *  This action will retrieve a complete list of an account's images (from the api).
-     */
-    async get_user_images({ commit, state, rootState }) {
-
-        // TODO: Remove hard coded values and make sure that username in UI is linked to image records in database
-        // let username = rootState.auth.user.username
-        let username = "wmd_admin" // TODO: Grab username from state 
-        let apiName = rootState.dev.active_api;
-        let path = `/image_by_user/${username}/`;
-
-        axios.get(apiName+path).then(response => {
-            response = JSON.parse(response.data)
-            commit('setUserImages', response)
-        }).catch(error => {
-            console.warn(error)
-        });
-    },
 
     /**
      *  This action will retrieve a list of images filtered by the parameters in filter_params
@@ -91,7 +73,7 @@ const actions = {
          *      "filter_used": str,
          *      "exposure_time": str,
          *      "airmass": str,
-         *      "jpg13_url": str,
+         *      "jpg_url": str,
          *  }
          */
         axios.get(apiName+path).then(async response => {

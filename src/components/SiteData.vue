@@ -213,7 +213,7 @@
         <div class="level">
           <div class=" level-left"> 
             <figure class="level-item image is-64x64">
-              <img :src="current_image.jpg13_url">
+              <img :src="current_image.jpg_url">
             </figure>
             <p class="title" style="overflow-wrap: anywhere; margin-left: 10px;">{{current_image.base_filename}}</p>
           </div>
