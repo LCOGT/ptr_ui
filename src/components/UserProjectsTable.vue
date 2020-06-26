@@ -39,13 +39,6 @@
                 </button>
             </b-table-column>
 
-            <!--b-table-column field="fits_download" label="Fits Download">
-                <a :href="props.row.fits10_url">download</a>
-            </b-table-column>
-
-            <b-table-column field="observation" label="Observation Time" centered>
-                    {{ new Date(props.row.capture_date).toUTCString() }}
-            </b-table-column-->
         </template>
 
         <template slot="bottom-left">

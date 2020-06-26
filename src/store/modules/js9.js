@@ -79,39 +79,38 @@ const actions = {
 
             // Get the url based on the image filename
             let apiName = rootState.dev.active_api;
-            let path = `/fits10_url/${base_filename}/`;
-            axios.get(apiName+path).then(async response => {
-                response = response.data
-                //console.log('response from loadImage: ',response)
+            let path = '/download';
+            let body = {
+                object_name: `${base_filename}-EX10.fits.bz2`,
+            }
+            console.log('url: ', apiName+path)
+            const resp = await axios.post(apiName+path, body);
+            const imageURL = resp.data
 
-                // Download the image to the browser instance
-                JS9.Load(response, {scale: "histeq"}, {display: state.JS9_ID})
+            // Download the image to the browser instance
+            JS9.Load(imageURL, {scale: "histeq"}, {display: state.JS9_ID})
 
-                commit('js9_current_image', base_filename)
+            commit('js9_current_image', base_filename)
 
-                // Once the image loads, upload the FITS file for server-side capabilities.
-                // Wait a bit before checking so we don't get the 'complete' status from the prior image.
-                setTimeout(function(){
-                    ensureImageLoaded().then(function(){
+            // Once the image loads, upload the FITS file for server-side capabilities.
+            // Wait a bit before checking so we don't get the 'complete' status from the prior image.
+            setTimeout(function(){
+                ensureImageLoaded().then(function(){
 
-                        // turn off the crosshair for new images
-                        commit('crosshairActive', false)
-                        //dispatch('crosshairOff')
+                    // turn off the crosshair for new images
+                    commit('crosshairActive', false)
+                    //dispatch('crosshairOff')
 
+                    // upload to enable server side tasks
+                    JS9.UploadFITSFile()
 
-                        // upload to enable server side tasks
-                        JS9.UploadFITSFile()
+                    console.warn('setting zoom level')
+                    // set zoom level
+                    if (zoom) JS9.SetZoom(zoom)
+                    if (flip) JS9.SetFlip(flip)
+                })
+            }, 500)
 
-                        console.warn('setting zoom level')
-                        // set zoom level
-                        if (zoom) JS9.SetZoom(zoom)
-                        if (flip) JS9.SetFlip(flip)
-                    })
-                }, 500)
-
-            }).catch(error => {
-                console.log(error)
-            });
         }
     },
 
