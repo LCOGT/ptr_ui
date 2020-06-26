@@ -77,8 +77,8 @@
           Use full resolution file (slower!)
         </b-switch>
 
-        <p class="warning-text">{{current_image.ex13_fits_exists ? "" : "missing small fits"}}</p>
-        <p class="warning-text">{{current_image.ex01_fits_exists ? "" : "missing full fits"}}</p>
+        <p class="warning-text">{{current_image.ex10_fits_exists ? "" : "missing small fits"}}</p>
+        <p class="warning-text">{{current_image.ex00_fits_exists ? "" : "missing full fits"}}</p>
 
         <b-field>
           <p class="control">
@@ -90,7 +90,7 @@
               <button 
                 class="button" 
                 :class="{'is-loading':region_info_loading}"
-                :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
+                :disabled="!current_image.ex00_fits_exists || !current_image.ex10_fits_exists" 
                 @click="getRegionStats(true)">
                 inspect region
               </button>
@@ -100,7 +100,7 @@
             <button 
               class="button" 
               :class="{'is-loading':image_info_loading}"
-              :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
+              :disabled="!current_image.ex00_fits_exists || !current_image.ex10_fits_exists" 
               @click="getRegionStats(false)">
               inspect image
             </button>
@@ -138,7 +138,7 @@
             <button 
               class="button" 
               :class="{'is-loading': inspect_region_loading}"
-              :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
+              :disabled="!current_image.ex00_fits_exists || !current_image.ex10_fits_exists" 
               @click="getStarProfiles">
               inspect region
             </button>
@@ -147,7 +147,7 @@
             <button 
               class="button" 
               :class="{'is-loading': inspect_image_loading}"
-              :disabled="!current_image.ex01_fits_exists || !current_image.ex13_fits_exists" 
+              :disabled="!current_image.ex00_fits_exists || !current_image.ex10_fits_exists" 
               @click="getStarProfiles(false)">
               inspect image
             </button>
@@ -302,7 +302,7 @@ export default {
       region_info_loading: false,
       image_info_loading: false,
 
-      ex13_isLoading: false,
+      ex10_isLoading: false,
 
       // Analysize the full sized raw file (default is 768px reduced file)
       imageStatsLargeFile: true,
@@ -362,7 +362,7 @@ export default {
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
-        "fitstype": this.starInspectorLargeFile ? "01" : "13",
+        "fitstype": this.starInspectorLargeFile ? "00" : "10",
       }
 
       if (useSubregion) {
@@ -631,7 +631,7 @@ export default {
     },
     getRegionStats(useSubregion=true) {
 
-      let fitstype = this.imageStatsLargeFile ? "01" : "13" // Determine the size of the image to analyze.
+      let fitstype = this.imageStatsLargeFile ? "00" : "10" // Determine the size of the image to analyze.
       let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
       let body = {
         "site": this.sitecode,
@@ -646,16 +646,16 @@ export default {
         body.region_y1 = this.subframe_y1
       }
       else { this.image_info_loading = true;}
-      if (fitstype == "13") { this.ex13_isLoading = true;}
+      if (fitstype == "10") { this.ex10_isLoading = true;}
       axios.post(url, body)
         .then(response => {this.displayRegionStats(response, fitstype)})
         .catch(response => {this.regionStatsReset(fitstype)})
     },
     regionStatsReset(fitstype) {
-      //if (fitstype == "01") { this.ex01_isLoading = false;}
+      //if (fitstype == "00") { this.ex00_isLoading = false;}
       this.image_info_loading = false;
       this.region_info_loading = false;
-      if (fitstype == "13") { this.ex13_isLoading = false;}
+      if (fitstype == "10") { this.ex10_isLoading = false;}
       this.region_min = "--"
       this.region_max = "--"
       this.region_median = "--"
@@ -667,7 +667,7 @@ export default {
       console.log(http_response)
       this.image_info_loading = false;
       this.region_info_loading = false;
-      if (fitstype == "13") { this.ex13_isLoading = false;}
+      if (fitstype == "10") { this.ex10_isLoading = false;}
       let data = http_response.data
       this.region_min = parseFloat(data.min).toFixed(3)
       this.region_max = parseFloat(data.max).toFixed(3)
