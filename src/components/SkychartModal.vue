@@ -169,7 +169,6 @@ import { commands_mixin } from '../mixins/commands_mixin'
 
 import CommandButton from '@/components/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import ModalSkyChart from '@/components/ModalSkyChart'
 import AladinLite from '@/components/AladinLite'
 
 export default {
@@ -179,7 +178,6 @@ export default {
     components: {
         CommandButton,
         TheSkyChart,
-        ModalSkyChart,
         AladinLite,
     },
     data() {
