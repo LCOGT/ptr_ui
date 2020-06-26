@@ -14,6 +14,8 @@
         <img
           id="main-image"
           ref="image" 
+          alt="no jpg available"
+          onerror="this.onerror=null;this.src='https://via.placeholder.com/768?text=no+jpg+preview+available'"
           v-show="!js9IsVisible"
           :src="current_image.jpg_url" />
 
@@ -34,6 +36,7 @@
           <img 
               style="width: 60px; height: 60px;"
               v-bind:src="item.jpg_url"
+              onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=:('"
               v-bind:title="item.base_filename"
               v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
               @click="setActiveImage(item)"
