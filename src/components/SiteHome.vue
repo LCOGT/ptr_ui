@@ -48,7 +48,6 @@ import TheDeviceSelectors from '@/components/TheDeviceSelectors'
 import TheDomeCam from '@/components/TheDomeCam'
 import { mapGetters } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
-import ImageView from '@/components/ImageView'
 import LeafletMap from '@/components/LeafletMap'
 
 export default {
@@ -58,7 +57,6 @@ export default {
     components: {
         TheDeviceSelectors,
         TheDomeCam,
-        ImageView,
         LeafletMap,
     },
     computed: {
