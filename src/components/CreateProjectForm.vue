@@ -53,16 +53,6 @@
                             v-model="targets[n-1].dec"/>
                     </b-field>
 
-                    <b-field 
-                        :type="{'is-danger': warn.dec}"
-                        :label="n==1 ? 'Photometric Pref.' : ''"
-                        style="width: 140px;"
-                        >
-                        <b-input 
-                            :disabled="!targets[n-1].active" 
-                            v-model="targets[n-1].photometric_preference"/>
-                    </b-field>
-
                     <div></div>
 
                 </div>
@@ -321,7 +311,6 @@ export default {
                     name: '',
                     ra: '',
                     dec: '',
-                    photometric_preference: 1,
                 },
             ],
 
@@ -428,7 +417,6 @@ export default {
                 name: '',
                 ra: '', 
                 dec: '',
-                photometric_preference: this.targets_index + 1,
             })
 
             // Show one additional row
