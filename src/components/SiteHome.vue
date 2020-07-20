@@ -11,6 +11,21 @@
     <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
 
+    <div style="display:flex; margin-bottom: 1em;">
+        <h3 class="subtitle">Site Events: </h3>
+        <div style="width: 10px;"/>
+        <button 
+            class="button" 
+            @click="siteEventsVisible = !siteEventsVisible">
+            show
+        </button>
+        <b-modal :active.sync="siteEventsVisible">
+            <site-events-modal 
+                :site-events="siteEventsTable" 
+                :sitecode="sitecode"/>
+        </b-modal>
+    </div>
+
     <!--leaflet-map 
         name="leafmap"
         :latitude="latitude"
@@ -49,6 +64,8 @@ import TheDomeCam from '@/components/TheDomeCam'
 import { mapGetters } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
 import LeafletMap from '@/components/LeafletMap'
+import SiteEventsModal from '@/components/SiteEventsModal'
+import moment from 'moment'
 
 export default {
     name: "SiteHome",
@@ -58,6 +75,12 @@ export default {
         TheDeviceSelectors,
         TheDomeCam,
         LeafletMap,
+        SiteEventsModal,
+    },
+    data() {
+        return {
+            siteEventsVisible: false
+        }
     },
     computed: {
         ...mapGetters('images', ['current_image']),
@@ -65,6 +88,24 @@ export default {
 
         latitude() { return this.site_config(this.sitecode).latitude },
         longitude() { return this.site_config(this.sitecode).longitude },
+
+        siteEventsTable() {
+            let djd2unix = t => (t-25567.5)*86400*1000
+            //(djd + 2415020 - 2440587.5) × 86400 = unix time (s)
+            let tableData = []
+            let events = this.site_config(this.sitecode).events
+            console.log(this.site_config(this.sitecode).events)
+            for (const property in events) {
+                let time = moment(djd2unix(events[property]))
+                tableData.push({
+                    key: property.toLowerCase(),
+                    time: time.format('HH:mm'),
+                    date: time.format('MM-DD . . . HH:mm'),
+                    unix: time.unix(),
+                })
+            }
+            return tableData
+        },
     }
     
     

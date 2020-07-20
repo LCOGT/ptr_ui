@@ -238,6 +238,7 @@
             :loading="headerIsLoading"
             >
         </b-table>
+        {{fitsHeaderTable}}
       
         <!--table class="info-panel-table">
           <tr v-for="(v,k) in fitsHeader" v-bind:key="k"> 
