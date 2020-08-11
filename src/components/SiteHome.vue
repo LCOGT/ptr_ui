@@ -8,9 +8,11 @@
 
     <div class="spacer" style="height: 2em;" />
 
+    <!-- Dome camera -->
     <the-dome-cam v-if="sitecode=='wmd'"/>
     <br>
 
+    <!-- Site events modal window -->
     <div style="display:flex; margin-bottom: 1em;">
         <h3 class="subtitle">Site Events: </h3>
         <div style="width: 10px;"/>
@@ -21,7 +23,6 @@
         </button>
         <b-modal :active.sync="siteEventsVisible">
             <site-events-modal 
-                :site-events="siteEventsTable" 
                 :sitecode="sitecode"/>
         </b-modal>
     </div>
@@ -31,11 +32,9 @@
         :latitude="latitude"
         :longitude="longitude"
     ></leaflet-map-->
-
     <div style="width: 100%; height: 500px; margin-bottom: 1em;">
         <iframe style="width: 100%; height: 100%;" :src="`https://embed.windy.com/embed2.html?lat=${latitude}&lon=${longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${latitude}&detailLon=${longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`" frameborder="0"></iframe>
     </div>
-
 
     <!-- This is a temporary solution only. Does not scale. -->
     <!-- Add ClearDarkSky charts to site homepage -->
@@ -66,6 +65,7 @@ import { commands_mixin } from '../mixins/commands_mixin'
 import LeafletMap from '@/components/LeafletMap'
 import SiteEventsModal from '@/components/SiteEventsModal'
 import moment from 'moment'
+import axios from 'axios'
 
 export default {
     name: "SiteHome",
@@ -79,7 +79,7 @@ export default {
     },
     data() {
         return {
-            siteEventsVisible: false
+            siteEventsVisible: false,
         }
     },
     computed: {
@@ -88,24 +88,6 @@ export default {
 
         latitude() { return this.site_config(this.sitecode).latitude },
         longitude() { return this.site_config(this.sitecode).longitude },
-
-        siteEventsTable() {
-            let djd2unix = t => (t-25567.5)*86400*1000
-            //(djd + 2415020 - 2440587.5) × 86400 = unix time (s)
-            let tableData = []
-            let events = this.site_config(this.sitecode).events
-            console.log(this.site_config(this.sitecode).events)
-            for (const property in events) {
-                let time = moment(djd2unix(events[property]))
-                tableData.push({
-                    key: property.toLowerCase(),
-                    time: time.format('HH:mm'),
-                    date: time.format('MM-DD . . . HH:mm'),
-                    unix: time.unix(),
-                })
-            }
-            return tableData
-        },
     }
     
     
