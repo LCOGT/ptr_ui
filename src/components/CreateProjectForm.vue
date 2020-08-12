@@ -74,6 +74,7 @@
                             <option value="skyflat"> skyflat </option>
                             <option value="screenflat"> screenflat </option>
                             <option value="bias"> bias </option>
+                            <option value="autofocus"> autofocus </option>
                         </b-select>
                     </b-field>
                     <b-field :label="n==1 ? 'Count' : ''" style="width: 130px;">
@@ -168,8 +169,17 @@
                 </b-field>
                 <b-field 
                     v-if="showAdvancedInputs"
+                    label="Meridian Flip">
+                    <b-checkbox v-model="noflip">No Flip</b-checkbox>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
                     label="Autofocus">
                     <b-checkbox v-model="frequent_autofocus">focus more frequently</b-checkbox>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs" >
+                    <b-checkbox v-model="near_tycho_star">Use Near Tycho Star</b-checkbox>
                 </b-field>
                 <b-field 
                     v-if="showAdvancedInputs"
@@ -314,7 +324,9 @@ export default {
                 },
             ],
 
+            noflip: false,
             frequent_autofocus: false,
+            near_tycho_star: false,
 
             prefer_bessell: false,
             max_airmass: 2.0,
@@ -487,7 +499,9 @@ export default {
                     lunar_dist_min: this.lunar_dist_min,
                     lunar_phase_max: this.lunar_phase_max,
                     enhance_photometry: this.enhance_photometry,
+                    noflip: this.noflip,
                     frequent_autofocus: this.frequent_autofocus,
+                    use_tycho_star: this.use_tycho_star,
                     pa: this.pa,
                     
                 },
