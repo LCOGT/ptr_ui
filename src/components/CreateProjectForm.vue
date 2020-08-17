@@ -9,8 +9,6 @@
                     <b-input class="project-input" v-model="project_name"></b-input>
                 </b-field>
 
-
-
      <b-tabs type="is-boxed">
 
         <b-tab-item label="Targets">
