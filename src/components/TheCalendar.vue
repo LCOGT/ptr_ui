@@ -121,7 +121,7 @@ TODO:
   - save events in UTC so that modifications are possible from any timezone.
     (currently appending -8:00 to indicate PST )
 
-  - retrieve site lat/lon in the twighlight calculator. Don't hardcode!
+  - retrieve site lat/lon in the twilight calculator. Don't hardcode!
 
   - set min/max time (start/end) to a few hours before dusk.
     use utc offset + site tz offset 
@@ -191,8 +191,8 @@ export default {
         // Return the list of sources that feed fullCalendar with events
         fc_eventSources() {
             return [
-                // Astronomical twighlight events (computed locally)
-                { events: this.getTwighlightEvents },
+                // Astronomical twilight events (computed locally)
+                { events: this.getTwilightEvents },
                 // Events from dynamodb backend
                 { events: this.fetchSiteEvents },
                 // Now Indicator
@@ -324,7 +324,7 @@ export default {
           this.isLoading = val; 
         },
 
-        async getTwighlightEvents(info) {
+        async getTwilightEvents(info) {
 
             // Timer start
             let t0=performance.now()
@@ -348,9 +348,9 @@ export default {
 
             //console.log('allDays: ', allDays)
 
-            // Generate the twighlight events (in proper fullCalendar format)
+            // Generate the twilight events (in proper fullCalendar format)
             // for one day column (evening-of and morning-after the given date.)
-            function oneDayTwighlight(timestamp, latitude, longitude) {
+            function oneDayTwilight(timestamp, latitude, longitude) {
 
                 let events = {}
 
@@ -384,24 +384,24 @@ export default {
                     //backgroundColor: daylightColor,
                     //id: `${currentDateObj.toISOString()}_day_afternoon`,
                 //}
-                events.civilTwighlightDusk = {
-                    title: "Civil Twighlight",
+                events.civilTwilightDusk = {
+                    title: "Civil Twilight",
                     start: sunEvents.sunset,
                     end: sunEvents.dusk,
                     backgroundColor: civilColor,
                     rendering: "background",
                     id: `${currentDateObj.toISOString()}_civil_dusk`,
                 }
-                events.nauticalTwighlightDusk = {
-                    title: "Nautical Twighlight",
+                events.nauticalTwilightDusk = {
+                    title: "Nautical Twilight",
                     start: sunEvents.dusk,
                     end: sunEvents.nauticalDusk,
                     backgroundColor: nauticalColor,
                     rendering: "background",
                     id: `${currentDateObj.toISOString()}_nautical_dusk`,
                 }
-                events.astronomicalTwighlightDusk = {
-                    title: "Astronomical Twighlight",
+                events.astronomicalTwilightDusk = {
+                    title: "Astronomical Twilight",
                     start: sunEvents.nauticalDusk,
                     end: sunEvents.night,
                     backgroundColor: astronomicalColor,
@@ -409,24 +409,24 @@ export default {
                     id: `${currentDateObj.toISOString()}_astronomical_dusk`,
                 }
 
-                events.astronomicalTwighlightDawn = {
-                    title: "Astronomical Twighlight",
+                events.astronomicalTwilightDawn = {
+                    title: "Astronomical Twilight",
                     start: nextDayEvents.nightEnd,
                     end: nextDayEvents.nauticalDawn,
                     backgroundColor: astronomicalColor,
                     rendering: "background",
                     id: `${currentDateObj.toISOString()}_astronomical_dawn`,
                 }
-                events.nauticalTwighlightDawn = {
-                    title: "Nautical Twighlight",
+                events.nauticalTwilightDawn = {
+                    title: "Nautical Twilight",
                     start: nextDayEvents.nauticalDawn,
                     end: nextDayEvents.dawn,
                     backgroundColor: nauticalColor,
                     rendering: "background",
                     id: `${currentDateObj.toISOString()}_nautical_dawn`,
                 }
-                events.civilTwighlightDawn = {
-                    title: "Civil Twighlight",
+                events.civilTwilightDawn = {
+                    title: "Civil Twilight",
                     start:nextDayEvents.dawn,
                     end:nextDayEvents.sunrise,
                     backgroundColor: civilColor,
@@ -446,15 +446,15 @@ export default {
             }
 
             // Collect all the events to display here
-            let twighlightEvents = []
+            let twilightEvents = []
 
             let site_lat = parseFloat(this.site_config(this.calendarSite)['latitude'])
             let site_lng = parseFloat(this.site_config(this.calendarSite)['longitude'])
 
 
             // Compute events for each day. 
-            allDays.map((day) => twighlightEvents.push(...Object.values(
-              oneDayTwighlight(
+            allDays.map((day) => twilightEvents.push(...Object.values(
+              oneDayTwilight(
                 day, 
                 site_lat,
                 site_lng,
@@ -463,11 +463,11 @@ export default {
 
             // Finish timer
             let t1=performance.now()
-            let twighlightComputeTime = t1-t0
-            if (twighlightComputeTime > 100) {
-                console.warn('Slow computation of astro twighlight: ', twighlightComputeTime.toFixed(2)+'ms')
+            let twilightComputeTime = t1-t0
+            if (twilightComputeTime > 100) {
+                console.warn('Slow computation of astro twilight: ', twilightComputeTime.toFixed(2)+'ms')
             }
-            return twighlightEvents
+            return twilightEvents
         },
 
         async getConfigWithAuth() {

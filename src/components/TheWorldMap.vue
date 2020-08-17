@@ -242,7 +242,7 @@ export default {
 
     // Draw the daylight regions, and update every few seconds.
     nite.init(this.map)
-    this.updateTwighlightInterval = setInterval(function () { nite.refresh() }, 10000) // every 10s
+    this.updateTwilightInterval = setInterval(function () { nite.refresh() }, 10000) // every 10s
 
     // Get position of the sun and display on map, and update every few seconds.
     this.drawSunMarker()
@@ -251,7 +251,7 @@ export default {
   },
   beforeDestroy() {
     // Remove the looping intervals that update the sun and daylight regions on the map.
-    clearInterval(this.updateTwighlightInterval)
+    clearInterval(this.updateTwilightInterval)
     clearInterval(this.updateSunInterval)
     clearInterval(this.updateSiteColorInterval)
   },
