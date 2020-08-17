@@ -100,9 +100,7 @@ export default {
     },
     data() {
         return {
-            //site_events: [{} * 26],
             site_events: JSON.parse(window.localStorage.getItem(`${this.sitecode}Events`)) || [],
-
             time_display_format: "user", // 'user' or 'observatory',
         }
     },
@@ -113,11 +111,9 @@ export default {
             site_events = site_events.data
 
             // Function to convert from dublin julian days to unix time
-            let djd2unix = t => (t-25567.5)*86400*1000
+            // Subtract difference in JD start vs unix start, then mulitply by 
+            // the number of miliseconds in a day.
             let jd2unix = t => (t - 2440587.5) * 86400 * 1000
-            //(djd + 2415020 - 2440587.5) × 86400 = unix time (s)
-
-            console.log(site_events)
 
             let tableData = []
 
