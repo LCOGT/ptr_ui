@@ -32,9 +32,7 @@
                 </b-navbar-item>
             </b-navbar-dropdown>
 
-
-
-            <b-navbar-dropdown label="experimental">
+            <b-navbar-dropdown v-if="userIsAdmin" label="experimental">
                 <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
                     chat
                 </b-navbar-item>
@@ -48,6 +46,11 @@
                     analysis
                 </b-navbar-item>
             </b-navbar-dropdown>
+
+            <b-navbar-item tag="router-link" :to="{ path: '/data/' }">
+                my data
+            </b-navbar-item>
+
         </template>
 
         <template slot="end">
@@ -83,31 +86,8 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "TheMenu",
-  //props: ["global_config"],
   data() {
     return {}
-    //return {
-      //sites: [
-        //{
-          //code: "wmd",
-          //name: "West Mountain Drive",
-          //country: "USA",
-          //tz: -8,
-          //lat: 34,
-          //lng: -119,
-          //elevation: 0 // meters
-        //},
-        //{
-          //code: "saf",
-          //name: "Apache Ridge Observatory",
-          //country: "USA",
-          //tz: -7,
-          //lat: 35.55444,
-          //lng: -105.870277,
-          //elevation: 2201
-        //}
-      //]
-    //};
   },
   computed: {
     ...mapGetters('site_config', [
@@ -115,6 +95,16 @@ export default {
       'global_config',
       'site',
     ]),
+
+    userIsAdmin() {
+      try {
+        let user = this.$auth.user 
+        let roles = user['https://photonranch.org/user_metadata'].roles
+        return roles.includes('admin')
+      } catch {
+        return false
+      }
+    },
 
     menu_name() {
       let siteName = ''
