@@ -104,6 +104,7 @@ export default {
                 this.$emit('jobPost', response.data)
             }).catch(error => {
                 this.isLoading = false;
+                console.log(error)
                 this.handleNotAuthorizedResponse(error)
             })
 
