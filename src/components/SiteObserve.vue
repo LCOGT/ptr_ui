@@ -124,6 +124,9 @@
             <b-dropdown-item aria-role="listitem">
               <command-button :data="mount_slew_chart_command" class="dropdown-button-command is-small"/>
             </b-dropdown-item>
+            <b-dropdown-item aria-role="listitem">
+              <command-button :data="mount_slew_near_tycho" class="dropdown-button-command is-small"/>
+            </b-dropdown-item>
             <b-dropdown-item>
               <command-button :data="mount_screenflat_command" class="dropdown-button-command is-small"/>
             </b-dropdown-item>

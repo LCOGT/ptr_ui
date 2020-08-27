@@ -320,6 +320,9 @@ export const commands_mixin = {
                 { object: obj, }
             )
         },
+        mount_slew_near_tycho() {
+            return this.base_command( 'mount', 'slew_to_near_tycho', 'nearby Tycho star' )
+        },
         mount_stop_command () {
             return this.base_command( 'mount', 'stop', 'stop movement' )
         },
