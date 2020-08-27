@@ -20,10 +20,10 @@ export const commands_mixin = {
             // Camera Fields
             camera_image_type_options: [
                 'light', 
-                'quick',
-                'test image', 
+                'experimental',
                 'bias', 
                 'dark', 
+                'autofocus probe',
                 'screen flat', 
                 'sky flat', 
                 'lamp flat', 
@@ -31,7 +31,7 @@ export const commands_mixin = {
                 'NeAr flat', 
                 'ThAr flat', 
                 'solar flat',
-                'experimental',
+                'simulation',
             ],
 
         }
