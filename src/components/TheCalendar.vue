@@ -532,6 +532,9 @@ export default {
             calendarApi.unselect();
             calendarApi.refetchEvents();
             this.eventEditorIsActive=false;
+            
+            // Update the list of active reservations
+            this.$store.dispatch('calendar/fetchActiveReservations', this.calendarSite)
         },
 
         /*===================================================/
@@ -552,7 +555,6 @@ export default {
             this.activeEvent.creator_id = this.$auth.user.sub
             this.activeEvent.project_id = "none"
 
-            console.log('actie event: ', this.activeEvent)
             this.isNewEvent = true; // setting for the modal event editor
             this.eventEditorIsActive= true;
         },
@@ -713,8 +715,6 @@ export default {
                 "project_id":initialEvent.project_id,
                 "rendering":initialEvent.rendering
             }
-            //console.log(theModifiedEvent)
-            //console.log(theInitialEvent)
             let body = {
                 originalEvent: theInitialEvent,
                 modifiedEvent: theModifiedEvent,
@@ -745,8 +745,6 @@ export default {
 
         async fetchSiteEvents(fetchInfo) {
 
-            // TODO: we don't want to define the site from the select box
-            // on this page.
             let site = this.calendarSite
             const url = `${this.backendUrl}/dev/siteevents`
             const options = {
