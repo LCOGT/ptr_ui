@@ -73,7 +73,6 @@
         </div>
     </b-modal>
 
-<span class="moon-text"> moon text</span>
 </div> 
 </template>
 
@@ -351,7 +350,8 @@ export default {
       },
 
       async getMoonRiseSet(info) {
-        console.log('moon info: ', info)
+        //sloppy 
+
           // Get the time range we need to display in the UI.
           let firstDay = info.start.valueOf()
           let lastDay = info.end.valueOf()
