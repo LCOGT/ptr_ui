@@ -11,6 +11,39 @@
 
     <div class="column menu-column is-one-fifth is-hidden-touch is-hidden-desktop-only">
 
+      <!-- Show whether a site is currently reserved or not -->
+      <div class="site-reservation-status-box">
+
+        <!-- Display if there are no current reservations --> 
+        <div v-if="!hasActiveReservation" class="menu-label site-not-reserved-notice"> {{sitecode}} is available
+          <router-link class="site-not-reserved-notice" :to="`/site/${sitecode}/calendar`"> 
+            <b-icon size="is-small" icon="arrow-right"></b-icon> 
+          </router-link> 
+        </div>
+
+        <!-- Display if the site is currently reserved for use (and not by current user). --> 
+        <div v-if="hasActiveReservation && !userHasActiveReservation"> 
+          <p class="menu-label site-reserved-notice">
+            Site is reserved 
+          </p>
+          <p>Remaining: {{timeRemainingForSoonestCurrentReservation}}</p>
+        </div>
+
+        <!-- Display if the site is currently reserved by the active user --> 
+        <div v-if="userHasActiveReservation"> 
+          <p class="menu-label site-not-reserved-notice">
+            Site is reserved by you
+          </p>
+          <p>Remaining: {{userReservationTimeRemaining}}</p>
+        </div>
+
+        <!--button @click="$store.dispatch('calendar/fetchActiveReservations', sitecode)">get reservations</button-->
+        <router-link :to="`/site/${sitecode}/calendar`"> 
+          <b-button class="button is-text" icon-right="calendar">go to calendar</b-button>
+        </router-link>
+
+      </div>
+
       <!-- Site menu for desktop or larger. Replaces bottom menu. -->
       <b-menu class="subpage-menu">
         <b-menu-list label="Menu">
@@ -186,6 +219,7 @@ import StatusPanelCollapsible from '@/components/StatusPanelCollapsible'
 import StatusRow from '@/components/StatusRow'
 
 import axios from 'axios';
+import moment from 'moment'
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { commands_mixin } from '../mixins/commands_mixin'
@@ -231,7 +265,6 @@ export default {
         */
       },
 
-
       flatSampleStatuss: [
           {"name": "enclosure", "val": "open"},
           {"name": "temp", "val": "5"},
@@ -241,10 +274,16 @@ export default {
           {"name": "age", "val": "seconds"},
       ],
 
+      current_time_millis: moment().valueOf(),
+      current_time_millis_updater: '', // setInterval object
+
     }
   },
 
   async created () {
+
+    // Load the active reservations for this site. 
+    this.$store.dispatch('calendar/fetchActiveReservations', this.sitecode)
 
     await this.setDefaultDevices()
 
@@ -262,14 +301,17 @@ export default {
       });
     }
 
+    // Update current_time_millis every second. For reservation countdown. 
+    this.current_time_millis_updater = setInterval(() => {
+      this.current_time_millis = moment().valueOf()
+    }, 1000)
 
-    // Load initial status
-    //this.getSiteDeviceStatus()
 
   },
 
   beforeDestroy() {
     this.$store.dispatch('site_config/remove_active_site')
+    clearTimeout(this.current_time_millis)
   },
 
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
@@ -285,6 +327,9 @@ export default {
       //this.getSiteDeviceStatus()
 
       this.$store.dispatch('images/refresh_latest_images')
+
+      // Refresh the active reservations list for the new site.
+      this.$store.dispatch('calendar/fetchActiveReservations', this.sitecode)
     },
   },
 
@@ -303,6 +348,58 @@ export default {
   computed: {
 
     ...mapState('site_config', ['site_config', 'global_config']),
+
+    ...mapState('calendar', ['active_reservations']),
+    ...mapGetters('calendar', [
+      'hasActiveReservation', 
+      'usersWithActiveReservation',
+      'userIDsWithActiveReservation',
+      'endOfUserReservation',
+      'endOfNextReservation',
+    ]),
+
+    userHasActiveReservation() {
+      if (this.$auth.isAuthenticated) {
+        let user_id = this.$auth.user.sub
+        return this.userIDsWithActiveReservation.includes(user_id)
+      }
+      else {
+        return false
+      }
+    },
+
+    timeRemainingForSoonestCurrentReservation() {
+      let expire_time = this.endOfNextReservation
+      let current_time = this.current_time_millis
+      let delta = expire_time - current_time
+
+      let millis_per_minute = 60 * 1000
+      let millis_per_hour = 3600 * 1000
+
+      let hours_left = Math.floor(delta / millis_per_hour)
+      let minutes_left = Math.floor((delta - hours_left) / millis_per_minute)
+      return `${hours_left}h ${minutes_left}m`
+    },
+
+    userReservationTimeRemaining() {
+      if (this.$auth.isAuthenticated) {
+        let user_id = this.$auth.user.sub
+        let expire_time = this.endOfUserReservation(user_id)
+        let current_time = this.current_time_millis
+        let delta = expire_time - current_time
+
+        let millis_per_minute = 60 * 1000
+        let millis_per_hour = 3600 * 1000
+
+        let hours_left = Math.floor(delta / millis_per_hour)
+        let minutes_left = Math.floor((delta - hours_left) / millis_per_minute)
+        return `${hours_left}h ${minutes_left}m`
+      }
+      else {
+        return "0h 0m"
+      }
+
+    },
 
     // Get the username from Auth0
     username() {
@@ -362,6 +459,20 @@ export default {
   height: auto;
   padding: 0 auto;
   margin-right: 40px;
+}
+
+.site-not-reserved-notice {
+  color: greenyellow
+}
+.site-reserved-notice {
+  color: yellow
+}
+
+.site-reservation-status-box {
+  background-color: black;
+  border-radius: 8px;
+  padding: 1em;
+  margin-bottom: 1em;
 }
 
 .subpage-menu {
