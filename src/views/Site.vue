@@ -12,13 +12,16 @@
     <div class="column menu-column is-one-fifth is-hidden-touch is-hidden-desktop-only">
 
       <!-- Show whether a site is currently reserved or not -->
+      <!-- TODO: refactor into it's own component -->
       <div class="site-reservation-status-box">
-
         <!-- Display if there are no current reservations --> 
-        <div v-if="!hasActiveReservation" class="menu-label site-not-reserved-notice"> {{sitecode}} is available
-          <router-link class="site-not-reserved-notice" :to="`/site/${sitecode}/calendar`"> 
-            <b-icon size="is-small" icon="arrow-right"></b-icon> 
-          </router-link> 
+        <div v-if="!hasActiveReservation"> 
+          <p class="menu-label site-not-reserved-notice">
+            no active reservations
+          </p>
+          <p>Next in: 0h 0m</p>
+          <p style="color: #555">(timer not implemented)</p>
+        <div style="height: 5px;" />
         </div>
 
         <!-- Display if the site is currently reserved for use (and not by current user). --> 
@@ -31,17 +34,16 @@
 
         <!-- Display if the site is currently reserved by the active user --> 
         <div v-if="userHasActiveReservation"> 
-          <p class="menu-label site-not-reserved-notice">
-            Site is reserved by you
+          <p class="menu-label site-reserved-current-user">
+            Reserved for you
           </p>
           <p>Remaining: {{userReservationTimeRemaining}}</p>
         </div>
 
-        <!--button @click="$store.dispatch('calendar/fetchActiveReservations', sitecode)">get reservations</button-->
+        <div style="height: 5px;" />
         <router-link :to="`/site/${sitecode}/calendar`"> 
-          <b-button class="button is-text" icon-right="calendar">go to calendar</b-button>
+          <b-button size="is-small" class="button is-dark" icon-right="calendar">view calendar</b-button>
         </router-link>
-
       </div>
 
       <!-- Site menu for desktop or larger. Replaces bottom menu. -->
@@ -78,11 +80,10 @@
       <!-- List of online users -->
       <div class="menu-label"> online users </div>
       <ul class="online-users-list">
-        <li v-for="(user, idx) in displayedOnlineUsers">
-          <div v-bind:key="idx">
+        <li v-for="(user, idx) in displayedOnlineUsers"
+          v-bind:key="idx">
             <!--b-icon icon="circle" size="is-small" type="is-success"/-->
             <span style="font-weight:lighter;">{{user}}</span>
-          </div>
         </li>
       </ul>
       
@@ -337,9 +338,8 @@ export default {
   async mounted() {
 
     // Update timestamp every second (sent with command)
-    var self = this;
-    setInterval(function() {
-      self.timestamp = parseInt(Date.now() / 1000)
+    setInterval(() => {
+      this.timestamp = parseInt(Date.now() / 1000)
     }, 1000)
 
     this.siteIsMounted = true; // child components are ready to render now
@@ -348,14 +348,28 @@ export default {
   computed: {
 
     ...mapState('site_config', ['site_config', 'global_config']),
+    ...mapGetters('site_config', [
+        'site_config',
+        'enclosure',
+        'mount',
+        'telescope',
+        'camera',
+        'filter_wheel',
+        'focuser',
+        'rotator',
+        'screen',
+        'weather',
+    ]),
 
-    ...mapState('calendar', ['active_reservations']),
+    ...mapState('calendar', [
+        'active_reservations'
+    ]),
     ...mapGetters('calendar', [
-      'hasActiveReservation', 
-      'usersWithActiveReservation',
-      'userIDsWithActiveReservation',
-      'endOfUserReservation',
-      'endOfNextReservation',
+        'hasActiveReservation', 
+        'usersWithActiveReservation',
+        'userIDsWithActiveReservation',
+        'endOfUserReservation',
+        'endOfNextReservation',
     ]),
 
     userHasActiveReservation() {
@@ -392,7 +406,7 @@ export default {
         let millis_per_hour = 3600 * 1000
 
         let hours_left = Math.floor(delta / millis_per_hour)
-        let minutes_left = Math.floor((delta - hours_left) / millis_per_minute)
+        let minutes_left = Math.floor((delta - (hours_left * millis_per_hour)) / millis_per_minute)
         return `${hours_left}h ${minutes_left}m`
       }
       else {
@@ -408,18 +422,6 @@ export default {
       }
       return "anonymous"
     },
-    ...mapGetters('site_config', [
-        'site_config',
-        'enclosure',
-        'mount',
-        'telescope',
-        'camera',
-        'filter_wheel',
-        'focuser',
-        'rotator',
-        'screen',
-        'weather',
-    ]),
 
   },
 
@@ -462,10 +464,13 @@ export default {
 }
 
 .site-not-reserved-notice {
-  color: greenyellow
+  color: $info;
 }
 .site-reserved-notice {
-  color: yellow
+  color: yellow;
+}
+.site-reserved-current-user {
+  color: greenyellow;
 }
 
 .site-reservation-status-box {
