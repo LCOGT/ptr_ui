@@ -78,7 +78,7 @@
         </b-switch>
 
         <p class="warning-text">{{current_image.ex10_fits_exists ? "" : "missing small fits"}}</p>
-        <p class="warning-text">{{current_image.ex00_fits_exists ? "" : "missing full fits"}}</p>
+        <p class="warning-text">{{current_image.ex01_fits_exists ? "" : "missing full fits"}}</p>
 
         <b-field>
           <p class="control">
@@ -90,7 +90,7 @@
               <button 
                 class="button" 
                 :class="{'is-loading':region_info_loading}"
-                :disabled="!current_image.ex00_fits_exists || !current_image.ex10_fits_exists" 
+                :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
                 @click="getRegionStats(true)">
                 inspect region
               </button>
@@ -100,7 +100,7 @@
             <button 
               class="button" 
               :class="{'is-loading':image_info_loading}"
-              :disabled="!current_image.ex00_fits_exists || !current_image.ex10_fits_exists" 
+              :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
               @click="getRegionStats(false)">
               inspect image
             </button>
@@ -138,7 +138,7 @@
             <button 
               class="button" 
               :class="{'is-loading': inspect_region_loading}"
-              :disabled="!current_image.ex00_fits_exists || !current_image.ex10_fits_exists" 
+              :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
               @click="getStarProfiles">
               inspect region
             </button>
@@ -147,12 +147,13 @@
             <button 
               class="button" 
               :class="{'is-loading': inspect_image_loading}"
-              :disabled="!current_image.ex00_fits_exists || !current_image.ex10_fits_exists" 
+              :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
               @click="getStarProfiles(false)">
               inspect image
             </button>
           </p>
         </b-field>
+        {{current_image}}
 
         <hr>
         <div id="brightest_star_profile" />
@@ -363,7 +364,7 @@ export default {
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
-        "fitstype": this.starInspectorLargeFile ? "00" : "10",
+        "fitstype": this.starInspectorLargeFile ? "EX01" : "EX10",
       }
 
       if (useSubregion) {
@@ -632,7 +633,7 @@ export default {
     },
     getRegionStats(useSubregion=true) {
 
-      let fitstype = this.imageStatsLargeFile ? "00" : "10" // Determine the size of the image to analyze.
+      let fitstype = this.imageStatsLargeFile ? "EX01" : "EX10" // Determine the size of the image to analyze.
       let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
       let body = {
         "site": this.sitecode,

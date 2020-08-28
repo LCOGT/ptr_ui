@@ -8,10 +8,6 @@
 
     <div class="spacer" style="height: 2em;" />
 
-    <!-- Dome camera -->
-    <the-dome-cam v-if="sitecode=='wmd'"/>
-    <br>
-
     <!-- Site events modal window -->
     <div style="display:flex; margin-bottom: 1em;">
         <h3 class="subtitle">Site Events: </h3>
@@ -27,13 +23,16 @@
         </b-modal>
     </div>
 
-    <!--leaflet-map 
-        name="leafmap"
-        :latitude="latitude"
-        :longitude="longitude"
-    ></leaflet-map-->
-    <div style="width: 100%; height: 500px; margin-bottom: 1em;">
-        <iframe style="width: 100%; height: 100%;" :src="`https://embed.windy.com/embed2.html?lat=${latitude}&lon=${longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${latitude}&detailLon=${longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`" frameborder="0"></iframe>
+
+    <div style="display: grid; grid-template-columns: auto 1fr;">
+        <!-- Dome camera -->
+        <the-dome-cam style="grid-column-start: 1;" v-if="sitecode=='wmd'"/>
+        <!--div style="grid-column-start: 2; min-width: 20px; height: 20px; background-color: red;"/-->
+        <!-- Windy weather map -->
+        <div style="grid-column-start: 2; width: 100%; height: 500px; margin-bottom: 1em;">
+            <iframe style="width: 100%; height: 100%;" :src="`https://embed.windy.com/embed2.html?lat=${latitude}&lon=${longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${latitude}&detailLon=${longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`" frameborder="0"></iframe>
+        </div>
+
     </div>
 
     <!-- This is a temporary solution only. Does not scale. -->
