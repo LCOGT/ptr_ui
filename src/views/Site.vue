@@ -391,7 +391,7 @@ export default {
       let millis_per_hour = 3600 * 1000
 
       let hours_left = Math.floor(delta / millis_per_hour)
-      let minutes_left = Math.floor((delta - hours_left) / millis_per_minute)
+      let minutes_left = Math.floor((delta - (hours_left * millis_per_hour)) / millis_per_minute)
       return `${hours_left}h ${minutes_left}m`
     },
 
