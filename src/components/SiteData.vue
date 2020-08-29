@@ -153,7 +153,6 @@
             </button>
           </p>
         </b-field>
-        {{current_image}}
 
         <hr>
         <div id="brightest_star_profile" />
@@ -178,7 +177,6 @@
                 <td>{{num_good_stars}}</td> </tr>
         </table>
       </side-info-panel>
-
 
       <!--js9-devtools/-->
       <image-filter/>

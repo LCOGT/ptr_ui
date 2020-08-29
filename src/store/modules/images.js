@@ -53,7 +53,7 @@ const actions = {
     /**
      *  This action will retrieve a list of the latest images (from the api).
      */
-    async refresh_latest_images({ commit, state, rootState }) {
+    async refresh_latest_images({ getters, commit, state, rootState }) {
 
         let site = rootState.site_config.selected_site;
         let apiName = rootState.dev.active_api;
@@ -82,7 +82,12 @@ const actions = {
             // Empty response:
             if (response.length == 0) { return; }
 
-            commit('setCurrentImage', response[0])
+            // Only change the current image to the newest if there is none 
+            // selected.
+            // We don't want to yank the view away from the user. 
+            if (!state.current_image.site) {
+                commit('setCurrentImage', response[0])
+            }
             commit('setRecentImages', response)
 
         }).catch(error => {
