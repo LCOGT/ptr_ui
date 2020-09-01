@@ -85,7 +85,7 @@
     import SunCalc from 'suncalc';
     import {mapGetters} from 'vuex'
 
-    import CalendarEventEditor from "@/components/CalendarEventEditor";
+    import CalendarEventEditor from "@/components/calendar/CalendarEventEditor";
 
     import FullCalendar from "@fullcalendar/vue";
     import dayGridPlugin from "@fullcalendar/daygrid";

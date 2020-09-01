@@ -208,16 +208,17 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import CommandButton from '@/components/CommandButton'
-import SiteHome from '@/components/SiteHome'
-import SiteObserve from '@/components/SiteObserve'
-import SiteTargets from '@/components/SiteTargets'
-import SiteCalendar from '@/components/SiteCalendar'
-import SiteProjects from '@/components/SiteProjects'
-import SiteData from '@/components/SiteData'
 import ChatModule from '@/components/ChatModule'
 import SideInfoPanel from '@/components/SideInfoPanel'
-import StatusPanelCollapsible from '@/components/StatusPanelCollapsible'
-import StatusRow from '@/components/StatusRow'
+import StatusPanelCollapsible from '@/components/status/StatusPanelCollapsible'
+import StatusRow from '@/components/status/StatusRow'
+
+import SiteHome from '@/components/sitepages/SiteHome'
+import SiteObserve from '@/components/sitepages/SiteObserve'
+import SiteTargets from '@/components/sitepages/SiteTargets'
+import SiteCalendar from '@/components/sitepages/SiteCalendar'
+import SiteProjects from '@/components/sitepages/SiteProjects'
+import SiteData from '@/components/sitepages/SiteData'
 
 import axios from 'axios';
 import moment from 'moment'

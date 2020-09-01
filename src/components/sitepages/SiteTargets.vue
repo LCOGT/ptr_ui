@@ -87,8 +87,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { commands_mixin } from '../mixins/commands_mixin'
-import { status_mixin } from '../mixins/status_mixin'
+import { commands_mixin } from '../../mixins/commands_mixin'
+import { status_mixin } from '../../mixins/status_mixin'
 import helpers from '@/utils/helpers'
 
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
