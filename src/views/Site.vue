@@ -1,208 +1,206 @@
-
-
 <template>
-<div class="page">
-  
-  <div class="container">
-  <section class="page-view">
+  <div class="page">
+    
+    <div class="container">
+    <section class="page-view">
 
-  <div style="height: 1em"></div>
-  <div class="columns" style="margin: 1em;">
+    <div style="height: 1em"></div>
+    <div class="columns" style="margin: 1em;">
 
-    <div class="column menu-column is-one-fifth is-hidden-touch is-hidden-desktop-only">
+      <div class="column menu-column is-one-fifth is-hidden-touch is-hidden-desktop-only">
 
-      <!-- Show whether a site is currently reserved or not -->
-      <!-- TODO: refactor into it's own component -->
-      <div class="site-reservation-status-box">
-        <!-- Display if there are no current reservations --> 
-        <div v-if="!hasActiveReservation"> 
-          <p class="menu-label site-not-reserved-notice">
-            no active reservations
-          </p>
-          <p>Next in: 0h 0m</p>
-          <p style="color: #555">(timer not implemented)</p>
-        <div style="height: 5px;" />
+        <!-- Show whether a site is currently reserved or not -->
+        <!-- TODO: refactor into it's own component -->
+        <div class="site-reservation-status-box">
+          <!-- Display if there are no current reservations --> 
+          <div v-if="!hasActiveReservation"> 
+            <p class="menu-label site-not-reserved-notice">
+              no active reservations
+            </p>
+            <p>Next in: 0h 0m</p>
+            <p style="color: #555">(timer not implemented)</p>
+          <div style="height: 5px;" />
+          </div>
+
+          <!-- Display if the site is currently reserved for use (and not by current user). --> 
+          <div v-if="hasActiveReservation && !userHasActiveReservation"> 
+            <p class="menu-label site-reserved-notice">
+              Site is reserved 
+            </p>
+            <p>Remaining: {{timeRemainingForSoonestCurrentReservation}}</p>
+          </div>
+
+          <!-- Display if the site is currently reserved by the active user --> 
+          <div v-if="userHasActiveReservation"> 
+            <p class="menu-label site-reserved-current-user">
+              Reserved for you
+            </p>
+            <p>Remaining: {{userReservationTimeRemaining}}</p>
+          </div>
+
+          <div style="height: 5px;" />
+          <router-link :to="`/site/${sitecode}/calendar`"> 
+            <b-button size="is-small" class="button is-dark" icon-right="calendar">view calendar</b-button>
+          </router-link>
         </div>
 
-        <!-- Display if the site is currently reserved for use (and not by current user). --> 
-        <div v-if="hasActiveReservation && !userHasActiveReservation"> 
-          <p class="menu-label site-reserved-notice">
-            Site is reserved 
-          </p>
-          <p>Remaining: {{timeRemainingForSoonestCurrentReservation}}</p>
-        </div>
+        <!-- Site menu for desktop or larger. Replaces bottom menu. -->
+        <b-menu class="subpage-menu">
+          <b-menu-list label="Menu">
+              <b-menu-item 
+                icon="home" 
+                label="Site Home" 
+                tag="router-link" 
+                :to="'/site/'+sitecode+'/home'"></b-menu-item>
+              <b-menu-item 
+                icon="telescope" 
+                tag="router-link"
+                :to="'/site/' + sitecode + '/observe'" 
+                label="Observe"></b-menu-item>
+              <b-menu-item 
+                icon="target" 
+                tag="router-link"
+                :to="'/site/' + sitecode + '/targets'" 
+                label="Target Explorer"></b-menu-item>
+              <b-menu-item 
+                icon="folder-multiple-image"
+                tag="router-link"
+                :to="'/site/' + sitecode + '/projects'" 
+                label="Projects"></b-menu-item>
+              <b-menu-item 
+                icon="calendar"
+                tag="router-link"
+                :to="'/site/' + sitecode + '/calendar'" 
+                label="Calendar"></b-menu-item>
+          </b-menu-list>
+        </b-menu>
 
-        <!-- Display if the site is currently reserved by the active user --> 
-        <div v-if="userHasActiveReservation"> 
-          <p class="menu-label site-reserved-current-user">
-            Reserved for you
-          </p>
-          <p>Remaining: {{userReservationTimeRemaining}}</p>
-        </div>
+        <!-- List of online users -->
+        <div class="menu-label"> online users </div>
+        <ul class="online-users-list">
+          <li v-for="(user, idx) in displayedOnlineUsers"
+            v-bind:key="idx">
+              <!--b-icon icon="circle" size="is-small" type="is-success"/-->
+              <span style="font-weight:lighter;">{{user}}</span>
+          </li>
+        </ul>
+        
+        <!-- Chat module. Also feeds online users list. -->
+        <chat-module 
+          :sitecode="sitecode" 
+          :username="username"
+          @whosonline="makeOnlineUsersList" />
 
-        <div style="height: 5px;" />
-        <router-link :to="`/site/${sitecode}/calendar`"> 
-          <b-button size="is-small" class="button is-dark" icon-right="calendar">view calendar</b-button>
-        </router-link>
+        <div style="height:3em;"/>
+
+        <status-panel-collapsible
+          :sitecode="sitecode"
+          :fullStatus="weather_state"
+          :statusList="buildWeatherStatus"
+          :statusAge="status_age"
+          >
+          <p slot="title">{{sitecode}} weather</p>
+        </status-panel-collapsible>
+
+        <status-panel-collapsible
+          :sitecode="sitecode"
+          :fullStatus="deviceStatus"
+          :statusList="buildGeneralStatus"
+          :statusAge="status_age"
+          >
+          <p slot="title">{{sitecode}} status</p>
+        </status-panel-collapsible>
+
       </div>
 
-      <!-- Site menu for desktop or larger. Replaces bottom menu. -->
-      <b-menu class="subpage-menu">
-        <b-menu-list label="Menu">
-            <b-menu-item 
-              icon="home" 
-              label="Site Home" 
-              tag="router-link" 
-              :to="'/site/'+sitecode+'/home'"></b-menu-item>
-            <b-menu-item 
-              icon="telescope" 
-              tag="router-link"
-              :to="'/site/' + sitecode + '/observe'" 
-              label="Observe"></b-menu-item>
-            <b-menu-item 
-              icon="target" 
-              tag="router-link"
-              :to="'/site/' + sitecode + '/targets'" 
-              label="Target Explorer"></b-menu-item>
-            <b-menu-item 
-              icon="folder-multiple-image"
-              tag="router-link"
-              :to="'/site/' + sitecode + '/projects'" 
-              label="Projects"></b-menu-item>
-            <b-menu-item 
-              icon="calendar"
-              tag="router-link"
-              :to="'/site/' + sitecode + '/calendar'" 
-              label="Calendar"></b-menu-item>
-        </b-menu-list>
-      </b-menu>
 
-      <!-- List of online users -->
-      <div class="menu-label"> online users </div>
-      <ul class="online-users-list">
-        <li v-for="(user, idx) in displayedOnlineUsers"
-          v-bind:key="idx">
-            <!--b-icon icon="circle" size="is-small" type="is-success"/-->
-            <span style="font-weight:lighter;">{{user}}</span>
-        </li>
-      </ul>
-      
-      <!-- Chat module. Also feeds online users list. -->
-      <chat-module 
-        :sitecode="sitecode" 
-        :username="username"
-        @whosonline="makeOnlineUsersList" />
+      <!-- Primary content of the page. Selects from the various site subpages. -->
+      <!-- Note: wait for parent (this component) to mount before loading child components. 
+      Otherwise, props may initially load as null. -->
+        <component 
+          style="width: 100%"
+          v-bind:is="`site-${subpage}`"
+          :sitecode="sitecode"
+          :deviceStatus="deviceStatus"
+          />
+      </div>
+    </section>
+    </div>
 
-      <div style="height:3em;"/>
+    <footer class="footer is-hidden-touch">
+      <div class="has-text-centered">
+        <p>
+          You are currently observing from site 
+          <span class="is-uppercase" style="color: greenyellow">{{sitecode}}</span> in the 
+          <strong>photon ranch</strong> network.
+        </p>
+      </div>
+    </footer>
 
-      <status-panel-collapsible
-        :sitecode="sitecode"
-        :fullStatus="weather_state"
-        :statusList="buildWeatherStatus"
-        :statusAge="status_age"
-        >
-        <p slot="title">{{sitecode}} weather</p>
-      </status-panel-collapsible>
 
-      <status-panel-collapsible
-        :sitecode="sitecode"
-        :fullStatus="deviceStatus"
-        :statusList="buildGeneralStatus"
-        :statusAge="status_age"
-        >
-        <p slot="title">{{sitecode}} status</p>
-      </status-panel-collapsible>
+    <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
+    <div class="mobile-menu ">
+      <status-row
+        :statusList="buildGeneralStatus" 
+        class="is-mobile is-hidden-widescreen"
+        style="margin: 0; padding: 0; background-color: #151718;"
+        :statusAge="status_age" />
+      <div class="level is-mobile is-hidden-widescreen">
 
+        <b-tooltip label="Home" type="is-dark" class="level-item">
+          <b-button tag="router-link"
+            class="mobile-menu-button level-item"
+            size="is-large"
+            :to="'/site/'+sitecode+'/home'"
+            icon-right="home"
+            type="is-text">
+          </b-button>
+        </b-tooltip>
+
+        <b-tooltip label="Observe" type="is-dark" class="level-item">
+          <b-button tag="router-link"
+            class="mobile-menu-button level-item"
+            size="is-large"
+            :to="'/site/'+sitecode+'/observe'"
+            icon-right="telescope"
+            type="is-text">
+          </b-button>
+        </b-tooltip>
+        
+        <b-tooltip label="Target Explorer" type="is-dark" class="level-item">
+          <b-button tag="router-link"
+            class="mobile-menu-button level-item"
+            size="is-large"
+            :to="'/site/'+sitecode+'/targets'"
+            icon-right="target"
+            type="is-text">
+          </b-button>
+        </b-tooltip>
+
+        <b-tooltip label="Projects" type="is-dark" class="level-item">
+          <b-button tag="router-link"
+            class="mobile-menu-button level-item"
+            size="is-large"
+            :to="'/site/'+sitecode+'/projects'"
+            icon-right="folder-multiple-image"
+            type="is-text">
+          </b-button>
+        </b-tooltip>
+
+        <b-tooltip label="Calendar" type="is-dark" class="level-item">
+          <b-button tag="router-link"
+            class="mobile-menu-button level-item"
+            size="is-large"
+            :to="'/site/'+sitecode+'/calendar'"
+            icon-right="calendar"
+            type="is-text">
+          </b-button>
+        </b-tooltip>
+      </div>
     </div>
 
 
-    <!-- Primary content of the page. Selects from the various site subpages. -->
-    <!-- Note: wait for parent (this component) to mount before loading child components. 
-    Otherwise, props may initially load as null. -->
-      <component 
-        style="width: 100%"
-        v-bind:is="`site-${subpage}`"
-        :sitecode="sitecode"
-        :deviceStatus="deviceStatus"
-        />
-    </div>
-  </section>
   </div>
-
-  <footer class="footer is-hidden-touch">
-    <div class="has-text-centered">
-      <p>
-        You are currently observing from site 
-        <span class="is-uppercase" style="color: greenyellow">{{sitecode}}</span> in the 
-        <strong>photon ranch</strong> network.
-      </p>
-    </div>
-  </footer>
-
-
-  <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
-  <div class="mobile-menu ">
-    <status-row
-      :statusList="buildGeneralStatus" 
-      class="is-mobile is-hidden-widescreen"
-      style="margin: 0; padding: 0; background-color: #151718;"
-      :statusAge="status_age" />
-    <div class="level is-mobile is-hidden-widescreen">
-
-      <b-tooltip label="Home" type="is-dark" class="level-item">
-        <b-button tag="router-link"
-          class="mobile-menu-button level-item"
-          size="is-large"
-          :to="'/site/'+sitecode+'/home'"
-          icon-right="home"
-          type="is-text">
-        </b-button>
-      </b-tooltip>
-
-      <b-tooltip label="Observe" type="is-dark" class="level-item">
-        <b-button tag="router-link"
-          class="mobile-menu-button level-item"
-          size="is-large"
-          :to="'/site/'+sitecode+'/observe'"
-          icon-right="telescope"
-          type="is-text">
-        </b-button>
-      </b-tooltip>
-      
-      <b-tooltip label="Target Explorer" type="is-dark" class="level-item">
-        <b-button tag="router-link"
-          class="mobile-menu-button level-item"
-          size="is-large"
-          :to="'/site/'+sitecode+'/targets'"
-          icon-right="target"
-          type="is-text">
-        </b-button>
-      </b-tooltip>
-
-      <b-tooltip label="Projects" type="is-dark" class="level-item">
-        <b-button tag="router-link"
-          class="mobile-menu-button level-item"
-          size="is-large"
-          :to="'/site/'+sitecode+'/projects'"
-          icon-right="folder-multiple-image"
-          type="is-text">
-        </b-button>
-      </b-tooltip>
-
-      <b-tooltip label="Calendar" type="is-dark" class="level-item">
-        <b-button tag="router-link"
-          class="mobile-menu-button level-item"
-          size="is-large"
-          :to="'/site/'+sitecode+'/calendar'"
-          icon-right="calendar"
-          type="is-text">
-        </b-button>
-      </b-tooltip>
-    </div>
-  </div>
-
-
-</div>
 </template>
 
 <script>
