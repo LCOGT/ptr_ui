@@ -5,6 +5,17 @@
 
 //import { API } from 'aws-amplify'
 import axios from 'axios'
+import { getInstance } from '../../auth/index' // get user object: getInstance().user
+
+
+function user_id() {
+    if (getInstance().user) {
+        return getInstance().user.sub
+    }
+    else {
+        return false
+    }
+}
 
 const state = {
 
@@ -16,12 +27,22 @@ const state = {
     // user_images a list of all a user's images associated with their account
     // TODO: Write an action that will update a user's image list when images are added to their account
     user_images: [],
+
+    show_user_data_only: false,
 }
 
 const getters = {
     current_image: state => state.current_image,
     recent_images: state => state.recent_images,
     user_images: state => state.user_images,
+    show_user_data_only: state => state.show_user_data_only,
+}
+
+const mutations = {
+    setCurrentImage(state, the_current_image) { state.current_image = the_current_image; },
+    setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
+    setUserImages(state, user_images_list) { state.user_images = user_images_list },
+    show_user_data_only(state, val) { state.show_user_data_only = val},
 }
 
 const actions = {
@@ -53,12 +74,23 @@ const actions = {
     /**
      *  This action will retrieve a list of the latest images (from the api).
      */
-    async refresh_latest_images({ getters, commit, state, rootState }) {
+    async refresh_latest_images({ dispatch, commit, state, rootState }) {
 
         let site = rootState.site_config.selected_site;
         let apiName = rootState.dev.active_api;
         let querySize = 40; // How many images to get
-        let path = `/${site}/latest_images/${querySize}/`;
+        let path = `/${site}/latest_images/${querySize}`;
+
+        // Get the current user's id
+        let userid = user_id()
+        
+        // If a user is logged in and they want to see only their data, 
+        // add their id as a query string param for the api call. 
+        if (state.show_user_data_only && userid) {
+            const query_data = { userid: userid, };
+            const query_params = new URLSearchParams(query_data);
+            path += '?' + query_params
+        }
 
         /**
          * The response for this api call is a list of elements with the form:
@@ -80,7 +112,10 @@ const actions = {
             response = response.data
 
             // Empty response:
-            if (response.length == 0) { return; }
+            if (response.length == 0) { 
+                dispatch('display_placeholder_image') 
+                return; 
+            }
 
             // Only change the current image to the newest if there is none 
             // selected.
@@ -93,6 +128,18 @@ const actions = {
         }).catch(error => {
             //console.log(error)
         });
+    },
+
+    // Use a placeholder image (when there are none to display)
+    display_placeholder_image({ commit }) {
+        let placeholder_url = "https://via.placeholder.com/768x768?text=nothing here yet"
+        let placeholder_image = {
+            jpg_url: placeholder_url,
+            base_filename: "placeholder image",
+            recency_order: 0,  // need this so prev/next buttons don't break
+        }
+        commit('setRecentImages', [placeholder_image])
+        commit('setCurrentImage', placeholder_image)
     },
 
     /**
@@ -139,11 +186,6 @@ const actions = {
 
 }
 
-const mutations = {
-    setCurrentImage(state, the_current_image) { state.current_image = the_current_image; },
-    setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
-    setUserImages(state, user_images_list) { state.user_images = user_images_list },
-}
 
 export default {
     namespaced: true,
