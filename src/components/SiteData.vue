@@ -22,6 +22,24 @@
     <!-- Collapsible panels on the right of the image --> 
     <div class="nav-panel column" style="max-width: 300px;">  
 
+
+      <!-- Toggle display of all site images or just the user's images. -->
+      <b-field>
+        <b-radio-button expanded 
+          v-model="show_user_data_only"
+          :native-value="true"
+          :disabled="!$auth.isAuthenticated"
+          >
+          <span>Only My Data</span>
+        </b-radio-button>
+
+        <b-radio-button expanded 
+          v-model="show_user_data_only"
+          :native-value="false">
+          <span>All Data</span>
+        </b-radio-button>
+      </b-field>
+
       <!-- Basic image info and a button to reveal the full fits header -->
       <side-info-panel :startOpen="true">
 
@@ -33,9 +51,9 @@
         <div style="margin: 1em;">
           <table class="info-panel-table">
               <tr> <td class="info-panel-val" align="right">filename: </td>
-                  <td>{{current_image.base_filename}}</td> </tr>
+                  <td>{{current_image.base_filename || "---"}}</td> </tr>
               <tr> <td class="info-panel-val" align="right">date: </td>
-                  <td>{{captureDate}}</td> </tr>
+                  <td>{{captureDate || "---" }}</td></tr>
               <tr> <td class="info-panel-val" align="right">time: </td>
                   <td>{{captureTime + " GMT"}}</td> </tr>
               <tr> <td class="info-panel-val" align="right">site: </td>
@@ -49,9 +67,9 @@
               <div class="blank-row" />
 
               <tr> <td class="info-panel-val" align="right">RA: </td>
-                  <td>{{rightAscension}}</td> </tr>
+                  <td>{{rightAscension || "---"}}</td> </tr>
               <tr> <td class="info-panel-val" align="right">Dec: </td>
-                  <td>{{declination}}</td> </tr>
+                  <td>{{declination || "---"}}</td> </tr>
 
               <tr> <td class="info-panel-val" align="right">azimuth: </td>
                   <td>{{current_image.azimuth || "---"}}</td> </tr>
@@ -237,14 +255,7 @@
             :loading="headerIsLoading"
             >
         </b-table>
-        {{fitsHeaderTable}}
       
-        <!--table class="info-panel-table">
-          <tr v-for="(v,k) in fitsHeader" v-bind:key="k"> 
-            <td class="info-panel-val" align="right">{{k}}: </td>
-            <td>{{v}}</td> 
-          </tr>
-        </table-->
       </div>
     </div>
   </b-modal>
@@ -264,7 +275,7 @@ import ImageFilter from "@/components/ImageFilter";
 import ImageInfoPanel from "@/components/ImageInfoPanel";
 import SideInfoPanel from "@/components/SideInfoPanel";
 import moment from 'moment'
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import axios from 'axios'
 import * as d3 from 'd3'
 
@@ -676,6 +687,11 @@ export default {
       this.region_std = parseFloat(data.std).toFixed(3)
     },
     refreshFitsHeader() {
+      // First check if image is placeholder. If so, nothing to show.
+      if (this.current_image.base_filename == "placeholder image") {
+        this.fitsHeader = {}
+        return
+      }
       this.headerIsLoading = true 
       let url = `https://api.photonranch.org/api/fitsheader/${this.current_image.base_filename}/`
       let response = axios.get(url).then(response => {
@@ -693,8 +709,28 @@ export default {
     current_image() {
       if (this.showFitsHeaderModal) this.refreshFitsHeader(); 
     },
+    show_user_data_only() {
+      this.$store.dispatch('images/refresh_latest_images')
+    }
   },
   computed: {
+
+    ...mapState("images", [
+      'recent_images',
+      'current_image', 
+    ]),
+
+    ...mapGetters("site_config", [
+      "site_config", 
+      "available_sites"
+    ]),
+
+    // Vuex mapping for the value that toggles whether to show all the site
+    // images or just the user's images.
+    show_user_data_only: {
+      get() { return this.$store.getters['images/show_user_data_only']},
+      set(val) { this.$store.commit('images/show_user_data_only', val)} 
+    },
 
     fitsHeaderTable() {
       let tableData = []
@@ -708,9 +744,17 @@ export default {
     },
 
     captureDate() {
-      return moment.utc(new Date(this.current_image.capture_date)).format('MMMM DD, YYYY')
+      // Error handling
+      if (!this.current_image.capture_date) {
+        return "---"
+      }
+      return moment.utc(new Date(this.current_image.capture_date)).format('MMMM DD, YYYY') 
     },
     captureTime() {
+      // Error handling
+      if (!this.current_image.capture_date) {
+        return "---"
+      }
       return moment.utc(new Date(this.current_image.capture_date)).format('HH:mm:ss')
     },
     rightAscension() {
@@ -725,12 +769,6 @@ export default {
       }
       return "---"
     },
-    ...mapGetters("site_config", ["site_config", "available_sites"]),
-
-    ...mapGetters("images", {
-      recent_images: "recent_images",
-      current_image: "current_image"
-    }),
 
     subframe_x0: {
       get() { return this.$store.getters['command_params/subframe_x0']},
