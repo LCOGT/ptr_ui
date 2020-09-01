@@ -1,16 +1,18 @@
 <template>
   <div class="container">
-    <div class="level top-section">
-      <img class="profile-picture" :src="$auth.user.picture">
-      <b-image
+    <div style="height: 25px;"/>
+    <div class="top-section">
+      <div class="img-container" style="width: 200px;">
+          <b-image
             :src="$auth.user.picture"
             alt="alt text"
             ratio="1by1"
             :rounded="true"
-        ></b-image>
-      <p class="title">{{ $auth.user.name }}</p>
+            :lazy="false" ></b-image>
+          </div>
+        <p class="title profile-name">{{ $auth.user.name }}</p>
+      </div>
       <!--p>{{ $auth.user.email }}</p-->
-    </div>
     <div>
       <pre>{{ JSON.stringify($auth.user, null, 2) }}</pre>
       <p>break</p>
@@ -43,11 +45,14 @@ export default {
 </script>
 
 <style scoped>
-.profile-picture {
-  width: 100px;
-  height: 100px;
-}
 .top-section {
   max-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 2em;
+}
+.profile-name {
 }
 </style>

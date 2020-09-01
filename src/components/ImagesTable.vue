@@ -11,27 +11,25 @@
             class="no-margin"
             >
 
-            <template slot-scope="props">
-                <b-table-column field="filename" label="Filename">
-                    {{ get_filename(props.row) }}
-                </b-table-column>
+            <b-table-column field="filename" label="Filename" v-slot="props">
+                {{ get_filename(props.row) }}
+            </b-table-column>
 
-                <b-table-column field="right_ascension" label="Right Ascension">
-                    {{ get_right_ascension(props.row) }} 
-                </b-table-column>
+            <b-table-column field="right_ascension" label="Right Ascension" v-slot="props">
+                {{ get_right_ascension(props.row) }} 
+            </b-table-column>
 
-                <b-table-column field="declination" label="Declination">
-                    {{ get_declination(props.row) }} 
-                </b-table-column>
+            <b-table-column field="declination" label="Declination" v-slot="props">
+                {{ get_declination(props.row) }} 
+            </b-table-column>
 
-                <b-table-column field="exposure_time" label="Exposure Time">
-                    {{ get_exposure_time(props.row) }} 
-                </b-table-column>
+            <b-table-column field="exposure_time" label="Exposure Time" v-slot="props">
+                {{ get_exposure_time(props.row) }} 
+            </b-table-column>
 
-                <b-table-column field="observation" label="Observation Time" centered>
-                    {{ get_observation_time(props.row) }}
-                </b-table-column>
-            </template>
+            <b-table-column field="observation" label="Observation Time" centered v-slot="props">
+                {{ get_observation_time(props.row) }}
+            </b-table-column>
 
             <template slot="empty">
                 <section class="section">
