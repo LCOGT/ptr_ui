@@ -10,82 +10,80 @@
         class="no-margin"
         @click="setActiveEvent"
         >
-        <template slot-scope="props">
-            <b-table-column field="site" label="site" sortable>
-                {{ props.row.site }}
-            </b-table-column>
+        <b-table-column field="site" label="site" sortable v-slot="props">
+            {{ props.row.site }}
+        </b-table-column>
 
-            <b-table-column field="event name" label="event name">
-                {{ props.row.title}} 
-            </b-table-column>
+        <b-table-column field="event name" label="event name" v-slot="props">
+            {{ props.row.title}} 
+        </b-table-column>
 
-            <b-table-column field="duration" label="duration (h:m)" sortable>
-                {{ displayEventDuration(props.row) }}
-            </b-table-column>
+        <b-table-column field="duration" label="duration (h:m)" sortable v-slot="props">
+            {{ displayEventDuration(props.row) }}
+        </b-table-column>
 
-            <b-table-column field="timeUntilStart" label="time until start (h:m)" sortable>
-                {{ displayTimeUntilStart(props.row) }} 
-            </b-table-column>
+        <b-table-column field="timeUntilStart" label="time until start (h:m)" sortable v-slot="props">
+            {{ displayTimeUntilStart(props.row) }} 
+        </b-table-column>
 
-            <b-table-column field="start" label="start">
-                {{ displayUtcTime(props.row.start) }} 
-            </b-table-column>
+        <b-table-column field="start" label="start" v-slot="props">
+            {{ displayUtcTime(props.row.start) }} 
+        </b-table-column>
 
-            <b-table-column field="end" label="end">
-                {{ displayUtcTime(props.row.end) }} 
-            </b-table-column>
+        <b-table-column field="end" label="end" v-slot="props">
+            {{ displayUtcTime(props.row.end) }} 
+        </b-table-column>
 
-            <b-table-column field="project" label="projects">
-                <!--button 
-                    v-if="props.row.project_id=='none'"
-                    class="button is-small is-success"
-                    >
-                    add
-                </button-->
-
-                <b-dropdown
-                    :scrollable="true"
-                    :max-height="400"
-                    aria-role="list"
-
+        <b-table-column field="project" label="projects" v-slot="props">
+            <!--button 
+                v-if="props.row.project_id=='none'"
+                class="button is-small is-success"
                 >
-                    <button 
-                        class="button is-primary" 
-                        :class="{'is-loading': props.row.event_id == activeEvent.event_id && setProjectButtonIsLoading}"
-                        type="button" 
-                        slot="trigger">
-                        <template>
-                            <span>{{ props.row.project_id=="none" ? '' : props.row.project_id.split('#')[0]}} </span>
-                            <!--span>{{props.row.project_id}}</span-->
-                        </template>
-                        <b-icon icon="menu-down"></b-icon>
-                    </button>
+                add
+            </button-->
 
-                    <b-dropdown-item 
-                        @click="setProjectId('none', 0)"
-                        value="none"
-                        >
-                        <div class="media">
-                            <div class="media-content">
-                                <h3>none</h3>
-                            </div>
-                        </div>
-                    </b-dropdown-item>
-                    <b-dropdown-item 
-                        v-for="(p, index) in user_projects"
-                        @click="setProjectId(p.project_name, p.created_at)"
-                        :key="index"
-                        :value="p.project_name" aria-role="listitem">
-                        <div class="media">
-                            <div class="media-content">
-                                <h3>{{p.project_name}}</h3>
-                            </div>
-                        </div>
-                    </b-dropdown-item>
-                </b-dropdown>
-            </b-table-column>
+            <b-dropdown
+                :scrollable="true"
+                :max-height="400"
+                aria-role="list"
 
-        </template>
+            >
+                <button 
+                    class="button is-primary" 
+                    :class="{'is-loading': props.row.event_id == activeEvent.event_id && setProjectButtonIsLoading}"
+                    type="button" 
+                    slot="trigger">
+                    <template>
+                        <span>{{ props.row.project_id=="none" ? '' : props.row.project_id.split('#')[0]}} </span>
+                        <!--span>{{props.row.project_id}}</span-->
+                    </template>
+                    <b-icon icon="menu-down"></b-icon>
+                </button>
+
+                <b-dropdown-item 
+                    @click="setProjectId('none', 0)"
+                    value="none"
+                    >
+                    <div class="media">
+                        <div class="media-content">
+                            <h3>none</h3>
+                        </div>
+                    </div>
+                </b-dropdown-item>
+                <b-dropdown-item 
+                    v-for="(p, index) in user_projects"
+                    @click="setProjectId(p.project_name, p.created_at)"
+                    :key="index"
+                    :value="p.project_name" aria-role="listitem">
+                    <div class="media">
+                        <div class="media-content">
+                            <h3>{{p.project_name}}</h3>
+                        </div>
+                    </div>
+                </b-dropdown-item>
+            </b-dropdown>
+        </b-table-column>
+
         
         <template slot="bottom-left">
             <button 
@@ -102,12 +100,6 @@
         <template slot="empty">
             <section class="section">
                 <div class="content has-text-grey has-text-centered">
-                    <p>
-                        <b-icon
-                            icon="emoticon-sad"
-                            size="is-large">
-                        </b-icon>
-                    </p>
                     <p>Nothing here.</p>
                 </div>
             </section>

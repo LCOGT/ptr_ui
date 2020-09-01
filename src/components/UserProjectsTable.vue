@@ -10,25 +10,23 @@
         detailed
         class="my-table no-margin"
         >
-        <template slot-scope="props">
-
-            <b-table-column field="project_name" label="project name">
+            <b-table-column field="project_name" label="project name" v-slot="props">
                 {{ props.row.project_name }} 
             </b-table-column>
 
-            <b-table-column field="object.name" label="object">
+            <b-table-column field="object.name" label="object" v-slot="props">
                 {{ props.row.project_targets[0].name }}
             </b-table-column>
 
-            <b-table-column field="object.ra" label="ra" sortable>
+            <b-table-column field="object.ra" label="ra" sortable v-slot="props">
                 {{ props.row.project_targets[0].ra }} 
             </b-table-column>
 
-            <b-table-column field="object.dec" label="dec">
+            <b-table-column field="object.dec" label="dec" v-slot="props">
                 {{ props.row.project_targets[0].dec }} 
             </b-table-column>
 
-            <b-table-column field="delete" label="">
+            <b-table-column field="delete" label="" v-slot="props">
                 <button 
                     class="button is-danger is-small" 
                     @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created_at': props.row.created_at})" 
@@ -38,8 +36,6 @@
                     </span>
                 </button>
             </b-table-column>
-
-        </template>
 
         <template slot="bottom-left">
             <button 
