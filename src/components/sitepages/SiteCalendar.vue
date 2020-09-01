@@ -27,7 +27,7 @@
 
 
 <script>
-import TheCalendar from '@/components/TheCalendar';
+import TheCalendar from '@/components/calendar/TheCalendar';
 import UserEventsTable from '@/components/UserEventsTable'
 import {mapGetters} from 'vuex'
 import axios from 'axios'

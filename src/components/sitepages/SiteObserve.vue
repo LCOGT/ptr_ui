@@ -685,22 +685,22 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { commands_mixin } from '../mixins/commands_mixin'
-import { status_mixin } from '../mixins/status_mixin'
+import { commands_mixin } from '../../mixins/commands_mixin'
+import { status_mixin } from '../../mixins/status_mixin'
 import helpers from '@/utils/helpers'
-import store from '../store/index'
+import store from '../../store/index'
 
 // Components
 import CommandButton from '@/components/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
-import ScriptSettings from '@/components/ScriptSettings'
+import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
+import ScriptSettings from '@/components/ScriptSettings/ScriptSettings'
 import TheDomeCam from '@/components/TheDomeCam'
 import SideInfoPanel from '@/components/SideInfoPanel'
-import SiteData from '@/components/SiteData'
+import SiteData from '@/components/sitepages/SiteData'
 import SkychartModal from '@/components/SkychartModal'
 import ImagesTable from '@/components/ImagesTable'
-import StatusColumn from '@/components/StatusColumn'
+import StatusColumn from '@/components/status/StatusColumn'
 
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';

@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import TheCalendar from '@/components/TheCalendar';
+import TheCalendar from '@/components/calendar/TheCalendar';
 
 export default {
   name: 'calendarPage',

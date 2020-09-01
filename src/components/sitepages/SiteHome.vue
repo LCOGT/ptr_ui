@@ -60,7 +60,7 @@
 import TheDeviceSelectors from '@/components/TheDeviceSelectors'
 import TheDomeCam from '@/components/TheDomeCam'
 import { mapGetters } from 'vuex'
-import { commands_mixin } from '../mixins/commands_mixin'
+import { commands_mixin } from '../../mixins/commands_mixin'
 import LeafletMap from '@/components/LeafletMap'
 import SiteEventsModal from '@/components/SiteEventsModal'
 import moment from 'moment'

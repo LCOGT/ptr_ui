@@ -61,7 +61,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import helpers from '@/utils/helpers'
-import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
+import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 export default {
     props: ['deviceStatus', 'sitecode'],
     components: {
