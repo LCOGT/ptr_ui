@@ -20,37 +20,37 @@ a {
   transition: all 200ms ease;
 }
 
-.button {
-  transition: all 200ms ease;
-  border-width: $border-width;
-  color: $white;
+//.button {
+  //transition: all 200ms ease;
+  //border-width: $border-width;
+  //color: $white;
 
-  &.is-active,
-  &.is-focused,
-  &:active,
-  &:focus {
-    box-shadow: 0 0 0 2px rgba($button-focus-border-color, 0.5);
-  }
-  @each $name, $pair in $colors {
-    $color: nth($pair, 1);
-    $color-invert: nth($pair, 2);
+  //&.is-active,
+  //&.is-focused,
+  //&:active,
+  //&:focus {
+    //box-shadow: 0 0 0 2px rgba($button-focus-border-color, 0.5);
+  //}
+  //@each $name, $pair in $colors {
+    //$color: nth($pair, 1);
+    //$color-invert: nth($pair, 2);
 
-    &.is-#{$name} {
-      &.is-hovered,
-      &:hover {
-        background-color: lighten($color, 7.5%);
-      }
+    //&.is-#{$name} {
+      //&.is-hovered,
+      //&:hover {
+        //background-color: lighten($color, 7.5%);
+      //}
 
-      &.is-active,
-      &.is-focused,
-      &:active,
-      &:focus {
-        border-color: $color;
-        box-shadow: 0 0 0 2px rgba($color, 0.5);
-      }
-    }
-  }
-}
+      //&.is-active,
+      //&.is-focused,
+      //&:active,
+      //&:focus {
+        //border-color: $color;
+        //box-shadow: 0 0 0 2px rgba($color, 0.5);
+      //}
+    //}
+  //}
+//}
 
 .label {
   color: $grey-lighter;
@@ -74,7 +74,7 @@ a {
 .textarea {
   transition: all 200ms ease;
   box-shadow: none;
-  border-width: $border-width;
+  //border-width: $border-width;
   padding-left: 1em;
   padding-right: 1em;
 }
