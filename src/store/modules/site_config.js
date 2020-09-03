@@ -197,12 +197,18 @@ const getters = {
         : 0
     },
 
+    timezone: state => {
+        return (state.did_config_load_yet && state.is_site_selected)
+        ? state.global_config[state.selected_site].TZ_database_name
+        : "no timezone"
+    },
+
 
     /* These getters are used to customize the control form fields. */
     // Available camera areas
     camera_areas: state => {
         try {
-            return state.global_config[state.selected_site].camera[state.selected_camera].settings.area
+            return state.global_config[state.selected_site].camera[state.selected_camera].settings.areas_implemented
         } catch {
             return []
         }
