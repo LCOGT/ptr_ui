@@ -100,13 +100,13 @@
         <b-field horizontal label="Ra">
           <b-field>
             <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
-            <p class="control"><span class="button is-static is-small">hrs</span></p>
+            <p class="control"><span class="button is-light is-static is-small">hrs</span></p>
             </b-field>
           </b-field>
           <b-field horizontal label="Dec">
             <b-field>
               <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
-              <p class="control"><span class="button is-static is-small">deg</span></p>
+              <p class="control"><span class="button is-light is-static is-small">deg</span></p>
             </b-field>
           </b-field>
           <b-field horizontal label="Object">
@@ -187,7 +187,7 @@
           <b-field horizontal label="Expose">
               <b-field>
                   <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
-                  <p class="control"> <span class="button is-static is-small">s</span> </p>
+                  <p class="control"> <span class="button is-light is-static is-small">s</span> </p>
               </b-field>
           </b-field>
 
@@ -230,7 +230,7 @@
             </b-select>
           </b-field>
 
-          <b-field horizontal label="Area" v-if="camera_areas.length != 0">
+          <b-field horizontal label="Area" v-if="camera_areas && camera_areas.length != 0">
               <b-select 
                 placeholder="Select chip area" 
                 v-model="camera_areas_selection" 
@@ -864,6 +864,11 @@ export default {
     },
   
     parseTrueFalse(s) {
+    
+      // In case the input is actually a boolean
+      if (s === true) { return true }
+      if (s === false) {return false}
+
       if (undefined == s) { 
         return false; 
       }
@@ -1095,9 +1100,6 @@ export default {
 }
 .choose-target {
   margin-top: 1em;
-}
-.label {
-  color: #dbdee0;
 }
 
 .dropdown-button-command {

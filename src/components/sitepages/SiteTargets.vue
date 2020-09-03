@@ -35,7 +35,7 @@
                 <b-field>
                     <b-field>
                         <p class="control">
-                            <span style="width: 42px;" class="button is-static">Dec</span>
+                            <span style="width: 42px;" class="button is-light is-static">Dec</span>
                         </p>
                         <b-input 
                             expanded
@@ -56,7 +56,7 @@
                 <b-field >
                     <b-field>
                         <p class="control">
-                            <span style="width: 110px;" class="button is-static">Pointing Note</span>
+                            <span style="width: 110px;" class="button is-light is-static">Pointing Note</span>
                         </p>
                         <b-input 
                             style="width: calc(100% - 42px);"
