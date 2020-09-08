@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import StatusColumn from '@/components/StatusColumn'
+import StatusColumn from '@/components/status/StatusColumn'
 export default {
     props: {
         'statusAge': Number, 

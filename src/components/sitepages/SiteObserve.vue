@@ -100,13 +100,13 @@
         <b-field horizontal label="Ra">
           <b-field>
             <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
-            <p class="control"><span class="button is-static is-small">hrs</span></p>
+            <p class="control"><span class="button is-light is-static is-small">hrs</span></p>
             </b-field>
           </b-field>
           <b-field horizontal label="Dec">
             <b-field>
               <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
-              <p class="control"><span class="button is-static is-small">deg</span></p>
+              <p class="control"><span class="button is-light is-static is-small">deg</span></p>
             </b-field>
           </b-field>
           <b-field horizontal label="Object">
@@ -123,6 +123,9 @@
             </button>
             <b-dropdown-item aria-role="listitem">
               <command-button :data="mount_slew_chart_command" class="dropdown-button-command is-small"/>
+            </b-dropdown-item>
+            <b-dropdown-item aria-role="listitem">
+              <command-button :data="mount_slew_near_tycho" class="dropdown-button-command is-small"/>
             </b-dropdown-item>
             <b-dropdown-item>
               <command-button :data="mount_screenflat_command" class="dropdown-button-command is-small"/>
@@ -184,7 +187,7 @@
           <b-field horizontal label="Expose">
               <b-field>
                   <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
-                  <p class="control"> <span class="button is-static is-small">s</span> </p>
+                  <p class="control"> <span class="button is-light is-static is-small">s</span> </p>
               </b-field>
           </b-field>
 
@@ -227,7 +230,7 @@
             </b-select>
           </b-field>
 
-          <b-field horizontal label="Area" v-if="camera_areas.length != 0">
+          <b-field horizontal label="Area" v-if="camera_areas && camera_areas.length != 0">
               <b-select 
                 placeholder="Select chip area" 
                 v-model="camera_areas_selection" 
@@ -682,22 +685,22 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { commands_mixin } from '../mixins/commands_mixin'
-import { status_mixin } from '../mixins/status_mixin'
+import { commands_mixin } from '../../mixins/commands_mixin'
+import { status_mixin } from '../../mixins/status_mixin'
 import helpers from '@/utils/helpers'
-import store from '../store/index'
+import store from '../../store/index'
 
 // Components
 import CommandButton from '@/components/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import SimpleDeviceStatus from '@/components/SimpleDeviceStatus'
-import ScriptSettings from '@/components/ScriptSettings'
+import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
+import ScriptSettings from '@/components/ScriptSettings/ScriptSettings'
 import TheDomeCam from '@/components/TheDomeCam'
 import SideInfoPanel from '@/components/SideInfoPanel'
-import SiteData from '@/components/SiteData'
+import SiteData from '@/components/sitepages/SiteData'
 import SkychartModal from '@/components/SkychartModal'
 import ImagesTable from '@/components/ImagesTable'
-import StatusColumn from '@/components/StatusColumn'
+import StatusColumn from '@/components/status/StatusColumn'
 
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
@@ -861,6 +864,11 @@ export default {
     },
   
     parseTrueFalse(s) {
+    
+      // In case the input is actually a boolean
+      if (s === true) { return true }
+      if (s === false) {return false}
+
       if (undefined == s) { 
         return false; 
       }
@@ -1092,9 +1100,6 @@ export default {
 }
 .choose-target {
   margin-top: 1em;
-}
-.label {
-  color: #dbdee0;
 }
 
 .dropdown-button-command {

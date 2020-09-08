@@ -62,20 +62,21 @@ export default {
         ...mapGetters('site_config', [
             'site_config',
             'global_config',
+            'timezone',
         ]), 
 
         user() {
             return this.$auth.user
         },
 
-        timezone() {
-          let tz = {
-            "wmd": "America/Los_Angeles",
-            "saf": "America/Denver",
-            "ALI-sim": "Asia/Kashgar",
-          }
-          return  tz[this.sitecode]
-        },
+        //timezone() {
+          //let tz = {
+            //"wmd": "America/Los_Angeles",
+            //"saf": "America/Denver",
+            //"ALI-sim": "Asia/Kashgar",
+          //}
+          //return  tz[this.sitecode]
+        //},
 
         // Calendar Resources (Observatories) to feed into the calendar component
         listOfObservatories() {
