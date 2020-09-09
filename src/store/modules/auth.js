@@ -25,7 +25,7 @@ const actions = {
     //log_in_user({ commit, dispatch }, user) {
     //    commit('setUser', user)
     //    dispatch('site_config/update_config', null, {root: true})
-    //    dispatch('images/refresh_latest_images', null, {root: true})
+    //    dispatch('images/load_latest_images', null, {root: true})
     //},
 
     //logInUser({ commit, dispatch }, user_credentials) {
@@ -36,7 +36,7 @@ const actions = {
     //            console.log(user)
     //            commit('setUser', user)
     //            dispatch('site_config/update_config', null, {root: true})
-    //            dispatch('images/refresh_latest_images', null, {root: true})
+    //            dispatch('images/load_latest_images', null, {root: true})
     //        })
     //        .catch(err => console.log(err))
     //},

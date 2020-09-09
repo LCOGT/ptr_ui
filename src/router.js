@@ -6,6 +6,7 @@ import VueRouter from 'vue-router'
 import Home from './views/Home.vue'
 import Profile from './views/Profile.vue'
 import AdminOnly from './views/AdminOnly.vue'
+import devtools from './views/devtools.vue'
 
 import About from './views/info/About.vue'
 import ReservationInfo from './views/info/ReservationInfo.vue'
@@ -37,6 +38,13 @@ const router = new VueRouter({
       path: '/adminonly', 
       name: 'adminonly', 
       component: AdminOnly, 
+      beforeEnter: authGuard, 
+      meta: { requiresRole: 'admin'}
+    },
+    { 
+      path: '/devtools', 
+      name: 'devtools', 
+      component: devtools, 
       beforeEnter: authGuard, 
       meta: { requiresRole: 'admin'}
     },
