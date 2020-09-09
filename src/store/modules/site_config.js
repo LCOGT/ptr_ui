@@ -288,6 +288,7 @@ const actions = {
         let apiName = rootState.dev.active_api;
         let path = '/all/config/';
         return axios.get(apiName+path).then(response => {
+            console.log(response.data)
             commit('setGlobalConfig', response.data)
         }).catch(error => {
             console.log(error)

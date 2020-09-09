@@ -53,7 +53,7 @@ export default {
     this.js9menu = document.getElementById('myJS9Menubar')
     this.js9menu.style.display= this.includeMenu ? "block" : "none";
 
-    this.$store.dispatch("images/refresh_latest_images")
+    this.$store.dispatch("images/load_latest_images")
   },
 
   beforeDestroy() {

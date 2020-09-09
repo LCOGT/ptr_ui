@@ -30,7 +30,7 @@
           :native-value="true"
           :disabled="!$auth.isAuthenticated"
           >
-          <span>Only My Data</span>
+          <span>My Data</span>
         </b-radio-button>
 
         <b-radio-button expanded 
@@ -710,7 +710,7 @@ export default {
       if (this.showFitsHeaderModal) this.refreshFitsHeader(); 
     },
     show_user_data_only() {
-      this.$store.dispatch('images/refresh_latest_images')
+      this.$store.dispatch('images/load_latest_images')
     }
   },
   computed: {

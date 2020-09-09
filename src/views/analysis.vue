@@ -103,7 +103,7 @@ export default {
 
   async created() {
 
-    await this.$store.dispatch("images/refresh_latest_images")
+    await this.$store.dispatch("images/load_latest_images")
 
     this.$store.dispatch('js9/resizeForCrosshairs')
 
