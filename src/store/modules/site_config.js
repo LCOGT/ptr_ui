@@ -198,9 +198,9 @@ const getters = {
     },
 
     timezone: state => {
-        return (state.did_config_load_yet && state.is_site_selected)
-        ? state.global_config[state.selected_site].TZ_database_name
-        : "no timezone"
+        if (state.did_config_load_yet && state.is_site_selected) {
+            return state.global_config[state.selected_site].TZ_database_name
+        }
     },
 
 

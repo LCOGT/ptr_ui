@@ -122,7 +122,7 @@
 
 <script>
 import moment from 'moment';
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 
 export default {
     name: 'CalendarEventEditor',
@@ -157,17 +157,9 @@ export default {
         ...mapState('user_data', [
             'user_projects',
         ]),
-        timezone() {
-          let tz = {
-            "wmd": "America/Los_Angeles",
-            "saf": "America/Denver",
-            "ALI-sim": "Asia/Kashgar",
-          }
-          return  tz[this.eventDetails.site]
-          //return 'local'
-          //return 'America/Los_Angeles'
-          //return "UTC"
-        },
+        ...mapGetters('site_config', [
+            'timezone',
+        ]),
         nightOf() {
             console.log(moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY'))
             return moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY')

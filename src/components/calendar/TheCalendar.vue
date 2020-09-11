@@ -172,20 +172,11 @@ export default {
         fullCalendarApi() {
           return this.$refs.fullCalendar.getApi();
         },
-        fc_timeZone() {
-          let tz = {
-            "wmd": "America/Los_Angeles",
-            "saf": "America/Denver",
-            "ALI-sim": "Asia/Kashgar",
-          }
-          return  tz[this.calendarSite]
-          //return 'local'
-          //return 'America/Los_Angeles'
-          //return "UTC"
-        },
 
         fc_now() {
-          return moment().tz(this.fc_timeZone).format()
+          if (this.fc_timeZone) { // make sure timezone has loaded from the config
+            return moment().tz(this.fc_timeZone).format()
+          }
         },
 
         // Return the list of sources that feed fullCalendar with events
@@ -207,7 +198,11 @@ export default {
           'global_config',
           'site_latitude',
           'site_longitude',
+          'timezone',
         ]),
+        ...mapGetters('site_config', {
+          "fc_timeZone": "timezone", // rename to match fc namespacing.
+        }),
 
         user() {
           return this.$auth.user
@@ -241,7 +236,6 @@ export default {
         fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
         fc_eventTimeFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr times on events
         fc_slotLabelFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr time on axis labels
-        //fc_timeZone: 'Asia/Kashgar',
         fc_minTime: "12:00:00", // start the day column at noon
         fc_maxTime: "36:00:00", // end the day column at noon for the following day
         fc_scrollTime: "16:00:00", // calendar default view starts at 4pm.
