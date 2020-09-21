@@ -11,27 +11,25 @@
             class="no-margin"
             >
 
-            <template slot-scope="props">
-                <b-table-column field="filename" label="Filename">
-                    {{ props.row.base_filename }}
-                </b-table-column>
+            <b-table-column field="filename" label="Filename" v-slot="props">
+                {{ get_filename(props.row) }}
+            </b-table-column>
 
-                <b-table-column field="right_ascension" label="Right Ascension">
-                    {{ props.row.right_ascension.toFixed(3) }} 
-                </b-table-column>
+            <b-table-column field="right_ascension" label="Right Ascension" v-slot="props">
+                {{ get_right_ascension(props.row) }} 
+            </b-table-column>
 
-                <b-table-column field="declination" label="Declination">
-                    {{ props.row.declination.toFixed(3) }} 
-                </b-table-column>
+            <b-table-column field="declination" label="Declination" v-slot="props">
+                {{ get_declination(props.row) }} 
+            </b-table-column>
 
-                <b-table-column field="exposure_time" label="Exposure Time">
-                    {{ props.row.exposure_time}} 
-                </b-table-column>
+            <b-table-column field="exposure_time" label="Exposure Time" v-slot="props">
+                {{ get_exposure_time(props.row) }} 
+            </b-table-column>
 
-                <b-table-column field="observation" label="Observation Time" centered>
-                        {{ new Date(props.row.capture_date).toUTCString() }}
-                </b-table-column>
-            </template>
+            <b-table-column field="observation" label="Observation Time" centered v-slot="props">
+                {{ get_observation_time(props.row) }}
+            </b-table-column>
 
             <template slot="empty">
                 <section class="section">
@@ -61,11 +59,45 @@ import { mapGetters } from 'vuex'
                 isSelectable: true,
             }
         },
+        methods: {
+            get_filename(image) {
+                if (image.base_filename) {
+                    return image.base_filename
+                }
+                return "placeholder"
+            },
+            get_right_ascension(image) {
+                if (image.right_ascension) {
+                    return image.right_ascension.toFixed(3)
+                }
+                return '---'
+            },
+            get_declination(image) {
+                if (image.declination) {
+                    return image.declination.toFixed(3)
+                }
+                return '---'
+            },
+            get_exposure_time(image) {
+                if (image.exposure_time) {
+                    return image.exposure_time.toFixed(3)
+                }
+                return '---'
+            },
+            get_observation_time(image) {
+                if (image.capture_date) {
+                    return new Date(image.capture_date).toUTCString()
+                }
+                return '---'
+            },
+
+        },
 
         computed: {
             ...mapGetters('images', [
                 'recent_images',
             ]),
+
 
             current_image: {
                 get() {return this.$store.getters['images/current_image']},

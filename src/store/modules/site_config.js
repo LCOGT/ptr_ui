@@ -197,12 +197,18 @@ const getters = {
         : 0
     },
 
+    timezone: state => {
+        if (state.did_config_load_yet && state.is_site_selected) {
+            return state.global_config[state.selected_site].TZ_database_name
+        }
+    },
+
 
     /* These getters are used to customize the control form fields. */
     // Available camera areas
     camera_areas: state => {
         try {
-            return state.global_config[state.selected_site].camera[state.selected_camera].settings.area
+            return state.global_config[state.selected_site].camera[state.selected_camera].settings.areas_implemented
         } catch {
             return []
         }
@@ -282,6 +288,7 @@ const actions = {
         let apiName = rootState.dev.active_api;
         let path = '/all/config/';
         return axios.get(apiName+path).then(response => {
+            console.log(response.data)
             commit('setGlobalConfig', response.data)
         }).catch(error => {
             console.log(error)

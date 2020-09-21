@@ -47,10 +47,6 @@
                 </b-navbar-item>
             </b-navbar-dropdown>
 
-            <b-navbar-item tag="router-link" :to="{ path: '/data/' }">
-                my data
-            </b-navbar-item>
-
         </template>
 
         <template slot="end">
@@ -112,7 +108,18 @@ export default {
          siteName += ' - ' + this.site.toUpperCase()
       }
       return siteName
-    }
+    },
+
+    userIsAdmin() {
+      try {
+        let user = this.$auth.user 
+        let roles = user['https://photonranch.org/user_metadata'].roles
+        return roles.includes('admin')
+      } catch {
+        return false
+      }
+    },
+
   },
   methods: {
     // Log the user in with Auth0

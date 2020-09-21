@@ -27,7 +27,7 @@
 
 
 <script>
-import TheCalendar from '@/components/TheCalendar';
+import TheCalendar from '@/components/calendar/TheCalendar';
 import UserEventsTable from '@/components/UserEventsTable'
 import {mapGetters} from 'vuex'
 import axios from 'axios'
@@ -72,6 +72,7 @@ export default {
         ...mapGetters('site_config', [
             'site_config',
             'global_config',
+            'timezone',
         ]), 
 
         user() {
@@ -84,14 +85,14 @@ export default {
             return '-'
         },
 
-        timezone() {
-          let tz = {
-            "wmd": "America/Los_Angeles",
-            "saf": "America/Denver",
-            "ALI-sim": "Asia/Kashgar",
-          }
-          return  tz[this.sitecode]
-        },
+        //timezone() {
+          //let tz = {
+            //"wmd": "America/Los_Angeles",
+            //"saf": "America/Denver",
+            //"ALI-sim": "Asia/Kashgar",
+          //}
+          //return  tz[this.sitecode]
+        //},
 
         // Calendar Resources (Observatories) to feed into the calendar component
         listOfObservatories() {

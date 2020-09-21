@@ -9,6 +9,7 @@ import dev from './modules/dev'
 import js9 from './modules/js9'
 import command_params from './modules/command_params'
 import user_data from './modules/user_data'
+import calendar from './modules/calendar'
 
 Vue.use(Vuex)
 
@@ -32,5 +33,6 @@ export default new Vuex.Store({
         dev,
         js9,
         auth,
+        calendar,
     },
 })

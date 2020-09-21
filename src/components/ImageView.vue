@@ -14,6 +14,7 @@
         <img
           id="main-image"
           ref="image" 
+          rel="preload"
           alt="no jpg available"
           onerror="this.onerror=null;this.src='https://via.placeholder.com/768?text=no+jpg+preview+available'"
           v-show="!js9IsVisible"
@@ -128,6 +129,7 @@ export default {
   },
   data() {
     return {
+      placeholder_image: require('@/assets/logo.png'),
       // The image that is selected and visible in the main viewer.
       active_image: "",
 
@@ -173,7 +175,7 @@ export default {
   },
   created() {
     this.$store.commit("site_config/setActiveSite", this.site);
-    this.$store.dispatch("images/refresh_latest_images");
+    this.$store.dispatch("images/load_latest_images");
 
     // Keep the displayed image element width and height in sync.
     // This is important for relative measurements on the image (crosshairs, clicks, etc)
@@ -191,7 +193,7 @@ export default {
   watch: {
     site: function(newVal, oldVal) {
       this.$store.commit("site_config/setActiveSite", newVal);
-      this.$store.dispatch("images/refresh_latest_images");
+      this.$store.dispatch("images/load_latest_images");
     },
 
     // Toggle whether the subframe box is displayed or not
@@ -667,7 +669,7 @@ export default {
 
     // Display the latest image in the view.
     setLatestImage() {
-      this.$store.dispatch("images/refresh_latest_images");
+      this.$store.dispatch("images/load_latest_images");
       this.$store.dispatch("images/set_latest_image");
     },
 
