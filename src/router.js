@@ -4,9 +4,12 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import Home from './views/Home.vue'
-import About from './views/About.vue'
 import Profile from './views/Profile.vue'
 import AdminOnly from './views/AdminOnly.vue'
+import devtools from './views/devtools.vue'
+
+import About from './views/info/About.vue'
+import ReservationInfo from './views/info/ReservationInfo.vue'
 
 // Observatories
 import Site from './views/Site.vue'
@@ -39,8 +42,19 @@ const router = new VueRouter({
       beforeEnter: authGuard, 
       meta: { requiresRole: 'admin'}
     },
-    { path: '/profile', name: 'profile', component: Profile, beforeEnter: authGuard,},
+    { 
+      path: '/devtools', 
+      name: 'devtools', 
+      component: devtools, 
+      beforeEnter: authGuard, 
+      meta: { requiresRole: 'admin'}
+    },
+
     { path: '/about', name: 'about', component: About },
+    { path: '/info/reservations', name: 'reservations', component: ReservationInfo},
+
+
+    { path: '/profile', name: 'profile', component: Profile, beforeEnter: authGuard,},
     { path: '/btns', name: 'btns', component: btns },
     { path: '/skymap', name: 'skymap', component: skymap },
     { path: '/analysis', name: 'analysis', component: analysis },

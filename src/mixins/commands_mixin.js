@@ -20,10 +20,10 @@ export const commands_mixin = {
             // Camera Fields
             camera_image_type_options: [
                 'light', 
-                'quick',
-                'test image', 
+                'experimental',
                 'bias', 
                 'dark', 
+                'autofocus probe',
                 'screen flat', 
                 'sky flat', 
                 'lamp flat', 
@@ -31,7 +31,7 @@ export const commands_mixin = {
                 'NeAr flat', 
                 'ThAr flat', 
                 'solar flat',
-                'experimental',
+                'simulation',
             ],
 
         }
@@ -319,6 +319,9 @@ export const commands_mixin = {
                 { ra: ra, dec: dec, },
                 { object: obj, }
             )
+        },
+        mount_slew_near_tycho() {
+            return this.base_command( 'mount', 'slew_to_near_tycho', 'nearby Tycho star' )
         },
         mount_stop_command () {
             return this.base_command( 'mount', 'stop', 'stop movement' )

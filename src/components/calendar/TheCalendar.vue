@@ -85,7 +85,7 @@
     import SunCalc from 'suncalc';
     import {mapGetters} from 'vuex'
 
-    import CalendarEventEditor from "@/components/CalendarEventEditor";
+    import CalendarEventEditor from "@/components/calendar/CalendarEventEditor";
 
     import FullCalendar from "@fullcalendar/vue";
     import dayGridPlugin from "@fullcalendar/daygrid";
@@ -172,20 +172,11 @@ export default {
         fullCalendarApi() {
           return this.$refs.fullCalendar.getApi();
         },
-        fc_timeZone() {
-          let tz = {
-            "wmd": "America/Los_Angeles",
-            "saf": "America/Denver",
-            "ALI-sim": "Asia/Kashgar",
-          }
-          return  tz[this.calendarSite]
-          //return 'local'
-          //return 'America/Los_Angeles'
-          //return "UTC"
-        },
 
         fc_now() {
-          return moment().tz(this.fc_timeZone).format()
+          if (this.fc_timeZone) { // make sure timezone has loaded from the config
+            return moment().tz(this.fc_timeZone).format()
+          }
         },
 
         // Return the list of sources that feed fullCalendar with events
@@ -210,7 +201,11 @@ export default {
           'global_config',
           'site_latitude',
           'site_longitude',
+          'timezone',
         ]),
+        ...mapGetters('site_config', {
+          "fc_timeZone": "timezone", // rename to match fc namespacing.
+        }),
 
         user() {
           return this.$auth.user
@@ -244,7 +239,6 @@ export default {
         fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
         fc_eventTimeFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr times on events
         fc_slotLabelFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr time on axis labels
-        //fc_timeZone: 'Asia/Kashgar',
         fc_minTime: "12:00:00", // start the day column at noon
         fc_maxTime: "36:00:00", // end the day column at noon for the following day
         fc_scrollTime: "16:00:00", // calendar default view starts at 4pm.
@@ -352,209 +346,209 @@ export default {
       async getMoonRiseSet(info) {
         //sloppy 
 
-          // Get the time range we need to display in the UI.
-          let firstDay = info.start.valueOf()
-          let lastDay = info.end.valueOf()
-          
-          // List all the days we'll need to display
-          let allDays = []
+        // Get the time range we need to display in the UI.
+        let firstDay = info.start.valueOf()
+        let lastDay = info.end.valueOf()
+        
+        // List all the days we'll need to display
+        let allDays = []
+        let msPerDay = 1000*60*60*24
+
+        // Generate events for 60 days before the start time to 60 days after.
+        // This is to prevent the loading flicker when changing weeks.
+        // note: this still only takes ~5ms to compute.
+        for (let day=firstDay-(2*msPerDay); day<lastDay+(2*msPerDay); day+=msPerDay) {
+          // Define each day by the timestamp a little after 1:01am to avoid DST hell
+          allDays.push(day+3700000)
+        }
+
+        function oneDayMoon(timestamp, lat, lng) {
+
           let msPerDay = 1000*60*60*24
+          let events = {}
+          let moonEvents = SunCalc.getMoonTimes(timestamp, lat, lng)
+          let prevMoonEvents = SunCalc.getMoonTimes(timestamp+msPerDay, lat, lng)
+          let nextMoonEvents = SunCalc.getMoonTimes(timestamp-msPerDay, lat, lng)
 
-          // Generate events for 60 days before the start time to 60 days after.
-          // This is to prevent the loading flicker when changing weeks.
-          // note: this still only takes ~5ms to compute.
-          for (let day=firstDay-(2*msPerDay); day<lastDay+(2*msPerDay); day+=msPerDay) {
-              // Define each day by the timestamp a little after 1:01am to avoid DST hell
-              allDays.push(day+3700000)
+          let rise, set
+          if ('rise' in moonEvents) {
+            rise = moonEvents.rise
+          } else {
+            rise = new Date(timestamp).setHours(12,0,0,0) // start of day
           }
 
-          function oneDayMoon(timestamp, lat, lng) {
-
-            let msPerDay = 1000*60*60*24
-            let events = {}
-            let moonEvents = SunCalc.getMoonTimes(timestamp, lat, lng)
-            let prevMoonEvents = SunCalc.getMoonTimes(timestamp+msPerDay, lat, lng)
-            let nextMoonEvents = SunCalc.getMoonTimes(timestamp-msPerDay, lat, lng)
-
-            let rise, set
-            if ('rise' in moonEvents) {
-              rise = moonEvents.rise
+          // Simplest case: moon sets within calendar day
+          if ('set' in moonEvents) {
+            set = moonEvents.set
+          } else {
+            // Check if moon sets before noon the next day
+            let tomorrowSet = nextMoonEvents.set
+            if (tomorrowSet.getHours < 12) {
+              set = tomorrowSet // Include on calendar display
             } else {
-              rise = new Date(timestamp).setHours(12,0,0,0) // start of day
+              set = new Date(timestamp+msPerDay).setHours(11,59,59,999) // end of day
             }
-
-            // Simplest case: moon sets within calendar day
-            if ('set' in moonEvents) {
-              set = moonEvents.set
-            } else {
-              // Check if moon sets before noon the next day
-              let tomorrowSet = nextMoonEvents.set
-              if (tomorrowSet.getHours < 12) {
-                set = tomorrowSet // Include on calendar display
-              } else {
-                set = new Date(timestamp+msPerDay).setHours(11,59,59,999) // end of day
-              }
-            }
-
-            //console.log(moonEvents)
-            events.moon = {
-              start: rise,
-              end: set,
-              rendering: "background",
-              backgroundColor:"#aaaaaa",
-              borderColor: "#aaaaaa",
-              id: `fc-custom-moon-indicator`,
-              classNames: ["fc-moon-indicator","fc-moon-indicator-line"]
-            }
-            return events
           }
 
-          let moonEvents = []
-          let site_lat = parseFloat(this.site_config(this.calendarSite)['latitude'])
+          //console.log(moonEvents)
+          events.moon = {
+            start: rise,
+            end: set,
+            rendering: "background",
+            backgroundColor:"#aaaaaa",
+            borderColor: "#aaaaaa",
+            id: `fc-custom-moon-indicator`,
+            classNames: ["fc-moon-indicator","fc-moon-indicator-line"]
+          }
+          return events
+        }
 
-          let site_lng = parseFloat(this.site_config(this.calendarSite)['longitude'])
+        let moonEvents = []
+        let site_lat = parseFloat(this.site_config(this.calendarSite)['latitude'])
 
-          // Compute events for each day. 
-          allDays.map((day) => moonEvents.push(...Object.values(
-            oneDayMoon( day, site_lat, site_lng,)
-          )))
+        let site_lng = parseFloat(this.site_config(this.calendarSite)['longitude'])
 
-          //console.log('moon events: ', moonEvents)
-          return moonEvents
+        // Compute events for each day. 
+        allDays.map((day) => moonEvents.push(...Object.values(
+          oneDayMoon( day, site_lat, site_lng,)
+        )))
+
+        //console.log('moon events: ', moonEvents)
+        return moonEvents
       },
 
       async getTwilightEvents(info) {
 
-          // Timer start
-          let t0=performance.now()
-          //console.log('info: ', info)
+        // Timer start
+        let t0=performance.now()
+        //console.log('info: ', info)
 
-          // Get the time range we need to display in the UI.
-          let firstDay = info.start.valueOf()
-          let lastDay = info.end.valueOf()
-          
-          // List all the days we'll need to display
-          let allDays = []
+        // Get the time range we need to display in the UI.
+        let firstDay = info.start.valueOf()
+        let lastDay = info.end.valueOf()
+        
+        // List all the days we'll need to display
+        let allDays = []
+        let msPerDay = 1000*60*60*24
+
+        // Generate events for 60 days before the start time to 60 days after.
+        // This is to prevent the loading flicker when changing weeks.
+        // note: this still only takes ~5ms to compute.
+        for (let day=firstDay-(60*msPerDay); day<lastDay+(60*msPerDay); day+=msPerDay) {
+          // Define each day by the timestamp a little after 1:01am to avoid DST hell
+          allDays.push(day+3700000)
+        }
+
+        //console.log('allDays: ', allDays)
+
+        // Generate the twilight events (in proper fullCalendar format)
+        // for one day column (evening-of and morning-after the given date.)
+        function oneDayTwilight(timestamp, latitude, longitude) {
+
+          let events = {}
+
           let msPerDay = 1000*60*60*24
+          let sunEvents = SunCalc.getTimes(new Date(timestamp), latitude, longitude)
+          let nextDayEvents = SunCalc.getTimes(new Date(timestamp+msPerDay),latitude, longitude)
+          let prevDayEvents = SunCalc.getTimes(new Date(timestamp-msPerDay),latitude, longitude)
 
-          // Generate events for 60 days before the start time to 60 days after.
-          // This is to prevent the loading flicker when changing weeks.
-          // note: this still only takes ~5ms to compute.
-          for (let day=firstDay-(60*msPerDay); day<lastDay+(60*msPerDay); day+=msPerDay) {
-              // Define each day by the timestamp a little after 1:01am to avoid DST hell
-              allDays.push(day+3700000)
+          let currentDateObj = new Date(timestamp)
+
+          // The event colors for the calendar
+          //let daylightColor = "rgb(129, 212, 250)"
+          //let civilColor = "rgb(52, 152, 219)"
+          //let nauticalColor = "rgb(36, 113, 163)"
+          //let astronomicalColor = "rgb(26, 82, 118)"
+
+          let daylightColor = "#81D4FA"
+          let civilColor = "#1B9FD8"
+          let nauticalColor = "#166EA9"
+          let astronomicalColor = "#084165"
+
+          events.civilTwilightDusk = {
+            title: "Civil Twilight",
+            start: sunEvents.sunset,
+            end: sunEvents.dusk,
+            backgroundColor: civilColor,
+            rendering: "background",
+            id: `${currentDateObj.toISOString()}_civil_dusk`,
+          }
+          events.nauticalTwilightDusk = {
+            title: "Nautical Twilight",
+            start: sunEvents.dusk,
+            end: sunEvents.nauticalDusk,
+            backgroundColor: nauticalColor,
+            rendering: "background",
+            id: `${currentDateObj.toISOString()}_nautical_dusk`,
+          }
+          events.astronomicalTwilightDusk = {
+            title: "Astronomical Twilight",
+            start: sunEvents.nauticalDusk,
+            end: sunEvents.night,
+            backgroundColor: astronomicalColor,
+            rendering: "background",
+            id: `${currentDateObj.toISOString()}_astronomical_dusk`,
           }
 
-          //console.log('allDays: ', allDays)
-
-          // Generate the twilight events (in proper fullCalendar format)
-          // for one day column (evening-of and morning-after the given date.)
-          function oneDayTwilight(timestamp, latitude, longitude) {
-
-              let events = {}
-
-              let msPerDay = 1000*60*60*24
-              let sunEvents = SunCalc.getTimes(new Date(timestamp), latitude, longitude)
-              let nextDayEvents = SunCalc.getTimes(new Date(timestamp+msPerDay),latitude, longitude)
-              let prevDayEvents = SunCalc.getTimes(new Date(timestamp-msPerDay),latitude, longitude)
-
-              let currentDateObj = new Date(timestamp)
-
-              // The event colors for the calendar
-              //let daylightColor = "rgb(129, 212, 250)"
-              //let civilColor = "rgb(52, 152, 219)"
-              //let nauticalColor = "rgb(36, 113, 163)"
-              //let astronomicalColor = "rgb(26, 82, 118)"
-
-              let daylightColor = "#81D4FA"
-              let civilColor = "#1B9FD8"
-              let nauticalColor = "#166EA9"
-              let astronomicalColor = "#084165"
-
-              events.civilTwilightDusk = {
-                  title: "Civil Twilight",
-                  start: sunEvents.sunset,
-                  end: sunEvents.dusk,
-                  backgroundColor: civilColor,
-                  rendering: "background",
-                  id: `${currentDateObj.toISOString()}_civil_dusk`,
-              }
-              events.nauticalTwilightDusk = {
-                  title: "Nautical Twilight",
-                  start: sunEvents.dusk,
-                  end: sunEvents.nauticalDusk,
-                  backgroundColor: nauticalColor,
-                  rendering: "background",
-                  id: `${currentDateObj.toISOString()}_nautical_dusk`,
-              }
-              events.astronomicalTwilightDusk = {
-                  title: "Astronomical Twilight",
-                  start: sunEvents.nauticalDusk,
-                  end: sunEvents.night,
-                  backgroundColor: astronomicalColor,
-                  rendering: "background",
-                  id: `${currentDateObj.toISOString()}_astronomical_dusk`,
-              }
-
-              events.astronomicalTwilightDawn = {
-                  title: "Astronomical Twilight",
-                  start: nextDayEvents.nightEnd,
-                  end: nextDayEvents.nauticalDawn,
-                  backgroundColor: astronomicalColor,
-                  rendering: "background",
-                  id: `${currentDateObj.toISOString()}_astronomical_dawn`,
-              }
-              events.nauticalTwilightDawn = {
-                  title: "Nautical Twilight",
-                  start: nextDayEvents.nauticalDawn,
-                  end: nextDayEvents.dawn,
-                  backgroundColor: nauticalColor,
-                  rendering: "background",
-                  id: `${currentDateObj.toISOString()}_nautical_dawn`,
-              }
-              events.civilTwilightDawn = {
-                  title: "Civil Twilight",
-                  start:nextDayEvents.dawn,
-                  end:nextDayEvents.sunrise,
-                  backgroundColor: civilColor,
-                  rendering: "background",
-                  id: `${currentDateObj.toISOString()}_civil_dawn`,
-              }
-              events.daylightMorning = {
-                  title: "Morning Daylight",
-                  start: nextDayEvents.sunrise,
-                  end: nextDayEvents.sunset,
-                  //end: new Date(new Date(timestamp).setHours(36)),
-                  rendering: "background",
-                  backgroundColor: daylightColor,
-                  id: `${currentDateObj.toISOString()}_day_morning`,
-              }
-              return events
+          events.astronomicalTwilightDawn = {
+            title: "Astronomical Twilight",
+            start: nextDayEvents.nightEnd,
+            end: nextDayEvents.nauticalDawn,
+            backgroundColor: astronomicalColor,
+            rendering: "background",
+            id: `${currentDateObj.toISOString()}_astronomical_dawn`,
           }
-
-          // Collect all the events to display here
-          let twilightEvents = []
-
-          let site_lat = parseFloat(this.site_config(this.calendarSite)['latitude'])
-          let site_lng = parseFloat(this.site_config(this.calendarSite)['longitude'])
-
-
-          // Compute events for each day. 
-          allDays.map((day) => twilightEvents.push(...Object.values(
-            oneDayTwilight(
-              day, 
-              site_lat,
-              site_lng,
-            )
-          )))
-
-          // Finish timer
-          let t1=performance.now()
-          let twilightComputeTime = t1-t0
-          if (twilightComputeTime > 100) {
-              console.warn('Slow computation of astro twilight: ', twilightComputeTime.toFixed(2)+'ms')
+          events.nauticalTwilightDawn = {
+            title: "Nautical Twilight",
+            start: nextDayEvents.nauticalDawn,
+            end: nextDayEvents.dawn,
+            backgroundColor: nauticalColor,
+            rendering: "background",
+            id: `${currentDateObj.toISOString()}_nautical_dawn`,
           }
-          return twilightEvents
+          events.civilTwilightDawn = {
+            title: "Civil Twilight",
+            start:nextDayEvents.dawn,
+            end:nextDayEvents.sunrise,
+            backgroundColor: civilColor,
+            rendering: "background",
+            id: `${currentDateObj.toISOString()}_civil_dawn`,
+          }
+          events.daylightMorning = {
+            title: "Morning Daylight",
+            start: nextDayEvents.sunrise,
+            end: nextDayEvents.sunset,
+            //end: new Date(new Date(timestamp).setHours(36)),
+            rendering: "background",
+            backgroundColor: daylightColor,
+            id: `${currentDateObj.toISOString()}_day_morning`,
+          }
+          return events
+        }
+
+        // Collect all the events to display here
+        let twilightEvents = []
+
+        let site_lat = parseFloat(this.site_config(this.calendarSite)['latitude'])
+        let site_lng = parseFloat(this.site_config(this.calendarSite)['longitude'])
+
+
+        // Compute events for each day. 
+        allDays.map((day) => twilightEvents.push(...Object.values(
+          oneDayTwilight(
+            day, 
+            site_lat,
+            site_lng,
+          )
+        )))
+
+        // Finish timer
+        let t1=performance.now()
+        let twilightComputeTime = t1-t0
+        if (twilightComputeTime > 100) {
+          console.warn('Slow computation of astro twilight: ', twilightComputeTime.toFixed(2)+'ms')
+        }
+        return twilightEvents
       },
 
       async getConfigWithAuth() {
@@ -584,41 +578,44 @@ export default {
       },
 
       handleNotAuthorizedResponse(error) {
-          if (error.response) {
-              // Request made and server responded
-              console.log(error.response.data);
-              console.log(error.response.status);
-              console.log(error.response.headers);
-              // small popup notification describing error
-              this.$buefy.toast.open({
-                  duration: 5000,
-                  message: `${error.response.status} error: ${error.response.data}`,
-                  position: 'is-bottom',
-                  type: 'is-danger' ,
-              })
-          } else if (error.request) {
-              // The request was made but no response was received
-              console.log(error.request);
-          } else {
-              // Something happened in setting up the request that triggered an Error
-              console.log('Error', error.message);
-          }
+        if (error.response) {
+          // Request made and server responded
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+          // small popup notification describing error
+          this.$buefy.toast.open({
+            duration: 5000,
+            message: `${error.response.status} error: ${error.response.data}`,
+            position: 'is-bottom',
+            type: 'is-danger' ,
+          })
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
       },
 
       // Make a unique id for calendar events. UUID style. This is the pk in dynamodb.
       makeUniqueID() {
-          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-              var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-              return v.toString(16);
-          });
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
       },
 
       // Used when exiting event editor modals. Clear selections, close modal, and refresh events.
       async refreshCalendarView() {
-          let calendarApi = this.$refs.fullCalendar.getApi();
-          calendarApi.unselect();
-          calendarApi.refetchEvents();
-          this.eventEditorIsActive=false;
+        let calendarApi = this.$refs.fullCalendar.getApi();
+        calendarApi.unselect();
+        calendarApi.refetchEvents();
+        this.eventEditorIsActive=false;
+
+        // Update the list of active reservations
+        this.$store.dispatch('calendar/fetchActiveReservations', this.calendarSite)
       },
 
       /*===================================================/
@@ -628,45 +625,44 @@ export default {
        *  This is run when a user clicks on the calendar to create a new event.
        */
       newEventSelected(event){ 
-          //console.log(event)
-          this.activeEvent.startStr = moment(event.startStr).utc().format()
-          this.activeEvent.endStr = moment(event.endStr).utc().format()
-          this.activeEvent.title = titleGenerator.makeTitle()
-          this.activeEvent.creator = this.$auth.user.name
-          this.activeEvent.id = this.makeUniqueID()
-          this.activeEvent.site = this.calendarSite
-          this.activeEvent.resourceId = this.calendarSite
-          this.activeEvent.creator_id = this.$auth.user.sub
-          this.activeEvent.project_id = "none"
+        //console.log(event)
+        this.activeEvent.startStr = moment(event.startStr).utc().format()
+        this.activeEvent.endStr = moment(event.endStr).utc().format()
+        this.activeEvent.title = titleGenerator.makeTitle()
+        this.activeEvent.creator = this.$auth.user.name
+        this.activeEvent.id = this.makeUniqueID()
+        this.activeEvent.site = this.calendarSite
+        this.activeEvent.resourceId = this.calendarSite
+        this.activeEvent.creator_id = this.$auth.user.sub
+        this.activeEvent.project_id = "none"
 
-          console.log('actie event: ', this.activeEvent)
-          this.isNewEvent = true; // setting for the modal event editor
-          this.eventEditorIsActive= true;
+        this.isNewEvent = true; // setting for the modal event editor
+        this.eventEditorIsActive= true;
       },
       /**
        *  This is run when a user clicks on an existing event in the calendar.
        */
       existingEventSelected(arg) {
-          let event = arg.event;
-          //console.log(event)
-          this.activeEvent.id = event.id,
-          this.activeEvent.startStr = moment(event.start).format();
-          this.activeEvent.endStr = moment(event.end).format();
-          this.activeEvent.title = event.title;
-          this.activeEvent.creator = event.extendedProps.creator
-          this.activeEvent.site = event.extendedProps.site
-          this.activeEvent.resourceId = event.getResources()[0].id
-          this.activeEvent.project_id = event.extendedProps.project_id
+        let event = arg.event;
+        //console.log(event)
+        this.activeEvent.id = event.id,
+        this.activeEvent.startStr = moment(event.start).format();
+        this.activeEvent.endStr = moment(event.end).format();
+        this.activeEvent.title = event.title;
+        this.activeEvent.creator = event.extendedProps.creator
+        this.activeEvent.site = event.extendedProps.site
+        this.activeEvent.resourceId = event.getResources()[0].id
+        this.activeEvent.project_id = event.extendedProps.project_id
 
-          this.isNewEvent = false; // setting for the modal event editor
-          this.eventEditorIsActive= true
+        this.isNewEvent = false; // setting for the modal event editor
+        this.eventEditorIsActive= true
       },
 
 
       /*===================================================/
       Calendar CRUD
       /===================================================*/
-      /**testing */
+
       async refreshIfUserIsScheduled() {
         // Make request headers and include token. 
         // Requires user to be logged in.
@@ -695,127 +691,125 @@ export default {
       async submitButtonClicked(newEvent) {
         //console.log('new event creation: ', newEvent)
 
-          // Make request headers and include token. 
-          // Requires user to be logged in.
-          let config = await this.getConfigWithAuth();
+        // Make request headers and include token. 
+        // Requires user to be logged in.
+        let config = await this.getConfigWithAuth();
 
-          let url = `${this.backendUrl}/dev/newevent`
-          let eventToPost = {
-              "event_id": newEvent.id,
-              "start": moment(newEvent.startStr).utc().format(),
-              "end": moment(newEvent.endStr).utc().format(),
-              "creator": newEvent.creator,
-              "creator_id": newEvent.creator_id,
-              "site": newEvent.site,
-              "title": newEvent.title,
-              "resourceId": newEvent.resourceId,
-              "project_id": newEvent.project_id,
-              "rendering": newEvent.rendering
-          }
-          axios.post(url, eventToPost, config)
-              .then(res => {
-                  this.isLoading = true;
-                  this.refreshCalendarView()
-              })
-              .catch(error => {
-                  this.eventEditorIsActive= false;
-                  this.handleNotAuthorizedResponse(error)
-              })
+        let url = `${this.backendUrl}/dev/newevent`
+        let eventToPost = {
+          "event_id": newEvent.id,
+          "start": moment(newEvent.startStr).utc().format(),
+          "end": moment(newEvent.endStr).utc().format(),
+          "creator": newEvent.creator,
+          "creator_id": newEvent.creator_id,
+          "site": newEvent.site,
+          "title": newEvent.title,
+          "resourceId": newEvent.resourceId,
+          "project_id": newEvent.project_id,
+          "rendering": newEvent.rendering
+        }
+        axios.post(url, eventToPost, config)
+          .then(res => {
+            this.isLoading = true;
+            this.refreshCalendarView()
+          })
+          .catch(error => {
+            this.eventEditorIsActive= false;
+            this.handleNotAuthorizedResponse(error)
+          })
 
-          // refresh to show update and close modal
+        // refresh to show update and close modal
       },
       /**
        * Close the event modal and deselect its associated calendar event.
        */
       cancelButtonClicked() {
-          let calendarApi = this.$refs.fullCalendar.getApi();
-          calendarApi.unselect()
-          this.eventEditorIsActive = false;
+        let calendarApi = this.$refs.fullCalendar.getApi();
+        calendarApi.unselect()
+        this.eventEditorIsActive = false;
       },
       /**
        * Replicates the 'cancelButtonClicked' function for the case when the user
        * closes the modal window by clicking outside of it.
        */
       eventModalClosed() {
-          let calendarApi = this.$refs.fullCalendar.getApi();
-          calendarApi.unselect()
+        let calendarApi = this.$refs.fullCalendar.getApi();
+        calendarApi.unselect()
       },
       /**
        * Delete the selected calendar event from the backend database
        */
       async deleteButtonClicked(eventToDelete) {
-          let config = await this.getConfigWithAuth();
-          let url = `${this.backendUrl}/dev/delete`
-          //console.log('event to delete: ', eventToDelete)
-          let body = {
-              "event_id": eventToDelete.id,
-              "start": moment(eventToDelete.startStr).utc().format(),
-          }
-          let res = await axios.post(url, body, config)
-              .then(res => {
-                  this.isLoading = true;
-                  this.refreshCalendarView()
-              })
-              .catch(error => {
-                  this.eventEditorIsActive= false;
-                  this.handleNotAuthorizedResponse(error)
-              })
+        let config = await this.getConfigWithAuth();
+        let url = `${this.backendUrl}/dev/delete`
+        //console.log('event to delete: ', eventToDelete)
+        let body = {
+          "event_id": eventToDelete.id,
+          "start": moment(eventToDelete.startStr).utc().format(),
+        }
+        let res = await axios.post(url, body, config)
+          .then(res => {
+            this.isLoading = true;
+            this.refreshCalendarView()
+          })
+          .catch(error => {
+            this.eventEditorIsActive= false;
+            this.handleNotAuthorizedResponse(error)
+          })
       },
 
       async modifyButtonClicked(events) {
-          let initialEvent = events.initialEvent
-          let modifiedEvent = events.modifiedEvent
+        let initialEvent = events.initialEvent
+        let modifiedEvent = events.modifiedEvent
 
-          // Maybe we don't need to update anything?
-          if (JSON.stringify(initialEvent) == JSON.stringify(modifiedEvent)){
-              this.refreshCalendarView()
-              return;
-          }
+        // Maybe we don't need to update anything?
+        if (JSON.stringify(initialEvent) == JSON.stringify(modifiedEvent)){
+          this.refreshCalendarView()
+          return;
+        }
 
-          // Make request headers and include token. 
-          // Requires user to be logged in.
-          let config = await this.getConfigWithAuth();
-          let url = `${this.backendUrl}/dev/modifyevent`
-          let theModifiedEvent = {
-              "event_id":modifiedEvent.id,
-              "start": moment(modifiedEvent.startStr).utc().format(),
-              "end":  moment(modifiedEvent.endStr).utc().format(),
-              "creator":modifiedEvent.creator,
-              "creator_id":modifiedEvent.creator_id,
-              "site":modifiedEvent.site,
-              "title":modifiedEvent.title,
-              "resourceId":modifiedEvent.resourceId,
-              "project_id":modifiedEvent.project_id,
-              "rendering":modifiedEvent.rendering
-          }
-          let theInitialEvent = {
-              "event_id":initialEvent.id,
-              "start": moment(initialEvent.startStr).utc().format(),
-              "end": moment(initialEvent.endStr).utc().format(),
-              "creator":initialEvent.creator,
-              "creator_id":initialEvent.creator_id,
-              "site":initialEvent.site,
-              "title":initialEvent.title,
-              "resourceId":initialEvent.resourceId,
-              "project_id":initialEvent.project_id,
-              "rendering":initialEvent.rendering
-          }
-          //console.log(theModifiedEvent)
-          //console.log(theInitialEvent)
-          let body = {
-              originalEvent: theInitialEvent,
-              modifiedEvent: theModifiedEvent,
-          }
+        // Make request headers and include token. 
+        // Requires user to be logged in.
+        let config = await this.getConfigWithAuth();
+        let url = `${this.backendUrl}/dev/modifyevent`
+        let theModifiedEvent = {
+          "event_id":modifiedEvent.id,
+          "start": moment(modifiedEvent.startStr).utc().format(),
+          "end":  moment(modifiedEvent.endStr).utc().format(),
+          "creator":modifiedEvent.creator,
+          "creator_id":modifiedEvent.creator_id,
+          "site":modifiedEvent.site,
+          "title":modifiedEvent.title,
+          "resourceId":modifiedEvent.resourceId,
+          "project_id":modifiedEvent.project_id,
+          "rendering":modifiedEvent.rendering
+        }
+        let theInitialEvent = {
+          "event_id":initialEvent.id,
+          "start": moment(initialEvent.startStr).utc().format(),
+          "end": moment(initialEvent.endStr).utc().format(),
+          "creator":initialEvent.creator,
+          "creator_id":initialEvent.creator_id,
+          "site":initialEvent.site,
+          "title":initialEvent.title,
+          "resourceId":initialEvent.resourceId,
+          "project_id":initialEvent.project_id,
+          "rendering":initialEvent.rendering
+        }
+        let body = {
+          originalEvent: theInitialEvent,
+          modifiedEvent: theModifiedEvent,
+        }
 
-          axios.post(url,body,config)
-              .then(res => {
-                  this.isLoading = true;
-                  this.refreshCalendarView()
-              })
-              .catch(error => {
-                  this.eventEditorIsActive= false;
-                  this.handleNotAuthorizedResponse(error)
-              })
+        axios.post(url,body,config)
+          .then(res => {
+            this.isLoading = true;
+            this.refreshCalendarView()
+          })
+          .catch(error => {
+            this.eventEditorIsActive= false;
+            this.handleNotAuthorizedResponse(error)
+          })
       },
 
 
@@ -832,45 +826,43 @@ export default {
 
       async fetchSiteEvents(fetchInfo) {
 
-          // TODO: we don't want to define the site from the select box
-          // on this page.
-          let site = this.calendarSite
-          const url = `${this.backendUrl}/dev/siteevents`
-          const options = {
-              'headers': {
-                  'Content-Type': 'application/json;charset=UTF-8',
-                  'Access-Control-Allow-Origin': '*',
-              }
+        let site = this.calendarSite
+        const url = `${this.backendUrl}/dev/siteevents`
+        const options = {
+          'headers': {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Access-Control-Allow-Origin': '*',
           }
-          let body = {
-              "site": site,
-              "start": fetchInfo.startStr,
-              "end": fetchInfo.endStr,
+        }
+        let body = {
+          "site": site,
+          "start": fetchInfo.startStr,
+          "end": fetchInfo.endStr,
+        }
+
+        let resp = await axios.post(url, body, options)
+
+        // Format the returned items to work nicely with fullcalendar.
+        let formatted_events = resp.data.map(obj => {
+          let fObj = {
+          'start': obj.start,
+          'end': obj.end,
+          'id': obj.event_id,
+          'title': obj.title,
+          'creator': obj.creator,
+          'creator_id': obj.creator_id,
+          'site': obj.site,
+          'resourceId': obj.resourceId,
+          'project_id': obj.project_id,
+          'rendering': obj.rendering,
           }
-
-          let resp = await axios.post(url, body, options)
-
-          // Format the returned items to work nicely with fullcalendar.
-          let formatted_events = resp.data.map(obj => {
-              let fObj = {
-              'start': obj.start,
-              'end': obj.end,
-              'id': obj.event_id,
-              'title': obj.title,
-              'creator': obj.creator,
-              'creator_id': obj.creator_id,
-              'site': obj.site,
-              'resourceId': obj.resourceId,
-              'project_id': obj.project_id,
-              'rendering': obj.rendering,
-              }
-              if (this.$auth.isAuthenticated && fObj.creator_id == this.$auth.user.sub) {
-                fObj.backgroundColor = '#933bff'
-                //fObj.borderColor = '#4099ff'
-              }
-              return fObj
-          })
-          return formatted_events
+          if (this.$auth.isAuthenticated && fObj.creator_id == this.$auth.user.sub) {
+            fObj.backgroundColor = '#933bff'
+            //fObj.borderColor = '#4099ff'
+          }
+          return fObj
+        })
+        return formatted_events
       },
   },
 

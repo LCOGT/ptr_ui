@@ -1,16 +1,14 @@
 <template>
 <div>
     <h1 class="title">Create a project</h1>
-
-                <b-field 
-                    label="Project Name" 
-                    :type="{'is-danger': warn.project_name}"
-                    >
-                    <b-input class="project-input" v-model="project_name"></b-input>
-                </b-field>
+    <b-field 
+        label="Project Name" 
+        :type="{'is-danger': warn.project_name}"
+        >
+        <b-input class="project-input" v-model="project_name"></b-input>
+    </b-field>
 
      <b-tabs type="is-boxed">
-
         <b-tab-item label="Targets">
                 <div v-for="n in targets_index" v-bind:key="n" class="target-row">
 
@@ -58,7 +56,6 @@
         </b-tab-item>
         <b-tab-item label="Settings">
 
-                
             <section class="columnn">
 
                 <div v-for="n in exposures_index" v-bind:key="n" class="exposure-row">
@@ -165,11 +162,35 @@
                     >
                     <b-input class="project-input" type="number" min="-360" max="360" v-model="pa"/>
                 </b-field>
+
                 <b-field 
                     v-if="showAdvancedInputs"
                     label="Meridian Flip">
-                    <b-checkbox v-model="noflip">No Flip</b-checkbox>
+                    <b-field>
+                        <b-radio-button v-model="meridian_flip"
+                            native-value="east_only">
+                            <b-icon icon="close"></b-icon>
+                            <span>East Only</span>
+                        </b-radio-button>
+
+                        <b-radio-button v-model="meridian_flip"
+                            native-value="west_only">
+                            <b-icon icon="check"></b-icon>
+                            <span>West Only</span>
+                        </b-radio-button>
+
+                        <b-radio-button v-model="meridian_flip"
+                            native-value="flip_ok">
+                            Flip OK
+                        </b-radio-button>
+
+                        <b-radio-button v-model="meridian_flip"
+                            native-value="no_flip">
+                            No Flip
+                        </b-radio-button>
+                    </b-field>
                 </b-field>
+
                 <b-field 
                     v-if="showAdvancedInputs"
                     label="Autofocus">
@@ -191,6 +212,18 @@
                 </b-field>
                 <b-field 
                     v-if="showAdvancedInputs"
+                    label="Max HA (decimal hours, absolute value)" 
+                    :type="{'is-danger': warn.max_ha}" >
+                    <b-numberinput 
+                        step="0.5" 
+                        type="is-light"
+                        max="12" 
+                        controls-position="compact" 
+                        class="project-input" 
+                        v-model="max_ha"></b-numberinput>
+                </b-field>
+                <b-field 
+                    v-if="showAdvancedInputs"
                     label="Max Airmass" 
                     :type="{'is-danger': warn.max_airmass}"
                     >
@@ -198,14 +231,14 @@
                 </b-field>
                 <b-field 
                     v-if="showAdvancedInputs"
-                    label="Min Lunar Dist." 
+                    label="Min Lunar Dist. (deg)" 
                     :type="{'is-danger': warn.lunar_dist_min}"
                     >
                     <b-input class="project-input" v-model="lunar_dist_min"></b-input>
                 </b-field>
                 <b-field 
                     v-if="showAdvancedInputs"
-                    label="Max Lunar Phase" 
+                    label="Max Lunar Phase %" 
                     :type="{'is-danger': warn.lunar_phase_max}"
                     >
                     <b-input class="project-input" v-model="lunar_phase_max"></b-input>
@@ -255,12 +288,14 @@
     </b-tabs>
 
 
-    <b-tooltip :label="!$auth.isAuthenticated ? 'You must be logged in to create a project.' : ''">
-    <button 
-        class="button is-success is-outlined"
-        @click="saveNewProject"
-        :disabled="!$auth.isAuthenticated"
-        >Create Project</button>
+    <b-tooltip 
+        :active="!$auth.isAuthenticated" 
+        label="You must be logged in to create a project." >
+        <button 
+            class="button is-success is-outlined"
+            @click="saveNewProject"
+            :disabled="!$auth.isAuthenticated"
+            >Create Project</button>
     </b-tooltip>
 
 
@@ -322,15 +357,16 @@ export default {
                 },
             ],
 
-            noflip: false,
+            meridian_flip: 'flip_ok', // can be ['flip_ok', 'no_flip', 'east_only', 'west_only']
             frequent_autofocus: false,
             near_tycho_star: false,
 
             prefer_bessell: false,
+            max_ha: 4, // decimal hours
             max_airmass: 2.0,
             enhance_photometry: false,
-            lunar_dist_min: 0,
-            lunar_phase_max: 1,
+            lunar_dist_min: 30, // deg
+            lunar_phase_max: 60, // % 
 
             site: this.sitecode,
 
@@ -342,6 +378,7 @@ export default {
                 pa: false,
                 user_diffuser: false,
                 prefer_bessell: false,
+                max_ha: false,
                 max_airmass: false,
                 lunar_dist_min: false,
                 lunar_phase_max: false,
@@ -492,16 +529,16 @@ export default {
                 created_at: moment().utc().format(),
                 user_id: this.user.sub,
                 project_constraints: {
+                    max_ha: this.max_ha,
                     max_airmass: this.max_airmass,
                     prefer_bessell: this.prefer_bessell,
                     lunar_dist_min: this.lunar_dist_min,
                     lunar_phase_max: this.lunar_phase_max,
                     enhance_photometry: this.enhance_photometry,
-                    noflip: this.noflip,
+                    meridian_flip: this.meridian_flip,
                     frequent_autofocus: this.frequent_autofocus,
                     use_tycho_star: this.use_tycho_star,
                     pa: this.pa,
-                    
                 },
 
                 // List of objects (targets in the project)

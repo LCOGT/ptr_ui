@@ -34,7 +34,7 @@ $title-weight: 500;
 $subtitle-weight: 400;
 $subtitle-color: $grey-dark;
 
-$border-width: 2px;
+$border-width: 1px;
 $border: $grey;
 
 $body-background-color: darken($grey-darker, 4);
@@ -50,7 +50,7 @@ $subtitle-color: $grey-light;
 $subtitle-strong-color: $grey-light;
 
 $text: #fff;
-$text-light: lighten($text, 10);
+//$text-light: lighten($text, 10);
 $text-strong: darken($text, 5);
 
 $box-color: $text;
