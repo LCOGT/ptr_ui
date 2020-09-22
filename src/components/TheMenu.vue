@@ -4,9 +4,9 @@
         <template slot="brand">
             <b-navbar-item tag="router-link" class="menu-title" :to="{ path: '/' }">
               <span v-if="site==''" style="margin: 0;" class="title">photon ranch</span>
-              <span v-if="site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp</span>
-              <span v-if="site!=''" class="is-hidden-tablet">&nbsp&nbsp<b-icon icon="home"/>&nbsp</span>
-              <span v-if="site!=''" style="margin: 0;" class="subtitle">>&nbsp{{site.toUpperCase()}}</span>
+              <span v-if="site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp;</span>
+              <span v-if="site!=''" class="is-hidden-tablet">&nbsp;&nbsp;<b-icon icon="home"/>&nbsp;</span>
+              <span v-if="site!=''" style="margin: 0;" class="subtitle">>&nbsp;{{site.toUpperCase()}}</span>
               <!--span>&nbspv5</span-->
                 <!--img
                     src="img/icons/logo-via-logohub.png"
