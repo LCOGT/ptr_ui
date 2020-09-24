@@ -8,6 +8,7 @@ import axios from 'axios'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
 import { data } from 'jquery'
 
+const testapi = "https://bl77j5t5s0.execute-api.us-east-1.amazonaws.com/dev"
 
 function user_id() {
     if (getInstance().user) {
@@ -159,22 +160,26 @@ const actions = {
     /**
      *  This action will retrieve a list of images filtered by the parameters in filter_params
      */
-    get_filtered_images({ commit, state, rootState }, filter_params) {
+    get_filtered_images({ commit, dispatch, rootState }, filter_params) {
         console.log(filter_params)
         let apiName = rootState.dev.active_api;
-        let path = `/filtered_images`;
-        //let url = apiName+path;
+        let url = apiName + '/filtered_images';
         let body = { 
             method: "GET",
             params: filter_params,
             baseURL: apiName,
-            url: path,
+            url: url,
         }
         axios(body).then(response => {
             response = response.data
-            commit('setUserImages', response)
-            let recent_image_list = response.slice(0, 40)
-            commit('setRecentImages', recent_image_list)
+
+            // Empty response:
+            if (response.length == 0) { 
+                dispatch('display_placeholder_image') 
+                return; 
+            }
+
+            commit('setRecentImages',response)
         }).catch(error => {
             console.warn(error)
         });
