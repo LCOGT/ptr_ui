@@ -197,7 +197,7 @@
       </side-info-panel>
 
       <!--js9-devtools/-->
-      <image-filter/>
+      <image-filter :sitecode="sitecode"/>
       <!--image-navigation-panel/-->
     </div>
 
