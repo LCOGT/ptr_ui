@@ -48,10 +48,8 @@ export const commands_mixin = {
          * @param {string} device_type Used to create the JSON command.
          * @param {string} action The thing that the device should do.
          * @param {string} name The text on the button that sends the command.
-         * @param {object} req_params Required parameters for the command. See 
-         *  command_syntax_doc.js for details.
-         * @param {object} opt_params Optional parameters for the command. See 
-         *  command_syntax_doc.js for details.
+         * @param {object} req_params Required parameters for the command.
+         * @param {object} opt_params Optional parameters for the command. 
          */
         base_command(device_type, action, name, req_params, opt_params) {
 
@@ -80,7 +78,11 @@ export const commands_mixin = {
                     timestamp: parseInt(Date.now() / 1000),
                     action: action,
                     required_params: req_params || {},
-                    optional_params: opt_params || {},
+                    optional_params: {
+                        instrument_selector_position: this.selector_position,
+                        telescope_selection: this.telescope_selection,
+                        ...(opt_params || {}),
+                    }
                 }
             }
 
@@ -138,6 +140,8 @@ export const commands_mixin = {
 
         // User-supplied command parameters
         ...mapGetters('command_params', [
+            'telescope_selection', 
+
             'subframeIsActive',
             'subframeDefinedWithFile',
             'subframe_x0',
@@ -159,6 +163,8 @@ export const commands_mixin = {
             'camera_de_ice_cooling',
 
             'filter_wheel_options_selection',
+            
+            'selector_position',
 
             'focuser_relative',
             'focuser_absolute',
@@ -234,6 +240,10 @@ export const commands_mixin = {
         active_sequencer: {
             get() { return this.$store.getters['site_config/sequencer'] },
             set(value) { this.$store.commit('site_config/setActiveSequencer', value) }
+        },
+        active_selector: {
+            get() { return "selector_not_from_config"},
+            set(value) { return }
         },
 
 
