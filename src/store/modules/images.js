@@ -8,8 +8,6 @@ import axios from 'axios'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
 import { data } from 'jquery'
 
-const testapi = "https://bl77j5t5s0.execute-api.us-east-1.amazonaws.com/dev"
-
 function user_id() {
     if (getInstance().user) {
         return getInstance().user.sub
