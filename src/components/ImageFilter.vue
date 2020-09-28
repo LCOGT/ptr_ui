@@ -24,13 +24,6 @@
                             <b-input v-model="filename" placeholder="(Optional)"></b-input>
                         </b-field>
 
-                        <b-field  label="Site">
-                            <b-select v-model="site" placeholder="--" >
-                                <option>wmd</option>
-                                <option>saf</option>
-                            </b-select>
-                        </b-field>
-
                         <b-field label="Filter">
                             <b-select v-model="filter" placeholder="--">
                                 <option v-for="filter_option in filter_options">
@@ -107,6 +100,7 @@ moment().format();
 
 export default {
   name: "ImageFilter",
+  props: ["sitecode"],
   data() {
     return {
       filename: null,
@@ -172,11 +166,10 @@ export default {
       }
 
       let filterparams = {
-        username: "wmd_admin",
         filename: this.filename,
         exposure_time_min: this.exp_time_min,
         exposure_time_max: this.exp_time_max,
-        site: this.site,
+        site: this.sitecode,
         start_date: startDate,
         end_date: endDate,
         filter: this.filter

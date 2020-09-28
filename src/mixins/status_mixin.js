@@ -118,6 +118,15 @@ export const status_mixin = {
 
     computed: {
 
+        buildEmptyStatus() {
+            let status = []
+            status.push({
+                "name": "status",
+                "val": "not configured"
+            })
+            return status
+        },
+
         buildWeatherStatus() {
             let status = []
             status.push({"name": "Status Age", ...this.status_age_display})
