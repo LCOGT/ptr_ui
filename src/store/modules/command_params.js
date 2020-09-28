@@ -11,6 +11,8 @@ const state = {
     mount_dec: '',
     mount_object: '',
 
+    telescope_selection: 1, // 1: main telescope, 2: auxiliary telescope
+
     // Subframe parameters
     subframeIsActive: false,
     subframeDefinedWithFile: '',
@@ -35,6 +37,8 @@ const state = {
 
     filter_wheel_options_selection: '',
 
+    selector_position: 1, // the chosen inst. selector position.
+
     focuser_relative: '',
     focuser_absolute: '',
 
@@ -49,6 +53,8 @@ const getters = {
     mount_ra: state => state.mount_ra,
     mount_dec: state => state.mount_dec,
     mount_object: state => state.mount_object,
+
+    telescope_selection: state => state.telescope_selection,
 
     subframeIsActive: state => state.subframeIsActive,
     subframeDefinedWithFile: state => state.subframeDefinedWithFile,
@@ -72,6 +78,8 @@ const getters = {
 
     filter_wheel_options_selection: state => state.filter_wheel_options_selection,
 
+    selector_position: state => state.selector_position,
+
     focuser_relative: state => state.focuser_relative,
     focuser_absolute: state => state.focuser_absolute,
 
@@ -87,6 +95,8 @@ const mutations = {
     mount_ra(state, val) { state.mount_ra = val; },
     mount_dec(state, val) { state.mount_dec = val; },
     mount_object(state, val) { state.mount_object = val; },
+
+    telescope_selection(state, val) { state.telescope_selection = val; },
 
     subframeIsActive (state, val) { state.subframeIsActive = val },
     subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },
@@ -109,6 +119,8 @@ const mutations = {
     camera_de_ice_cooling (state, val) { state.camera_de_ice_cooling = val; },
 
     filter_wheel_options_selection(state, val) { state.filter_wheel_options_selection = val; },
+
+    selector_position(state, val) {state.selector_position = val; },
 
     focuser_relative(state, val) { state.focuser_relative = val; },
     focuser_absolute(state, val) { state.focuser_absolute = val; },
