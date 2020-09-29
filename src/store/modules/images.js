@@ -105,7 +105,7 @@ const actions = {
         // otherwise add it to the stack. 
         axios.get(apiName+path).then(async response => {
 
-            console.log(response.data)
+            console.log('update_new_image response: ', response.data)
 
             // Empty response. If this runs, something is wrong. 
             if (response.data.length == 0) { 
@@ -151,7 +151,15 @@ const actions = {
                 commit('setCurrentImage', new_image)
             }
         }).catch(error => {
-            console.warn("Error in vuex 'images/update_new_image': ", error)
+            // Most likely: no jpg availaable
+            if (error.status == 404) {
+                console.log('update_new_image: not found, probably because\
+                there was no jpg included in the db')
+            }
+            else {
+                console.warn("Error in vuex 'images/update_new_image': ", error)
+            }
+
         });
     },
 

@@ -70,6 +70,49 @@
         </b-dropdown-item> 
       </b-dropdown>
 
+      <!-- Screen Tab -->
+      <b-dropdown>
+        <a
+          slot="trigger"
+          role="button">
+          <div class="button is-text">Screen</div>
+        </a>
+        <b-dropdown-item custom label="Screen">
+          <div class="instrument-control-title-bar">
+            <div class="title">Screen</div>
+            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+              {{active_screen}}
+            </div>
+          </div>
+
+          <status-column :statusList="buildScreenTabStatus" />
+
+          <b-field label="Brightness">
+            <b-field>
+              <b-input 
+                expanded 
+                size="is-small" 
+                name="subject" 
+                v-model="screen_brightness" 
+                type="number" 
+                :step="1" 
+                min="0" 
+                max="100" 
+                autocomplete="off" />
+                <p class="control"> <command-button :data="screen_on_command" class="is-small control" /> </p>
+                <p class="control"> <command-button :data="screen_off_command" class="is-small control" /> </p>
+            </b-field>
+          </b-field>
+
+          <div class="status-toggle-bar" @click="isScreenStatusVisible = !isScreenStatusVisible">
+            {{ isScreenStatusVisible ? 'collapse status' : 'expand status' }}
+          </div>
+          <pre v-if="isScreenStatusVisible">
+            <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
+          </pre>
+        </b-dropdown-item>
+      </b-dropdown>
+
       <!-- Telescope Tab -->
       <b-dropdown :append-to-body="true">
         <a
@@ -553,49 +596,6 @@
             <simple-device-status :device_name="active_sequencer" device_type="Sequencer" :device_status="sequencer_state" />
           </pre>
 
-        </b-dropdown-item>
-      </b-dropdown>
-
-      <!-- Screen Tab -->
-      <b-dropdown v-if="isCmdTabsExpanded">
-        <a
-          slot="trigger"
-          role="button">
-          <div class="button is-text">Screen</div>
-        </a>
-        <b-dropdown-item custom label="Screen">
-          <div class="instrument-control-title-bar">
-            <div class="title">Screen</div>
-            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
-              {{active_screen}}
-            </div>
-          </div>
-
-          <status-column :statusList="buildScreenTabStatus" />
-
-          <b-field label="Brightness">
-            <b-field>
-              <b-input 
-                expanded 
-                size="is-small" 
-                name="subject" 
-                v-model="screen_brightness" 
-                type="number" 
-                :step="1" 
-                min="0" 
-                max="100" 
-                autocomplete="off" />
-                <p class="control"> <command-button :data="screen_on_command" class="is-small control" /> </p>
-                <p class="control"> <command-button :data="screen_off_command" class="is-small control" /> </p>
-            </b-field>
-          </b-field>
-
-          <div class="status-toggle-bar" @click="isScreenStatusVisible = !isScreenStatusVisible">
-            {{ isScreenStatusVisible ? 'collapse status' : 'expand status' }}
-          </div>
-          <pre v-if="isScreenStatusVisible">
-            <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
-          </pre>
         </b-dropdown-item>
       </b-dropdown>
 
