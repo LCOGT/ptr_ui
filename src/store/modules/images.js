@@ -8,7 +8,6 @@ import axios from 'axios'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
 import { data } from 'jquery'
 
-
 function user_id() {
     if (getInstance().user) {
         return getInstance().user.sub
@@ -106,7 +105,7 @@ const actions = {
         // otherwise add it to the stack. 
         axios.get(apiName+path).then(async response => {
 
-            console.log(response.data)
+            console.log('update_new_image response: ', response.data)
 
             // Empty response. If this runs, something is wrong. 
             if (response.data.length == 0) { 
@@ -152,29 +151,41 @@ const actions = {
                 commit('setCurrentImage', new_image)
             }
         }).catch(error => {
-            console.warn("Error in vuex 'images/update_new_image': ", error)
+            // Most likely: no jpg availaable
+            if (error.status == 404) {
+                console.log('update_new_image: not found, probably because\
+                there was no jpg included in the db')
+            }
+            else {
+                console.warn("Error in vuex 'images/update_new_image': ", error)
+            }
+
         });
     },
 
     /**
      *  This action will retrieve a list of images filtered by the parameters in filter_params
      */
-    get_filtered_images({ commit, state, rootState }, filter_params) {
+    get_filtered_images({ commit, dispatch, rootState }, filter_params) {
         console.log(filter_params)
         let apiName = rootState.dev.active_api;
-        let path = `/filtered_images`;
-        //let url = apiName+path;
+        let url = apiName + '/filtered_images';
         let body = { 
             method: "GET",
             params: filter_params,
             baseURL: apiName,
-            url: path,
+            url: url,
         }
         axios(body).then(response => {
             response = response.data
-            commit('setUserImages', response)
-            let recent_image_list = response.slice(0, 40)
-            commit('setRecentImages', recent_image_list)
+
+            // Empty response:
+            if (response.length == 0) { 
+                dispatch('display_placeholder_image') 
+                return; 
+            }
+
+            commit('setRecentImages',response)
         }).catch(error => {
             console.warn(error)
         });

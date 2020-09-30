@@ -52,8 +52,6 @@ export default {
     // Determine whether or not the menu is included
     this.js9menu = document.getElementById('myJS9Menubar')
     this.js9menu.style.display= this.includeMenu ? "block" : "none";
-
-    this.$store.dispatch("images/load_latest_images")
   },
 
   beforeDestroy() {

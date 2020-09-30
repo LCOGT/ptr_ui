@@ -32,7 +32,9 @@
                 </b-navbar-item>
             </b-navbar-dropdown>
 
-            <b-navbar-dropdown v-if="userIsAdmin" label="experimental">
+
+
+            <!--b-navbar-dropdown label="experimental">
                 <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
                     chat
                 </b-navbar-item>
@@ -45,7 +47,7 @@
                 <b-navbar-item tag="router-link" :to="{ path: '/analysis' }">
                     analysis
                 </b-navbar-item>
-            </b-navbar-dropdown>
+            </b-navbar-dropdown-->
 
         </template>
 
