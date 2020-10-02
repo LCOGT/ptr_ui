@@ -93,7 +93,7 @@
     </b-modal>
 
     <!-- Moon info box that appears when hovering over a moon event -->
-    <div class="fc-settings-box" id="moon-info">
+    <div id="moon-info">
       <p>Moon is above the horizon</p>
       <p>---</p>
       <p>Illumination: &emsp;{{moon_hover_data.illumination}} %</p>
@@ -727,8 +727,14 @@ export default {
         this.moon_hover_data.illumination = mouseInfo.event.extendedProps
           .illumination.toFixed(3)
 
-        let x = mouseInfo.jsEvent.pageX;
-        let y = mouseInfo.jsEvent.pageY;
+        let page = document.getElementsByClassName('page-view')[0]
+        let page_boundary = page.getBoundingClientRect()
+        let left_position_offset = page_boundary.left
+        let top_position_offset = page_boundary.top
+        let top_scroll_offset = document.body.getBoundingClientRect().top
+
+        let x = mouseInfo.jsEvent.pageX - left_position_offset;
+        let y = mouseInfo.jsEvent.pageY - top_position_offset + top_scroll_offset;
 
         document.getElementById('moon-info').style.top = y + 'px'
         document.getElementById('moon-info').style.left = x + 'px'
@@ -980,11 +986,17 @@ export default {
 }
 
 #moon-info {
+  background-color: black;
+  opacity: 0.9;
+  border-radius: 8px;
+  padding: 1em;
+  margin-bottom: 1em;
   position: absolute;
   visibility: hidden;
   z-index: 16;
   top: 0px;
   left: 0px;
+  pointer-events: none;
 }
 .fc-moon-indicator {
   z-index: 15;
