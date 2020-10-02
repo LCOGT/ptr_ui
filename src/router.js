@@ -22,6 +22,7 @@ import analysis from './views/analysis.vue'
 import { authGuard } from "./auth/authGuard";
 import calendarPage from './views/calendarPage.vue'
 import JobsMonitor from './views/JobsMonitor.vue'
+import UserData from './views/UserData.vue'
 import axios from 'axios'
 
 
@@ -59,6 +60,7 @@ const router = new VueRouter({
     { path: '/analysis', name: 'analysis', component: analysis },
     { path: '/calendar', name: 'calendar', component: calendarPage },
     { path: '/jobs', name: 'jobs', component: JobsMonitor},
+    { path: '/data/:user', name: 'data', component: UserData},
     {
       path: '/site/:sitecode/:subpage',
       name: 'site',
