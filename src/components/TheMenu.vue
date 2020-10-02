@@ -4,9 +4,9 @@
         <template slot="brand">
             <b-navbar-item tag="router-link" class="menu-title" :to="{ path: '/' }">
               <span v-if="site==''" style="margin: 0;" class="title">photon ranch</span>
-              <span v-if="site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp</span>
-              <span v-if="site!=''" class="is-hidden-tablet">&nbsp&nbsp<b-icon icon="home"/>&nbsp</span>
-              <span v-if="site!=''" style="margin: 0;" class="subtitle">>&nbsp{{site.toUpperCase()}}</span>
+              <span v-if="site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp;</span>
+              <span v-if="site!=''" class="is-hidden-tablet">&nbsp;&nbsp;<b-icon icon="home"/>&nbsp;</span>
+              <span v-if="site!=''" style="margin: 0;" class="subtitle">>&nbsp;{{site.toUpperCase()}}</span>
               <!--span>&nbspv5</span-->
                 <!--img
                     src="img/icons/logo-via-logohub.png"
@@ -34,7 +34,7 @@
 
 
 
-            <b-navbar-dropdown label="experimental">
+            <!--b-navbar-dropdown label="experimental">
                 <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
                     chat
                 </b-navbar-item>
@@ -47,7 +47,7 @@
                 <b-navbar-item tag="router-link" :to="{ path: '/analysis' }">
                     analysis
                 </b-navbar-item>
-            </b-navbar-dropdown>
+            </b-navbar-dropdown-->
 
         </template>
 
@@ -84,31 +84,8 @@ import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "TheMenu",
-  //props: ["global_config"],
   data() {
     return {}
-    //return {
-      //sites: [
-        //{
-          //code: "wmd",
-          //name: "West Mountain Drive",
-          //country: "USA",
-          //tz: -8,
-          //lat: 34,
-          //lng: -119,
-          //elevation: 0 // meters
-        //},
-        //{
-          //code: "saf",
-          //name: "Apache Ridge Observatory",
-          //country: "USA",
-          //tz: -7,
-          //lat: 35.55444,
-          //lng: -105.870277,
-          //elevation: 2201
-        //}
-      //]
-    //};
   },
   computed: {
     ...mapGetters('site_config', [
@@ -116,6 +93,16 @@ export default {
       'global_config',
       'site',
     ]),
+
+    userIsAdmin() {
+      try {
+        let user = this.$auth.user 
+        let roles = user['https://photonranch.org/user_metadata'].roles
+        return roles.includes('admin')
+      } catch {
+        return false
+      }
+    },
 
     menu_name() {
       let siteName = ''
