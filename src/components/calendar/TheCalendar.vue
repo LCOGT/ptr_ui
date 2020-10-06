@@ -8,6 +8,7 @@
     <!--button class="level-item button is-danger" @click="updateNowIndicator">refresh</button-->
     <!--div>{{currentUserScheduled}}</div-->
 
+    {{fc_timeZone}}
     <FullCalendar
       class="demo-app-calendar"
       ref="fullCalendar"
@@ -35,6 +36,7 @@
       :schedulerLicenseKey="fc_schedulerLicenseKey"
       :eventSources="fc_eventSources"
       :eventRender="fc_eventRender"
+      :dayRender="dayRender"
       :resources="fc_resources"
       :plugins="fc_plugins"
       @loading="fc_isLoading"
@@ -99,6 +101,7 @@
       <p>Illumination: &emsp;{{moon_hover_data.illumination}} %</p>
       <p>Rise: &emsp;&emsp;&emsp;&emsp;&ensp;{{moon_hover_data.rise}}</p>
       <p>Set: &emsp;&emsp;&emsp;&emsp;&emsp;{{moon_hover_data.set}}</p>
+      <p>Transit: &emsp;&emsp;&emsp;&ensp;{{moon_hover_data.transit}}</p>
     </div>
 
   </div>
@@ -285,6 +288,7 @@ export default {
       moon_hover_data: {
         rise: '',
         set: '',
+        transit: '',
         illumination: '',
       },
 
@@ -311,6 +315,97 @@ export default {
     async updateNowIndicator() {
       this.fullCalendarApi.unselect();
       this.fullCalendarApi.refetchEvents();
+    },
+
+    getMoonPhaseDays(year, month, day) {
+
+      // https://gist.github.com/endel/dfe6bb2fbe679781948c
+      var Moon = {
+        phases: ["new", "waxing-crescent", "first-quarter", "waxing-gibbous", 
+          "full", "waning-gibbous", "last-quarter", "waning-crescent" ],
+        phase: function (year, month, day) {
+          let e
+          let jd
+          let b
+          let c = e = jd = b = 0;
+
+          if (month < 3) {
+            year--;
+            month += 12;
+          }
+
+          ++month;
+          c = 365.25 * year;
+          e = 30.6 * month;
+          jd = c + e + day - 694039.09; // jd is total days elapsed
+          jd /= 29.5305882; // divide by the moon cycle
+          b = parseInt(jd); // int(jd) -> b, take integer part of jd
+          jd -= b; // subtract integer part to leave fractional part of original jd
+          b = Math.round(jd * 8); // scale fraction from 0-8 and round
+
+          if (b >= 8) b = 0; // 0 and 8 are the same so turn 8 into 0
+          return {phase: b, name: Moon.phases[b]};
+        }
+      };
+
+      if (!this.fc_timeZone) { return false }
+      let moment_today = moment([year, month, day]).utc()
+      let moment_yesterday = moment([year, month, day]).utc().add(-1, 'days')
+      //console.log(moment_today.format())
+      //console.log(moment_today.add(-1, 'days').format())
+      //console.log(moment_today.format())
+      console.log('today: ',moment_today.format())
+      console.log('yesterday: ',moment_yesterday.format())
+
+      let phase_today = Moon.phase(
+        moment_today.years(), 
+        moment_today.months(), 
+        moment_today.dates())
+      let phase_yesterday = Moon.phase(
+        moment_yesterday.years(), 
+        moment_yesterday.months(), 
+        moment_yesterday.dates())
+
+      console.log(phase_today.phase)
+      console.log(phase_yesterday.phase)
+      if (phase_today.phase != phase_yesterday.phase) {
+        return phase_today
+      }
+      else {
+        return false
+      }
+    },
+
+
+    // Display moon phase icons in the calendar
+    dayRender(dayRenderInfo) {
+      if (dayRenderInfo.view.type == "dayGridMonth" || true) {
+
+        let moon_phases = ["mdi-moon-new", "mdi-moon-waxing-crescent", 
+          "mdi-moon-first-quarter", "mdi-moon-waxing-gibbous", "mdi-moon-full",
+          "mdi-moon-waning-gibbous", "mdi-moon-last-quarter", 
+          "mdi-moon-waning-crescent" ]
+
+        console.log(dayRenderInfo)
+        let date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
+        console.log(date.format())
+        console.log('y: ', date.years())
+        console.log('m: ', date.months())
+        console.log('d: ', date.dates())
+        let moon_phase = this.getMoonPhaseDays(
+          date.years(), 
+          date.months(), 
+          date.dates())
+        console.log(moon_phase)
+
+        if (moon_phase) {
+          dayRenderInfo.el.innerHTML = `<i class="moon-icon mdi \
+            mdi-moon-${moon_phase.name}" aria-hidden="true"></i>`
+        }
+
+
+        console.log("----------------------")
+      }
     },
 
     async getNowIndicator(info) {
@@ -360,7 +455,7 @@ export default {
     },
     rgba_from_illumination(illum) {
       let alpha = 0.1 + (0.9 * illum) // should have minimum opacity of 0.1
-      let peak = 230  // brightest, out of 255
+      let peak = 245  // brightest, out of 255
       return `rgba(${peak},${peak},${peak},${alpha})`
     },
 
@@ -379,10 +474,7 @@ export default {
       let payload_str = 
         start.slice(0,10) + '#' + // only take the yyyy-mm-dd part of the date
         end.slice(0,10)
-      console.log(payload_str)
-      console.log('moon cache: ', this.moon_cache)
       if (this.moon_cache.hasOwnProperty(payload_str)) {
-        console.log('payload_str in this.moon_cache')
         return this.moon_cache[payload_str]
       }
 
@@ -431,18 +523,13 @@ export default {
           classNames: ["fc-moon-indicator",],
           title: "Moon Visible",
           extendedProps: {
-            illumination: moon.illumination
+            illumination: moon.illumination,
+            transit: moon.transit,
           }
         })
       );
 
       return moonEvents;
-    },
-
-    toggle_moon_display(make_visible) {
-
-
-
     },
 
     async getTwilightEvents(info) {
@@ -724,6 +811,8 @@ export default {
           .tz(this.fc_timeZone).format("HH:mm MM/DD")
         this.moon_hover_data.set = moment(mouseInfo.event.end)
           .tz(this.fc_timeZone).format("HH:mm MM/DD")
+        this.moon_hover_data.transit = moment(mouseInfo.event.extendedProps.
+          transit).tz(this.fc_timeZone).format("HH:mm MM/DD")
         this.moon_hover_data.illumination = mouseInfo.event.extendedProps
           .illumination.toFixed(3)
 
@@ -997,6 +1086,10 @@ export default {
   top: 0px;
   left: 0px;
   pointer-events: none;
+}
+.moon-icon {
+  padding: 5px;
+  color: yellow;
 }
 .fc-moon-indicator {
   z-index: 15;
