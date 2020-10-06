@@ -70,7 +70,13 @@ export default {
     },
     updateTime() {
       this.localTime = moment().format("MMM D, kk:mm");
-      this.siteTime = moment().tz(this.timezone).format("MMM D, kk:mm");
+
+      if (this.timezone) {
+        this.siteTime = moment().tz(this.timezone).format("MMM D, kk:mm");
+      }
+      else {
+        this.siteTime = '---'
+      }
       this.utcTime = moment().utc().format("MMM D, kk:mm");
     },
   },
