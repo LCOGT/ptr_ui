@@ -120,10 +120,24 @@
                     </b-field>
                     <b-field :label="n==1 ? 'Bin' : ''">
                         <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].bin">
-                            <option value="1"> 1 </option>
-                            <option value="2"> 2 </option>
-                            <option value="3"> 3 </option>
-                            <option value="4"> 4 </option>
+                            <option value="1"> 1,1 </option>
+                            <option value="2"> 2,2 </option>
+                            <option value="3"> 3,3 </option>
+                            <option value="4"> 4,4 </option>
+                        </b-select>
+                    </b-field>
+                    <b-field :label="n==1 ? 'Area' : ''">
+                        <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].area">
+                            <option value="300"> 300% </option>
+                            <option value="220"> 220% </option>
+                            <option value="150"> 150% </option>
+                            <option value="full"> full </option>
+                            <option value="square"> square </option>
+                            <option value="71"> 71% </option>
+                            <option value="50"> 50% </option>
+                            <option value="35"> 35% </option>
+                            <option value="25"> 25% </option>
+                            <option value="12"> 12% </option>
                         </b-select>
                     </b-field>
                     <b-field :label="n==1 ? 'Dither' : ''">
@@ -341,7 +355,8 @@ export default {
                     imtype: "light",
                     exposure: 0,
                     filter: 'Lum',
-                    bin: 1,
+                    area: 'full',
+                    bin: 2,
                     dither: 'no',
                     defocus: 0,
                 },
@@ -447,7 +462,8 @@ export default {
                 imtype: 'light',
                 exposure: 0, 
                 filter: 'Lum',
-                bin: 1,
+                area: 'full',
+                bin: 2,
                 dither: 'no',
                 defocus: 0,
             })
@@ -549,6 +565,7 @@ export default {
                 // List of objects (exposures to complete for each target).
                 exposures: this.exposures
                         .filter(e => e.active)
+                        // check that the row is active, then discard that key.
                         .map(({active, ...stuff_to_keep}) => stuff_to_keep),
 
                 // Nested arrays such that
