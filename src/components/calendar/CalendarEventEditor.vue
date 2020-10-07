@@ -161,7 +161,7 @@ export default {
             'timezone',
         ]),
         nightOf() {
-            console.log(moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY'))
+            //console.log(moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY'))
             return moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY')
         },
         startTimeOptions() {

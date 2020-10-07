@@ -8,7 +8,6 @@
     <!--button class="level-item button is-danger" @click="updateNowIndicator">refresh</button-->
     <!--div>{{currentUserScheduled}}</div-->
 
-    {{fc_timeZone}}
     <FullCalendar
       class="demo-app-calendar"
       ref="fullCalendar"
@@ -153,10 +152,7 @@ export default {
   ],
 
   mounted() {
-    console.log(
-      "timezone: " + this.$refs.fullCalendar.getApi().dateEnv.timeZone
-    );
-    console.log("mounted");
+    //console.log( "timezone: " + this.$refs.fullCalendar.getApi().dateEnv.timeZone);
     this.refreshCalendarView();
     this.nowIndicatorTimeInteval = setInterval(this.updateNowIndicator, 300000);
   },
@@ -348,31 +344,34 @@ export default {
         }
       };
 
-      if (!this.fc_timeZone) { return false }
-      let moment_today = moment([year, month, day]).utc()
-      let moment_yesterday = moment([year, month, day]).utc().add(-1, 'days')
-      //console.log(moment_today.format())
-      //console.log(moment_today.add(-1, 'days').format())
-      //console.log(moment_today.format())
-      console.log('today: ',moment_today.format())
-      console.log('yesterday: ',moment_yesterday.format())
+      try { // ignore errors caused by the timezone not being loaded yet.
+        let moment_today = moment([year, month, day]).utc()
+        let moment_yesterday = moment([year, month, day]).utc().add(-1, 'days')
+        //console.log('today: ',moment_today.format())
+        //console.log('yesterday: ',moment_yesterday.format())
 
-      let phase_today = Moon.phase(
-        moment_today.years(), 
-        moment_today.months(), 
-        moment_today.dates())
-      let phase_yesterday = Moon.phase(
-        moment_yesterday.years(), 
-        moment_yesterday.months(), 
-        moment_yesterday.dates())
+        let phase_today = Moon.phase(
+          moment_today.year(), 
+          moment_today.month(), 
+          moment_today.date())
+        let phase_yesterday = Moon.phase(
+          moment_yesterday.year(), 
+          moment_yesterday.month(), 
+          moment_yesterday.date())
 
-      console.log(phase_today.phase)
-      console.log(phase_yesterday.phase)
-      if (phase_today.phase != phase_yesterday.phase) {
-        return phase_today
-      }
-      else {
-        return false
+        //console.log(phase_today.phase)
+        //console.log(phase_yesterday.phase)
+
+        // If the phase is changed from the previous day, then return it to
+        // display on the calendar.
+        if (phase_today.phase != phase_yesterday.phase) {
+          return phase_today
+        }
+        else {
+          return false
+        }
+      } catch {
+        return false;
       }
     },
 
@@ -381,30 +380,27 @@ export default {
     dayRender(dayRenderInfo) {
       if (dayRenderInfo.view.type == "dayGridMonth" || true) {
 
-        let moon_phases = ["mdi-moon-new", "mdi-moon-waxing-crescent", 
-          "mdi-moon-first-quarter", "mdi-moon-waxing-gibbous", "mdi-moon-full",
-          "mdi-moon-waning-gibbous", "mdi-moon-last-quarter", 
-          "mdi-moon-waning-crescent" ]
+        try { // ignore errors from the timezone not being loaded yet. 
+          //console.log(dayRenderInfo)
+          let date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
+          //console.log(date.format())
+          //console.log('y: ', date.year())
+          //console.log('m: ', date.month())
+          //console.log('d: ', date.date())
+          let moon_phase = this.getMoonPhaseDays(
+            date.year(), 
+            date.month(), 
+            date.date())
+          //console.log(moon_phase)
 
-        console.log(dayRenderInfo)
-        let date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
-        console.log(date.format())
-        console.log('y: ', date.years())
-        console.log('m: ', date.months())
-        console.log('d: ', date.dates())
-        let moon_phase = this.getMoonPhaseDays(
-          date.years(), 
-          date.months(), 
-          date.dates())
-        console.log(moon_phase)
-
-        if (moon_phase) {
-          dayRenderInfo.el.innerHTML = `<i class="moon-icon mdi \
-            mdi-moon-${moon_phase.name}" aria-hidden="true"></i>`
+          if (moon_phase) {
+            dayRenderInfo.el.innerHTML = `<i class="moon-icon mdi \
+              mdi-moon-${moon_phase.name}" aria-hidden="true"></i>`
+          }
+        } catch {
+          console.warn('dayRender waiting for valid timezone.')
         }
 
-
-        console.log("----------------------")
       }
     },
 
@@ -767,7 +763,7 @@ export default {
       //console.log(event)
       this.activeEvent.startStr = moment(event.startStr).utc().format();
       this.activeEvent.endStr = moment(event.endStr).utc().format();
-      this.activeEvent.title = titleGenerator.makeTitle();
+      this.activeEvent.title = "new event";
       this.activeEvent.creator = this.$auth.user.name;
       this.activeEvent.id = this.makeUniqueID();
       this.activeEvent.site = this.calendarSite;
