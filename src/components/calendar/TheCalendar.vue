@@ -99,8 +99,8 @@
       <p>---</p>
       <p>Illumination: &emsp;{{moon_hover_data.illumination}} %</p>
       <p>Rise: &emsp;&emsp;&emsp;&emsp;&ensp;{{moon_hover_data.rise}}</p>
-      <p>Set: &emsp;&emsp;&emsp;&emsp;&emsp;{{moon_hover_data.set}}</p>
       <p>Transit: &emsp;&emsp;&emsp;&ensp;{{moon_hover_data.transit}}</p>
+      <p>Set: &emsp;&emsp;&emsp;&emsp;&emsp;{{moon_hover_data.set}}</p>
     </div>
 
   </div>
@@ -434,29 +434,18 @@ export default {
     /**
      * Helper function for displaying moon visibility in the calendar.
      * Returns a grey color with brightness corresponding to moon brightness.
-     * @param {float} illum: moon illumination in [0,1]
-     * @returns {string}: hex color to use when displaying the moon.
+     * @param {float} illum: moon illumination between 0 and 1.
+     * @returns {string}: css value, something like 'rgba(255,255,255,0.5)'
      */
-    color_from_illumination(illum) {
-      let darkest = 90; // value in [0,255]
-      let brightest = 190;
-      let range = brightest - darkest;
-      let decimal_color = parseInt(darkest + illum * range);
-      let hex_string =
-        "#" +
-        decimal_color.toString(16) + // convert to hex
-        decimal_color.toString(16) + // three of the same to produce grey.
-        decimal_color.toString(16);
-      return hex_string;
-    },
-    rgba_from_illumination(illum) {
+    rgba_from_illumination(illum, peak) {
       let alpha = 0.1 + (0.9 * illum) // should have minimum opacity of 0.1
-      let peak = 245  // brightest, out of 255
       return `rgba(${peak},${peak},${peak},${alpha})`
     },
 
+
+    // Call the photonranch api to get moon times. 
     async getMoonTimesFromAPI(start, end) {
-      let url = "https://api.photonranch.org/test/events/moon/rise-set-illum";
+      let url = "https://api.photonranch.org/api/events/moon/rise-set-illum";
       let payload = {
         params: {
           start: start,
@@ -484,6 +473,8 @@ export default {
       return riseset
     },
 
+    // Return an array of fullcalendar background events to display the 
+    // moon visibility
     async getMoonRiseSet(info) {
 
       if (!this.display_moon) {
@@ -508,21 +499,35 @@ export default {
       let riseset = await this.getMoonTimesFromAPI(start_iso, end_iso)
 
       let moonEvents = [];
-      riseset.map((moon) =>
+      riseset.map((moon) => {
+
+        // The primary moon event
         moonEvents.push({
           start: new Date(moon.rise),
           end: new Date(moon.set),
           rendering: "background",
-          backgroundColor: this.rgba_from_illumination(moon.illumination),
+          backgroundColor: this.rgba_from_illumination(moon.illumination, 235),
           borderColor: "#aaaaaa",
           id: `fc-custom-moon-indicator`,
           classNames: ["fc-moon-indicator",],
-          title: "Moon Visible",
+          title: "Moon Event",
           extendedProps: {
             illumination: moon.illumination,
             transit: moon.transit,
           }
-        })
+        });
+
+        // The marker for transit time. 
+        moonEvents.push({
+          start: moment(moon.transit).format(),
+          end: moment(moon.transit).add("1", "minutes").format(),
+          title: "Moon Event",
+          rendering: "background",
+          // Opacity should vary with moon brightness, but not too much.
+          backgroundColor: `rgba(255,255,255,${moon.illumination ** 0.25})`,
+          classNames: ["fc-moon-transit-indicator"],
+        });
+      }
       );
 
       return moonEvents;
@@ -800,7 +805,7 @@ export default {
     eventMouseEnter( mouseInfo ) {
 
       // Show moon info box when hovering a moon event.
-      if (mouseInfo.event.title == "Moon Visible") {
+      if (mouseInfo.event.title == "Moon Event") {
         document.getElementById('moon-info').style.visibility = 'visible'
 
         this.moon_hover_data.rise = moment(mouseInfo.event.start)
@@ -829,7 +834,7 @@ export default {
     eventMouseLeave( mouseInfo ) {
 
       // Hide moon info boxes when the mouse leaves.
-      if (mouseInfo.event.title == "Moon Visible") {
+      if (mouseInfo.event.title == "Moon Event") {
         document.getElementById('moon-info').style.visibility = 'hidden'
       }
     },
@@ -1086,6 +1091,11 @@ export default {
 .moon-icon {
   padding: 5px;
   color: yellow;
+}
+.fc-moon-transit-indicator {
+  z-index: 15;
+  opacity: 1;
+  width: 20px;
 }
 .fc-moon-indicator {
   z-index: 15;
