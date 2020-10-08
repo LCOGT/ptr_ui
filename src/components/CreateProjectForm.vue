@@ -99,7 +99,7 @@
                             <option value="S2"> S2 </option>
                             <option value="CR"> CR </option>
                             <option value="EXO"> EXO </option>
-                            <option value="W"> W </option>
+                            <option value="w"> w </option>
                             <option value="air"> air </option>
                             <option value="clear"> clear </option>
                             <option value="silica"> silica </option>
@@ -645,4 +645,5 @@ export default {
 .target-row > * {
     margin-right: 8px;
 }
+
 </style>
