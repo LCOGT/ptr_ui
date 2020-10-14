@@ -21,7 +21,12 @@
       </div>
     </div>
 
-    <the-calendar :calendarSite="sitecode" :fc_resources="listOfObservatories" />
+    <the-calendar 
+      v-if="timezone"
+      :fc_timeZone="timezone"
+      :calendarSite="sitecode" 
+      :fc_resources="listOfObservatories" 
+      />
 
 
     <!--button class="button" @click="getUserEvents">get user events</button-->
@@ -35,7 +40,7 @@
 <script>
 import TheCalendar from "@/components/calendar/TheCalendar";
 import UserEventsTable from "@/components/UserEventsTable";
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import axios from "axios";
 import moment from "moment";
 
@@ -81,7 +86,15 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("site_config", ["site_config", "global_config", "timezone"]),
+    ...mapGetters("site_config", [
+      "site_config", 
+      "global_config", 
+      "timezone"
+    ]),
+
+    ...mapState("site_config", [
+      "did_config_load_yet"
+    ]),
 
     user() {
       return this.$auth.user;

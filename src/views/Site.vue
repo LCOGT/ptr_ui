@@ -282,6 +282,8 @@ export default {
 
   async created () {
 
+    console.log('site created, sitecode: ', this.sitecode)
+
     // Load the active reservations for this site. 
     this.$store.dispatch('calendar/fetchActiveReservations', this.sitecode)
 
@@ -437,10 +439,8 @@ export default {
 
     /**
      * Set the default devices for this site.
-     * First, update the config. Then use the config to specify devices.
      */
     async setDefaultDevices() {
-      await this.$store.dispatch('site_config/update_config')
       this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
     },
 

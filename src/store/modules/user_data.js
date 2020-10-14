@@ -8,7 +8,8 @@ import { getInstance } from '../../auth/index' // get user object: getInstance()
 async function getAuthRequestHeader() {
     let token, configWithAuth;
     try {
-        token = await getInstance().getTokenSilently(); 
+        let instance = await getInstance()
+        token = instance.getTokenSilently(); 
     } catch(err) {
         console.error(err)
         console.warn('Did not acquire the needed token. Stopping request.')
@@ -29,7 +30,6 @@ async function getAuthRequestHeader() {
         'Authorization': `Bearer ${token}`
         }
     }
-    console.log('header', header)
 
     return header
 }
@@ -68,6 +68,7 @@ const actions = {
         }).catch(err => {
             commit('user_projects_is_loading', false)
             console.log('error fetching user projects: ', err)
+            console.log("user: ",user_id)
         })
     },
 
@@ -90,10 +91,10 @@ const actions = {
         axios.post(url, body, header).then(response => {
             commit('user_events_is_loading', false)
             commit('user_events', response.data)
-            console.log(response.data)
         }).catch(err => {
             commit('user_events_is_loading', false)
             console.log("error fetching user events: ", err)
+            console.log("user: ",user_id)
         })
     },
 

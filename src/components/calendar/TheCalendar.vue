@@ -36,6 +36,7 @@
       :eventSources="fc_eventSources"
       :eventRender="fc_eventRender"
       :dayRender="dayRender"
+      :firstDay="fc_firstDay"
       :resources="fc_resources"
       :plugins="fc_plugins"
       @loading="fc_isLoading"
@@ -149,9 +150,19 @@ export default {
 
     // Resources for fullcalendar (in our case they are observatories)
     "fc_resources",
+
+    // Timezone of the site
+    "fc_timeZone",
   ],
 
   mounted() {
+
+    // Once we've mounted, we're able to access the fullCalendar $ref. 
+    // We need this to access the fullCalendar.getApi() method. 
+    this.isMounted = true;
+
+    this.fullCalendarApi = this.$refs.fullCalendar.getApi()
+
     //console.log( "timezone: " + this.$refs.fullCalendar.getApi().dateEnv.timeZone);
     this.refreshCalendarView();
     this.nowIndicatorTimeInteval = setInterval(this.updateNowIndicator, 300000);
@@ -162,26 +173,23 @@ export default {
 
   watch: {
     calendarSite: function (val) {
-      console.log(`site changed to ${val}`);
       this.refreshCalendarView();
     },
     global_config() {
       this.refreshCalendarView();
     },
     user() {
-      console.log("user changed; refresh calendar view");
       this.refreshCalendarView();
     },
     display_moon() {
-      console.log("display_moon toggle switched to ", this.display_moon)
       this.refreshCalendarView();
     }
   },
 
   computed: {
-    fullCalendarApi() {
-      return this.$refs.fullCalendar.getApi();
-    },
+    //fullCalendarApi() {
+      //return this.$refs.fullCalendar.getApi();
+    //},
 
     fc_now() {
       if (this.fc_timeZone) {
@@ -204,10 +212,33 @@ export default {
       ];
       return sources
     },
+
     fc_selectable() {
       // whether to let user click and drag to select a time range.
       return this.$auth.isAuthenticated;
     },
+
+    // Define the starting calendar day. 0=sunday, 1=monday, ...
+    fc_firstDay() {
+      // The fullCalendar ref doesn't work until the component is mounted.
+      if (!this.isMounted)
+        return;
+
+      // Get the fullCalendar api
+      let api = this.$refs.fullCalendar.getApi();
+
+      // If the week view is displayed, we want to center the 'today' column.
+      if (api.view.type == 'timeGridWeek') {
+        let today_day_number = moment().tz(this.fc_timeZone).day()
+        let starting_day_number = (today_day_number - 3) % 6
+        return starting_day_number
+      }
+      else {
+        // Otherwise, Sunday is the first day. 
+        return 0
+      }
+    },
+
     ...mapGetters("site_config", [
       "site_config",
       "global_config",
@@ -215,9 +246,10 @@ export default {
       "site_longitude",
       "timezone",
     ]),
-    ...mapGetters("site_config", {
-      fc_timeZone: "timezone", // rename to match fc namespacing.
-    }),
+
+    //...mapGetters("site_config", {
+      //fc_timeZone: "timezone", // rename to match fc namespacing.
+    //}),
 
     user() {
       return this.$auth.user;
@@ -275,6 +307,13 @@ export default {
         resourceTimeGridPlugin,
         momentTimezonePlugin,
       ],
+
+      fullCalendarApi: '',
+
+      // Change to true when the 'mounted' hook is run. 
+      // We need to know whether the component is mounted to access the 
+      // $refs.fullCalendar.getApi() method. 
+      isMounted: false,
 
       // Users can toggle whether the visible moon times are on the calendar. 
       display_moon: true,
@@ -746,7 +785,7 @@ export default {
 
     // Used when exiting event editor modals. Clear selections, close modal, and refresh events.
     async refreshCalendarView() {
-      let calendarApi = this.$refs.fullCalendar.getApi();
+      let calendarApi = this.fullCalendarApi //this.$refs.fullCalendar.getApi();
       calendarApi.unselect();
       calendarApi.refetchEvents();
       this.eventEditorIsActive = false;
