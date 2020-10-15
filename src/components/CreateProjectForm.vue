@@ -354,9 +354,9 @@ export default {
                     active: true,
                     count: 1,
                     imtype: "light",
-                    exposure: 0,
+                    exposure: 1,
                     filter: 'Lum',
-                    area: 'full',
+                    area: 'FULL',
                     bin: 2,
                     dither: 'no',
                     defocus: 0,
@@ -455,21 +455,12 @@ export default {
 
         newExposureRow() {
 
-            // Add another object to the list of exposures
-            // Do this first to keep reactivity.
-            this.exposures.push({
-                active: true,
-                count: 1,
-                imtype: 'light',
-                exposure: 0, 
-                filter: 'Lum',
-                area: 'full',
-                bin: 2,
-                dither: 'no',
-                defocus: 0,
-            })
+            // Add another object to the list of exposures (but it is not visible yet)
+            // Do this before rendering it to preserve reactivity.
+            // It should also be a copy of the previous row. 
+            this.exposures.push( {...this.exposures[this.exposures.length - 1]} )
 
-            // Show one additional row
+            // Show the additional row
             this.exposures_index += 1;
         },
         newTargetRow() {
