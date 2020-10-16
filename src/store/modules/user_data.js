@@ -9,10 +9,11 @@ async function getAuthRequestHeader() {
     let token, configWithAuth;
     try {
         let instance = await getInstance()
-        token = instance.getTokenSilently(); 
+        token = await instance.getTokenSilently(); 
     } catch(err) {
-        console.error(err)
-        console.warn('Did not acquire the needed token. Stopping request.')
+        console.warn("Token request stopped.")
+        //console.warn(err)
+        //console.warn('Did not acquire the needed token. Stopping request.')
         
         //// small popup notification
         //Toast.open({
@@ -53,6 +54,10 @@ const getters = {
 const actions = {
 
     async fetchUserProjects({ commit }, user_id) {
+        
+        // This happens when the method is called before the current user is loaded.
+        if (user_id===undefined) return;
+
         commit('user_projects_is_loading', true)
 
         let url = 'https://projects.photonranch.org/dev'
@@ -109,6 +114,10 @@ const actions = {
             created_at: created_at
         }
 
+        console.log('delete project request:')
+        console.log(url)
+        console.log(body)
+        console.log(header)
         axios.post(url, body, header).then(async response => {
             console.log(response)
             let user = await getInstance().user.sub
