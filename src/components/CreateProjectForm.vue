@@ -163,20 +163,12 @@
                 <button 
                     class="button is-text"
                     @click="showAdvancedInputs = !showAdvancedInputs"
-                    style="margin-bottom: 15px;"
+                    style="margin: 15px 0;"
                     >
                     {{showAdvancedInputs ? "hide" : "show"}} advanced
                 </button>
 
                 <br>
-
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Position Angle" 
-                    :type="{'is-danger': warn.pa}"
-                    >
-                    <b-input class="project-input" type="number" min="-360" max="360" v-model="pa"/>
-                </b-field>
 
                 <b-field 
                     v-if="showAdvancedInputs"
@@ -205,26 +197,43 @@
                         </b-radio-button>
                     </b-field>
                 </b-field>
+                
+                <b-field grouped v-if="showAdvancedInputs">
+                    <b-field 
+                        v-if="showAdvancedInputs"
+                        label="Ra offset" 
+                        >
+                        <b-input class="project-input" v-model="ra_offset"></b-input>
+                        <b-select v-model="ra_offset_units">
+                            <option value="deg">deg</option>
+                            <option value="min">minutes</option>
+                            <option value="asec">arcsec</option>
+                        </b-select>
+                    </b-field>
+                    <b-field 
+                        v-if="showAdvancedInputs"
+                        label="Dec offset [deg]" 
+                        >
+                        <b-input class="project-input" v-model="dec_offset"></b-input>
+                        <b-select v-model="dec_offset_units">
+                            <option value="deg">deg</option>
+                            <option value="asec">arcsec</option>
+                        </b-select>
+                    </b-field>
+                </b-field>
 
                 <b-field 
                     v-if="showAdvancedInputs"
-                    label="Autofocus">
-                    <b-checkbox v-model="frequent_autofocus">focus more frequently</b-checkbox>
+                    label="Position Angle [deg]" 
+                    :type="{'is-danger': warn.pa}"
+                    >
+                    <b-input class="project-input" type="number" min="-360" max="360" v-model="pa"/>
+                    <b-select value="deg">
+                        <option value="deg">deg</option>
+                    </b-select>
                 </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs" >
-                    <b-checkbox v-model="near_tycho_star">Use Near Tycho Star</b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Prefer Bessell">
-                    <b-checkbox v-model="prefer_bessell"></b-checkbox>
-                </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Enhance Photometry">
-                    <b-checkbox v-model="enhance_photometry"></b-checkbox>
-                </b-field>
+
+
                 <b-field 
                     v-if="showAdvancedInputs"
                     label="Max HA (decimal hours, absolute value)" 
@@ -244,19 +253,35 @@
                     >
                     <b-input class="project-input" v-model="max_airmass"></b-input>
                 </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Min Lunar Dist. (deg)" 
-                    :type="{'is-danger': warn.lunar_dist_min}"
-                    >
-                    <b-input class="project-input" v-model="lunar_dist_min"></b-input>
+
+                <b-field grouped v-if="showAdvancedInputs">
+                    <b-field 
+                        v-if="showAdvancedInputs"
+                        label="Min Lunar Dist. [deg]" 
+                        :type="{'is-danger': warn.lunar_dist_min}"
+                        >
+                        <b-input class="project-input" v-model="lunar_dist_min"></b-input>
+                    </b-field>
+                    <b-field 
+                        v-if="showAdvancedInputs"
+                        label="Max Lunar Phase %" 
+                        :type="{'is-danger': warn.lunar_phase_max}"
+                        >
+                        <b-input class="project-input" v-model="lunar_phase_max"></b-input>
+                    </b-field>
                 </b-field>
-                <b-field 
-                    v-if="showAdvancedInputs"
-                    label="Max Lunar Phase %" 
-                    :type="{'is-danger': warn.lunar_phase_max}"
-                    >
-                    <b-input class="project-input" v-model="lunar_phase_max"></b-input>
+
+                <b-field v-if="showAdvancedInputs">
+                    <b-checkbox v-model="frequent_autofocus">Autofocus: focus more frequently</b-checkbox>
+                </b-field>
+                <b-field v-if="showAdvancedInputs">
+                    <b-checkbox v-model="near_tycho_star">Autofocus: Use Near Tycho Star</b-checkbox>
+                </b-field>
+                <b-field v-if="showAdvancedInputs">
+                    <b-checkbox v-model="prefer_bessell">Prefer Bessel</b-checkbox>
+                </b-field>
+                <b-field v-if="showAdvancedInputs">
+                    <b-checkbox v-model="enhance_photometry">Enhance Photometry</b-checkbox>
                 </b-field>
 
             </section>
@@ -337,7 +362,11 @@ export default {
             //projects_api_url: 'https://a85vsflfd2.execute-api.us-east-1.amazonaws.com/dev',
             projects_api_url: 'https://projects.photonranch.org/dev',
             showAdvancedInputs: false,
+                
 
+            /*************************************************/
+            /************* Project Default Values ************/
+            /*************************************************/
             project_name: '',
             project_events: [],
 
@@ -374,15 +403,25 @@ export default {
             ],
 
             meridian_flip: 'flip_ok', // can be ['flip_ok', 'no_flip', 'east_only', 'west_only']
-            frequent_autofocus: false,
-            near_tycho_star: false,
+            ra_offset: 0.0,
+            ra_offset_units: 'deg',
+            dec_offset: 0.0,
+            dec_offset_units: 'deg',
 
-            prefer_bessell: false,
             max_ha: 4, // decimal hours
             max_airmass: 2.0,
-            enhance_photometry: false,
+
             lunar_dist_min: 30, // deg
             lunar_phase_max: 60, // % 
+
+            frequent_autofocus: false,
+            near_tycho_star: false,
+            prefer_bessell: false,
+            enhance_photometry: false,
+
+            /*************************************************/
+            /*********** End Project Default Values **********/
+            /*************************************************/
 
             site: this.sitecode,
 
@@ -537,6 +576,10 @@ export default {
                 created_at: moment().utc().format(),
                 user_id: this.user.sub,
                 project_constraints: {
+                    ra_offset: this.ra_offset,
+                    ra_offset_units: this.ra_offset_units,
+                    dec_offset: this.dec_offset,
+                    dec_offset_units: this.dec_offset_units,
                     max_ha: this.max_ha,
                     max_airmass: this.max_airmass,
                     prefer_bessell: this.prefer_bessell,

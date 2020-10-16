@@ -38,17 +38,16 @@ var initial_state = function() {
     }).catch(error => {
         console.log(error)
     });
-    console.log('initial config state: ')
-    console.log(state)
+    //console.log('initial config state: ')
+    //console.log(state)
     return state;
 }
 
-console.log('global config from localStorage: ',window.localStorage.getItem('global_config'))
 
 const state = {
     global_config: JSON.parse(window.localStorage.getItem('global_config') || '{}'),
     is_site_selected: false,
-    did_config_load_yet:false,
+    did_config_load_yet: false,
     selected_site: '',
     selected_enclosure: '',
     selected_mount: '',
@@ -292,7 +291,7 @@ const actions = {
         return axios.get(apiName+path).then(response => {
             console.log(response.data)
             window.localStorage.setItem('global_config', JSON.stringify(response.data))
-            console.log(JSON.parse(window.localStorage.getItem('global_config')))
+            //console.log(JSON.parse(window.localStorage.getItem('global_config')))
             commit('setGlobalConfig', response.data)
         }).catch(error => {
             console.log(error)
@@ -307,11 +306,11 @@ const actions = {
     },
 
     set_default_active_devices({ state, commit, getters, rootGetters}, site) {
-        console.log('global_config: ')
-        console.log(state.global_config)
-        console.log(typeof state.global_config)
-        console.log('site: ', site)
-        console.log('global_config[site]: ', state.global_config[site])
+        //console.log('global_config: ')
+        //console.log(state.global_config)
+        //console.log(typeof state.global_config)
+        //console.log('site: ', site)
+        //console.log('global_config[site]: ', state.global_config[site])
         let defaults = state.global_config[site].defaults
 
         commit('setActiveSite', site)
