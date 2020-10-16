@@ -372,7 +372,7 @@ export default {
       this.brightest_relative_pos_x = -1
       this.brightest_relative_pos_y = -1
       this.u_brightest_relative_pos_x = -1
-      this.u_,brightest_relative_pos_y = -1
+      this.u_brightest_relative_pos_y = -1
     },
 
     drawEmptyStarProfiles() {
