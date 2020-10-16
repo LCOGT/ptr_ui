@@ -91,12 +91,13 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
+          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
           v-model="imageStatsLargeFile">
           Use full resolution file (slower!)
         </b-switch>
 
-        <p class="warning-text">{{current_image.ex10_fits_exists ? "" : "missing small fits"}}</p>
-        <p class="warning-text">{{current_image.ex01_fits_exists ? "" : "missing full fits"}}</p>
+        <p class="warning-text" v-if="!current_image.ex10_fits_exists">{{"missing small fits"}}</p>
+        <p class="warning-text" v-if="!current_image.ex01_fits_exists">{{"missing full fits"}}</p>
 
         <b-field>
           <p class="control">
@@ -108,7 +109,7 @@
               <button 
                 class="button" 
                 :class="{'is-loading':region_info_loading}"
-                :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+                :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
                 @click="getRegionStats(true)">
                 inspect region
               </button>
@@ -118,7 +119,7 @@
             <button 
               class="button" 
               :class="{'is-loading':image_info_loading}"
-              :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
               @click="getRegionStats(false)">
               inspect image
             </button>
@@ -147,16 +148,20 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
+          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
           v-model="starInspectorLargeFile">
           Use full resolution file (slower!)
         </b-switch>
+
+        <p class="warning-text" v-if="!current_image.ex10_fits_exists">{{"missing small fits"}}</p>
+        <p class="warning-text" v-if="!current_image.ex01_fits_exists">{{"missing full fits"}}</p>
 
         <b-field>
           <p class="control">
             <button 
               class="button" 
               :class="{'is-loading': inspect_region_loading}"
-              :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
               @click="getStarProfiles">
               inspect region
             </button>
@@ -165,7 +170,7 @@
             <button 
               class="button" 
               :class="{'is-loading': inspect_image_loading}"
-              :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
               @click="getStarProfiles(false)">
               inspect image
             </button>
@@ -316,8 +321,8 @@ export default {
       ex10_isLoading: false,
 
       // Analysize the full sized raw file (default is 768px reduced file)
-      imageStatsLargeFile: true,
-      starInspectorLargeFile: true,
+      imageStatsLargeFile: false,
+      starInspectorLargeFile: false,
 
       region_min: '--',
       region_max: '--',
@@ -332,23 +337,23 @@ export default {
       median_fwhm: '--',
       median_hfd: '--',
       median_profile: [0,0],
-      median_relative_pos_x: 0,
-      median_relative_pos_y: 0,
+      median_relative_pos_x: -1,
+      median_relative_pos_y: -1,
 
       brightest_plot_color: '#efea5a',
       brightest_fwhm: '--',
       brightest_hfd: '--',
       brightest_profile: [0,0],
-      brightest_relative_pos_x: 0,
-      brightest_relative_pos_y: 0,
+      brightest_relative_pos_x: -1,
+      brightest_relative_pos_y: -1,
 
       // Unsaturated brightest object
       u_brightest_plot_color: '#209cee',
       u_brightest_fwhm: '--',
       u_brightest_hfd: '--',
       u_brightest_profile: [0,0],
-      u_brightest_relative_pos_x: 0,
-      u_brightest_relative_pos_y: 0,
+      u_brightest_relative_pos_x: -1,
+      u_brightest_relative_pos_y: -1,
 
       starProfileToolActive: false,
       inspect_region_loading: false,
@@ -359,15 +364,27 @@ export default {
   },
   mounted(){
     // Draw empty plots for the star profiles
-    this.plotStarProfile([0], {}, 1, "#brightest_star_profile", 
-      {plot_color: "#efea5a"},
-      {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
-
-    this.plotStarProfile([0], {}, 1, "#u_brightest_star_profile", 
-      {plot_color: "#209cee"},
-      {title: "Brightest Unsaturated Star Profile", x_axis_label: "arcseconds"})
+    this.drawEmptyStarProfiles()
   },
   methods: {
+
+    reset_star_markers() {
+      this.brightest_relative_pos_x = -1
+      this.brightest_relative_pos_y = -1
+      this.u_brightest_relative_pos_x = -1
+      this.u_,brightest_relative_pos_y = -1
+    },
+
+    drawEmptyStarProfiles() {
+      // Draw empty plots for the star profiles
+      this.plotStarProfile([0], {}, 1, "#brightest_star_profile", 
+        {plot_color: "#efea5a"},
+        {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
+
+      this.plotStarProfile([0], {}, 1, "#u_brightest_star_profile", 
+        {plot_color: "#209cee"},
+        {title: "Brightest Unsaturated Star Profile", x_axis_label: "arcseconds"})
+    },
     getStarProfiles(useSubregion=true) {
       let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/starprofiles"
       let body = {
@@ -708,6 +725,13 @@ export default {
   watch: {
     current_image() {
       if (this.showFitsHeaderModal) this.refreshFitsHeader(); 
+
+      // Reset the star profile graph and remove the star markers
+      // TODO: cache the results of full image analysis and reload when 
+      // switching back to the image.
+      this.regionStatsReset("10")
+      this.drawEmptyStarProfiles()
+      this.reset_star_markers()
     },
     show_user_data_only() {
       this.$store.dispatch('images/load_latest_images')
@@ -809,6 +833,8 @@ table.info-panel-table { color: #dbdee0; }
 
 .warning-text {
   color: #f1b70e;
+  padding: 2px;
+  margin: 5px 0;
   background-color: black;
 }
 

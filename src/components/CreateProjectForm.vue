@@ -173,7 +173,9 @@
                 <b-field 
                     v-if="showAdvancedInputs"
                     label="Meridian Flip">
-                    <b-field>
+                    <b-field
+                    type="is-light"
+                    >
                         <b-radio-button v-model="meridian_flip"
                             native-value="east_only">
                             <b-icon icon="close"></b-icon>
@@ -212,7 +214,7 @@
                     </b-field>
                     <b-field 
                         v-if="showAdvancedInputs"
-                        label="Dec offset [deg]" 
+                        label="Dec offset" 
                         >
                         <b-input class="project-input" v-model="dec_offset"></b-input>
                         <b-select v-model="dec_offset_units">
@@ -224,7 +226,7 @@
 
                 <b-field 
                     v-if="showAdvancedInputs"
-                    label="Position Angle [deg]" 
+                    label="Position Angle" 
                     :type="{'is-danger': warn.pa}"
                     >
                     <b-input class="project-input" type="number" min="-360" max="360" v-model="pa"/>
