@@ -21,7 +21,7 @@ const state = {
     subframe_x1: 1,
     subframe_y1: 1,
 
-    camera_areas_selection: '',
+    camera_areas_selection: 'Full',
     camera_hint: '',
     camera_exposure: '1',
     camera_count: 1, // numberinput form requires number, not string. converted to string in expose command.
