@@ -120,10 +120,10 @@
                     </b-field>
                     <b-field :label="n==1 ? 'Bin' : ''">
                         <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].bin">
-                            <option value="1"> 1,1 </option>
-                            <option value="2"> 2,2 </option>
-                            <option value="3"> 3,3 </option>
-                            <option value="4"> 4,4 </option>
+                            <option value="1, 1"> 1, 1 </option>
+                            <option value="2, 1"> 2, 2 </option>
+                            <option value="3, 3"> 3, 3 </option>
+                            <option value="4, 4"> 4, 4 </option>
                         </b-select>
                     </b-field>
                     <b-field :label="n==1 ? 'Area' : ''">

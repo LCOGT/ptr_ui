@@ -727,7 +727,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { status_mixin } from '../../mixins/status_mixin'
 import helpers from '@/utils/helpers'
@@ -834,6 +834,12 @@ export default {
       this.focuserStatus = newJob
       //this.$set(this.jobIds, newJob.ulid, newJob)
     }
+
+    // set default values from config
+    // TODO: this should go in a better place
+    this.camera_bin = this.camera_default_bin
+    this.camera_areas_selection = this.camera_default_area
+
   },
   beforeDestroy() {
     clearInterval(this.update_time_interval)
@@ -982,6 +988,9 @@ export default {
       'site_config',
       'available_devices',
 
+      'camera_default_bin',
+      'camera_default_area',
+
       'enclosure',
       'mount',
       'telescope',
@@ -992,6 +1001,9 @@ export default {
       'screen',
       'weather',
       'sequencer',
+    ]),
+
+    ...mapState('site_config', [
     ]),
 
       

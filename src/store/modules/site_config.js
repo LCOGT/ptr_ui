@@ -214,6 +214,13 @@ const getters = {
             return []
         }
     },
+    camera_default_area: state => {
+        try {
+            return state.global_config[state.selected_site].camera[state.selected_camera].settings.default_area
+        } catch {
+            return ""
+        }
+    },
 
     // Available filters
     filter_wheel_options: state => {
@@ -229,10 +236,8 @@ const getters = {
 
     camera_bin_options: state => {
         try {
-            let bin_options = []
             let bins = state.global_config[state.selected_site].camera[state.selected_camera].settings.bin_modes
-            for (let i=0; i<bins.length; i++) { bin_options.push(bins[i].join()) }
-            return bin_options
+            return bins;
         } catch {
             return [];
         }
@@ -248,6 +253,18 @@ const getters = {
             ) 
         } catch {
             return false
+        }
+    },
+
+    camera_default_bin: state => {
+        try {
+            let default_bin = state.global_config[state.selected_site]
+                    .camera[state.selected_camera]
+                    .settings
+                    .default_bin
+            return default_bin
+        } catch {
+            return ""
         }
     },
 
