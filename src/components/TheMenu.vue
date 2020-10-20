@@ -1,5 +1,5 @@
 <template>
-    <b-navbar type="is-dark" wrapper-class="container">
+    <b-navbar type="is-dark" wrapper-class="container is-fluid">
 
         <template slot="brand">
             <b-navbar-item tag="router-link" class="menu-title" :to="{ path: '/' }">

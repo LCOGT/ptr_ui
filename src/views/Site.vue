@@ -1,13 +1,13 @@
 <template>
   <div class="page">
     
-    <div class="container">
+    <div class="container is-fluid">
     <section class="page-view">
 
     <div style="height: 1em"></div>
     <div class="columns" style="margin: 1em;">
 
-      <div class="column menu-column is-one-fifth is-hidden-touch is-hidden-desktop-only">
+      <div class="column menu-column is-2 is-hidden-touch is-hidden-desktop-only">
 
         <!-- Show whether a site is currently reserved or not -->
         <!-- TODO: refactor into it's own component -->
@@ -92,6 +92,8 @@
           @whosonline="makeOnlineUsersList" />
 
         <div style="height:3em;"/>
+      </div>
+      <div class="column menu-column is-hidden-touch is-hidden-desktop-only">
 
         <status-panel-collapsible
           :sitecode="sitecode"
