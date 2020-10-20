@@ -121,24 +121,24 @@
                     <b-field :label="n==1 ? 'Bin' : ''">
                         <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].bin">
                             <option value="1, 1"> 1, 1 </option>
-                            <option value="2, 1"> 2, 2 </option>
+                            <option value="2, 2"> 2, 2 </option>
                             <option value="3, 3"> 3, 3 </option>
                             <option value="4, 4"> 4, 4 </option>
                         </b-select>
                     </b-field>
                     <b-field :label="n==1 ? 'Area' : ''">
                         <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].area">
-                            <option value="600"> 600% </option>
-                            <option value="300"> 300% </option>
-                            <option value="220"> 220% </option>
-                            <option value="150"> 150% </option>
+                            <option value="600%"> 600% </option>
+                            <option value="300%"> 300% </option>
+                            <option value="220%"> 220% </option>
+                            <option value="150%"> 150% </option>
                             <option value="FULL"> FULL </option>
                             <option value="SQUARE"> SQUARE </option>
-                            <option value="71"> 71% </option>
-                            <option value="50"> 50% </option>
-                            <option value="35"> 35% </option>
-                            <option value="25"> 25% </option>
-                            <option value="12"> 12% </option>
+                            <option value="71%"> 71% </option>
+                            <option value="50%"> 50% </option>
+                            <option value="35%"> 35% </option>
+                            <option value="25%"> 25% </option>
+                            <option value="12%"> 12% </option>
                         </b-select>
                     </b-field>
                     <b-field :label="n==1 ? 'Dither' : ''">
@@ -388,7 +388,7 @@ export default {
                     exposure: 1,
                     filter: 'Lum',
                     area: 'FULL',
-                    bin: 2,
+                    bin: '2, 2',
                     dither: 'no',
                     defocus: 0,
                 },
