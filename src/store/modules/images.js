@@ -39,6 +39,9 @@ const getters = {
     recent_images: state => state.recent_images,
     user_images: state => state.user_images,
     show_user_data_only: state => state.show_user_data_only,
+
+    large_fits_exists: state => !state.current_image.ex01_fits_exists,
+    small_fits_exists: state => !state.current_image.ex10_fits_exists,
 }
 
 const mutations = {
@@ -279,29 +282,37 @@ const actions = {
 
 
     set_next_image({ commit, state }) {
-        let i = state.current_image.recency_order
-        let lastImageIndex = state.recent_images.length - 1
-
-        if (i == lastImageIndex) {
-            let the_next_image = state.recent_images[0]
-            commit('setCurrentImage', the_next_image)
-        } else {
-            let the_next_image = state.recent_images[i + 1]
-            commit('setCurrentImage', the_next_image)
+        let next_image
+        let index = state.recent_images.indexOf(state.current_image);
+        if (index >= 0 && index < state.recent_images.length - 1) {
+            next_image = state.recent_images[index + 1]
+            commit('setCurrentImage', next_image)
         }
     },
     set_previous_image({ commit, state }) {
-        let i = state.current_image.recency_order
-        let lastImageIndex = state.recent_images.length - 1
-
-        if (i == 0) {
-            let the_previous_image = state.recent_images[lastImageIndex]
-            commit('setCurrentImage', the_previous_image)
-        } else {
-            let the_previous_image = state.recent_images[i - 1]
-            commit('setCurrentImage', the_previous_image)
+        let prev_image
+        let index = state.recent_images.indexOf(state.current_image);
+        if (index >= 1) {
+            prev_image = state.recent_images[index - 1]
+            commit('setCurrentImage', prev_image)
         }
-    }
+    },
+
+    async get_fits_url({rootState}, {base_filename, ex_type}) {
+
+        // Get the global configuration for all sites from an api call.
+        const apiName = rootState.dev.active_api
+
+        const path = '/download';
+        let body = {
+            object_name: `${base_filename}-${ex_type}.fits.bz2`
+        }
+        console.log(path, body)
+        const fits_url = await axios.post(apiName+path, body);
+
+        console.log(fits_url.data)
+        return fits_url.data;
+    },
 
 }
 
