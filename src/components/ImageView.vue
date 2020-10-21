@@ -50,7 +50,10 @@
       <!-- Controls in the top row above the main view --> 
       <div class="controls">
 
-          <button class="button" @click="toggleAnalysis">JS9</button>
+        <b-field grouped>
+          <b-field>
+            <button class="button" @click="toggleAnalysis">JS9</button>
+          </b-field>
           <b-field>
             <p class="control">
               <b-tooltip label="latest image" position="is-bottom" type="is-black">
@@ -60,34 +63,59 @@
             </p>
             <p class="control">
               <b-tooltip label="previous image" position="is-bottom" type="is-black">
-              <button class="button level-item" @click="setPreviousImage">
-              <b-icon icon="chevron-left" /></button>
+                <button class="button level-item" 
+                  @click="$store.dispatch('images/set_previous_image')">
+                  <b-icon icon="chevron-left" />
+                </button>
               </b-tooltip>
             </p>
             <p class="control">
               <b-tooltip label="next image" position="is-bottom" type="is-black">
-              <button class="button level-item" @click="setNextImage">
-              <b-icon icon="chevron-right" /></button>
+                <button class="button level-item" 
+                  @click="$store.dispatch('images/set_next_image')">
+                  <b-icon icon="chevron-right" />
+                </button>
               </b-tooltip>
             </p>
           </b-field>
-          <b-tooltip label="download fits file" position="is-right" type="is-black">
-            <a class="button has-text-white" @click="downloadFits13Url(current_image)">
-              <b-icon icon="cloud-download" /></a>
-          </b-tooltip>
+
+          <b-field>
+            <p class="control">
+              <b-tooltip label="download small fits file" position="is-bottom" type="is-black">
+                <a class="button has-text-white" 
+                  :disabled="small_fits_exists"
+                  @click="download_fits_file(current_image.base_filename, 'EX10')">
+                  <b-icon icon="cloud-download" size="is-small" /></a>
+              </b-tooltip>
+            </p>
+            <p class="control">
+              <b-tooltip label="download large fits file" position="is-bottom" type="is-black">
+                <a class="button has-text-white" 
+                  :disabled="large_fits_exists"
+                  @click="download_fits_file(current_image.base_filename, 'EX01')">
+                  <b-icon icon="cloud-download" /></a>
+              </b-tooltip>
+            </p>
+          </b-field>
+
+        </b-field>
 
 
-          <div> <b-field label="subframe active">
-                <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
-            </b-field> </div>
-          <!---div> <b-field label="subframe visible">
-                <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
-            </b-field> </div-->
-          <div> <b-field label="crosshairs">
-                <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
-            </b-field> </div>
+        <div> <b-field label="subframe active">
+              <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
+          </b-field> </div>
+        <!---div> <b-field label="subframe visible">
+              <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
+          </b-field> </div-->
+        <div> <b-field label="crosshairs">
+              <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
+          </b-field> </div>
 
       </div>
+
+      <!--pre style="max-width: 500px;">
+        {{current_image}}
+      </pre-->
 
     </div>
   </div>
@@ -691,38 +719,13 @@ export default {
       }
     },
 
-    setNextImage() {
-      this.$store.dispatch("images/set_next_image");
-    },
-
-    setPreviousImage() {
-      this.$store.dispatch("images/set_previous_image");
-    },
-
-    async getFits13Url(image) {
-      console.log('Image download requested.')
-
-      // Get image information for path construction
-      let site = image.site
-      let base_filename = image.base_filename
-
-      // Get the global configuration for all sites from an api call.
-      let apiName = this.$store.getters['dev/api'];
-
-      let path = '/download';
-      let body = {
-        object_name: `${base_filename}-EX10.fits.bz2`,
+    async download_fits_file(base_filename, ex_type) {
+      const params = {
+        base_filename: base_filename, 
+        ex_type: ex_type
       }
-      console.log('url: ', apiName+path)
-      const smallFitsURL = await axios.post(apiName+path, body);
-
-      console.log(smallFitsURL.data)
-      return smallFitsURL.data;
-    },
-
-    async downloadFits13Url(image) {
-      let fits13url = await this.getFits13Url(image)
-      window.location.assign(fits13url)
+      const fits_url = await this.$store.dispatch('images/get_fits_url', params)
+      window.location.assign(fits_url)
     },
     
   },
@@ -736,10 +739,12 @@ export default {
       }
     },
 
-    ...mapGetters("images", {
-      recent_images: "recent_images",
-      current_image: "current_image"
-    }),
+    ...mapGetters("images", [
+      "recent_images",
+      "current_image",
+      "large_fits_exists",
+      "small_fits_exists",
+    ]),
 
     js9IsVisible: {
       get() { return this.$store.getters['js9/instanceIsVisible']},
