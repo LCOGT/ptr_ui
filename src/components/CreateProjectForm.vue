@@ -11,10 +11,11 @@
      <b-tabs type="is-boxed">
         <b-tab-item label="Targets">
                 <div v-for="n in targets_index" v-bind:key="n" class="target-row">
-
-                    <b-field :label="' '">
+                    
+                    <!-- we decided to only allow one target per project -->
+                    <!--b-field :label="' '">
                         <b-checkbox v-model="targets[n-1].active"></b-checkbox>
-                    </b-field>
+                    </b-field-->
 
                     <b-field :label="n==1 ? 'Name' : ''" style="width: 130px;">
                         <b-field>
@@ -52,7 +53,9 @@
                     <div></div>
 
                 </div>
-                <button class="button" @click="newTargetRow">add another target</button>
+
+                <!-- we decided to only allow one target per project -->
+                <!--button class="button" @click="newTargetRow">add another target</button-->
         </b-tab-item>
         <b-tab-item label="Settings">
 
@@ -88,34 +91,14 @@
                     </b-field>
                     <b-field :label="n==1 ? 'Filter' : ''">
                         <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].filter">
-                            <option value="Lum"> Lum </option>
-                            <option value="Red"> Red </option>
-                            <option value="Green"> Green </option>
-                            <option value="Blue"> Blue </option>
-                            <option value="NIR"> NIR </option>
-                            <option value="O3"> O3 </option>
-                            <option value="Ha"> HA </option>
-                            <option value="N2"> N2 </option>
-                            <option value="S2"> S2 </option>
-                            <option value="CR"> CR </option>
-                            <option value="EXO"> EXO </option>
-                            <option value="w"> w </option>
-                            <option value="air"> air </option>
-                            <option value="clear"> clear </option>
-                            <option value="silica"> silica </option>
-                            <option value="up"> u' </option>
-                            <option value="gp"> g' </option>
-                            <option value="rp"> r' </option>
-                            <option value="ip"> i' </option>
-                            <option value="zs"> zs </option>
-                            <option value="zp"> z' </option>
-                            <option value="Y"> Y </option>
-                            <option value="U"> U </option>
-                            <option value="B"> B </option>
-                            <option value="V"> V </option>
-                            <option value="Rc"> Rc </option>
-                            <option value="Ic"> Ic </option>
-                            <option value="dark"> dark </option>
+                            <option
+                                v-for="(filter, index) in project_filter_list"
+                                v-bind:value="filter"
+                                v-bind:selected="index === 0"
+                                v-bind:key="index"
+                                >
+                                {{filter}}
+                            </option>
                         </b-select>
                     </b-field>
                     <b-field :label="n==1 ? 'Bin' : ''">
@@ -292,7 +275,8 @@
         </b-tab-item>
         <b-tab-item label="Scheduling">
                 <b-field    
-                    label="Run during these reserved events:"
+                    label="Add to your exising calendar events:"
+                    message="note: this will apply only after you click 'create project'."
                     >
                     <b-dropdown
                         v-model="project_events"
@@ -314,7 +298,7 @@
                                 <span> {{event.title}} - {{event.site}} </span>
                         </b-dropdown-item>
                         <b-dropdown-item separator />
-                        <b-dropdown-item disabled> events with existing projects (will be replaced)</b-dropdown-item>
+                        <b-dropdown-item disabled> events with existing projects (existing projects will be replaced)</b-dropdown-item>
                         <b-dropdown-item separator />
                         <b-dropdown-item 
                             v-for="(event, index) in user_events_without_projects" 
@@ -358,12 +342,43 @@ export default {
         SideInfoPanel,
         TheSkyChart,
     },
+    created() {
+        console.log(this.filter_wheel_options.map(x => x[0]))
+        console.log(this.generic_filter_list)
+    },
     data() {
         return {
 
-            //projects_api_url: 'https://a85vsflfd2.execute-api.us-east-1.amazonaws.com/dev',
             projects_api_url: 'https://projects.photonranch.org/dev',
             showAdvancedInputs: false,
+
+            generic_filter_list: [
+                "Lum",
+                "Red",
+                "Green",
+                "Blue",
+                "NIR",
+                "O3",
+                "Ha",
+                "N2",
+                "S2",
+                "air",
+                "w",
+                "clear",
+                "silica",
+                "up",
+                "gp",
+                "rp",
+                "ip",
+                "zs",
+                "zp",
+                "Y",
+                "U",
+                "B",
+                "V",
+                "Rc",
+                "Ic",
+            ],
                 
 
             /*************************************************/
@@ -641,9 +656,21 @@ export default {
     watch: {
     },
     computed: {
+
+        // Append any new filters from the site config to the generic filters list.
+        project_filter_list() {
+            let generics = this.generic_filter_list
+            let config_filters = this.filter_wheel_options.map(x => x[0])
+            var combined_filters = generics.concat(
+                    config_filters.filter((item) => generics.indexOf(item) < 0)
+                )
+            return combined_filters
+        },
+
         ...mapGetters('site_config', [
             'site_config',
             'global_config',
+            'filter_wheel_options'
         ]), 
         ...mapState('user_data', [
             'user_events',
