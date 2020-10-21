@@ -366,7 +366,7 @@ export default {
       // save the current coordinates and draw them as a rectangle.
       if (this.subframeIsVisible && this.mouseIsDown) {
         this.subframe_x1 = mDrag[0] /imageWidth
-        this.subframe_y1 = mDrag[1] /imageWidth
+        this.subframe_y1 = mDrag[1] /imageHeight
 
 
         this.drawSubframe()
@@ -548,11 +548,11 @@ export default {
       this.remove_star_markers()
 
       let med_x = this.median_star_pos_x * this.imageWidth
-      let med_y = this.median_star_pos_y * this.imageWidth
+      let med_y = this.median_star_pos_y * this.imageHeight
       let ubri_x = this.u_brightest_star_pos_x * this.imageWidth
-      let ubri_y = this.u_brightest_star_pos_y * this.imageWidth
+      let ubri_y = this.u_brightest_star_pos_y * this.imageHeight
       let bri_x = this.brightest_star_pos_x * this.imageWidth
-      let bri_y = this.brightest_star_pos_y * this.imageWidth
+      let bri_y = this.brightest_star_pos_y * this.imageHeight
 
       // Draw the crosshairs around the brightest unsaturated star
       d3
