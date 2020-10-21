@@ -1173,4 +1173,8 @@ export default {
   font:bolder;
 }
 
+.wrapper {
+  margin: 0;
+}
+
 </style>
