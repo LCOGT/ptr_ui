@@ -93,8 +93,8 @@
 
         <div style="height:3em;"/>
       </div>
-      <div class="column menu-column is-hidden-touch is-hidden-desktop-only">
 
+      <div class="column is-hidden-touch is-hidden-desktop-only status-column">
         <status-panel-collapsible
           :sitecode="sitecode"
           :fullStatus="weather_state"
@@ -119,12 +119,14 @@
       <!-- Primary content of the page. Selects from the various site subpages. -->
       <!-- Note: wait for parent (this component) to mount before loading child components. 
       Otherwise, props may initially load as null. -->
+      <div class="column">
         <component 
           style="width: 100%"
           v-bind:is="`site-${subpage}`"
           :sitecode="sitecode"
           :deviceStatus="deviceStatus"
           />
+          </div>
       </div>
     </section>
     </div>
@@ -462,7 +464,10 @@ export default {
   width: 300px;
   height: auto;
   padding: 0 auto;
-  margin-right: 40px;
+}
+
+.status-column {
+  max-width: 250px;
 }
 
 .site-not-reserved-notice {
