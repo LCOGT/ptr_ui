@@ -252,6 +252,12 @@ export default {
     median_star_pos_y: function() {
       this.draw_star_markers()
     },
+    brightest_star_pos_x: function() {
+      this.draw_star_markers()
+    },
+    brightest_star_pos_y: function() {
+      this.draw_star_markers()
+    },
 
   },
 
