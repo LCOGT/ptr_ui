@@ -446,29 +446,85 @@ export default {
 
       // Otherwise, do this if good stars were found
       else {
+        console.log('good stars were found')
         let med_star = response.data.median_star
-        let bright_star = response.data.brightest_star
-        let u_bright_star = response.data.brightest_unsaturated
         let region_coords = response.data.region_coords
 
-        // TODO: plot the gaussian curve over the data instead of connecting the dots.
+        // Brightest unsaturated star profile.
+        if (response.data.brightest_unsaturated) {
+          let u_bright_star = response.data.brightest_unsaturated
+          this.u_brightest_fwhm = (u_bright_star.gaussian_fwhm *u_bright_star.pixscale).toFixed(2) + '"' 
+          this.u_brightest_hfd = (u_bright_star.hfd*u_bright_star.pixscale).toFixed(2) + '"' 
+          this.u_brightest_relative_pos_x = (u_bright_star.x / u_bright_star.naxis1) + region_coords.x0
+          this.u_brightest_relative_pos_y = (u_bright_star.y / u_bright_star.naxis2) + region_coords.y0
+          // Plot the brightest unsaturated star profile
+          console.log('plotting brightest unsaturated star profile')
+          let ub_profile = u_bright_star.radial_profile 
+          let ub_gauss = {
+            mean: u_bright_star.gaussian_mean,
+            stddev: u_bright_star.gaussian_stddev,
+            amplitude: u_bright_star.gaussian_amplitude,
+          }
+          let ub_pixscale = u_bright_star.pixscale 
+          let ub_element_id = "#u_brightest_star_profile" 
+          let ub_formatting = {
+            margin_top: 50,
+            margin_right: 25,
+            margin_bottom: 50,
+            margin_left: 45,
+            plot_color: "#209cee",
+            x_axis_ticks: 8,
+            y_axis_ticks: 5,
+          }
+          let ub_labels = {
+            title: "Brightest Unsaturated Star Profile",
+            x_axis_label: "arcseconds",
+          }
+          this.plotStarProfile(ub_profile, ub_gauss, ub_pixscale, ub_element_id, ub_formatting, ub_labels)
+        }
+
+        // Brightest star profile
+        if (response.data.brightest_star) {
+          console.log('plotting brightest star')
+          let bright_star = response.data.brightest_star
+          this.brightest_fwhm = (bright_star.gaussian_fwhm *bright_star.pixscale).toFixed(2) + '"' 
+          this.brightest_hfd = (bright_star.hfd*bright_star.pixscale).toFixed(2) + '"' 
+          this.brightest_relative_pos_x = (bright_star.x / bright_star.naxis1) + region_coords.x0
+          this.brightest_relative_pos_y = (bright_star.y / bright_star.naxis2) + region_coords.y0
+          // Plot the brightest star profile
+          let b_profile = bright_star.radial_profile 
+          let b_gauss = {
+            mean: bright_star.gaussian_mean,
+            stddev: bright_star.gaussian_stddev,
+            amplitude: bright_star.gaussian_amplitude,
+          }
+          let b_pixscale = bright_star.pixscale 
+          let b_element_id = "#brightest_star_profile" 
+          let b_formatting = {
+            margin_top: 50,
+            margin_right: 25,
+            margin_bottom: 50,
+            margin_left: 45,
+            plot_color: "#efea5a",
+            x_axis_ticks: 8,
+            y_axis_ticks: 5,
+          }
+          let b_labels = {
+            title: "Brightest Star Profile",
+            x_axis_label: "arcseconds",
+          }
+          this.plotStarProfile(b_profile, b_gauss, b_pixscale, b_element_id, b_formatting, b_labels)
+        }
+
+        
 
         // Get the fwhm from the gaussian fit
         this.median_fwhm = (med_star.gaussian_fwhm * med_star.pixscale).toFixed(2) + '"' 
-        this.brightest_fwhm = (bright_star.gaussian_fwhm *bright_star.pixscale).toFixed(2) + '"' 
-        this.u_brightest_fwhm = (u_bright_star.gaussian_fwhm *u_bright_star.pixscale).toFixed(2) + '"' 
-
         this.median_hfd = (med_star.hfd* med_star.pixscale).toFixed(2) + '"' 
-        this.brightest_hfd = (bright_star.hfd*bright_star.pixscale).toFixed(2) + '"' 
-        this.u_brightest_hfd = (u_bright_star.hfd*u_bright_star.pixscale).toFixed(2) + '"' 
 
         // Get the positions of the stars to show in the image display.
-        this.median_relative_pos_x = (med_star.x / med_star.naxis1) + region_coords.x0,
-        this.median_relative_pos_y = (med_star.y / med_star.naxis2) + region_coords.y0,
-        this.brightest_relative_pos_x = (bright_star.x / bright_star.naxis1) + region_coords.x0,
-        this.brightest_relative_pos_y = (bright_star.y / bright_star.naxis2) + region_coords.y0,
-        this.u_brightest_relative_pos_x = (u_bright_star.x / u_bright_star.naxis1) + region_coords.x0,
-        this.u_brightest_relative_pos_y = (u_bright_star.y / u_bright_star.naxis2) + region_coords.y0,
+        this.median_relative_pos_x = (med_star.x / med_star.naxis1) + region_coords.x0
+        this.median_relative_pos_y = (med_star.y / med_star.naxis2) + region_coords.y0
         this.num_good_stars = response.data.num_good_stars
 
         // Plot the median star profile
@@ -496,54 +552,8 @@ export default {
         //this.plotStarProfile(m_profile, m_gauss, m_pixscale, m_element_id, m_formatting, m_labels)
 
 
-        // Plot the brightest star profile
-        let b_profile = bright_star.radial_profile 
-        let b_gauss = {
-          mean: bright_star.gaussian_mean,
-          stddev: bright_star.gaussian_stddev,
-          amplitude: bright_star.gaussian_amplitude,
-        }
-        let b_pixscale = bright_star.pixscale 
-        let b_element_id = "#brightest_star_profile" 
-        let b_formatting = {
-          margin_top: 50,
-          margin_right: 25,
-          margin_bottom: 50,
-          margin_left: 45,
-          plot_color: "#efea5a",
-          x_axis_ticks: 8,
-          y_axis_ticks: 5,
-        }
-        let b_labels = {
-          title: "Brightest Star Profile",
-          x_axis_label: "arcseconds",
-        }
-        this.plotStarProfile(b_profile, b_gauss, b_pixscale, b_element_id, b_formatting, b_labels)
 
-        // Plot the brightest unsaturated star profile
-        let ub_profile = u_bright_star.radial_profile 
-        let ub_gauss = {
-          mean: u_bright_star.gaussian_mean,
-          stddev: u_bright_star.gaussian_stddev,
-          amplitude: u_bright_star.gaussian_amplitude,
-        }
-        let ub_pixscale = u_bright_star.pixscale 
-        let ub_element_id = "#u_brightest_star_profile" 
-        let ub_formatting = {
-          margin_top: 50,
-          margin_right: 25,
-          margin_bottom: 50,
-          margin_left: 45,
-          plot_color: "#209cee",
-          x_axis_ticks: 8,
-          y_axis_ticks: 5,
-        }
-        let ub_labels = {
-          title: "Brightest Unsaturated Star Profile",
-          x_axis_label: "arcseconds",
-        }
-        this.plotStarProfile(ub_profile, ub_gauss, ub_pixscale, ub_element_id, ub_formatting, ub_labels)
-
+        console.log('finished plotting star profiles')
       }
     },
     plotStarProfile( profile, gaussian, pixscale=1, el_id, formatting_opts, label_options ) {
