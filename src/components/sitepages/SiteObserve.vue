@@ -497,13 +497,13 @@
             </b-checkbox>
           </b-field>
 
-          <b-field horizontal label="Hint">
-            <b-input placeholder="a hint for the FITS header..."
+          <b-field horizontal label="Note">
+            <b-input placeholder="a camera note for the FITS header..."
               type="text"
               min="0"
               max="64"
               size="is-small"
-              v-model="camera_hint">
+              v-model="camera_note">
             </b-input>
           </b-field>
 
@@ -803,6 +803,10 @@ export default {
       focuserStatus: 'nothing yet',
       jobSub: '', //ws connection
 
+      // logs websocket
+      logs_ws: '', //ws connection
+
+
       focuserJobs: {},
 
 
@@ -815,6 +819,7 @@ export default {
   created() {
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_time_interval = setInterval(this.update_time, 1000)
+
 
     // This websocket subscribes to changes in job status
     this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
@@ -834,6 +839,7 @@ export default {
       this.focuserStatus = newJob
       //this.$set(this.jobIds, newJob.ulid, newJob)
     }
+
 
     // set default values from config
     // TODO: this should go in a better place
@@ -1046,9 +1052,9 @@ export default {
       get() { return this.$store.getters['command_params/camera_areas_selection'] },
       set(val) {this.$store.commit('command_params/camera_areas_selection', val)}
     },
-    camera_hint: {
-      get() { return this.$store.getters['command_params/camera_hint']},
-      set(val) { this.$store.commit('command_params/camera_hint', val)},
+    camera_note: {
+      get() { return this.$store.getters['command_params/camera_note']},
+      set(val) { this.$store.commit('command_params/camera_note', val)},
     },
     camera_exposure: {
       get() { return this.$store.getters['command_params/camera_exposure'] },
