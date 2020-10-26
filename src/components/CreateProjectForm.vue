@@ -9,7 +9,7 @@
     </b-field>
 
      <b-tabs type="is-boxed">
-        <b-tab-item label="Targets">
+        <b-tab-item label="Target">
                 <div v-for="n in targets_index" v-bind:key="n" class="target-row">
                     
                     <!-- we decided to only allow one target per project -->
@@ -50,9 +50,16 @@
                             v-model="targets[n-1].dec"/>
                     </b-field>
 
+
                     <div></div>
 
                 </div>
+
+                <b-field label="Project Note" style="max-width: 345px;">
+                    <b-input 
+                        :maxlength="max_fits_header_length"
+                        v-model="project_note" ></b-input>
+                </b-field>
 
                 <!-- we decided to only allow one target per project -->
                 <!--button class="button" @click="newTargetRow">add another target</button-->
@@ -352,6 +359,10 @@ export default {
             projects_api_url: 'https://projects.photonranch.org/dev',
             showAdvancedInputs: false,
 
+            // Max length for a fits header string value. 
+            // Pos 10 to 80, including two single quotes containing the value
+            max_fits_header_length: 68, 
+
             generic_filter_list: [
                 "Lum",
                 "Red",
@@ -393,6 +404,8 @@ export default {
             ra: '', 
             dec: '',
             pa: 0,
+
+            project_note: '',
 
             exposures_index: 1,
             exposures: [
@@ -592,6 +605,7 @@ export default {
                 project_name: this.project_name,
                 created_at: moment().utc().format(),
                 user_id: this.user.sub,
+                project_note: this.project_note,
                 project_constraints: {
                     ra_offset: this.ra_offset,
                     ra_offset_units: this.ra_offset_units,
