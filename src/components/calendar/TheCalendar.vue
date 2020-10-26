@@ -259,8 +259,8 @@ export default {
   data: function () {
     return {
       /*===================================================/
-    Configs for fullCalendar (anything with fc_ namespace)
-    /===================================================*/
+      Configs for fullCalendar (anything with fc_ namespace)
+      /===================================================*/
       fc_views: {
         // definitions for additional calendar views (eg. 10 day grid)
         resourceTimelineDay: {
@@ -814,6 +814,7 @@ export default {
       this.activeEvent.resourceId = this.calendarSite;
       this.activeEvent.creator_id = this.$auth.user.sub;
       this.activeEvent.project_id = "none";
+      this.activeEvent.reservation_note = "";
 
       this.isNewEvent = true; // setting for the modal event editor
       this.eventEditorIsActive = true;
@@ -832,6 +833,7 @@ export default {
       this.activeEvent.site = event.extendedProps.site;
       this.activeEvent.resourceId = event.getResources()[0].id;
       this.activeEvent.project_id = event.extendedProps.project_id;
+      this.activeEvent.reservation_note = event.extendedProps.reservation_note || "";
 
       this.isNewEvent = false; // setting for the modal event editor
       this.eventEditorIsActive = true;
@@ -926,6 +928,7 @@ export default {
         title: newEvent.title,
         resourceId: newEvent.resourceId,
         project_id: newEvent.project_id,
+        reservation_note: newEvent.reservation_note,
         rendering: newEvent.rendering,
       };
       axios
@@ -1005,6 +1008,7 @@ export default {
         title: modifiedEvent.title,
         resourceId: modifiedEvent.resourceId,
         project_id: modifiedEvent.project_id,
+        reservation_note: modifiedEvent.reservation_note,
         rendering: modifiedEvent.rendering,
       };
       let theInitialEvent = {
@@ -1017,6 +1021,7 @@ export default {
         title: initialEvent.title,
         resourceId: initialEvent.resourceId,
         project_id: initialEvent.project_id,
+        reservation_note: initialEvent.reservation_note,
         rendering: initialEvent.rendering,
       };
       let body = {
@@ -1074,6 +1079,7 @@ export default {
           site: obj.site,
           resourceId: obj.resourceId,
           project_id: obj.project_id,
+          reservation_note: obj.reservation_note,
           rendering: obj.rendering,
         };
         if (

@@ -14,6 +14,8 @@
         <b-input :default="eventDetails.title" v-model="title">{{title}}</b-input>
     </b-field>
 
+    <hr>
+
     <b-field horizontal label="Night of">
         <p class="is-family-primary">{{nightOf}}</p>
     </b-field>
@@ -40,11 +42,17 @@
         </b-select>
     </b-field>
 
+
+    <b-field horizontal>
+        {{eventDuration}}
+    </b-field>
+
+    <hr>
+
     <b-field    
         label="Project"
         horizontal
         >
-
         <b-select v-model="project_name_and_created">
 
             <option value="none">none</option>
@@ -59,9 +67,11 @@
         </b-select>
     </b-field>
 
-
-    <b-field horizontal>
-        {{eventDuration}}
+    <b-field label="Note" horizontal >
+        <b-input 
+            v-model="reservation_note" 
+            :maxlength="max_fits_header_length"
+            > </b-input>
     </b-field>
 
     <hr>
@@ -133,6 +143,10 @@ export default {
     data() {
         return {
 
+            // Max length for a fits header string value. 
+            // Pos 10 to 80, including two single quotes containing the value
+            max_fits_header_length: 68, 
+
             submitIsLoading: false,
             modifyIsLoading: false,
             deleteIsLoading: false,
@@ -146,6 +160,7 @@ export default {
             site: this.eventDetails.site,
             resourceId: this.eventDetails.resourceId,
             project_name_and_created: this.eventDetails.project_id,
+            reservation_note: this.eventDetails.reservation_note,
 
         }
     },
@@ -230,6 +245,7 @@ export default {
                 creator_id: this.creator_id,
                 site: this.site,
                 resourceId: this.resourceId,
+                reservation_note: this.reservation_note,
                 project_id: this.project_name_and_created,
             }
             console.log('modified event: ', m_event)
