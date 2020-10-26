@@ -22,7 +22,7 @@ const state = {
     subframe_y1: 1,
 
     camera_areas_selection: 'Full',
-    camera_hint: '',
+    camera_note: '',
     camera_exposure: '1',
     camera_count: 1, // numberinput form requires number, not string. converted to string in expose command.
     camera_area: null, 
@@ -64,7 +64,7 @@ const getters = {
     subframe_y1: state => state.subframe_y1,
 
     camera_areas_selection: state => state.camera_areas_selection, 
-    camera_hint: state => state.camera_hint,
+    camera_note: state => state.camera_note,
     camera_exposure: state => state.camera_exposure,
     camera_count: state => state.camera_count,
     camera_bin: state => state.camera_bin,
@@ -106,7 +106,7 @@ const mutations = {
     subframe_y1 (state, val) { state.subframe_y1 = val; },
 
     camera_areas_selection (state, val) { state.camera_areas_selection = val; },
-    camera_hint (state, val) { state.camera_hint = val; },
+    camera_note(state, val) { state.camera_note = val; },
     camera_exposure (state, val) { state.camera_exposure = val; },
     camera_count (state, val) { state.camera_count = val; },
     camera_bin (state, val) { state.camera_bin = val; },

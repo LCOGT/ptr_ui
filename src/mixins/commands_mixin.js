@@ -150,7 +150,7 @@ export const commands_mixin = {
             'subframe_y1',
 
             'camera_areas_selection',
-            'camera_hint',
+            'camera_note',
             'camera_exposure',
             'camera_count',
             'camera_bin',
@@ -274,8 +274,8 @@ export const commands_mixin = {
             }
 
             // Avoid empty strings (thanks, dynamodb)
-            if (this.camera_hint != '') {
-                opt_params["hint"] = this.camera_hint
+            if (this.camear_note != '') {
+                opt_params["hint"] = this.camera_note
             }
 
             // If active, add subframe parameters.
