@@ -260,10 +260,13 @@
             :loading="headerIsLoading"
             >
         </b-table>
+
       
       </div>
     </div>
   </b-modal>
+
+  <div style="height: 400px;"></div>
 
 
 </section>

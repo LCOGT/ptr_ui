@@ -723,6 +723,10 @@
     :deviceStatus="deviceStatus"
     />
 
+  <log-stream 
+    :site="sitecode"
+    />
+
   </div>
 </template>
 
@@ -744,6 +748,7 @@ import SiteData from '@/components/sitepages/SiteData'
 import SkychartModal from '@/components/SkychartModal'
 import ImagesTable from '@/components/ImagesTable'
 import StatusColumn from '@/components/status/StatusColumn'
+import LogStream from '@/components/LogStream'
 
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
@@ -761,6 +766,7 @@ export default {
     SkychartModal,
     ImagesTable,
     StatusColumn,
+    LogStream,
   },
   mixins: [commands_mixin, status_mixin],
   props: ['sitecode'],
@@ -839,7 +845,6 @@ export default {
       this.focuserStatus = newJob
       //this.$set(this.jobIds, newJob.ulid, newJob)
     }
-
 
     // set default values from config
     // TODO: this should go in a better place
