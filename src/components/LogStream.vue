@@ -32,10 +32,15 @@
                         position="is-right" 
                         type="is-dark" 
                         :label="timestamp_to_date(log.timestamp)">
-                        {{timestamp_to_logdate(log.timestamp)}}:
+                        {{timestamp_to_logdate(log.timestamp)}}
                     </b-tooltip>
                 </div>
-                <pre class="log-message">{{log.message}}</pre>
+                <pre 
+                    class="log-message"
+                    :class="get_log_level_classes(log)"
+                    >
+                    {{format_log_message_text(log)}}
+                </pre>
             </div>
         </div>
 
@@ -57,6 +62,13 @@ export default {
         return {
             logs: [],
             is_collapsed: false,
+            supported_log_levels: [
+                "debug",
+                "info", 
+                "warning",
+                "error",
+                "critical",
+            ]
         }
     },
 
@@ -81,6 +93,9 @@ export default {
 
 
     methods: {
+        getRandomInt(max) {
+            return Math.floor(Math.random() * Math.floor(max));
+        },
         get_timestamp_seconds() {
             return Math.floor(Date.now() / 1000)
         },
@@ -96,10 +111,12 @@ export default {
         send_fake_log_ws() {
             let body = {
                 action: "newlog",
-                log_message: "0........1........2........3.........4........5........6........7........8",
-                site: this.site,
+                log_message: "This is a log message for testing.\nIt is sent from the frontend.",
+                site: this.site, 
+                log_level: this.supported_log_levels[this.getRandomInt(5)],
                 timestamp: this.get_timestamp_seconds()
             }
+            console.log(body)
             this.logs_ws.send(JSON.stringify(body))
         },
         send_fake_log_http() {
@@ -126,7 +143,7 @@ export default {
         handle_new_log(message) {
             const new_log = JSON.parse(message.data)
             //console.log("new log entry: ")
-            //console.log(new_log)
+            console.log(new_log)
             if (this.isScrolledToBottom(this.$refs.loglist)) {
                 this.logs.push(new_log)
                 //console.log('scroll to bottom')
@@ -158,6 +175,42 @@ export default {
             })
         },
 
+        // Returns class names used to style a log message based on the 
+        // supplied log level. 
+        get_log_level_classes(log) {
+                
+            // Default level of info if none supplied
+            if (!('log_level' in log)) {
+                return "info"
+            }
+
+            let log_level = log.log_level
+            if (this.supported_log_levels.includes(log_level)) {
+                return log_level
+            }
+            else {
+                console.warn("Unrecognized log level in log: ", log_level)
+                return "info"
+            }
+        },
+
+        format_log_message_text(log) {
+            // Handle case of no message
+            if (!("message" in log)) {
+                return ""
+            }
+            
+            let message = log.message
+            let log_level = log.log_level || "info"
+
+            if (["debug", "info"].includes(log_level)) {
+                return message
+            }
+            else {
+                return `[${log_level.toUpperCase()}]  ${message}`
+            }
+        },
+
         // Method for converting timestamp(seconds) to a date that reads easily
         // in the log UI
         timestamp_to_logdate(timestamp) {
@@ -181,7 +234,16 @@ export default {
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
+
+@import "@/style/buefy-styles.scss";
+
+$log-debug: #aaa;
+$log-info: #bbb;
+$log-warning: $warning;
+$log-error: $danger;
+$log-critical: $danger;
+
 .logstream-wrapper {
     display: flex;
     flex-direction: row;
@@ -189,7 +251,7 @@ export default {
     position: fixed;
     right: 0%;
     bottom: 0;
-    height: 200px;
+    height: 150px;
     max-width: 100%;
     margin-bottom: 1em;
 }
@@ -230,14 +292,8 @@ export default {
 
 .log-line {
     display: grid;
-    grid-template-columns: 8em 1fr;
+    grid-template-columns: 6em 1fr;
     padding-bottom: 0.5em;
-}
-.log-line:hover * {
-    color:white;
-}
-.log-line:last-of-type * {
-    color: white;
 }
 
 
@@ -245,28 +301,51 @@ export default {
     color: #bbb;
     animation: blinkonce 1s;
     grid-column-start: 1;
+    padding-top: 2pt;
+    font-size: 9pt;
+    font-family:'Courier New', Courier, monospace;
+    align-items: center;
+    margin-left: 1em;
 }
 pre.log-message {
     color: #bbb;
+    font-size: 11pt;
+    font-family:'Courier New', Courier, monospace;
     width: 100%;
     max-width: 80ch;
     background-color:black;
     animation: blinkonce 1s;
     grid-column-start: 2;
     text-align: left;
-    word-break: break-all;
-    overflow-wrap:break-word;
-    white-space: pre-wrap;
+    white-space: pre-line;
     hyphens: auto;
     padding: 0;
 }
+
+pre.log-message.debug {
+    color: $log-debug;
+}
+pre.log-message.info {
+    color: $log-info;
+}
+pre.log-message.warning {
+    color: $log-warning;
+}
+pre.log-message.error {
+    color: $log-error;
+}
+pre.log-message.critical {
+    color: $log-critical;
+    font-weight: bold;
+}
+
 @keyframes blinkonce {
     0% {
         color: yellow;
     }
-    100% {
-        color: white
-    }
+}
+.log-line:hover * {
+    color:white;
 }
 
 </style>
