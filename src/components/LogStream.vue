@@ -1,7 +1,7 @@
 <template>
     <div>
         
-    <!-- for testing
+    <!-- enable these buttons for easier manual testing
     <button @click="send_fake_log_ws" class="button ">send ws log</button>
     <button @click="send_fake_log_http" class="button ">send http log</button>
     <button @click="get_recent_logs" class="button">get recent logs</button>
@@ -76,13 +76,12 @@ export default {
 
         this.get_recent_logs()
 
+        // Connect to websocket
         let logs_url = this.logs_ws_endpoint
         logs_url += `?site=${encodeURIComponent(this.site)}`
-
-        // Connect to websocket
         this.logs_ws = new ReconnectingWebSocket(logs_url)
 
-        // New message behavior
+        // Define websocket incoming message behavior
         this.logs_ws.onmessage = this.handle_new_log
             
     },
@@ -100,6 +99,7 @@ export default {
             return Math.floor(Date.now() / 1000)
         },
 
+        // Open or collapse the logs window
         toggle_open() {
             if (this.is_collapsed) {                    
                 this.is_collapsed = false;
@@ -108,6 +108,8 @@ export default {
                 this.is_collapsed = true;
             }
         },
+
+        // Used to test sending a message.
         send_fake_log_ws() {
             let body = {
                 action: "newlog",
@@ -119,6 +121,8 @@ export default {
             console.log(body)
             this.logs_ws.send(JSON.stringify(body))
         },
+
+        // Used to test sending a message.
         send_fake_log_http() {
             const url = this.logs_endpoint + '/newlog'
             let body = {
@@ -130,16 +134,21 @@ export default {
             axios.post(url, body)
 
         },
+
+        // Returns true if the element is scrolled to the bottom
         isScrolledToBottom(el) {
             var $el = $(el);
             return el.scrollHeight - $el.scrollTop() - $el.outerHeight() < 1;
         },
-
+            
+        // This method will scroll the log window to the bottom (to the latest 
+        // message)
         scrollToBottom() {
             const div = this.$refs.loglist;
             div.scrollTop = div.scrollHeight - div.clientHeight;
         },
 
+        // This function is run whenever the websocket gets a new message.
         handle_new_log(message) {
             const new_log = JSON.parse(message.data)
             //console.log("new log entry: ")
@@ -154,6 +163,8 @@ export default {
             }
         },
 
+        // Fetch logs from the last day and display them in the log window 
+        // in chronological order (newest at bottom)
         get_recent_logs() {
 
             // Fetch any logs that are under a day old
@@ -194,6 +205,8 @@ export default {
             }
         },
 
+        // Add the log level in front of the message if it is a warning, error,
+        // or critical level.
         format_log_message_text(log) {
             // Handle case of no message
             if (!("message" in log)) {
@@ -217,6 +230,9 @@ export default {
             const timestamp_ms = timestamp * 1000
             return moment(timestamp_ms).format('HH:mm:ss')
         },            
+
+        // Used to format the time for the timestmap tooltip.
+        // (reveals the yyyy/mm/dd, not included in the default view)
         timestamp_to_date(timestamp) {
             const timestamp_ms = timestamp * 1000
             return moment(timestamp_ms).format('YYYY/MM/DD')
@@ -322,6 +338,7 @@ pre.log-message {
     padding: 0;
 }
 
+// Style the log message based on its log level class.
 pre.log-message.debug {
     color: $log-debug;
 }
@@ -339,11 +356,15 @@ pre.log-message.critical {
     font-weight: bold;
 }
 
+// New messages enter yellow to grab attention, then fade to their 
+// destination color (based on the log level, see above)
 @keyframes blinkonce {
     0% {
         color: yellow;
     }
 }
+
+// highlight the timestamp of the line that is hovered over. 
 .log-line:hover * {
     color:white;
 }
