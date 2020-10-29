@@ -415,7 +415,7 @@ export default {
           icon: {
             url: `http://maps.google.com/mapfiles/ms/icons/${icon_color}-dot.png`
           },
-          title: site.name
+          title: site.name,
         })
         let siteInfoWindow = new google.maps.InfoWindow({
           content: this.renderSiteContent(site.name, site.site, sitesOpenStatus[site.site])
