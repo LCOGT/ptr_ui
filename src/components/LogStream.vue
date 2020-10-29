@@ -196,8 +196,8 @@ export default {
             }
 
             let log_level = log.log_level
-            if (this.supported_log_levels.includes(log_level)) {
-                return log_level
+            if (this.supported_log_levels.includes(log_level.toLowerCase())) {
+                return log_level.toLowerCase()
             }
             else {
                 console.warn("Unrecognized log level in log: ", log_level)
@@ -216,7 +216,7 @@ export default {
             let message = log.message
             let log_level = log.log_level || "info"
 
-            if (["debug", "info"].includes(log_level)) {
+            if (["debug", "info"].includes(log_level.toLowerCase())) {
                 return message
             }
             else {
