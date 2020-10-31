@@ -404,7 +404,7 @@ export default {
     async redrawMapSites() {
       // Fetch the list of sites to display on the map
       let sitesOpenStatus = await this.getSiteOpenStatus()
-      let sites = this.sitesForMap
+      let sites = this.sitesForMap.reverse()
 
       // For each site, draw a marker with a popup (on click) to visit the site.
       sites.forEach(site => {
