@@ -1,11 +1,14 @@
 <template>
 <div>
 
-    <create-project-form :sitecode="sitecode" />
+    <create-project-form :sitecode="sitecode" :project_to_load="project_to_load"/>
     <div style='height: 50px;' />
 
     <h1 class="subtitle"> Projects</h1>
-    <user-projects-table :user="user"/>
+    <user-projects-table 
+        :user="user"
+        @load_project_form="load_project_form"
+        />
 
     <h1 class="subtitle"> Reservations</h1>
     <user-events-table :user="user"/>
@@ -36,6 +39,8 @@ export default {
             siteTime: '-',
             utcTime: '-',
 
+            project_to_load: "",
+
             // URL for the calendar backend api
             //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
             backendUrl: 'https://calendar.photonranch.org',
@@ -57,6 +62,11 @@ export default {
             this.siteTime = moment().tz(this.timezone).format('MMM D, kk:mm')
             this.utcTime = moment().utc().format('MMM D, kk:mm')
         },
+
+        load_project_form(project) {
+            console.log('in parent: loading project in form')
+            this.project_to_load = project
+        }
     },
     computed: {
         ...mapGetters('site_config', [

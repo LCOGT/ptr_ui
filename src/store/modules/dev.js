@@ -11,6 +11,8 @@ const state = {
     //jobs_api: "https://jobs.photonranch.org/test",
     calendar_api: "https://calendar.photonranch.org/calendar",
 
+    projects_endpoint: "https://projects.photonranch.org/dev", // prod endpoint
+
     logs_endpoint: "https://logs.photonranch.org/logs",  // prod
     //logs_endpoint: "https://logs.photonranch.org/dev",  // dev
 
