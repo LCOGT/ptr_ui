@@ -5,8 +5,14 @@
     <div class="project-form">
         <div class="target-row">
             <b-field 
+                :type="{'is-warning': project_name_changed}"
                 label="Project Name" >
-                <b-input class="project-input" v-model="project_name"></b-input>
+                <template #message>
+                    <div v-if="project_name_changed">Warning: if you change the name of an</div>
+                    <div v-if="project_name_changed">existing project, you will have to </div>
+                    <div v-if="project_name_changed">reconnect any associated calendar events.</div>
+                </template>
+                <b-input class="project-input" :lazy="false" v-model="project_name"></b-input>
             </b-field>
 
             <b-field 
@@ -799,6 +805,18 @@ export default {
                     config_filters.filter((item) => generics.indexOf(item) < 0)
                 )
             return combined_filters
+        },
+
+        // True if we're modifying a project and the name is changed.
+        project_name_changed() {
+            if (
+                this.project_is_loaded
+                && this.loaded_project_name != this.project_name
+            ) {
+                return true
+            } else {
+                return false
+            }
         },
 
         ...mapGetters('site_config', [
