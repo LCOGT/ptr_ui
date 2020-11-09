@@ -34,6 +34,16 @@ export const commands_mixin = {
                 'simulation',
             ],
 
+            telescope_coordinate_frame_options: [
+                'ICRS',
+                'J2000',
+                'JNOW', 
+                'FK5',
+                'B1950',
+                'Ecliptic',
+                'Galactic',
+            ],
+
         }
     },
 
@@ -141,6 +151,7 @@ export const commands_mixin = {
         // User-supplied command parameters
         ...mapGetters('command_params', [
             'telescope_selection', 
+            'telescope_coordinate_frame', 
 
             'subframeIsActive',
             'subframeDefinedWithFile',
@@ -312,12 +323,21 @@ export const commands_mixin = {
                 {},
                 { username: this.username })
         },
-        mount_slew_command () {
+        mount_slew_radec_command () {
             let ra = emptyString(this.mount_ra.toString())
             let dec = emptyString(this.mount_dec.toString())
             let obj = emptyString(this.mount_object.toString())
-            return this.base_command( 'mount', 'go', 'slew to coordinates',
-                { ra: ra, dec: dec, },
+            return this.base_command( 'mount', 'go', 'slew to RA/Dec',
+                { ra: ra, dec: dec, frame: this.telescope_coordinate_frame },
+                { object: obj }
+            )
+        },
+        mount_slew_azalt_command () {
+            let az = emptyString(this.mount_ra.toString())
+            let alt= emptyString(this.mount_dec.toString())
+            let obj = emptyString(this.mount_object.toString())
+            return this.base_command( 'mount', 'go', 'slew to az/alt',
+                { az: az, alt: alt, frame: this.telescope_coordinate_frame },
                 { object: obj }
             )
         },

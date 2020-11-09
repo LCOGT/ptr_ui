@@ -76,6 +76,7 @@ var helpers = {
         if (Math.sin(ha) > 0) hrz_azimuth = 360 - hrz_azimuth;
         return [hrz_altitude, hrz_azimuth]
     },
+
     hour2degree: ra => {
         return ra > 12? (ra - 24) * 15 : ra * 15;
     },

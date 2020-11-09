@@ -12,6 +12,7 @@ const state = {
     mount_object: '',
 
     telescope_selection: 1, // 1: main telescope, 2: auxiliary telescope
+    telescope_coordinate_frame: 'ICRS',
 
     // Subframe parameters
     subframeIsActive: false,
@@ -55,6 +56,7 @@ const getters = {
     mount_object: state => state.mount_object,
 
     telescope_selection: state => state.telescope_selection,
+    telescope_coordinate_frame: state => state.telescope_coordinate_frame,
 
     subframeIsActive: state => state.subframeIsActive,
     subframeDefinedWithFile: state => state.subframeDefinedWithFile,
@@ -97,6 +99,7 @@ const mutations = {
     mount_object(state, val) { state.mount_object = val; },
 
     telescope_selection(state, val) { state.telescope_selection = val; },
+    telescope_coordinate_frame (state, val) { state.telescope_coordinate_frame = val; },
 
     subframeIsActive (state, val) { state.subframeIsActive = val },
     subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },

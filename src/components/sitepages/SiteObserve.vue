@@ -155,23 +155,46 @@
             <status-column class="column" :statusList="buildTelescopeTabStatus2"/>
           </div>
 
-          <b-field horizontal label="Ra">
+          <b-field horizontal label="Ra/Az/Long">
             <b-field>
               <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
-              <p class="control"><span class="button is-light is-static is-small">hrs</span></p>
+              <!--p class="control"><span class="button is-light is-static is-small">hrs</span></p-->
             </b-field>
           </b-field>
-          <b-field horizontal label="Dec">
+          <b-field horizontal label="Dec/Alt/Lat">
             <b-field>
               <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
-              <p class="control"><span class="button is-light is-static is-small">deg</span></p>
+              <!--p class="control"><span class="button is-light is-static is-small">deg</span></p-->
             </b-field>
           </b-field>
           <b-field horizontal label="Object">
             <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_object" autocomplete="off"></b-input>
           </b-field>
 
-          <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>
+
+          <b-field horizontal label="Frame">
+            <b-select placeholder="Select bin" 
+              v-model="telescope_coordinate_frame" size="is-small">
+              <option
+                v-for="(frame_option, index) in telescope_coordinate_frame_options"
+                v-bind:value="frame_option"
+                v-bind:selected="index === 0"
+                v-bind:key="index"
+                >
+                {{ frame_option }}
+              </option>
+            </b-select>
+          </b-field>
+
+
+          <b-field>
+            <p class="control">
+              <command-button :data="mount_slew_radec_command" style="margin-bottom: 1em;" class="is-small"/>
+            </p>
+            <p class="control">
+              <command-button :data="mount_slew_azalt_command" style="margin-bottom: 1em;" class="is-small"/>
+            </p>
+          </b-field>
           <br>
 
           <b-dropdown aria-role="list" style="width: 100%;" size="is-small">
@@ -1046,6 +1069,11 @@ export default {
     telescope_selection: {
       get() { return this.$store.getters['command_params/telescope_selection']},
       set(val) { this.$store.commit('command_params/telescope_selection', val)},
+    },
+
+    telescope_coordinate_frame: {
+      get() { return this.$store.getters['command_params/telescope_coordinate_frame']},
+      set(val) { this.$store.commit('command_params/telescope_coordinate_frame', val)},
     },
 
     subframeIsActive: {
