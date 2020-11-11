@@ -307,6 +307,12 @@ export const commands_mixin = {
         camera_cancel_command () {
             return this.base_command( 'camera', 'stop', 'cancel' )
         },
+        camera_darkslide_open_command () {
+            return this.base_command( 'camera', 'darkslide_open', 'open' )
+        },
+        camera_darkslide_close_command () {
+            return this.base_command( 'camera', 'darkslide_close', 'close' )
+        },
         enclosure_open_command () {
             return this.base_command( 'enclosure', 'open', 'Request Roof to Open')
         },

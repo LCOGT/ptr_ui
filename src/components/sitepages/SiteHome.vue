@@ -6,6 +6,8 @@
         </div>
     </div>
 
+    <div class="resizable">resizable div</div>
+
     <div class="spacer" style="height: 2em;" />
 
     <!-- Site events modal window -->
@@ -127,5 +129,10 @@ export default {
     margin: 2em;
 }
 
+.resizable {
+    overflow:hidden;
+    border: 2px solid gold;
+    resize:vertical;
+}
 
 </style>
