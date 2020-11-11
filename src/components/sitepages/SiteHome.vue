@@ -6,8 +6,6 @@
         </div>
     </div>
 
-    <div class="resizable">resizable div</div>
-
     <div class="spacer" style="height: 2em;" />
 
     <!-- Site events modal window -->
