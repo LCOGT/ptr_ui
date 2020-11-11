@@ -414,7 +414,6 @@
 
           <status-column :statusList="buildCameraTabStatus" />
 
-
           <b-field horizontal label="Expose">
               <b-field>
                   <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
@@ -427,7 +426,6 @@
                   <b-numberinput name="subject" type="is-light" min="1" size="is-small" controls-position="compact" v-model="camera_count" autocomplete="off"></b-numberinput>
               </b-field>
           </b-field>
-
 
           <b-field horizontal label="Filter">
 
@@ -486,7 +484,6 @@
             <button class="button is-small" v-if="!subframeIsActive" @click="function(){subframeIsActive = true}"> activate </button>
           </b-field>
 
-
           <b-field horizontal label="Image Type">
             <b-select placeholder="Select image type" v-model="camera_image_type" size="is-small">
               <option
@@ -535,6 +532,21 @@
             <command-button :data="camera_expose_command" style="width: 70%" class="is-small"/>
             <command-button :data="camera_cancel_command" style="width: 30%" class="is-small"/>
           </div>
+
+          <br>
+
+          <b-field horizontal style="height: auto;" label="Darkslide">
+
+            <div class="status-val">{{ camera_state.darkslide || "no status" }}</div>
+
+            <div class="buttons has-addons">
+              <command-button :data="camera_darkslide_open_command" style="width: 50%;" class="is-small mb-0"/>
+              <command-button :data="camera_darkslide_close_command" style="width: 50%" class="is-small mb-0" />
+            </div>
+          </b-field>
+
+          <br>
+
           <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">
             {{ isCameraStatusVisible ? 'collapse status' : 'expand status'}}
           </div>
@@ -1202,6 +1214,11 @@ export default {
 }
 .choose-target {
   margin-top: 1em;
+}
+.status-val {
+  background-color: black;
+  color:yellowgreen;
+  padding: 2px 10px;
 }
 
 .dropdown-button-command {
