@@ -6,6 +6,7 @@
 
 import { mapGetters } from 'vuex'
 import { getInstance } from '../auth/index' // get user object: getInstance().user
+import axios from 'axios'
 
 // Change empty strings to 'empty'. 
 function emptyString(s) {
@@ -40,6 +41,7 @@ export const commands_mixin = {
                 'JNOW', 
                 'FK5',
                 'B1950',
+                'B1900',
                 'Ecliptic',
                 'Galactic',
             ],
@@ -110,6 +112,59 @@ export const commands_mixin = {
             return this.base_command( 'focuser', 'move_relative', 'focus',
                 { position: microns.toString(), }
             )
+        },
+        focus_auto_command(num_focus_pts) {
+            return this.base_command(
+                'focuser',
+                'autofocus',
+                '',
+                {
+                    num_focus_pts: num_focus_pts,
+                },
+                {}
+            )
+        },
+        // Alternative to the command_button component
+        async postCommand(formCreatorFunction, args) {
+
+            const options = await this.getAuthHeader()
+            let form = formCreatorFunction(...args).form
+            const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.sitecode}`
+
+            form.timestamp = parseInt(Date.now() / 1000)
+            form.site = this.sitecode
+            form.mount = this.active_mount
+
+            axios.post(url,form, options).then(response => {
+                console.log(response.data)
+                this.$emit('jobPost', response.data)
+            }).catch(e => {
+                this.handleNotAuthorizedResponse(e)
+            })
+        },
+
+        handleNotAuthorizedResponse(error) {
+        if (error.response) {
+            // Request made and server responded
+            console.log("error message", error.response.data);
+            console.log("error status", error.response.status);
+            console.log("error headers", error.response.headers);
+            // small popup notification describing error
+            this.$buefy.toast.open({
+            duration: 5000,
+            message: `${error.response.status} error: ${error.response.data}`,
+            position: 'is-bottom',
+            type: 'is-danger' ,
+            })
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.warn("The request was made but no response was received.")
+            console.log(error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.warn("Something happened in setting up the request that triggered an error.")
+            console.log('Error', error.message);
+        }
         },
 
     },
@@ -362,6 +417,12 @@ export const commands_mixin = {
         mount_stop_command () {
             return this.base_command( 'mount', 'stop', 'stop movement' )
         },
+        mount_tracking_on_command() {
+            return this.base_command( 'mount', 'set_tracking_on', 'Start Tracking' )
+        },
+        mount_tracking_off_command() {
+            return this.base_command( 'mount', 'set_tracking_off', 'Stop Tracking' )
+        },
         mount_park_command () {
             return this.base_command( 'mount', 'park', 'park' )
         },
@@ -378,6 +439,7 @@ export const commands_mixin = {
         mount_raSidDec0_command () {
             return this.base_command( 'mount', 'ra=sid, dec=0', 'ra=sid, dec=0')
         },
+
         focus_relative_command () {
             let focus_relative = emptyString(this.focuser_relative.toString())
             return this.base_command( 'focuser', 'move_relative', 'focus',
@@ -390,9 +452,6 @@ export const commands_mixin = {
                 { position: focus_abs, } 
             )
         },
-        focus_auto_command () {
-            return this.base_command( 'focuser', 'auto', 'autofocus' )
-        },
         focus_home_command () {
                 return this.base_command( 'focuser', 'home', 'home' )
         },
@@ -400,7 +459,7 @@ export const commands_mixin = {
             return this.base_command('focuser', 'fine_focus', 'fine focus' )
         },
         focus_vcurve_command () {
-            return this.base_command('focuser', 'v_curve', 'v-curve focus' )
+            return this.base_command('focuser', 'v_curve', 'Find Focus (v-curve)' )
         },
         focus_gotoreference_command () {
             return this.base_command('focuser', 'go_to_reference', 'go to reference' )
@@ -414,6 +473,7 @@ export const commands_mixin = {
         focus_stop_command () {
             return this.base_command( 'focuser', 'stop', 'stop' )
         },
+
         filter_wheel_command () {
             return this.base_command( 'filter_wheel', 'set_name', 'apply',
                 { filter_name: this.filter_wheel_options_selection},

@@ -202,30 +202,23 @@
                 <span>Slew to...</span>
                 <b-icon icon="menu-down"></b-icon>
             </button>
-            <b-dropdown-item aria-role="listitem">
-              <command-button :data="mount_slew_chart_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item aria-role="listitem">
-              <command-button :data="mount_slew_near_tycho" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_screenflat_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_skyflat_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_home_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_park_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_raSidDec0_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_stop_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
+            <template
+              v-for="(command, idx) in [
+                  mount_slew_chart_command,
+                  mount_screenflat_command,
+                  mount_skyflat_command,
+                  mount_home_command,
+                  mount_park_command,
+                  mount_raSidDec0_command,
+                  mount_stop_command,
+                  mount_tracking_on_command,
+                  mount_tracking_off_command
+                ]"
+              >
+              <b-dropdown-item :key="idx" aria-role="listitem">
+                <command-button :data="command" class="dropdown-button-command is-small"/>
+              </b-dropdown-item>
+            </template>
           </b-dropdown>
 
           <b-button class="button" style="width:100%; margin:1em 0;" @click=" telescopeModal = !telescopeModal" icon-right="arrow-top-right">view skychart</b-button>
@@ -302,46 +295,60 @@
                 <span>Focus Action...</span>
                 <b-icon icon="menu-down"></b-icon>
             </button>
-            <b-dropdown-item aria-role="listitem">
-              <command-button :data="focus_home_command" class="dropdown-button-command"/>
+            <template
+              v-for="(command, idx) in [
+                  focus_home_command,
+                  focus_gotoreference_command,
+                  focus_gotocompensated_command,
+                  focus_saveasreference_command,
+                  focus_vcurve_command,
+                ]"
+              >
+              <b-dropdown-item :key="idx" aria-role="listitem">
+                <command-button :data="command" class="dropdown-button-command is-small"/>
+              </b-dropdown-item>
+            </template>
+            <b-dropdown-item>
+                <button class="button dropdown-button-command is-small" 
+                  @click="postCommand(focus_auto_command,[3])">
+                  Quick Autofocus (3 points) 
+                </button>
             </b-dropdown-item>
             <b-dropdown-item>
-              <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
+                <button class="button dropdown-button-command is-small" 
+                  @click="postCommand(focus_auto_command,[5])">
+                  Fine Autofocus (5 points) 
+                </button>
             </b-dropdown-item>
           </b-dropdown>
           <br>
 
           <b-field label="Relative">
             <b-field>
-              <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
-              <p class="control"> <command-button :data="focus_relative_command" class="is-small" @jobPost="focuserJobPost"/>  </p><br>
+              <b-input expanded 
+                name="subject" 
+                size="is-small" 
+                v-model="focuser_relative" 
+                type="number" 
+                :step="focuser_step_size" 
+                autocomplete="off"/>
+              <p class="control"> 
+                <command-button 
+                  :data="focus_relative_command" 
+                  class="is-small" 
+                  @jobPost="focuserJobPost"/>  </p> <br>
             </b-field>
           </b-field>
           <b-field>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-300'])"> -300 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-100'])"> -100 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-30'])"> -30 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+30'])"> +30 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+100'])"> +100 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+300'])"> +300 </button>
-            </p>
+            <template v-for="(focus_val, idx) in ['-300', '-100', '-30', '+30', '+100', '+300']">
+              <p class="control" :key="idx">
+                <button 
+                  class="button is-small"
+                  @click="postCommand(focus_relative_command_args, [focus_val])">
+                  {{focus_val}}
+                </button>
+              </p>
+            </template>
           </b-field>
 
           <b-field label="Absolute">
@@ -537,7 +544,9 @@
 
           <b-field horizontal style="height: auto;" label="Darkslide">
 
-            <div class="status-val">{{ camera_state.darkslide || "no status" }}</div>
+            <div class="status-val">
+              {{ camera_state && camera_state.darkslide || "no status" }}
+            </div>
 
             <div class="buttons has-addons">
               <command-button :data="camera_darkslide_open_command" style="width: 50%;" class="is-small mb-0"/>
@@ -900,48 +909,7 @@ export default {
     async setDefaultDevices() {
       this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
     },
-    handleNotAuthorizedResponse(error) {
-      if (error.response) {
-        // Request made and server responded
-        console.log("error message", error.response.data);
-        console.log("error status", error.response.status);
-        console.log("error headers", error.response.headers);
-        // small popup notification describing error
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: `${error.response.status} error: ${error.response.data}`,
-          position: 'is-bottom',
-          type: 'is-danger' ,
-        })
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.warn("The request was made but no response was received.")
-        console.log(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.warn("Something happened in setting up the request that triggered an error.")
-        console.log('Error', error.message);
-      }
-    },
 
-    // Alternative to the command_button component
-    async postCommand(formCreatorFunction, args) {
-
-      const options = await this.getAuthHeader()
-      let form = formCreatorFunction(...args).form
-      const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.sitecode}`
-
-      form.timestamp = parseInt(Date.now() / 1000)
-      form.site = this.sitecode
-      form.mount = this.active_mount
-
-      axios.post(url,form, options).then(response => {
-        console.log(response.data)
-        this.$emit('jobPost', response.data)
-      }).catch(e => {
-        this.handleNotAuthorizedResponse(e)
-      })
-    },
 
     focuserJobPost(data) {
       console.log('focuser job post: ',data)
