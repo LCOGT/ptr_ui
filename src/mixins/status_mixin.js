@@ -188,6 +188,7 @@ export const status_mixin = {
             if (this.dec != '-') { status.push({"name": "Dec", "val": this.dec})}
             if (this.azimuth != '-') { status.push({"name": "Azimuth", "val": this.azimuth})}
             if (this.altitude != '-') { status.push({"name": "Altitude", "val": this.altitude})}
+            if (this.refraction != '-') { status.push({"name": "Refr.", "val": this.refraction})}
             return status
         },
         buildTelescopeTabStatus2() {
@@ -208,6 +209,8 @@ export const status_mixin = {
         buildFocuserTabStatus() {
             let status = []
             if (this.focus_position != '-') { status.push({"name": "Focus", "val": this.focus_position})}
+            if (this.focus_comp != '-') { status.push({"name": "Comp.", "val": this.focus_comp})}
+            if (this.focus_filter_offset != '-') { status.push({"name": "Offset", "val": this.focus_filter_offset})}
             if (this.focus_temperature != '-') { status.push({"name": "Temp", "val": this.focus_temperature})}
             if (this.focus_moving != '-') { status.push({"name": "Status", "val": this.focus_moving})}
             return status
@@ -458,6 +461,13 @@ export const status_mixin = {
                 return '-'
             }
         },
+        refraction() {
+            if (this.telescope_state && 'refraction' in this.telescope_state ){
+                return (this.telescope_state.refraction || '-')
+            } else {
+                return '-'
+            }
+        },
         hour_angle() {
             if (this.telescope_state 
                     && "right_ascension" in this.telescope_state 
@@ -530,6 +540,20 @@ export const status_mixin = {
         focus_position() {
             if (this.focuser_state && 'focus_position' in this.focuser_state){
                 return this.focuser_state.focus_position + " μm"
+            } else {
+                return '-'
+            }
+        },
+        focus_comp() {
+            if (this.focuser_state && 'comp' in this.focuser_state){
+                return String(this.focuser_state.comp) + " μm"
+            } else {
+                return '-'
+            }
+        },
+        focus_filter_offset() {
+            if (this.focuser_state && 'filter_offset' in this.focuser_state){
+                return this.focuser_state.filter_offset + " μm"
             } else {
                 return '-'
             }
