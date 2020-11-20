@@ -53,19 +53,17 @@ const getters = {
 // actions
 const actions = {
 
-    async fetchUserProjects({ commit }, user_id) {
+    async fetchUserProjects({ commit, rootState }, user_id) {
         
         // This happens when the method is called before the current user is loaded.
         if (user_id===undefined) return;
 
         commit('user_projects_is_loading', true)
 
-        let url = 'https://projects.photonranch.org/dev'
-        url += '/get-user-projects'
-        
+        const url = rootState.dev.projects_endpoint + '/get-user-projects'
+        const body = {user_id: user_id}
         let header = await getAuthRequestHeader()
 
-        let body = {user_id: user_id}
 
         axios.post(url, body, header).then(response => {
             commit('user_projects_is_loading', false)
@@ -76,13 +74,27 @@ const actions = {
             console.log("user: ",user_id)
         })
     },
+    async fetchAllProjects({ commit, rootState}) {
+        
+        commit('user_projects_is_loading', true)
 
-    fetchUserEvents({ commit }, user_id) {
+        const url = rootState.dev.projects_endpoint + '/get-all-projects'
+        const body = {}
+        let header = await getAuthRequestHeader()
+
+        axios.post(url, body, header).then(response => {
+            commit('user_projects_is_loading', false)
+            commit('user_projects', response.data)
+        }).catch(err => {
+            commit('user_projects_is_loading', false)
+            console.log('error fetching user projects: ', err)
+        })
+    },
+
+    fetchUserEvents({ commit, rootState }, user_id) {
         commit('user_events_is_loading', true)
 
-        let url = 'https://calendar.photonranch.org'
-        url += '/dev/user-events-ending-after-time'
-
+        const url = rootState.dev.calendar_api + '/user-events-ending-after-time'
         const header = {
             'headers': {
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -103,12 +115,9 @@ const actions = {
         })
     },
 
-    async deleteProject({ dispatch }, {project_name,created_at}) {
-        let url = 'https://projects.photonranch.org/dev'
-        url += '/delete-project'
-        
+    async deleteProject({ dispatch, rootState }, {project_name,created_at}) {
+        const url = rootState.dev.projects_endpoint + '/delete-project'
         let header = await getAuthRequestHeader()
-
         let body = {
             project_name:project_name,
             created_at: created_at
@@ -140,11 +149,10 @@ const actions = {
         })
     },
 
-    updateProjectInEvent({dispatch}, {event, project_name,created_at}) {
+    updateProjectInEvent({ dispatch, rootState }, {event, project_name,created_at}) {
         /* arg 'event' is the event object we want to update. Must include 'event_id' and 'start' */
 
-        let url = 'https://calendar.photonranch.org'
-        url += '/dev/add-projects-to-events'
+        const url = rootState.dev.calendar_api + '/add-projects-to-events'
 
         const header = {
             'headers': {

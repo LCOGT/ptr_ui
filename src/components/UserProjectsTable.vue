@@ -1,5 +1,13 @@
 <template>
 <div>
+    <div class="table-header">
+        <h1 class="subtitle"> Projects</h1>
+        <b-switch 
+            v-model="show_everyones_projects" 
+            v-if="userIsAdmin">
+            Show everyone's projects [admin only]
+        </b-switch>
+    </div>
     <b-table
         :data="user_projects"
         :loading="user_projects_is_loading"
@@ -94,6 +102,10 @@ export default {
     },
     data() {
         return {
+
+            // Admins can choose to see all ptr projects, not just their own.
+            show_everyones_projects: false,
+
             localTime: '-',
             siteTime: '-',
             utcTime: '-',
@@ -117,6 +129,14 @@ export default {
         user() {
             this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
         },
+
+        show_everyones_projects(value) {
+            if (value) {
+                this.$store.dispatch('user_data/fetchAllProjects')
+            } else {
+                this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+            }
+        }
 
     },
     methods: {
@@ -163,6 +183,15 @@ export default {
             'user_projects',
             'user_projects_is_loading',
         ]),
+        userIsAdmin() {
+            try {
+                let user = this.$auth.user 
+                let roles = user['https://photonranch.org/user_metadata'].roles
+                return roles.includes('admin')
+            } catch {
+                return false
+            }
+        },
     },
     
 }
@@ -171,6 +200,11 @@ export default {
 
 
 <style lang="scss" scoped>
+
+.table-header {
+    display:flex;
+    justify-content: space-between;
+}
 
 // Fix buefy's default white detail background color
 .my-table {

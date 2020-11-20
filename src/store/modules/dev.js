@@ -9,7 +9,7 @@ const state = {
     //active_api: "https://api.photonranch.org/test", 
     jobs_api: "https://jobs.photonranch.org/jobs",
     //jobs_api: "https://jobs.photonranch.org/test",
-    calendar_api: "https://calendar.photonranch.org/calendar",
+    calendar_api: "https://calendar.photonranch.org/dev",
 
     projects_endpoint: "https://projects.photonranch.org/dev", // prod endpoint
 

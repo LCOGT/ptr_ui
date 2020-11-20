@@ -149,6 +149,16 @@
                         <option v-for="i in 25" :key="i-1" :value="i-1"> {{i-1}}</option>
                     </b-select>
                 </b-field>
+                <b-field :label="n==1 ? 'Photometry' : ''">
+                    <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].photometry">
+                        <option value="-"> - </option>
+                        <option value="target"> target </option>
+                        <option value="comparison1"> Comparison 1 </option>
+                        <option value="comparison2"> Comparison 2 </option>
+                        <option value="check1"> Check 1 </option>
+                        <option value="check2"> Check 2 </option>
+                    </b-select>
+                </b-field>
                 <b-field :label="n==1 ? 'Defocus' : ''">
                     <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].defocus">
                         <option v-for="i in 6" :key="i-1" :value="i-1"> {{i-1}}</option>
@@ -389,6 +399,7 @@ export default {
                     area: 'FULL',
                     bin: '2, 2',
                     dither: 'no',
+                    photometry: '-',
                     defocus: 0,
                 },
             ],
@@ -540,6 +551,7 @@ export default {
                     area: 'FULL',
                     bin: '2, 2',
                     dither: 'no',
+                    photometry: '-',
                     defocus: 0,
                 },
             ]
@@ -619,9 +631,6 @@ export default {
                     type: "is-danger"
                 })
             }
-            //if (this.dither == '') { this.warn.dither = true }
-            //if (this.lunar_dist_min == '') { this.warn.lunar_dist_min = true }
-            //if (this.lunar_phase_max == '') { this.warn.lunar_phase_max = true }
         },
 
         resetInputWarnings() {

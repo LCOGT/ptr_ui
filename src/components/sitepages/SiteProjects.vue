@@ -4,7 +4,6 @@
     <create-project-form :sitecode="sitecode" :project_to_load="project_to_load"/>
     <div style='height: 50px;' />
 
-    <h1 class="subtitle"> Projects</h1>
     <user-projects-table 
         :user="user"
         @load_project_form="load_project_form"
