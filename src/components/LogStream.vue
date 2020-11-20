@@ -1,7 +1,7 @@
 <template>
     <div>
         
-    <!-- enable these buttons for easier manual testing
+    <!-- enable these buttons for easier manual testing>
     <button @click="send_fake_log_ws" class="button ">send ws log</button>
     <button @click="send_fake_log_http" class="button ">send http log</button>
     <button @click="get_recent_logs" class="button">get recent logs</button>
@@ -113,7 +113,7 @@ export default {
         send_fake_log_ws() {
             let body = {
                 action: "newlog",
-                log_message: "This is a log message for testing.\nIt is sent from the frontend.",
+                log_message: "This is a log message for testing. It is sent from the frontend.",
                 site: this.site, 
                 log_level: this.supported_log_levels[this.getRandomInt(5)],
                 timestamp: this.get_timestamp_seconds()

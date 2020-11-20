@@ -37,7 +37,7 @@
           <img 
               style="width: 60px; height: 60px;"
               v-bind:src="item.jpg_url"
-              onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=:('"
+              onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
               v-bind:title="item.base_filename"
               v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
               @click="setActiveImage(item)"
@@ -273,7 +273,6 @@ export default {
     init() {
 
       this.d3_image_element = d3.select(this.image_element)
-
 
       let that = this;
 
