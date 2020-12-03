@@ -767,9 +767,7 @@
     :deviceStatus="deviceStatus"
     />
 
-  <log-stream 
-    :site="sitecode"
-    />
+  <!--log-stream :site="sitecode" /-->
 
   </div>
 </template>

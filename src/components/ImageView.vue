@@ -800,7 +800,7 @@ export default {
   margin-top: 1em;
   display: flex;
   justify-content: space-between;
-  overflow-y: visible;
+  overflow-x:auto;
 }
 
 .image-div {

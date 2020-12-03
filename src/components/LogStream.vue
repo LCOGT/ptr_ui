@@ -1,7 +1,7 @@
 <template>
     <div>
         
-    <!-- enable these buttons for easier manual testing>
+    <-- enable these buttons for easier manual testing>
     <button @click="send_fake_log_ws" class="button ">send ws log</button>
     <button @click="send_fake_log_http" class="button ">send http log</button>
     <button @click="get_recent_logs" class="button">get recent logs</button>
@@ -11,17 +11,13 @@
 
     <div class="logstream-wrapper">
 
-        <b-tooltip label="observatory logs" position="is-left" :active="is_collapsed" square>
-            <div class="collapse-button" @click="toggle_open">
-                <b-icon v-if="is_collapsed" icon="chevron-left" />
-                <b-icon v-if="!is_collapsed" icon="chevron-right"/>
-            </div>
-        </b-tooltip>
 
         <div class="log-list" ref="loglist" v-if="!is_collapsed">
+
             <div style="text-align: center; padding: 1em 4em;">
                 observatory logs will appear below
             </div>
+
             <div 
                 v-for="(log, idx) in logs"
                 v-bind:key="idx"
@@ -42,7 +38,15 @@
                     {{format_log_message_text(log)}}
                 </pre>
             </div>
+
         </div>
+
+        <b-tooltip label="observatory logs" position="is-left" :active="is_collapsed" square>
+            <div class="collapse-button" @click="toggle_open">
+                <b-icon v-if="is_collapsed" icon="chevron-left" />
+                <b-icon v-if="!is_collapsed" icon="chevron-right"/>
+            </div>
+        </b-tooltip>
 
     </div>    
     </div>
@@ -266,7 +270,7 @@ $log-critical: $danger;
     background-color:black;
     position: fixed;
     right: 0%;
-    bottom: 0;
+    top: 200px;
     height: 150px;
     max-width: 100%;
     margin-bottom: 1em;
