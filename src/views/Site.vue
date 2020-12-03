@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     
-    <div class="container is-fluid">
+    <div class="container">
     <section class="page-view">
 
     <div style="height: 1em"></div>
@@ -94,7 +94,7 @@
         <div style="height:3em;"/>
       </div>
 
-      <div class="column is-hidden-touch is-hidden-desktop-only status-column">
+      <!--div class="column is-hidden-touch is-hidden-desktop-only status-column">
         <status-panel-collapsible
           :sitecode="sitecode"
           :fullStatus="weather_state"
@@ -113,7 +113,7 @@
           <p slot="title">{{sitecode}} status</p>
         </status-panel-collapsible>
 
-      </div>
+      </div-->
 
 
       <!-- Primary content of the page. Selects from the various site subpages. -->
@@ -131,6 +131,20 @@
     </section>
     </div>
 
+    <site-status-footer 
+      class="is-hidden-mobile"
+      :site="sitecode" 
+      :fullStatus="deviceStatus"
+      :statusList="buildGeneralStatus"
+      style="position: sticky; bottom: 0;"/>
+
+    <site-status-footer-mobile 
+      class="is-hidden-tablet"
+      :site="sitecode" 
+      :fullStatus="deviceStatus"
+      :statusList="buildGeneralStatus"
+      style="position: sticky; bottom: 0;"/>
+
     <footer class="footer is-hidden-touch">
       <div class="has-text-centered">
         <p>
@@ -143,7 +157,7 @@
 
 
     <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
-    <div class="mobile-menu ">
+    <!--div class="mobile-menu ">
       <status-row
         :statusList="buildGeneralStatus" 
         class="is-mobile is-hidden-widescreen"
@@ -201,7 +215,7 @@
           </b-button>
         </b-tooltip>
       </div>
-    </div>
+    </div-->
 
 
   </div>
@@ -214,6 +228,8 @@ import ChatModule from '@/components/ChatModule'
 import SideInfoPanel from '@/components/SideInfoPanel'
 import StatusPanelCollapsible from '@/components/status/StatusPanelCollapsible'
 import StatusRow from '@/components/status/StatusRow'
+import SiteStatusFooter from '@/components/status/SiteStatusFooter'
+import SiteStatusFooterMobile from '@/components/status/SiteStatusFooterMobile'
 
 import SiteHome from '@/components/sitepages/SiteHome'
 import SiteObserve from '@/components/sitepages/SiteObserve'
@@ -243,6 +259,8 @@ export default {
     SideInfoPanel,
     StatusPanelCollapsible,
     StatusRow,
+    SiteStatusFooter,
+    SiteStatusFooterMobile,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin, status_mixin],
@@ -459,7 +477,6 @@ export default {
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
 @import "../style/_variables.scss";
 
-
 .menu-column {
   width: 300px;
   height: auto;
@@ -524,13 +541,13 @@ export default {
 }
 .page-view {
   /* min height: screen + footer + visual buffer */
-  height: 1400px;
+  min-height: 1400px;
   margin: 0 auto; /* center the main div */
 }
 
 footer {
   display:none;
-  position:absolute;
+  position:sticky;
   bottom: 0;
   width: 100vw;
   padding: 2em 1em 2em; 

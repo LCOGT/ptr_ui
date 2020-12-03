@@ -4,6 +4,14 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import axios from 'axios'
 import { getInstance } from '../auth/index' // get user object: getInstance().user
 
+
+/**
+ * 
+ *  NOTE: 
+ *  This mixin requires 'sitecode' to be defined by the parent component that
+ *  imports the mixin. This should be changed eventually. 
+ */
+
 // Change empty strings to 'empty'. 
 function emptyString(s) {
     return s == '' ? 'empty' : s;
@@ -20,6 +28,12 @@ export const status_mixin = {
 
             local_timestamp: Date.now(),
             update_time_interval: '',
+
+            display_colors: {
+                "red": "orangered",
+                "yellow": "yellow",
+                "green": "greenyellow",
+            }
         }
     },
 
@@ -95,6 +109,9 @@ export const status_mixin = {
             if (undefined == s) { 
                 return false; 
             }
+            if (typeof s === "boolean") {
+                return s
+            }
             else if (s.toLowerCase()=="true") {return true}
             else if (s.toLowerCase()=="false") {return false}
             console.error("Could not parse true or false. Check for bad behavior.")
@@ -129,9 +146,9 @@ export const status_mixin = {
 
         buildWeatherStatus() {
             let status = []
-            status.push({"name": "Status Age", ...this.status_age_display})
-            if (this.weather_ok != '-'){ status.push({"name": "Weather ok", "val": this.weather_ok}) }
-            if (this.open_ok != '-'){ status.push({"name": "Open Ok", "val": this.open_ok}) }
+            //status.push({"name": "Status Age", ...this.status_age_display})
+            if (this.weather_ok.val != '-'){ status.push({"name": "Weather ok", ...this.weather_ok}) }
+            if (this.open_ok.val != '-'){ status.push({"name": "Open Ok", ...this.open_ok}) }
 
             status.push({"name": "spacer", "val": "spacer"}) 
 
@@ -179,7 +196,7 @@ export const status_mixin = {
             let status = []
             if (this.enclosure_mode != '-'){ status.push({"name": "Mode", "val": this.enclosure_mode}) }
             if (this.enclosure_status != '-'){ status.push({"name": "Enclosure", "val": this.enclosure_status}) }
-            if (this.open_ok != '-'){ status.push({"name": "Open ok", "val": this.open_ok}) }
+            if (this.open_ok.val != '-'){ status.push({"name": "Open ok", ...this.open_ok}) }
             return status
         },
         buildTelescopeTabStatus1() {
@@ -237,7 +254,6 @@ export const status_mixin = {
 
         ...mapGetters('site_config', [
             'site_config',
-            'site',
             'enclosure',
             'mount',
             'telescope',
@@ -253,32 +269,32 @@ export const status_mixin = {
             if (this.status_age < 60) { 
                 return {
                     "val": this.status_age_seconds,
-                    "color": "lightgreen",
+                    "color": this.display_colors.green,
                 }
             } else if (this.status_age < 600) { 
                 return {
                     "val": this.status_age_minutes,
-                    "color": "yellow",
+                    "color": this.display_colors.yellow,
                 }
             } else if (this.status_age < 3600) { 
                 return {
                     "val": this.status_age_minutes,
-                    "color": "red",
+                    "color": this.display_colors.red,
                 }
             } else if (this.status_age < 86400) { 
                 return {
                     "val": this.status_age_hours,
-                    "color": "red",
+                    "color": this.display_colors.red,
                 }
             } else if (this.status_age < 18000*86400 ) { 
                 return {
                     "val": this.status_age_days,
-                    "color": "red",
+                    "color": this.display_colors.red,
                 }
             } else { 
                 return {
                     "val": 'unavailable',
-                    "color": "red",
+                    "color": this.display_colors.red,
                 }
             }
         },
@@ -338,10 +354,24 @@ export const status_mixin = {
             } catch { return {} }
         },
         weather_ok() {
-            return (this.weather_state.wx_ok || '-')
+            let color = this.display_colors.red
+            let val = this.weather_state.wx_ok || '-'
+            if (val == "Yes") { color = this.display_colors.green }
+
+            return {
+                "val": val,
+                "color": color
+            }
         },
         open_ok() {
-            return (this.weather_state.open_ok || '-')
+            let color = this.display_colors.red
+            let val = this.weather_state.open_ok || '-'
+            if (val == "Yes") { color = this.display_colors.green }
+
+            return {
+                "val": val,
+                "color": color
+            }
         },
         sky_temp() {
             return (this.weather_state.sky_temp_C || '-') + ' °C'

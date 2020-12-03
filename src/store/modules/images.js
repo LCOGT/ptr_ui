@@ -155,6 +155,7 @@ const actions = {
             }
         }).catch(error => {
             // Most likely: no jpg availaable
+            console.log(error)
             if (error.status == 404) {
                 console.log('update_new_image: not found, probably because\
                 there was no jpg included in the db')
