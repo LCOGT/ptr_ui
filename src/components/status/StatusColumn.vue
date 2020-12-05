@@ -64,7 +64,7 @@ export default {
 }
 .val{
   color: greenyellow;
-  color: white;
+  color: lightgray;
   background-color: rgb(12, 12, 12);
   border: 1px solid black;
   padding: 0 8px;

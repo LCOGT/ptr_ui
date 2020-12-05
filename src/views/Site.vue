@@ -1,8 +1,25 @@
 <template>
   <div class="page">
     
-    <div class="container">
-    <section class="page-view">
+    <div class="container page-view">
+
+    <div class="mobile-site-menu is-hidden-widescreen">
+      <router-link :to="'/site/'+sitecode+'/home'">
+        <button class="button" >Home</button>
+      </router-link>
+      <router-link :to="'/site/'+sitecode+'/observe'">
+        <button class="button" >Observe</button>
+      </router-link>
+      <router-link :to="'/site/'+sitecode+'/targets'">
+        <button class="button" >Targets</button>
+      </router-link>
+      <router-link :to="'/site/'+sitecode+'/projects'">
+        <button class="button" >Projects</button>
+      </router-link>
+      <router-link :to="'/site/'+sitecode+'/calendar'">
+        <button class="button" >Calendar</button>
+      </router-link>
+    </div>
 
     <div style="height: 1em"></div>
     <div class="columns" style="margin: 1em;">
@@ -94,28 +111,6 @@
         <div style="height:3em;"/>
       </div>
 
-      <!--div class="column is-hidden-touch is-hidden-desktop-only status-column">
-        <status-panel-collapsible
-          :sitecode="sitecode"
-          :fullStatus="weather_state"
-          :statusList="buildWeatherStatus"
-          :statusAge="status_age"
-          >
-          <p slot="title">{{sitecode}} weather</p>
-        </status-panel-collapsible>
-
-        <status-panel-collapsible
-          :sitecode="sitecode"
-          :fullStatus="deviceStatus"
-          :statusList="buildGeneralStatus"
-          :statusAge="status_age"
-          >
-          <p slot="title">{{sitecode}} status</p>
-        </status-panel-collapsible>
-
-      </div-->
-
-
       <!-- Primary content of the page. Selects from the various site subpages. -->
       <!-- Note: wait for parent (this component) to mount before loading child components. 
       Otherwise, props may initially load as null. -->
@@ -128,95 +123,17 @@
           />
           </div>
       </div>
-    </section>
     </div>
 
     <site-status-footer 
       class="is-hidden-mobile"
       :site="sitecode" 
-      :fullStatus="deviceStatus"
-      :statusList="buildGeneralStatus"
       style="position: sticky; bottom: 0;"/>
 
     <site-status-footer-mobile 
       class="is-hidden-tablet"
       :site="sitecode" 
-      :fullStatus="deviceStatus"
-      :statusList="buildGeneralStatus"
       style="position: sticky; bottom: 0;"/>
-
-    <footer class="footer is-hidden-touch">
-      <div class="has-text-centered">
-        <p>
-          You are currently observing from site 
-          <span class="is-uppercase" style="color: greenyellow">{{sitecode}}</span> in the 
-          <strong>photon ranch</strong> network.
-        </p>
-      </div>
-    </footer>
-
-
-    <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
-    <!--div class="mobile-menu ">
-      <status-row
-        :statusList="buildGeneralStatus" 
-        class="is-mobile is-hidden-widescreen"
-        style="margin: 0; padding: 0; background-color: #151718;"
-        :statusAge="status_age" />
-      <div class="level is-mobile is-hidden-widescreen">
-
-        <b-tooltip label="Home" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/home'"
-            icon-right="home"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
-
-        <b-tooltip label="Observe" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/observe'"
-            icon-right="telescope"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
-        
-        <b-tooltip label="Target Explorer" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/targets'"
-            icon-right="target"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
-
-        <b-tooltip label="Projects" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/projects'"
-            icon-right="folder-multiple-image"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
-
-        <b-tooltip label="Calendar" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/calendar'"
-            icon-right="calendar"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
-      </div>
-    </div-->
-
 
   </div>
 </template>
@@ -496,13 +413,13 @@ export default {
 .site-reserved-current-user {
   color: greenyellow;
 }
-
 .site-reservation-status-box {
   background-color: black;
   border-radius: 8px;
   padding: 1em;
   margin-bottom: 1em;
 }
+
 
 .subpage-menu {
   margin-bottom: 3em;
@@ -514,43 +431,24 @@ export default {
   padding-left: 1em;
 }
 
-.mobile-menu {
-  background-color: darken($dark, 3);
-  position: fixed;
-  bottom: 0;
+
+.mobile-site-menu {
   width: 100%;
-  z-index: 10;
+  top: 0;
+  bottom: 300px;
+  z-index: 0;
 }
-.mobile-menu-button.level-item {
-  background-color:hsla(0,0,0,0);
-  border: none;
+.mobile-site-menu button {
   border-radius: 0;
-  color:grey;
-  padding-top: 1.5em;
-  padding-bottom: 2.5em;
-  
-}
-.mobile-menu-button.is-active.router-link-active.is-large.is-text {
-  background-color:hsla(0,0,0,0);
-  color:white;
-  box-shadow: none;
+  width: 20%;
+  font-size: 12px;
+  background-color: $dark;
 }
 
-.page-content {
-  margin-bottom: 200px;
-}
+
 .page-view {
   /* min height: screen + footer + visual buffer */
-  min-height: 1400px;
-  margin: 0 auto; /* center the main div */
-}
-
-footer {
-  display:none;
-  position:sticky;
-  bottom: 0;
-  width: 100vw;
-  padding: 2em 1em 2em; 
+  min-height: 100vh;
 }
 
 

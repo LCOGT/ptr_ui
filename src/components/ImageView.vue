@@ -56,13 +56,13 @@
           </b-field>
           <b-field>
             <p class="control">
-              <b-tooltip label="latest image" position="is-bottom" type="is-black">
+              <b-tooltip label="latest image" position="is-right" type="is-black">
               <button class="button level-item" @click="setLatestImage">
               <b-icon icon="chevron-double-left"/></button>
               </b-tooltip>
             </p>
             <p class="control">
-              <b-tooltip label="previous image" position="is-bottom" type="is-black">
+              <b-tooltip label="previous image" position="is-right" type="is-black">
                 <button class="button level-item" 
                   @click="$store.dispatch('images/set_previous_image')">
                   <b-icon icon="chevron-left" />
@@ -70,7 +70,7 @@
               </b-tooltip>
             </p>
             <p class="control">
-              <b-tooltip label="next image" position="is-bottom" type="is-black">
+              <b-tooltip label="next image" position="is-right" type="is-black">
                 <button class="button level-item" 
                   @click="$store.dispatch('images/set_next_image')">
                   <b-icon icon="chevron-right" />
@@ -81,7 +81,7 @@
 
           <b-field>
             <p class="control">
-              <b-tooltip label="download small fits file" position="is-bottom" type="is-black">
+              <b-tooltip label="download small fits file" position="is-right" type="is-black">
                 <a class="button has-text-white" 
                   :disabled="small_fits_exists"
                   @click="download_fits_file(current_image.base_filename, 'EX10')">
@@ -89,7 +89,7 @@
               </b-tooltip>
             </p>
             <p class="control">
-              <b-tooltip label="download large fits file" position="is-bottom" type="is-black">
+              <b-tooltip label="download large fits file" position="is-right" type="is-black">
                 <a class="button has-text-white" 
                   :disabled="large_fits_exists"
                   @click="download_fits_file(current_image.base_filename, 'EX01')">
@@ -101,7 +101,7 @@
         </b-field>
 
 
-        <div> <b-field label="subframe active">
+        <div> <b-field label="subframe">
               <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
           </b-field> </div>
         <!---div> <b-field label="subframe visible">
@@ -801,6 +801,7 @@ export default {
   display: flex;
   justify-content: space-between;
   overflow-x:auto;
+  overflow-y:visible;
 }
 
 .image-div {

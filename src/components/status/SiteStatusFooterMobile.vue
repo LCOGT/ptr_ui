@@ -20,7 +20,6 @@
 
             <!-- Content -->
             <div class="status-content">
-                
 
                 <!-- Main Status Display -->
                 <div class="main-status-mobile" v-if="main_status_visible">
@@ -35,7 +34,7 @@
                         </div>
                         <div style="display:flex; flex-direction:column; align-items:center;">
                             <div class="sidereal-time" :class="{'offline': !isOnline}">
-                                {{ decimalToHHMMSS(sidereal_time).slice(0,-3) }}
+                                <site-sidereal-time :longitude="site_longitude"/> 
                             </div>
                             <div class="sidereal-label">
                                 sidereal time
@@ -46,10 +45,12 @@
 
                         <status-column 
                             style="padding: 0;"
+                            :isOffline="!isOnline"
                             :statusList="buildGeneralStatus"/>
 
                         <status-column 
                             style="padding: 0;"
+                            :isOffline="!isOnline"
                             :statusList="buildWeatherStatus"/>
                     </div>
 
@@ -64,7 +65,7 @@
                         </div>
 
                         <div 
-                            v-for="(log, idx) in logs"
+                            v-for="(log, idx) in user_status_logs"
                             v-bind:key="idx"
                             class="log-line"
                             >
@@ -93,83 +94,52 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
 import moment from 'moment';
-import { status_mixin } from '../../mixins/status_mixin'
+import { status_mixin } from '@/mixins/status_mixin'
+import { user_status_mixin } from '@/mixins/user_status_mixin'
 import StatusColumn from '@/components/status/StatusColumn'
+import SiteSiderealTime from '@/components/SiteSiderealTime'
 export default {
     name: 'SiteStatusFooterMobile',
-    mixins: [status_mixin],
+    mixins: [status_mixin, user_status_mixin],
     components: {
-        StatusColumn
+        StatusColumn,
+        SiteSiderealTime
     },
     props: {
         site: String,
-        statusList: Array,
     },
 
     data() {
         return {
-
             status_visible: false,
             main_status_visible: false,
             user_status_visible: false,
-
-            status_bar_1_expanded: false,
-            status_bar_2_expanded: false,
-                
-            // user status (logs)
-            logs: [],
-            is_collapsed: false,
-            supported_log_levels: [
-                "debug",
-                "info", 
-                "warning",
-                "error",
-                "critical",
-            ]
         }
     },
 
-    mounted() {
-
-        this.get_recent_logs()
-
-        this.connect_to_logs_ws()
-            
+    created() {
+        this.set_user_status_active_site(this.site)
     },
 
     watch: {
 
-        // If the site changes:
         site() {
-            console.log('changing site detected from sitestatusfooter.')
-            // Close old logs connection
-            this.logs_ws.close()
-
-            this.logs = []
-            this.get_recent_logs()
-
-            // Open connection with new site
-            this.connect_to_logs_ws(this.site)
+            this.set_user_status_active_site(this.site)
         },
 
-        user_status_visible() {
-            if (this.user_status_visible) {
-                this.scrollToBottom()
+        user_status_logs() {
+            const div = this.$refs.loglist;
+            if (this.user_status_visible && this.isScrolledToBottom(div)) {
+                this.$nextTick(this.scrollToBottom)
             }
-        }
+        },
     },
-
-    beforeDestroy() {
-        this.close_logs_websocket()
-    },
-
 
     methods: {
-
 
         hide_status() {
             this.status_visible = false;
@@ -197,71 +167,6 @@ export default {
             }
         },
 
-        connect_to_logs_ws(site) {
-
-            if (!site) return;
-
-            // Connect to websocket
-            let logs_url = this.logs_ws_endpoint
-            logs_url += `?site=${encodeURIComponent(site)}`
-            this.logs_ws = new ReconnectingWebSocket(logs_url)
-
-            // Define websocket incoming message behavior
-            this.logs_ws.onmessage = this.handle_new_log
-        },
-
-        close_logs_websocket(site) {
-            try {
-                this.logs_ws.close()
-            } catch {
-                return;
-            }
-        },
-
-        getRandomInt(max) {
-
-            return Math.floor(Math.random() * Math.floor(max));
-        },
-        get_timestamp_seconds() {
-            return Math.floor(Date.now() / 1000)
-        },
-
-        // Open or collapse the logs window
-        toggle_open() {
-            if (this.is_collapsed) {                    
-                this.is_collapsed = false;
-                this.$nextTick(this.scrollToBottom)
-            } else {
-                this.is_collapsed = true;
-            }
-        },
-
-        // Used to test sending a message.
-        send_fake_log_ws() {
-            let body = {
-                action: "newlog",
-                log_message: "This is a log message for testing. It is sent from the frontend.",
-                site: this.site, 
-                log_level: this.supported_log_levels[this.getRandomInt(5)],
-                timestamp: this.get_timestamp_seconds()
-            }
-            console.log(body)
-            this.logs_ws.send(JSON.stringify(body))
-        },
-
-        // Used to test sending a message.
-        send_fake_log_http() {
-            const url = this.logs_endpoint + '/newlog'
-            let body = {
-                log_message: `multiline\nlog\nmessage`,
-                site: this.site,
-                timestamp: this.get_timestamp_seconds()
-            }
-            //console.log(body.log_message)
-            axios.post(url, body)
-
-        },
-
         // Returns true if the element is scrolled to the bottom
         isScrolledToBottom(el) {
             var $el = $(el);
@@ -274,90 +179,11 @@ export default {
             const div = this.$refs.loglist;
             div.scrollTop = div.scrollHeight - div.clientHeight;
         },
-
-        // This function is run whenever the websocket gets a new message.
-        handle_new_log(message) {
-            const new_log = JSON.parse(message.data)
-            //console.log("new log entry: ")
-            console.log(new_log)
-            if (this.isScrolledToBottom(this.$refs.loglist)) {
-                this.logs.push(new_log)
-                //console.log('scroll to bottom')
-                this.$nextTick(this.scrollToBottom)
-            }
-            else {
-                this.logs.push(new_log)
-            }
-        },
-
-        // Fetch logs from the last day and display them in the log window 
-        // in chronological order (newest at bottom)
-        get_recent_logs() {
-
-            // Fetch any logs that are under a day old
-            const seconds_per_day = 86400
-            const after_time_param = this.get_timestamp_seconds() - seconds_per_day
-
-            // Only fetch logs from the current site
-            const site_param = this.site
-
-            // Form the url with query params
-            let url = this.logs_endpoint + '/recent-logs'
-            url += '?after_time=' + encodeURIComponent(after_time_param)
-            url += '&site=' + encodeURIComponent(site_param)
-
-            axios.get(url).then(logs => {
-                //console.log(logs.data)
-                this.logs = [...this.logs, ...logs.data].sort((a,b) => a.timestamp - b.timestamp)
-                if (this.user_status_visible){ 
-                    this.$nextTick(this.scrollToBottom)
-                }
-            })
-        },
-
-        // Returns class names used to style a log message based on the 
-        // supplied log level. 
-        get_log_level_classes(log) {
-                
-            // Default level of info if none supplied
-            if (!('log_level' in log)) {
-                return "info"
-            }
-
-            let log_level = log.log_level
-            if (this.supported_log_levels.includes(log_level.toLowerCase())) {
-                return log_level.toLowerCase()
-            }
-            else {
-                console.warn("Unrecognized log level in log: ", log_level)
-                return "info"
-            }
-        },
-
-        // Add the log level in front of the message if it is a warning, error,
-        // or critical level.
-        format_log_message_text(log) {
-            // Handle case of no message
-            if (!("message" in log)) {
-                return ""
-            }
-            
-            let message = log.message
-            let log_level = log.log_level || "info"
-
-            if (["debug", "info"].includes(log_level.toLowerCase())) {
-                return message
-            }
-            else {
-                return `[${log_level.toUpperCase()}]  ${message}`
-            }
-        },
-
         // Method for converting timestamp(seconds) to a date that reads easily
         // in the log UI
         timestamp_to_logdate(timestamp) {
             const timestamp_ms = timestamp * 1000
-            return moment(timestamp_ms).format('HH:mm:ss')
+            return moment(timestamp_ms).format('HH:mm:ss UTC')
         },            
 
         // Used to format the time for the timestmap tooltip.
@@ -369,18 +195,8 @@ export default {
 
     },
     computed: {
-        ...mapState('dev', [
-            'logs_ws_endpoint',
-            'logs_endpoint',
-        ]),
-        ...mapState('site_config', ['site_config', 'global_config']),
 
-
-        // The latest user status log to display in collapsed view. 
-        last_log() {
-            return this.logs.slice(-1)[0]
-        },
-
+        ...mapGetters('site_config', ['site_longitude']),
 
         // Sitecode and site both refer to the 3-leter site abbreviation.
         // They are duplicated because the status mixin expects 'sitecode'.
@@ -388,37 +204,12 @@ export default {
             return this.site;
         },
 
-
-        // Assemble the list of status elements for the status-column components
-        status_col_3() {
-            return [
-                {"name": "Weather OK", ...this.weather_ok},
-                {"name": "Open OK", ...this.open_ok},
-                {"name": "Enclosure", "val": this.enclosure_status},
-            ]
-        },
-        status_col_4() {
-            return [
-                {"name": "Ra", "val": this.ra},
-                {"name": "Dec", "val": this.dec},
-                {"name": "Azimuth", "val": this.azimuth},
-                {"name": "Altitude", "val": this.altitude},
-            ]
-        },
-        status_col_5() {
-            return [
-                {"name": "Airmass", "val": this.airmass},
-                {"name": "HA", "val": this.hour_angle},
-            ]
-        },
-
-        /** 
-         * Control the status indicator dot in the title bar.
-         */
+        // Control the status indicator dot in the title bar.
         isOnline() {
             if (this.status_age < 60) {return true}
             else return false;
         },
+        
     },
 
 
@@ -430,10 +221,13 @@ export default {
 @import "@/style/_variables.scss";
 @import "@/style/buefy-styles.scss";
 
-$status-tab-height: 37.5px; //button height
-$status-tab-color: #0f1313;
 
-$user-status-background: #050505;
+$main-status-background: #0f1313;
+$user-status-background: darken($main-status-background, 3);
+$toggle-button-color: darken($main-status-background, 5);
+
+$status-tab-height: 37.5px; //button height
+$status-tab-color: darken($main-status-background, 3);
 
 
 .status-tabs {
@@ -447,7 +241,7 @@ $user-status-background: #050505;
     //color: white;
     //border: solid 3px black;
     border-radius: 0;
-    margin: 0 !important;
+    background-color: $status-tab-color;
 
 
     display: flex;
@@ -474,7 +268,7 @@ $user-status-background: #050505;
     position: fixed;
     top: 0;
     width: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.7);
     z-index: -1;
 }
 .status-content {
@@ -482,18 +276,20 @@ $user-status-background: #050505;
     bottom: $status-tab-height;
     position: fixed;
     overscroll-behavior:contain;
+    border: 1px solid lighten($main-status-background, 6);
 }
 
 
 .main-status-mobile {
     width: 100%;
     height: 100%;
-    background-color: #222;
+    background-color: $main-status-background;
 }
 .main-status-header {
     width: 100%;
     display: flex;
     border-bottom: 1px dashed #111;
+    border-bottom: 1px dashed lighten($main-status-background, 10);
     padding-bottom: 1em;
 }
 .main-status-header > div {
@@ -514,35 +310,8 @@ $user-status-background: #050505;
     width: 100%;
 }
 
-
-
-/******************************************** */
-
-/**     
- *  Component styling
- */
-.statusbar {
-    z-index: 100;
-    width: 100%;
-}
-.hidden {
-    display: none;
-}
-
-$margin-x-768: 30px;
-$margin-x-1024: 100px;
-$margin-x-1216: 200px;
-$margin-x-1408: 250px;
-
-$toggle-button-width: 60px;
-
-$status-col-width: 150px;
-
-
-
-
 /**
- *  User status (log) styles (the top status bar)
+ *  User status (log) styles 
  */
 
 $log-debug: #aaa;
@@ -552,32 +321,31 @@ $log-error: $danger;
 $log-critical: $danger;
 
 
-.status-bar-1 {
-    display: grid;
-    grid-template-columns: 1fr 60px;
-    background-color: $user-status-background;
-}
-.status-1-content {
-    height: 2em;
-}
-
-.user-status {
+.user-status.expanded {
     display: flex;
     flex-direction: column;
     width: 100%;
-    line-height: 2em;
-}
-.user-status.expanded {
     height: 400px;
+
+    line-height: 2em;
     line-height: 1.3em;
     overflow-y: scroll;
     overscroll-behavior:contain;
     padding-top: 2pt;
 }
+.default-log-message {
+    width: 100%;
+    color: #bbb;
+    font-size: 11pt;
+    font-family:'Courier New', Courier, monospace;
+    padding: 1em;
+    border-bottom: 1px dashed #333;
+}
+
 .log-line {
     display:flex;
     flex-direction: column;
-    padding: 1em;
+    padding: 5px 1em;
     width: 100%;
 }
 .log-timestamp {
@@ -602,24 +370,6 @@ pre.log-message {
     padding: 0;
     padding-top: 2pt;
 }
-// keep to a single line when user status is collapsed 
-.user-status:not(.expanded) * .log-message {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow-x: hidden;
-    padding-top: 2px;
-}
-// New messages enter yellow to grab attention, then fade to their 
-// destination color (based on the log level, see above)
-@keyframes blinkonce {
-    0% {
-        color: yellow;
-    }
-}
-div.log-line:last-of-type * {
-    animation: blinkonce 1s;
-}
-
 // Style the log message based on its log level class.
 pre.log-message.debug {
     color: $log-debug;
@@ -638,145 +388,22 @@ pre.log-message.critical {
     font-weight: bold;
 }
 
+// New messages enter yellow to grab attention, then fade to their 
+// destination color (based on the log level, see above)
+@keyframes blinkonce {
+    0% {
+        color: yellow;
+    }
+}
+div.log-line:last-of-type * {
+    animation: blinkonce 1s;
+}
+
 // highlight the timestamp of the line that is hovered over. 
 .log-line:hover * {
     color:white;
 }
 
-.default-log-message {
-    width: 100%;
-    color: #bbb;
-    font-size: 11pt;
-    font-family:'Courier New', Courier, monospace;
-    padding: 1em;
-    border-bottom: 1px dashed #333;
-}
-
-
-/**
- * Style rules for the bottom status bar
- */
-
-.status-bar-2 {
-    display: grid;
-    grid-template-columns: 1fr 60px;
-    background-color: #222;
-    border-top: 1px grey solid;
-}
-#status-2-primary {
-    display: grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: 90px 50px repeat(4, $status-col-width);
-    grid-auto-rows: 0px;
-    grid-column-gap: 20px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-//#status-2-primary > div:nth-child(n+5) {
-    //display: none;
-//}
-@media screen and (min-width: 768px ) {
-    #status-2-primary {
-        grid-template-columns: 90px 50px repeat(3, $status-col-width);
-    }
-    #status-2-primary > div {
-        display: block;
-    }
-    #status-2-primary > div:nth-child(n+6) {
-        display: none;
-    }
-}
-@media screen and (min-width: 1024px) {
-    #status-2-primary {
-        grid-template-columns: 90px 50px repeat(4, $status-col-width);
-    }
-    #status-2-primary > div {
-        display: normal;
-    }
-    #status-2-primary > div:nth-child(n+7) {
-        display: none;
-    }
-}
-@media screen and (min-width: 1216px) {
-    #status-2-primary {
-        grid-template-columns: 90px 50px repeat(5, $status-col-width);
-    }
-    #status-2-primary > div {
-        display: block;
-    }
-    #status-2-primary > div:nth-child(n+8) {
-        display: none;
-    }
-}
-@media screen and (min-width: 1408px) {
-    #status-2-primary {
-        grid-template-columns: 90px 50px repeat(6, $status-col-width);
-    }
-    #status-2-primary > div {
-        display: block;
-    }
-    #status-2-primary > div:nth-child(n+9) {
-        display: none;
-    }
-}
-#status-2-expanded {
-    padding-bottom: 1em;
-    padding-top: 1em;
-    border-bottom: 1px solid grey;
-    display:grid;
-    grid-template-columns: 100px 50px repeat(5,5px);// $status-col-width);
-    grid-column-gap: 30px;
-    // align with the .container margins:
-    padding-left: #{$toggle-button-width / 2};
-}
-
-
-/**
- * This styles the individual key/value status items.
- */
-//.status-grid {
-//    font-size: 14px;
-//    display:grid;
-//    grid-auto-flow: column;
-//    grid-template-columns: max-content max-content;
-//    grid-row-gap: 3px;
-//    width: 100%;
-//    overflow: hidden;
-//}
-//.key {
-//  color:silver;
-//  padding: 0 8px;
-//  white-space: nowrap;
-//  text-align: right;
-//  grid-column-start: 1;
-//}
-//.val{
-//  color: greenyellow;
-//  background-color: black;
-//  padding: 0 8px;
-//  white-space: nowrap;
-//  grid-column-start:2;
-//}
-//.spacer {
-//    display: inline-block;
-//    height: 1em; 
-//    visibility: hidden;
-//}
-
-
-/** 
- * Toggle expand/collaps button style
- */
-
-.toggle {
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: whitesmoke;
-    background-color: #111;
-    width: $toggle-button-width;
-}
 
 
 /**
