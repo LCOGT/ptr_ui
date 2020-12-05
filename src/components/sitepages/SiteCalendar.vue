@@ -147,7 +147,7 @@ export default {
   left: 0px;
 }
 .fc-moon-indicator {
-  z-index: 15;
+  z-index: 5;
   opacity: 0.5;
   width: 20px;
   border-radius: 12px;

@@ -1,6 +1,6 @@
 
 <template>
-    <div>
+    <div class="site-status-footer-mobile-wrapper">
 
         <div class="status-tabs">
 
@@ -230,10 +230,15 @@ $status-tab-height: 37.5px; //button height
 $status-tab-color: darken($main-status-background, 3);
 
 
+.site-status-footer-mobile-wrapper {
+    z-index: 1;
+}
+
 .status-tabs {
     display: flex;
     height: $status-tab-height;
     margin: 0;
+    z-index: 2;
 }
 .status-tabs > div {
     width: 50%;
