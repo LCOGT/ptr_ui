@@ -254,7 +254,7 @@ $status-tab-color: darken($main-status-background, 3);
 
 
 .overlay {
-    height: calc(100vh-$status-tab-height);
+    height: 100%;
     bottom: $status-tab-height;
     position: fixed;
     top: 0;
@@ -263,7 +263,7 @@ $status-tab-color: darken($main-status-background, 3);
     overscroll-behavior:contain;
 }
 .overlay > .backdrop {
-    height: calc(100vh-$status-tab-height);
+    height: 100%;
     bottom: $status-tab-height;
     position: fixed;
     top: 0;
