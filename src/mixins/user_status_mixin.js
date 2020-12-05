@@ -37,11 +37,9 @@ export const user_status_mixin = {
 
             // Do nothing if already set
             if (this.user_status_active_site == site) {
-                console.log('user status site is already ', site)
                 return; 
             }
             if (site == '' ) {
-                console.log('user status site is blank string')
                 return;
             }
 
@@ -50,11 +48,7 @@ export const user_status_mixin = {
             try {
                 this.user_status_websocket.close()
             } catch {
-                console.log('tried closing user status ws for site ', this.user_status_active_site)
-                console.log('did not close user status websocket.')
             }
-
-            //this.user_status_logs = []
 
             // Connect using new site
             this.user_status_active_site = site

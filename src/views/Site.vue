@@ -116,7 +116,6 @@
       Otherwise, props may initially load as null. -->
       <div class="column">
         <component 
-          style="width: 100%"
           v-bind:is="`site-${subpage}`"
           :sitecode="sitecode"
           :deviceStatus="deviceStatus"
@@ -395,7 +394,6 @@ export default {
 @import "../style/_variables.scss";
 
 .menu-column {
-  width: 300px;
   height: auto;
   padding: 0 auto;
 }

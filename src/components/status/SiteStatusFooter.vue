@@ -304,7 +304,7 @@ export default {
  *  Component styling
  */
 .statusbar {
-    z-index: 100;
+    z-index: 10;
 }
 .hidden {
     display: none;

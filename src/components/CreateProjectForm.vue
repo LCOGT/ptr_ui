@@ -70,12 +70,12 @@
 
         </div>
 
-
         <!-- we decided to only allow one target per project -->
         <!--button class="button" @click="newTargetRow">add another target</button-->
         <hr>
 
-        <section>
+        <div class="exposure-rows">
+
 
             <div v-for="n in exposures_index" v-bind:key="n" class="exposure-row">
 
@@ -100,7 +100,7 @@
                         min="1" 
                         v-model="exposures[n-1].count"/>
                 </b-field>
-                <b-field :label="n==1 ? 'Exposure [s]' : ''">
+                <b-field :label="n==1 ? 'Exposure [s]' : ''" style="max-width: 100px;">
                     <b-input 
                         :disabled="!exposures[n-1].active" 
                         type="number" 
@@ -168,13 +168,13 @@
 
                 <div></div>
             </div>
-            <button class="button" @click="newExposureRow">add row</button>
             <div/>
-        </section>
+        </div>
+            <button class="button" @click="newExposureRow">add row</button>
 
         <hr>
 
-        <section>
+        <div>
             <button 
                 class="button is-text"
                 @click="showAdvancedInputs = !showAdvancedInputs"
@@ -301,7 +301,7 @@
                 <b-checkbox v-model="project_constraints.enhance_photometry">Enhance Photometry</b-checkbox>
             </b-field>
 
-        </section>
+        </div>
         <hr>
 
         <b-tooltip 
@@ -852,21 +852,40 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .project-form {
     background-color: #2a2f30;
     padding: 1em;
+    overflow:hidden;
 }
 .project-input {
-    max-width: 200px;
+}
+
+.exposure-rows {
+    max-width: 959px;
+    overflow-x:auto;
+}
+@media screen and (min-width: 768px) {
+    .exposure-rows {
+        max-width: 700px;
+    }
+}
+@media screen and (min-width: 1024px) {
+    .exposure-rows {
+        max-width: 750px;
+    }
+}
+@media screen and (min-width: 1408px) {
+    .exposure-rows {
+        max-width: 959px;
+    }
 }
 .exposure-row {
-    display: flex;
-    flex-direction: row;
-    align-items:center;
+    white-space: nowrap;
 }
 .exposure-row > * {
     margin-right: 8px;
+    display: inline-block;
 }
 .target-row {
     display: flex;
