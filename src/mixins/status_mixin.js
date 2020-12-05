@@ -181,6 +181,17 @@ export const status_mixin = {
                 {"name": "HA", "val": this.hour_angle},
             ]
         },
+        buildFocusRotatorCameraStatus() {
+            let status = [
+                ...this.buildFocuserTabStatus,
+                {"name": "spacer", "val": "spacer"},
+                ...this.buildRotatorTabStatus,
+                {"name": "spacer", "val": "spacer"},
+                ...this.buildCameraTabStatus,
+                {"name": "spacer", "val": "spacer"},
+            ]
+            return status
+        },
         buildTargetPageStatus() {
             let status = []
             status.push({"name": "Ra", "val": this.ra})
@@ -234,8 +245,8 @@ export const status_mixin = {
         },
         buildRotatorTabStatus() {
             let status = []
+            if (this.rotator_moving != '-') { status.push({"name": "Rotator", "val": this.rotator_moving})}
             if (this.rotator_position != '-') { status.push({"name": "Position", "val": this.rotator_position })}
-            if (this.rotator_moving != '-') { status.push({"name": "Activity", "val": this.rotator_moving})}
             return status
         },
         buildScreenTabStatus() {
