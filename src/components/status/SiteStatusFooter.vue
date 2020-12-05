@@ -151,7 +151,7 @@ export default {
     mixins: [status_mixin, user_status_mixin],
     components: {
         StatusColumn,
-        SiteSiderealTime,
+        SiteSiderealTime
     },
     props: {
         site: String,
@@ -246,6 +246,7 @@ export default {
         // Assemble the list of status elements for the status-column components
         open_safety_status() {
             return [
+                {"name": "Status Age", ...this.status_age_display},
                 {"name": "Weather OK", ...this.weather_ok},
                 {"name": "Open OK", ...this.open_ok},
                 {"name": "Enclosure", "val": this.enclosure_status},
