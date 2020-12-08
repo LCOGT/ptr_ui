@@ -71,7 +71,6 @@
                 </div>
                 <div id="status-2-primary" class="container">
                     <div>
-                        
                         <div style="display: flex; flex-direction: column;">
                             <div class="online-status">
                                 <div :class="{'status-on':isOnline, 'status-off':!isOnline}" ></div>
@@ -269,7 +268,10 @@ export default {
 
         // Control the status indicator dot in the title bar.
         isOnline() {
-            if (this.status_age < 60) {return true}
+            // online is defined by status age under 5 minutes
+            if (this.status_age < 300) {
+                return true
+            }
             else return false;
         },
 

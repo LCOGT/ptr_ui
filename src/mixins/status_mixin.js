@@ -281,6 +281,11 @@ export const status_mixin = {
                 return {
                     "val": this.status_age_seconds,
                     "color": this.display_colors.green,
+                } 
+            } else if (this.status_age < 300) { 
+                return {
+                    "val": this.status_age_minutes,
+                    "color": this.display_colors.green,
                 }
             } else if (this.status_age < 600) { 
                 return {

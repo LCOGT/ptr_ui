@@ -389,7 +389,7 @@ export default {
     },
 
     getSiteMapColor(siteOpenStatus) {
-      if (parseFloat(siteOpenStatus.status_age_s) > 60) { return 'red' }
+      if (parseFloat(siteOpenStatus.status_age_s) > 300) { return 'red' }
       if (!siteOpenStatus.hasWeatherStatus) { return 'yellow'}
       if (siteOpenStatus.weather_ok && siteOpenStatus.open_ok) {return 'green'}
       if (siteOpenStatus.weather_ok || siteOpenStatus.open_ok) {return 'yellow'}
