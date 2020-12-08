@@ -252,7 +252,6 @@
           </div>
 
           <status-column :statusList="buildRotatorTabStatus" />
-
           <command-button :data="rotate_home_command" class="is-small" style="width:100%; margin-bottom:1em;"/>
           <b-field label="Relative">
             <b-field>
@@ -1117,7 +1116,7 @@ export default {
     },
     rotator_absolute: {
       get() { return this.$store.getters['command_params/rotator_absolute'] },
-      set(val) {this.$store.commit('command_params/rotate_absolute', val)}
+      set(val) {this.$store.commit('command_params/rotator_absolute', val)}
     },
 
     screen_brightness: {

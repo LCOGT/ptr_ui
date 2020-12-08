@@ -206,7 +206,10 @@ export default {
 
         // Control the status indicator dot in the title bar.
         isOnline() {
-            if (this.status_age < 60) {return true}
+            // online is defined by status age under 5 minutes
+            if (this.status_age < 300) {
+                return true
+            }
             else return false;
         },
         
