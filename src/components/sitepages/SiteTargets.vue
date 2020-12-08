@@ -67,7 +67,7 @@
                             autocomplete="off" />
                     </b-field>
                 </b-field>
-                <command-button :data="mount_slew_command" style="" class="is-success">
+                <command-button :data="mount_slew_radec_command" style="" class="is-success">
                     <p slot="title">Point Telescope</p>
                 </command-button>
             </div>
