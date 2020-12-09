@@ -446,7 +446,9 @@ export default {
 
       let command_form = [
         String(x / this.imageWidth),
-        String(y / this.imageHeight),
+
+        // Change the y coordinate to start at the bottom. 
+        String((this.imageHeight - y ) / this.imageHeight),
         filename
       ]
 
