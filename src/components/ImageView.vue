@@ -318,7 +318,8 @@ export default {
         onAction: () => {
           console.log("slew to " + position[0]/ this.imageWidth + ", " + position[1]/ this.imageHeight);
           this.send_pixels_center_command(
-            position,
+            position[0],
+            position[1],
             this.current_image.base_filename
           );
         }
@@ -441,11 +442,11 @@ export default {
       this.drawSubframe()
     },
 
-    send_pixels_center_command(pixels, filename) {
+    send_pixels_center_command(x, y, filename) {
 
       let command_form = [
-        toString(pixels[0] / this.imageWidth),
-        toString(pixels[1] / this.imageHeight),
+        String(x / this.imageWidth),
+        String(y / this.imageHeight),
         filename
       ]
 
