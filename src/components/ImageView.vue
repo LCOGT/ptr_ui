@@ -313,7 +313,7 @@ export default {
           "Click to center the telescope here.",
         type: "is-warning",
         position: "is-top",
-        actionText: "Slew",
+        actionText: "Center on pixels",
         queue: false,
         onAction: () => {
           console.log("slew to " + position[0]/ this.imageWidth + ", " + position[1]/ this.imageHeight);

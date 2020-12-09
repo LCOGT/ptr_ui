@@ -127,7 +127,7 @@ export const commands_mixin = {
         mount_slew_clickposition_command(x, y, filename) {
             return this.base_command(
                 'mount',
-                'slew',
+                'center_on_pixels',
                 '',
                 {
                     image_x: x,
