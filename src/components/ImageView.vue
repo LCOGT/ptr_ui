@@ -188,7 +188,7 @@ export default {
       context_marker_timer: "",
 
       // Time that right click events stay on the screen.
-      right_click_ttl: 5000,
+      right_click_ttl: 9000,
 
       //Image ID of the currently highlighted image (focused)
       highlighted_image: 0,
@@ -309,9 +309,10 @@ export default {
       Snackbar.open({
         duration: this.right_click_ttl,
         message:
-          "Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.",
+          //"Center telescope here? <br>Note: <em>telescope will move to the location you clicked.</em>.",
+          "Click to center the telescope here.",
         type: "is-warning",
-        position: "is-bottom-left",
+        position: "is-top",
         actionText: "Slew",
         queue: false,
         onAction: () => {
@@ -441,39 +442,15 @@ export default {
     },
 
     send_pixels_center_command(pixels, filename) {
-      let req_params = {
-        //x_from_left: pixels[0],
-        //y_from_top: pixels[1],
-        rel_x_pos: pixels[0] / this.imageWidth,
-        rel_y_pos: pixels[1] / this.imageHeight,
-        filename: filename
-      };
-      let opt_params = {};
-      let theCommand = {
-        url: `/${this.active_site}/${this.active_mount}/command/`,
-        http_method: "POST",
-        form: {
-          device: "mount",
-          instance: this.active_mount,
-          timestamp: parseInt(Date.now() / 1000),
-          action: "center_on_pixels",
-          required_params: req_params,
-          optional_params: opt_params
-        }
-      };
-      let apiName = this.$store.getters["dev/api"];
-      let url = theCommand.url;
-      let body = { body: theCommand.form };
-      axios.post(apiName+url, body)
-        .then(response => {
-          console.log("sent pixel center command");
-          console.log(response.data);
-          console.log(theCommand.form);
-        })
-        .catch(error => {
-          console.log("error with pixel centercommand");
-          console.log(error);
-        });
+
+      let command_form = [
+        toString(pixels[0] / this.imageWidth),
+        toString(pixels[1] / this.imageHeight),
+        filename
+      ]
+
+      this.postCommand(this.mount_slew_clickposition_command, command_form)
+
     },
 
     drawCircle(pixelX, pixelY) {
@@ -735,6 +712,11 @@ export default {
     
   },
   computed: {
+
+    sitecode() {
+      return this.site;
+    },
+
     active_site: {
       get() {
         return this.$store.getters["site_config/site"];

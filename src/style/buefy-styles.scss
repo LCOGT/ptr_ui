@@ -24,6 +24,9 @@ $colors: (
     "twitter": ($twitter, $twitter-invert)
 );
 
+// Snackbar
+$snackbar-background-color: lighten($dark, 15);
+
 // Links
 $link: $primary;
 $link-invert: $primary-invert;
