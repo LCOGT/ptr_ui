@@ -124,6 +124,19 @@ export const commands_mixin = {
                 {}
             )
         },
+        mount_slew_clickposition_command(x, y, filename) {
+            return this.base_command(
+                'mount',
+                'slew',
+                '',
+                {
+                    image_x: x,
+                    image_y: y,
+                    base_filename: filename
+                },
+                {}
+            )
+        },
         // Alternative to the command_button component
         async postCommand(formCreatorFunction, args) {
 
@@ -135,12 +148,39 @@ export const commands_mixin = {
             form.site = this.sitecode
             form.mount = this.active_mount
 
+            console.log(form)
             axios.post(url,form, options).then(response => {
                 console.log(response.data)
                 this.$emit('jobPost', response.data)
             }).catch(e => {
                 this.handleNotAuthorizedResponse(e)
             })
+        },
+        async getAuthHeader() {
+            let token, configWithAuth;
+            try {
+                token = await this.$auth.getTokenSilently(); 
+            } catch(err) {
+                console.error(err)
+                console.warn('Did not acquire the needed token. Stopping request.')
+                
+                // small popup notification
+                this.$buefy.toast.open({
+                    duration: 5000,
+                    message: "Oops! You need to be logged in to do that.",
+                    position: 'is-bottom',
+                    type: 'is-danger' ,
+                })
+                //return {}
+            }
+
+            return {
+                'headers': {
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         },
 
         handleNotAuthorizedResponse(error) {
