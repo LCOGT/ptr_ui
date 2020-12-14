@@ -1059,10 +1059,12 @@ export default {
           "Access-Control-Allow-Origin": "*",
         },
       };
+
+      // The start and end times must be formatted as UTC like 2020-12-31T23:59:59Z
       let body = {
         site: site,
-        start: fetchInfo.startStr,
-        end: fetchInfo.endStr,
+        start: moment(fetchInfo.startStr).utc().format(),
+        end: moment(fetchInfo.endStr).utc().format(),
       };
 
       let resp = await axios.post(url, body, options);
