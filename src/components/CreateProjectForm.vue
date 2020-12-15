@@ -288,6 +288,7 @@
                 </b-field>
             </b-field>
 
+            <div style="height: 5px;"/>
             <b-field v-if="showAdvancedInputs">
                 <b-checkbox v-model="project_constraints.frequent_autofocus">Autofocus: focus more frequently</b-checkbox>
             </b-field>
@@ -299,6 +300,9 @@
             </b-field>
             <b-field v-if="showAdvancedInputs">
                 <b-checkbox v-model="project_constraints.enhance_photometry">Enhance Photometry</b-checkbox>
+            </b-field>
+            <b-field v-if="showAdvancedInputs">
+                <b-checkbox v-model="project_constraints.close_on_block_completion">Close on block completion</b-checkbox>
             </b-field>
 
         </div>
@@ -432,6 +436,8 @@ export default {
                 near_tycho_star: false,
                 prefer_bessell: false,
                 enhance_photometry: false,
+
+                close_on_block_completion: false,
             },
 
 
@@ -573,6 +579,8 @@ export default {
                 near_tycho_star: false,
                 prefer_bessell: false,
                 enhance_photometry: false,
+
+                close_on_block_completion: false,
             }
         },
 
