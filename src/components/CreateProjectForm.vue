@@ -24,7 +24,6 @@
             </b-field>
 
         </div>
-        <hr>
 
         <div v-for="n in targets_index" v-bind:key="n" class="target-row">
             
@@ -41,7 +40,7 @@
                         class="project-input" 
                         v-model="targets[n-1].name"></b-input>
                     <p class="control">
-                        <b-button class="button" type="is-light" @click="getCoordinatesFromName(n-1)"><b-icon icon="magnify"/></b-button>
+                        <b-button class="button" @click="getCoordinatesFromName(n-1)"><b-icon icon="magnify"/></b-button>
                     </p>
                 </b-field>
             </b-field>
@@ -84,8 +83,8 @@
                 <b-field :label="n==1 ? '  ' : ' '">
                     <b-checkbox v-model="exposures[n-1].active"></b-checkbox>
                 </b-field>
-                <b-field :label="n==1 ? 'Imtype' : ''">
-                    <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].imtype">
+                <b-field size="is-small" :label="n==1 ? 'Imtype' : ''">
+                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].imtype">
                         <option value="light"> light </option>
                         <option value="dark"> dark </option>
                         <option value="skyflat"> skyflat </option>
@@ -94,22 +93,22 @@
                         <option value="autofocus"> autofocus </option>
                     </b-select>
                 </b-field>
-                <b-field :label="n==1 ? 'Count' : ''" style="width: 130px;">
+                <b-field :label="n==1 ? 'Count' : ''" style="width: 100px;">
                     <b-input 
+                        size="is-small"
                         :disabled="!exposures[n-1].active" 
-                        type="number" 
                         min="1" 
                         v-model="exposures[n-1].count"/>
                 </b-field>
                 <b-field :label="n==1 ? 'Exposure [s]' : ''" style="max-width: 100px;">
                     <b-input 
+                        size="is-small"
                         :disabled="!exposures[n-1].active" 
-                        type="number" 
                         min="0" 
                         v-model="exposures[n-1].exposure"/>
                 </b-field>
                 <b-field :label="n==1 ? 'Filter' : ''">
-                    <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].filter">
+                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].filter">
                         <option
                             v-for="(filter, index) in project_filter_list"
                             v-bind:value="filter"
@@ -121,7 +120,7 @@
                     </b-select>
                 </b-field>
                 <b-field :label="n==1 ? 'Bin' : ''">
-                    <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].bin">
+                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].bin">
                         <option value="1, 1"> 1, 1 </option>
                         <option value="2, 2"> 2, 2 </option>
                         <option value="3, 3"> 3, 3 </option>
@@ -129,7 +128,7 @@
                     </b-select>
                 </b-field>
                 <b-field :label="n==1 ? 'Area' : ''">
-                    <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].area">
+                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].area">
                         <option value="600%"> 600% </option>
                         <option value="300%"> 300% </option>
                         <option value="220%"> 220% </option>
@@ -144,14 +143,14 @@
                     </b-select>
                 </b-field>
                 <b-field :label="n==1 ? 'Dither' : ''">
-                    <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].dither">
+                    <b-select size="is-small":disabled="!exposures[n-1].active" v-model="exposures[n-1].dither">
                         <option value="yes"> yes </option>
                         <option value="no"> no </option>
                         <option v-for="i in 25" :key="i-1" :value="i-1"> {{i-1}}</option>
                     </b-select>
                 </b-field>
                 <b-field :label="n==1 ? 'Photometry' : ''">
-                    <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].photometry">
+                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].photometry">
                         <option value="-"> - </option>
                         <option value="target"> target </option>
                         <option value="comparison1"> Comparison 1 </option>
@@ -161,7 +160,7 @@
                     </b-select>
                 </b-field>
                 <b-field :label="n==1 ? 'Defocus' : ''">
-                    <b-select :disabled="!exposures[n-1].active" v-model="exposures[n-1].defocus">
+                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].defocus">
                         <option v-for="i in 6" :key="i-1" :value="i-1"> {{i-1}}</option>
                         <option value="diffuser"> diffuser </option>
                     </b-select>
@@ -171,18 +170,20 @@
             </div>
             <div/>
         </div>
-            <button class="button" @click="newExposureRow">add row</button>
 
-        <hr>
+        <button style="margin-top: 1em;" class="button" @click="newExposureRow">
+            <b-icon icon="plus" />
+            <span>add row</span>
+        </button>
+
 
         <div>
-            <button 
-                class="button is-text"
+            <div
+                class="toggle-advanced-settings"
                 @click="showAdvancedInputs = !showAdvancedInputs"
-                style="margin: 15px 0;"
                 >
                 {{showAdvancedInputs ? "hide" : "show"}} advanced
-            </button>
+            </div>
 
             <br>
 
@@ -190,26 +191,29 @@
                 v-if="showAdvancedInputs"
                 label="Meridian Flip">
                 <b-field
-                type="is-light"
                 >
                     <b-radio-button v-model="project_constraints.meridian_flip"
+                        type="is-light"
                         native-value="east_only">
                         <b-icon icon="close"></b-icon>
                         <span>East Only</span>
                     </b-radio-button>
 
                     <b-radio-button v-model="project_constraints.meridian_flip"
+                        type="is-light"
                         native-value="west_only">
                         <b-icon icon="check"></b-icon>
                         <span>West Only</span>
                     </b-radio-button>
 
                     <b-radio-button v-model="project_constraints.meridian_flip"
+                        type="is-light"
                         native-value="flip_ok">
                         Flip OK
                     </b-radio-button>
 
                     <b-radio-button v-model="project_constraints.meridian_flip"
+                        type="is-light"
                         native-value="no_flip">
                         No Flip
                     </b-radio-button>
@@ -258,7 +262,7 @@
                 :type="{'is-danger': warn.max_ha}" >
                 <b-numberinput 
                     step="0.5" 
-                    type="is-light"
+                    type="is-button"
                     max="12" 
                     controls-position="compact" 
                     class="project-input" 
@@ -305,14 +309,23 @@
             <b-field v-if="showAdvancedInputs">
                 <b-checkbox v-model="project_constraints.close_on_block_completion">Close on block completion</b-checkbox>
             </b-field>
+            <b-field v-if="showAdvancedInputs">
+                <b-checkbox v-model="project_constraints.add_center_to_mosaic">Add center to mosaic</b-checkbox>
+            </b-field>
             
-            <section v-if="showAdvancedInputs">
+            <section v-if="showAdvancedInputs" style="max-width: 50%;">
             <b-field label="Site tags">
                 <b-taginput
                     v-model="project_constraints.site_tags"
+                    type="is-light"
+                    open-on-focus
+                    autocomplete
+                    :data="filtered_site_tags"
+                    :allow-new="false"
+                    @typing="getFilteredSiteTags"
                     ellipsis
                     icon="label"
-                    placeholder="Add a tag"
+                    placeholder="Add a site"
                     aria-close-label="Delete this tag">
                 </b-taginput>
             </b-field>
@@ -452,8 +465,8 @@ export default {
                 near_tycho_star: false,
                 prefer_bessell: false,
                 enhance_photometry: false,
-
                 close_on_block_completion: false,
+                add_center_to_mosaic: false,
             },
 
 
@@ -464,6 +477,8 @@ export default {
             project_is_loaded: false,
             loaded_project_name: '',
             loaded_project_created_at: '',
+
+            filtered_site_tags: [], // List of autocomplete matches for site_tags
 
             projects_api_url: 'https://projects.photonranch.org/dev',
             showAdvancedInputs: false,
@@ -479,9 +494,10 @@ export default {
                 "Blue",
                 "NIR",
                 "O3",
-                "Ha",
+                "HA",
                 "N2",
                 "S2",
+                "ME",
                 "air",
                 "w",
                 "clear",
@@ -519,6 +535,16 @@ export default {
         }
     },
     methods: {
+
+        // site_tags autocomplete helper
+        getFilteredSiteTags(text) {
+            this.filtered_site_tags = this.available_sites.filter((option) => {
+                return option
+                    .toString()
+                    .toLowerCase()
+                    .indexOf(text.toLowerCase()) >= 0
+            })
+        },
 
         async getAuthRequestHeader() {
             let token, configWithAuth;
@@ -598,8 +624,8 @@ export default {
                 near_tycho_star: false,
                 prefer_bessell: false,
                 enhance_photometry: false,
-
                 close_on_block_completion: false,
+                add_center_to_mosaic: false,
             }
         },
 
@@ -881,12 +907,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/style/buefy-styles.scss";
+
 .project-form {
-    background-color: #2a2f30;
+    background-color: $background;
     padding: 1em;
-    overflow:hidden;
 }
-.project-input {
+
+.toggle-advanced-settings {
+    width: 100%;
+    border-bottom: $grey solid 1px;
+    margin-top: 1em;
+    text-align: center;
+    background-color: darken($background, 3);
+}
+.toggle-advanced-settings:hover {
+    cursor: pointer;
 }
 
 .exposure-rows {

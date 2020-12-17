@@ -36,6 +36,10 @@ $link-focus-border: $primary;
 $pre-background: $dark;
 $pre: $dark-invert;
 
+select option {
+    color: $grey-light !important;
+}
+
 
 $link: $primary;
 $link-hover: lighten($link, 5);
@@ -52,6 +56,7 @@ $body-background-color: $black;
 $body-color: $light;
 $text: $light;
 
+
 // This is the empty edge space around divs with .container.is-fluid
 $gap: 100px;
 
@@ -64,9 +69,6 @@ $gap: 100px;
 
 // These are hacks to fix an issue from the _variables.scss and _overrides.scss
 // files that didn't transition smoothly to buefy 0.9 and/or bulma 0.9.0.
-.input, .textarea, .taginput .taginput-container.is-focusable, .select select {
-    color: black;
-}
 .button {
     color: $light;
 }
