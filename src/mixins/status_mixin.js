@@ -135,6 +135,15 @@ export const status_mixin = {
 
     computed: {
 
+        // Control the status indicator dot in the title bar.
+        isOnline() {
+            // online is defined by status age under 5 minutes
+            if (this.status_age < 300) {
+                return true
+            }
+            else return false;
+        },
+
         buildEmptyStatus() {
             let status = []
             status.push({
