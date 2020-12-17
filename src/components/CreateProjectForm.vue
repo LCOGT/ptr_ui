@@ -22,6 +22,7 @@
                     :maxlength="max_fits_header_length"
                     v-model="project_note" ></b-input>
             </b-field>
+
         </div>
         <hr>
 
@@ -304,6 +305,18 @@
             <b-field v-if="showAdvancedInputs">
                 <b-checkbox v-model="project_constraints.close_on_block_completion">Close on block completion</b-checkbox>
             </b-field>
+            
+            <section v-if="showAdvancedInputs">
+            <b-field label="Site tags">
+                <b-taginput
+                    v-model="project_constraints.site_tags"
+                    ellipsis
+                    icon="label"
+                    placeholder="Add a tag"
+                    aria-close-label="Delete this tag">
+                </b-taginput>
+            </b-field>
+            </section>
 
         </div>
         <hr>
@@ -369,6 +382,7 @@ export default {
             this.project_is_loaded = true
             this.loaded_project_name = project.project_name
             this.loaded_project_created_at = project.created_at
+            this.loaded_site_tags = project.site_tags
 
             this.project_name = project.project_name
             this.project_events = project.scheduled_with_events
@@ -419,6 +433,8 @@ export default {
             ],
 
             project_constraints: {
+                site_tags: [],
+
                 meridian_flip: 'flip_ok', // can be ['flip_ok', 'no_flip', 'east_only', 'west_only']
                 ra_offset: 0.0,
                 ra_offset_units: 'deg',
@@ -537,6 +553,7 @@ export default {
 
             this.project_name = ""
             this.project_events = []
+            this.site_tags = []
             this.targets = [
                 {
                     active: true,
@@ -563,6 +580,8 @@ export default {
             ]
             this.exposures_index = 1
             this.project_constraints = {
+                site_tags: [],
+
                 ra_offset: 0.0,
                 ra_offset_units: 'deg',
                 dec_offset: 0.0,
@@ -837,6 +856,7 @@ export default {
         },
 
         ...mapGetters('site_config', [
+            'available_sites',
             'site_config',
             'global_config',
             'filter_wheel_options'
