@@ -71,26 +71,27 @@ $button-static-color: $grey-light;
 $button-static-background-color: $grey-dark;
 $button-static-border-color: $grey;
 
+
 $input-color: $grey-lighter;
 $input-placeholder-color: lighten($grey, 3);
 $input-background-color: darken($background, 5);
 $input-border-color: darken($grey, 15);
-//$input-shadow
 $input-hover-color: $grey-lighter;
 $input-hover-border-color: $grey;
 $input-focus-color: $grey;
-//$input-focus-box-shadow-size
 $input-disabled-color:$grey-lighter;
 $input-disabled-background-color: $grey;
-//$input-disabled-border-color
 $input-arrow: lighten($link, 10);
 $input-icon-color: $grey;
 $input-icon-active-color: $grey-lighter;
-//$input-radius
-
 $input-hover-color: $grey-light;
 $input-disabled-background-color: $grey-light;
 $input-disabled-border: $grey-lighter;
+//$input-shadow
+//$input-focus-box-shadow-size
+//$input-disabled-border-color
+//$input-radius
+
 
 $table-color: $text;
 $table-head: $grey-lighter;

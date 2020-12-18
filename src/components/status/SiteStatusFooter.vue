@@ -42,7 +42,6 @@
             </a>
         </div>
 
-
         <div class="status-bar-2">
             <div class="status-content">
                 <div id="status-2-expanded" 
@@ -68,6 +67,31 @@
                             :isOffline="!isOnline"
                             :statusList="buildFocusRotatorCameraStatus"/>
                     </div>
+
+                    <site-reservation-status :sitecode="site" />
+
+                    <!-- chat module -->
+                    <div>
+                        <!-- List of online users -->
+                        <div class="menu-label"> online users </div>
+                        <ul class="online-users-list">
+                        <li v-for="(user, idx) in displayedOnlineUsers" 
+                            v-bind:key="idx">
+                            <span style="font-weight:lighter;">{{user}}</span>
+                        </li>
+                        </ul>
+                        
+                        <!-- Chat module. Also feeds online users list. -->
+                        <chat-module 
+                        style="min-width: 250px;"
+                        :sitecode="sitecode" 
+                        :username="username"
+                        @whosonline="makeOnlineUsersList" />
+
+                    </div>
+
+
+
                 </div>
                 <div id="status-2-primary" class="container">
                     <div>
@@ -78,7 +102,7 @@
                                 <p v-if="!isOnline" style="font-weight: bold; color: orangered;">offline</p>
                             </div>
                             <div class="sidereal-time" :class="{'offline': !isOnline}">
-                                <site-sidereal-time :longitude="site_longitude"/> 
+                                <site-sidereal-time v-if="site_longitude" :longitude="site_longitude"/> 
                             </div>
                             <div class="sidereal-label">
                                 sidereal time
@@ -107,12 +131,12 @@
                             :isOffline="!isOnline"
                             :statusList="az_alt_airmass_status"/>
                     </div>
-                    <div>
+                    <!--div>
                         <status-column 
                             style="padding: 0;"
                             :isOffline="!isOnline"
                             :statusList="buildFocuserTabStatus"/>
-                    </div>
+                    </div-->
                     <div>
                         <status-column 
                             style="padding: 0;"
@@ -145,12 +169,16 @@ import { status_mixin } from '../../mixins/status_mixin'
 import { user_status_mixin } from '../../mixins/user_status_mixin'
 import StatusColumn from '@/components/status/StatusColumn'
 import SiteSiderealTime from '@/components/SiteSiderealTime'
+import SiteReservationStatus from '@/components/SiteReservationStatus'
+import ChatModule from '@/components/ChatModule'
 export default {
     name: 'SiteStatusFooter',
     mixins: [status_mixin, user_status_mixin],
     components: {
         StatusColumn,
-        SiteSiderealTime
+        SiteSiderealTime,
+        SiteReservationStatus,
+        ChatModule,
     },
     props: {
         site: String,
@@ -158,6 +186,8 @@ export default {
 
     data() {
         return {
+
+            displayedOnlineUsers: new Set([]),
 
             status_bar_1_expanded: false,
             status_bar_2_expanded: false,
@@ -188,6 +218,23 @@ export default {
     },
 
     methods: {
+
+        // Get the username from Auth0
+        username() {
+            if (this.$auth.isAuthenticated) {
+                return this.$auth.user.name
+            }
+            return "anonymous"
+        },
+
+        // Format the displayed list of online users
+        makeOnlineUsersList(listOfUsers) {
+            let theList = new Set(listOfUsers) // Remove duplicates
+            theList.delete("anonymous")
+            theList.delete(this.username)
+            if (this.username != "anonymous") theList.add(`${this.username} (me)`)
+            this.displayedOnlineUsers = theList;
+        },
 
         toggle_status_bar_height_1() {
             if (this.status_bar_1_expanded) {
@@ -248,7 +295,7 @@ export default {
                 {"name": "Status Age", ...this.status_age_display},
                 {"name": "Weather OK", ...this.weather_ok},
                 {"name": "Open OK", ...this.open_ok},
-                {"name": "Enclosure", "val": this.enclosure_status},
+                //{"name": "Enclosure", "val": this.enclosure_status},
             ]
         },
         ra_dec_ha_status() {
@@ -301,6 +348,12 @@ export default {
 @import "@/style/_variables.scss";
 @import "@/style/buefy-styles.scss";
 
+.online-users-list {
+  margin-bottom: 20px;
+}
+.online-users-list > * {
+  padding-left: 1em;
+}
 
 /**     
  *  Component styling

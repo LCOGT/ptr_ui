@@ -170,6 +170,7 @@ export const status_mixin = {
             if (this.surface != '-'){ status.push({"name": "Surface", "val": this.surface}) }
             if (this.ambient != '-'){ status.push({"name": "Ambient", "val": this.ambient}) }
             if (this.meas_sky_mpsas != '-'){ status.push({"name": "Meas. mpsas", "val": this.meas_sky_mpsas}) }
+            if (this.calc_sky_mpsas != '-'){ status.push({"name": "Calc. mpsas", "val": this.calc_sky_mpsas}) }
             return status 
         },
         buildGeneralStatus() {
@@ -421,6 +422,9 @@ export const status_mixin = {
         },
         meas_sky_mpsas() {
             return (this.weather_state.meas_sky_mpsas || '-')
+        },
+        calc_sky_mpsas() {
+            return (this.weather_state.calc_sky_mpsas || '-')
         },
 
 

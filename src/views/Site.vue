@@ -1,7 +1,52 @@
 <template>
   <div class="page">
+
+    <b-navbar wrapper-class="container site-menu" class="is-hidden-touch is-hidden-desktop-only">
+        <template slot="brand">
+        </template>
+        <template slot="start">
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/home'}">
+              Home
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/observe'}">
+              Observe
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/targets'}">
+              Targets
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/projects'}">
+              Projects
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/calendar'}">
+              Calendar
+            </b-navbar-item>
+        </template>
+
+        <template slot="end">
+        </template>
+    </b-navbar>
     
     <div class="container page-view">
+
+    <!--b-tabs type="is-boxed">
+      <b-tab-item>
+        <template #header>
+          <b-icon icon="information-outline"></b-icon>
+          <span> Issues <b-tag rounded> 3 </b-tag> </span>
+        </template>
+      </b-tab-item>
+      <b-tab-item>
+        <template #header>
+          <b-icon icon="source-pull"></b-icon>
+          <span> Pull Requests <b-tag rounded>5</b-tag> </span>
+        </template>
+      </b-tab-item>
+    </b-tabs-->
 
     <div class="mobile-site-menu is-hidden-widescreen">
       <router-link :to="'/site/'+sitecode+'/home'">
@@ -24,42 +69,8 @@
     <div style="height: 1em"></div>
     <div class="columns" style="margin: 1em;">
 
-      <div class="column menu-column is-2 is-hidden-touch is-hidden-desktop-only">
+      <div class="column menu-column is-2 is-hidden-touch is-hidden-desktop-only" v-if="false">
 
-        <!-- Show whether a site is currently reserved or not -->
-        <!-- TODO: refactor into it's own component -->
-        <div class="site-reservation-status-box">
-          <!-- Display if there are no current reservations --> 
-          <div v-if="!hasActiveReservation"> 
-            <p class="menu-label site-not-reserved-notice">
-              no active reservations
-            </p>
-            <p>Next in: 0h 0m</p>
-            <p style="color: #555">(timer not implemented)</p>
-          <div style="height: 5px;" />
-          </div>
-
-          <!-- Display if the site is currently reserved for use (and not by current user). --> 
-          <div v-if="hasActiveReservation && !userHasActiveReservation"> 
-            <p class="menu-label site-reserved-notice">
-              Site is reserved 
-            </p>
-            <p>Remaining: {{timeRemainingForSoonestCurrentReservation}}</p>
-          </div>
-
-          <!-- Display if the site is currently reserved by the active user --> 
-          <div v-if="userHasActiveReservation"> 
-            <p class="menu-label site-reserved-current-user">
-              Reserved for you
-            </p>
-            <p>Remaining: {{userReservationTimeRemaining}}</p>
-          </div>
-
-          <div style="height: 5px;" />
-          <router-link :to="`/site/${sitecode}/calendar`"> 
-            <b-button size="is-small" class="button is-dark" icon-right="calendar">view calendar</b-button>
-          </router-link>
-        </div>
 
         <!-- Site menu for desktop or larger. Replaces bottom menu. -->
         <b-menu class="subpage-menu">
@@ -301,59 +312,6 @@ export default {
         'weather',
     ]),
 
-    ...mapState('calendar', [
-        'active_reservations'
-    ]),
-    ...mapGetters('calendar', [
-        'hasActiveReservation', 
-        'usersWithActiveReservation',
-        'userIDsWithActiveReservation',
-        'endOfUserReservation',
-        'endOfNextReservation',
-    ]),
-
-    userHasActiveReservation() {
-      if (this.$auth.isAuthenticated) {
-        let user_id = this.$auth.user.sub
-        return this.userIDsWithActiveReservation.includes(user_id)
-      }
-      else {
-        return false
-      }
-    },
-
-    timeRemainingForSoonestCurrentReservation() {
-      let expire_time = this.endOfNextReservation
-      let current_time = this.current_time_millis
-      let delta = expire_time - current_time
-
-      let millis_per_minute = 60 * 1000
-      let millis_per_hour = 3600 * 1000
-
-      let hours_left = Math.floor(delta / millis_per_hour)
-      let minutes_left = Math.floor((delta - (hours_left * millis_per_hour)) / millis_per_minute)
-      return `${hours_left}h ${minutes_left}m`
-    },
-
-    userReservationTimeRemaining() {
-      if (this.$auth.isAuthenticated) {
-        let user_id = this.$auth.user.sub
-        let expire_time = this.endOfUserReservation(user_id)
-        let current_time = this.current_time_millis
-        let delta = expire_time - current_time
-
-        let millis_per_minute = 60 * 1000
-        let millis_per_hour = 3600 * 1000
-
-        let hours_left = Math.floor(delta / millis_per_hour)
-        let minutes_left = Math.floor((delta - (hours_left * millis_per_hour)) / millis_per_minute)
-        return `${hours_left}h ${minutes_left}m`
-      }
-      else {
-        return "0h 0m"
-      }
-
-    },
 
     // Get the username from Auth0
     username() {
@@ -402,21 +360,6 @@ export default {
   max-width: 250px;
 }
 
-.site-not-reserved-notice {
-  color: $info;
-}
-.site-reserved-notice {
-  color: yellow;
-}
-.site-reserved-current-user {
-  color: greenyellow;
-}
-.site-reservation-status-box {
-  background-color: black;
-  border-radius: 8px;
-  padding: 1em;
-  margin-bottom: 1em;
-}
 
 
 .subpage-menu {
