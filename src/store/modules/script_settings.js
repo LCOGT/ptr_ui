@@ -368,7 +368,10 @@ const actions = {
                 script:script_name,
                 ...getters.getAllParamsFromScript(script_name),
             },
-            optional_params: {}
+            optional_params: {
+                instrument_selector_position: rootState.command_params.selector_position,
+                telescope_selection: rootState.command_params.telescope_selection,
+            }
         }
         
         // Send the command and log the output

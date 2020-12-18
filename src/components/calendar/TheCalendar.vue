@@ -1,5 +1,7 @@
-<template> <div class="calendar-container">
+<template>
+  <div class="calendar-container">
 
+    <!-- for development -->
     <!--button class="level-item button is-danger" @click="refreshCalendarView">refresh</button-->
     <!--button class="level-item button is-danger" @click="refreshIfUserIsScheduled">refresh current user is scheduled</button-->
     <!--button class="level-item button is-danger" @click="ping">ping</button-->
@@ -7,794 +9,1151 @@
     <!--div>{{currentUserScheduled}}</div-->
 
     <FullCalendar
-        class="demo-app-calendar"
-        ref="fullCalendar"
-
-        :views="fc_views"
-        :defaultView="fc_defaultView"
-        :header="fc_header"
-        :slotDuration="fc_slotDuration"
-        :slotLabelFormat="fc_slotLabelFormat"
-        :eventTimeFormat="fc_eventTimeFormat"
-        :timeZone="fc_timeZone"
-        :min-time="fc_minTime"
-        :max-time="fc_maxTime"
-        :scrollTime="fc_scrollTime"
-        :navLinks="fc_navLinks"
-        :selectable="fc_selectable"
-        :selectMirror="fc_selectMirror"
-        :unselectAuto="fc_unselectAuto"
-        :editable="fc_editable"
-        :weekends="fc_weekends"
-        :nowIndicator="fc_nowIndicator"
-        :now="fc_now"
-        :progressiveEventRendering="fc_progressiveEventRendering"
-        :aspect-ratio="fc_aspectRatio"
-        :themeSystem="fc_themeSystem"
-        :schedulerLicenseKey="fc_schedulerLicenseKey"
-        :eventSources="fc_eventSources"
-        :eventRender="fc_eventRender"
-        :resources="fc_resources"
-        :plugins="fc_plugins"
-
-        @loading="fc_isLoading"
-        @select="newEventSelected"
-        @eventClick="existingEventSelected"
+      class="demo-app-calendar"
+      ref="fullCalendar"
+      :views="fc_views"
+      :defaultView="fc_defaultView"
+      :header="fc_header"
+      :slotDuration="fc_slotDuration"
+      :slotLabelFormat="fc_slotLabelFormat"
+      :eventTimeFormat="fc_eventTimeFormat"
+      :timeZone="fc_timeZone"
+      :min-time="fc_minTime"
+      :max-time="fc_maxTime"
+      :scrollTime="fc_scrollTime"
+      :navLinks="fc_navLinks"
+      :selectable="fc_selectable"
+      :selectMirror="fc_selectMirror"
+      :unselectAuto="fc_unselectAuto"
+      :editable="fc_editable"
+      :weekends="fc_weekends"
+      :nowIndicator="fc_nowIndicator"
+      :now="fc_now"
+      :progressiveEventRendering="fc_progressiveEventRendering"
+      :aspect-ratio="fc_aspectRatio"
+      :themeSystem="fc_themeSystem"
+      :schedulerLicenseKey="fc_schedulerLicenseKey"
+      :eventSources="fc_eventSources"
+      :eventRender="fc_eventRender"
+      :dayRender="dayRender"
+      :firstDay="fc_firstDay"
+      :resources="fc_resources"
+      :plugins="fc_plugins"
+      @loading="fc_isLoading"
+      @select="newEventSelected"
+      @eventClick="existingEventSelected"
+      @eventMouseEnter="eventMouseEnter"
+      @eventMouseLeave="eventMouseLeave"
     />
 
-    <div class="level">
-        <div class="level-left">
-          <div class="level-item">
-            <button class="button" style="opacity: 0;">padding only</button>
-          </div>
+    <div class="level" style="margin: 0;">
+      <div class="level-left">
+        <div class="level-item">
+          <button class="button" style="opacity: 0;">padding only</button>
         </div>
-        <div class="level-right">
-          <div class="level-item">
-            <button v-if="isLoading" class="level-item button is-text is-loading">loading</button>
-          </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <button v-if="isLoading" class="level-item button is-text is-loading">loading</button>
         </div>
+      </div>
     </div>
 
 
+    <div class="fc-settings-box">
+      <div>
+        <p class="menu-label">Settings</p>
+        <div class="field">
+            <b-switch v-model="display_moon">
+                Show moon events
+            </b-switch>
+        </div>
+      </div>
+
+    </div>
+
     <!-- popup for creating calendar events -->
-    <b-modal :active.sync="eventEditorIsActive" :width="640" scroll="keep" @close="eventModalClosed">
-        <div class="card">
-            <div class="card-content">
-            <calendar-event-editor 
-            :eventDetails="activeEvent" 
+    <b-modal
+      :active.sync="eventEditorIsActive"
+      :width="640"
+      scroll="keep"
+      @close="eventModalClosed"
+    >
+      <div class="card">
+        <div class="card-content">
+          <calendar-event-editor
+            :eventDetails="activeEvent"
             :isNewEvent="isNewEvent"
             :eventIsLoading="isLoading"
             @submit="submitButtonClicked"
             @cancel="cancelButtonClicked"
             @delete="deleteButtonClicked"
             @modify="modifyButtonClicked"
-            />
-            </div>
+          />
         </div>
+      </div>
     </b-modal>
 
-</div> 
+    <!-- Moon info box that appears when hovering over a moon event -->
+    <div id="moon-info">
+      <p>Moon is above the horizon</p>
+      <p>---</p>
+      <p>Illumination: &emsp;{{moon_hover_data.illumination}} %</p>
+      <p>Rise: &emsp;&emsp;&emsp;&emsp;&ensp;{{moon_hover_data.rise}}</p>
+      <p>Transit: &emsp;&emsp;&emsp;&ensp;{{moon_hover_data.transit}}</p>
+      <p>Set: &emsp;&emsp;&emsp;&emsp;&emsp;{{moon_hover_data.set}}</p>
+    </div>
+
+  </div>
 </template>
 
 <script>
-
 //{ import scripts (collapsible)
-    import axios from 'axios';
-    import moment from 'moment';
-    import titleGenerator from '@/utils/titleGenerator';
-    import SunCalc from 'suncalc';
-    import {mapGetters} from 'vuex'
+import axios from "axios";
+import moment from "moment";
+import titleGenerator from "@/utils/titleGenerator";
+import SunCalc from "suncalc";
+import { mapGetters } from "vuex";
 
-    import CalendarEventEditor from "@/components/calendar/CalendarEventEditor";
+import CalendarEventEditor from "@/components/calendar/CalendarEventEditor";
 
-    import FullCalendar from "@fullcalendar/vue";
-    import dayGridPlugin from "@fullcalendar/daygrid";
-    import timeGridPlugin from "@fullcalendar/timegrid";
-    import interactionPlugin from "@fullcalendar/interaction";
-    import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
-    import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
-    import bootstrapPlugin from '@fullcalendar/bootstrap';
-    import momentTimezonePlugin from '@fullcalendar/moment-timezone';
-    import { toMoment } from '@fullcalendar/moment'; // only for formatting
+import FullCalendar from "@fullcalendar/vue";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
+import bootstrapPlugin from "@fullcalendar/bootstrap";
+import momentTimezonePlugin from "@fullcalendar/moment-timezone";
+import { toMoment } from "@fullcalendar/moment"; // only for formatting
 
+// must manually include stylesheets for each plugin
+import "@fullcalendar/core/main.css";
+import "@fullcalendar/daygrid/main.css";
+import "@fullcalendar/timegrid/main.css";
+import "@fullcalendar/resource-timeline/main.css";
 
-    // must manually include stylesheets for each plugin
-    import "@fullcalendar/core/main.css";
-    import "@fullcalendar/daygrid/main.css";
-    import "@fullcalendar/timegrid/main.css";
-    import "@fullcalendar/resource-timeline/main.css";
-
-
-    /* TODO:
-
+/* TODO:
     - merge the idea of 'resources' with the existing site-based event filtering
-
-    - Convert stuff to UTC instead of local times. Somehow preserve notion of local time.
-
     */
-
 //}
 
-/*
-TODO: 
-
-  - save events in UTC so that modifications are possible from any timezone.
-    (currently appending -8:00 to indicate PST )
-
-  - retrieve site lat/lon in the twilight calculator. Don't hardcode!
-
-  - set min/max time (start/end) to a few hours before dusk.
-    use utc offset + site tz offset 
-
-*/
-
-
 export default {
-    name: 'TheCalendar',
-    components: {
-        FullCalendar, // make the <FullCalendar> tag available
-        CalendarEventEditor,
+  name: "TheCalendar",
+  components: {
+    FullCalendar, // make the <FullCalendar> tag available
+    CalendarEventEditor,
+  },
+  props: [
+    // The active site (resource) disaplyed in the calendar
+    "calendarSite",
+
+    // Resources for fullcalendar (in our case they are observatories)
+    "fc_resources",
+
+    // Timezone of the site
+    "fc_timeZone",
+  ],
+
+  mounted() {
+
+    // Once we've mounted, we're able to access the fullCalendar $ref. 
+    // We need this to access the fullCalendar.getApi() method. 
+    this.isMounted = true;
+
+    this.fullCalendarApi = this.$refs.fullCalendar.getApi()
+
+    //console.log( "timezone: " + this.$refs.fullCalendar.getApi().dateEnv.timeZone);
+    this.refreshCalendarView();
+    this.nowIndicatorTimeInteval = setInterval(this.updateNowIndicator, 300000);
+  },
+  destroyed() {
+    clearInterval(this.nowIndicatorTimeInterval);
+  },
+
+  watch: {
+    calendarSite: function (val) {
+      this.refreshCalendarView();
     },
-    props: [
-        // The active site (resource) disaplyed in the calendar
-        'calendarSite', 
-
-        // Resources for fullcalendar (in our case they are observatories)
-        'fc_resources'
-    ],
-
-    mounted() {
-      console.log('timezone: '+ this.$refs.fullCalendar.getApi().dateEnv.timeZone)
-      console.log('mounted')
-      this.refreshCalendarView()
-      this.nowIndicatorTimeInteval = setInterval( this.updateNowIndicator, 300000)
+    global_config() {
+      this.refreshCalendarView();
     },
-    destroyed() {
-      clearInterval(this.nowIndicatorTimeInterval)
+    user() {
+      this.refreshCalendarView();
     },
+    display_moon() {
+      this.refreshCalendarView();
+    }
+  },
 
-    watch: {
-        calendarSite: function(val){
-            console.log(`site changed to ${val}`)
-            this.refreshCalendarView()
-        },
-        global_config() {
-          this.refreshCalendarView()
-        },
-        user() {
-          console.log('user changed; refresh calendar view')
-          this.refreshCalendarView()
-        },
+  computed: {
+    //fullCalendarApi() {
+      //return this.$refs.fullCalendar.getApi();
+    //},
+
+    fc_now() {
+      if (this.fc_timeZone) {
+        // make sure timezone has loaded from the config
+        return moment().tz(this.fc_timeZone).format();
+      }
     },
 
+    // Return the list of sources that feed fullCalendar with events
+    fc_eventSources() {
+      let sources = [
+        // Astronomical twilight events (computed locally)
+        { events: this.getTwilightEvents },
+        // Events from dynamodb backend
+        { events: this.fetchSiteEvents },
+        // Now Indicator
+        { events: this.getNowIndicator },
+        // Moon Indicator
+        { events: this.getMoonRiseSet },
+      ];
+      return sources
+    },
 
-    computed: {
-        fullCalendarApi() {
-          return this.$refs.fullCalendar.getApi();
+    fc_selectable() {
+      // whether to let user click and drag to select a time range.
+      return this.$auth.isAuthenticated;
+    },
+
+    // Define the starting calendar day. 0=sunday, 1=monday, ...
+    fc_firstDay() {
+      // The fullCalendar ref doesn't work until the component is mounted.
+      if (!this.isMounted)
+        return;
+
+      // Get the fullCalendar api
+      let api = this.$refs.fullCalendar.getApi();
+
+      // If the week view is displayed, we want to center the 'today' column.
+      if (api.view.type == 'timeGridWeek') {
+        let today_day_number = moment().tz(this.fc_timeZone).day()
+        let starting_day_number = (today_day_number - 3) % 6
+        return starting_day_number
+      }
+      else {
+        // Otherwise, Sunday is the first day. 
+        return 0
+      }
+    },
+
+    ...mapGetters("site_config", [
+      "site_config",
+      "global_config",
+      "site_latitude",
+      "site_longitude",
+      "timezone",
+    ]),
+
+    //...mapGetters("site_config", {
+      //fc_timeZone: "timezone", // rename to match fc namespacing.
+    //}),
+
+    user() {
+      return this.$auth.user;
+    },
+  },
+
+  data: function () {
+    return {
+      /*===================================================/
+      Configs for fullCalendar (anything with fc_ namespace)
+      /===================================================*/
+      fc_views: {
+        // definitions for additional calendar views (eg. 10 day grid)
+        resourceTimelineDay: {
+          buttonText: ":15 slots",
+          slotDuration: "00:15",
         },
+        resourceTimelineTenDay: {
+          type: "resourceTimeline",
+          duration: { days: 10 },
+          buttonText: "10 days",
+        },
+      },
+      fc_defaultView: "timeGridWeek",
+      fc_header: {
+        // define the top row of buttons
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,listWeek",
+      },
+      fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
+      fc_eventTimeFormat: { hour: "numeric", minute: "2-digit", hour12: false }, // 24hr times on events
+      fc_slotLabelFormat: { hour: "numeric", minute: "2-digit", hour12: false }, // 24hr time on axis labels
+      fc_minTime: "12:00:00", // start the day column at noon
+      fc_maxTime: "36:00:00", // end the day column at noon for the following day
+      fc_scrollTime: "16:00:00", // calendar default view starts at 4pm.
+      fc_navLinks: false, // whether to enable clicking on a day to view that day only.
+      fc_selectMirror: true, // whether to draw placeholder event while user is dragging
+      fc_unselectAuto: false, // whether clicking elsewhere closes the current selection
+      fc_editable: true, // whether events on calendar can be modified
+      fc_weekends: true, // whether to show weekends in week view
+      fc_nowIndicator: false, // whether to draw line indicating current time in grid views.
+      fc_progressiveEventRendering: true,
+      fc_aspectRatio: 1.2, // calendar window width/height
+      fc_themeSystem: "bootstrap", // uses bootstrap css (see <style> below)
+      fc_schedulerLicenseKey: "GPL-My-Project-Is-Open-Source", // free use of scheduler/resources
+      // fullcalendar plugins
+      fc_plugins: [
+        // plugins must be defined in the JS
+        dayGridPlugin,
+        timeGridPlugin,
+        interactionPlugin, // needed for dateClick
+        bootstrapPlugin,
+        resourceTimelinePlugin,
+        resourceTimeGridPlugin,
+        momentTimezonePlugin,
+      ],
 
-        fc_now() {
-          if (this.fc_timeZone) { // make sure timezone has loaded from the config
-            return moment().tz(this.fc_timeZone).format()
+      fullCalendarApi: '',
+
+      // Change to true when the 'mounted' hook is run. 
+      // We need to know whether the component is mounted to access the 
+      // $refs.fullCalendar.getApi() method. 
+      isMounted: false,
+
+      // Users can toggle whether the visible moon times are on the calendar. 
+      display_moon: true,
+
+      moon_cache: {},
+
+      moon_hover_data: {
+        rise: '',
+        set: '',
+        transit: '',
+        illumination: '',
+      },
+
+      // URL for the calendar backend api
+      //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
+      backendUrl: "https://calendar.photonranch.org",
+
+      // this informs what buttons appear in the modal event editor
+      isNewEvent: false,
+
+      // toggles the popup for setting calendar events
+      eventEditorIsActive: false,
+
+      // properties of the selected calendar event
+      activeEvent: {},
+
+      isLoading: false,
+
+      currentUserScheduled: false,
+    };
+  },
+
+  methods: {
+    async updateNowIndicator() {
+      this.fullCalendarApi.unselect();
+      this.fullCalendarApi.refetchEvents();
+    },
+
+    getMoonPhaseDays(year, month, day) {
+
+      // https://gist.github.com/endel/dfe6bb2fbe679781948c
+      var Moon = {
+        phases: ["new", "waxing-crescent", "first-quarter", "waxing-gibbous", 
+          "full", "waning-gibbous", "last-quarter", "waning-crescent" ],
+        phase: function (year, month, day) {
+          let e
+          let jd
+          let b
+          let c = e = jd = b = 0;
+
+          if (month < 3) {
+            year--;
+            month += 12;
           }
-        },
 
-        // Return the list of sources that feed fullCalendar with events
-        fc_eventSources() {
-            return [
-                // Astronomical twilight events (computed locally)
-                { events: this.getTwilightEvents },
-                // Events from dynamodb backend
-                { events: this.fetchSiteEvents },
-                // Now Indicator
-                { events: this.getNowIndicator },
-            ]
-        },
-        fc_selectable() { // whether to let user click and drag to select a time range.
-            return this.$auth.isAuthenticated
-        },
-        ...mapGetters('site_config', [
-          'site_config',
-          'global_config',
-          'site_latitude',
-          'site_longitude',
-          'timezone',
-        ]),
-        ...mapGetters('site_config', {
-          "fc_timeZone": "timezone", // rename to match fc namespacing.
-        }),
+          ++month;
+          c = 365.25 * year;
+          e = 30.6 * month;
+          jd = c + e + day - 694039.09; // jd is total days elapsed
+          jd /= 29.5305882; // divide by the moon cycle
+          b = parseInt(jd); // int(jd) -> b, take integer part of jd
+          jd -= b; // subtract integer part to leave fractional part of original jd
+          b = Math.round(jd * 8); // scale fraction from 0-8 and round
 
-        user() {
-          return this.$auth.user
-        },
+          if (b >= 8) b = 0; // 0 and 8 are the same so turn 8 into 0
+          return {phase: b, name: Moon.phases[b]};
+        }
+      };
 
+      try { // ignore errors caused by the timezone not being loaded yet.
+        let moment_today = moment([year, month, day]).utc()
+        let moment_yesterday = moment([year, month, day]).utc().add(-1, 'days')
+        //console.log('today: ',moment_today.format())
+        //console.log('yesterday: ',moment_yesterday.format())
 
+        let phase_today = Moon.phase(
+          moment_today.year(), 
+          moment_today.month(), 
+          moment_today.date())
+        let phase_yesterday = Moon.phase(
+          moment_yesterday.year(), 
+          moment_yesterday.month(), 
+          moment_yesterday.date())
+
+        //console.log(phase_today.phase)
+        //console.log(phase_yesterday.phase)
+
+        // If the phase is changed from the previous day, then return it to
+        // display on the calendar.
+        if (phase_today.phase != phase_yesterday.phase) {
+          return phase_today
+        }
+        else {
+          return false
+        }
+      } catch {
+        return false;
+      }
     },
 
-    data: function() { return {
 
-        /*===================================================/
-        Configs for fullCalendar (anything with fc_ namespace)
-        /===================================================*/
-        fc_views: { // definitions for additional calendar views (eg. 10 day grid)
-            resourceTimelineDay: {
-                buttonText: ':15 slots',
-                slotDuration: '00:15'
-            },
-            resourceTimelineTenDay: {
-                type: 'resourceTimeline',
-                duration: { days: 10 },
-                buttonText: '10 days'
-            }
-        },
-        fc_defaultView: "timeGridWeek", 
-        fc_header: { // define the top row of buttons
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek'
-        },
-        fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
-        fc_eventTimeFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr times on events
-        fc_slotLabelFormat: {hour: 'numeric', minute: '2-digit', hour12: false}, // 24hr time on axis labels
-        fc_minTime: "12:00:00", // start the day column at noon
-        fc_maxTime: "36:00:00", // end the day column at noon for the following day
-        fc_scrollTime: "16:00:00", // calendar default view starts at 4pm.
-        fc_navLinks: false, // whether to enable clicking on a day to view that day only.
-        fc_selectMirror: true, // whether to draw placeholder event while user is dragging
-        fc_unselectAuto: false, // whether clicking elsewhere closes the current selection
-        fc_editable: true, // whether events on calendar can be modified
-        fc_weekends: true, // whether to show weekends in week view
-        fc_nowIndicator:false, // whether to draw line indicating current time in grid views.
-        fc_progressiveEventRendering: true,
-        fc_aspectRatio: 1.2, // calendar window width/height
-        fc_themeSystem: 'bootstrap', // uses bootstrap css (see <style> below)
-        fc_schedulerLicenseKey: "GPL-My-Project-Is-Open-Source", // free use of scheduler/resources 
-        // fullcalendar plugins
-        fc_plugins: [
-            // plugins must be defined in the JS
-            dayGridPlugin,
-            timeGridPlugin,
-            interactionPlugin, // needed for dateClick
-            bootstrapPlugin,
-            resourceTimelinePlugin,
-            resourceTimeGridPlugin,
-            momentTimezonePlugin,
-        ],
+    // Display moon phase icons in the calendar
+    dayRender(dayRenderInfo) {
+      if (dayRenderInfo.view.type == "dayGridMonth" || true) {
 
-        // URL for the calendar backend api
-        //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
-        backendUrl: 'https://calendar.photonranch.org',
+        try { // ignore errors from the timezone not being loaded yet. 
+          //console.log(dayRenderInfo)
+          let date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
+          //console.log(date.format())
+          //console.log('y: ', date.year())
+          //console.log('m: ', date.month())
+          //console.log('d: ', date.date())
+          let moon_phase = this.getMoonPhaseDays(
+            date.year(), 
+            date.month(), 
+            date.date())
+          //console.log(moon_phase)
 
-        // this informs what buttons appear in the modal event editor
-        isNewEvent: false,
+          if (moon_phase) {
+            dayRenderInfo.el.innerHTML = `<i class="moon-icon mdi \
+              mdi-moon-${moon_phase.name}" aria-hidden="true"></i>`
+          }
+        } catch {
+          console.warn('dayRender waiting for valid timezone.')
+        }
 
-        // toggles the popup for setting calendar events
-        eventEditorIsActive: false,
+      }
+    },
 
-        // properties of the selected calendar event
-        activeEvent: {},
-
-        isLoading: false,
-
-        currentUserScheduled: false,
-
-    }},
-
-    methods: {
-      foo() {
-        console.warn('bar')
-      },
-
-      async updateNowIndicator() {
-        this.fullCalendarApi.unselect();
-        this.fullCalendarApi.refetchEvents();
-      },
-
-      async getNowIndicator(info) {
-        let now = [{
+    async getNowIndicator(info) {
+      let now = [
+        {
           start: moment().utc().format(),
-          end: moment().utc().add('1', 'minutes').format(),
+          end: moment().utc().add("1", "minutes").format(),
           rendering: "background",
-          backgroundColor:"#ff0000",
+          backgroundColor: "#ff0000",
           borderColor: "#ff0000",
           id: `fc-custom-now-indicator`,
-          classNames: ["fc-now-indicator","fc-now-indicator-line"]
-        }]
-        return now
-      },
-
-      fc_eventRender() {
-        let n = document.getElementsByClassName("fc-now-indicator")[0]
-        if(n){
-          //n.style['z-index'] = 15
-          n.parentElement.style["z-index"] = "auto"
-        }
-      },
-
-      
-        // Displays loading spinner when calendar is fetching.
-
-        fc_isLoading(val) { 
-          this.isLoading = val; 
+          classNames: ["fc-now-indicator", "fc-now-indicator-line"],
         },
-
-        async getTwilightEvents(info) {
-
-            // Timer start
-            let t0=performance.now()
-            //console.log('info: ', info)
-
-            // Get the time range we need to display in the UI.
-            let firstDay = info.start.valueOf()
-            let lastDay = info.end.valueOf()
-            
-            // List all the days we'll need to display
-            let allDays = []
-            let msPerDay = 1000*60*60*24
-
-            // Generate events for 60 days before the start time to 60 days after.
-            // This is to prevent the loading flicker when changing weeks.
-            // note: this still only takes ~5ms to compute.
-            for (let day=firstDay-(60*msPerDay); day<lastDay+(60*msPerDay); day+=msPerDay) {
-                // Define each day by the timestamp a little after 1:01am to avoid DST hell
-                allDays.push(day+3700000)
-            }
-
-            //console.log('allDays: ', allDays)
-
-            // Generate the twilight events (in proper fullCalendar format)
-            // for one day column (evening-of and morning-after the given date.)
-            function oneDayTwilight(timestamp, latitude, longitude) {
-
-                let events = {}
-
-                let msPerDay = 1000*60*60*24
-                let sunEvents = SunCalc.getTimes(new Date(timestamp), latitude, longitude)
-                let nextDayEvents = SunCalc.getTimes(new Date(timestamp+msPerDay),latitude, longitude)
-                let prevDayEvents = SunCalc.getTimes(new Date(timestamp-msPerDay),latitude, longitude)
-
-                let currentDateObj = new Date(timestamp)
-
-                // The event colors for the calendar
-                //let daylightColor = "rgb(129, 212, 250)"
-                //let civilColor = "rgb(52, 152, 219)"
-                //let nauticalColor = "rgb(36, 113, 163)"
-                //let astronomicalColor = "rgb(26, 82, 118)"
-
-                let daylightColor = "#81D4FA"
-                let civilColor = "#1B9FD8"
-                let nauticalColor = "#166EA9"
-                let astronomicalColor = "#084165"
-
-                // This is redundant; replaced by the other daylight event (bottom)
-                //events.daylightAfternoon = {
-                    //title: "Afternoon Daylight",
-                    //// Start daylight event at noon
-                    //start: prevDayEvents.sunrise,
-                    ////start: new Date(timestamp).setHours(12),
-                    ////end: sunEvents.sunset,
-                    //end: prevDayEvents.sunset,
-                    //rendering: "background",
-                    //backgroundColor: daylightColor,
-                    //id: `${currentDateObj.toISOString()}_day_afternoon`,
-                //}
-                events.civilTwilightDusk = {
-                    title: "Civil Twilight",
-                    start: sunEvents.sunset,
-                    end: sunEvents.dusk,
-                    backgroundColor: civilColor,
-                    rendering: "background",
-                    id: `${currentDateObj.toISOString()}_civil_dusk`,
-                }
-                events.nauticalTwilightDusk = {
-                    title: "Nautical Twilight",
-                    start: sunEvents.dusk,
-                    end: sunEvents.nauticalDusk,
-                    backgroundColor: nauticalColor,
-                    rendering: "background",
-                    id: `${currentDateObj.toISOString()}_nautical_dusk`,
-                }
-                events.astronomicalTwilightDusk = {
-                    title: "Astronomical Twilight",
-                    start: sunEvents.nauticalDusk,
-                    end: sunEvents.night,
-                    backgroundColor: astronomicalColor,
-                    rendering: "background",
-                    id: `${currentDateObj.toISOString()}_astronomical_dusk`,
-                }
-
-                events.astronomicalTwilightDawn = {
-                    title: "Astronomical Twilight",
-                    start: nextDayEvents.nightEnd,
-                    end: nextDayEvents.nauticalDawn,
-                    backgroundColor: astronomicalColor,
-                    rendering: "background",
-                    id: `${currentDateObj.toISOString()}_astronomical_dawn`,
-                }
-                events.nauticalTwilightDawn = {
-                    title: "Nautical Twilight",
-                    start: nextDayEvents.nauticalDawn,
-                    end: nextDayEvents.dawn,
-                    backgroundColor: nauticalColor,
-                    rendering: "background",
-                    id: `${currentDateObj.toISOString()}_nautical_dawn`,
-                }
-                events.civilTwilightDawn = {
-                    title: "Civil Twilight",
-                    start:nextDayEvents.dawn,
-                    end:nextDayEvents.sunrise,
-                    backgroundColor: civilColor,
-                    rendering: "background",
-                    id: `${currentDateObj.toISOString()}_civil_dawn`,
-                }
-                events.daylightMorning = {
-                    title: "Morning Daylight",
-                    start: nextDayEvents.sunrise,
-                    end: nextDayEvents.sunset,
-                    //end: new Date(new Date(timestamp).setHours(36)),
-                    rendering: "background",
-                    backgroundColor: daylightColor,
-                    id: `${currentDateObj.toISOString()}_day_morning`,
-                }
-                return events
-            }
-
-            // Collect all the events to display here
-            let twilightEvents = []
-
-            let site_lat = parseFloat(this.site_config(this.calendarSite)['latitude'])
-            let site_lng = parseFloat(this.site_config(this.calendarSite)['longitude'])
-
-
-            // Compute events for each day. 
-            allDays.map((day) => twilightEvents.push(...Object.values(
-              oneDayTwilight(
-                day, 
-                site_lat,
-                site_lng,
-              )
-            )))
-
-            // Finish timer
-            let t1=performance.now()
-            let twilightComputeTime = t1-t0
-            if (twilightComputeTime > 100) {
-                console.warn('Slow computation of astro twilight: ', twilightComputeTime.toFixed(2)+'ms')
-            }
-            return twilightEvents
-        },
-
-        async getConfigWithAuth() {
-            let token, configWithAuth;
-            try {
-                token = await this.$auth.getTokenSilently(); 
-            } catch(err) {
-                console.error(err)
-                console.warn('Did not acquire the needed token. Stopping request.')
-                
-                // small popup notification
-                this.$buefy.toast.open({
-                    duration: 5000,
-                    message: "Oops! You aren't authorized to do that.",
-                    position: 'is-bottom',
-                    type: 'is-danger' ,
-                })
-            }
-
-            return {
-                'headers': {
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${token}`
-                }
-            }
-        },
-
-        handleNotAuthorizedResponse(error) {
-            if (error.response) {
-                // Request made and server responded
-                console.log(error.response.data);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-                // small popup notification describing error
-                this.$buefy.toast.open({
-                    duration: 5000,
-                    message: `${error.response.status} error: ${error.response.data}`,
-                    position: 'is-bottom',
-                    type: 'is-danger' ,
-                })
-            } else if (error.request) {
-                // The request was made but no response was received
-                console.log(error.request);
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.log('Error', error.message);
-            }
-        },
-
-        // Make a unique id for calendar events. UUID style. This is the pk in dynamodb.
-        makeUniqueID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        },
-
-        // Used when exiting event editor modals. Clear selections, close modal, and refresh events.
-        async refreshCalendarView() {
-            let calendarApi = this.$refs.fullCalendar.getApi();
-            calendarApi.unselect();
-            calendarApi.refetchEvents();
-            this.eventEditorIsActive=false;
-            
-            // Update the list of active reservations
-            this.$store.dispatch('calendar/fetchActiveReservations', this.calendarSite)
-        },
-
-        /*===================================================/
-        Calendar Event Selection Handlers
-        /===================================================*/
-        /**
-         *  This is run when a user clicks on the calendar to create a new event.
-         */
-        newEventSelected(event){ 
-            //console.log(event)
-            this.activeEvent.startStr = moment(event.startStr).utc().format()
-            this.activeEvent.endStr = moment(event.endStr).utc().format()
-            this.activeEvent.title = titleGenerator.makeTitle()
-            this.activeEvent.creator = this.$auth.user.name
-            this.activeEvent.id = this.makeUniqueID()
-            this.activeEvent.site = this.calendarSite
-            this.activeEvent.resourceId = this.calendarSite
-            this.activeEvent.creator_id = this.$auth.user.sub
-            this.activeEvent.project_id = "none"
-
-            this.isNewEvent = true; // setting for the modal event editor
-            this.eventEditorIsActive= true;
-        },
-        /**
-         *  This is run when a user clicks on an existing event in the calendar.
-         */
-        existingEventSelected(arg) {
-            let event = arg.event;
-            //console.log(event)
-            this.activeEvent.id = event.id,
-            this.activeEvent.startStr = moment(event.start).format();
-            this.activeEvent.endStr = moment(event.end).format();
-            this.activeEvent.title = event.title;
-            this.activeEvent.creator = event.extendedProps.creator
-            this.activeEvent.site = event.extendedProps.site
-            this.activeEvent.resourceId = event.getResources()[0].id
-            this.activeEvent.project_id = event.extendedProps.project_id
-
-            this.isNewEvent = false; // setting for the modal event editor
-            this.eventEditorIsActive= true
-        },
-
-
-        /*===================================================/
-        Calendar CRUD
-        /===================================================*/
-        /**testing */
-        async refreshIfUserIsScheduled() {
-          // Make request headers and include token. 
-          // Requires user to be logged in.
-          let header = await this.getConfigWithAuth();
-          let url = `${this.backendUrl}/dev/is-user-scheduled`
-          let user_id = this.$auth.user.sub
-          let body = {
-            "user_id": user_id,
-            "site": this.calendarSite,
-            "time": moment().utc().format()
-          }
-          let response = await axios.post(url, body, header)
-          console.log('userIsScheduled response: ',response)
-          this.currentUserScheduled = response.data
-        },
-        async ping() {
-          let url = 'https://api.photonranch.org/api/ping/helloping'
-          let header = await this.getConfigWithAuth();
-          let body = {}
-          console.log(await axios.post(url, body, header))
-        },
-
-        /**
-         * When the user clicks submit, event details are sent to the backend.
-         */
-        async submitButtonClicked(newEvent) {
-          //console.log('new event creation: ', newEvent)
-
-            // Make request headers and include token. 
-            // Requires user to be logged in.
-            let config = await this.getConfigWithAuth();
-
-            let url = `${this.backendUrl}/dev/newevent`
-            let eventToPost = {
-                "event_id": newEvent.id,
-                "start": moment(newEvent.startStr).utc().format(),
-                "end": moment(newEvent.endStr).utc().format(),
-                "creator": newEvent.creator,
-                "creator_id": newEvent.creator_id,
-                "site": newEvent.site,
-                "title": newEvent.title,
-                "resourceId": newEvent.resourceId,
-                "project_id": newEvent.project_id,
-                "rendering": newEvent.rendering
-            }
-            axios.post(url, eventToPost, config)
-                .then(res => {
-                    this.isLoading = true;
-                    this.refreshCalendarView()
-                })
-                .catch(error => {
-                    this.eventEditorIsActive= false;
-                    this.handleNotAuthorizedResponse(error)
-                })
-
-            // refresh to show update and close modal
-        },
-        /**
-         * Close the event modal and deselect its associated calendar event.
-         */
-        cancelButtonClicked() {
-            let calendarApi = this.$refs.fullCalendar.getApi();
-            calendarApi.unselect()
-            this.eventEditorIsActive = false;
-        },
-        /**
-         * Replicates the 'cancelButtonClicked' function for the case when the user
-         * closes the modal window by clicking outside of it.
-         */
-        eventModalClosed() {
-            let calendarApi = this.$refs.fullCalendar.getApi();
-            calendarApi.unselect()
-        },
-        /**
-         * Delete the selected calendar event from the backend database
-         */
-        async deleteButtonClicked(eventToDelete) {
-            let config = await this.getConfigWithAuth();
-            let url = `${this.backendUrl}/dev/delete`
-            //console.log('event to delete: ', eventToDelete)
-            let body = {
-                "event_id": eventToDelete.id,
-                "start": moment(eventToDelete.startStr).utc().format(),
-            }
-            let res = await axios.post(url, body, config)
-                .then(res => {
-                    this.isLoading = true;
-                    this.refreshCalendarView()
-                })
-                .catch(error => {
-                    this.eventEditorIsActive= false;
-                    this.handleNotAuthorizedResponse(error)
-                })
-        },
-
-        async modifyButtonClicked(events) {
-            let initialEvent = events.initialEvent
-            let modifiedEvent = events.modifiedEvent
-
-            // Maybe we don't need to update anything?
-            if (JSON.stringify(initialEvent) == JSON.stringify(modifiedEvent)){
-                this.refreshCalendarView()
-                return;
-            }
-
-            // Make request headers and include token. 
-            // Requires user to be logged in.
-            let config = await this.getConfigWithAuth();
-            let url = `${this.backendUrl}/dev/modifyevent`
-            let theModifiedEvent = {
-                "event_id":modifiedEvent.id,
-                "start": moment(modifiedEvent.startStr).utc().format(),
-                "end":  moment(modifiedEvent.endStr).utc().format(),
-                "creator":modifiedEvent.creator,
-                "creator_id":modifiedEvent.creator_id,
-                "site":modifiedEvent.site,
-                "title":modifiedEvent.title,
-                "resourceId":modifiedEvent.resourceId,
-                "project_id":modifiedEvent.project_id,
-                "rendering":modifiedEvent.rendering
-            }
-            let theInitialEvent = {
-                "event_id":initialEvent.id,
-                "start": moment(initialEvent.startStr).utc().format(),
-                "end": moment(initialEvent.endStr).utc().format(),
-                "creator":initialEvent.creator,
-                "creator_id":initialEvent.creator_id,
-                "site":initialEvent.site,
-                "title":initialEvent.title,
-                "resourceId":initialEvent.resourceId,
-                "project_id":initialEvent.project_id,
-                "rendering":initialEvent.rendering
-            }
-            let body = {
-                originalEvent: theInitialEvent,
-                modifiedEvent: theModifiedEvent,
-            }
-
-            axios.post(url,body,config)
-                .then(res => {
-                    this.isLoading = true;
-                    this.refreshCalendarView()
-                })
-                .catch(error => {
-                    this.eventEditorIsActive= false;
-                    this.handleNotAuthorizedResponse(error)
-                })
-        },
-
-
-        /*===================================================/
-        Fetching Calendar Events
-        /===================================================*/
-
-        /**
-         * The event color should reflect whether it is owned by the user.
-         */
-        eventColor() {
-
-        },
-
-        async fetchSiteEvents(fetchInfo) {
-
-            let site = this.calendarSite
-            const url = `${this.backendUrl}/dev/siteevents`
-            const options = {
-                'headers': {
-                    'Content-Type': 'application/json;charset=UTF-8',
-                    'Access-Control-Allow-Origin': '*',
-                }
-            }
-            let body = {
-                "site": site,
-                "start": fetchInfo.startStr,
-                "end": fetchInfo.endStr,
-            }
-
-            let resp = await axios.post(url, body, options)
-
-            // Format the returned items to work nicely with fullcalendar.
-            let formatted_events = resp.data.map(obj => {
-                let fObj = {
-                'start': obj.start,
-                'end': obj.end,
-                'id': obj.event_id,
-                'title': obj.title,
-                'creator': obj.creator,
-                'creator_id': obj.creator_id,
-                'site': obj.site,
-                'resourceId': obj.resourceId,
-                'project_id': obj.project_id,
-                'rendering': obj.rendering,
-                }
-                if (this.$auth.isAuthenticated && fObj.creator_id == this.$auth.user.sub) {
-                  fObj.backgroundColor = '#933bff'
-                  //fObj.borderColor = '#4099ff'
-                }
-                return fObj
-            })
-            return formatted_events
-        },
+      ];
+      return now;
     },
 
+    fc_eventRender() {
+      let n = document.getElementsByClassName("fc-now-indicator")[0];
+      if (n) {
+        n.parentElement.style["z-index"] = "auto";
+      }
+    },
+
+    // Displays loading spinner when calendar is fetching.
+    fc_isLoading(val) {
+      this.isLoading = val;
+    },
+
+    /**
+     * Helper function for displaying moon visibility in the calendar.
+     * Returns a grey color with brightness corresponding to moon brightness.
+     * @param {float} illum: moon illumination between 0 and 1.
+     * @returns {string}: css value, something like 'rgba(255,255,255,0.5)'
+     */
+    rgba_from_illumination(illum, peak) {
+      let alpha = 0.1 + (0.9 * illum) // should have minimum opacity of 0.1
+      return `rgba(${peak},${peak},${peak},${alpha})`
+    },
+
+
+    // Call the photonranch api to get moon times. 
+    async getMoonTimesFromAPI(start, end) {
+      let url = "https://api.photonranch.org/api/events/moon/rise-set-illum";
+      let payload = {
+        params: {
+          start: start,
+          end: end,
+          lat: this.site_latitude,
+          lng: this.site_longitude,
+        },
+      };
+
+      // Check cache
+      let payload_str = 
+        start.slice(0,10) + '#' + // only take the yyyy-mm-dd part of the date
+        end.slice(0,10)
+      if (this.moon_cache.hasOwnProperty(payload_str)) {
+        return this.moon_cache[payload_str]
+      }
+
+      // otherwise, make the api call
+      let response = await axios.get(url, payload);
+      let riseset = response.data;
+
+      // update cache
+      this.moon_cache[payload_str] = riseset
+
+      return riseset
+    },
+
+    // Return an array of fullcalendar background events to display the 
+    // moon visibility
+    async getMoonRiseSet(info) {
+
+      if (!this.display_moon) {
+        return [];
+      }
+      const ms_per_day = 86400000;
+
+      // Get the time range we need to display in the UI.
+      // Also convert from ms timestamp to iso utc seconds.
+      let start_timestamp = info.start.valueOf();
+      let end_timestamp = info.end.valueOf();
+
+      // Add buffer of a few days to the start and end window
+      start_timestamp -= ms_per_day * 12;
+      end_timestamp += ms_per_day * 12;
+
+      // Convert timestamps to utc iso format
+      let start_iso = moment(start_timestamp).format("YYYY-MM-DDTHH:mm:ss[Z]");
+      let end_iso = moment(end_timestamp).format("YYYY-MM-DDTHH:mm:ss[Z]");
+
+      // Make the api call to get moon rise/set times
+      let riseset = await this.getMoonTimesFromAPI(start_iso, end_iso)
+
+      let moonEvents = [];
+      riseset.map((moon) => {
+
+        // The primary moon event
+        moonEvents.push({
+          start: new Date(moon.rise),
+          end: new Date(moon.set),
+          rendering: "background",
+          backgroundColor: this.rgba_from_illumination(moon.illumination, 235),
+          borderColor: "#aaaaaa",
+          id: `fc-custom-moon-indicator`,
+          classNames: ["fc-moon-indicator",],
+          title: "Moon Event",
+          extendedProps: {
+            illumination: moon.illumination,
+            transit: moon.transit,
+          }
+        });
+
+        // The marker for transit time. 
+        moonEvents.push({
+          start: moment(moon.transit).format(),
+          end: moment(moon.transit).add("1", "minutes").format(),
+          title: "Moon Event",
+          rendering: "background",
+          // Opacity should vary with moon brightness, but not too much.
+          backgroundColor: `rgba(255,255,255,${moon.illumination ** 0.25})`,
+          classNames: ["fc-moon-transit-indicator"],
+        });
+      }
+      );
+
+      return moonEvents;
+    },
+
+    async getTwilightEvents(info) {
+      // Timer start
+      let t0 = performance.now();
+      //console.log('info: ', info)
+
+      // Get the time range we need to display in the UI.
+      let firstDay = info.start.valueOf();
+      let lastDay = info.end.valueOf();
+
+      // List all the days we'll need to display
+      let allDays = [];
+      let msPerDay = 1000 * 60 * 60 * 24;
+
+      // Generate events for 60 days before the start time to 60 days after.
+      // This is to prevent the loading flicker when changing weeks.
+      // note: this still only takes ~5ms to compute.
+      for (
+        let day = firstDay - 60 * msPerDay;
+        day < lastDay + 60 * msPerDay;
+        day += msPerDay
+      ) {
+        // Define each day by the timestamp a little after 1:01am to avoid DST hell
+        allDays.push(day + 3700000);
+      }
+
+      //console.log('allDays: ', allDays)
+
+      // Generate the twilight events (in proper fullCalendar format)
+      // for one day column (evening-of and morning-after the given date.)
+      function oneDayTwilight(timestamp, latitude, longitude) {
+        let events = {};
+
+        let msPerDay = 1000 * 60 * 60 * 24;
+        let sunEvents = SunCalc.getTimes(
+          new Date(timestamp),
+          latitude,
+          longitude
+        );
+        let nextDayEvents = SunCalc.getTimes(
+          new Date(timestamp + msPerDay),
+          latitude,
+          longitude
+        );
+        let prevDayEvents = SunCalc.getTimes(
+          new Date(timestamp - msPerDay),
+          latitude,
+          longitude
+        );
+
+        let currentDateObj = new Date(timestamp);
+
+        // The event colors for the calendar
+        //let daylightColor = "rgb(129, 212, 250)"
+        //let civilColor = "rgb(52, 152, 219)"
+        //let nauticalColor = "rgb(36, 113, 163)"
+        //let astronomicalColor = "rgb(26, 82, 118)"
+
+        let daylightColor = "#81D4FA";
+        let civilColor = "#1B9FD8";
+        let nauticalColor = "#166EA9";
+        let astronomicalColor = "#084165";
+
+        events.civilTwilightDusk = {
+          title: "Civil Twilight",
+          start: sunEvents.sunset,
+          end: sunEvents.dusk,
+          backgroundColor: civilColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_civil_dusk`,
+        };
+        events.nauticalTwilightDusk = {
+          title: "Nautical Twilight",
+          start: sunEvents.dusk,
+          end: sunEvents.nauticalDusk,
+          backgroundColor: nauticalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_nautical_dusk`,
+        };
+        events.astronomicalTwilightDusk = {
+          title: "Astronomical Twilight",
+          start: sunEvents.nauticalDusk,
+          end: sunEvents.night,
+          backgroundColor: astronomicalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_astronomical_dusk`,
+        };
+
+        events.astronomicalTwilightDawn = {
+          title: "Astronomical Twilight",
+          start: nextDayEvents.nightEnd,
+          end: nextDayEvents.nauticalDawn,
+          backgroundColor: astronomicalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_astronomical_dawn`,
+        };
+        events.nauticalTwilightDawn = {
+          title: "Nautical Twilight",
+          start: nextDayEvents.nauticalDawn,
+          end: nextDayEvents.dawn,
+          backgroundColor: nauticalColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_nautical_dawn`,
+        };
+        events.civilTwilightDawn = {
+          title: "Civil Twilight",
+          start: nextDayEvents.dawn,
+          end: nextDayEvents.sunrise,
+          backgroundColor: civilColor,
+          rendering: "background",
+          id: `${currentDateObj.toISOString()}_civil_dawn`,
+        };
+        events.daylightMorning = {
+          title: "Morning Daylight",
+          start: nextDayEvents.sunrise,
+          end: nextDayEvents.sunset,
+          //end: new Date(new Date(timestamp).setHours(36)),
+          rendering: "background",
+          backgroundColor: daylightColor,
+          id: `${currentDateObj.toISOString()}_day_morning`,
+        };
+        return events;
+      }
+
+      // Collect all the events to display here
+      let twilightEvents = [];
+
+      let site_lat = parseFloat(
+        this.site_config(this.calendarSite)["latitude"]
+      );
+      let site_lng = parseFloat(
+        this.site_config(this.calendarSite)["longitude"]
+      );
+
+      // Compute events for each day.
+      allDays.map((day) =>
+        twilightEvents.push(
+          ...Object.values(oneDayTwilight(day, site_lat, site_lng))
+        )
+      );
+
+      // Finish timer
+      let t1 = performance.now();
+      let twilightComputeTime = t1 - t0;
+      if (twilightComputeTime > 100) {
+        console.warn(
+          "Slow computation of astro twilight: ",
+          twilightComputeTime.toFixed(2) + "ms"
+        );
+      }
+      return twilightEvents;
+    },
+
+    async getConfigWithAuth() {
+      let token, configWithAuth;
+      try {
+        token = await this.$auth.getTokenSilently();
+      } catch (err) {
+        console.error(err);
+        console.warn("Did not acquire the needed token. Stopping request.");
+
+        // small popup notification
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: "Oops! You aren't authorized to do that.",
+          position: "is-bottom",
+          type: "is-danger",
+        });
+      }
+
+      return {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+    },
+
+    handleNotAuthorizedResponse(error) {
+      if (error.response) {
+        // Request made and server responded
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+        // small popup notification describing error
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: `${error.response.status} error: ${error.response.data}`,
+          position: "is-bottom",
+          type: "is-danger",
+        });
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error", error.message);
+      }
+    },
+
+    // Make a unique id for calendar events. UUID style. This is the pk in dynamodb.
+    makeUniqueID() {
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (
+        c
+      ) {
+        var r = (Math.random() * 16) | 0,
+          v = c == "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    },
+
+    // Used when exiting event editor modals. Clear selections, close modal, and refresh events.
+    async refreshCalendarView() {
+      let calendarApi = this.fullCalendarApi //this.$refs.fullCalendar.getApi();
+      calendarApi.unselect();
+      calendarApi.refetchEvents();
+      this.eventEditorIsActive = false;
+
+      // Update the list of active reservations
+      this.$store.dispatch(
+        "calendar/fetchActiveReservations",
+        this.calendarSite
+      );
+    },
+
+    /*===================================================/
+    Calendar Event Selection Handlers
+    /===================================================*/
+    /**
+     *  This is run when a user clicks on the calendar to create a new event.
+     */
+    newEventSelected(event) {
+      //console.log(event)
+      this.activeEvent.startStr = moment(event.startStr).utc().format();
+      this.activeEvent.endStr = moment(event.endStr).utc().format();
+      this.activeEvent.title = "new event";
+      this.activeEvent.creator = this.$auth.user.name;
+      this.activeEvent.id = this.makeUniqueID();
+      this.activeEvent.site = this.calendarSite;
+      this.activeEvent.resourceId = this.calendarSite;
+      this.activeEvent.creator_id = this.$auth.user.sub;
+      this.activeEvent.project_id = "none";
+      this.activeEvent.reservation_note = "";
+
+      this.isNewEvent = true; // setting for the modal event editor
+      this.eventEditorIsActive = true;
+    },
+    /**
+     *  This is run when a user clicks on an existing event in the calendar.
+     */
+    existingEventSelected(arg) {
+      let event = arg.event;
+      console.log(event);
+      (this.activeEvent.id = event.id),
+        (this.activeEvent.startStr = moment(event.start).format());
+      this.activeEvent.endStr = moment(event.end).format();
+      this.activeEvent.title = event.title;
+      this.activeEvent.creator = event.extendedProps.creator;
+      this.activeEvent.site = event.extendedProps.site;
+      this.activeEvent.resourceId = event.getResources()[0].id;
+      this.activeEvent.project_id = event.extendedProps.project_id;
+      this.activeEvent.reservation_note = event.extendedProps.reservation_note || "";
+
+      this.isNewEvent = false; // setting for the modal event editor
+      this.eventEditorIsActive = true;
+    },
+
+    /*===================================================/
+    Calendar mouseover events
+    /===================================================*/
+
+    eventMouseEnter( mouseInfo ) {
+
+      // Show moon info box when hovering a moon event.
+      if (mouseInfo.event.title == "Moon Event") {
+        document.getElementById('moon-info').style.visibility = 'visible'
+
+        this.moon_hover_data.rise = moment(mouseInfo.event.start)
+          .tz(this.fc_timeZone).format("HH:mm MM/DD")
+        this.moon_hover_data.set = moment(mouseInfo.event.end)
+          .tz(this.fc_timeZone).format("HH:mm MM/DD")
+        this.moon_hover_data.transit = moment(mouseInfo.event.extendedProps.
+          transit).tz(this.fc_timeZone).format("HH:mm MM/DD")
+        this.moon_hover_data.illumination = mouseInfo.event.extendedProps
+          .illumination.toFixed(3)
+
+        let page = document.getElementsByClassName('page-view')[0]
+        let page_boundary = page.getBoundingClientRect()
+        let left_position_offset = page_boundary.left
+        let top_position_offset = page_boundary.top
+        let top_scroll_offset = document.body.getBoundingClientRect().top
+
+        let x = mouseInfo.jsEvent.pageX - left_position_offset;
+        let y = mouseInfo.jsEvent.pageY - top_position_offset + top_scroll_offset;
+
+        document.getElementById('moon-info').style.top = y + 'px'
+        document.getElementById('moon-info').style.left = x + 'px'
+      }
+    },
+
+    eventMouseLeave( mouseInfo ) {
+
+      // Hide moon info boxes when the mouse leaves.
+      if (mouseInfo.event.title == "Moon Event") {
+        document.getElementById('moon-info').style.visibility = 'hidden'
+      }
+    },
+
+
+    /*===================================================/
+    Calendar CRUD
+    /===================================================*/
+
+    async refreshIfUserIsScheduled() {
+      // Make request headers and include token.
+      // Requires user to be logged in.
+      let header = await this.getConfigWithAuth();
+      let url = `${this.backendUrl}/dev/is-user-scheduled`;
+      let user_id = this.$auth.user.sub;
+      let body = {
+        user_id: user_id,
+        site: this.calendarSite,
+        time: moment().utc().format(),
+      };
+      let response = await axios.post(url, body, header);
+      console.log("userIsScheduled response: ", response);
+      this.currentUserScheduled = response.data;
+    },
+    async ping() {
+      let url = "https://api.photonranch.org/api/ping/helloping";
+      let header = await this.getConfigWithAuth();
+      let body = {};
+      console.log(await axios.post(url, body, header));
+    },
+
+    /**
+     * When the user clicks submit, event details are sent to the backend.
+     */
+    async submitButtonClicked(newEvent) {
+      //console.log('new event creation: ', newEvent)
+
+      // Make request headers and include token.
+      // Requires user to be logged in.
+      let config = await this.getConfigWithAuth();
+
+      let url = `${this.backendUrl}/dev/newevent`;
+      let eventToPost = {
+        event_id: newEvent.id,
+        start: moment(newEvent.startStr).utc().format(),
+        end: moment(newEvent.endStr).utc().format(),
+        creator: newEvent.creator,
+        creator_id: newEvent.creator_id,
+        site: newEvent.site,
+        title: newEvent.title,
+        resourceId: newEvent.resourceId,
+        project_id: newEvent.project_id,
+        reservation_note: newEvent.reservation_note,
+        rendering: newEvent.rendering,
+      };
+      axios
+        .post(url, eventToPost, config)
+        .then((res) => {
+          this.isLoading = true;
+          this.refreshCalendarView();
+        })
+        .catch((error) => {
+          this.eventEditorIsActive = false;
+          this.handleNotAuthorizedResponse(error);
+        });
+    },
+
+    /**
+     * Close the event modal and deselect its associated calendar event.
+     */
+    cancelButtonClicked() {
+      let calendarApi = this.$refs.fullCalendar.getApi();
+      calendarApi.unselect();
+      this.eventEditorIsActive = false;
+    },
+    
+    /**
+     * Replicates the 'cancelButtonClicked' function for the case when the user
+     * closes the modal window by clicking outside of it.
+     */
+    eventModalClosed() {
+      let calendarApi = this.$refs.fullCalendar.getApi();
+      calendarApi.unselect();
+    },
+
+    /**
+     * Delete the selected calendar event from the backend database
+     */
+    async deleteButtonClicked(eventToDelete) {
+      let config = await this.getConfigWithAuth();
+      let url = `${this.backendUrl}/dev/delete`;
+      //console.log('event to delete: ', eventToDelete)
+      let body = {
+        event_id: eventToDelete.id,
+        start: moment(eventToDelete.startStr).utc().format(),
+      };
+      let res = await axios
+        .post(url, body, config)
+        .then((res) => {
+          this.isLoading = true;
+          this.refreshCalendarView();
+        })
+        .catch((error) => {
+          this.eventEditorIsActive = false;
+          this.handleNotAuthorizedResponse(error);
+        });
+    },
+
+    async modifyButtonClicked(events) {
+      let initialEvent = events.initialEvent;
+      let modifiedEvent = events.modifiedEvent;
+
+      // Maybe we don't need to update anything?
+      if (JSON.stringify(initialEvent) == JSON.stringify(modifiedEvent)) {
+        this.refreshCalendarView();
+        return;
+      }
+
+      // Make request headers and include token.
+      // Requires user to be logged in.
+      let config = await this.getConfigWithAuth();
+      let url = `${this.backendUrl}/dev/modifyevent`;
+      let theModifiedEvent = {
+        event_id: modifiedEvent.id,
+        start: moment(modifiedEvent.startStr).utc().format(),
+        end: moment(modifiedEvent.endStr).utc().format(),
+        creator: modifiedEvent.creator,
+        creator_id: modifiedEvent.creator_id,
+        site: modifiedEvent.site,
+        title: modifiedEvent.title,
+        resourceId: modifiedEvent.resourceId,
+        project_id: modifiedEvent.project_id,
+        reservation_note: modifiedEvent.reservation_note,
+        rendering: modifiedEvent.rendering,
+      };
+      let theInitialEvent = {
+        event_id: initialEvent.id,
+        start: moment(initialEvent.startStr).utc().format(),
+        end: moment(initialEvent.endStr).utc().format(),
+        creator: initialEvent.creator,
+        creator_id: initialEvent.creator_id,
+        site: initialEvent.site,
+        title: initialEvent.title,
+        resourceId: initialEvent.resourceId,
+        project_id: initialEvent.project_id,
+        reservation_note: initialEvent.reservation_note,
+        rendering: initialEvent.rendering,
+      };
+      let body = {
+        originalEvent: theInitialEvent,
+        modifiedEvent: theModifiedEvent,
+      };
+
+      axios
+        .post(url, body, config)
+        .then((res) => {
+          this.isLoading = true;
+          this.refreshCalendarView();
+        })
+        .catch((error) => {
+          this.eventEditorIsActive = false;
+          this.handleNotAuthorizedResponse(error);
+        });
+    },
+
+    /*===================================================/
+    Fetching Calendar Events
+    /===================================================*/
+
+    /**
+     * The event color should reflect whether it is owned by the user.
+     */
+    eventColor() {},
+
+    async fetchSiteEvents(fetchInfo) {
+      let site = this.calendarSite;
+      const url = `${this.backendUrl}/dev/siteevents`;
+      const options = {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          "Access-Control-Allow-Origin": "*",
+        },
+      };
+
+      // The start and end times must be formatted as UTC like 2020-12-31T23:59:59Z
+      let body = {
+        site: site,
+        start: moment(fetchInfo.startStr).utc().format(),
+        end: moment(fetchInfo.endStr).utc().format(),
+      };
+
+      let resp = await axios.post(url, body, options);
+
+      // Format the returned items to work nicely with fullcalendar.
+      let formatted_events = resp.data.map((obj) => {
+        let fObj = {
+          start: obj.start,
+          end: obj.end,
+          id: obj.event_id,
+          title: obj.title,
+          creator: obj.creator,
+          creator_id: obj.creator_id,
+          site: obj.site,
+          resourceId: obj.resourceId,
+          project_id: obj.project_id,
+          reservation_note: obj.reservation_note,
+          rendering: obj.rendering,
+        };
+        if (
+          this.$auth.isAuthenticated &&
+          fObj.creator_id == this.$auth.user.sub
+        ) {
+          fObj.backgroundColor = "#933bff";
+          //fObj.borderColor = '#4099ff'
+        }
+        return fObj;
+      });
+      return formatted_events;
+    },
+  },
 };
 </script>
 
 <!-- TODO: reduce the bootstrap css (below) to the minimum required for button groups. -->
 <style lang='scss'>
 
+.fc-settings-box {
+  background-color: black;
+  border-radius: 8px;
+  padding: 1em;
+  margin-bottom: 1em;
+}
+
 /* the line showing the current time */
 .fc-now-indicator.fc-now-indicator-line {
   border-color: rgb(255, 0, 0);
   z-index: 15;
   opacity: 1;
+  background-color: red;
 }
 .fc-now-indicator.fc-now-indicator-arrow {
   border-color: rgb(255, 0, 0);
   z-index: 15;
   opacity: 1;
+}
+
+#moon-info {
+  background-color: black;
+  opacity: 0.9;
+  border-radius: 8px;
+  padding: 1em;
+  margin-bottom: 1em;
+  position: absolute;
+  visibility: hidden;
+  z-index: 16;
+  top: 0px;
+  left: 0px;
+  pointer-events: none;
+}
+.moon-icon {
+  padding: 5px;
+  color: yellow;
+}
+.fc-moon-transit-indicator {
+  z-index: 15;
+  opacity: 1;
+  width: 20px;
+}
+.fc-moon-indicator {
+  z-index: 15;
+  opacity: 0.5;
+  width: 20px;
+  border-radius: 12px;
+  transition: 0.2s;
+}
+.fc-moon-indicator:hover {
+  opacity: 0.8;
+  transition: 0.2s;
 }
 /*@import url("https://bootswatch.com/4/darkly/bootstrap.min.css");*/
 .demo-app {
@@ -802,7 +1161,7 @@ export default {
   font-size: 14px;
 }
 .fc table * {
-  border-color:#444;
+  border-color: #444;
 }
 
 .demo-app-top {
@@ -812,7 +1171,6 @@ export default {
 .calendar-container {
   margin: 0 auto;
 }
-
 
 .sr-only {
   position: absolute;
@@ -1413,11 +1771,15 @@ input[type="button"].btn-block {
   border-radius: 0;
 }
 .btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,
-.btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
+.btn-group-vertical
+  > .btn-group:first-child:not(:last-child)
+  > .dropdown-toggle {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
-.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {
+.btn-group-vertical
+  > .btn-group:last-child:not(:first-child)
+  > .btn:first-child {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }

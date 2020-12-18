@@ -389,7 +389,7 @@ export default {
     },
 
     getSiteMapColor(siteOpenStatus) {
-      if (parseFloat(siteOpenStatus.status_age_s) > 60) { return 'red' }
+      if (parseFloat(siteOpenStatus.status_age_s) > 300) { return 'red' }
       if (!siteOpenStatus.hasWeatherStatus) { return 'yellow'}
       if (siteOpenStatus.weather_ok && siteOpenStatus.open_ok) {return 'green'}
       if (siteOpenStatus.weather_ok || siteOpenStatus.open_ok) {return 'yellow'}
@@ -404,7 +404,7 @@ export default {
     async redrawMapSites() {
       // Fetch the list of sites to display on the map
       let sitesOpenStatus = await this.getSiteOpenStatus()
-      let sites = this.sitesForMap
+      let sites = this.sitesForMap.reverse()
 
       // For each site, draw a marker with a popup (on click) to visit the site.
       sites.forEach(site => {
@@ -415,7 +415,7 @@ export default {
           icon: {
             url: `http://maps.google.com/mapfiles/ms/icons/${icon_color}-dot.png`
           },
-          title: site.name
+          title: site.name,
         })
         let siteInfoWindow = new google.maps.InfoWindow({
           content: this.renderSiteContent(site.name, site.site, sitesOpenStatus[site.site])

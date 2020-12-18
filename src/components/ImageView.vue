@@ -37,7 +37,7 @@
           <img 
               style="width: 60px; height: 60px;"
               v-bind:src="item.jpg_url"
-              onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=:('"
+              onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
               v-bind:title="item.base_filename"
               v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
               @click="setActiveImage(item)"
@@ -50,44 +50,72 @@
       <!-- Controls in the top row above the main view --> 
       <div class="controls">
 
-          <button class="button" @click="toggleAnalysis">JS9</button>
+        <b-field grouped>
+          <b-field>
+            <button class="button" @click="toggleAnalysis">JS9</button>
+          </b-field>
           <b-field>
             <p class="control">
-              <b-tooltip label="latest image" position="is-bottom" type="is-black">
+              <b-tooltip label="latest image" position="is-right" type="is-black">
               <button class="button level-item" @click="setLatestImage">
               <b-icon icon="chevron-double-left"/></button>
               </b-tooltip>
             </p>
             <p class="control">
-              <b-tooltip label="previous image" position="is-bottom" type="is-black">
-              <button class="button level-item" @click="setPreviousImage">
-              <b-icon icon="chevron-left" /></button>
+              <b-tooltip label="previous image" position="is-right" type="is-black">
+                <button class="button level-item" 
+                  @click="$store.dispatch('images/set_previous_image')">
+                  <b-icon icon="chevron-left" />
+                </button>
               </b-tooltip>
             </p>
             <p class="control">
-              <b-tooltip label="next image" position="is-bottom" type="is-black">
-              <button class="button level-item" @click="setNextImage">
-              <b-icon icon="chevron-right" /></button>
+              <b-tooltip label="next image" position="is-right" type="is-black">
+                <button class="button level-item" 
+                  @click="$store.dispatch('images/set_next_image')">
+                  <b-icon icon="chevron-right" />
+                </button>
               </b-tooltip>
             </p>
           </b-field>
-          <b-tooltip label="download fits file" position="is-right" type="is-black">
-            <a class="button has-text-white" @click="downloadFits13Url(current_image)">
-              <b-icon icon="cloud-download" /></a>
-          </b-tooltip>
+
+          <b-field>
+            <p class="control">
+              <b-tooltip label="download small fits file" position="is-right" type="is-black">
+                <a class="button has-text-white" 
+                  :disabled="small_fits_exists"
+                  @click="download_fits_file(current_image.base_filename, 'EX10')">
+                  <b-icon icon="cloud-download" size="is-small" /></a>
+              </b-tooltip>
+            </p>
+            <p class="control">
+              <b-tooltip label="download large fits file" position="is-right" type="is-black">
+                <a class="button has-text-white" 
+                  :disabled="large_fits_exists"
+                  @click="download_fits_file(current_image.base_filename, 'EX01')">
+                  <b-icon icon="cloud-download" /></a>
+              </b-tooltip>
+            </p>
+          </b-field>
+
+        </b-field>
 
 
-          <div> <b-field label="subframe active">
-                <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
-            </b-field> </div>
-          <!---div> <b-field label="subframe visible">
-                <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
-            </b-field> </div-->
-          <div> <b-field label="crosshairs">
-                <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
-            </b-field> </div>
+        <div> <b-field label="subframe">
+              <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
+          </b-field> </div>
+        <!---div> <b-field label="subframe visible">
+              <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
+          </b-field> </div-->
+        <div> <b-field label="crosshairs">
+              <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
+          </b-field> </div>
 
       </div>
+
+      <!--pre style="max-width: 500px;">
+        {{current_image}}
+      </pre-->
 
     </div>
   </div>
@@ -160,7 +188,7 @@ export default {
       context_marker_timer: "",
 
       // Time that right click events stay on the screen.
-      right_click_ttl: 5000,
+      right_click_ttl: 9000,
 
       //Image ID of the currently highlighted image (focused)
       highlighted_image: 0,
@@ -224,6 +252,12 @@ export default {
     median_star_pos_y: function() {
       this.draw_star_markers()
     },
+    brightest_star_pos_x: function() {
+      this.draw_star_markers()
+    },
+    brightest_star_pos_y: function() {
+      this.draw_star_markers()
+    },
 
   },
 
@@ -239,7 +273,6 @@ export default {
     init() {
 
       this.d3_image_element = d3.select(this.image_element)
-
 
       let that = this;
 
@@ -276,15 +309,17 @@ export default {
       Snackbar.open({
         duration: this.right_click_ttl,
         message:
-          "Center telescope here? <br>Note: <em>telescope will move and take another exposure.</em>.",
+          //"Center telescope here? <br>Note: <em>telescope will move to the location you clicked.</em>.",
+          "Click to center the telescope here.",
         type: "is-warning",
-        position: "is-bottom-left",
-        actionText: "Slew",
+        position: "is-top",
+        actionText: "Center on pixels",
         queue: false,
         onAction: () => {
           console.log("slew to " + position[0]/ this.imageWidth + ", " + position[1]/ this.imageHeight);
           this.send_pixels_center_command(
-            position,
+            position[0],
+            position[1],
             this.current_image.base_filename
           );
         }
@@ -338,7 +373,7 @@ export default {
       // save the current coordinates and draw them as a rectangle.
       if (this.subframeIsVisible && this.mouseIsDown) {
         this.subframe_x1 = mDrag[0] /imageWidth
-        this.subframe_y1 = mDrag[1] /imageWidth
+        this.subframe_y1 = mDrag[1] /imageHeight
 
 
         this.drawSubframe()
@@ -407,40 +442,18 @@ export default {
       this.drawSubframe()
     },
 
-    send_pixels_center_command(pixels, filename) {
-      let req_params = {
-        //x_from_left: pixels[0],
-        //y_from_top: pixels[1],
-        rel_x_pos: pixels[0] / this.imageWidth,
-        rel_y_pos: pixels[1] / this.imageHeight,
-        filename: filename
-      };
-      let opt_params = {};
-      let theCommand = {
-        url: `/${this.active_site}/${this.active_mount}/command/`,
-        http_method: "POST",
-        form: {
-          device: "mount",
-          instance: this.active_mount,
-          timestamp: parseInt(Date.now() / 1000),
-          action: "center_on_pixels",
-          required_params: req_params,
-          optional_params: opt_params
-        }
-      };
-      let apiName = this.$store.getters["dev/api"];
-      let url = theCommand.url;
-      let body = { body: theCommand.form };
-      axios.post(apiName+url, body)
-        .then(response => {
-          console.log("sent pixel center command");
-          console.log(response.data);
-          console.log(theCommand.form);
-        })
-        .catch(error => {
-          console.log("error with pixel centercommand");
-          console.log(error);
-        });
+    send_pixels_center_command(x, y, filename) {
+
+      let command_form = [
+        String(x / this.imageWidth),
+
+        // Change the y coordinate to start at the bottom. 
+        String((this.imageHeight - y ) / this.imageHeight),
+        filename
+      ]
+
+      this.postCommand(this.mount_slew_clickposition_command, command_form)
+
     },
 
     drawCircle(pixelX, pixelY) {
@@ -520,11 +533,11 @@ export default {
       this.remove_star_markers()
 
       let med_x = this.median_star_pos_x * this.imageWidth
-      let med_y = this.median_star_pos_y * this.imageWidth
+      let med_y = this.median_star_pos_y * this.imageHeight
       let ubri_x = this.u_brightest_star_pos_x * this.imageWidth
-      let ubri_y = this.u_brightest_star_pos_y * this.imageWidth
+      let ubri_y = this.u_brightest_star_pos_y * this.imageHeight
       let bri_x = this.brightest_star_pos_x * this.imageWidth
-      let bri_y = this.brightest_star_pos_y * this.imageWidth
+      let bri_y = this.brightest_star_pos_y * this.imageHeight
 
       // Draw the crosshairs around the brightest unsaturated star
       d3
@@ -691,42 +704,22 @@ export default {
       }
     },
 
-    setNextImage() {
-      this.$store.dispatch("images/set_next_image");
-    },
-
-    setPreviousImage() {
-      this.$store.dispatch("images/set_previous_image");
-    },
-
-    async getFits13Url(image) {
-      console.log('Image download requested.')
-
-      // Get image information for path construction
-      let site = image.site
-      let base_filename = image.base_filename
-
-      // Get the global configuration for all sites from an api call.
-      let apiName = this.$store.getters['dev/api'];
-
-      let path = '/download';
-      let body = {
-        object_name: `${base_filename}-EX10.fits.bz2`,
+    async download_fits_file(base_filename, ex_type) {
+      const params = {
+        base_filename: base_filename, 
+        ex_type: ex_type
       }
-      console.log('url: ', apiName+path)
-      const smallFitsURL = await axios.post(apiName+path, body);
-
-      console.log(smallFitsURL.data)
-      return smallFitsURL.data;
-    },
-
-    async downloadFits13Url(image) {
-      let fits13url = await this.getFits13Url(image)
-      window.location.assign(fits13url)
+      const fits_url = await this.$store.dispatch('images/get_fits_url', params)
+      window.location.assign(fits_url)
     },
     
   },
   computed: {
+
+    sitecode() {
+      return this.site;
+    },
+
     active_site: {
       get() {
         return this.$store.getters["site_config/site"];
@@ -736,10 +729,12 @@ export default {
       }
     },
 
-    ...mapGetters("images", {
-      recent_images: "recent_images",
-      current_image: "current_image"
-    }),
+    ...mapGetters("images", [
+      "recent_images",
+      "current_image",
+      "large_fits_exists",
+      "small_fits_exists",
+    ]),
 
     js9IsVisible: {
       get() { return this.$store.getters['js9/instanceIsVisible']},
@@ -790,7 +785,8 @@ export default {
   margin-top: 1em;
   display: flex;
   justify-content: space-between;
-  overflow-y: visible;
+  overflow-x:auto;
+  overflow-y:visible;
 }
 
 .image-div {

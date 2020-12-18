@@ -4,6 +4,14 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import axios from 'axios'
 import { getInstance } from '../auth/index' // get user object: getInstance().user
 
+
+/**
+ * 
+ *  NOTE: 
+ *  This mixin requires 'sitecode' to be defined by the parent component that
+ *  imports the mixin. This should be changed eventually. 
+ */
+
 // Change empty strings to 'empty'. 
 function emptyString(s) {
     return s == '' ? 'empty' : s;
@@ -20,6 +28,12 @@ export const status_mixin = {
 
             local_timestamp: Date.now(),
             update_time_interval: '',
+
+            display_colors: {
+                "red": "orangered",
+                "yellow": "yellow",
+                "green": "greenyellow",
+            }
         }
     },
 
@@ -95,6 +109,9 @@ export const status_mixin = {
             if (undefined == s) { 
                 return false; 
             }
+            if (typeof s === "boolean") {
+                return s
+            }
             else if (s.toLowerCase()=="true") {return true}
             else if (s.toLowerCase()=="false") {return false}
             console.error("Could not parse true or false. Check for bad behavior.")
@@ -118,11 +135,29 @@ export const status_mixin = {
 
     computed: {
 
+        // Control the status indicator dot in the title bar.
+        isOnline() {
+            // online is defined by status age under 5 minutes
+            if (this.status_age < 300) {
+                return true
+            }
+            else return false;
+        },
+
+        buildEmptyStatus() {
+            let status = []
+            status.push({
+                "name": "status",
+                "val": "not configured"
+            })
+            return status
+        },
+
         buildWeatherStatus() {
             let status = []
-            status.push({"name": "Status Age", ...this.status_age_display})
-            if (this.weather_ok != '-'){ status.push({"name": "Weather ok", "val": this.weather_ok}) }
-            if (this.open_ok != '-'){ status.push({"name": "Open Ok", "val": this.open_ok}) }
+            //status.push({"name": "Status Age", ...this.status_age_display})
+            if (this.weather_ok.val != '-'){ status.push({"name": "Weather ok", ...this.weather_ok}) }
+            if (this.open_ok.val != '-'){ status.push({"name": "Open Ok", ...this.open_ok}) }
 
             status.push({"name": "spacer", "val": "spacer"}) 
 
@@ -135,6 +170,7 @@ export const status_mixin = {
             if (this.surface != '-'){ status.push({"name": "Surface", "val": this.surface}) }
             if (this.ambient != '-'){ status.push({"name": "Ambient", "val": this.ambient}) }
             if (this.meas_sky_mpsas != '-'){ status.push({"name": "Meas. mpsas", "val": this.meas_sky_mpsas}) }
+            if (this.calc_sky_mpsas != '-'){ status.push({"name": "Calc. mpsas", "val": this.calc_sky_mpsas}) }
             return status 
         },
         buildGeneralStatus() {
@@ -155,6 +191,17 @@ export const status_mixin = {
                 {"name": "HA", "val": this.hour_angle},
             ]
         },
+        buildFocusRotatorCameraStatus() {
+            let status = [
+                ...this.buildFocuserTabStatus,
+                {"name": "spacer", "val": "spacer"},
+                ...this.buildRotatorTabStatus,
+                {"name": "spacer", "val": "spacer"},
+                ...this.buildCameraTabStatus,
+                {"name": "spacer", "val": "spacer"},
+            ]
+            return status
+        },
         buildTargetPageStatus() {
             let status = []
             status.push({"name": "Ra", "val": this.ra})
@@ -170,7 +217,7 @@ export const status_mixin = {
             let status = []
             if (this.enclosure_mode != '-'){ status.push({"name": "Mode", "val": this.enclosure_mode}) }
             if (this.enclosure_status != '-'){ status.push({"name": "Enclosure", "val": this.enclosure_status}) }
-            if (this.open_ok != '-'){ status.push({"name": "Open ok", "val": this.open_ok}) }
+            if (this.open_ok.val != '-'){ status.push({"name": "Open ok", ...this.open_ok}) }
             return status
         },
         buildTelescopeTabStatus1() {
@@ -179,6 +226,7 @@ export const status_mixin = {
             if (this.dec != '-') { status.push({"name": "Dec", "val": this.dec})}
             if (this.azimuth != '-') { status.push({"name": "Azimuth", "val": this.azimuth})}
             if (this.altitude != '-') { status.push({"name": "Altitude", "val": this.altitude})}
+            if (this.refraction != '-') { status.push({"name": "Refr.", "val": this.refraction})}
             return status
         },
         buildTelescopeTabStatus2() {
@@ -199,14 +247,16 @@ export const status_mixin = {
         buildFocuserTabStatus() {
             let status = []
             if (this.focus_position != '-') { status.push({"name": "Focus", "val": this.focus_position})}
+            if (this.focus_comp != '-') { status.push({"name": "Comp.", "val": this.focus_comp})}
+            if (this.focus_filter_offset != '-') { status.push({"name": "Offset", "val": this.focus_filter_offset})}
             if (this.focus_temperature != '-') { status.push({"name": "Temp", "val": this.focus_temperature})}
             if (this.focus_moving != '-') { status.push({"name": "Status", "val": this.focus_moving})}
             return status
         },
         buildRotatorTabStatus() {
             let status = []
+            if (this.rotator_moving != '-') { status.push({"name": "Rotator", "val": this.rotator_moving})}
             if (this.rotator_position != '-') { status.push({"name": "Position", "val": this.rotator_position })}
-            if (this.rotator_moving != '-') { status.push({"name": "Activity", "val": this.rotator_moving})}
             return status
         },
         buildScreenTabStatus() {
@@ -225,7 +275,6 @@ export const status_mixin = {
 
         ...mapGetters('site_config', [
             'site_config',
-            'site',
             'enclosure',
             'mount',
             'telescope',
@@ -241,32 +290,37 @@ export const status_mixin = {
             if (this.status_age < 60) { 
                 return {
                     "val": this.status_age_seconds,
-                    "color": "lightgreen",
+                    "color": this.display_colors.green,
+                } 
+            } else if (this.status_age < 300) { 
+                return {
+                    "val": this.status_age_minutes,
+                    "color": this.display_colors.green,
                 }
             } else if (this.status_age < 600) { 
                 return {
                     "val": this.status_age_minutes,
-                    "color": "yellow",
+                    "color": this.display_colors.yellow,
                 }
             } else if (this.status_age < 3600) { 
                 return {
                     "val": this.status_age_minutes,
-                    "color": "red",
+                    "color": this.display_colors.red,
                 }
             } else if (this.status_age < 86400) { 
                 return {
                     "val": this.status_age_hours,
-                    "color": "red",
+                    "color": this.display_colors.red,
                 }
             } else if (this.status_age < 18000*86400 ) { 
                 return {
                     "val": this.status_age_days,
-                    "color": "red",
+                    "color": this.display_colors.red,
                 }
             } else { 
                 return {
                     "val": 'unavailable',
-                    "color": "red",
+                    "color": this.display_colors.red,
                 }
             }
         },
@@ -326,10 +380,24 @@ export const status_mixin = {
             } catch { return {} }
         },
         weather_ok() {
-            return (this.weather_state.wx_ok || '-')
+            let color = this.display_colors.red
+            let val = this.weather_state.wx_ok || '-'
+            if (val == "Yes") { color = this.display_colors.green }
+
+            return {
+                "val": val,
+                "color": color
+            }
         },
         open_ok() {
-            return (this.weather_state.open_ok || '-')
+            let color = this.display_colors.red
+            let val = this.weather_state.open_ok || '-'
+            if (val == "Yes") { color = this.display_colors.green }
+
+            return {
+                "val": val,
+                "color": color
+            }
         },
         sky_temp() {
             return (this.weather_state.sky_temp_C || '-') + ' °C'
@@ -354,6 +422,9 @@ export const status_mixin = {
         },
         meas_sky_mpsas() {
             return (this.weather_state.meas_sky_mpsas || '-')
+        },
+        calc_sky_mpsas() {
+            return (this.weather_state.calc_sky_mpsas || '-')
         },
 
 
@@ -449,6 +520,13 @@ export const status_mixin = {
                 return '-'
             }
         },
+        refraction() {
+            if (this.telescope_state && 'refraction' in this.telescope_state ){
+                return (this.telescope_state.refraction || '-')
+            } else {
+                return '-'
+            }
+        },
         hour_angle() {
             if (this.telescope_state 
                     && "right_ascension" in this.telescope_state 
@@ -521,6 +599,20 @@ export const status_mixin = {
         focus_position() {
             if (this.focuser_state && 'focus_position' in this.focuser_state){
                 return this.focuser_state.focus_position + " μm"
+            } else {
+                return '-'
+            }
+        },
+        focus_comp() {
+            if (this.focuser_state && 'comp' in this.focuser_state){
+                return String(this.focuser_state.comp) + " μm"
+            } else {
+                return '-'
+            }
+        },
+        focus_filter_offset() {
+            if (this.focuser_state && 'filter_offset' in this.focuser_state){
+                return this.focuser_state.filter_offset + " μm"
             } else {
                 return '-'
             }

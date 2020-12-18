@@ -127,5 +127,10 @@ export default {
     margin: 2em;
 }
 
+.resizable {
+    overflow:hidden;
+    border: 2px solid gold;
+    resize:vertical;
+}
 
 </style>

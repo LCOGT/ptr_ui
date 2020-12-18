@@ -38,15 +38,16 @@ var initial_state = function() {
     }).catch(error => {
         console.log(error)
     });
-    console.log('initial config state: ')
-    console.log(state)
+    //console.log('initial config state: ')
+    //console.log(state)
     return state;
 }
 
+
 const state = {
-    did_config_load_yet: false,
+    global_config: JSON.parse(window.localStorage.getItem('global_config') || '{}'),
     is_site_selected: false,
-    global_config: {},
+    did_config_load_yet: false,
     selected_site: '',
     selected_enclosure: '',
     selected_mount: '',
@@ -213,6 +214,13 @@ const getters = {
             return []
         }
     },
+    camera_default_area: state => {
+        try {
+            return state.global_config[state.selected_site].camera[state.selected_camera].settings.default_area
+        } catch {
+            return ""
+        }
+    },
 
     // Available filters
     filter_wheel_options: state => {
@@ -228,10 +236,8 @@ const getters = {
 
     camera_bin_options: state => {
         try {
-            let bin_options = []
             let bins = state.global_config[state.selected_site].camera[state.selected_camera].settings.bin_modes
-            for (let i=0; i<bins.length; i++) { bin_options.push(bins[i].join()) }
-            return bin_options
+            return bins;
         } catch {
             return [];
         }
@@ -247,6 +253,18 @@ const getters = {
             ) 
         } catch {
             return false
+        }
+    },
+
+    camera_default_bin: state => {
+        try {
+            let default_bin = state.global_config[state.selected_site]
+                    .camera[state.selected_camera]
+                    .settings
+                    .default_bin
+            return default_bin
+        } catch {
+            return ""
         }
     },
 
@@ -289,6 +307,8 @@ const actions = {
         let path = '/all/config/';
         return axios.get(apiName+path).then(response => {
             console.log(response.data)
+            window.localStorage.setItem('global_config', JSON.stringify(response.data))
+            //console.log(JSON.parse(window.localStorage.getItem('global_config')))
             commit('setGlobalConfig', response.data)
         }).catch(error => {
             console.log(error)
@@ -303,6 +323,11 @@ const actions = {
     },
 
     set_default_active_devices({ state, commit, getters, rootGetters}, site) {
+        //console.log('global_config: ')
+        //console.log(state.global_config)
+        //console.log(typeof state.global_config)
+        //console.log('site: ', site)
+        //console.log('global_config[site]: ', state.global_config[site])
         let defaults = state.global_config[site].defaults
 
         commit('setActiveSite', site)

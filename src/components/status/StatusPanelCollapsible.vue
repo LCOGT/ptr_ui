@@ -105,7 +105,6 @@ export default {
 
 .wrapper {
     margin-bottom: 1em;
-    padding-top:1em;
 }
 
 

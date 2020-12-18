@@ -40,6 +40,7 @@
         </b-radio-button>
       </b-field>
 
+
       <!-- Basic image info and a button to reveal the full fits header -->
       <side-info-panel :startOpen="true">
 
@@ -91,12 +92,13 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
+          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
           v-model="imageStatsLargeFile">
           Use full resolution file (slower!)
         </b-switch>
 
-        <p class="warning-text">{{current_image.ex10_fits_exists ? "" : "missing small fits"}}</p>
-        <p class="warning-text">{{current_image.ex01_fits_exists ? "" : "missing full fits"}}</p>
+        <p class="warning-text" v-if="!current_image.ex10_fits_exists">{{"missing small fits"}}</p>
+        <p class="warning-text" v-if="!current_image.ex01_fits_exists">{{"missing full fits"}}</p>
 
         <b-field>
           <p class="control">
@@ -108,7 +110,7 @@
               <button 
                 class="button" 
                 :class="{'is-loading':region_info_loading}"
-                :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+                :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
                 @click="getRegionStats(true)">
                 inspect region
               </button>
@@ -118,7 +120,7 @@
             <button 
               class="button" 
               :class="{'is-loading':image_info_loading}"
-              :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
               @click="getRegionStats(false)">
               inspect image
             </button>
@@ -147,16 +149,20 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
+          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
           v-model="starInspectorLargeFile">
           Use full resolution file (slower!)
         </b-switch>
+
+        <p class="warning-text" v-if="!current_image.ex10_fits_exists">{{"missing small fits"}}</p>
+        <p class="warning-text" v-if="!current_image.ex01_fits_exists">{{"missing full fits"}}</p>
 
         <b-field>
           <p class="control">
             <button 
               class="button" 
               :class="{'is-loading': inspect_region_loading}"
-              :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
               @click="getStarProfiles">
               inspect region
             </button>
@@ -165,7 +171,7 @@
             <button 
               class="button" 
               :class="{'is-loading': inspect_image_loading}"
-              :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
               @click="getStarProfiles(false)">
               inspect image
             </button>
@@ -197,7 +203,7 @@
       </side-info-panel>
 
       <!--js9-devtools/-->
-      <image-filter/>
+      <image-filter :sitecode="sitecode"/>
       <!--image-navigation-panel/-->
     </div>
 
@@ -255,10 +261,13 @@
             :loading="headerIsLoading"
             >
         </b-table>
+
       
       </div>
     </div>
   </b-modal>
+
+  <div style="height: 400px;"></div>
 
 
 </section>
@@ -293,6 +302,8 @@ export default {
   },
   data() {
     return {
+      accordionIsOpen: 1,
+
       fitsHeader: {},
       showFitsHeaderModal: false,
       headerIsLoading: false,
@@ -316,8 +327,8 @@ export default {
       ex10_isLoading: false,
 
       // Analysize the full sized raw file (default is 768px reduced file)
-      imageStatsLargeFile: true,
-      starInspectorLargeFile: true,
+      imageStatsLargeFile: false,
+      starInspectorLargeFile: false,
 
       region_min: '--',
       region_max: '--',
@@ -332,23 +343,23 @@ export default {
       median_fwhm: '--',
       median_hfd: '--',
       median_profile: [0,0],
-      median_relative_pos_x: 0,
-      median_relative_pos_y: 0,
+      median_relative_pos_x: -1,
+      median_relative_pos_y: -1,
 
       brightest_plot_color: '#efea5a',
       brightest_fwhm: '--',
       brightest_hfd: '--',
       brightest_profile: [0,0],
-      brightest_relative_pos_x: 0,
-      brightest_relative_pos_y: 0,
+      brightest_relative_pos_x: -1,
+      brightest_relative_pos_y: -1,
 
       // Unsaturated brightest object
       u_brightest_plot_color: '#209cee',
       u_brightest_fwhm: '--',
       u_brightest_hfd: '--',
       u_brightest_profile: [0,0],
-      u_brightest_relative_pos_x: 0,
-      u_brightest_relative_pos_y: 0,
+      u_brightest_relative_pos_x: -1,
+      u_brightest_relative_pos_y: -1,
 
       starProfileToolActive: false,
       inspect_region_loading: false,
@@ -359,15 +370,27 @@ export default {
   },
   mounted(){
     // Draw empty plots for the star profiles
-    this.plotStarProfile([0], {}, 1, "#brightest_star_profile", 
-      {plot_color: "#efea5a"},
-      {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
-
-    this.plotStarProfile([0], {}, 1, "#u_brightest_star_profile", 
-      {plot_color: "#209cee"},
-      {title: "Brightest Unsaturated Star Profile", x_axis_label: "arcseconds"})
+    this.drawEmptyStarProfiles()
   },
   methods: {
+
+    reset_star_markers() {
+      this.brightest_relative_pos_x = -1
+      this.brightest_relative_pos_y = -1
+      this.u_brightest_relative_pos_x = -1
+      this.u_brightest_relative_pos_y = -1
+    },
+
+    drawEmptyStarProfiles() {
+      // Draw empty plots for the star profiles
+      this.plotStarProfile([0], {}, 1, "#brightest_star_profile", 
+        {plot_color: "#efea5a"},
+        {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
+
+      this.plotStarProfile([0], {}, 1, "#u_brightest_star_profile", 
+        {plot_color: "#209cee"},
+        {title: "Brightest Unsaturated Star Profile", x_axis_label: "arcseconds"})
+    },
     getStarProfiles(useSubregion=true) {
       let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/starprofiles"
       let body = {
@@ -429,29 +452,85 @@ export default {
 
       // Otherwise, do this if good stars were found
       else {
+        console.log('good stars were found')
         let med_star = response.data.median_star
-        let bright_star = response.data.brightest_star
-        let u_bright_star = response.data.brightest_unsaturated
         let region_coords = response.data.region_coords
 
-        // TODO: plot the gaussian curve over the data instead of connecting the dots.
+        // Brightest unsaturated star profile.
+        if (response.data.brightest_unsaturated) {
+          let u_bright_star = response.data.brightest_unsaturated
+          this.u_brightest_fwhm = (u_bright_star.gaussian_fwhm *u_bright_star.pixscale).toFixed(2) + '"' 
+          this.u_brightest_hfd = (u_bright_star.hfd*u_bright_star.pixscale).toFixed(2) + '"' 
+          this.u_brightest_relative_pos_x = (u_bright_star.x / u_bright_star.naxis1) + region_coords.x0
+          this.u_brightest_relative_pos_y = (u_bright_star.y / u_bright_star.naxis2) + region_coords.y0
+          // Plot the brightest unsaturated star profile
+          console.log('plotting brightest unsaturated star profile')
+          let ub_profile = u_bright_star.radial_profile 
+          let ub_gauss = {
+            mean: u_bright_star.gaussian_mean,
+            stddev: u_bright_star.gaussian_stddev,
+            amplitude: u_bright_star.gaussian_amplitude,
+          }
+          let ub_pixscale = u_bright_star.pixscale 
+          let ub_element_id = "#u_brightest_star_profile" 
+          let ub_formatting = {
+            margin_top: 50,
+            margin_right: 25,
+            margin_bottom: 50,
+            margin_left: 45,
+            plot_color: "#209cee",
+            x_axis_ticks: 8,
+            y_axis_ticks: 5,
+          }
+          let ub_labels = {
+            title: "Brightest Unsaturated Star Profile",
+            x_axis_label: "arcseconds",
+          }
+          this.plotStarProfile(ub_profile, ub_gauss, ub_pixscale, ub_element_id, ub_formatting, ub_labels)
+        }
+
+        // Brightest star profile
+        if (response.data.brightest_star) {
+          console.log('plotting brightest star')
+          let bright_star = response.data.brightest_star
+          this.brightest_fwhm = (bright_star.gaussian_fwhm *bright_star.pixscale).toFixed(2) + '"' 
+          this.brightest_hfd = (bright_star.hfd*bright_star.pixscale).toFixed(2) + '"' 
+          this.brightest_relative_pos_x = (bright_star.x / bright_star.naxis1) + region_coords.x0
+          this.brightest_relative_pos_y = (bright_star.y / bright_star.naxis2) + region_coords.y0
+          // Plot the brightest star profile
+          let b_profile = bright_star.radial_profile 
+          let b_gauss = {
+            mean: bright_star.gaussian_mean,
+            stddev: bright_star.gaussian_stddev,
+            amplitude: bright_star.gaussian_amplitude,
+          }
+          let b_pixscale = bright_star.pixscale 
+          let b_element_id = "#brightest_star_profile" 
+          let b_formatting = {
+            margin_top: 50,
+            margin_right: 25,
+            margin_bottom: 50,
+            margin_left: 45,
+            plot_color: "#efea5a",
+            x_axis_ticks: 8,
+            y_axis_ticks: 5,
+          }
+          let b_labels = {
+            title: "Brightest Star Profile",
+            x_axis_label: "arcseconds",
+          }
+          this.plotStarProfile(b_profile, b_gauss, b_pixscale, b_element_id, b_formatting, b_labels)
+        }
+
+        
 
         // Get the fwhm from the gaussian fit
         this.median_fwhm = (med_star.gaussian_fwhm * med_star.pixscale).toFixed(2) + '"' 
-        this.brightest_fwhm = (bright_star.gaussian_fwhm *bright_star.pixscale).toFixed(2) + '"' 
-        this.u_brightest_fwhm = (u_bright_star.gaussian_fwhm *u_bright_star.pixscale).toFixed(2) + '"' 
-
         this.median_hfd = (med_star.hfd* med_star.pixscale).toFixed(2) + '"' 
-        this.brightest_hfd = (bright_star.hfd*bright_star.pixscale).toFixed(2) + '"' 
-        this.u_brightest_hfd = (u_bright_star.hfd*u_bright_star.pixscale).toFixed(2) + '"' 
 
         // Get the positions of the stars to show in the image display.
-        this.median_relative_pos_x = (med_star.x / med_star.naxis1) + region_coords.x0,
-        this.median_relative_pos_y = (med_star.y / med_star.naxis2) + region_coords.y0,
-        this.brightest_relative_pos_x = (bright_star.x / bright_star.naxis1) + region_coords.x0,
-        this.brightest_relative_pos_y = (bright_star.y / bright_star.naxis2) + region_coords.y0,
-        this.u_brightest_relative_pos_x = (u_bright_star.x / u_bright_star.naxis1) + region_coords.x0,
-        this.u_brightest_relative_pos_y = (u_bright_star.y / u_bright_star.naxis2) + region_coords.y0,
+        this.median_relative_pos_x = (med_star.x / med_star.naxis1) + region_coords.x0
+        this.median_relative_pos_y = (med_star.y / med_star.naxis2) + region_coords.y0
         this.num_good_stars = response.data.num_good_stars
 
         // Plot the median star profile
@@ -479,54 +558,8 @@ export default {
         //this.plotStarProfile(m_profile, m_gauss, m_pixscale, m_element_id, m_formatting, m_labels)
 
 
-        // Plot the brightest star profile
-        let b_profile = bright_star.radial_profile 
-        let b_gauss = {
-          mean: bright_star.gaussian_mean,
-          stddev: bright_star.gaussian_stddev,
-          amplitude: bright_star.gaussian_amplitude,
-        }
-        let b_pixscale = bright_star.pixscale 
-        let b_element_id = "#brightest_star_profile" 
-        let b_formatting = {
-          margin_top: 50,
-          margin_right: 25,
-          margin_bottom: 50,
-          margin_left: 45,
-          plot_color: "#efea5a",
-          x_axis_ticks: 8,
-          y_axis_ticks: 5,
-        }
-        let b_labels = {
-          title: "Brightest Star Profile",
-          x_axis_label: "arcseconds",
-        }
-        this.plotStarProfile(b_profile, b_gauss, b_pixscale, b_element_id, b_formatting, b_labels)
 
-        // Plot the brightest unsaturated star profile
-        let ub_profile = u_bright_star.radial_profile 
-        let ub_gauss = {
-          mean: u_bright_star.gaussian_mean,
-          stddev: u_bright_star.gaussian_stddev,
-          amplitude: u_bright_star.gaussian_amplitude,
-        }
-        let ub_pixscale = u_bright_star.pixscale 
-        let ub_element_id = "#u_brightest_star_profile" 
-        let ub_formatting = {
-          margin_top: 50,
-          margin_right: 25,
-          margin_bottom: 50,
-          margin_left: 45,
-          plot_color: "#209cee",
-          x_axis_ticks: 8,
-          y_axis_ticks: 5,
-        }
-        let ub_labels = {
-          title: "Brightest Unsaturated Star Profile",
-          x_axis_label: "arcseconds",
-        }
-        this.plotStarProfile(ub_profile, ub_gauss, ub_pixscale, ub_element_id, ub_formatting, ub_labels)
-
+        console.log('finished plotting star profiles')
       }
     },
     plotStarProfile( profile, gaussian, pixscale=1, el_id, formatting_opts, label_options ) {
@@ -708,6 +741,13 @@ export default {
   watch: {
     current_image() {
       if (this.showFitsHeaderModal) this.refreshFitsHeader(); 
+
+      // Reset the star profile graph and remove the star markers
+      // TODO: cache the results of full image analysis and reload when 
+      // switching back to the image.
+      this.regionStatsReset("10")
+      this.drawEmptyStarProfiles()
+      this.reset_star_markers()
     },
     show_user_data_only() {
       this.$store.dispatch('images/load_latest_images')
@@ -793,7 +833,11 @@ export default {
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
+@import "@/style/buefy-styles.scss";
+
+
+
 
 table.info-panel-table { color: #dbdee0; }
 .blank-row { height: 1.5em; }
@@ -809,6 +853,8 @@ table.info-panel-table { color: #dbdee0; }
 
 .warning-text {
   color: #f1b70e;
+  padding: 2px;
+  margin: 5px 0;
   background-color: black;
 }
 

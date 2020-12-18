@@ -1,119 +1,214 @@
 <template>
 
-<div class="wrapper container">
+  <div class="wrapper container">
   
-<div class="content-column">
-        <b-modal :active.sync="telescopeModal"
-                trap-focus
-                :can-cancel="['escape']"
-                scroll="clip"
-                full-screen
-                style="z-index:1000;"
-                 >
-          <skychart-modal
-            style="background-color:#151718; overflow-y:auto; height: 100%;"
-            :sitecode="sitecode"
-            :deviceStatus="deviceStatus"
+  <div class="content-column">
+    <b-modal :active.sync="telescopeModal"
+      trap-focus
+      :can-cancel="['escape']"
+      scroll="clip"
+      full-screen
+      style="z-index:1000;"
+      >
+      <skychart-modal
+        style="background-color:#151718; overflow-y:auto; height: 100%;"
+        :sitecode="sitecode"
+        :deviceStatus="deviceStatus"
+      />
+    </b-modal>
+
+    <div class="b-tabs" style="position: relative;">
+
+      <!-- Enclosure Tab -->
+      <b-dropdown :trap-focus="true" :append-to-body="true">
+        <a
+          slot="trigger"
+          role="button">
+          <div class="button is-text">Enclosure</div>
+        </a>
+        <b-dropdown-item custom style="position;absolute; width:100%" label="Enclosure" >
+          <div class="instrument-control-title-bar">
+            <div class="title">Enclosure</div>
+            <div class="device-instance-subtitle tag is-small is-light" 
+              @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+              {{active_enclosure}}
+            </div>
+          </div>
+
+          <div class="val">{{enclosure_state.enclosure_message}}</div>
+
+          <status-column 
+            class="status-column"
+            :statusList="buildEnclosureTabStatus" 
+            :isOffline="!isOnline"
+          />
+
+          <command-button 
+            admin
+            v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Manual'" 
+            :data="enclosure_manual_command" 
+            style="margin-bottom: 1em; width: 100%;" 
             />
-        </b-modal>
+          <command-button 
+            admin
+            v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Automatic'" 
+            :data="enclosure_auto_command" 
+            style="margin-bottom: 1em; width: 100%;" 
+            />
 
-  <div class="b-tabs" style="position: relative;">
-
-    <b-dropdown :trap-focus="true" :append-to-body="true">
-      <a
-        slot="trigger"
-        role="button">
-        <div class="button is-text">Enclosure</div>
-      </a>
-      <b-dropdown-item custom style="position;absolute; width:100%" label="Enclosure" >
-        <div class="instrument-control-title-bar">
-          <div class="title">Enclosure</div>
-          <div class="device-instance-subtitle tag is-small is-light" 
-            @click="isDeviceSelectorActive = !isDeviceSelectorActive">
-            {{active_enclosure}}
-          </div>
-        </div>
-
-        <div class="val">{{enclosure_state.enclosure_message}}</div>
-
-        <status-column :statusList="buildEnclosureTabStatus" />
-
-        <command-button 
-          admin
-          v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Manual'" 
-          :data="enclosure_manual_command" 
-          style="margin-bottom: 1em; width: 100%;" 
-          />
-        <command-button 
-          admin
-          v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Automatic'" 
-          :data="enclosure_auto_command" 
-          style="margin-bottom: 1em; width: 100%;" 
-          />
-
-        <b-field>
-          <p class="control">
-            <command-button :data="enclosure_open_command" style="margin-bottom: 1em;" class="is-small"/>
-          </p>
-          <p class="control">
-            <command-button :data="enclosure_close_command" style="margin-bottom: 1em;" class="is-small"/>
-          </p>
-        </b-field>
-        <br>
-
-        <div class="status-toggle-bar" @click="isEnclosureStatusVisible = !isEnclosureStatusVisible">{{isEnclosureStatusVisible ? 'collapse status' : 'expand status'}}</div>
-        <pre v-if="isEnclosureStatusVisible">
-          <simple-device-status :device_name="active_enclosure" device_type="enclosure" :device_status="enclosure_state" />
-        </pre>
-
-      </b-dropdown-item> 
-    </b-dropdown>
-
-    <b-dropdown :append-to-body="true">
-      <a
-        slot="trigger"
-        role="button">
-        <div class="button is-text" >Telescope</div>
-      </a>
-      <b-dropdown-item custom label="Telescope">
-
-        <div class="instrument-control-title-bar">
-          <div class="title">Telescope</div>
-          <div 
-            class="device-instance-subtitle tag is-small is-light" 
-            @click="isDeviceSelectorActive = !isDeviceSelectorActive">
-            {{active_mount}}
-          </div>
-          <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
-            {{active_telescope}}
-          </div>
-        </div>
-
-        <div class="val" v-if="mount_state && mount_state.message && mount_state.message != '-'">{{mount_state.message}}</div>
-        <div class="val" v-if="telescope_state && telescope_state.message && telescope_state.message != '-'">{{telescope_state.message}}</div>
-
-        <div class="columns">
-          <status-column class="column" :statusList="buildTelescopeTabStatus1"/>
-          <status-column class="column" :statusList="buildTelescopeTabStatus2"/>
-        </div>
-
-        <b-field horizontal label="Ra">
           <b-field>
-            <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
-            <p class="control"><span class="button is-light is-static is-small">hrs</span></p>
+            <p class="control">
+              <command-button :data="enclosure_open_command" style="margin-bottom: 1em;" class="is-small"/>
+            </p>
+            <p class="control">
+              <command-button :data="enclosure_close_command" style="margin-bottom: 1em;" class="is-small"/>
+            </p>
+          </b-field>
+          <br>
+
+          <div class="status-toggle-bar" @click="isEnclosureStatusVisible = !isEnclosureStatusVisible">{{isEnclosureStatusVisible ? 'collapse status' : 'expand status'}}</div>
+          <pre v-if="isEnclosureStatusVisible">
+            <simple-device-status :device_name="active_enclosure" device_type="enclosure" :device_status="enclosure_state" />
+          </pre>
+
+        </b-dropdown-item> 
+      </b-dropdown>
+
+      <!-- Screen Tab -->
+      <b-dropdown>
+        <a
+          slot="trigger"
+          role="button">
+          <div class="button is-text">Screen</div>
+        </a>
+        <b-dropdown-item custom label="Screen">
+          <div class="instrument-control-title-bar">
+            <div class="title">Screen</div>
+            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+              {{active_screen}}
+            </div>
+          </div>
+
+          <status-column 
+            class="status-column"
+            :statusList="buildScreenTabStatus" 
+            :isOffline="!isOnline"
+          />
+
+          <b-field label="Brightness">
+            <b-field>
+              <b-input 
+                expanded 
+                size="is-small" 
+                name="subject" 
+                v-model="screen_brightness" 
+                type="number" 
+                :step="1" 
+                min="0" 
+                max="100" 
+                autocomplete="off" />
+                <p class="control"> <command-button :data="screen_on_command" class="is-small control" /> </p>
+                <p class="control"> <command-button :data="screen_off_command" class="is-small control" /> </p>
             </b-field>
           </b-field>
-          <b-field horizontal label="Dec">
+
+          <div class="status-toggle-bar" @click="isScreenStatusVisible = !isScreenStatusVisible">
+            {{ isScreenStatusVisible ? 'collapse status' : 'expand status' }}
+          </div>
+          <pre v-if="isScreenStatusVisible">
+            <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
+          </pre>
+        </b-dropdown-item>
+      </b-dropdown>
+
+      <!-- Telescope Tab -->
+      <b-dropdown :append-to-body="true">
+        <a
+          slot="trigger"
+          role="button">
+          <div class="button is-text" >Telescope</div>
+        </a>
+        <b-dropdown-item custom label="Telescope">
+
+          <div class="instrument-control-title-bar">
+            <div class="title">Telescope</div>
+            <div 
+              class="device-instance-subtitle tag is-small is-light" 
+              @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+              {{active_mount}}
+            </div>
+            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+              {{active_telescope}}
+            </div>
+          </div>
+
+          <div class="val" v-if="mount_state && mount_state.message && mount_state.message != '-'">{{mount_state.message}}</div>
+          <div class="val" v-if="telescope_state && telescope_state.message && telescope_state.message != '-'">{{telescope_state.message}}</div>
+
+          <b-field>
+            <b-radio-button v-model="telescope_selection"
+              expanded
+              :native-value="1">
+              Primary
+            </b-radio-button>
+            <b-radio-button v-model="telescope_selection"
+              expanded
+              :native-value="2">
+              Aux
+            </b-radio-button>
+          </b-field>
+
+          <div class="columns">
+            <status-column
+              class="status-column"
+              :statusList="buildTelescopeTabStatus1"
+              :isOffline="!isOnline" />
+            <status-column
+              class="status-column column"
+              :isOffline="!isOnline"
+              :statusList="buildTelescopeTabStatus2"/>
+          </div>
+
+          <b-field horizontal label="Ra/Az/Long">
+            <b-field>
+              <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
+              <!--p class="control"><span class="button is-static is-small">hrs</span></p-->
+            </b-field>
+          </b-field>
+          <b-field horizontal label="Dec/Alt/Lat">
             <b-field>
               <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
-              <p class="control"><span class="button is-light is-static is-small">deg</span></p>
+              <!--p class="control"><span class="button is-static is-small">deg</span></p-->
             </b-field>
           </b-field>
           <b-field horizontal label="Object">
             <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_object" autocomplete="off"></b-input>
           </b-field>
 
-          <command-button :data="mount_slew_command" style="margin-bottom: 1em;" class="is-small"/>
+
+          <b-field horizontal label="Frame">
+            <b-select placeholder="Select bin" 
+              v-model="telescope_coordinate_frame" size="is-small">
+              <option
+                v-for="(frame_option, index) in telescope_coordinate_frame_options"
+                v-bind:value="frame_option"
+                v-bind:selected="index === 0"
+                v-bind:key="index"
+                >
+                {{ frame_option }}
+              </option>
+            </b-select>
+          </b-field>
+
+
+          <b-field>
+            <p class="control">
+              <command-button :data="mount_slew_radec_command" style="margin-bottom: 1em;" class="is-small"/>
+            </p>
+            <p class="control">
+              <command-button :data="mount_slew_azalt_command" style="margin-bottom: 1em;" class="is-small"/>
+            </p>
+          </b-field>
           <br>
 
           <b-dropdown aria-role="list" style="width: 100%;" size="is-small">
@@ -121,30 +216,23 @@
                 <span>Slew to...</span>
                 <b-icon icon="menu-down"></b-icon>
             </button>
-            <b-dropdown-item aria-role="listitem">
-              <command-button :data="mount_slew_chart_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item aria-role="listitem">
-              <command-button :data="mount_slew_near_tycho" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_screenflat_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_skyflat_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_home_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_park_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_raSidDec0_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="mount_stop_command" class="dropdown-button-command is-small"/>
-            </b-dropdown-item>
+            <template
+              v-for="(command, idx) in [
+                  mount_slew_chart_command,
+                  mount_screenflat_command,
+                  mount_skyflat_command,
+                  mount_home_command,
+                  mount_park_command,
+                  mount_raSidDec0_command,
+                  mount_stop_command,
+                  mount_tracking_on_command,
+                  mount_tracking_off_command
+                ]"
+              >
+              <b-dropdown-item :key="idx" aria-role="listitem">
+                <command-button :data="command" class="dropdown-button-command is-small"/>
+              </b-dropdown-item>
+            </template>
           </b-dropdown>
 
           <b-button class="button" style="width:100%; margin:1em 0;" @click=" telescopeModal = !telescopeModal" icon-right="arrow-top-right">view skychart</b-button>
@@ -161,6 +249,181 @@
         </b-dropdown-item>
       </b-dropdown>
 
+      <!-- Rotator/Focuser Tab -->
+      <b-dropdown>
+        <a
+          slot="trigger"
+          role="button">
+          <div class="button is-text">Rotator/Focuser</div>
+        </a>
+        <b-dropdown-item custom label="Rotator">
+
+          <div class="instrument-control-title-bar">
+            <div class="title">Rotator</div>
+            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+              {{active_rotator}}
+            </div>
+          </div>
+
+          <status-column 
+            class="status-column"
+            :isOffline="!isOnline"
+            :statusList="buildRotatorTabStatus" 
+          />
+          <command-button :data="rotate_home_command" class="is-small" style="width:100%; margin-bottom:1em;"/>
+          <b-field label="Relative">
+            <b-field>
+              <b-input expanded size="is-small" name="subject" v-model="rotator_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
+            </b-field>
+          </b-field>
+          <b-field label="Absolute">
+            <b-field>
+              <b-input expanded size="is-small" name="subject" v-model="rotator_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
+            </b-field>
+          </b-field>
+          <br>
+
+          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">
+            {{ isFocuserStatusVisible ? 'collapse status' : 'expand status' }}
+          </div>
+          <pre v-if="isFocuserStatusVisible">
+            <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
+          </pre>
+        </b-dropdown-item>
+
+        <div style="height: 5px; background-color: silver; width: 100%; margin: 10px 0;"/>
+
+        <b-dropdown-item custom label="Focuser">
+
+          <div class="instrument-control-title-bar">
+            <div class="title">Focuser</div>
+            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+              {{active_focuser}}
+            </div>
+          </div>
+
+          <div class="val" v-if="focuser_state && focuser_state.message">{{focuser_state.message}}</div>
+          <status-column 
+            class="status-column"
+            :statusList="buildFocuserTabStatus" 
+            :isOffline="!isOnline"
+          />
+
+          <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
+            <button class="button is-small" slot="trigger" style="width: 100%;">
+                <span>Focus Action...</span>
+                <b-icon icon="menu-down"></b-icon>
+            </button>
+            <template
+              v-for="(command, idx) in [
+                  focus_home_command,
+                  focus_gotoreference_command,
+                  focus_gotocompensated_command,
+                  focus_saveasreference_command,
+                  focus_vcurve_command,
+                ]"
+              >
+              <b-dropdown-item :key="idx" aria-role="listitem">
+                <command-button :data="command" class="dropdown-button-command is-small"/>
+              </b-dropdown-item>
+            </template>
+            <b-dropdown-item>
+                <button class="button dropdown-button-command is-small" 
+                  @click="postCommand(focus_auto_command,[3])">
+                  Quick Autofocus (3 points) 
+                </button>
+            </b-dropdown-item>
+            <b-dropdown-item>
+                <button class="button dropdown-button-command is-small" 
+                  @click="postCommand(focus_auto_command,[5])">
+                  Fine Autofocus (5 points) 
+                </button>
+            </b-dropdown-item>
+          </b-dropdown>
+          <br>
+
+          <b-field label="Relative">
+            <b-field>
+              <b-input expanded 
+                name="subject" 
+                size="is-small" 
+                v-model="focuser_relative" 
+                type="number" 
+                :step="focuser_step_size" 
+                autocomplete="off"/>
+              <p class="control"> 
+                <command-button 
+                  :data="focus_relative_command" 
+                  class="is-small" 
+                  @jobPost="focuserJobPost"/>  </p> <br>
+            </b-field>
+          </b-field>
+          <b-field>
+            <template v-for="(focus_val, idx) in ['-300', '-100', '-30', '+30', '+100', '+300']">
+              <p class="control" :key="idx">
+                <button 
+                  class="button is-small"
+                  @click="postCommand(focus_relative_command_args, [focus_val])">
+                  {{focus_val}}
+                </button>
+              </p>
+            </template>
+          </b-field>
+
+          <b-field label="Absolute">
+            <b-field>
+              <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+              <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
+            </b-field>
+          </b-field>
+          <br>
+
+          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">
+            {{ isFocuserStatusVisible ? 'collapse status' : 'expand status' }}
+          </div>
+          <pre v-if="isFocuserStatusVisible">
+            <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
+          </pre>
+        </b-dropdown-item>
+      </b-dropdown>
+
+      <!-- Inst.Selector Tab -->
+      <b-dropdown>
+        <a
+          slot="trigger"
+          role="button">
+          <div class="button is-text">Inst. Selector</div>
+        </a>
+        <b-dropdown-item custom label="Selector">
+
+          <div class="instrument-control-title-bar">
+            <div class="title">Selector</div>
+            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
+              {{"not configured"}}
+            </div>
+          </div>
+
+          <status-column 
+            class="status-column"
+            :isOffline="!isOnline"
+            :statusList="buildEmptyStatus" 
+          />
+
+        <b-field label="Instrument Selection">
+          <b-select v-model="selector_position">
+            <option :value="1">Camera 1 (val=1)</option>
+            <option :value="2">Low-res Spectograph (val=2)</option>
+            <option :value="3">Camera 2 (val=3)</option>
+            <option :value="4">Hi-res spectograph (val=4)</option>
+          </b-select>
+        </b-field>
+
+        </b-dropdown-item>
+      </b-dropdown>
+
+      <!-- Camera Tab -->
       <b-dropdown>
         <a
           slot="trigger"
@@ -181,22 +444,24 @@
 
           <div class="val" v-if="camera_state && camera_state.message">{{camera_state.message}}</div>
 
-          <status-column :statusList="buildCameraTabStatus" />
-
+          <status-column 
+            class="status-column"
+            :statusList="buildCameraTabStatus" 
+            :isOffline="!isOnline"
+          />
 
           <b-field horizontal label="Expose">
               <b-field>
                   <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
-                  <p class="control"> <span class="button is-light is-static is-small">s</span> </p>
+                  <p class="control"> <span class="button is-static is-small">s</span> </p>
               </b-field>
           </b-field>
 
           <b-field horizontal label="Count">
               <b-field>
-                  <b-numberinput name="subject" type="is-light" min="1" size="is-small" controls-position="compact" v-model="camera_count" autocomplete="off"></b-numberinput>
+                  <b-numberinput name="subject" type="is-button" min="1" size="is-small" controls-position="compact" v-model="camera_count" autocomplete="off"></b-numberinput>
               </b-field>
           </b-field>
-
 
           <b-field horizontal label="Filter">
 
@@ -255,7 +520,6 @@
             <button class="button is-small" v-if="!subframeIsActive" @click="function(){subframeIsActive = true}"> activate </button>
           </b-field>
 
-
           <b-field horizontal label="Image Type">
             <b-select placeholder="Select image type" v-model="camera_image_type" size="is-small">
               <option
@@ -289,13 +553,13 @@
             </b-checkbox>
           </b-field>
 
-          <b-field horizontal label="Hint">
-            <b-input placeholder="a hint for the FITS header..."
+          <b-field horizontal label="Note">
+            <b-input placeholder="a camera note for the FITS header..."
               type="text"
               min="0"
               max="64"
               size="is-small"
-              v-model="camera_hint">
+              v-model="camera_note">
             </b-input>
           </b-field>
 
@@ -304,6 +568,23 @@
             <command-button :data="camera_expose_command" style="width: 70%" class="is-small"/>
             <command-button :data="camera_cancel_command" style="width: 30%" class="is-small"/>
           </div>
+
+          <br>
+
+          <b-field horizontal style="height: auto;" label="Darkslide">
+
+            <div class="status-val">
+              {{ camera_state && camera_state.darkslide || "no status" }}
+            </div>
+
+            <div class="buttons has-addons">
+              <command-button :data="camera_darkslide_open_command" style="width: 50%;" class="is-small mb-0"/>
+              <command-button :data="camera_darkslide_close_command" style="width: 50%" class="is-small mb-0" />
+            </div>
+          </b-field>
+
+          <br>
+
           <div class="status-toggle-bar" @click="isCameraStatusVisible = !isCameraStatusVisible">
             {{ isCameraStatusVisible ? 'collapse status' : 'expand status'}}
           </div>
@@ -315,88 +596,7 @@
         </b-dropdown-item>
       </b-dropdown>
 
-      <b-dropdown>
-        <a
-          slot="trigger"
-          role="button">
-          <div class="button is-text">Focuser</div>
-        </a>
-        <b-dropdown-item custom label="Focuser">
-
-          <div class="instrument-control-title-bar">
-            <div class="title">Focuser</div>
-            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
-              {{active_focuser}}
-            </div>
-          </div>
-
-          <div class="val" v-if="focuser_state && focuser_state.message">{{focuser_state.message}}</div>
-          <status-column :statusList="buildFocuserTabStatus" />
-
-          <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
-            <button class="button is-small" slot="trigger" style="width: 100%;">
-                <span>Focus Action...</span>
-                <b-icon icon="menu-down"></b-icon>
-            </button>
-            <b-dropdown-item aria-role="listitem">
-              <command-button :data="focus_home_command" class="dropdown-button-command"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="focus_gotoreference_command" class="dropdown-button-command"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="focus_gotocompensated_command" class="dropdown-button-command"/>
-            </b-dropdown-item>
-            <b-dropdown-item>
-              <command-button :data="focus_saveasreference_command" class="dropdown-button-command"/>
-            </b-dropdown-item>
-          </b-dropdown>
-          <br>
-
-          <b-field label="Relative">
-            <b-field>
-              <b-input expanded name="subject" size="is-small" v-model="focuser_relative" type="number" :step="focuser_step_size" autocomplete="off"></b-input>
-              <p class="control"> <command-button :data="focus_relative_command" class="is-small" @jobPost="focuserJobPost"/>  </p><br>
-            </b-field>
-          </b-field>
-          <b-field>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-300'])"> -300 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-100'])"> -100 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['-30'])"> -30 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+30'])"> +30 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+100'])"> +100 </button>
-            </p>
-            <p class="control">
-                <button class="button is-small" @click="postCommand(focus_relative_command_args,['+300'])"> +300 </button>
-            </p>
-          </b-field>
-
-          <b-field label="Absolute">
-            <b-field>
-              <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
-              <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
-            </b-field>
-          </b-field>
-          <br>
-
-          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">
-            {{ isFocuserStatusVisible ? 'collapse status' : 'expand status' }}
-          </div>
-          <pre v-if="isFocuserStatusVisible">
-            <simple-device-status :device_name="active_focuser" device_type="Focuser" :device_status="focuser_state" />
-          </pre>
-        </b-dropdown-item>
-      </b-dropdown>
-
+      <!-- Sequencer Tab -->
       <b-dropdown>
         <a
           slot="trigger"
@@ -411,7 +611,11 @@
           </div>
 
           <div class="val" v-if="sequencer_state && sequencer_state.message">{{sequencer_state.message}}</div>
-          <status-column :statusList="buildSequencerTabStatus" />
+          <status-column 
+            class="status-column"
+            :statusList="buildSequencerTabStatus" 
+            :isOffline="!isOnline"
+          />
 
           <b-field label="Script">
             <b-field>
@@ -441,7 +645,7 @@
               </b-select>
               <p class="control">
                 <button 
-                  class="button is-light is-small" 
+                  class="button is-small" 
                   :disabled="!scriptHasSettings"
                   @click="isScriptSettingsActive = !isScriptSettingsActive"
                   >
@@ -472,92 +676,7 @@
         </b-dropdown-item>
       </b-dropdown>
 
-
-      <b-dropdown v-if="isCmdTabsExpanded">
-        <a
-          slot="trigger"
-          role="button">
-          <div class="button is-text">Rotator</div>
-        </a>
-        <b-dropdown-item custom label="Rotator">
-
-          <div class="instrument-control-title-bar">
-            <div class="title">Rotator</div>
-            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
-              {{active_rotator}}
-            </div>
-          </div>
-
-          <status-column :statusList="buildRotatorTabStatus" />
-
-          <command-button :data="rotate_home_command" class="is-small" style="width:100%; margin-bottom:1em;"/>
-          <b-field label="Relative">
-            <b-field>
-              <b-input expanded size="is-small" name="subject" v-model="rotator_relative" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
-              <p class="control"> <command-button :data="rotate_relative_command" class="is-small"/>  </p>
-            </b-field>
-          </b-field>
-          <b-field label="Absolute">
-            <b-field>
-              <b-input expanded size="is-small" name="subject" v-model="rotator_absolute" type="number" :step="rotator_step_size" autocomplete="off"></b-input>
-              <p class="control"> <command-button :data="rotate_absolute_command" class="is-small" />  </p>
-            </b-field>
-          </b-field>
-          <br>
-
-          <div class="status-toggle-bar" @click="isFocuserStatusVisible = !isFocuserStatusVisible">
-            {{ isFocuserStatusVisible ? 'collapse status' : 'expand status' }}
-          </div>
-          <pre v-if="isFocuserStatusVisible">
-            <simple-device-status :device_name="active_rotator" device_type="Rotator" :device_status="rotator_state" />
-          </pre>
-        </b-dropdown-item>
-      </b-dropdown>
-
-      <b-dropdown v-if="isCmdTabsExpanded">
-        <a
-          slot="trigger"
-          role="button">
-          <div class="button is-text">Screen</div>
-        </a>
-        <b-dropdown-item custom label="Screen">
-          <div class="instrument-control-title-bar">
-            <div class="title">Screen</div>
-            <div class="device-instance-subtitle tag is-small is-light" @click="isDeviceSelectorActive = !isDeviceSelectorActive">
-              {{active_screen}}
-            </div>
-          </div>
-
-          <status-column :statusList="buildScreenTabStatus" />
-
-          <b-field label="Brightness">
-            <b-field>
-              <b-input 
-                expanded 
-                size="is-small" 
-                name="subject" 
-                v-model="screen_brightness" 
-                type="number" 
-                :step="1" 
-                min="0" 
-                max="100" 
-                autocomplete="off" />
-                <p class="control"> <command-button :data="screen_on_command" class="is-small control" /> </p>
-                <p class="control"> <command-button :data="screen_off_command" class="is-small control" /> </p>
-            </b-field>
-          </b-field>
-
-          <div class="status-toggle-bar" @click="isScreenStatusVisible = !isScreenStatusVisible">
-            {{ isScreenStatusVisible ? 'collapse status' : 'expand status' }}
-          </div>
-          <pre v-if="isScreenStatusVisible">
-            <simple-device-status :device_name="active_screen" device_type="Screen" :device_status="screen_state" />
-          </pre>
-        </b-dropdown-item>
-      </b-dropdown>
-
-        
-
+      <!-- Settings Tab -->
       <b-dropdown v-if="isCmdTabsExpanded">
         <a
           slot="trigger"
@@ -611,6 +730,7 @@
         </b-dropdown-item>
       </b-dropdown>
 
+      <!-- Site Config Display Tab -->
       <b-dropdown v-if="isCmdTabsExpanded && userIsAdmin" position="is-bottom-left">
         <a
           slot="trigger"
@@ -680,11 +800,13 @@
     :deviceStatus="deviceStatus"
     />
 
+  <!--log-stream :site="sitecode" /-->
+
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { status_mixin } from '../../mixins/status_mixin'
 import helpers from '@/utils/helpers'
@@ -701,6 +823,7 @@ import SiteData from '@/components/sitepages/SiteData'
 import SkychartModal from '@/components/SkychartModal'
 import ImagesTable from '@/components/ImagesTable'
 import StatusColumn from '@/components/status/StatusColumn'
+import LogStream from '@/components/LogStream'
 
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
@@ -718,6 +841,7 @@ export default {
     SkychartModal,
     ImagesTable,
     StatusColumn,
+    LogStream,
   },
   mixins: [commands_mixin, status_mixin],
   props: ['sitecode'],
@@ -760,6 +884,10 @@ export default {
       focuserStatus: 'nothing yet',
       jobSub: '', //ws connection
 
+      // logs websocket
+      logs_ws: '', //ws connection
+
+
       focuserJobs: {},
 
 
@@ -772,6 +900,7 @@ export default {
   created() {
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_time_interval = setInterval(this.update_time, 1000)
+
 
     // This websocket subscribes to changes in job status
     this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
@@ -791,6 +920,12 @@ export default {
       this.focuserStatus = newJob
       //this.$set(this.jobIds, newJob.ulid, newJob)
     }
+
+    // set default values from config
+    // TODO: this should go in a better place
+    this.camera_bin = this.camera_default_bin
+    this.camera_areas_selection = this.camera_default_area
+
   },
   beforeDestroy() {
     clearInterval(this.update_time_interval)
@@ -801,54 +936,11 @@ export default {
 
     /**
      * Set the default devices for this site.
-     * First, update the config. Then use the config to specify devices.
      */
     async setDefaultDevices() {
-      await this.$store.dispatch('site_config/update_config')
       this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
     },
-    handleNotAuthorizedResponse(error) {
-        if (error.response) {
-            // Request made and server responded
-            console.log("error message", error.response.data);
-            console.log("error status", error.response.status);
-            console.log("error headers", error.response.headers);
-            // small popup notification describing error
-            this.$buefy.toast.open({
-                duration: 5000,
-                message: `${error.response.status} error: ${error.response.data}`,
-                position: 'is-bottom',
-                type: 'is-danger' ,
-            })
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.warn("The request was made but no response was received.")
-            console.log(error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.warn("Something happened in setting up the request that triggered an error.")
-            console.log('Error', error.message);
-        }
-    },
 
-    // Alternative to the command_button component
-    async postCommand(formCreatorFunction, args) {
-
-      const options = await this.getAuthHeader()
-      let form = formCreatorFunction(...args).form
-      const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.sitecode}`
-
-      form.timestamp = parseInt(Date.now() / 1000)
-      form.site = this.sitecode
-      form.mount = this.active_mount
-
-      axios.post(url,form, options).then(response => {
-          console.log(response.data)
-          this.$emit('jobPost', response.data)
-      }).catch(e => {
-          this.handleNotAuthorizedResponse(e)
-      })
-    },
 
     focuserJobPost(data) {
       console.log('focuser job post: ',data)
@@ -885,29 +977,29 @@ export default {
 
     // Get axios request config object (the headers) with auth token
     async getAuthHeader() {
-        let token, configWithAuth;
-        try {
-            token = await this.$auth.getTokenSilently(); 
-        } catch(err) {
-            console.error(err)
-            console.warn('Did not acquire the needed token. Stopping request.')
-            
-            // small popup notification
-            this.$buefy.toast.open({
-                duration: 5000,
-                message: "Oops! You need to be logged in to do that.",
-                position: 'is-bottom',
-                type: 'is-danger' ,
-            })
-        }
+      let token, configWithAuth;
+      try {
+        token = await this.$auth.getTokenSilently(); 
+      } catch(err) {
+        console.error(err)
+        console.warn('Did not acquire the needed token. Stopping request.')
+        
+        // small popup notification
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: "Oops! You need to be logged in to do that.",
+          position: 'is-bottom',
+          type: 'is-danger' ,
+        })
+      }
 
-        return {
-            'headers': {
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${token}`
-            }
+      return {
+        'headers': {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': `Bearer ${token}`
         }
+      }
     },
   },
 
@@ -941,6 +1033,9 @@ export default {
       'site_config',
       'available_devices',
 
+      'camera_default_bin',
+      'camera_default_area',
+
       'enclosure',
       'mount',
       'telescope',
@@ -951,6 +1046,9 @@ export default {
       'screen',
       'weather',
       'sequencer',
+    ]),
+
+    ...mapState('site_config', [
     ]),
 
       
@@ -967,82 +1065,97 @@ export default {
 
     // command_params
     mount_ra: {
-        get() { return this.$store.getters['command_params/mount_ra']},
-        set(val) { this.$store.commit('command_params/mount_ra', val)},
+      get() { return this.$store.getters['command_params/mount_ra']},
+      set(val) { this.$store.commit('command_params/mount_ra', val)},
     },
     mount_dec: {
-        get() { return this.$store.getters['command_params/mount_dec']},
-        set(val) { this.$store.commit('command_params/mount_dec', val)},
+      get() { return this.$store.getters['command_params/mount_dec']},
+      set(val) { this.$store.commit('command_params/mount_dec', val)},
     },
     mount_object: {
-        get() { return this.$store.getters['command_params/mount_object']},
-        set(val) { this.$store.commit('command_params/mount_object', val)},
+      get() { return this.$store.getters['command_params/mount_object']},
+      set(val) { this.$store.commit('command_params/mount_object', val)},
+    },
+
+    telescope_selection: {
+      get() { return this.$store.getters['command_params/telescope_selection']},
+      set(val) { this.$store.commit('command_params/telescope_selection', val)},
+    },
+
+    telescope_coordinate_frame: {
+      get() { return this.$store.getters['command_params/telescope_coordinate_frame']},
+      set(val) { this.$store.commit('command_params/telescope_coordinate_frame', val)},
     },
 
     subframeIsActive: {
-        get() { return this.$store.getters['command_params/subframeIsActive']},
-        set(val) { this.$store.commit('command_params/subframeIsActive', val)},
+      get() { return this.$store.getters['command_params/subframeIsActive']},
+      set(val) { this.$store.commit('command_params/subframeIsActive', val)},
     },
 
     camera_areas_selection: {
-        get() { return this.$store.getters['command_params/camera_areas_selection'] },
-        set(val) {this.$store.commit('command_params/camera_areas_selection', val)}
+      get() { return this.$store.getters['command_params/camera_areas_selection'] },
+      set(val) {this.$store.commit('command_params/camera_areas_selection', val)}
     },
-    camera_hint: {
-        get() { return this.$store.getters['command_params/camera_hint']},
-        set(val) { this.$store.commit('command_params/camera_hint', val)},
+    camera_note: {
+      get() { return this.$store.getters['command_params/camera_note']},
+      set(val) { this.$store.commit('command_params/camera_note', val)},
     },
     camera_exposure: {
-        get() { return this.$store.getters['command_params/camera_exposure'] },
-        set(val) {this.$store.commit('command_params/camera_exposure', val)}
+      get() { return this.$store.getters['command_params/camera_exposure'] },
+      set(val) {this.$store.commit('command_params/camera_exposure', val)}
     },
     camera_count: {
-        get() { return this.$store.getters['command_params/camera_count'] },
-        set(val) {this.$store.commit('command_params/camera_count', val)}
+      get() { return this.$store.getters['command_params/camera_count'] },
+      set(val) {this.$store.commit('command_params/camera_count', val)}
     },
     camera_bin: {
-        get() { return this.$store.getters['command_params/camera_bin'] },
-        set(val) {this.$store.commit('command_params/camera_bin', val)}
+      get() { return this.$store.getters['command_params/camera_bin'] },
+      set(val) {this.$store.commit('command_params/camera_bin', val)}
     },
     camera_dither: {
-        get() { return this.$store.getters['command_params/camera_dither'] },
-        set(val) {this.$store.commit('command_params/camera_dither', val)}
+      get() { return this.$store.getters['command_params/camera_dither'] },
+      set(val) {this.$store.commit('command_params/camera_dither', val)}
     },
     camera_extract: {
-        get() { return this.$store.getters['command_params/camera_extract'] },
-        set(val) {this.$store.commit('command_params/camera_extract', val)}
+      get() { return this.$store.getters['command_params/camera_extract'] },
+      set(val) {this.$store.commit('command_params/camera_extract', val)}
     },
     camera_image_type: {
-        get() { return this.$store.getters['command_params/camera_image_type'] },
-        set(val) {this.$store.commit('command_params/camera_image_type', val)}
+      get() { return this.$store.getters['command_params/camera_image_type'] },
+      set(val) {this.$store.commit('command_params/camera_image_type', val)}
     },
 
     filter_wheel_options_selection: {
-        get() { return this.$store.getters['command_params/filter_wheel_options_selection'] },
-        set(val) { this.$store.commit('command_params/filter_wheel_options_selection', val) }
+      get() { return this.$store.getters['command_params/filter_wheel_options_selection'] },
+      set(val) { this.$store.commit('command_params/filter_wheel_options_selection', val) }
+    },
+
+    selector_position: {
+      get() { return this.$store.getters['command_params/selector_position'] },
+      set(val) { this.$store.commit('command_params/selector_position', val) }
     },
 
     focuser_relative: {
-        get() { return this.$store.getters['command_params/focuser_relative'] },
-        set(val) {this.$store.commit('command_params/focuser_relative', val)}
+      get() { return this.$store.getters['command_params/focuser_relative'] },
+      set(val) {this.$store.commit('command_params/focuser_relative', val)}
     },
     focuser_absolute: {
-        get() { return this.$store.getters['command_params/focuser_absolute'] },
-        set(val) {this.$store.commit('command_params/focuser_absolute', val)}
+      get() { return this.$store.getters['command_params/focuser_absolute'] },
+      set(val) {this.$store.commit('command_params/focuser_absolute', val)}
     },
 
     rotator_relative: {
-        get() { return this.$store.getters['command_params/rotator_relative'] },
-        set(val) {this.$store.commit('command_params/rotator_relative', val)}
+      get() { return this.$store.getters['command_params/rotator_relative'] },
+      set(val) {this.$store.commit('command_params/rotator_relative', val)}
     },
     rotator_absolute: {
-        get() { return this.$store.getters['command_params/rotator_absolute'] },
-        set(val) {this.$store.commit('command_params/rotate_absolute', val)}
+      get() { return this.$store.getters['command_params/rotator_absolute'] },
+      set(val) {this.$store.commit('command_params/rotator_absolute', val)}
     },
 
     screen_brightness: {
-        get() { return this.$store.getters['command_params/screen_brightness'] },
-        set(val) {this.$store.commit('command_params/screen_brightness', val)}
+      get() { return this.$store.getters['command_params/screen_brightness'] },
+      set(val) {this.$store.commit('command_params/screen_brightness', val)}
     },
   },
 
@@ -1089,6 +1202,10 @@ export default {
   background-color: rgba(20,20,20,0.9)
 }
 
+.status-column {
+  padding-bottom: 15px;
+  padding-top: 15px;
+}
 
 .status-toggle-bar {
   height: 1.5em;
@@ -1101,6 +1218,11 @@ export default {
 .choose-target {
   margin-top: 1em;
 }
+.status-val {
+  background-color: black;
+  color:yellowgreen;
+  padding: 2px 10px;
+}
 
 .dropdown-button-command {
   border: none;
@@ -1108,6 +1230,10 @@ export default {
 .dropdown-button-command:hover {
   color:grey;
   font:bolder;
+}
+
+.wrapper {
+  margin: 0;
 }
 
 </style>

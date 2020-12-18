@@ -6,6 +6,7 @@
 
 import { mapGetters } from 'vuex'
 import { getInstance } from '../auth/index' // get user object: getInstance().user
+import axios from 'axios'
 
 // Change empty strings to 'empty'. 
 function emptyString(s) {
@@ -34,6 +35,17 @@ export const commands_mixin = {
                 'simulation',
             ],
 
+            telescope_coordinate_frame_options: [
+                'ICRS',
+                'J2000',
+                'JNOW', 
+                'FK5',
+                'B1950',
+                'B1900',
+                'Ecliptic',
+                'Galactic',
+            ],
+
         }
     },
 
@@ -48,10 +60,8 @@ export const commands_mixin = {
          * @param {string} device_type Used to create the JSON command.
          * @param {string} action The thing that the device should do.
          * @param {string} name The text on the button that sends the command.
-         * @param {object} req_params Required parameters for the command. See 
-         *  command_syntax_doc.js for details.
-         * @param {object} opt_params Optional parameters for the command. See 
-         *  command_syntax_doc.js for details.
+         * @param {object} req_params Required parameters for the command.
+         * @param {object} opt_params Optional parameters for the command. 
          */
         base_command(device_type, action, name, req_params, opt_params) {
 
@@ -80,7 +90,11 @@ export const commands_mixin = {
                     timestamp: parseInt(Date.now() / 1000),
                     action: action,
                     required_params: req_params || {},
-                    optional_params: opt_params || {},
+                    optional_params: {
+                        instrument_selector_position: this.selector_position,
+                        telescope_selection: this.telescope_selection,
+                        ...(opt_params || {}),
+                    }
                 }
             }
 
@@ -98,6 +112,99 @@ export const commands_mixin = {
             return this.base_command( 'focuser', 'move_relative', 'focus',
                 { position: microns.toString(), }
             )
+        },
+        focus_auto_command(num_focus_pts) {
+            return this.base_command(
+                'focuser',
+                'autofocus',
+                '',
+                {
+                    num_focus_pts: num_focus_pts,
+                },
+                {}
+            )
+        },
+        mount_slew_clickposition_command(x, y, filename) {
+            return this.base_command(
+                'mount',
+                'center_on_pixels',
+                '',
+                {
+                    image_x: x,
+                    image_y: y,
+                    base_filename: filename
+                },
+                {}
+            )
+        },
+        // Alternative to the command_button component
+        async postCommand(formCreatorFunction, args) {
+
+            const options = await this.getAuthHeader()
+            let form = formCreatorFunction(...args).form
+            const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.sitecode}`
+
+            form.timestamp = parseInt(Date.now() / 1000)
+            form.site = this.sitecode
+            form.mount = this.active_mount
+
+            console.log(form)
+            axios.post(url,form, options).then(response => {
+                console.log(response.data)
+                this.$emit('jobPost', response.data)
+            }).catch(e => {
+                this.handleNotAuthorizedResponse(e)
+            })
+        },
+        async getAuthHeader() {
+            let token, configWithAuth;
+            try {
+                token = await this.$auth.getTokenSilently(); 
+            } catch(err) {
+                console.error(err)
+                console.warn('Did not acquire the needed token. Stopping request.')
+                
+                // small popup notification
+                this.$buefy.toast.open({
+                    duration: 5000,
+                    message: "Oops! You need to be logged in to do that.",
+                    position: 'is-bottom',
+                    type: 'is-danger' ,
+                })
+                //return {}
+            }
+
+            return {
+                'headers': {
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        },
+
+        handleNotAuthorizedResponse(error) {
+        if (error.response) {
+            // Request made and server responded
+            console.log("error message", error.response.data);
+            console.log("error status", error.response.status);
+            console.log("error headers", error.response.headers);
+            // small popup notification describing error
+            this.$buefy.toast.open({
+            duration: 5000,
+            message: `${error.response.status} error: ${error.response.data}`,
+            position: 'is-bottom',
+            type: 'is-danger' ,
+            })
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.warn("The request was made but no response was received.")
+            console.log(error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.warn("Something happened in setting up the request that triggered an error.")
+            console.log('Error', error.message);
+        }
         },
 
     },
@@ -138,6 +245,9 @@ export const commands_mixin = {
 
         // User-supplied command parameters
         ...mapGetters('command_params', [
+            'telescope_selection', 
+            'telescope_coordinate_frame', 
+
             'subframeIsActive',
             'subframeDefinedWithFile',
             'subframe_x0',
@@ -146,7 +256,7 @@ export const commands_mixin = {
             'subframe_y1',
 
             'camera_areas_selection',
-            'camera_hint',
+            'camera_note',
             'camera_exposure',
             'camera_count',
             'camera_bin',
@@ -159,6 +269,8 @@ export const commands_mixin = {
             'camera_de_ice_cooling',
 
             'filter_wheel_options_selection',
+            
+            'selector_position',
 
             'focuser_relative',
             'focuser_absolute',
@@ -235,6 +347,10 @@ export const commands_mixin = {
             get() { return this.$store.getters['site_config/sequencer'] },
             set(value) { this.$store.commit('site_config/setActiveSequencer', value) }
         },
+        active_selector: {
+            get() { return "selector_not_from_config"},
+            set(value) { return }
+        },
 
 
         command_url: function () {
@@ -264,8 +380,8 @@ export const commands_mixin = {
             }
 
             // Avoid empty strings (thanks, dynamodb)
-            if (this.camera_hint != '') {
-                opt_params["hint"] = this.camera_hint
+            if (this.camear_note != '') {
+                opt_params["hint"] = this.camera_note
             }
 
             // If active, add subframe parameters.
@@ -286,6 +402,12 @@ export const commands_mixin = {
         camera_cancel_command () {
             return this.base_command( 'camera', 'stop', 'cancel' )
         },
+        camera_darkslide_open_command () {
+            return this.base_command( 'camera', 'darkslide_open', 'open' )
+        },
+        camera_darkslide_close_command () {
+            return this.base_command( 'camera', 'darkslide_close', 'close' )
+        },
         enclosure_open_command () {
             return this.base_command( 'enclosure', 'open', 'Request Roof to Open')
         },
@@ -302,12 +424,21 @@ export const commands_mixin = {
                 {},
                 { username: this.username })
         },
-        mount_slew_command () {
+        mount_slew_radec_command () {
             let ra = emptyString(this.mount_ra.toString())
             let dec = emptyString(this.mount_dec.toString())
             let obj = emptyString(this.mount_object.toString())
-            return this.base_command( 'mount', 'go', 'slew to coordinates',
-                { ra: ra, dec: dec, },
+            return this.base_command( 'mount', 'go', 'slew to RA/Dec',
+                { ra: ra, dec: dec, frame: this.telescope_coordinate_frame },
+                { object: obj }
+            )
+        },
+        mount_slew_azalt_command () {
+            let az = emptyString(this.mount_ra.toString())
+            let alt= emptyString(this.mount_dec.toString())
+            let obj = emptyString(this.mount_object.toString())
+            return this.base_command( 'mount', 'go', 'slew to az/alt',
+                { az: az, alt: alt, frame: this.telescope_coordinate_frame },
                 { object: obj }
             )
         },
@@ -326,6 +457,12 @@ export const commands_mixin = {
         mount_stop_command () {
             return this.base_command( 'mount', 'stop', 'stop movement' )
         },
+        mount_tracking_on_command() {
+            return this.base_command( 'mount', 'set_tracking_on', 'Start Tracking' )
+        },
+        mount_tracking_off_command() {
+            return this.base_command( 'mount', 'set_tracking_off', 'Stop Tracking' )
+        },
         mount_park_command () {
             return this.base_command( 'mount', 'park', 'park' )
         },
@@ -342,6 +479,7 @@ export const commands_mixin = {
         mount_raSidDec0_command () {
             return this.base_command( 'mount', 'ra=sid, dec=0', 'ra=sid, dec=0')
         },
+
         focus_relative_command () {
             let focus_relative = emptyString(this.focuser_relative.toString())
             return this.base_command( 'focuser', 'move_relative', 'focus',
@@ -354,9 +492,6 @@ export const commands_mixin = {
                 { position: focus_abs, } 
             )
         },
-        focus_auto_command () {
-            return this.base_command( 'focuser', 'auto', 'autofocus' )
-        },
         focus_home_command () {
                 return this.base_command( 'focuser', 'home', 'home' )
         },
@@ -364,7 +499,7 @@ export const commands_mixin = {
             return this.base_command('focuser', 'fine_focus', 'fine focus' )
         },
         focus_vcurve_command () {
-            return this.base_command('focuser', 'v_curve', 'v-curve focus' )
+            return this.base_command('focuser', 'v_curve', 'Find Focus (v-curve)' )
         },
         focus_gotoreference_command () {
             return this.base_command('focuser', 'go_to_reference', 'go to reference' )
@@ -378,6 +513,7 @@ export const commands_mixin = {
         focus_stop_command () {
             return this.base_command( 'focuser', 'stop', 'stop' )
         },
+
         filter_wheel_command () {
             return this.base_command( 'filter_wheel', 'set_name', 'apply',
                 { filter_name: this.filter_wheel_options_selection},

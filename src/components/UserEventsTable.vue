@@ -148,19 +148,22 @@ export default {
     created() {
         window.moment = moment; // use moment lib in browser devtools
 
-        //this.getUserEvents()
-        this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
-        this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+        // Only do this if the active user is authenticated and loaded.
+        if (this.user.sub) {
+            this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
+            this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+        }
     },
     destroyed() {
     },
     watch: {
 
         user() {
-            console.log('user: ', this.user)
-            //this.getUserEvents()
-            this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
-            this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+            // Only do this if the active user is authenticated and loaded.
+            if (this.user.sub) {
+                this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
+                this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+            }
         },
 
     },

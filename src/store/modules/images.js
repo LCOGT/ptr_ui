@@ -8,7 +8,6 @@ import axios from 'axios'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
 import { data } from 'jquery'
 
-
 function user_id() {
     if (getInstance().user) {
         return getInstance().user.sub
@@ -40,6 +39,9 @@ const getters = {
     recent_images: state => state.recent_images,
     user_images: state => state.user_images,
     show_user_data_only: state => state.show_user_data_only,
+
+    large_fits_exists: state => !state.current_image.ex01_fits_exists,
+    small_fits_exists: state => !state.current_image.ex10_fits_exists,
 }
 
 const mutations = {
@@ -106,7 +108,7 @@ const actions = {
         // otherwise add it to the stack. 
         axios.get(apiName+path).then(async response => {
 
-            console.log(response.data)
+            console.log('update_new_image response: ', response.data)
 
             // Empty response. If this runs, something is wrong. 
             if (response.data.length == 0) { 
@@ -152,29 +154,42 @@ const actions = {
                 commit('setCurrentImage', new_image)
             }
         }).catch(error => {
-            console.warn("Error in vuex 'images/update_new_image': ", error)
+            // Most likely: no jpg availaable
+            console.log(error)
+            if (error.status == 404) {
+                console.log('update_new_image: not found, probably because\
+                there was no jpg included in the db')
+            }
+            else {
+                console.warn("Error in vuex 'images/update_new_image': ", error)
+            }
+
         });
     },
 
     /**
      *  This action will retrieve a list of images filtered by the parameters in filter_params
      */
-    get_filtered_images({ commit, state, rootState }, filter_params) {
+    get_filtered_images({ commit, dispatch, rootState }, filter_params) {
         console.log(filter_params)
         let apiName = rootState.dev.active_api;
-        let path = `/filtered_images`;
-        //let url = apiName+path;
+        let url = apiName + '/filtered_images';
         let body = { 
             method: "GET",
             params: filter_params,
             baseURL: apiName,
-            url: path,
+            url: url,
         }
         axios(body).then(response => {
             response = response.data
-            commit('setUserImages', response)
-            let recent_image_list = response.slice(0, 40)
-            commit('setRecentImages', recent_image_list)
+
+            // Empty response:
+            if (response.length == 0) { 
+                dispatch('display_placeholder_image') 
+                return; 
+            }
+
+            commit('setRecentImages',response)
         }).catch(error => {
             console.warn(error)
         });
@@ -268,29 +283,37 @@ const actions = {
 
 
     set_next_image({ commit, state }) {
-        let i = state.current_image.recency_order
-        let lastImageIndex = state.recent_images.length - 1
-
-        if (i == lastImageIndex) {
-            let the_next_image = state.recent_images[0]
-            commit('setCurrentImage', the_next_image)
-        } else {
-            let the_next_image = state.recent_images[i + 1]
-            commit('setCurrentImage', the_next_image)
+        let next_image
+        let index = state.recent_images.indexOf(state.current_image);
+        if (index >= 0 && index < state.recent_images.length - 1) {
+            next_image = state.recent_images[index + 1]
+            commit('setCurrentImage', next_image)
         }
     },
     set_previous_image({ commit, state }) {
-        let i = state.current_image.recency_order
-        let lastImageIndex = state.recent_images.length - 1
-
-        if (i == 0) {
-            let the_previous_image = state.recent_images[lastImageIndex]
-            commit('setCurrentImage', the_previous_image)
-        } else {
-            let the_previous_image = state.recent_images[i - 1]
-            commit('setCurrentImage', the_previous_image)
+        let prev_image
+        let index = state.recent_images.indexOf(state.current_image);
+        if (index >= 1) {
+            prev_image = state.recent_images[index - 1]
+            commit('setCurrentImage', prev_image)
         }
-    }
+    },
+
+    async get_fits_url({rootState}, {base_filename, ex_type}) {
+
+        // Get the global configuration for all sites from an api call.
+        const apiName = rootState.dev.active_api
+
+        const path = '/download';
+        let body = {
+            object_name: `${base_filename}-${ex_type}.fits.bz2`
+        }
+        console.log(path, body)
+        const fits_url = await axios.post(apiName+path, body);
+
+        console.log(fits_url.data)
+        return fits_url.data;
+    },
 
 }
 

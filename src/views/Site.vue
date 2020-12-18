@@ -1,48 +1,76 @@
 <template>
   <div class="page">
+
+    <b-navbar wrapper-class="container site-menu" class="is-hidden-touch is-hidden-desktop-only">
+        <template slot="brand">
+        </template>
+        <template slot="start">
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/home'}">
+              Home
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/observe'}">
+              Observe
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/targets'}">
+              Targets
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/projects'}">
+              Projects
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/calendar'}">
+              Calendar
+            </b-navbar-item>
+        </template>
+
+        <template slot="end">
+        </template>
+    </b-navbar>
     
-    <div class="container">
-    <section class="page-view">
+    <div class="container page-view">
+
+    <!--b-tabs type="is-boxed">
+      <b-tab-item>
+        <template #header>
+          <b-icon icon="information-outline"></b-icon>
+          <span> Issues <b-tag rounded> 3 </b-tag> </span>
+        </template>
+      </b-tab-item>
+      <b-tab-item>
+        <template #header>
+          <b-icon icon="source-pull"></b-icon>
+          <span> Pull Requests <b-tag rounded>5</b-tag> </span>
+        </template>
+      </b-tab-item>
+    </b-tabs-->
+
+    <div class="mobile-site-menu is-hidden-widescreen">
+      <router-link :to="'/site/'+sitecode+'/home'">
+        <button class="button" >Home</button>
+      </router-link>
+      <router-link :to="'/site/'+sitecode+'/observe'">
+        <button class="button" >Observe</button>
+      </router-link>
+      <router-link :to="'/site/'+sitecode+'/targets'">
+        <button class="button" >Targets</button>
+      </router-link>
+      <router-link :to="'/site/'+sitecode+'/projects'">
+        <button class="button" >Projects</button>
+      </router-link>
+      <router-link :to="'/site/'+sitecode+'/calendar'">
+        <button class="button" >Calendar</button>
+      </router-link>
+    </div>
 
     <div style="height: 1em"></div>
     <div class="columns" style="margin: 1em;">
 
-      <div class="column menu-column is-one-fifth is-hidden-touch is-hidden-desktop-only">
+      <div class="column menu-column is-2 is-hidden-touch is-hidden-desktop-only" v-if="false">
 
-        <!-- Show whether a site is currently reserved or not -->
-        <!-- TODO: refactor into it's own component -->
-        <div class="site-reservation-status-box">
-          <!-- Display if there are no current reservations --> 
-          <div v-if="!hasActiveReservation"> 
-            <p class="menu-label site-not-reserved-notice">
-              no active reservations
-            </p>
-            <p>Next in: 0h 0m</p>
-            <p style="color: #555">(timer not implemented)</p>
-          <div style="height: 5px;" />
-          </div>
-
-          <!-- Display if the site is currently reserved for use (and not by current user). --> 
-          <div v-if="hasActiveReservation && !userHasActiveReservation"> 
-            <p class="menu-label site-reserved-notice">
-              Site is reserved 
-            </p>
-            <p>Remaining: {{timeRemainingForSoonestCurrentReservation}}</p>
-          </div>
-
-          <!-- Display if the site is currently reserved by the active user --> 
-          <div v-if="userHasActiveReservation"> 
-            <p class="menu-label site-reserved-current-user">
-              Reserved for you
-            </p>
-            <p>Remaining: {{userReservationTimeRemaining}}</p>
-          </div>
-
-          <div style="height: 5px;" />
-          <router-link :to="`/site/${sitecode}/calendar`"> 
-            <b-button size="is-small" class="button is-dark" icon-right="calendar">view calendar</b-button>
-          </router-link>
-        </div>
 
         <!-- Site menu for desktop or larger. Replaces bottom menu. -->
         <b-menu class="subpage-menu">
@@ -92,113 +120,30 @@
           @whosonline="makeOnlineUsersList" />
 
         <div style="height:3em;"/>
-
-        <status-panel-collapsible
-          :sitecode="sitecode"
-          :fullStatus="weather_state"
-          :statusList="buildWeatherStatus"
-          :statusAge="status_age"
-          >
-          <p slot="title">{{sitecode}} weather</p>
-        </status-panel-collapsible>
-
-        <status-panel-collapsible
-          :sitecode="sitecode"
-          :fullStatus="deviceStatus"
-          :statusList="buildGeneralStatus"
-          :statusAge="status_age"
-          >
-          <p slot="title">{{sitecode}} status</p>
-        </status-panel-collapsible>
-
       </div>
-
 
       <!-- Primary content of the page. Selects from the various site subpages. -->
       <!-- Note: wait for parent (this component) to mount before loading child components. 
       Otherwise, props may initially load as null. -->
+      <div class="column">
         <component 
-          style="width: 100%"
           v-bind:is="`site-${subpage}`"
           :sitecode="sitecode"
           :deviceStatus="deviceStatus"
           />
-      </div>
-    </section>
-    </div>
-
-    <footer class="footer is-hidden-touch">
-      <div class="has-text-centered">
-        <p>
-          You are currently observing from site 
-          <span class="is-uppercase" style="color: greenyellow">{{sitecode}}</span> in the 
-          <strong>photon ranch</strong> network.
-        </p>
-      </div>
-    </footer>
-
-
-    <!-- Bottom site menu for tablet and mobile. Replaces left side menu. -->
-    <div class="mobile-menu ">
-      <status-row
-        :statusList="buildGeneralStatus" 
-        class="is-mobile is-hidden-widescreen"
-        style="margin: 0; padding: 0; background-color: #151718;"
-        :statusAge="status_age" />
-      <div class="level is-mobile is-hidden-widescreen">
-
-        <b-tooltip label="Home" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/home'"
-            icon-right="home"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
-
-        <b-tooltip label="Observe" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/observe'"
-            icon-right="telescope"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
-        
-        <b-tooltip label="Target Explorer" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/targets'"
-            icon-right="target"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
-
-        <b-tooltip label="Projects" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/projects'"
-            icon-right="folder-multiple-image"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
-
-        <b-tooltip label="Calendar" type="is-dark" class="level-item">
-          <b-button tag="router-link"
-            class="mobile-menu-button level-item"
-            size="is-large"
-            :to="'/site/'+sitecode+'/calendar'"
-            icon-right="calendar"
-            type="is-text">
-          </b-button>
-        </b-tooltip>
+          </div>
       </div>
     </div>
 
+    <site-status-footer 
+      class="is-hidden-mobile"
+      :site="sitecode" 
+      style="position: sticky; bottom: 0;"/>
+
+    <site-status-footer-mobile 
+      class="is-hidden-tablet"
+      :site="sitecode" 
+      style="position: sticky; bottom: 0;"/>
 
   </div>
 </template>
@@ -210,6 +155,8 @@ import ChatModule from '@/components/ChatModule'
 import SideInfoPanel from '@/components/SideInfoPanel'
 import StatusPanelCollapsible from '@/components/status/StatusPanelCollapsible'
 import StatusRow from '@/components/status/StatusRow'
+import SiteStatusFooter from '@/components/status/SiteStatusFooter'
+import SiteStatusFooterMobile from '@/components/status/SiteStatusFooterMobile'
 
 import SiteHome from '@/components/sitepages/SiteHome'
 import SiteObserve from '@/components/sitepages/SiteObserve'
@@ -239,6 +186,8 @@ export default {
     SideInfoPanel,
     StatusPanelCollapsible,
     StatusRow,
+    SiteStatusFooter,
+    SiteStatusFooterMobile,
   },
   props: ['sitecode', 'subpage'],
   mixins: [commands_mixin, status_mixin],
@@ -281,6 +230,8 @@ export default {
   },
 
   async created () {
+
+    console.log('site created, sitecode: ', this.sitecode)
 
     // Load the active reservations for this site. 
     this.$store.dispatch('calendar/fetchActiveReservations', this.sitecode)
@@ -361,59 +312,6 @@ export default {
         'weather',
     ]),
 
-    ...mapState('calendar', [
-        'active_reservations'
-    ]),
-    ...mapGetters('calendar', [
-        'hasActiveReservation', 
-        'usersWithActiveReservation',
-        'userIDsWithActiveReservation',
-        'endOfUserReservation',
-        'endOfNextReservation',
-    ]),
-
-    userHasActiveReservation() {
-      if (this.$auth.isAuthenticated) {
-        let user_id = this.$auth.user.sub
-        return this.userIDsWithActiveReservation.includes(user_id)
-      }
-      else {
-        return false
-      }
-    },
-
-    timeRemainingForSoonestCurrentReservation() {
-      let expire_time = this.endOfNextReservation
-      let current_time = this.current_time_millis
-      let delta = expire_time - current_time
-
-      let millis_per_minute = 60 * 1000
-      let millis_per_hour = 3600 * 1000
-
-      let hours_left = Math.floor(delta / millis_per_hour)
-      let minutes_left = Math.floor((delta - (hours_left * millis_per_hour)) / millis_per_minute)
-      return `${hours_left}h ${minutes_left}m`
-    },
-
-    userReservationTimeRemaining() {
-      if (this.$auth.isAuthenticated) {
-        let user_id = this.$auth.user.sub
-        let expire_time = this.endOfUserReservation(user_id)
-        let current_time = this.current_time_millis
-        let delta = expire_time - current_time
-
-        let millis_per_minute = 60 * 1000
-        let millis_per_hour = 3600 * 1000
-
-        let hours_left = Math.floor(delta / millis_per_hour)
-        let minutes_left = Math.floor((delta - (hours_left * millis_per_hour)) / millis_per_minute)
-        return `${hours_left}h ${minutes_left}m`
-      }
-      else {
-        return "0h 0m"
-      }
-
-    },
 
     // Get the username from Auth0
     username() {
@@ -437,10 +335,8 @@ export default {
 
     /**
      * Set the default devices for this site.
-     * First, update the config. Then use the config to specify devices.
      */
     async setDefaultDevices() {
-      await this.$store.dispatch('site_config/update_config')
       this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
     },
 
@@ -455,30 +351,16 @@ export default {
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
 @import "../style/_variables.scss";
 
-
 .menu-column {
-  width: 300px;
   height: auto;
   padding: 0 auto;
-  margin-right: 40px;
 }
 
-.site-not-reserved-notice {
-  color: $info;
-}
-.site-reserved-notice {
-  color: yellow;
-}
-.site-reserved-current-user {
-  color: greenyellow;
+.status-column {
+  max-width: 250px;
 }
 
-.site-reservation-status-box {
-  background-color: black;
-  border-radius: 8px;
-  padding: 1em;
-  margin-bottom: 1em;
-}
+
 
 .subpage-menu {
   margin-bottom: 3em;
@@ -490,43 +372,24 @@ export default {
   padding-left: 1em;
 }
 
-.mobile-menu {
-  background-color: darken($dark, 3);
-  position: fixed;
-  bottom: 0;
+
+.mobile-site-menu {
   width: 100%;
-  z-index: 10;
+  top: 0;
+  bottom: 300px;
+  z-index: 0;
 }
-.mobile-menu-button.level-item {
-  background-color:hsla(0,0,0,0);
-  border: none;
+.mobile-site-menu button {
   border-radius: 0;
-  color:grey;
-  padding-top: 1.5em;
-  padding-bottom: 2.5em;
-  
-}
-.mobile-menu-button.is-active.router-link-active.is-large.is-text {
-  background-color:hsla(0,0,0,0);
-  color:white;
-  box-shadow: none;
+  width: 20%;
+  font-size: 12px;
+  background-color: $dark;
 }
 
-.page-content {
-  margin-bottom: 200px;
-}
+
 .page-view {
   /* min height: screen + footer + visual buffer */
-  height: 1400px;
-  margin: 0 auto; /* center the main div */
-}
-
-footer {
-  display:none;
-  position:absolute;
-  bottom: 0;
-  width: 100vw;
-  padding: 2em 1em 2em; 
+  min-height: 100vh;
 }
 
 
