@@ -117,6 +117,12 @@
                         <status-column 
                             style="padding: 0;"
                             :isOffline="!isOnline"
+                            :statusList="status_age_enclosure_status"/>
+                    </div>
+                    <div>
+                        <status-column 
+                            style="padding: 0;"
+                            :isOffline="!isOnline"
                             :statusList="open_safety_status"/>
                     </div>
                     <div>
@@ -290,12 +296,16 @@ export default {
 
 
         // Assemble the list of status elements for the status-column components
-        open_safety_status() {
+        status_age_enclosure_status() {
             return [
                 {"name": "Status Age", ...this.status_age_display},
+                {"name": "Enclosure", "val": this.enclosure_status},
+            ]
+        },
+        open_safety_status() {
+            return [
                 {"name": "Weather OK", ...this.weather_ok},
                 {"name": "Open OK", ...this.open_ok},
-                //{"name": "Enclosure", "val": this.enclosure_status},
             ]
         },
         ra_dec_ha_status() {
@@ -580,7 +590,7 @@ div.log-line:last-of-type * {
 }
 .sidereal-time {
     padding-top: 10px;
-    font-size: 30px;
+    font-size: 20px;
 }
 .sidereal-time.offline {
     color: grey;
