@@ -225,7 +225,10 @@
                     v-if="showAdvancedInputs"
                     label="Ra offset" 
                     >
-                    <b-input class="project-input" v-model="project_constraints.ra_offset"></b-input>
+                    <b-input 
+                        style="max-width: 100px"
+                        class="project-input" 
+                        v-model="project_constraints.ra_offset"></b-input>
                     <b-select v-model="project_constraints.ra_offset_units">
                         <option value="deg">deg</option>
                         <option value="min">minutes</option>
@@ -236,7 +239,10 @@
                     v-if="showAdvancedInputs"
                     label="Dec offset" 
                     >
-                    <b-input class="project-input" v-model="project_constraints.dec_offset"></b-input>
+                    <b-input 
+                        style="max-width: 100px"
+                        class="project-input" 
+                        v-model="project_constraints.dec_offset"></b-input>
                     <b-select v-model="project_constraints.dec_offset_units">
                         <option value="deg">deg</option>
                         <option value="asec">arcsec</option>
@@ -269,6 +275,7 @@
                     v-model="project_constraints.max_ha"></b-numberinput>
             </b-field>
             <b-field 
+                style="max-width: 150px;"
                 v-if="showAdvancedInputs"
                 label="Max Airmass" 
                 :type="{'is-danger': warn.max_airmass}"
