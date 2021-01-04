@@ -8,8 +8,14 @@
         <svg 
           id='image_svg' 
           ref="svgElement" 
+          style="border: 1px solid gold;"
           :class="{'image-div-pointer-cross':subframeIsVisible}" 
-          v-show="!js9IsVisible"/>
+          v-show="!js9IsVisible"
+          >
+            <svg-circle />
+            <line x1="0" y1="80" x2="100" y2="20" stroke="blue" />
+          </svg>
+
 
         <img
           id="main-image"
@@ -113,6 +119,14 @@
 
       </div>
 
+      <button class="button" @click="addNewLine"> add new line </button>
+      <button class="button" @click="updateLines">update lines</button>
+      <button class="button" @click="draw_star_markers">draw starmarkers</button>
+      <button class="button" @click="drawSubframe">draw subs</button>
+      width:{{imageWidth}}
+      height:{{imageHeight}}
+      <pre>{{lines}}</pre>
+
       <!--pre style="max-width: 500px;">
         {{current_image}}
       </pre-->
@@ -131,10 +145,13 @@ import { SnackbarProgrammatic as Snackbar } from "buefy";
 import JS9 from "@/components/JS9";
 import * as d3 from "d3";
 
+import SvgCircle from "@/components/ImageView/SvgCircle"
+
 export default {
   name: "ImageView",
   components: {
-    JS9
+    JS9,
+    SvgCircle,
   },
   mixins: [commands_mixin],
   props: {
@@ -155,6 +172,7 @@ export default {
     u_brightest_star_pos_y: Number,
     u_brightest_plot_color: String,
   },
+
   data() {
     return {
       placeholder_image: require('@/assets/logo.png'),
@@ -195,27 +213,56 @@ export default {
 
       // Runs a function at a regular interval to update the size of the image component.
       syncImageSize: '',
-      syncImageInterval: 1000,
+      syncImageInterval: 3000,
 
       js9width: 200,
-      js9height: 500
+      js9height: 500,
+
+
+
+      /*** experimenting ***/
+      svg: '',
+
+      changeLines: '',
+
+      lines: [
+        {x1: 60, y1: 350, x2: 90, y2: 100, fill: "green", show: true},
+        {x1: 50, y1: 150, x2: 100, y2: 200, fill: "red", show: true},
+        {x1: 70, y1: 300, x2: 80, y2: 400, fill: "gold", show: true},
+      ],
+
+
+
+      /*** end experimenting ***/
+
     };
   },
+
   created() {
     this.$store.commit("site_config/setActiveSite", this.site);
     this.$store.dispatch("images/load_latest_images");
 
+
     // Keep the displayed image element width and height in sync.
     // This is important for relative measurements on the image (crosshairs, clicks, etc)
+    window.addEventListener('resize', this.get_image_element_dimensions)
+
+    // replace with this instead: https://github.com/marcj/css-element-queries
     this.syncImageSize = setInterval(
       this.get_image_element_dimensions,
       this.syncImageInterval
     );
+
+    this.lineInterval = setInterval(
+      this.changeline, 3000
+    )
   },
 
   beforeDestroy() {
     // We don't need to keep the image dimensions in sync if it's not displayed.
+    window.removeEventListener('resize', this.get_image_element_dimensions)
     clearInterval(this.syncImageSize);
+    clearInterval(this.lineInterval);
   },
 
   watch: {
@@ -259,15 +306,84 @@ export default {
       this.draw_star_markers()
     },
 
+    lines: function() {
+      this.updateLines()
+    },
+
   },
 
   mounted() {
-    this.init()
-
-    this.init()
+    //this.init()
+    //this.init()
+    this.get_image_element_dimensions()
+    this.newInit()
   },
 
   methods: {
+
+    updateAll() {
+      this.updateLines()
+      this.draw_star_markers()
+      this.drawSubframe()
+
+    },
+
+    changeline() {
+      this.lines[0].x1 += 1 
+      this.updateAll()
+    },
+
+    addNewLine() {
+      let newline = {
+        x1: this.imageWidth * Math.random(),
+        x2: this.imageWidth * Math.random(),
+        y1: this.imageHeight * Math.random(),
+        y2: this.imageHeight * Math.random(),
+        fill: 'purple',
+        show: true,
+      }
+      this.lines.push(newline)
+      this.updateLines()
+    },
+
+    updateLines() {
+      function handleLineMouseOver(d, i) {  // Add interactivity
+        // Use D3 to select element, change color and size
+        d3.select(this)
+          .attr('stroke-width', 5)
+          .attr('stroke', 'orange')
+      }
+      console.log('updating lines')
+      this.svg.selectAll('line')
+        .data(this.lines)
+        .join('line')
+        .attr("x1", d => d.x1)
+        .attr("x2", d => d.x2)
+        .attr("y1", d => d.y1)
+        .attr("y2", d => d.y2)
+        .attr("stroke-width", 3)
+        .attr("stroke", d => d.fill)
+        .on('mouseover', handleLineMouseOver)
+        .on('mouseout', this.handleLineMouseOut)
+    },
+    handleLineMouseOut(d, i) {
+      this.updateAll()
+    },
+
+    newInit() {
+      this.svg = d3.select('#image_svg')
+      this.init()
+      this.updateAll()
+
+      //this.changeLines = setInterval(this.changeline, 5000)
+        
+      //this.updateLines()
+
+
+
+      console.log(this.svg)
+      
+    },
 
 
     init() {
@@ -401,13 +517,14 @@ export default {
         .attr("y", minY)
         .attr("width",width)
         .attr("height", height)
+
     },
 
     // Resize the image element to fit the browser window
     get_image_element_dimensions() {
 
 
-      let imageWindow = this.$refs.imagewindow.getBoundingClientRect();
+      let imageWindow = document.getElementById('image-window').getBoundingClientRect();
 
       if (this.js9IsVisible) {
         let resize_opts = {
@@ -418,27 +535,27 @@ export default {
         this.$store.dispatch('js9/resizeDisplay', resize_opts)
       } else {
         // Resize the image displayed
-        let svgRect = this.$refs.svgElement.getBoundingClientRect();
-        let imageEl = this.$refs.image
+        let svgRect = document.getElementById('image_svg').getBoundingClientRect();
+        let imageEl = document.getElementById('main-image')
 
         // If nothing changed, we're done.
         if (this.js9width==svgRect.width && this.js9height==svgRect.height) {
           return;
         }
         // This is fed to js9 just before displaying to set the matching size. 
-        this.js9width=svgRect.width
-        this.js9height=svgRect.width
+        this.js9width=parseInt(svgRect.width)
+        this.js9height=parseInt(svgRect.width)
 
-        imageEl.setAttribute("width", svgRect.width)
-        imageEl.setAttribute("height", svgRect.height)
+        imageEl.setAttribute("width", parseInt(svgRect.width))
+        imageEl.setAttribute("height", parseInt(svgRect.height))
         // Resize the svg
         // WARNING: this may have bugs if image is not a square.
         let imageRect = this.$refs.image.getBoundingClientRect();
-        this.imageWidth = imageRect.width
-        this.imageHeight = imageRect.height
+        this.imageWidth = parseInt(imageRect.width)
+        this.imageHeight = parseInt(imageRect.height)
       }
       
-      this.draw_star_markers()
+      //this.draw_star_markers()
       this.drawSubframe()
     },
 
