@@ -37,7 +37,11 @@
 
           <div class="val">{{enclosure_state.enclosure_message}}</div>
 
-          <status-column :statusList="buildEnclosureTabStatus" />
+          <status-column 
+            class="status-column"
+            :statusList="buildEnclosureTabStatus" 
+            :isOffline="!isOnline"
+          />
 
           <command-button 
             admin
@@ -85,7 +89,11 @@
             </div>
           </div>
 
-          <status-column :statusList="buildScreenTabStatus" />
+          <status-column 
+            class="status-column"
+            :statusList="buildScreenTabStatus" 
+            :isOffline="!isOnline"
+          />
 
           <b-field label="Brightness">
             <b-field>
@@ -151,20 +159,26 @@
           </b-field>
 
           <div class="columns">
-            <status-column class="column" :statusList="buildTelescopeTabStatus1"/>
-            <status-column class="column" :statusList="buildTelescopeTabStatus2"/>
+            <status-column
+              class="status-column"
+              :statusList="buildTelescopeTabStatus1"
+              :isOffline="!isOnline" />
+            <status-column
+              class="status-column column"
+              :isOffline="!isOnline"
+              :statusList="buildTelescopeTabStatus2"/>
           </div>
 
           <b-field horizontal label="Ra/Az/Long">
             <b-field>
               <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
-              <!--p class="control"><span class="button is-light is-static is-small">hrs</span></p-->
+              <!--p class="control"><span class="button is-static is-small">hrs</span></p-->
             </b-field>
           </b-field>
           <b-field horizontal label="Dec/Alt/Lat">
             <b-field>
               <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
-              <!--p class="control"><span class="button is-light is-static is-small">deg</span></p-->
+              <!--p class="control"><span class="button is-static is-small">deg</span></p-->
             </b-field>
           </b-field>
           <b-field horizontal label="Object">
@@ -251,7 +265,11 @@
             </div>
           </div>
 
-          <status-column :statusList="buildRotatorTabStatus" />
+          <status-column 
+            class="status-column"
+            :isOffline="!isOnline"
+            :statusList="buildRotatorTabStatus" 
+          />
           <command-button :data="rotate_home_command" class="is-small" style="width:100%; margin-bottom:1em;"/>
           <b-field label="Relative">
             <b-field>
@@ -287,7 +305,11 @@
           </div>
 
           <div class="val" v-if="focuser_state && focuser_state.message">{{focuser_state.message}}</div>
-          <status-column :statusList="buildFocuserTabStatus" />
+          <status-column 
+            class="status-column"
+            :statusList="buildFocuserTabStatus" 
+            :isOffline="!isOnline"
+          />
 
           <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
             <button class="button is-small" slot="trigger" style="width: 100%;">
@@ -383,7 +405,11 @@
             </div>
           </div>
 
-          <status-column :statusList="buildEmptyStatus" />
+          <status-column 
+            class="status-column"
+            :isOffline="!isOnline"
+            :statusList="buildEmptyStatus" 
+          />
 
         <b-field label="Instrument Selection">
           <b-select v-model="selector_position">
@@ -418,18 +444,22 @@
 
           <div class="val" v-if="camera_state && camera_state.message">{{camera_state.message}}</div>
 
-          <status-column :statusList="buildCameraTabStatus" />
+          <status-column 
+            class="status-column"
+            :statusList="buildCameraTabStatus" 
+            :isOffline="!isOnline"
+          />
 
           <b-field horizontal label="Expose">
               <b-field>
                   <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
-                  <p class="control"> <span class="button is-light is-static is-small">s</span> </p>
+                  <p class="control"> <span class="button is-static is-small">s</span> </p>
               </b-field>
           </b-field>
 
           <b-field horizontal label="Count">
               <b-field>
-                  <b-numberinput name="subject" type="is-light" min="1" size="is-small" controls-position="compact" v-model="camera_count" autocomplete="off"></b-numberinput>
+                  <b-numberinput name="subject" type="is-button" min="1" size="is-small" controls-position="compact" v-model="camera_count" autocomplete="off"></b-numberinput>
               </b-field>
           </b-field>
 
@@ -581,7 +611,11 @@
           </div>
 
           <div class="val" v-if="sequencer_state && sequencer_state.message">{{sequencer_state.message}}</div>
-          <status-column :statusList="buildSequencerTabStatus" />
+          <status-column 
+            class="status-column"
+            :statusList="buildSequencerTabStatus" 
+            :isOffline="!isOnline"
+          />
 
           <b-field label="Script">
             <b-field>
@@ -611,7 +645,7 @@
               </b-select>
               <p class="control">
                 <button 
-                  class="button is-light is-small" 
+                  class="button is-small" 
                   :disabled="!scriptHasSettings"
                   @click="isScriptSettingsActive = !isScriptSettingsActive"
                   >
@@ -1168,6 +1202,10 @@ export default {
   background-color: rgba(20,20,20,0.9)
 }
 
+.status-column {
+  padding-bottom: 15px;
+  padding-top: 15px;
+}
 
 .status-toggle-bar {
   height: 1.5em;

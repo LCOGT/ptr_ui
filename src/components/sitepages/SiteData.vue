@@ -40,6 +40,7 @@
         </b-radio-button>
       </b-field>
 
+
       <!-- Basic image info and a button to reveal the full fits header -->
       <side-info-panel :startOpen="true">
 
@@ -301,6 +302,8 @@ export default {
   },
   data() {
     return {
+      accordionIsOpen: 1,
+
       fitsHeader: {},
       showFitsHeaderModal: false,
       headerIsLoading: false,
@@ -830,7 +833,11 @@ export default {
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
+@import "@/style/buefy-styles.scss";
+
+
+
 
 table.info-panel-table { color: #dbdee0; }
 .blank-row { height: 1.5em; }
