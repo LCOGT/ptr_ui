@@ -42,7 +42,11 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "~bulma/sass/utilities/_all";
+@import "@/style/buefy-styles.scss";
+
+$status-value-background-color: $input-background-color;
 .status-grid {
     font-size: 14px;
     display:grid;
@@ -63,10 +67,9 @@ export default {
   vertical-align: middle;
 }
 .val{
-  color: greenyellow;
   color: lightgray;
-  background-color: rgb(12, 12, 12);
-  border: 1px solid black;
+  //background-color: $status-value-background-color;
+  border: 1px solid lighten($grey-dark, 3);
   padding: 0 8px;
   white-space: nowrap;
   grid-column-start:2;

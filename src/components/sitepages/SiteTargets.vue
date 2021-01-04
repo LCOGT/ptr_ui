@@ -3,26 +3,24 @@
 
     <div class="page-layout">
 
-        <div class="query-box">
-            <b-field label="Search for objects...">
-                <b-field>
-                    <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
-                </b-field>
-            </b-field>
-            <button style="width: 100%;" class="button" @click="submit_simbad_query">search</button>
-        </div>
-
-        <div class="ptr-aladin-parent-div">
-            <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
-        </div>
-
         <div class="parameters-box">
             <div style="display:flex; flex-direction:column; width: 100%;">
+
+                <b-field label="Search for objects...">
+                    <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
+                    <p class="control">
+                        <b-button @click="submit_simbad_query"><b-icon icon="magnify" /></b-button>
+                    </p>
+                </b-field>
+
+                <div style="
+                        width: 100%; 
+                        height:1px;
+                        margin-bottom:10px; 
+                        border-bottom: 1px solid grey;"/>
+                
                 <b-field>
-                    <b-field>
-                        <p class="control">
-                            <span style="width: 42px;" class="button is-static">Ra</span>
-                        </p>
+                    <b-field label="ra/az/long" horizontal>
                         <b-input 
                             expanded 
                             name="subject" 
@@ -33,10 +31,7 @@
                     </b-field>
                 </b-field>
                 <b-field>
-                    <b-field>
-                        <p class="control">
-                            <span style="width: 42px;" class="button is-light is-static">Dec</span>
-                        </p>
+                    <b-field label="dec/alt/lat" horizontal>
                         <b-input 
                             expanded
                             name="subject" 
@@ -54,12 +49,8 @@
                         border-bottom: 1px solid grey;"/>
 
                 <b-field >
-                    <b-field>
-                        <p class="control">
-                            <span style="width: 110px;" class="button is-light is-static">Pointing Note</span>
-                        </p>
+                    <b-field label="note" horizontal>
                         <b-input 
-                            style="width: calc(100% - 42px);"
                             name="subject" 
                             type="search" 
                             icon-clickable 
@@ -71,6 +62,10 @@
                     <p slot="title">Point Telescope</p>
                 </command-button>
             </div>
+        </div>
+
+        <div class="ptr-aladin-parent-div">
+            <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
         </div>
 
     </div>
@@ -257,8 +252,8 @@ export default {
 .page-layout{
     height: min-content;
     display:flex ;
-    flex-wrap: wrap;
     margin-bottom: 30px;
+    flex-wrap: wrap-reverse;
 }
 .parameters-box {
     padding-top: 20px;
@@ -266,27 +261,21 @@ export default {
     display: flex;
     min-width: 250px;
     max-width: 300px;
-    flex: 1 0 min-content;
 }
+
 #aladin-lite-div {
     min-height: 250px;
     width: 100%;
-    height: 250px;
+    height: 100%;
+    max-height: 450px;
 }
 .ptr-aladin-parent-div {
     margin: 10px;
     min-width: 100px;
     min-height: 100px;
     width: 100%;
-    height: 100%;
-    flex: 3 0 200px;
+    flex: 1 0 200px;
     background-color:grey;
-}
-.query-box {
-    padding-top: 10px;
-    margin: 10px;
-    min-width: 150px;
-    flex: 1 0 min-content;
 }
 .skychart-box {
     width: 100%;

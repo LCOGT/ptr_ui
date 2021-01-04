@@ -20,7 +20,7 @@
             <b-navbar-dropdown label="sites" :close-on-click="true">
                 <template v-for="(site, index) in available_sites">
                   <b-navbar-item tag="router-link" 
-                    :to="{ path: '/site/' + site+ '/home'}"
+                    :to="{ path: '/site/' + site+ '/observe'}"
                     v-bind:key="index"
                     v-if="global_config[site]">
                     {{global_config[site].name}}
@@ -31,8 +31,6 @@
                     About
                 </b-navbar-item>
             </b-navbar-dropdown>
-
-
 
             <!--b-navbar-dropdown label="experimental">
                 <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
@@ -154,6 +152,6 @@ nav {
 }
 .navbar {
   border-radius: 0;
-  z-index:10; /* so the navbar doesn't cover fullscreen modals */
+  z-index:31; /* so the navbar doesn't cover fullscreen modals */
 }
 </style>
