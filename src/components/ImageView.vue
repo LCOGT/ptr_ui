@@ -13,7 +13,6 @@
           v-show="!js9IsVisible"
           >
             <svg-circle />
-            <line x1="0" y1="80" x2="100" y2="20" stroke="blue" />
           </svg>
 
 
@@ -120,9 +119,9 @@
       </div>
 
       <button class="button" @click="addNewLine"> add new line </button>
-      <button class="button" @click="updateLines">update lines</button>
+      <button class="button" @click="updateAll">update all</button>
       <button class="button" @click="draw_star_markers">draw starmarkers</button>
-      <button class="button" @click="drawSubframe">draw subs</button>
+      <button class="button" @click="drawSubframe" title="i'm a title" >draw subs</button>
       width:{{imageWidth}}
       height:{{imageHeight}}
       <pre>{{lines}}</pre>
@@ -144,6 +143,7 @@ import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
 import JS9 from "@/components/JS9";
 import * as d3 from "d3";
+
 
 import SvgCircle from "@/components/ImageView/SvgCircle"
 
@@ -230,6 +230,11 @@ export default {
         {x1: 50, y1: 150, x2: 100, y2: 200, fill: "red", show: true},
         {x1: 70, y1: 300, x2: 80, y2: 400, fill: "gold", show: true},
       ],
+      rects: [
+        {x: 200, y: 200, width: 20, height: 20, stroke: 'pink', show: true},
+        {x: 500, y: 400, width: 10, height: 30, stroke: 'green', show: true},
+        {x: 500, y: 200, width: 10, height: 30, stroke: 'yellow', show: true},
+      ]
 
 
 
@@ -248,21 +253,18 @@ export default {
     window.addEventListener('resize', this.get_image_element_dimensions)
 
     // replace with this instead: https://github.com/marcj/css-element-queries
+    // we do not want this just running on a timer.
     this.syncImageSize = setInterval(
       this.get_image_element_dimensions,
       this.syncImageInterval
     );
 
-    this.lineInterval = setInterval(
-      this.changeline, 3000
-    )
   },
 
   beforeDestroy() {
     // We don't need to keep the image dimensions in sync if it's not displayed.
     window.removeEventListener('resize', this.get_image_element_dimensions)
     clearInterval(this.syncImageSize);
-    clearInterval(this.lineInterval);
   },
 
   watch: {
@@ -323,6 +325,7 @@ export default {
 
     updateAll() {
       this.updateLines()
+      this.updateRects()
       this.draw_star_markers()
       this.drawSubframe()
 
@@ -346,13 +349,81 @@ export default {
       this.updateLines()
     },
 
+    updateRects() {
+
+        function dragstarted() {
+          console.log('drag started')
+          d3.select(this).attr("stroke", "black");
+        }
+
+        function dragged(event, d) {
+          console.log('dragged')
+          d3.select(this).raise().attr("x", d.x = event.x).attr("y", d.y = event.y);
+        }
+
+        function dragended() {
+          console.log('drag ended')
+          d3.select(this).attr("stroke", null);
+        }
+
+      this.svg.selectAll('.custom-rect')
+        .data(this.rects)
+        .join(
+          enter => enter.append("rect"),
+          update => update.attr('fill', 'blue'),
+          exit => exit.remove()
+        )
+        .attr('class', 'custom-rect')
+        .attr('x', r => r.x)
+        .attr('y', r => r.y)
+        .attr('width', r => r.width)
+        .attr('height', r => r.height)
+        .attr('stroke', r => r.stroke)
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        )
+    },
+
+
     updateLines() {
+        function dragstarted() {
+          console.log('drag started')
+          //d3.select(this).attr("stroke", "black");
+        }
+
+        function dragged(event, d) {
+          console.log('dragged')
+          //d3.select(this).raise().attr("x2", d.x = event.x).attr("y2", d.y = event.y);
+          d3.select(this).data()[0].x1 += event.dx;
+          d3.select(this).data()[0].y1 += event.dy;
+          d3.select(this).data()[0].x2 += event.dx;
+          d3.select(this).data()[0].y2 += event.dy;
+          d3.select(this).attr("x1", +d3.select(this).attr("x1") + event.dx);
+          d3.select(this).attr("y1", +d3.select(this).attr("y1") + event.dy);
+          d3.select(this).attr("x2", +d3.select(this).attr("x2") + event.dx);
+          d3.select(this).attr("y2", +d3.select(this).attr("y2") + event.dy);
+        }
+
+        function dragended() {
+          console.log('drag ended')
+          //d3.select(this).attr("stroke", null);
+        }
+
+      function move() {
+            d3.select(this).data()[0].x2 += d3.event.dx;
+            d3.select(this).data()[0].y2 += d3.event.dy;
+            d3.select(this).attr("x2", +d3.select(this).attr("x2") + d3.event.dx);
+            d3.select(this).attr("y2", +d3.select(this).attr("y2") + d3.event.dy);
+        }
       function handleLineMouseOver(d, i) {  // Add interactivity
         // Use D3 to select element, change color and size
         d3.select(this)
           .attr('stroke-width', 5)
           .attr('stroke', 'orange')
       }
+
       console.log('updating lines')
       this.svg.selectAll('line')
         .data(this.lines)
@@ -365,9 +436,14 @@ export default {
         .attr("stroke", d => d.fill)
         .on('mouseover', handleLineMouseOver)
         .on('mouseout', this.handleLineMouseOut)
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        )
     },
     handleLineMouseOut(d, i) {
-      this.updateAll()
+      this.updateLines()
     },
 
     newInit() {
@@ -413,10 +489,10 @@ export default {
 
       // Event actions to perform on the image window element
       this.d3_image_element
-        .on("mousedown", this.handleMouseDown) 
-        .on("mousemove", this.handleMouseMove)
-        .on("mouseup", this.handleMouseUp)
-        .on("contextmenu", this.handleContextMenu)
+        //.on("mousedown", this.handleMouseDown) 
+        //.on("mousemove", this.handleMouseMove)
+        //.on("mouseup", this.handleMouseUp)
+        //.on("contextmenu", this.handleContextMenu)
     }, 
 
     handleContextMenu(data, index) {
