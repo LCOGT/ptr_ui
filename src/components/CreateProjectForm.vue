@@ -130,6 +130,7 @@
                 <b-field :label="n==1 ? 'Area' : ''">
                     <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].area">
                         <option value="600%"> 600% </option>
+                        <option value="450%"> 450% </option>
                         <option value="300%"> 300% </option>
                         <option value="220%"> 220% </option>
                         <option value="150%"> 150% </option>
@@ -319,6 +320,9 @@
             <b-field v-if="showAdvancedInputs">
                 <b-checkbox v-model="project_constraints.add_center_to_mosaic">Add center to mosaic</b-checkbox>
             </b-field>
+            <b-field v-if="showAdvancedInputs">
+                <b-checkbox v-model="project_constraints.dark_sky_setting">Astronomical Dark & Moon Alt < 6</b-checkbox>
+            </b-field>
             
             <section v-if="showAdvancedInputs" style="max-width: 50%;">
             <b-field label="Site tags">
@@ -474,6 +478,7 @@ export default {
                 enhance_photometry: false,
                 close_on_block_completion: false,
                 add_center_to_mosaic: false,
+                dark_sky_setting: false,
             },
 
 
@@ -633,6 +638,7 @@ export default {
                 enhance_photometry: false,
                 close_on_block_completion: false,
                 add_center_to_mosaic: false,
+                dark_sky_setting: false,
             }
         },
 
