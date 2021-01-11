@@ -7,15 +7,7 @@
       <!-- The actual image view component -->
       <image-view 
         :site="sitecode" 
-        :median_star_pos_x="median_relative_pos_x"
-        :median_star_pos_y="median_relative_pos_y"
-        :median_plot_color="median_plot_color"
-        :u_brightest_star_pos_x="u_brightest_relative_pos_x"
-        :u_brightest_star_pos_y="u_brightest_relative_pos_y"
-        :u_brightest_plot_color="u_brightest_plot_color"
-        :brightest_star_pos_x="brightest_relative_pos_x"
-        :brightest_star_pos_y="brightest_relative_pos_y"
-        :brightest_plot_color="brightest_plot_color"
+        :marked_stars="marked_stars"
         />
     </div>
 
@@ -764,6 +756,28 @@ export default {
       "site_config", 
       "available_sites"
     ]),
+
+    brightest_star_display() {
+      return {
+        x: this.brightest_relative_pos_x,
+        y: this.brightest_relative_pos_y,
+        color: this.u_brightest_plot_color,
+      }
+    },
+
+    marked_stars() {
+      const brightest_star = {
+        x: this.brightest_relative_pos_x,
+        y: this.brightest_relative_pos_y,
+        color: this.brightest_plot_color,
+      }
+      const brightest_unsaturated = {
+        x: this.u_brightest_relative_pos_x,
+        y: this.u_brightest_relative_pos_y,
+        color: this.u_brightest_plot_color,
+      }
+      return [ brightest_star,brightest_unsaturated ]
+    },
 
     // Vuex mapping for the value that toggles whether to show all the site
     // images or just the user's images.

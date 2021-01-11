@@ -8,12 +8,12 @@
         <svg 
           id='image_svg' 
           ref="svgElement" 
-          style="border: 1px solid gold;"
           :class="{'image-div-pointer-cross':subframeIsVisible}" 
           v-show="!js9IsVisible"
+          viewbox="50 0 100 100"
           >
-            <svg-circle />
           </svg>
+      <svg-context-menu />
 
 
         <img
@@ -113,22 +113,15 @@
               <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
           </b-field> </div-->
         <div> <b-field label="crosshairs">
-              <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
+              <b-switch type="is-info" v-model="show_crosshairs" v-on:input="drawCrosshairs"></b-switch>
           </b-field> </div>
 
       </div>
 
-      <button class="button" @click="addNewLine"> add new line </button>
       <button class="button" @click="updateAll">update all</button>
-      <button class="button" @click="draw_star_markers">draw starmarkers</button>
-      <button class="button" @click="drawSubframe" title="i'm a title" >draw subs</button>
-      width:{{imageWidth}}
-      height:{{imageHeight}}
-      <pre>{{lines}}</pre>
+      <div>{{marked_stars}}</div>
 
-      <!--pre style="max-width: 500px;">
-        {{current_image}}
-      </pre-->
+
 
     </div>
   </div>
@@ -144,33 +137,24 @@ import { SnackbarProgrammatic as Snackbar } from "buefy";
 import JS9 from "@/components/JS9";
 import * as d3 from "d3";
 
+import { Point, Line, Rect, Circle, Starmarker }from "@/utils/drawshapes"
+
 
 import SvgCircle from "@/components/ImageView/SvgCircle"
+import SvgContextMenu from "@/components/SvgContextMenu"
 
 export default {
   name: "ImageView",
   components: {
     JS9,
     SvgCircle,
+    SvgContextMenu,
   },
   mixins: [commands_mixin],
   props: {
     site: String,
 
-    // median brightness star display
-    median_star_pos_x: Number,
-    median_star_pos_y: Number,
-    median_plot_color: String,
-
-    // brightest saturated star display
-    brightest_star_pos_x: Number,
-    brightest_star_pos_y: Number,
-    brightest_plot_color: String,
-
-    // brightest unsaturated star display
-    u_brightest_star_pos_x: Number,
-    u_brightest_star_pos_y: Number,
-    u_brightest_plot_color: String,
+    marked_stars: Array,
   },
 
   data() {
@@ -183,8 +167,8 @@ export default {
       d3_image_element: '', // the d3 selection of this.image_element
 
       // Width of image in UI
-      imageWidth: 1,
-      imageHeight: 1,
+      imageWidth: 0,
+      imageHeight: 0,
 
       // Mouse position, in px, on the image window
       mouseX: 0,
@@ -211,10 +195,6 @@ export default {
       //Image ID of the currently highlighted image (focused)
       highlighted_image: 0,
 
-      // Runs a function at a regular interval to update the size of the image component.
-      syncImageSize: '',
-      syncImageInterval: 3000,
-
       js9width: 200,
       js9height: 500,
 
@@ -223,18 +203,27 @@ export default {
       /*** experimenting ***/
       svg: '',
 
-      changeLines: '',
-
+      points: [
+        {x: .7, y: .65, color: "orangered", show: true},
+      ],
       lines: [
-        {x1: 60, y1: 350, x2: 90, y2: 100, fill: "green", show: true},
-        {x1: 50, y1: 150, x2: 100, y2: 200, fill: "red", show: true},
-        {x1: 70, y1: 300, x2: 80, y2: 400, fill: "gold", show: true},
+        {x1: .6, y1: .35, x2: .9, y2: .1, fill: "gold", show: true},
+        //{x1: .5, y1: .15, x2: .1, y2: .2, fill: "red", show: true},
+        //{x1: .7, y1: .30, x2: .8, y2: .4, fill: "gold", show: true},
       ],
       rects: [
-        {x: 200, y: 200, width: 20, height: 20, stroke: 'pink', show: true},
-        {x: 500, y: 400, width: 10, height: 30, stroke: 'green', show: true},
-        {x: 500, y: 200, width: 10, height: 30, stroke: 'yellow', show: true},
-      ]
+        {x1: .2, y1: .23, x2: .704, y2: .20, color: 'pink', show: true},
+        //{x1: .5, y1: .3, x2: .310, y2: .130, stroke: 'green', show: true},
+        //{x1: .8, y1: .4, x2: .210, y2: .340, stroke: 'yellow', show: true},
+      ],
+      circles: [
+        {x: .3, y: .35, radx:0.03, color: "limegreen", show: true},
+      ],
+
+      drawPoints: '',
+      drawLines: '',
+      drawCircles: '',
+      drawRects: '',
 
 
 
@@ -246,25 +235,23 @@ export default {
   created() {
     this.$store.commit("site_config/setActiveSite", this.site);
     this.$store.dispatch("images/load_latest_images");
-
-
-    // Keep the displayed image element width and height in sync.
-    // This is important for relative measurements on the image (crosshairs, clicks, etc)
-    window.addEventListener('resize', this.get_image_element_dimensions)
-
-    // replace with this instead: https://github.com/marcj/css-element-queries
-    // we do not want this just running on a timer.
-    this.syncImageSize = setInterval(
-      this.get_image_element_dimensions,
-      this.syncImageInterval
-    );
-
   },
 
-  beforeDestroy() {
-    // We don't need to keep the image dimensions in sync if it's not displayed.
-    window.removeEventListener('resize', this.get_image_element_dimensions)
-    clearInterval(this.syncImageSize);
+  mounted() {
+    this.newInit()
+
+    // Updates whenever the rendered image size changes
+    var ro = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const cr = entry.contentRect;
+        this.onImageResize(cr.width, cr.height)
+        this.updateAll()
+        //console.log(cr)
+      }
+    });
+    let imageEl = document.getElementById('main-image')
+    // Observe one or multiple elements
+    ro.observe(imageEl);
   },
 
   watch: {
@@ -292,181 +279,108 @@ export default {
       if (this.js9IsVisible) {
         this.js9LoadImage(newVal)
       }
-      this.remove_star_markers()
     },
 
-    median_star_pos_x: function() {
-      this.draw_star_markers()
+    lines: {
+      handler: function() {
+        this.drawLines.draw()
+      },
+      deep: true,
     },
-    median_star_pos_y: function() {
-      this.draw_star_markers()
+    
+    points: {
+      handler: function() {
+        this.drawPoints.draw()
+      },
+      deep: true,
     },
-    brightest_star_pos_x: function() {
-      this.draw_star_markers()
+    rects: {
+      handler: function() {
+        this.drawRects.draw()
+      },
+      deep: true,
     },
-    brightest_star_pos_y: function() {
-      this.draw_star_markers()
+    circles: {
+      handler: function() {
+        this.drawCircles.draw()
+      },
+      deep: true,
     },
-
-    lines: function() {
-      this.updateLines()
-    },
+    marked_stars() {
+      this.drawStarmarkers.updateData(this.marked_stars)
+      this.drawStarmarkers.draw()
+    }
 
   },
 
-  mounted() {
-    //this.init()
-    //this.init()
-    this.get_image_element_dimensions()
-    this.newInit()
-  },
 
   methods: {
 
     updateAll() {
-      this.updateLines()
-      this.updateRects()
-      this.draw_star_markers()
+      this.drawPoints.draw()
+      this.drawLines.draw()
+      this.drawRects.draw()
+      this.drawCircles.draw()
+      this.drawStarmarkers.draw()
+
+      //this.draw_star_markers()
       this.drawSubframe()
 
     },
 
-    changeline() {
-      this.lines[0].x1 += 1 
-      this.updateAll()
-    },
 
-    addNewLine() {
-      let newline = {
-        x1: this.imageWidth * Math.random(),
-        x2: this.imageWidth * Math.random(),
-        y1: this.imageHeight * Math.random(),
-        y2: this.imageHeight * Math.random(),
-        fill: 'purple',
-        show: true,
-      }
-      this.lines.push(newline)
-      this.updateLines()
-    },
+    onImageResize(width, height) {
 
-    updateRects() {
+      // This happens when we load js9, since the jpg display goes away. 
+      if (width == 0 && height == 0) return;
 
-        function dragstarted() {
-          console.log('drag started')
-          d3.select(this).attr("stroke", "black");
+      this.imageWidth = parseInt(width)
+      this.imageHeight = parseInt(height)
+
+      // Update the svg drawing tools
+      this.drawPoints.imageDimensions = [width, height]
+      this.drawRects.imageDimensions = [width, height]
+      this.drawLines.imageDimensions = [width, height]
+      this.drawCircles.imageDimensions = [width, height]
+      this.drawStarmarkers.imageDimensions = [width, height]
+
+      // Update the js9 size
+      if (this.js9IsVisible) {
+        let resize_opts = {
+          id: "myJS9",
+          width: width, // adjust for 15px padding
+          height: width,
         }
-
-        function dragged(event, d) {
-          console.log('dragged')
-          d3.select(this).raise().attr("x", d.x = event.x).attr("y", d.y = event.y);
-        }
-
-        function dragended() {
-          console.log('drag ended')
-          d3.select(this).attr("stroke", null);
-        }
-
-      this.svg.selectAll('.custom-rect')
-        .data(this.rects)
-        .join(
-          enter => enter.append("rect"),
-          update => update.attr('fill', 'blue'),
-          exit => exit.remove()
-        )
-        .attr('class', 'custom-rect')
-        .attr('x', r => r.x)
-        .attr('y', r => r.y)
-        .attr('width', r => r.width)
-        .attr('height', r => r.height)
-        .attr('stroke', r => r.stroke)
-        .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended)
-        )
-    },
-
-
-    updateLines() {
-        function dragstarted() {
-          console.log('drag started')
-          //d3.select(this).attr("stroke", "black");
-        }
-
-        function dragged(event, d) {
-          console.log('dragged')
-          //d3.select(this).raise().attr("x2", d.x = event.x).attr("y2", d.y = event.y);
-          d3.select(this).data()[0].x1 += event.dx;
-          d3.select(this).data()[0].y1 += event.dy;
-          d3.select(this).data()[0].x2 += event.dx;
-          d3.select(this).data()[0].y2 += event.dy;
-          d3.select(this).attr("x1", +d3.select(this).attr("x1") + event.dx);
-          d3.select(this).attr("y1", +d3.select(this).attr("y1") + event.dy);
-          d3.select(this).attr("x2", +d3.select(this).attr("x2") + event.dx);
-          d3.select(this).attr("y2", +d3.select(this).attr("y2") + event.dy);
-        }
-
-        function dragended() {
-          console.log('drag ended')
-          //d3.select(this).attr("stroke", null);
-        }
-
-      function move() {
-            d3.select(this).data()[0].x2 += d3.event.dx;
-            d3.select(this).data()[0].y2 += d3.event.dy;
-            d3.select(this).attr("x2", +d3.select(this).attr("x2") + d3.event.dx);
-            d3.select(this).attr("y2", +d3.select(this).attr("y2") + d3.event.dy);
-        }
-      function handleLineMouseOver(d, i) {  // Add interactivity
-        // Use D3 to select element, change color and size
-        d3.select(this)
-          .attr('stroke-width', 5)
-          .attr('stroke', 'orange')
+        this.$store.dispatch('js9/resizeDisplay', resize_opts)
       }
 
-      console.log('updating lines')
-      this.svg.selectAll('line')
-        .data(this.lines)
-        .join('line')
-        .attr("x1", d => d.x1)
-        .attr("x2", d => d.x2)
-        .attr("y1", d => d.y1)
-        .attr("y2", d => d.y2)
-        .attr("stroke-width", 3)
-        .attr("stroke", d => d.fill)
-        .on('mouseover', handleLineMouseOver)
-        .on('mouseout', this.handleLineMouseOut)
-        .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended)
-        )
-    },
-    handleLineMouseOut(d, i) {
-      this.updateLines()
+      // This is fed to js9 just before displaying to set the matching size. 
+      this.js9width=parseInt(width)
+      this.js9height=parseInt(height)
+
+      this.drawCrosshairs()
+
     },
 
     newInit() {
       this.svg = d3.select('#image_svg')
+
+      this.drawPoints = new Point(this.svg, this.points, this.imageWidth, this.imageHeight)
+      this.drawLines = new Line(this.svg, this.lines, this.imageWidth, this.imageHeight)
+      this.drawRects = new Rect(this.svg, this.rects, this.imageWidth, this.imageHeight)
+      this.drawCircles = new Circle(this.svg, this.circles, this.imageWidth, this.imageHeight)
+      this.drawStarmarkers = new Starmarker(this.svg, this.marked_stars, this.imageWidth, this.imageHeight)
+
       this.init()
       this.updateAll()
 
-      //this.changeLines = setInterval(this.changeline, 5000)
-        
-      //this.updateLines()
-
-
-
-      console.log(this.svg)
-      
     },
 
 
     init() {
 
+      // this is the subframe element
       this.d3_image_element = d3.select(this.image_element)
-
-      let that = this;
 
       // Initialize subframe rectangle
       const rect1 = [{"x":0, "y":0}]
@@ -489,9 +403,9 @@ export default {
 
       // Event actions to perform on the image window element
       this.d3_image_element
-        //.on("mousedown", this.handleMouseDown) 
-        //.on("mousemove", this.handleMouseMove)
-        //.on("mouseup", this.handleMouseUp)
+        .on("mousedown", this.handleMouseDown) 
+        .on("mousemove", this.handleMouseMove)
+        .on("mouseup", this.handleMouseUp)
         //.on("contextmenu", this.handleContextMenu)
     }, 
 
@@ -576,7 +490,6 @@ export default {
       this.mouseIsDown = false;
       let mouse = d3.mouse(this.d3_image_element.node())
       if(this.subframeIsVisible) {
-        //that.subframeIsActive = true;
         this.subframeDefinedWithFile = this.current_image.base_filename
       }
       this.drawSubframe()
@@ -596,45 +509,6 @@ export default {
 
     },
 
-    // Resize the image element to fit the browser window
-    get_image_element_dimensions() {
-
-
-      let imageWindow = document.getElementById('image-window').getBoundingClientRect();
-
-      if (this.js9IsVisible) {
-        let resize_opts = {
-          id: "myJS9",
-          width: imageWindow.width-30, // adjust for 15px padding
-          height: imageWindow.width-30,
-        }
-        this.$store.dispatch('js9/resizeDisplay', resize_opts)
-      } else {
-        // Resize the image displayed
-        let svgRect = document.getElementById('image_svg').getBoundingClientRect();
-        let imageEl = document.getElementById('main-image')
-
-        // If nothing changed, we're done.
-        if (this.js9width==svgRect.width && this.js9height==svgRect.height) {
-          return;
-        }
-        // This is fed to js9 just before displaying to set the matching size. 
-        this.js9width=parseInt(svgRect.width)
-        this.js9height=parseInt(svgRect.width)
-
-        imageEl.setAttribute("width", parseInt(svgRect.width))
-        imageEl.setAttribute("height", parseInt(svgRect.height))
-        // Resize the svg
-        // WARNING: this may have bugs if image is not a square.
-        let imageRect = this.$refs.image.getBoundingClientRect();
-        this.imageWidth = parseInt(imageRect.width)
-        this.imageHeight = parseInt(imageRect.height)
-      }
-      
-      //this.draw_star_markers()
-      this.drawSubframe()
-    },
-
     send_pixels_center_command(x, y, filename) {
 
       let command_form = [
@@ -649,28 +523,6 @@ export default {
 
     },
 
-    drawCircle(pixelX, pixelY) {
-      // Remove any other right click markers on the screen.
-      this.removeCircle();
-
-      // Draw a small cross where user clicks.
-      d3
-        .select(this.image_element)
-        .append("circle")
-        .attr("class", "circle-cursor")
-        .attr("cx", pixelX)
-        .attr("cy", pixelY)
-        .attr("r", "8px")
-        .attr("stroke", "red")
-        .attr("stroke-width", 1)
-        .style("fill", "none");
-    },
-    removeCircle() {
-      d3
-        .select(this.image_element)
-        .selectAll(".circle-cursor")
-        .remove();
-    },
 
     draw_marker(pixelX, pixelY) {
       // Make sure a previous timer doesn't wipe our current right-click marker
@@ -716,154 +568,37 @@ export default {
         .remove();
     },
 
-    // The star inspector (see SiteData component) will calculate and plot
-    // radial profiles for the max and median brightest stars detected in the
-    // user-selected region. 
-    //
-    // This function also draws a marker on the actual image to indicate which 
-    // stars are shown in the radial profile plots.
-    draw_star_markers() {
-      this.remove_star_markers()
-
-      let med_x = this.median_star_pos_x * this.imageWidth
-      let med_y = this.median_star_pos_y * this.imageHeight
-      let ubri_x = this.u_brightest_star_pos_x * this.imageWidth
-      let ubri_y = this.u_brightest_star_pos_y * this.imageHeight
-      let bri_x = this.brightest_star_pos_x * this.imageWidth
-      let bri_y = this.brightest_star_pos_y * this.imageHeight
-
-      // Draw the crosshairs around the brightest unsaturated star
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", ubri_x - 15)
-        .attr("y1", ubri_y)
-        .attr("x2", ubri_x - 5)
-        .attr("y2", ubri_y)
-        .attr("stroke", this.median_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", ubri_x + 5)
-        .attr("y1", ubri_y)
-        .attr("x2", ubri_x + 15)
-        .attr("y2", ubri_y)
-        .attr("stroke", this.median_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", ubri_x)
-        .attr("y1", ubri_y - 15)
-        .attr("x2", ubri_x)
-        .attr("y2", ubri_y - 5)
-        .attr("stroke", this.median_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", ubri_x)
-        .attr("y1", ubri_y + 5)
-        .attr("x2", ubri_x)
-        .attr("y2", ubri_y + 15)
-        .attr("stroke", this.median_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-        
-      // Draw crosshairs around the brightest selected star
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", bri_x - 15)
-        .attr("y1", bri_y)
-        .attr("x2", bri_x - 5)
-        .attr("y2", bri_y)
-        .attr("stroke", this.brightest_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", bri_x + 5)
-        .attr("y1", bri_y)
-        .attr("x2", bri_x + 15)
-        .attr("y2", bri_y)
-        .attr("stroke", this.brightest_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", bri_x)
-        .attr("y1", bri_y - 15)
-        .attr("x2", bri_x)
-        .attr("y2", bri_y - 5)
-        .attr("stroke", this.brightest_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", bri_x)
-        .attr("y1", bri_y + 5)
-        .attr("x2", bri_x)
-        .attr("y2", bri_y + 15)
-        .attr("stroke", this.brightest_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-    },
-    remove_star_markers() {
-      d3
-        .select(this.image_element)
-        .selectAll(".star-marker")
-        .remove();
-    },
-
-    toggleCrosshairs() {
+    drawCrosshairs() {
       console.log("toggle crosshairs");
 
       let elem = this.image_element;
 
+      d3.select(elem)
+        .selectAll(".crosshairs")
+        .remove();
+
       if (this.show_crosshairs) {
+        d3.select(elem)
+          .append("line")
+            .attr("class", "crosshairs")
+            .attr("x1", this.imageWidth / 2)
+            .attr("y1", 0)
+            .attr("x2", this.imageWidth / 2)
+            .attr("y2", this.imageHeight)
+            .attr("id", "crosshair_vertical")
+            .attr("stroke-width", 2)
+            .attr("stroke", this.crosshair_color);
         d3
           .select(elem)
           .append("line")
-          .attr("class", "crosshairs")
-          .attr("x1", this.imageWidth / 2)
-          .attr("y1", 0)
-          .attr("x2", this.imageWidth / 2)
-          .attr("y2", this.imageHeight)
-          .attr("id", "crosshair_vertical")
-          .attr("stroke-width", 2)
-          .attr("stroke", this.crosshair_color);
-        d3
-          .select(elem)
-          .append("line")
-          .attr("class", "crosshairs")
-          .attr("y1", this.imageHeight / 2)
-          .attr("x1", 0)
-          .attr("y2", this.imageHeight / 2)
-          .attr("x2", this.imageWidth)
-          .attr("id", "crosshair_horizontal")
-          .attr("stroke-width", 2)
-          .attr("stroke", this.crosshair_color);
-      } else {
-        d3
-          .select(elem)
-          .selectAll(".crosshairs")
-          .remove();
+            .attr("class", "crosshairs")
+            .attr("y1", this.imageHeight / 2)
+            .attr("x1", 0)
+            .attr("y2", this.imageHeight / 2)
+            .attr("x2", this.imageWidth)
+            .attr("id", "crosshair_horizontal")
+            .attr("stroke-width", 2)
+            .attr("stroke", this.crosshair_color);
       }
     },
 
@@ -922,12 +657,14 @@ export default {
       }
     },
 
+
     ...mapGetters("images", [
       "recent_images",
       "current_image",
       "large_fits_exists",
       "small_fits_exists",
     ]),
+
 
     js9IsVisible: {
       get() { return this.$store.getters['js9/instanceIsVisible']},
