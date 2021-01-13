@@ -2,6 +2,20 @@ import * as d3 from 'd3'
 
 
 
+/**
+ * 
+ *  The input data should contain rect objects with keys:
+ *      x1: coordinate for one of the corners, as proportion of imWidth
+ *      y1: coordiante for one of the corners, as proportion of imHeight
+ *      x2: coordinate of the opposite corner, as proportion of imWidth
+ *      y2: coordinate of the opposite corner, as proportion of imHeight
+ *      color: circle line color
+ *      display: boolean whether to draw or not
+ * 
+ * These differ from the svg convention (x,y,width,height) so that users can draw
+ * 'backwards' and not have to worry about negative width/height, which
+ * svg doesn't allow. 
+ */
 class Rect {
     constructor(svg, data, width, height) {
         this.svg = svg

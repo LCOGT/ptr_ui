@@ -34,7 +34,7 @@
 
 
       <!-- Basic image info and a button to reveal the full fits header -->
-      <side-info-panel :startOpen="true">
+      <side-info-panel :startOpen="false">
 
         <p class="level" slot="title">
           Image Info 
@@ -71,7 +71,25 @@
               <tr> <td class="info-panel-val" align="right">airmass: </td>
                   <td>{{current_image.airmass || "---"}}</td> </tr>
           </table>
-          <div style="height: 1em;"/>
+          <div style="height: 2em;"/>
+          <b-field label="downloads:" style="width: 100%">
+            <p class="control">
+              <a class="button has-text-white" 
+                :disabled="small_fits_exists"
+                @click="download_fits_file(current_image.base_filename, 'EX10')">
+                <b-icon icon="download" size="is-small" />
+                <span>small fits</span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button has-text-white" 
+                :disabled="large_fits_exists"
+                @click="download_fits_file(current_image.base_filename, 'EX01')">
+                <b-icon icon="download" size="is-small" />
+                <span>large fits</span>
+              </a>
+            </p>
+          </b-field>
         </div>
       </side-info-panel>
 
@@ -192,6 +210,40 @@
             <tr> <td class="info-panel-val" align="right">number of stars detected: </td>
                 <td>{{num_good_stars}}</td> </tr>
         </table>
+      </side-info-panel>
+
+      <!-- shape selection tools -->
+      <side-info-panel :startOpen="true">
+        <p slot="title">Selection Tools</p>
+
+        <b-field>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="none">
+              none
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="point">
+              <span class="iconify" data-icon="radix-icons:dot" data-inline="false"></span>
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="line">
+              <span class="iconify" data-icon="mdi:vector-line" data-inline="false"></span>
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="circle">
+              <span class="iconify" data-icon="mdi:vector-circle-variant" data-inline="false"></span>
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="rect">
+              <span class="iconify" data-icon="mdi:vector-rectangle" data-inline="false"></span>
+          </b-radio-button>
+        </b-field>
+
+          <p>Selected Shape: </p>
+          <p>{{activeDrawShape}}</p>
+          
+
+
       </side-info-panel>
 
       <!--js9-devtools/-->
@@ -728,7 +780,15 @@ export default {
     showFitsHeader() {
       this.refreshFitsHeader()
       this.showFitsHeaderModal = true
-    }
+    },
+    async download_fits_file(base_filename, ex_type) {
+      const params = {
+        base_filename: base_filename, 
+        ex_type: ex_type
+      }
+      const fits_url = await this.$store.dispatch('images/get_fits_url', params)
+      window.location.assign(fits_url)
+    },
   },
   watch: {
     current_image() {
@@ -750,12 +810,16 @@ export default {
     ...mapState("images", [
       'recent_images',
       'current_image', 
+      'small_fits_exists',
+      'large_fits_exists'
     ]),
 
     ...mapGetters("site_config", [
       "site_config", 
       "available_sites"
     ]),
+    
+    ...mapState("drawshapes", ['activeDrawShape',]),
 
     brightest_star_display() {
       return {
@@ -777,6 +841,11 @@ export default {
         color: this.u_brightest_plot_color,
       }
       return [ brightest_star,brightest_unsaturated ]
+    },
+
+    activeDrawShape: {
+      get() { return this.$store.getters['drawshapes/activeDrawShape']},
+      set(val) { this.$store.commit('drawshapes/activeDrawShape', val)}
     },
 
     // Vuex mapping for the value that toggles whether to show all the site

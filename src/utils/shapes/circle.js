@@ -4,6 +4,19 @@ import tinycolor from 'tinycolor2'
 
 
 
+/**
+ *  The input data should contain circle objects with keys:
+ *      x: center x coordinate, proportion of imWidth
+ *      y: center y coordinate, proportion of imHeight
+ *      rx: x coordinate of click handle
+ *      ry: y coordinate of click handle
+ *      color: circle line color
+ *      display: boolean whether to draw or not
+ * 
+ * These differ from the svg convention (cx, cy, r) so that users can draw
+ * 'backwards' and not have to worry about negative radii (svg doesn't allow). 
+ */
+
 class Circle {
     constructor(svg, data, imWidth, imHeight) {
         this.svg = svg
@@ -29,7 +42,8 @@ class Circle {
     }
 
     draggedHandle = (d,i) => {
-        d.radx += d3.event.dx / this.imWidth
+        d.rx += d3.event.dx / this.imWidth
+        d.ry += d3.event.dy / this.imHeight
     }
 
     dragged = (d,i) => {
@@ -58,7 +72,7 @@ class Circle {
                 .attr('class', 'main-circle')
                 .attr("cx", d => d.x * this.imWidth)
                 .attr("cy", d => d.y * this.imHeight)
-                .attr("r", d => Math.abs(d.radx) * this.imWidth)
+                .attr("r", d => Math.sqrt((d.rx * this.imWidth)**2 + (d.ry * this.imHeight)**2))
                 .attr("fill", "transparent")
                 .attr('stroke', d => d.color)
                 .attr('stroke-width', '2px')
@@ -88,8 +102,9 @@ class Circle {
             .data(d => [d])
             .join('circle')
                 .attr('class', 'drag-handle')
-                .attr("cx", d => (d.x + d.radx) * this.imWidth)
-                .attr("cy", d => d.y * this.imHeight)
+                .attr("cx", d => (d.x + d.rx) * this.imWidth)
+                .attr("cy", d => (d.y + d.ry) * this.imHeight)
+                //.attr("cy", d => d.y * this.imHeight)
                 .attr("r", d => 4)
                 .attr("fill", "transparent")
                 .attr('stroke', d => d.color)
@@ -100,8 +115,9 @@ class Circle {
             .data(d => [d])
             .join('circle')
                 .attr('class', 'hover-circle')
-                .attr("cx", d => (d.x + d.radx) * this.imWidth)
-                .attr("cy", d => d.y * this.imHeight)
+                .attr("cx", d => (d.x + d.rx) * this.imWidth)
+                .attr("cy", d => (d.y + d.ry) * this.imHeight)
+                //.attr("cy", d => d.y * this.imHeight)
                 .attr("r", 20)
                 .attr("fill", "transparent")
                 .attr('stroke', d => d.color)

@@ -84,25 +84,6 @@
             </p>
           </b-field>
 
-          <b-field>
-            <p class="control">
-              <b-tooltip label="download small fits file" position="is-right" type="is-black">
-                <a class="button has-text-white" 
-                  :disabled="small_fits_exists"
-                  @click="download_fits_file(current_image.base_filename, 'EX10')">
-                  <b-icon icon="cloud-download" size="is-small" /></a>
-              </b-tooltip>
-            </p>
-            <p class="control">
-              <b-tooltip label="download large fits file" position="is-right" type="is-black">
-                <a class="button has-text-white" 
-                  :disabled="large_fits_exists"
-                  @click="download_fits_file(current_image.base_filename, 'EX01')">
-                  <b-icon icon="cloud-download" /></a>
-              </b-tooltip>
-            </p>
-          </b-field>
-
         </b-field>
 
 
@@ -121,6 +102,10 @@
       <button class="button" @click="updateAll">update all</button>
       <div>{{marked_stars}}</div>
 
+      <button class="button" @click="lines[0].x1 += 0.1">add to x</button>
+      <button class="button" @click="lines[0].x1 = 0.15">set x</button>
+      <div>{{lines}}</div>
+
 
 
     </div>
@@ -131,7 +116,7 @@
 //import { API, Auth } from "aws-amplify";
 import axios from 'axios';
 import wcs from "@/utils/pix2wcs";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
 import JS9 from "@/components/JS9";
@@ -203,22 +188,22 @@ export default {
       /*** experimenting ***/
       svg: '',
 
-      points: [
-        {x: .7, y: .65, color: "orangered", show: true},
-      ],
-      lines: [
-        {x1: .6, y1: .35, x2: .9, y2: .1, fill: "gold", show: true},
-        //{x1: .5, y1: .15, x2: .1, y2: .2, fill: "red", show: true},
-        //{x1: .7, y1: .30, x2: .8, y2: .4, fill: "gold", show: true},
-      ],
-      rects: [
-        {x1: .2, y1: .23, x2: .704, y2: .20, color: 'pink', show: true},
-        //{x1: .5, y1: .3, x2: .310, y2: .130, stroke: 'green', show: true},
-        //{x1: .8, y1: .4, x2: .210, y2: .340, stroke: 'yellow', show: true},
-      ],
-      circles: [
-        {x: .3, y: .35, radx:0.03, color: "limegreen", show: true},
-      ],
+      //points: [
+        //{x: .7, y: .65, color: "orangered", show: true},
+      //],
+      //lines1: [
+        //{x1: .6, y1: .35, x2: .9, y2: .1, fill: "gold", show: true},
+        ////{x1: .5, y1: .15, x2: .1, y2: .2, fill: "red", show: true},
+        ////{x1: .7, y1: .30, x2: .8, y2: .4, fill: "gold", show: true},
+      //],
+      //rects: [
+        //{x1: .2, y1: .23, x2: .704, y2: .20, color: 'pink', show: true},
+        ////{x1: .5, y1: .3, x2: .310, y2: .130, stroke: 'green', show: true},
+        ////{x1: .8, y1: .4, x2: .210, y2: .340, stroke: 'yellow', show: true},
+      //],
+      //circles: [
+        //{x: .3, y: .35, radx:0.03, color: "limegreen", show: true},
+      //],
 
       drawPoints: '',
       drawLines: '',
@@ -283,6 +268,7 @@ export default {
 
     lines: {
       handler: function() {
+        console.log('lines changed')
         this.drawLines.draw()
       },
       deep: true,
@@ -384,27 +370,26 @@ export default {
 
       // Initialize subframe rectangle
       const rect1 = [{"x":0, "y":0}]
-      d3.select(this.image_element)
-        .selectAll("subframeBox")
-        .data(rect1)
-        .join("rect")
-          .attr("id", "subframeSVG")
-          .attr("x", d => d.x)
-          .attr("y", d => d.y)
-          .attr("width", 0)
-          .attr("height", 0)
-          .style("display","none")
-          .style("stroke", "red")
-          .style("stroke-width", 1)
-          .style("fill", "none")
-          .style("cursor", "crosshair")
+      //d3.select(this.image_element)
+        //.selectAll("subframeBox")
+        //.data(rect1)
+        //.join("rect")
+          //.attr("id", "subframeSVG")
+          //.attr("x", d => d.x)
+          //.attr("y", d => d.y)
+          //.attr("width", 0)
+          //.attr("height", 0)
+          //.style("display","none")
+          //.style("stroke", "red")
+          //.style("stroke-width", 1)
+          //.style("fill", "none")
+          //.style("cursor", "crosshair")
 
       this.subframeSVG = d3.select("#subframeSVG")
 
       // Event actions to perform on the image window element
       this.d3_image_element
         .on("mousedown", this.handleMouseDown) 
-        .on("mousemove", this.handleMouseMove)
         .on("mouseup", this.handleMouseUp)
         //.on("contextmenu", this.handleContextMenu)
     }, 
@@ -434,15 +419,98 @@ export default {
       d3.event.preventDefault();
     },
 
+    newPointMouseMove() {
+      let mouse = d3.mouse(this.d3_image_element.node())
+      let newPoint = this.points[this.points.length - 1]
+      newPoint.x = mouse[0] / this.imageWidth
+      newPoint.y = mouse[1] / this.imageHeight
+    },
+    newLineMouseMove() {
+      let mouse = d3.mouse(this.d3_image_element.node())
+      let newLine = this.lines[this.lines.length - 1]
+      newLine.x2 = mouse[0] / this.imageWidth
+      newLine.y2 = mouse[1] / this.imageHeight
+    },
+    newRectMouseMove() {
+      let mouse = d3.mouse(this.d3_image_element.node())
+      let newRect = this.rects[this.rects.length - 1]
+      console.log('new rect: ', newRect)
+      newRect.x2 = mouse[0] / this.imageWidth
+      newRect.y2 = mouse[1] / this.imageHeight
+    },
+    newCircleMouseMove() {
+      let mouse = d3.mouse(this.d3_image_element.node())
+      let newCircle = this.circles[this.circles.length - 1]
+      console.log('new circle: ', newCircle)
+      newCircle.rx = (mouse[0] / this.imageWidth) - newCircle.x
+      newCircle.ry = (mouse[1] / this.imageHeight) - newCircle.y
+    },
+
     handleMouseDown() {
       d3.event.preventDefault();
 
+      //this.d3_image_element
+        //.on("mousemove", this.handleMouseMove)
+
       let mClick = d3.mouse(this.d3_image_element.node())
+      let mouse = d3.mouse(this.d3_image_element.node())
 
       // Calculate image dimensions
       let bounds = this.d3_image_element.node().getBoundingClientRect()
       let imageWidth = bounds.width
       let imageHeight = bounds.height
+
+
+      if (this.activeDrawShape == 'line') {
+        this.$store.commit('drawshapes/addLine', {
+          x1: mouse[0] / imageWidth,
+          y1: mouse[1] / imageHeight,
+          x2: mouse[0] / imageWidth,
+          y2: mouse[1] / imageHeight,
+          color: 'gold',
+          selected: false,
+        })
+        this.d3_image_element.on("mousemove", this.newLineMouseMove)
+      }
+
+      else if (this.activeDrawShape == 'rect') {
+        this.$store.commit('drawshapes/addRect', {
+          x1: mouse[0] / imageWidth,
+          y1: mouse[1] / imageHeight,
+          x2: mouse[0] / imageWidth,
+          y2: mouse[1] / imageHeight,
+          color: 'gold',
+          selected: false,
+        })
+        this.d3_image_element.on("mousemove", this.newRectMouseMove)
+      }
+
+      else if ( this.activeDrawShape == 'point') {
+        this.$store.commit('drawshapes/addPoint', {
+          x: mouse[0] / imageWidth,
+          y: mouse[1] / imageHeight,
+          color: 'gold', 
+          show: true,
+          selected: false,
+        })
+        this.d3_image_element.on("mousemove", this.newPointMouseMove)
+      }
+
+      else if (this.activeDrawShape == 'circle') {
+        this.$store.commit('drawshapes/addCircle', {
+          x: mouse[0] / imageWidth,
+          y: mouse[1] / imageHeight,
+          rx: 0,
+          ry: 0,
+          color: 'gold', 
+          show: true,
+          selected: false,
+        })
+        this.d3_image_element.on("mousemove", this.newCircleMouseMove)
+
+      }
+
+
 
 
       // start drawing a subframe box if subframe mode is active.
@@ -475,6 +543,12 @@ export default {
       this.mouseX = mDrag[0]
       this.mouseY = mDrag[1]
 
+      if (this.drawActiveShape == 'line') {
+        let currentLine = this.lines[this.lines.length - 1]
+        currentLine.x2 = this.mouseX / imageWidth
+        currentLine.y2 = this.mouseY / imageHeight
+      }
+
       // if subframe mode is active, and the mouse is dragging, 
       // save the current coordinates and draw them as a rectangle.
       if (this.subframeIsVisible && this.mouseIsDown) {
@@ -487,6 +561,14 @@ export default {
     },
 
     handleMouseUp(context) {
+
+      // We don't want every click to draw a shape. Users need to select what
+      // they want drawn each time. 
+      this.activeDrawShape = 'none'
+
+      this.d3_image_element
+        .on("mousemove", null)
+
       this.mouseIsDown = false;
       let mouse = d3.mouse(this.d3_image_element.node())
       if(this.subframeIsVisible) {
@@ -632,15 +714,6 @@ export default {
       }
     },
 
-    async download_fits_file(base_filename, ex_type) {
-      const params = {
-        base_filename: base_filename, 
-        ex_type: ex_type
-      }
-      const fits_url = await this.$store.dispatch('images/get_fits_url', params)
-      window.location.assign(fits_url)
-    },
-    
   },
   computed: {
 
@@ -661,8 +734,6 @@ export default {
     ...mapGetters("images", [
       "recent_images",
       "current_image",
-      "large_fits_exists",
-      "small_fits_exists",
     ]),
 
 
@@ -695,6 +766,34 @@ export default {
         get() { return this.$store.getters['command_params/subframe_y1']},
         set(val) { this.$store.commit('command_params/subframe_y1', val)},
     },
+
+
+    ...mapState('drawshapes', ['lines', 'rects', 'circles', 'points', 'starmarkers']),
+    activeDrawShape: {
+      get() { return this.$store.getters['drawshapes/activeDrawShape']},
+      set(val) { this.$store.commit('drawshapes/activeDrawShape', val)}
+
+    }
+    //lines: {
+      //get() { return this.$store.getters['drawshapes/lines']},
+      //set(val) { this.$store.commit('drawshapes/newLine')}
+    //},
+    //rects: {
+      //get() { return this.$store.getters['drawshapes/rects']},
+      //set(val) { this.$store.commit('drawshapes/newRect')}
+    //},
+    //circles: {
+      //get() { return this.$store.getters['drawshapes/circles']},
+      //set(val) { this.$store.commit('drawshapes/newCircle')}
+    //},
+    //points: {
+      //get() { return this.$store.getters['drawshapes/points']},
+      //set(val) { this.$store.commit('drawshapes/newPoint')}
+    //},
+    //starmarkers: {
+      //get() { return this.$store.getters['drawshapes/starmarkers']},
+      //set(val) { this.$store.commit('drawshapes/newStarmarker')}
+    //},
 
   }
 };
