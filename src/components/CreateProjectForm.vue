@@ -131,7 +131,7 @@
                     <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].area">
                         <option value="600%"> 600% </option>
                         <option value="500%"> 500% </option>
-                        <option value="450%"> 450% </option>
+                        <option value="400%"> 400% </option>
                         <option value="300%"> 300% </option>
                         <option value="220%"> 220% </option>
                         <option value="133%"> 133% </option>
