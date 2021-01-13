@@ -130,10 +130,11 @@
                 <b-field :label="n==1 ? 'Area' : ''">
                     <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].area">
                         <option value="600%"> 600% </option>
+                        <option value="500%"> 500% </option>
                         <option value="450%"> 450% </option>
                         <option value="300%"> 300% </option>
                         <option value="220%"> 220% </option>
-                        <option value="150%"> 150% </option>
+                        <option value="133%"> 133% </option>
                         <option value="FULL"> FULL </option>
                         <option value="SQUARE"> SQUARE </option>
                         <option value="71%"> 71% </option>
