@@ -134,7 +134,7 @@ export default {
     width: 100%;
     padding: 10px;
     text-align: left;
-    background-color: inherit;
+    background-color: blue;
     &:hover {
         background-color: lighten(steelblue, 50%);
     }

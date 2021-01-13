@@ -18,8 +18,9 @@ class Line {
         this.imHeight = val[1] || 0
         this.draw()
     }
-    
-    // Coordinate helpers:
+
+
+    // Display helpers:
     //p1(l) { return [this.imWidth * l.x1, this.imHeight * l.y1] }
     //p2(l) { return [this.imWidth * l.x2, this.imHeight * l.y2]}
 
@@ -34,7 +35,7 @@ class Line {
 
     mouseout(d,i) {
         //console.log('mouseout')
-        const stroke = d3.select(this).data()[0].fill
+        const stroke = d3.select(this).data()[0].color
         d3.select(this.parentNode).selectAll('.main-line')
             .attr('stroke-width', 3)
             .attr('stroke', stroke)
@@ -49,6 +50,8 @@ class Line {
 
         d3.select(this).selectAll('.main-line')
             .attr("stroke", "black")
+
+        d.selected = true
     }
 
     dragged = (d,i) => {
@@ -99,7 +102,7 @@ class Line {
                 .attr("x2", d => d.x2 * this.imWidth)
                 .attr("y2", d => d.y2 * this.imHeight)
                 .attr("stroke-width", 3)
-                .attr("stroke", d => d.fill)
+                .attr("stroke", d => d.color)
 
         let hoverArea = g.selectAll('.hover-line')
             .data(d => [d])
@@ -123,7 +126,7 @@ class Line {
                 .attr("cy", d => d.y1 * this.imHeight)
                 .attr("r", 15)
                 .attr("fill", "transparent")
-                .attr('stroke', d => d.fill)
+                .attr('stroke', d => d.color)
                 .style('opacity', '0.0')
                 .on('mouseover', function() {
                     d3.select(this).style('opacity', 0.5)
@@ -140,7 +143,7 @@ class Line {
                 .attr("cy", d => d.y1 * this.imHeight)
                 .attr("r", 3)
                 .attr("fill", "transparent")
-                .attr('stroke', d => d.fill)
+                .attr('stroke', d => d.color)
         let dragHandle2Area = g.selectAll('.drag-handle-2-area')
             .data(d => [d])
             .join('circle')
@@ -149,7 +152,7 @@ class Line {
                 .attr("cy", d => d.y2 * this.imHeight)
                 .attr("r", 15)
                 .attr("fill", "transparent")
-                .attr('stroke', d => d.fill)
+                .attr('stroke', d => d.color)
                 .style('opacity', 0)
                 .on('mouseover', function() {
                     d3.select(this).style('opacity', 0.5)
@@ -166,7 +169,7 @@ class Line {
                 .attr("cy", d => d.y2 * this.imHeight)
                 .attr("r", 3)
                 .attr("fill", "transparent")
-                .attr('stroke', d => d.fill)
+                .attr('stroke', d => d.color)
     }
 }
 
