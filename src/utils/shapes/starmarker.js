@@ -30,8 +30,6 @@ class Starmarker {
 
         // don't draw if the svg isn't visible
         if (this.imHeight * this.imWidth == 0) {return;}
-        console.log('in Starmarker')
-        console.log('data in starmarker draw: ', this.data)
 
         let g = this.svg.selectAll('.star-marker1')
             .data(this.data)

@@ -1,5 +1,6 @@
 
 import * as d3 from 'd3'
+import store from '../../store'
 import tinycolor from 'tinycolor2'
 
 
@@ -31,14 +32,23 @@ class Circle {
     set imageDimensions(val) {
         this.imWidth = val[0]
         this.imHeight = val[1]
-        this.draw()
     }
 
-    clicked(event, d) {
-        if (event.defaultPrevented) return; // dragged
+    get selectedId() {
+        return store.getters['drawshapes/selectedId']
+    }
+    set selectedId(val) {
+        store.commit('drawshapes/selectedId', val)
+    }
 
-        d3.select(this).selectAll('.main-circle')
+    clicked = (d,i) => {
+        //if (d.defaultPrevented) return; // dragged
+
+        this.svg.select('#'+d.id).select('.main-circle')
             .attr("stroke", "black")
+
+        this.selectedId = d.id
+        this.draw()
     }
 
     draggedHandle = (d,i) => {
@@ -47,6 +57,7 @@ class Circle {
     }
 
     dragged = (d,i) => {
+        this.selectedId = d.id // make this the selected shape
         d.x += d3.event.dx / this.imWidth
         d.y += d3.event.dy / this.imHeight
     }
@@ -59,23 +70,27 @@ class Circle {
         let g = this.svg.selectAll('.circle-selection')
             .data(this.data)
             .join('g')
-            .attr("class", "circle-selection")
+            .attr("class", "circle-selection selectable-shape")
+            .attr('id', d => d.id)
             .call(d3.drag()
                 .on("drag", this.dragged)
             )
             .on('click', this.clicked)
+            .on('mouseover', function () {
+                d3.select(this).style('cursor', 'grab')
+            })
 
 
-        let point = g.selectAll('.main-circle')
+        let circle = g.selectAll('.main-circle')
             .data(d => [d])
             .join('circle')
-                .attr('class', 'main-circle')
+                .attr('class', 'main-circle selectable-shape')
                 .attr("cx", d => d.x * this.imWidth)
                 .attr("cy", d => d.y * this.imHeight)
                 .attr("r", d => Math.sqrt((d.rx * this.imWidth)**2 + (d.ry * this.imHeight)**2))
                 .attr("fill", "transparent")
                 .attr('stroke', d => d.color)
-                .attr('stroke-width', '2px')
+                .attr('stroke-width', d => d.id == this.selectedId ? 3 : 1)
 
         let centerx = g.selectAll('.center-cross-x')
             .data(d => [d])
@@ -123,10 +138,14 @@ class Circle {
                 .attr('stroke', d => d.color)
                 .style('opacity', '0.0')
                 .on('mouseover', function() {
-                    d3.select(this).style('opacity', 0.5)
+                    d3.select(this)
+                        .style('opacity', 0.5)
+                        .style('cursor', 'ew-resize')
                 })
                 .on('mouseout', function() {
-                    d3.select(this).style('opacity', 0)
+                    d3.select(this)
+                        .style('opacity', 0)
+                        .style('cursor', 'default')
                 })
                 .call(d3.drag().on("drag", this.draggedHandle))
 
