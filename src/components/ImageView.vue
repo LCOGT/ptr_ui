@@ -8,9 +8,10 @@
         <svg 
           id='image_svg' 
           ref="svgElement" 
-          :class="{'image-div-pointer-cross':subframeIsVisible}" 
+          :class="{'crosshair-cursor': activeDrawShape!='none'}" 
           v-show="!js9IsVisible"
           viewbox="50 0 100 100"
+          v-on:keyup.delete="foo"
           >
           </svg>
       <svg-context-menu />
@@ -99,15 +100,6 @@
 
       </div>
 
-      <button class="button" @click="updateAll">update all</button>
-      <div>{{marked_stars}}</div>
-
-      <button class="button" @click="lines[0].x1 += 0.1">add to x</button>
-      <button class="button" @click="lines[0].x1 = 0.15">set x</button>
-      <div>{{lines}}</div>
-
-
-
     </div>
   </div>
 </template>
@@ -149,7 +141,6 @@ export default {
       active_image: "",
 
       image_element: "#image_svg",
-      d3_image_element: '', // the d3 selection of this.image_element
 
       // Width of image in UI
       imageWidth: 0,
@@ -187,24 +178,6 @@ export default {
 
       /*** experimenting ***/
       svg: '',
-
-      //points: [
-        //{x: .7, y: .65, color: "orangered", show: true},
-      //],
-      //lines1: [
-        //{x1: .6, y1: .35, x2: .9, y2: .1, fill: "gold", show: true},
-        ////{x1: .5, y1: .15, x2: .1, y2: .2, fill: "red", show: true},
-        ////{x1: .7, y1: .30, x2: .8, y2: .4, fill: "gold", show: true},
-      //],
-      //rects: [
-        //{x1: .2, y1: .23, x2: .704, y2: .20, color: 'pink', show: true},
-        ////{x1: .5, y1: .3, x2: .310, y2: .130, stroke: 'green', show: true},
-        ////{x1: .8, y1: .4, x2: .210, y2: .340, stroke: 'yellow', show: true},
-      //],
-      //circles: [
-        //{x: .3, y: .35, radx:0.03, color: "limegreen", show: true},
-      //],
-
       drawPoints: '',
       drawLines: '',
       drawCircles: '',
@@ -266,9 +239,15 @@ export default {
       }
     },
 
+    shapes: {
+      handler: function(a) {
+        console.log('lines changed: ', a)
+        this.updateAll()
+      },
+      deep: true,
+    },
     lines: {
       handler: function() {
-        console.log('lines changed')
         this.drawLines.draw()
       },
       deep: true,
@@ -292,6 +271,9 @@ export default {
       },
       deep: true,
     },
+    selectedId() {
+      this.updateAll()
+    },
     marked_stars() {
       this.drawStarmarkers.updateData(this.marked_stars)
       this.drawStarmarkers.draw()
@@ -303,6 +285,7 @@ export default {
   methods: {
 
     updateAll() {
+      this.drawBackground()
       this.drawPoints.draw()
       this.drawLines.draw()
       this.drawRects.draw()
@@ -351,6 +334,11 @@ export default {
     newInit() {
       this.svg = d3.select('#image_svg')
 
+      this.svg.append('rect')
+        .attr('width', this.imageWidth)
+        .attr('height', this.imageHeight)
+        .attr('fill', 'blue')
+
       this.drawPoints = new Point(this.svg, this.points, this.imageWidth, this.imageHeight)
       this.drawLines = new Line(this.svg, this.lines, this.imageWidth, this.imageHeight)
       this.drawRects = new Rect(this.svg, this.rects, this.imageWidth, this.imageHeight)
@@ -362,11 +350,25 @@ export default {
 
     },
 
+    drawBackground() {
+
+      this.svg.selectAll('.svg-background')
+        .data([this.imageWidth, this.imageHeight])
+        .join('rect')
+          .attr('class', 'svg-background')
+          .attr('width', this.imageWidth)
+          .attr('height', this.imageHeight)
+          .attr('fill', 'transparent')
+          .on('click', () => {
+            console.log('clicked the blue background')
+            this.$store.commit('drawshapes/selectedId', 'none')
+          })
+    },
 
     init() {
 
-      // this is the subframe element
-      this.d3_image_element = d3.select(this.image_element)
+
+
 
       // Initialize subframe rectangle
       const rect1 = [{"x":0, "y":0}]
@@ -388,14 +390,14 @@ export default {
       this.subframeSVG = d3.select("#subframeSVG")
 
       // Event actions to perform on the image window element
-      this.d3_image_element
+      this.svg
         .on("mousedown", this.handleMouseDown) 
         .on("mouseup", this.handleMouseUp)
         //.on("contextmenu", this.handleContextMenu)
     }, 
 
     handleContextMenu(data, index) {
-      let position = d3.mouse(this.d3_image_element.node());
+      let position = d3.mouse(this.svg.node());
       this.draw_marker(position[0], position[1]);
       Snackbar.open({
         duration: this.right_click_ttl,
@@ -420,28 +422,30 @@ export default {
     },
 
     newPointMouseMove() {
-      let mouse = d3.mouse(this.d3_image_element.node())
+      let mouse = d3.mouse(this.svg.node())
       let newPoint = this.points[this.points.length - 1]
+      this.selectedId = newPoint.id
       newPoint.x = mouse[0] / this.imageWidth
       newPoint.y = mouse[1] / this.imageHeight
     },
     newLineMouseMove() {
-      let mouse = d3.mouse(this.d3_image_element.node())
+      let mouse = d3.mouse(this.svg.node())
       let newLine = this.lines[this.lines.length - 1]
+      this.selectedId = newLine.id
       newLine.x2 = mouse[0] / this.imageWidth
       newLine.y2 = mouse[1] / this.imageHeight
     },
     newRectMouseMove() {
-      let mouse = d3.mouse(this.d3_image_element.node())
+      let mouse = d3.mouse(this.svg.node())
       let newRect = this.rects[this.rects.length - 1]
-      console.log('new rect: ', newRect)
+      this.selectedId = newRect.id
       newRect.x2 = mouse[0] / this.imageWidth
       newRect.y2 = mouse[1] / this.imageHeight
     },
     newCircleMouseMove() {
-      let mouse = d3.mouse(this.d3_image_element.node())
+      let mouse = d3.mouse(this.svg.node())
       let newCircle = this.circles[this.circles.length - 1]
-      console.log('new circle: ', newCircle)
+      this.selectedId = newCircle.id
       newCircle.rx = (mouse[0] / this.imageWidth) - newCircle.x
       newCircle.ry = (mouse[1] / this.imageHeight) - newCircle.y
     },
@@ -449,14 +453,14 @@ export default {
     handleMouseDown() {
       d3.event.preventDefault();
 
-      //this.d3_image_element
+      //this.svg
         //.on("mousemove", this.handleMouseMove)
 
-      let mClick = d3.mouse(this.d3_image_element.node())
-      let mouse = d3.mouse(this.d3_image_element.node())
+      let mClick = d3.mouse(this.svg.node())
+      let mouse = d3.mouse(this.svg.node())
 
       // Calculate image dimensions
-      let bounds = this.d3_image_element.node().getBoundingClientRect()
+      let bounds = this.svg.node().getBoundingClientRect()
       let imageWidth = bounds.width
       let imageHeight = bounds.height
 
@@ -468,9 +472,9 @@ export default {
           x2: mouse[0] / imageWidth,
           y2: mouse[1] / imageHeight,
           color: 'gold',
-          selected: false,
+          show: true,
         })
-        this.d3_image_element.on("mousemove", this.newLineMouseMove)
+        this.svg.on("mousemove", this.newLineMouseMove)
       }
 
       else if (this.activeDrawShape == 'rect') {
@@ -480,9 +484,9 @@ export default {
           x2: mouse[0] / imageWidth,
           y2: mouse[1] / imageHeight,
           color: 'gold',
-          selected: false,
+          show: true,
         })
-        this.d3_image_element.on("mousemove", this.newRectMouseMove)
+        this.svg.on("mousemove", this.newRectMouseMove)
       }
 
       else if ( this.activeDrawShape == 'point') {
@@ -491,9 +495,8 @@ export default {
           y: mouse[1] / imageHeight,
           color: 'gold', 
           show: true,
-          selected: false,
         })
-        this.d3_image_element.on("mousemove", this.newPointMouseMove)
+        this.svg.on("mousemove", this.newPointMouseMove)
       }
 
       else if (this.activeDrawShape == 'circle') {
@@ -504,9 +507,8 @@ export default {
           ry: 0,
           color: 'gold', 
           show: true,
-          selected: false,
         })
-        this.d3_image_element.on("mousemove", this.newCircleMouseMove)
+        this.svg.on("mousemove", this.newCircleMouseMove)
 
       }
 
@@ -532,10 +534,10 @@ export default {
 
     handleMouseMove() {
       // coordinates of current mouse position
-      let mDrag = d3.mouse(this.d3_image_element.node())
+      let mDrag = d3.mouse(this.svg.node())
 
       // Calculate image dimensions
-      let bounds = this.d3_image_element.node().getBoundingClientRect()
+      let bounds = this.svg.node().getBoundingClientRect()
       let imageWidth = bounds.width
       let imageHeight = bounds.height
 
@@ -566,11 +568,11 @@ export default {
       // they want drawn each time. 
       this.activeDrawShape = 'none'
 
-      this.d3_image_element
+      this.svg
         .on("mousemove", null)
 
       this.mouseIsDown = false;
-      let mouse = d3.mouse(this.d3_image_element.node())
+      let mouse = d3.mouse(this.svg.node())
       if(this.subframeIsVisible) {
         this.subframeDefinedWithFile = this.current_image.base_filename
       }
@@ -768,32 +770,16 @@ export default {
     },
 
 
-    ...mapState('drawshapes', ['lines', 'rects', 'circles', 'points', 'starmarkers']),
+    ...mapState('drawshapes', ['shapes', 'lines', 'rects', 'circles', 'points', 'starmarkers']),
+    selectedId: {
+      get() { return this.$store.getters['drawshapes/selectedId']},
+      set(val) { this.$store.commit('drawshapes/selectedId', val)}
+    },
     activeDrawShape: {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},
       set(val) { this.$store.commit('drawshapes/activeDrawShape', val)}
 
     }
-    //lines: {
-      //get() { return this.$store.getters['drawshapes/lines']},
-      //set(val) { this.$store.commit('drawshapes/newLine')}
-    //},
-    //rects: {
-      //get() { return this.$store.getters['drawshapes/rects']},
-      //set(val) { this.$store.commit('drawshapes/newRect')}
-    //},
-    //circles: {
-      //get() { return this.$store.getters['drawshapes/circles']},
-      //set(val) { this.$store.commit('drawshapes/newCircle')}
-    //},
-    //points: {
-      //get() { return this.$store.getters['drawshapes/points']},
-      //set(val) { this.$store.commit('drawshapes/newPoint')}
-    //},
-    //starmarkers: {
-      //get() { return this.$store.getters['drawshapes/starmarkers']},
-      //set(val) { this.$store.commit('drawshapes/newStarmarker')}
-    //},
 
   }
 };
@@ -836,11 +822,8 @@ export default {
   height: 100%;
 }
 
-.image-div-pointer-cross:hover {
+.crosshair-cursor:hover {
   cursor:crosshair;
-}
-.image-div-no-cursor:hover {
-  cursor:none;
 }
 
 .recent_images {

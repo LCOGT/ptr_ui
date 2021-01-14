@@ -20,7 +20,7 @@ export default {
   },
 
   mounted() {
-      console.log('mounted context')
+      //console.log('mounted context')
       this.createChart()
   },
 
@@ -32,7 +32,7 @@ export default {
   methods: {
     createChart() {
         const vm = this;
-      console.log('createchart context')
+      //console.log('createchart context')
       const chartComponent = document.getElementById("chart-component");
       chartComponent.addEventListener("contextmenu", this.setContextMenuCoords);
       //d3.select('#image_svg').selectAll('.circle-selection')
@@ -44,13 +44,13 @@ export default {
 
       d3.select('#image_svg')
       .on('mouseover', function() {
-          console.log('in svg mouseover')
+          //console.log('in svg mouseover')
           d3.select(this).style('border-color', 'green')
       })
 
       .on('contextmenu', function(d) {
           d3.event.preventDefault()
-          console.log('right click')
+          //console.log('right click')
           vm.contextMenu(d, this)
       })
 

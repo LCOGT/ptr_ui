@@ -1,4 +1,5 @@
 import * as d3 from 'd3'
+import store from '../../store'
 
 
 
@@ -38,6 +39,12 @@ class Rect {
     midx(r) { return (r.x1 + r.x2) * this.imWidth / 2 }
     midy(r) { return (r.y1 + r.y2) * this.imHeight / 2 }
     
+    get selectedId() {
+        return store.getters['drawshapes/selectedId']
+    }
+    set selectedId(val) {
+        store.commit('drawshapes/selectedId', val)
+    }
 
 
     handleLineMouseOver(d, i) {  // Add interactivity
@@ -48,8 +55,8 @@ class Rect {
     }
 
 
-    dragstarted() {
-        //console.log('drag started')
+    dragstarted = d => {
+        this.selectedId = d.id
     }
 
     dragged = (d, i) => {
@@ -82,17 +89,19 @@ class Rect {
 
     draw() {
 
+        const dragHandleRadius = 5
+
         // don't draw if the svg isn't visible
         if (this.imHeight * this.imWidth == 0) {return;}
 
-        let self = this
 
         const handleSelectableAreaRadius = 12
 
         let g = this.svg.selectAll('.custom-rect')
             .data(this.data)
             .join('g')
-            .attr('class', 'custom-rect')
+            .attr('class', 'custom-rect selectable-shape')
+            .attr('id', d => d.id)
             //.on('mouseover', this.mouseover)
             //.on('mouseout', this.mouseout)
             .call(d3.drag()
@@ -100,127 +109,136 @@ class Rect {
                 .on("drag", this.dragged)
                 .on("end", this.dragended)
             )
+            .on('mouseover', function () {
+                d3.select(this).style('cursor', 'grab')
+            })
 
         let rect = g.selectAll('.main-rect')
             .data(d => [d])
             .join('rect')
                 .attr('class', 'main-rect')
-                .attr('x', r => self.minx(r))
-                .attr('y', r => self.miny(r))
-                .attr('width', r => self.rectwidth(r))
-                .attr('height', r => self.rectheight(r))
+                .attr('x', r => this.minx(r))
+                .attr('y', r => this.miny(r))
+                .attr('width', r => this.rectwidth(r))
+                .attr('height', r => this.rectheight(r))
                 .attr('stroke', r => r.color)
                 .attr("fill", 'transparent')
-                //.on('mouseover', this.mouseover)
+                .attr('stroke-width', d => d.id == this.selectedId ? 3 : 1)
+
                 //.on('mouseout', this.mouseout)
+
+
+
+        let dragHandle1 = g.selectAll('.drag-handle-1')
+            .data(d => [d])
+            .join('circle')
+                .attr('class', 'drag-handle-1 drag-handle')
+                .attr("cx", d => d.x1 * this.imWidth)
+                .attr("cy", d => d.y1 * this.imHeight)
+                .attr("r", dragHandleRadius)
+        let dragHandle2 = g.selectAll('.drag-handle-2')
+            .data(d => [d])
+            .join('circle')
+                .attr('class', 'drag-handle-2 drag-handle')
+                .attr("cx", d => d.x2 * this.imWidth)
+                .attr("cy", d => d.y1 * this.imHeight)
+                .attr("r", dragHandleRadius)
+        let dragHandle3 = g.selectAll('.drag-handle-3')
+            .data(d => [d])
+            .join('circle')
+                .attr('class', 'drag-handle-3 drag-handle')
+                .attr("cx", d => d.x1 * this.imWidth)
+                .attr("cy", d => d.y2 * this.imHeight)
+                .attr("r", dragHandleRadius)
+        let dragHandle4 = g.selectAll('.drag-handle-4')
+            .data(d => [d])
+            .join('circle')
+                .attr('class', 'drag-handle-4 drag-handle')
+                .attr("cx", d => d.x2 * this.imWidth)
+                .attr("cy", d => d.y2 * this.imHeight)
+                .attr("r", dragHandleRadius)
+        let dragHandleCommon = g.selectAll('.drag-handle')
+            .attr('stroke', d => d.color)
+            .attr("fill", "transparent")
+            .style('opacity', d => d.id == this.selectedId ? 1 : 0)
+
 
         let dragHandle1Area = g.selectAll('.drag-handle-1-area')
             .data(d => [d])
             .join('circle')
                 .attr('class', 'drag-handle-1-area')
-                .attr("cx", d => d.x1 * self.imWidth)
-                .attr("cy", d => d.y1 * self.imHeight)
+                .attr("cx", d => d.x1 * this.imWidth)
+                .attr("cy", d => d.y1 * this.imHeight)
                 .attr("r", handleSelectableAreaRadius)
                 .attr("fill", "transparent")
                 .attr('stroke', d => d.color)
                 .style('opacity', 0)
                 .on('mouseover', function() {
-                    d3.select(this).style('opacity', 0.5)
+                    d3.select(this)
+                        .style('opacity', 0.5)
+                        .style('cursor', 'nesw-resize')
                 })
                 .on('mouseout', function() {
                     d3.select(this).style('opacity', 0)
                 })
                 .call(d3.drag().on("drag", this.dragHandle1))
-        let dragHandle1 = g.selectAll('.drag-handle-1')
-            .data(d => [d])
-            .join('circle')
-                .attr('class', 'drag-handle-1')
-                .attr("cx", d => d.x1 * self.imWidth)
-                .attr("cy", d => d.y1 * self.imHeight)
-                .attr("r", 3)
-                .attr("fill", "transparent")
-                .attr('stroke', d => d.color)
-
         let dragHandle2Area = g.selectAll('.drag-handle-2-area')
             .data(d => [d])
             .join('circle')
                 .attr('class', 'drag-handle-2-area')
-                .attr("cx", d => d.x2 * self.imWidth)
-                .attr("cy", d => d.y1 * self.imHeight)
+                .attr("cx", d => d.x2 * this.imWidth)
+                .attr("cy", d => d.y1 * this.imHeight)
                 .attr("r", handleSelectableAreaRadius)
                 .attr('stroke', d => d.color)
                 .attr("fill", "transparent")
                 .style('opacity', 0)
                 .on('mouseover', function() {
-                    d3.select(this).style('opacity', 0.5)
+                    d3.select(this)
+                        .style('opacity', 0.5)
+                        .style('cursor', 'nwse-resize')
                 })
                 .on('mouseout', function() {
                     d3.select(this).style('opacity', 0)
                 })
                 .call(d3.drag().on("drag", this.dragHandle2))
-        let dragHandle2 = g.selectAll('.drag-handle-2')
-            .data(d => [d])
-            .join('circle')
-                .attr('class', 'drag-handle-2')
-                .attr("cx", d => d.x2 * self.imWidth)
-                .attr("cy", d => d.y1 * self.imHeight)
-                .attr("r", 3)
-                .attr("fill", "transparent")
-                .attr('stroke', d => d.color)
-
         let dragHandle3Area = g.selectAll('.drag-handle-3-area')
             .data(d => [d])
             .join('circle')
                 .attr('class', 'drag-handle-3-area')
-                .attr("cx", d => d.x1 * self.imWidth)
-                .attr("cy", d => d.y2 * self.imHeight)
+                .attr("cx", d => d.x1 * this.imWidth)
+                .attr("cy", d => d.y2 * this.imHeight)
                 .attr("r", handleSelectableAreaRadius)
                 .attr("fill", "transparent")
                 .attr('stroke', d => d.color)
                 .style('opacity', 0)
                 .on('mouseover', function() {
-                    d3.select(this).style('opacity', 0.5)
+                    d3.select(this)
+                        .style('opacity', 0.5)
+                        .style('cursor', 'nwse-resize')
                 })
                 .on('mouseout', function() {
                     d3.select(this).style('opacity', 0)
                 })
                 .call(d3.drag().on("drag", this.dragHandle3))
-        let dragHandle3 = g.selectAll('.drag-handle-3')
-            .data(d => [d])
-            .join('circle')
-                .attr('class', 'drag-handle-3')
-                .attr("cx", d => d.x1 * self.imWidth)
-                .attr("cy", d => d.y2 * self.imHeight)
-                .attr("r", 3)
-                .attr("fill", "transparent")
-                .attr('stroke', d => d.color)
-
         let dragHandle4Area = g.selectAll('.drag-handle-4-area')
             .data(d => [d])
             .join('circle')
                 .attr('class', 'drag-handle-4-area')
-                .attr("cx", d => d.x2 * self.imWidth)
-                .attr("cy", d => d.y2 * self.imHeight)
+                .attr("cx", d => d.x2 * this.imWidth)
+                .attr("cy", d => d.y2 * this.imHeight)
                 .attr("r", handleSelectableAreaRadius)
                 .attr("fill", "transparent")
                 .attr('stroke', d => d.color)
                 .style('opacity', 0)
                 .on('mouseover', function() {
-                    d3.select(this).style('opacity', 0.5)
+                    d3.select(this)
+                        .style('opacity', 0.5)
+                        .style('cursor', 'nesw-resize')
                 })
                 .on('mouseout', function() {
                     d3.select(this).style('opacity', 0)
                 })
                 .call(d3.drag().on("drag", this.dragHandle4))
-        let dragHandle4 = g.selectAll('.drag-handle-4')
-            .data(d => [d])
-            .join('circle')
-                .attr('class', 'drag-handle-4')
-                .attr("cx", d => d.x2 * self.imWidth)
-                .attr("cy", d => d.y2 * self.imHeight)
-                .attr("r", 3)
-                .attr("fill", "transparent")
-                .attr('stroke', d => d.color)
 
         let centerx = g.selectAll('.center-cross-x')
             .data(d => [d])
@@ -244,6 +262,8 @@ class Rect {
                 .attr('color', d => d.color)
                 .attr('stroke', d => d.color)
                 .attr('stroke-width', 1)
+
+
     }
 }
 

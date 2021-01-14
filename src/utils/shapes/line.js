@@ -1,4 +1,5 @@
 import * as d3 from 'd3'
+import store from '../../store'
 
 
 class Line {
@@ -18,40 +19,45 @@ class Line {
         this.imHeight = val[1] || 0
         this.draw()
     }
+    get selectedId() {
+        return store.getters['drawshapes/selectedId']
+    }
+    set selectedId(val) {
+        store.commit('drawshapes/selectedId', val)
+    }
 
 
     // Display helpers:
     //p1(l) { return [this.imWidth * l.x1, this.imHeight * l.y1] }
     //p2(l) { return [this.imWidth * l.x2, this.imHeight * l.y2]}
 
-    handleLineMouseOver(d, i) {
-        d3.select(this.parentNode).selectAll('.main-line')
-            .attr('stroke-width', 5)
-            .attr('stroke', 'orange')
-
-        d3.select(this)
+    handleLineMouseOver = (d, i) => {
+        this.svg.select(d.id)
+            .attr('stroke-width', d => d.id == this.selectedId ? 4 : 3)
+            .style('opacity', 0.9)
             .style('cursor', 'grab')
+
     }
 
-    mouseout(d,i) {
-        //console.log('mouseout')
-        const stroke = d3.select(this).data()[0].color
-        d3.select(this.parentNode).selectAll('.main-line')
-            .attr('stroke-width', 3)
+    mouseout = (d,i) => {
+        const stroke = d.color
+        this.svg.select(d.id).select('.main-line')
+            .attr('stroke-width', d => d.id == this.selectedId ? 3 : 2)
             .attr('stroke', stroke)
+            .style('opacity', 0.8)
     }
 
-    dragstarted() {
+    dragstarted = (d) => {
         //console.log('drag started')
+        this.selectedId = d.id
     }
 
-    clicked(event, d) {
-        if (event.defaultPrevented) return; // dragged
+    clicked = (d, i) => {
+        if (d.defaultPrevented) return; // dragged
 
-        d3.select(this).selectAll('.main-line')
+        this.svg.select(d.id).select('.main-line')
             .attr("stroke", "black")
 
-        d.selected = true
     }
 
     dragged = (d,i) => {
@@ -85,7 +91,8 @@ class Line {
         let g = this.svg.selectAll('.line-selection')
             .data(this.data)
             .join('g')
-            .attr("class", "line-selection")
+            .attr("class", "line-selection selectable-shape")
+            .attr('id', d => d.id)
             .call(d3.drag()
                 .on("start", this.dragstarted)
                 .on("drag", this.dragged)
@@ -101,8 +108,10 @@ class Line {
                 .attr("y1", d => d.y1 * this.imHeight)
                 .attr("x2", d => d.x2 * this.imWidth)
                 .attr("y2", d => d.y2 * this.imHeight)
-                .attr("stroke-width", 3)
+                .attr("stroke-width", d => d.id == this.selectedId ? 3 : 2)
                 .attr("stroke", d => d.color)
+                .style('opacity', d => d.id == this.selectedId ? 1 : 0.8)
+
 
         let hoverArea = g.selectAll('.hover-line')
             .data(d => [d])
@@ -144,6 +153,7 @@ class Line {
                 .attr("r", 3)
                 .attr("fill", "transparent")
                 .attr('stroke', d => d.color)
+                .style('opacity', d => d.id == this.selectedId ? 1 : 0)
         let dragHandle2Area = g.selectAll('.drag-handle-2-area')
             .data(d => [d])
             .join('circle')
@@ -170,6 +180,7 @@ class Line {
                 .attr("r", 3)
                 .attr("fill", "transparent")
                 .attr('stroke', d => d.color)
+                .style('opacity', d => d.id == this.selectedId ? 1 : 0)
     }
 }
 

@@ -34,7 +34,7 @@
 
 
       <!-- Basic image info and a button to reveal the full fits header -->
-      <side-info-panel :startOpen="false">
+      <side-info-panel :startOpen="true">
 
         <p class="level" slot="title">
           Image Info 
@@ -240,7 +240,21 @@
         </b-field>
 
           <p>Selected Shape: </p>
-          <p>{{activeDrawShape}}</p>
+          <table v-if="selectedId != 'none'" style="margin: 1em;">
+            <template v-for="(val, key) in selectedShape">
+              <tr v-if="selectedId != 'none'" v-bind:key="key">
+                <td align="right">{{key}}</td>
+                <td style="padding-left: 1em;">{{val}}</td>
+              </tr>
+            </template>
+          </table>
+          <div v-else>nothing selected</div>
+          <b-button 
+            class="button"
+            :disabled="selectedId == 'none'"
+            @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
+            delete selected shape
+          </b-button>
           
 
 
@@ -819,7 +833,15 @@ export default {
       "available_sites"
     ]),
     
-    ...mapState("drawshapes", ['activeDrawShape',]),
+    ...mapState("drawshapes", ['selectedId']),
+    activeDrawShape: {
+      get() { return this.$store.getters['drawshapes/activeDrawShape']},
+      set(val) { this.$store.dispatch('drawshapes/activeDrawShape', val )}
+    },
+    selectedShape: {
+      get() { return this.$store.getters['drawshapes/selectedShape']},
+      set(val) { this.$store.dispatch('drawshapes/selectedShape', val )}
+    },
 
     brightest_star_display() {
       return {
