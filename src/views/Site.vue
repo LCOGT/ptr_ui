@@ -160,7 +160,6 @@ import SiteStatusFooterMobile from '@/components/status/SiteStatusFooterMobile'
 
 import SiteHome from '@/components/sitepages/SiteHome'
 import SiteObserve from '@/components/sitepages/SiteObserve'
-import SiteObservesimple from '@/components/sitepages/SiteObservesimple'
 import SiteTargets from '@/components/sitepages/SiteTargets'
 import SiteCalendar from '@/components/sitepages/SiteCalendar'
 import SiteProjects from '@/components/sitepages/SiteProjects'
@@ -179,7 +178,6 @@ export default {
     CommandButton,
     SiteHome,
     SiteObserve,
-    SiteObservesimple,
     SiteTargets,
     SiteCalendar,
     SiteProjects,
