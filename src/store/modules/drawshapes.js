@@ -1,9 +1,11 @@
 
-const idToShapelistName = id => {
+function idToShapelistName(id) {
+    if (id == 'none') return 'none'
     if (id[0] == 'p') return 'points'
     if (id[0] == 'l') return 'lines'
     if (id[0] == 'r') return 'rects'
     if (id[0] == 'c') return 'circles'
+    console.log('unknown shape type from id: ', id)
 }
 
 const simpleId = () => Math.random().toString(36).slice(-6)
@@ -32,12 +34,47 @@ const state = {
 const getters = {
     activeDrawShape: state => state.activeDrawShape,
     selectedId: state => state.selectedId,
+    selectionExists: state => state.selectedId != 'none',
 
     selectedShape: state => {
         if (state.selectedId == 'none') return 'none'
         const allShapes = [...state.points, ...state.lines, ...state.rects, ...state.circles]
         const selected = allShapes.find(x => x.id == state.selectedId)
         return selected
+    },
+    selectedShapeType: state => {console.log(state.selectedId); return idToShapelistName(state.selectedId)},
+
+    // This is used as a camera command param
+    subframeFromShape: (state, getters) => {
+        const fullSubframe = { x0: 0, y0: 0, x1: 1, y1: 1 }
+
+        // If no shape is selected, the subframe is the default full image
+        if (state.selectedId == 'none') {
+            return fullSubframe
+        }
+        const shape = getters.selectedShape
+        const type = getters.selectedShapeType
+
+        if (type == 'rects' || type == 'lines') {
+            return {
+                x0: shape.x1,
+                y0: shape.y1,
+                x1: shape.x2,
+                y1: shape.y2,
+            }
+        } else if (type == 'circles') {
+            // get the square that encloses the circle
+            const rad_length = Math.sqrt((shape.rx ** 2) + (shape.ry ** 2))
+            return {
+                x0: shape.cx - rad_length,
+                y0: shape.cy - rad_length,
+                x1: shape.cx + rad_length,
+                y1: shape.xy + rad_length
+            }
+        } else {
+            // Default case
+            return fullSubframe
+        }
     },
 
     points: state => state.points,
@@ -50,7 +87,8 @@ const getters = {
 const mutations = {
 
     activeDrawShape(state, val) { state.activeDrawShape = val },
-    selectedId(state, val) { console.log('changing selected id'); state.selectedId = val },
+    selectedId(state, val) { state.selectedId = val },
+
 
 
     addPoint(state, newPoint) {
@@ -80,11 +118,7 @@ const mutations = {
     removeElement(state, {shape, id}) {
         let index = state[shape].findIndex(s => s.id == id)
         if (index == -1) return; // no element found
-        console.log(id)
-        console.log(index)
-        console.log(state[shape])
         state[shape].splice(index, 1)
-        console.log(state[shape])
     },
 }
 
@@ -95,6 +129,7 @@ const actions = {
         commit('removeElement', {shape, id})
     },
     deleteSelectedShape({commit, state, dispatch}) {
+        if (state.selectedId == "none") return; // if nothing is selected
         dispatch('deleteShape', state.selectedId)
         commit('selectedId', 'none')
     },
