@@ -17,10 +17,6 @@ const state = {
     // Subframe parameters
     subframeIsActive: false,
     subframeDefinedWithFile: '',
-    subframe_x0: 0,
-    subframe_y0: 0,
-    subframe_x1: 1,
-    subframe_y1: 1,
 
     camera_areas_selection: 'Full',
     camera_note: '',

@@ -116,7 +116,7 @@ class Rect {
         let rect = g.selectAll('.main-rect')
             .data(d => [d])
             .join('rect')
-                .attr('class', 'main-rect')
+                .attr('class', 'main-rect selectable-shape')
                 .attr('x', r => this.minx(r))
                 .attr('y', r => this.miny(r))
                 .attr('width', r => this.rectwidth(r))

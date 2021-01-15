@@ -7,8 +7,29 @@
       <!-- The actual image view component -->
       <image-view 
         :site="sitecode" 
-        :marked_stars="marked_stars"
-        />
+        :marked_stars="marked_stars" />
+
+      <hr>
+      <b-collapse class="card" position="is-top" :open="false" style="padding:0">
+        <div
+          slot="trigger" 
+          slot-scope="props"
+          class="card-header"
+          >
+          <p class="card-header-title">
+              Table of images
+          </p>
+          <a class="card-header-icon">
+              <b-icon
+                  :icon="props.open ? 'menu-down' : 'menu-up'">
+              </b-icon>
+          </a>
+        </div>
+        <div class="card-content" style="padding:0">
+          <images-table/>
+        </div>
+      </b-collapse>
+
     </div>
 
     <!-- Collapsible panels on the right of the image --> 
@@ -213,7 +234,7 @@
       </side-info-panel>
 
       <!-- shape selection tools -->
-      <side-info-panel :startOpen="true">
+      <side-info-panel :startOpen="false">
         <p slot="title">Selection Tools</p>
 
         <b-field>
@@ -251,9 +272,11 @@
           <div v-else>nothing selected</div>
           <b-button 
             class="button"
+            type="is-danger"
             :disabled="selectedId == 'none'"
+            icon-right="delete"
             @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
-            delete selected shape
+            <span>remove shape</span>
           </b-button>
           
 
@@ -267,25 +290,6 @@
 
   </div>
 
-  <b-collapse class="card" position="is-top" :open="false" style="padding:0">
-    <div
-      slot="trigger" 
-      slot-scope="props"
-      class="card-header"
-      >
-      <p class="card-header-title">
-          Table of images
-      </p>
-      <a class="card-header-icon">
-          <b-icon
-              :icon="props.open ? 'menu-down' : 'menu-up'">
-          </b-icon>
-      </a>
-    </div>
-    <div class="card-content" style="padding:0">
-      <images-table/>
-    </div>
-  </b-collapse>
 
   <!-- Modal popup window showing the full fits header. -->
   <b-modal :active.sync="showFitsHeaderModal" >
@@ -345,6 +349,7 @@ import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
 import axios from 'axios'
 import * as d3 from 'd3'
+import helpers from "@/utils/helpers"
 
 export default {
   name: "SubpageData",
@@ -458,11 +463,20 @@ export default {
       }
 
       if (useSubregion) {
+
+        if (this.selectedShapeType != "rects") {
+          console.log(this.selectedShapeType)
+          this.$buefy.toast.open({
+            type: 'is-warning',
+            message: 'Region must be a rectangle.'
+          })
+          return;
+        } 
         this.inspect_region_loading = true;
-        body.region_x0 = this.subframe_x0
-        body.region_x1 = this.subframe_x1
-        body.region_y0 = this.subframe_y0
-        body.region_y1 = this.subframe_y1
+        body.region_x0 = helpers.clamp(this.selectedShape.x1, 0, 1)
+        body.region_x1 = helpers.clamp(this.selectedShape.x2, 0, 1)
+        body.region_y0 = helpers.clamp(this.selectedShape.y1, 0, 1)
+        body.region_y1 = helpers.clamp(this.selectedShape.y2, 0, 1)
       }
       else { this.inspect_image_loading = true; }
 
@@ -741,11 +755,20 @@ export default {
         "fitstype": fitstype,
       }
       if (useSubregion) {
+
+        if (this.selectedShapeType != "rects") {
+          console.log(this.selectedShapeType)
+          this.$buefy.toast.open({
+            type: 'is-warning',
+            message: 'Region must be a rectangle.'
+          })
+          return;
+        } 
         this.region_info_loading = true;
-        body.region_x0 = this.subframe_x0,
-        body.region_x1 = this.subframe_x1,
-        body.region_y0 = this.subframe_y0,
-        body.region_y1 = this.subframe_y1
+        body.region_x0 = helpers.clamp(this.selectedShape.x1, 0, 1)
+        body.region_x1 = helpers.clamp(this.selectedShape.x2, 0, 1)
+        body.region_y0 = helpers.clamp(this.selectedShape.y1, 0, 1)
+        body.region_y1 = helpers.clamp(this.selectedShape.y2, 0, 1)
       }
       else { this.image_info_loading = true;}
       if (fitstype == "10") { this.ex10_isLoading = true;}
@@ -833,7 +856,11 @@ export default {
       "available_sites"
     ]),
     
-    ...mapState("drawshapes", ['selectedId']),
+    ...mapGetters("drawshapes", [
+      'selectedId',
+      'selectionExists',
+      'selectedShapeType',
+      ]),
     activeDrawShape: {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},
       set(val) { this.$store.dispatch('drawshapes/activeDrawShape', val )}
