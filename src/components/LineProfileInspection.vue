@@ -30,8 +30,6 @@
       </svg>
     </div>
 
-    <button @click="drawYAxis">y axis</button>
-
   </side-info-panel>
 </template>
 

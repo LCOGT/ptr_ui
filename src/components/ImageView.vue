@@ -83,6 +83,7 @@
         </b-field>
 
         <b-field>
+        <b-field>
           <b-radio-button v-model="activeDrawShape" native-value="none"> none </b-radio-button>
           <b-radio-button v-model="activeDrawShape" native-value="point">
               <span class="iconify" data-icon="radix-icons:dot" data-inline="false"></span>
@@ -96,6 +97,17 @@
           <b-radio-button v-model="activeDrawShape" native-value="rect">
               <span class="iconify" data-icon="mdi:vector-rectangle" data-inline="false"></span>
           </b-radio-button>
+        </b-field>
+
+        <b-button 
+          class="button"
+          title="Remove selected shape"
+          style="margin-left: 10px;"
+          type="is-danger"
+          :disabled="selectedId == 'none'"
+          icon-right="delete"
+          @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
+        </b-button>
         </b-field>
 
         <!--b-field label="crosshairs">
