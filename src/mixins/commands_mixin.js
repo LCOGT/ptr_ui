@@ -142,10 +142,10 @@ export const commands_mixin = {
 
             const options = await this.getAuthHeader()
             let form = formCreatorFunction(...args).form
-            const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.sitecode}`
+            const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.active_site}`
 
             form.timestamp = parseInt(Date.now() / 1000)
-            form.site = this.sitecode
+            form.site = this.active_site
             form.mount = this.active_mount
 
             console.log(form)
