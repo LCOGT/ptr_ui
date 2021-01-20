@@ -17,6 +17,7 @@
             :isVisible="show_crosshairs"
             color="yellow"/>
           <background-element id="svg-background" :width="imageWidth" :height="imageHeight" />
+
         </svg>
         <svg-context-menu svgId="image_svg" />
 
@@ -120,6 +121,7 @@ import JS9 from "@/components/JS9";
 import ImageCrosshairs from "@/components/svg/ImageCrosshairs"
 import BackgroundElement from "@/components/svg/BackgroundElement"
 import SvgContextMenu from "@/components/SvgContextMenu"
+import RectSelection from "@/components/svg/RectSelection"
 
 import { Point, Line, Rect, Circle, Starmarker }from "@/utils/drawshapes"
 
@@ -131,6 +133,7 @@ export default {
     SvgContextMenu,
     ImageCrosshairs,
     BackgroundElement,
+    RectSelection,
   },
 
   mixins: [commands_mixin],
@@ -230,13 +233,13 @@ export default {
       this.drawStarmarkers.updateData(this.marked_stars)
       this.drawStarmarkers.draw()
     }
-
   },
 
 
   methods: {
 
     init() {
+
       this.svg = d3.select('#image_svg')
 
       this.svg.append('rect')
@@ -254,6 +257,7 @@ export default {
       this.svg
         .on("mousedown", this.handleMouseDown) 
         .on("mouseup", this.handleMouseUp)
+        .on('keyup', e => console.log(e.key))
 
       this.updateAll()
     },

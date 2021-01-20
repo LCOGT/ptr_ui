@@ -37,6 +37,7 @@ export default {
 
       // Time that right click events stay on the screen.
       right_click_ttl: 9000,
+
     }
   },
 
@@ -49,7 +50,6 @@ export default {
     deselectAll() {
       this.$store.commit('drawshapes/selectedId', 'none')
     },
-
 
     handleContextMenu(data, index) {
       let position = d3.mouse(d3.select('#svg-background').node());
