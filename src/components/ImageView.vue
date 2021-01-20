@@ -16,7 +16,7 @@
             :height="imageHeight"
             :isVisible="show_crosshairs"
             color="yellow"/>
-          <background-element :width="imageWidth" :height="imageHeight" />
+          <background-element id="svg-background" :width="imageWidth" :height="imageHeight" />
         </svg>
         <svg-context-menu svgId="image_svg" />
 
@@ -82,24 +82,17 @@
         </b-field>
 
         <b-field>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="none">
-              none
-          </b-radio-button>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="point">
+          <b-radio-button v-model="activeDrawShape" native-value="none"> none </b-radio-button>
+          <b-radio-button v-model="activeDrawShape" native-value="point">
               <span class="iconify" data-icon="radix-icons:dot" data-inline="false"></span>
           </b-radio-button>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="line">
+          <b-radio-button v-model="activeDrawShape" native-value="line">
               <span class="iconify" data-icon="mdi:vector-line" data-inline="false"></span>
           </b-radio-button>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="circle">
+          <b-radio-button v-model="activeDrawShape" native-value="circle">
               <span class="iconify" data-icon="mdi:vector-circle-variant" data-inline="false"></span>
           </b-radio-button>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="rect">
+          <b-radio-button v-model="activeDrawShape" native-value="rect">
               <span class="iconify" data-icon="mdi:vector-rectangle" data-inline="false"></span>
           </b-radio-button>
         </b-field>
@@ -121,31 +114,29 @@ import wcs from "@/utils/pix2wcs";
 import { mapGetters, mapState } from "vuex";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
+import * as d3 from "d3";
+
 import JS9 from "@/components/JS9";
 import ImageCrosshairs from "@/components/svg/ImageCrosshairs"
 import BackgroundElement from "@/components/svg/BackgroundElement"
-
-import * as d3 from "d3";
+import SvgContextMenu from "@/components/SvgContextMenu"
 
 import { Point, Line, Rect, Circle, Starmarker }from "@/utils/drawshapes"
 
-
-import SvgCircle from "@/components/ImageView/SvgCircle"
-import SvgContextMenu from "@/components/SvgContextMenu"
-
 export default {
   name: "ImageView",
+
   components: {
     JS9,
-    SvgCircle,
     SvgContextMenu,
     ImageCrosshairs,
     BackgroundElement,
   },
+
   mixins: [commands_mixin],
+
   props: {
     site: String,
-
     marked_stars: Array,
   },
 
@@ -162,12 +153,6 @@ export default {
       show_crosshairs: false,
       crosshair_color: "#32cd32",
 
-      // Timer (setTimeout object) to clear the right click marker after a few seconds.
-      context_marker_timer: "",
-
-      // Time that right click events stay on the screen.
-      right_click_ttl: 9000,
-
       //Image ID of the currently highlighted image (focused)
       highlighted_image: 0,
 
@@ -178,7 +163,7 @@ export default {
   },
 
   created() {
-    this.$store.commit("site_config/setActiveSite", this.site);
+    //this.$store.commit("site_config/setActiveSite", this.site);
     this.$store.dispatch("images/load_latest_images");
   },
 
@@ -201,7 +186,6 @@ export default {
 
   watch: {
     site: function(newVal, oldVal) {
-      this.$store.commit("site_config/setActiveSite", newVal);
       this.$store.dispatch("images/load_latest_images");
     },
 
@@ -213,13 +197,6 @@ export default {
       }
     },
 
-    shapes: {
-      handler: function(a) {
-        console.log('lines changed: ', a)
-        this.updateAll()
-      },
-      deep: true,
-    },
     lines: {
       handler: function() {
         this.drawLines.draw()
@@ -277,7 +254,6 @@ export default {
       this.svg
         .on("mousedown", this.handleMouseDown) 
         .on("mouseup", this.handleMouseUp)
-        //.on("contextmenu", this.handleContextMenu)
 
       this.updateAll()
     },
@@ -320,31 +296,6 @@ export default {
       this.js9width=parseInt(width)
       this.js9height=parseInt(height)
 
-    },
-
-    handleContextMenu(data, index) {
-      let position = d3.mouse(this.svg.node());
-      this.draw_marker(position[0], position[1]);
-      Snackbar.open({
-        duration: this.right_click_ttl,
-        message:
-          //"Center telescope here? <br>Note: <em>telescope will move to the location you clicked.</em>.",
-          "Click to center the telescope here.",
-        type: "is-warning",
-        position: "is-top",
-        actionText: "Center on pixels",
-        queue: false,
-        onAction: () => {
-          console.log("slew to " + position[0]/ this.imageWidth + ", " + position[1]/ this.imageHeight);
-          this.send_pixels_center_command(
-            position[0],
-            position[1],
-            this.current_image.base_filename
-          );
-        }
-      });
-      // Don't open the usual right-click menu
-      d3.event.preventDefault();
     },
 
     handleMouseDown() {
@@ -437,65 +388,6 @@ export default {
     },
 
 
-    send_pixels_center_command(x, y, filename) {
-
-      let command_form = [
-        String(x / this.imageWidth),
-
-        // Change the y coordinate to start at the bottom. 
-        String((this.imageHeight - y ) / this.imageHeight),
-        filename
-      ]
-
-      this.postCommand(this.mount_slew_clickposition_command, command_form)
-
-    },
-
-
-    draw_marker(pixelX, pixelY) {
-      // Make sure a previous timer doesn't wipe our current right-click marker
-      clearTimeout(this.context_marker_timer);
-
-      // Remove any other right click markers on the screen.
-      this.remove_context_marker();
-
-      // Draw a small cross where user clicks.
-      d3
-        .select('#image_svg')
-        .append("line")
-        .attr("class", "context-marker")
-        .attr("x1", pixelX - 7)
-        .attr("y1", pixelY)
-        .attr("x2", pixelX + 7)
-        .attr("y2", pixelY)
-        .attr("stroke", "red")
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select('#image_svg')
-        .append("line")
-        .attr("class", "context-marker")
-        .attr("x1", pixelX)
-        .attr("y1", pixelY - 7)
-        .attr("x2", pixelX)
-        .attr("y2", pixelY + 7)
-        .attr("stroke", "red")
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-
-      // Set a timer to clear the marker in a few seconds.
-      this.context_marker_timer = setTimeout(
-        this.remove_context_marker,
-        this.right_click_ttl
-      );
-    },
-    remove_context_marker() {
-      d3
-        .select('#image_svg')
-        .selectAll(".context-marker")
-        .remove();
-    },
-
     // Activated by clicking on an image thumbnail. Displays that image
     // in the main view.
     setActiveImage(image) {
@@ -528,10 +420,6 @@ export default {
 
   },
   computed: {
-
-    sitecode() {
-      return this.site;
-    },
 
     ...mapGetters("images", [
       "recent_images",
