@@ -1,8 +1,6 @@
 import * as d3 from 'd3'
 import store from '../../store'
 
-
-
 /**
  * 
  *  The input data should contain rect objects with keys:
@@ -17,6 +15,7 @@ import store from '../../store'
  * 'backwards' and not have to worry about negative width/height, which
  * svg doesn't allow. 
  */
+
 class Rect {
     constructor(svg, data, width, height) {
         this.svg = svg
@@ -46,14 +45,12 @@ class Rect {
         store.commit('drawshapes/selectedId', val)
     }
 
-
     handleLineMouseOver(d, i) {  // Add interactivity
         // Use D3 to select element, change color and size
         d3.select(this)
             .attr('stroke-width', 5)
             .attr('stroke', 'orange')
     }
-
 
     dragstarted = d => {
         this.selectedId = d.id
@@ -67,7 +64,7 @@ class Rect {
     }
 
     dragended() {
-        //console.log('drag ended')
+        // placeholder for now
     }
 
     dragHandle1 = (d,i) => {
@@ -90,20 +87,16 @@ class Rect {
     draw() {
 
         const dragHandleRadius = 5
+        const handleSelectableAreaRadius = 12
 
         // don't draw if the svg isn't visible
         if (this.imHeight * this.imWidth == 0) {return;}
-
-
-        const handleSelectableAreaRadius = 12
 
         let g = this.svg.selectAll('.custom-rect')
             .data(this.data)
             .join('g')
             .attr('class', 'custom-rect selectable-shape')
             .attr('id', d => d.id)
-            //.on('mouseover', this.mouseover)
-            //.on('mouseout', this.mouseout)
             .call(d3.drag()
                 .on("start", this.dragstarted)
                 .on("drag", this.dragged)
@@ -124,10 +117,6 @@ class Rect {
                 .attr('stroke', r => r.color)
                 .attr("fill", 'transparent')
                 .attr('stroke-width', d => d.id == this.selectedId ? 3 : 1)
-
-                //.on('mouseout', this.mouseout)
-
-
 
         let dragHandle1 = g.selectAll('.drag-handle-1')
             .data(d => [d])
@@ -161,7 +150,6 @@ class Rect {
             .attr('stroke', d => d.color)
             .attr("fill", "transparent")
             .style('opacity', d => d.id == this.selectedId ? 1 : 0)
-
 
         let dragHandle1Area = g.selectAll('.drag-handle-1-area')
             .data(d => [d])
@@ -262,8 +250,6 @@ class Rect {
                 .attr('color', d => d.color)
                 .attr('stroke', d => d.color)
                 .attr('stroke-width', 1)
-
-
     }
 }
 

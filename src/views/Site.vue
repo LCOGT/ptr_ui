@@ -231,8 +231,6 @@ export default {
 
   async created () {
 
-    console.log('site created, sitecode: ', this.sitecode)
-
     this.$store.commit('site_config/setActiveSite', this.sitecode)
 
     // Load the active reservations for this site. 
@@ -259,7 +257,6 @@ export default {
       this.current_time_millis = moment().valueOf()
     }, 1000)
 
-
   },
 
   beforeDestroy() {
@@ -269,7 +266,7 @@ export default {
 
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
   watch: {
-    sitecode: function () {
+    sitecode() {
 
       this.$store.commit('site_config/setActiveSite', this.sitecode)
 
@@ -288,7 +285,6 @@ export default {
       this.$store.dispatch('calendar/fetchActiveReservations', this.sitecode)
     },
   },
-
 
   async mounted() {
 
@@ -316,7 +312,6 @@ export default {
         'weather',
     ]),
 
-
     // Get the username from Auth0
     username() {
       if (this.$auth.isAuthenticated) {
@@ -343,11 +338,8 @@ export default {
     async setDefaultDevices() {
       this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
     },
-
-
-
-}
   }
+}
 
 </script>
 

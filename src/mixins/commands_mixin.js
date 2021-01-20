@@ -250,10 +250,6 @@ export const commands_mixin = {
 
             'subframeIsActive',
             'subframeDefinedWithFile',
-            //'subframe_x0',
-            //'subframe_y0',
-            //'subframe_x1',
-            //'subframe_y1',
 
             'camera_areas_selection',
             'camera_note',

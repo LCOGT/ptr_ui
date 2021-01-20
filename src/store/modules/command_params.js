@@ -56,10 +56,6 @@ const getters = {
 
     subframeIsActive: state => state.subframeIsActive,
     subframeDefinedWithFile: state => state.subframeDefinedWithFile,
-    subframe_x0: state => state.subframe_x0,
-    subframe_y0: state => state.subframe_y0,
-    subframe_x1: state => state.subframe_x1,
-    subframe_y1: state => state.subframe_y1,
 
     camera_areas_selection: state => state.camera_areas_selection, 
     camera_note: state => state.camera_note,
@@ -99,10 +95,6 @@ const mutations = {
 
     subframeIsActive (state, val) { state.subframeIsActive = val },
     subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },
-    subframe_x0 (state, val) { state.subframe_x0 = val; },
-    subframe_y0 (state, val) { state.subframe_y0 = val; },
-    subframe_x1 (state, val) { state.subframe_x1 = val; },
-    subframe_y1 (state, val) { state.subframe_y1 = val; },
 
     camera_areas_selection (state, val) { state.camera_areas_selection = val; },
     camera_note(state, val) { state.camera_note = val; },

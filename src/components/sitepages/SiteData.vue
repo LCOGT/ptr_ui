@@ -278,9 +278,6 @@
             @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
             <span>remove shape</span>
           </b-button>
-          
-
-
       </side-info-panel>
 
       <!--js9-devtools/-->
@@ -289,7 +286,6 @@
     </div>
 
   </div>
-
 
   <!-- Modal popup window showing the full fits header. -->
   <b-modal :active.sync="showFitsHeaderModal" >
