@@ -5,5 +5,4 @@ import Circle from './shapes/circle'
 
 import Starmarker from './shapes/starmarker'
 
-
 export { Point, Line, Rect, Circle, Starmarker }

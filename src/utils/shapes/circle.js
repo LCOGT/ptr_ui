@@ -3,8 +3,6 @@ import * as d3 from 'd3'
 import store from '../../store'
 import tinycolor from 'tinycolor2'
 
-
-
 /**
  *  The input data should contain circle objects with keys:
  *      x: center x coordinate, proportion of imWidth
@@ -42,11 +40,7 @@ class Circle {
     }
 
     clicked = (d,i) => {
-        //if (d.defaultPrevented) return; // dragged
-
-        this.svg.select('#'+d.id).select('.main-circle')
-            .attr("stroke", "black")
-
+        if (d.defaultPrevented) return; // dragged
         this.selectedId = d.id
         this.draw()
     }
@@ -79,7 +73,6 @@ class Circle {
             .on('mouseover', function () {
                 d3.select(this).style('cursor', 'grab')
             })
-
 
         let circle = g.selectAll('.main-circle')
             .data(d => [d])
@@ -148,7 +141,6 @@ class Circle {
                         .style('cursor', 'default')
                 })
                 .call(d3.drag().on("drag", this.draggedHandle))
-
     }
 }
 

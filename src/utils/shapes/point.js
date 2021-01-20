@@ -1,7 +1,5 @@
-
 import * as d3 from 'd3'
 import store from '../../store'
-
 
 class Point {
     constructor(svg, data, imWidth, imHeight) {
@@ -47,7 +45,6 @@ class Point {
         // don't draw if the svg isn't visible
         if (this.imHeight * this.imWidth == 0) {return;}
 
-
         let g = this.svg.selectAll('.point-selection')
             .data(this.data)
             .join('g')
@@ -91,7 +88,6 @@ class Point {
                     .on("drag", this.dragged)
                     .on("end", this.dragended)
                 )
-
     }
 }
 

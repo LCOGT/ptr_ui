@@ -77,21 +77,12 @@ export default {
     },
 
     send_pixels_center_command(x, y, filename) {
-
       let command_form = [
-
-        // x coordinate
-        String(x / this.width),
-
-        // y coordinate
-        // Change the y coordinate to start at the bottom. 
-        String((this.height - y ) / this.height),
-
+        String(x / this.width), // x coordinate
+        String((this.height - y ) / this.height), // y coord, starts at bottom.
         filename
       ]
-
       this.postCommand(this.mount_slew_clickposition_command, command_form)
-
     },
 
 
@@ -103,8 +94,7 @@ export default {
       this.remove_context_marker();
 
       // Draw a small cross where user clicks.
-      d3
-        .select('#image_svg')
+      d3.select('#image_svg')
         .append("line")
         .attr("class", "context-marker")
         .attr("x1", pixelX - 7)
@@ -114,8 +104,7 @@ export default {
         .attr("stroke", "red")
         .attr("stroke-width", 2)
         .style("fill", "none");
-      d3
-        .select('#image_svg')
+      d3.select('#image_svg')
         .append("line")
         .attr("class", "context-marker")
         .attr("x1", pixelX)
@@ -138,7 +127,6 @@ export default {
         .selectAll(".context-marker")
         .remove();
     },
-
   },
 
   computed: {

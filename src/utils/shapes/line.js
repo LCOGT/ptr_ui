@@ -1,14 +1,12 @@
 import * as d3 from 'd3'
 import store from '../../store'
 
-
 class Line {
     constructor(svg, data, imWidth, imHeight) {
         this.svg = svg
         this.data = data
         this.imWidth = imWidth || 0
         this.imHeight = imHeight || 0
-
     }
 
     get imageDimensions() {
@@ -26,38 +24,29 @@ class Line {
         store.commit('drawshapes/selectedId', val)
     }
 
-
-    // Display helpers:
-    //p1(l) { return [this.imWidth * l.x1, this.imHeight * l.y1] }
-    //p2(l) { return [this.imWidth * l.x2, this.imHeight * l.y2]}
-
     handleLineMouseOver = (d, i) => {
-        this.svg.select(d.id)
-            .attr('stroke-width', d => d.id == this.selectedId ? 4 : 3)
+        d3.select('#'+d.id)
             .style('opacity', 0.9)
             .style('cursor', 'grab')
-
     }
 
     mouseout = (d,i) => {
         const stroke = d.color
-        this.svg.select(d.id).select('.main-line')
+        d3.select('#'+d.id).select('.main-line')
             .attr('stroke-width', d => d.id == this.selectedId ? 3 : 2)
             .attr('stroke', stroke)
             .style('opacity', 0.8)
     }
 
     dragstarted = (d) => {
-        //console.log('drag started')
-        this.selectedId = d.id
+        this.selectedId = d.id  // make this the selected shape
     }
 
     clicked = (d, i) => {
-        if (d.defaultPrevented) return; // dragged
+        if (d.defaultPrevented) return; // dragged, so don't do click routine.
 
         this.svg.select(d.id).select('.main-line')
             .attr("stroke", "black")
-
     }
 
     dragged = (d,i) => {
@@ -68,7 +57,6 @@ class Line {
     }
 
     dragended() {
-        //d3.select(this).attr("stroke", null);
         d3.selectAll('g')
             .attr('pointer-events', 'all')
     }
@@ -86,7 +74,6 @@ class Line {
 
         // don't draw if the svg isn't visible
         if (this.imHeight * this.imWidth == 0) {return;}
-
 
         let g = this.svg.selectAll('.line-selection')
             .data(this.data)

@@ -42,7 +42,7 @@ const getters = {
         const selected = allShapes.find(x => x.id == state.selectedId)
         return selected
     },
-    selectedShapeType: state => {console.log(state.selectedId); return idToShapelistName(state.selectedId)},
+    selectedShapeType: state => idToShapelistName(state.selectedId),
 
     // This is used as a camera command param
     subframeFromShape: (state, getters) => {
@@ -89,8 +89,6 @@ const mutations = {
     activeDrawShape(state, val) { state.activeDrawShape = val },
     selectedId(state, val) { state.selectedId = val },
 
-
-
     addPoint(state, newPoint) {
         newPoint.id = 'p' + simpleId()
         state.points.push(newPoint)
@@ -124,7 +122,6 @@ const mutations = {
 
 const actions = {
     deleteShape({state, commit}, id) {
-        console.log('deleting ', id)
         const shape = idToShapelistName(id)
         commit('removeElement', {shape, id})
     },
