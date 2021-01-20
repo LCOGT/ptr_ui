@@ -96,7 +96,7 @@
           <b-field label="downloads:" style="width: 100%">
             <p class="control">
               <a class="button has-text-white" 
-                :disabled="small_fits_exists"
+                :disabled="!small_fits_exists"
                 @click="download_fits_file(current_image.base_filename, 'EX10')">
                 <b-icon icon="download" size="is-small" />
                 <span>small fits</span>
@@ -104,7 +104,7 @@
             </p>
             <p class="control">
               <a class="button has-text-white" 
-                :disabled="large_fits_exists"
+                :disabled="!large_fits_exists"
                 @click="download_fits_file(current_image.base_filename, 'EX01')">
                 <b-icon icon="download" size="is-small" />
                 <span>large fits</span>
@@ -114,6 +114,8 @@
         </div>
       </side-info-panel>
 
+
+      <line-profile-inspection />
 
       <!-- image statistics -->
       <side-info-panel :startOpen="false">
@@ -345,6 +347,7 @@ import ImageNavigationPanel from "@/components/ImageNavigationPanel";
 import ImageFilter from "@/components/ImageFilter";
 import ImageInfoPanel from "@/components/ImageInfoPanel";
 import SideInfoPanel from "@/components/SideInfoPanel";
+import LineProfileInspection from "@/components/LineProfileInspection";
 import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
 import axios from 'axios'
@@ -362,6 +365,7 @@ export default {
       ImageFilter,
       Js9Devtools,
       SideInfoPanel,
+      LineProfileInspection,
   },
   data() {
     return {
