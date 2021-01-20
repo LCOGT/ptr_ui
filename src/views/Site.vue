@@ -233,6 +233,8 @@ export default {
 
     console.log('site created, sitecode: ', this.sitecode)
 
+    this.$store.commit('site_config/setActiveSite', this.sitecode)
+
     // Load the active reservations for this site. 
     this.$store.dispatch('calendar/fetchActiveReservations', this.sitecode)
 
@@ -268,6 +270,8 @@ export default {
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
   watch: {
     sitecode: function () {
+
+      this.$store.commit('site_config/setActiveSite', this.sitecode)
 
       this.setDefaultDevices()
 
