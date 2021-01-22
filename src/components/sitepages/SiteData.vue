@@ -96,7 +96,7 @@
           <b-field label="downloads:" style="width: 100%">
             <p class="control">
               <a class="button has-text-white" 
-                :disabled="small_fits_exists"
+                :disabled="!small_fits_exists"
                 @click="download_fits_file(current_image.base_filename, 'EX10')">
                 <b-icon icon="download" size="is-small" />
                 <span>small fits</span>
@@ -104,7 +104,7 @@
             </p>
             <p class="control">
               <a class="button has-text-white" 
-                :disabled="large_fits_exists"
+                :disabled="!large_fits_exists"
                 @click="download_fits_file(current_image.base_filename, 'EX01')">
                 <b-icon icon="download" size="is-small" />
                 <span>large fits</span>
@@ -113,6 +113,10 @@
           </b-field>
         </div>
       </side-info-panel>
+
+      large / small fits exists
+      {{large_fits_exists}}
+      {{small_fits_exists}}
 
 
       <!-- image statistics -->
@@ -123,7 +127,7 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+          :disabled="!large_fits_exists || !small_fits_exists" 
           v-model="imageStatsLargeFile">
           Use full resolution file (slower!)
         </b-switch>
@@ -141,7 +145,7 @@
               <button 
                 class="button" 
                 :class="{'is-loading':region_info_loading}"
-                :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+                :disabled="!large_fits_exists && !small_fits_exists" 
                 @click="getRegionStats(true)">
                 inspect region
               </button>
@@ -151,7 +155,7 @@
             <button 
               class="button" 
               :class="{'is-loading':image_info_loading}"
-              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+              :disabled="!large_fits_exists && !small_fits_exists" 
               @click="getRegionStats(false)">
               inspect image
             </button>
@@ -180,20 +184,20 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+          :disabled="!large_fits_exists || !small_fits_exists" 
           v-model="starInspectorLargeFile">
           Use full resolution file (slower!)
         </b-switch>
 
-        <p class="warning-text" v-if="!current_image.ex10_fits_exists">{{"missing small fits"}}</p>
-        <p class="warning-text" v-if="!current_image.ex01_fits_exists">{{"missing full fits"}}</p>
+        <p class="warning-text" v-if="!small_fits_exists">{{"missing small fits"}}</p>
+        <p class="warning-text" v-if="!large_fits_exists">{{"missing full fits"}}</p>
 
         <b-field>
           <p class="control">
             <button 
               class="button" 
               :class="{'is-loading': inspect_region_loading}"
-              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+              :disabled="!large_fits_exists && !small_fits_exists" 
               @click="getStarProfiles">
               inspect region
             </button>
@@ -202,7 +206,7 @@
             <button 
               class="button" 
               :class="{'is-loading': inspect_image_loading}"
-              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+              :disabled="!large_fits_exists && !small_fits_exists" 
               @click="getStarProfiles(false)">
               inspect image
             </button>
@@ -843,6 +847,8 @@ export default {
     ...mapState("images", [
       'recent_images',
       'current_image', 
+    ]),
+    ...mapGetters("images", [
       'small_fits_exists',
       'large_fits_exists'
     ]),
@@ -856,7 +862,7 @@ export default {
       'selectedId',
       'selectionExists',
       'selectedShapeType',
-      ]),
+    ]),
     activeDrawShape: {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},
       set(val) { this.$store.dispatch('drawshapes/activeDrawShape', val )}
