@@ -8,22 +8,6 @@
 
     <div class="spacer" style="height: 2em;" />
 
-    <!-- Site events modal window -->
-    <div style="display:flex; margin-bottom: 1em;">
-        <h3 class="subtitle">Site Events: </h3>
-        <div style="width: 10px;"/>
-        <button 
-            class="button" 
-            @click="siteEventsVisible = !siteEventsVisible">
-            show
-        </button>
-        <b-modal :active.sync="siteEventsVisible">
-            <site-events-modal 
-                :sitecode="sitecode"/>
-        </b-modal>
-    </div>
-
-
     <div style="display: grid; grid-template-columns: auto 1fr;">
         <!-- Dome camera -->
         <the-dome-cam style="grid-column-start: 1;" v-if="sitecode=='wmd'"/>
@@ -46,6 +30,7 @@
         <img src="https://www.cleardarksky.com/c/LmyRdgObNMcsk.gif?c=1594801"></a>
     </div>
 
+    <site-events-modal :sitecode="sitecode"/>
 
 
     <div style="height: 2em;" />
@@ -77,9 +62,7 @@ export default {
         SiteEventsModal,
     },
     data() {
-        return {
-            siteEventsVisible: false,
-        }
+        return { }
     },
     computed: {
         ...mapGetters('images', ['current_image']),

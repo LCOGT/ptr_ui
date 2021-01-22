@@ -16,7 +16,7 @@
                     </div>
 
                     <div style="padding-left: 10px;">
-                        <p>&nbsp</p>
+                        <p>&nbsp;</p>
                         <button class="button" @click="getSiteEvents">refresh</button>
                     </div>
                 </div>

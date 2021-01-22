@@ -8,8 +8,18 @@
         <svg 
           id='image_svg' 
           ref="svgElement" 
-          :class="{'image-div-pointer-cross':subframeIsVisible}" 
-          v-show="!js9IsVisible"/>
+          :class="{'cursor-is-crosshair': activeDrawShape!='none'}" 
+          v-show="!js9IsVisible"
+          >
+          <image-crosshairs 
+            :width="imageWidth"
+            :height="imageHeight"
+            :isVisible="show_crosshairs"
+            color="yellow"/>
+          <background-element id="svg-background" :width="imageWidth" :height="imageHeight" />
+
+        </svg>
+        <svg-context-menu svgId="image_svg" />
 
         <img
           id="main-image"
@@ -32,90 +42,63 @@
             class="recent_image" 
             style="display: flex;"
             v-for="(item, index) in recent_images" 
-            v-bind:key="index"
-        >
+            v-bind:key="index" >
           <img 
               style="width: 60px; height: 60px;"
               v-bind:src="item.jpg_url"
               onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
               v-bind:title="item.base_filename"
               v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
-              @click="setActiveImage(item)"
-          >
-          <!--p style="padding-left: 5px;">{{item.filename.slice(-13)}}</p-->
+              @click="setActiveImage(item)" >
         </div>
-          
       </div>
 
       <!-- Controls in the top row above the main view --> 
       <div class="controls">
-
         <b-field grouped>
-          <b-field>
-            <button class="button" @click="toggleAnalysis">JS9</button>
-          </b-field>
-          <b-field>
-            <p class="control">
-              <b-tooltip label="latest image" position="is-right" type="is-black">
-              <button class="button level-item" @click="setLatestImage">
-              <b-icon icon="chevron-double-left"/></button>
-              </b-tooltip>
-            </p>
-            <p class="control">
-              <b-tooltip label="previous image" position="is-right" type="is-black">
-                <button class="button level-item" 
-                  @click="$store.dispatch('images/set_previous_image')">
-                  <b-icon icon="chevron-left" />
-                </button>
-              </b-tooltip>
-            </p>
-            <p class="control">
-              <b-tooltip label="next image" position="is-right" type="is-black">
-                <button class="button level-item" 
-                  @click="$store.dispatch('images/set_next_image')">
-                  <b-icon icon="chevron-right" />
-                </button>
-              </b-tooltip>
-            </p>
-          </b-field>
-
+          <b-field> 
+            <button title="open the JS9 analysis tools"
+              class="button" @click="toggleAnalysis">JS9</button> </b-field>
           <b-field>
             <p class="control">
-              <b-tooltip label="download small fits file" position="is-right" type="is-black">
-                <a class="button has-text-white" 
-                  :disabled="small_fits_exists"
-                  @click="download_fits_file(current_image.base_filename, 'EX10')">
-                  <b-icon icon="cloud-download" size="is-small" /></a>
-              </b-tooltip>
+              <button 
+                class="button level-item" title="go to the latest image" 
+                @click="setLatestImage">
+                <b-icon icon="chevron-double-left"/>
+              </button>
             </p>
             <p class="control">
-              <b-tooltip label="download large fits file" position="is-right" type="is-black">
-                <a class="button has-text-white" 
-                  :disabled="large_fits_exists"
-                  @click="download_fits_file(current_image.base_filename, 'EX01')">
-                  <b-icon icon="cloud-download" /></a>
-              </b-tooltip>
+              <button class="button level-item" title="previous image"
+                @click="$store.dispatch('images/set_previous_image')">
+                <b-icon icon="chevron-left" />
+              </button>
+            </p>
+            <p class="control">
+              <button class="button level-item" title="next image"
+                @click="$store.dispatch('images/set_next_image')">
+                <b-icon icon="chevron-right" />
+              </button>
             </p>
           </b-field>
-
         </b-field>
 
-
-        <div> <b-field label="subframe">
-              <b-switch type="is-info" v-model="subframeIsActive"></b-switch>
-          </b-field> </div>
-        <!---div> <b-field label="subframe visible">
-              <b-switch type="is-info" v-model="subframeIsVisible"></b-switch>
-          </b-field> </div-->
-        <div> <b-field label="crosshairs">
-              <b-switch type="is-info" v-model="show_crosshairs" v-on:input="toggleCrosshairs"></b-switch>
-          </b-field> </div>
+        <b-field>
+          <b-radio-button v-model="activeDrawShape" native-value="none"> none </b-radio-button>
+          <b-radio-button v-model="activeDrawShape" native-value="point">
+              <span class="iconify" data-icon="radix-icons:dot" data-inline="false"></span>
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape" native-value="line">
+              <span class="iconify" data-icon="mdi:vector-line" data-inline="false"></span>
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape" native-value="circle">
+              <span class="iconify" data-icon="mdi:vector-circle-variant" data-inline="false"></span>
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape" native-value="rect">
+              <span class="iconify" data-icon="mdi:vector-rectangle" data-inline="false"></span>
+          </b-radio-button>
+        </b-field>
 
       </div>
-
-      <!--pre style="max-width: 500px;">
-        {{current_image}}
-      </pre-->
 
     </div>
   </div>
@@ -125,116 +108,83 @@
 //import { API, Auth } from "aws-amplify";
 import axios from 'axios';
 import wcs from "@/utils/pix2wcs";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
-import JS9 from "@/components/JS9";
 import * as d3 from "d3";
+
+import JS9 from "@/components/JS9";
+import ImageCrosshairs from "@/components/svg/ImageCrosshairs"
+import BackgroundElement from "@/components/svg/BackgroundElement"
+import SvgContextMenu from "@/components/SvgContextMenu"
+import RectSelection from "@/components/svg/RectSelection"
+
+import { Point, Line, Rect, Circle, Starmarker }from "@/utils/drawshapes"
 
 export default {
   name: "ImageView",
+
   components: {
-    JS9
+    JS9,
+    SvgContextMenu,
+    ImageCrosshairs,
+    BackgroundElement,
+    RectSelection,
   },
+
   mixins: [commands_mixin],
+
   props: {
     site: String,
-
-    // median brightness star display
-    median_star_pos_x: Number,
-    median_star_pos_y: Number,
-    median_plot_color: String,
-
-    // brightest saturated star display
-    brightest_star_pos_x: Number,
-    brightest_star_pos_y: Number,
-    brightest_plot_color: String,
-
-    // brightest unsaturated star display
-    u_brightest_star_pos_x: Number,
-    u_brightest_star_pos_y: Number,
-    u_brightest_plot_color: String,
+    markedStars: Array,
   },
+
   data() {
     return {
-      placeholder_image: require('@/assets/logo.png'),
       // The image that is selected and visible in the main viewer.
       active_image: "",
 
-      image_element: "#image_svg",
-      d3_image_element: '', // the d3 selection of this.image_element
-
       // Width of image in UI
-      imageWidth: 1,
-      imageHeight: 1,
-
-      // Mouse position, in px, on the image window
-      mouseX: 0,
-      mouseY: 0,
-
-
-      // The subframe rectangle svg element
-      subframeSVG: '',
-      // Toggles whether the subframe is visible or not
-      subframeIsVisible:true,
-      // Defines when the user is dragging the mouse (for drawing the rectangle)
-      mouseIsDown: false,
+      imageWidth: 0,
+      imageHeight: 0,
 
       // This is modified by the crosshairs switch and controls whether the crosshairs are visible.
       show_crosshairs: false,
       crosshair_color: "#32cd32",
 
-      // Timer (setTimeout object) to clear the right click marker after a few seconds.
-      context_marker_timer: "",
-
-      // Time that right click events stay on the screen.
-      right_click_ttl: 9000,
-
       //Image ID of the currently highlighted image (focused)
       highlighted_image: 0,
 
-      // Runs a function at a regular interval to update the size of the image component.
-      syncImageSize: '',
-      syncImageInterval: 1000,
-
       js9width: 200,
-      js9height: 500
+      js9height: 500,
+
     };
   },
-  created() {
-    this.$store.commit("site_config/setActiveSite", this.site);
-    this.$store.dispatch("images/load_latest_images");
 
-    // Keep the displayed image element width and height in sync.
-    // This is important for relative measurements on the image (crosshairs, clicks, etc)
-    this.syncImageSize = setInterval(
-      this.get_image_element_dimensions,
-      this.syncImageInterval
-    );
+  created() {
+    this.$store.dispatch("images/load_latest_images");
   },
 
-  beforeDestroy() {
-    // We don't need to keep the image dimensions in sync if it's not displayed.
-    clearInterval(this.syncImageSize);
+  mounted() {
+    this.init()
+
+    // Updates whenever the rendered image size changes
+    var ro = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const cr = entry.contentRect;
+        this.onImageResize(cr.width, cr.height)
+        this.updateAll()
+        //console.log(cr)
+      }
+    });
+    let imageEl = document.getElementById('main-image')
+    // Observe one or multiple elements
+    ro.observe(imageEl);
   },
 
   watch: {
     site: function(newVal, oldVal) {
-      this.$store.commit("site_config/setActiveSite", newVal);
       this.$store.dispatch("images/load_latest_images");
-    },
-
-    // Toggle whether the subframe box is displayed or not
-    subframeIsVisible: function(newVal, oldVal) {
-      if (newVal) {
-        this.subframeSVG
-          .style("display","block")
-          .attr("class","image-div-pointer-cross")
-      }
-      else {
-        this.subframeSVG
-          .style("display", "none")
-      }
     },
 
     current_image: function(newVal, oldVal) {
@@ -243,436 +193,194 @@ export default {
       if (this.js9IsVisible) {
         this.js9LoadImage(newVal)
       }
-      this.remove_star_markers()
     },
 
-    median_star_pos_x: function() {
-      this.draw_star_markers()
+    lines: {
+      handler: function() {
+        this.drawLines.draw()
+      },
+      deep: true,
     },
-    median_star_pos_y: function() {
-      this.draw_star_markers()
+    
+    points: {
+      handler: function() {
+        this.drawPoints.draw()
+      },
+      deep: true,
     },
-    brightest_star_pos_x: function() {
-      this.draw_star_markers()
+    rects: {
+      handler: function() {
+        this.drawRects.draw()
+      },
+      deep: true,
     },
-    brightest_star_pos_y: function() {
-      this.draw_star_markers()
+    circles: {
+      handler: function() {
+        this.drawCircles.draw()
+      },
+      deep: true,
     },
-
+    selectedId() {
+      this.updateAll()
+      this.subframeDefinedWithFile = this.current_image.base_filename
+    },
+    markedStars() {
+      this.drawStarmarkers.updateData(this.markedStars)
+      this.drawStarmarkers.draw()
+    }
   },
 
-  mounted() {
-    this.init()
-
-    this.init()
-  },
 
   methods: {
 
-
     init() {
 
-      this.d3_image_element = d3.select(this.image_element)
+      this.svg = d3.select('#image_svg')
 
-      let that = this;
-
-      // Initialize subframe rectangle
-      const rect1 = [{"x":0, "y":0}]
-      d3.select(this.image_element)
-        .selectAll("subframeBox")
-        .data(rect1)
-        .join("rect")
-          .attr("id", "subframeSVG")
-          .attr("x", d => d.x)
-          .attr("y", d => d.y)
-          .attr("width", 0)
-          .attr("height", 0)
-          .style("display","none")
-          .style("stroke", "red")
-          .style("stroke-width", 1)
-          .style("fill", "none")
-          .style("cursor", "crosshair")
-
-      this.subframeSVG = d3.select("#subframeSVG")
+      this.drawPoints = new Point(this.svg, this.points, this.imageWidth, this.imageHeight)
+      this.drawLines = new Line(this.svg, this.lines, this.imageWidth, this.imageHeight)
+      this.drawRects = new Rect(this.svg, this.rects, this.imageWidth, this.imageHeight)
+      this.drawCircles = new Circle(this.svg, this.circles, this.imageWidth, this.imageHeight)
+      this.drawStarmarkers = new Starmarker(this.svg, this.markedStars, this.imageWidth, this.imageHeight)
 
       // Event actions to perform on the image window element
-      this.d3_image_element
+      this.svg
         .on("mousedown", this.handleMouseDown) 
-        .on("mousemove", this.handleMouseMove)
         .on("mouseup", this.handleMouseUp)
-        .on("contextmenu", this.handleContextMenu)
-    }, 
+        .on('keyup', e => console.log(e.key))
 
-    handleContextMenu(data, index) {
-      let position = d3.mouse(this.d3_image_element.node());
-      this.draw_marker(position[0], position[1]);
-      Snackbar.open({
-        duration: this.right_click_ttl,
-        message:
-          //"Center telescope here? <br>Note: <em>telescope will move to the location you clicked.</em>.",
-          "Click to center the telescope here.",
-        type: "is-warning",
-        position: "is-top",
-        actionText: "Center on pixels",
-        queue: false,
-        onAction: () => {
-          console.log("slew to " + position[0]/ this.imageWidth + ", " + position[1]/ this.imageHeight);
-          this.send_pixels_center_command(
-            position[0],
-            position[1],
-            this.current_image.base_filename
-          );
+      this.updateAll()
+    },
+
+    updateAll() {
+      this.drawPoints.draw()
+      this.drawLines.draw()
+      this.drawRects.draw()
+      this.drawCircles.draw()
+      this.drawStarmarkers.draw()
+    },
+
+
+    onImageResize(width, height) {
+
+      // This happens when we load js9, since the jpg display goes away. 
+      if (width == 0 && height == 0) return;
+
+      this.imageWidth = parseInt(width)
+      this.imageHeight = parseInt(height)
+
+      // Update the svg drawing tools
+      this.drawPoints.imageDimensions = [width, height]
+      this.drawRects.imageDimensions = [width, height]
+      this.drawLines.imageDimensions = [width, height]
+      this.drawCircles.imageDimensions = [width, height]
+      this.drawStarmarkers.imageDimensions = [width, height]
+
+      // Update the js9 size
+      if (this.js9IsVisible) {
+        let resize_opts = {
+          id: "myJS9",
+          width: width, 
+          height: height,
         }
-      });
-      // Don't open the usual right-click menu
-      d3.event.preventDefault();
+        this.$store.dispatch('js9/resizeDisplay', resize_opts)
+      }
+
+      // This is fed to js9 just before displaying to set the matching size. 
+      this.js9width=parseInt(width)
+      this.js9height=parseInt(height)
+
     },
 
     handleMouseDown() {
       d3.event.preventDefault();
-
-      let mClick = d3.mouse(this.d3_image_element.node())
+      let mouse = d3.mouse(this.svg.node())
 
       // Calculate image dimensions
-      let bounds = this.d3_image_element.node().getBoundingClientRect()
+      let bounds = this.svg.node().getBoundingClientRect()
       let imageWidth = bounds.width
       let imageHeight = bounds.height
 
-
-      // start drawing a subframe box if subframe mode is active.
-      if (this.subframeIsVisible) {
-
-        // Make it visible
-        this.subframeSVG
-          .style("display","block")
-          .attr("class","image-div-pointer-cross")
-
-        this.mouseIsDown = true;
-        this.subframe_x0 = mClick[0] / imageWidth
-        this.subframe_y0 = mClick[1] / imageHeight
-        this.subframe_x1 = mClick[0] / imageWidth
-        this.subframe_y1 = mClick[1] / imageHeight
-        this.drawSubframe()
-      }
-    },
-
-    handleMouseMove() {
-      // coordinates of current mouse position
-      let mDrag = d3.mouse(this.d3_image_element.node())
-
-      // Calculate image dimensions
-      let bounds = this.d3_image_element.node().getBoundingClientRect()
-      let imageWidth = bounds.width
-      let imageHeight = bounds.height
-
-      // log the current mouse coordinates
-      this.mouseX = mDrag[0]
-      this.mouseY = mDrag[1]
-
-      // if subframe mode is active, and the mouse is dragging, 
-      // save the current coordinates and draw them as a rectangle.
-      if (this.subframeIsVisible && this.mouseIsDown) {
-        this.subframe_x1 = mDrag[0] /imageWidth
-        this.subframe_y1 = mDrag[1] /imageHeight
-
-
-        this.drawSubframe()
+      // Drawing a new line
+      if (this.activeDrawShape == 'line') {
+        this.$store.commit('drawshapes/addLine', {
+          x1: mouse[0] / imageWidth,
+          y1: mouse[1] / imageHeight,
+          x2: mouse[0] / imageWidth,
+          y2: mouse[1] / imageHeight,
+          color: 'gold',
+          show: true,
+        })
+        this.svg.on("mousemove", () => {
+          let mouse = d3.mouse(this.svg.node())
+          let newLine = this.lines[this.lines.length - 1]
+          this.selectedId = newLine.id
+          newLine.x2 = mouse[0] / this.imageWidth
+          newLine.y2 = mouse[1] / this.imageHeight
+        })
+      // Drawing a new rectangle
+      } else if (this.activeDrawShape == 'rect') {
+        this.$store.commit('drawshapes/addRect', {
+          x1: mouse[0] / imageWidth,
+          y1: mouse[1] / imageHeight,
+          x2: mouse[0] / imageWidth,
+          y2: mouse[1] / imageHeight,
+          color: 'gold',
+          show: true,
+        })
+        this.svg.on("mousemove", () => {
+          let mouse = d3.mouse(this.svg.node())
+          let newRect = this.rects[this.rects.length - 1]
+          this.selectedId = newRect.id
+          newRect.x2 = mouse[0] / this.imageWidth
+          newRect.y2 = mouse[1] / this.imageHeight
+        })
+      // Drawing a new point
+      } else if ( this.activeDrawShape == 'point') {
+        this.$store.commit('drawshapes/addPoint', {
+          x: mouse[0] / imageWidth,
+          y: mouse[1] / imageHeight,
+          color: 'gold', 
+          show: true,
+        })
+        this.svg.on("mousemove", () => {
+          let mouse = d3.mouse(this.svg.node())
+          let theNewPoint = this.points[this.points.length - 1]
+          this.selectedId = theNewPoint.id
+          theNewPoint.x = mouse[0] / this.imageWidth
+          theNewPoint.y = mouse[1] / this.imageHeight
+        })
+      // Drawing a new circle
+      } else if (this.activeDrawShape == 'circle') {
+        this.$store.commit('drawshapes/addCircle', {
+          x: mouse[0] / imageWidth,
+          y: mouse[1] / imageHeight,
+          rx: 0,
+          ry: 0,
+          color: 'gold', 
+          show: true,
+        })
+        this.svg.on("mousemove", () => {
+          let mouse = d3.mouse(this.svg.node())
+          let newCircle = this.circles[this.circles.length - 1]
+          this.selectedId = newCircle.id
+          newCircle.rx = (mouse[0] / this.imageWidth) - newCircle.x
+          newCircle.ry = (mouse[1] / this.imageHeight) - newCircle.y
+        })
       }
     },
 
     handleMouseUp(context) {
+      // We don't want every click to draw a shape. Users need to select what
+      // they want drawn each time. 
+      this.activeDrawShape = 'none'
+
+      // Remove the mousemove method
+      this.svg.on("mousemove", null)
+
       this.mouseIsDown = false;
-      let mouse = d3.mouse(this.d3_image_element.node())
-      if(this.subframeIsVisible) {
-        //that.subframeIsActive = true;
-        this.subframeDefinedWithFile = this.current_image.base_filename
-      }
-      this.drawSubframe()
     },
 
-    // Subframe stuff
-    drawSubframe() {
-      let minX = this.imageWidth * Math.min(this.subframe_x0, this.subframe_x1) 
-      let minY = this.imageHeight * Math.min(this.subframe_y0, this.subframe_y1) 
-      let width = this.imageWidth * Math.abs(this.subframe_x0 - this.subframe_x1)
-      let height = this.imageHeight * Math.abs(this.subframe_y0 - this.subframe_y1) 
-      d3.select("#subframeSVG")
-        .attr("x", minX)
-        .attr("y", minY)
-        .attr("width",width)
-        .attr("height", height)
-    },
-
-    // Resize the image element to fit the browser window
-    get_image_element_dimensions() {
-
-
-      let imageWindow = this.$refs.imagewindow.getBoundingClientRect();
-
-      if (this.js9IsVisible) {
-        let resize_opts = {
-          id: "myJS9",
-          width: imageWindow.width-30, // adjust for 15px padding
-          height: imageWindow.width-30,
-        }
-        this.$store.dispatch('js9/resizeDisplay', resize_opts)
-      } else {
-        // Resize the image displayed
-        let svgRect = this.$refs.svgElement.getBoundingClientRect();
-        let imageEl = this.$refs.image
-
-        // If nothing changed, we're done.
-        if (this.js9width==svgRect.width && this.js9height==svgRect.height) {
-          return;
-        }
-        // This is fed to js9 just before displaying to set the matching size. 
-        this.js9width=svgRect.width
-        this.js9height=svgRect.width
-
-        imageEl.setAttribute("width", svgRect.width)
-        imageEl.setAttribute("height", svgRect.height)
-        // Resize the svg
-        // WARNING: this may have bugs if image is not a square.
-        let imageRect = this.$refs.image.getBoundingClientRect();
-        this.imageWidth = imageRect.width
-        this.imageHeight = imageRect.height
-      }
-      
-      this.draw_star_markers()
-      this.drawSubframe()
-    },
-
-    send_pixels_center_command(x, y, filename) {
-
-      let command_form = [
-        String(x / this.imageWidth),
-
-        // Change the y coordinate to start at the bottom. 
-        String((this.imageHeight - y ) / this.imageHeight),
-        filename
-      ]
-
-      this.postCommand(this.mount_slew_clickposition_command, command_form)
-
-    },
-
-    drawCircle(pixelX, pixelY) {
-      // Remove any other right click markers on the screen.
-      this.removeCircle();
-
-      // Draw a small cross where user clicks.
-      d3
-        .select(this.image_element)
-        .append("circle")
-        .attr("class", "circle-cursor")
-        .attr("cx", pixelX)
-        .attr("cy", pixelY)
-        .attr("r", "8px")
-        .attr("stroke", "red")
-        .attr("stroke-width", 1)
-        .style("fill", "none");
-    },
-    removeCircle() {
-      d3
-        .select(this.image_element)
-        .selectAll(".circle-cursor")
-        .remove();
-    },
-
-    draw_marker(pixelX, pixelY) {
-      // Make sure a previous timer doesn't wipe our current right-click marker
-      clearTimeout(this.context_marker_timer);
-
-      // Remove any other right click markers on the screen.
-      this.remove_context_marker();
-
-      // Draw a small cross where user clicks.
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "context-marker")
-        .attr("x1", pixelX - 7)
-        .attr("y1", pixelY)
-        .attr("x2", pixelX + 7)
-        .attr("y2", pixelY)
-        .attr("stroke", "red")
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "context-marker")
-        .attr("x1", pixelX)
-        .attr("y1", pixelY - 7)
-        .attr("x2", pixelX)
-        .attr("y2", pixelY + 7)
-        .attr("stroke", "red")
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-
-      // Set a timer to clear the marker in a few seconds.
-      this.context_marker_timer = setTimeout(
-        this.remove_context_marker,
-        this.right_click_ttl
-      );
-    },
-    remove_context_marker() {
-      d3
-        .select(this.image_element)
-        .selectAll(".context-marker")
-        .remove();
-    },
-
-    // The star inspector (see SiteData component) will calculate and plot
-    // radial profiles for the max and median brightest stars detected in the
-    // user-selected region. 
-    //
-    // This function also draws a marker on the actual image to indicate which 
-    // stars are shown in the radial profile plots.
-    draw_star_markers() {
-      this.remove_star_markers()
-
-      let med_x = this.median_star_pos_x * this.imageWidth
-      let med_y = this.median_star_pos_y * this.imageHeight
-      let ubri_x = this.u_brightest_star_pos_x * this.imageWidth
-      let ubri_y = this.u_brightest_star_pos_y * this.imageHeight
-      let bri_x = this.brightest_star_pos_x * this.imageWidth
-      let bri_y = this.brightest_star_pos_y * this.imageHeight
-
-      // Draw the crosshairs around the brightest unsaturated star
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", ubri_x - 15)
-        .attr("y1", ubri_y)
-        .attr("x2", ubri_x - 5)
-        .attr("y2", ubri_y)
-        .attr("stroke", this.median_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", ubri_x + 5)
-        .attr("y1", ubri_y)
-        .attr("x2", ubri_x + 15)
-        .attr("y2", ubri_y)
-        .attr("stroke", this.median_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", ubri_x)
-        .attr("y1", ubri_y - 15)
-        .attr("x2", ubri_x)
-        .attr("y2", ubri_y - 5)
-        .attr("stroke", this.median_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", ubri_x)
-        .attr("y1", ubri_y + 5)
-        .attr("x2", ubri_x)
-        .attr("y2", ubri_y + 15)
-        .attr("stroke", this.median_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-        
-      // Draw crosshairs around the brightest selected star
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", bri_x - 15)
-        .attr("y1", bri_y)
-        .attr("x2", bri_x - 5)
-        .attr("y2", bri_y)
-        .attr("stroke", this.brightest_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", bri_x + 5)
-        .attr("y1", bri_y)
-        .attr("x2", bri_x + 15)
-        .attr("y2", bri_y)
-        .attr("stroke", this.brightest_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", bri_x)
-        .attr("y1", bri_y - 15)
-        .attr("x2", bri_x)
-        .attr("y2", bri_y - 5)
-        .attr("stroke", this.brightest_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-      d3
-        .select(this.image_element)
-        .append("line")
-        .attr("class", "star-marker")
-        .attr("x1", bri_x)
-        .attr("y1", bri_y + 5)
-        .attr("x2", bri_x)
-        .attr("y2", bri_y + 15)
-        .attr("stroke", this.brightest_plot_color)
-        .attr("stroke-width", 2)
-        .style("fill", "none");
-    },
-    remove_star_markers() {
-      d3
-        .select(this.image_element)
-        .selectAll(".star-marker")
-        .remove();
-    },
-
-    toggleCrosshairs() {
-      console.log("toggle crosshairs");
-
-      let elem = this.image_element;
-
-      if (this.show_crosshairs) {
-        d3
-          .select(elem)
-          .append("line")
-          .attr("class", "crosshairs")
-          .attr("x1", this.imageWidth / 2)
-          .attr("y1", 0)
-          .attr("x2", this.imageWidth / 2)
-          .attr("y2", this.imageHeight)
-          .attr("id", "crosshair_vertical")
-          .attr("stroke-width", 2)
-          .attr("stroke", this.crosshair_color);
-        d3
-          .select(elem)
-          .append("line")
-          .attr("class", "crosshairs")
-          .attr("y1", this.imageHeight / 2)
-          .attr("x1", 0)
-          .attr("y2", this.imageHeight / 2)
-          .attr("x2", this.imageWidth)
-          .attr("id", "crosshair_horizontal")
-          .attr("stroke-width", 2)
-          .attr("stroke", this.crosshair_color);
-      } else {
-        d3
-          .select(elem)
-          .selectAll(".crosshairs")
-          .remove();
-      }
-    },
 
     // Activated by clicking on an image thumbnail. Displays that image
     // in the main view.
@@ -704,36 +412,12 @@ export default {
       }
     },
 
-    async download_fits_file(base_filename, ex_type) {
-      const params = {
-        base_filename: base_filename, 
-        ex_type: ex_type
-      }
-      const fits_url = await this.$store.dispatch('images/get_fits_url', params)
-      window.location.assign(fits_url)
-    },
-    
   },
   computed: {
-
-    sitecode() {
-      return this.site;
-    },
-
-    active_site: {
-      get() {
-        return this.$store.getters["site_config/site"];
-      },
-      set(value) {
-        this.$store.commit("site_config/setActiveSite", value);
-      }
-    },
 
     ...mapGetters("images", [
       "recent_images",
       "current_image",
-      "large_fits_exists",
-      "small_fits_exists",
     ]),
 
     js9IsVisible: {
@@ -745,26 +429,32 @@ export default {
         get() { return this.$store.getters['command_params/subframeIsActive']},
         set(val) { this.$store.commit('command_params/subframeIsActive', val)},
     },
+
     subframeDefinedWithFile: {
         get() { return this.$store.getters['command_params/subframeDefinedWithFile']},
         set(val) { this.$store.commit('command_params/subframeDefinedWithFile', val)},
     },
-    subframe_x0: {
-        get() { return this.$store.getters['command_params/subframe_x0']},
-        set(val) { this.$store.commit('command_params/subframe_x0', val)},
+
+    ...mapState('drawshapes', [
+      'shapes', 
+      'lines', 
+      'rects', 
+      'circles', 
+      'points', 
+      'starmarkers'
+    ]),
+
+    selectedId: {
+      get() { return this.$store.getters['drawshapes/selectedId']},
+      set(val) { this.$store.commit('drawshapes/selectedId', val)}
     },
-    subframe_y0: {
-        get() { return this.$store.getters['command_params/subframe_y0']},
-        set(val) { this.$store.commit('command_params/subframe_y0', val)},
-    },
-    subframe_x1: {
-        get() { return this.$store.getters['command_params/subframe_x1']},
-        set(val) { this.$store.commit('command_params/subframe_x1', val)},
-    },
-    subframe_y1: {
-        get() { return this.$store.getters['command_params/subframe_y1']},
-        set(val) { this.$store.commit('command_params/subframe_y1', val)},
-    },
+
+    // User selection for which shape they want to draw
+    activeDrawShape: {
+      get() { return this.$store.getters['drawshapes/activeDrawShape']},
+      set(val) { this.$store.commit('drawshapes/activeDrawShape', val)}
+
+    }
 
   }
 };
@@ -807,14 +497,12 @@ export default {
   height: 100%;
 }
 
-.image-div-pointer-cross:hover {
-  cursor:crosshair;
-}
-.image-div-no-cursor:hover {
-  cursor:none;
+.cursor-is-crosshair:hover {
+  cursor: crosshair;
 }
 
 .recent_images {
+  min-height: 65px;
   display: flex;
   flex-wrap: nowrap;
   overflow-x: auto;
