@@ -81,9 +81,9 @@
               <div class="blank-row" />
 
               <tr> <td class="info-panel-val" align="right">RA: </td>
-                  <td>{{rightAscension || "---"}}</td> </tr>
+                  <td><ra-display  :ra_hours_decimal="current_image.right_ascension" :can_copy="true" /> </td> </tr>
               <tr> <td class="info-panel-val" align="right">Dec: </td>
-                  <td>{{declination || "---"}}</td> </tr>
+                  <td><dec-display  :dec_deg_decimal="current_image.declination" :can_copy="true" /> </td> </tr>
 
               <tr> <td class="info-panel-val" align="right">azimuth: </td>
                   <td>{{current_image.azimuth || "---"}}</td> </tr>
@@ -345,6 +345,8 @@ import ImageNavigationPanel from "@/components/ImageNavigationPanel";
 import ImageFilter from "@/components/ImageFilter";
 import ImageInfoPanel from "@/components/ImageInfoPanel";
 import SideInfoPanel from "@/components/SideInfoPanel";
+import RaDisplay from "@/components/display/RaDisplay"
+import DecDisplay from "@/components/display/DecDisplay"
 import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
 import axios from 'axios'
@@ -362,6 +364,8 @@ export default {
       ImageFilter,
       Js9Devtools,
       SideInfoPanel,
+      RaDisplay,
+      DecDisplay,
   },
   data() {
     return {
@@ -933,7 +937,7 @@ export default {
     },
     rightAscension() {
       if (this.current_image.right_ascension){
-        return this.current_image.right_ascension.toFixed(2)
+        return this.current_image.right_ascension
       }
       return "---"
     },
