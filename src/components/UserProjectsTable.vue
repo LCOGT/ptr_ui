@@ -27,11 +27,11 @@
             </b-table-column>
 
             <b-table-column field="object.ra" label="ra" sortable v-slot="props">
-                {{ props.row.project_targets[0].ra }} 
+                <ra-display :ra_hours_decimal="parseFloat(props.row.project_targets[0].ra)" /> 
             </b-table-column>
 
             <b-table-column field="object.dec" label="dec" v-slot="props">
-                {{ props.row.project_targets[0].dec }} 
+                <dec-display :dec_deg_decimal="parseFloat(props.row.project_targets[0].dec)" /> 
             </b-table-column>
 
             <b-table-column field="edit" label="" v-slot="props">
@@ -94,11 +94,15 @@
 import {mapGetters, mapState} from 'vuex'
 import axios from 'axios'
 import moment from 'moment'
+import RaDisplay from '@/components/display/RaDisplay'
+import DecDisplay from '@/components/display/DecDisplay'
 
 export default {
     name: "UserProjectsTable",
     props: ["user"],
     components: { 
+        RaDisplay,
+        DecDisplay,
     },
     data() {
         return {
