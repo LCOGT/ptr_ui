@@ -1,8 +1,4 @@
-
 import * as d3 from 'd3'
-import tinycolor from 'tinycolor2'
-
-
 
 class Starmarker {
     constructor(svg, data, imWidth, imHeight) {
@@ -25,7 +21,6 @@ class Starmarker {
         this.data = data
     }
 
-
     draw() {
 
         // don't draw if the svg isn't visible
@@ -35,7 +30,6 @@ class Starmarker {
             .data(this.data)
             .join('g')
             .attr("class", "star-marker1")
-
 
         g.selectAll('.line-left') 
             .data(d => [d]) 
@@ -80,18 +74,6 @@ class Starmarker {
                 .attr("y2", d => (d.y * this.imHeight) + 5)
                 .attr("stroke", d => d.color)
                 .attr("stroke-width", 2)
-
-        //g.selectAll('line') 
-            //.data(d => [d]) 
-            //.join('line')
-                //.attr("x1", d => (d.x * this.imWidth) - 15)
-                //.attr("y1", d => d.y * imHeight)
-                //.attr("x2", d => (d.x * this.imWidth) - 5)
-                //.attr("y2", d => d.y * imHeight)
-                //.attr("stroke", this.color)
-                //.attr("stroke-width", 2)
-                //.style("fill", "none");
-
     }
 }
 

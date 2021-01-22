@@ -1,7 +1,5 @@
 import * as d3 from 'd3'
-import store from '../../store'
-
-
+import BaseShape from './base_shape'
 
 /**
  * 
@@ -17,18 +15,10 @@ import store from '../../store'
  * 'backwards' and not have to worry about negative width/height, which
  * svg doesn't allow. 
  */
-class Rect {
-    constructor(svg, data, width, height) {
-        this.svg = svg
-        this.data = data
-        this.imWidth = width || 1
-        this.imHeight = height || 1
-    }
 
-    set imageDimensions(val) {
-        this.imWidth = val[0] || 1
-        this.imHeight = val[1] || 1
-        this.draw()
+class Rect extends BaseShape {
+    constructor(svg, data, imWidth, imHeight) {
+        super(svg, data, imWidth, imHeight)
     }
 
     // Rectangle helpers:
@@ -39,14 +29,6 @@ class Rect {
     midx(r) { return (r.x1 + r.x2) * this.imWidth / 2 }
     midy(r) { return (r.y1 + r.y2) * this.imHeight / 2 }
     
-    get selectedId() {
-        return store.getters['drawshapes/selectedId']
-    }
-    set selectedId(val) {
-        store.commit('drawshapes/selectedId', val)
-    }
-
-
     handleLineMouseOver(d, i) {  // Add interactivity
         // Use D3 to select element, change color and size
         d3.select(this)
@@ -54,35 +36,26 @@ class Rect {
             .attr('stroke', 'orange')
     }
 
-
-    dragstarted = d => {
-        this.selectedId = d.id
-    }
-
-    dragged = (d, i) => {
+    dragged = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.x2 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
         d.y2 += d3.event.dy / this.imHeight
     }
 
-    dragended() {
-        //console.log('drag ended')
-    }
-
-    dragHandle1 = (d,i) => {
+    dragHandle1 = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
     }
-    dragHandle2 = (d,i) => {
+    dragHandle2 = d => {
         d.x2 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
     }
-    dragHandle3 = (d,i) => {
+    dragHandle3 = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.y2 += d3.event.dy / this.imHeight
     }
-    dragHandle4 = (d,i) => {
+    dragHandle4 = d => {
         d.x2 += d3.event.dx / this.imWidth
         d.y2 += d3.event.dy / this.imHeight
     }
@@ -90,24 +63,19 @@ class Rect {
     draw() {
 
         const dragHandleRadius = 5
+        const handleSelectableAreaRadius = 12
 
         // don't draw if the svg isn't visible
         if (this.imHeight * this.imWidth == 0) {return;}
-
-
-        const handleSelectableAreaRadius = 12
 
         let g = this.svg.selectAll('.custom-rect')
             .data(this.data)
             .join('g')
             .attr('class', 'custom-rect selectable-shape')
             .attr('id', d => d.id)
-            //.on('mouseover', this.mouseover)
-            //.on('mouseout', this.mouseout)
             .call(d3.drag()
                 .on("start", this.dragstarted)
                 .on("drag", this.dragged)
-                .on("end", this.dragended)
             )
             .on('mouseover', function () {
                 d3.select(this).style('cursor', 'grab')
@@ -124,10 +92,6 @@ class Rect {
                 .attr('stroke', r => r.color)
                 .attr("fill", 'transparent')
                 .attr('stroke-width', d => d.id == this.selectedId ? 3 : 1)
-
-                //.on('mouseout', this.mouseout)
-
-
 
         let dragHandle1 = g.selectAll('.drag-handle-1')
             .data(d => [d])
@@ -161,7 +125,6 @@ class Rect {
             .attr('stroke', d => d.color)
             .attr("fill", "transparent")
             .style('opacity', d => d.id == this.selectedId ? 1 : 0)
-
 
         let dragHandle1Area = g.selectAll('.drag-handle-1-area')
             .data(d => [d])
@@ -240,7 +203,7 @@ class Rect {
                 })
                 .call(d3.drag().on("drag", this.dragHandle4))
 
-        let centerx = g.selectAll('.center-cross-x')
+        let centerX = g.selectAll('.center-cross-x')
             .data(d => [d])
             .join('line')
                 .attr('class', 'center-cross-x')
@@ -251,7 +214,7 @@ class Rect {
                 .attr('color', d => d.color)
                 .attr('stroke', d => d.color)
                 .attr('stroke-width', 1)
-        let centery = g.selectAll('.center-cross-y')
+        let centerY = g.selectAll('.center-cross-y')
             .data(d => [d])
             .join('line')
                 .attr('class', 'center-cross-y')
@@ -262,8 +225,6 @@ class Rect {
                 .attr('color', d => d.color)
                 .attr('stroke', d => d.color)
                 .attr('stroke-width', 1)
-
-
     }
 }
 

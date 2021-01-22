@@ -37,8 +37,8 @@ This component is not currently being used.
     <circle class="drag-handle" :stroke="color" fill="transparent" :cx="_x1" :cy="_y2" :r="dragHandleRadius"/>
     <circle class="drag-handle" :stroke="color" fill="transparent" :cx="_x2" :cy="_y2" :r="dragHandleRadius"/>
 
-    <line :stroke="color" stroke-width="1" :x1="centerx-5" :y1="centery" :x2="centerx+5" :y2="centery"/>
-    <line :stroke="color" stroke-width="1" :x1="centerx" :y1="centery-5" :x2="centerx" :y2="centery+5"/>
+    <line :stroke="color" stroke-width="1" :x1="centerX-5" :y1="centerY" :x2="centerX+5" :y2="centerY"/>
+    <line :stroke="color" stroke-width="1" :x1="centerX" :y1="centerY-5" :x2="centerX" :y2="centerY+5"/>
   </g>
 </template>
 
@@ -173,10 +173,10 @@ export default {
     _y2() {
       return (this.x1 >= this.x2 ? this.y1 : this.y2) * this.svgHeight
     },
-    centerx() {
+    centerX() {
       return this._x1 + (this.rectWidth / 2)
     },
-    centery() {
+    centerY() {
       return this._y1 + (this.rectHeight / 2)
     },
 
@@ -201,12 +201,8 @@ export default {
 .cursorgrabbing {
   cursor: grabbing;
 }
-.custom-rect {
-
-}
 .corner {
   fill: transparent;
 }
-
 
 </style>

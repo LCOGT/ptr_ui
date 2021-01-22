@@ -167,7 +167,7 @@ export default {
             aladin_ra = aladin_ra / 15;
 
             this.$store.dispatch('skyChart/setSelected', [aladin_ra, aladin_dec] )
-            this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(4))
+            this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(5))
             this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
             this.$store.commit('command_params/mount_object', ' ') // clear teh mount_object entry
         }, 
@@ -184,7 +184,7 @@ export default {
 
                 // convert from degrees to positive hours
                 let raHours = eq[0] > 0 ? eq[0] / 15 : (eq[0] / 15) + 24
-                this.$store.commit('command_params/mount_ra', raHours.toFixed(4))
+                this.$store.commit('command_params/mount_ra', raHours.toFixed(5))
                 this.$store.commit('command_params/mount_dec', eq[1].toFixed(4))
                 this.$store.commit('command_params/mount_object', ' ') // clear the mount_object entry
             }
