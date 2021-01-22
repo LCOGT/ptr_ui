@@ -1,83 +1,42 @@
 import * as d3 from 'd3'
-import store from '../../store'
+import BaseShape from './base_shape'
 
-
-class Line {
+class Line extends BaseShape {
     constructor(svg, data, imWidth, imHeight) {
-        this.svg = svg
-        this.data = data
-        this.imWidth = imWidth || 0
-        this.imHeight = imHeight || 0
-
+        super(svg, data, imWidth, imHeight)
     }
 
-    get imageDimensions() {
-        return [this.imWidth, this.imHeight]
-    }
-    set imageDimensions(val) {
-        this.imWidth = val[0] || 0
-        this.imHeight = val[1] || 0
-        this.draw()
-    }
-    get selectedId() {
-        return store.getters['drawshapes/selectedId']
-    }
-    set selectedId(val) {
-        store.commit('drawshapes/selectedId', val)
-    }
-
-
-    // Display helpers:
-    //p1(l) { return [this.imWidth * l.x1, this.imHeight * l.y1] }
-    //p2(l) { return [this.imWidth * l.x2, this.imHeight * l.y2]}
-
-    handleLineMouseOver = (d, i) => {
-        this.svg.select(d.id)
-            .attr('stroke-width', d => d.id == this.selectedId ? 4 : 3)
+    mouseover = d => {
+        d3.select('#'+d.id)
             .style('opacity', 0.9)
             .style('cursor', 'grab')
-
     }
 
     mouseout = (d,i) => {
         const stroke = d.color
-        this.svg.select(d.id).select('.main-line')
+        d3.select('#'+d.id).select('.main-line')
             .attr('stroke-width', d => d.id == this.selectedId ? 3 : 2)
             .attr('stroke', stroke)
             .style('opacity', 0.8)
     }
 
-    dragstarted = (d) => {
-        //console.log('drag started')
-        this.selectedId = d.id
-    }
-
-    clicked = (d, i) => {
-        if (d.defaultPrevented) return; // dragged
-
-        this.svg.select(d.id).select('.main-line')
-            .attr("stroke", "black")
-
-    }
-
-    dragged = (d,i) => {
+    dragged = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
         d.x2 += d3.event.dx / this.imWidth
         d.y2 += d3.event.dy / this.imHeight
     }
 
-    dragended() {
-        //d3.select(this).attr("stroke", null);
+    dragended = () => {
         d3.selectAll('g')
             .attr('pointer-events', 'all')
     }
 
-    handle1dragged = (d,i) => {
+    handle1dragged = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
     }
-    handle2dragged = (d,i) => {
+    handle2dragged = d => {
         d.x2 += d3.event.dx / this.imWidth
         d.y2 += d3.event.dy / this.imHeight
     }
@@ -86,7 +45,6 @@ class Line {
 
         // don't draw if the svg isn't visible
         if (this.imHeight * this.imWidth == 0) {return;}
-
 
         let g = this.svg.selectAll('.line-selection')
             .data(this.data)
@@ -124,7 +82,7 @@ class Line {
                 .attr('stroke-width', 25)
                 .attr('stroke', 'white')
                 .style('opacity', '0')
-                .on('mouseover', this.handleLineMouseOver)
+                .on('mouseover', this.mouseover)
                 .on('mouseout', this.mouseout)
 
         let dragHandle1Area = g.selectAll('.drag-handle-1-area')

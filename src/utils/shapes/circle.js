@@ -1,9 +1,5 @@
-
 import * as d3 from 'd3'
-import store from '../../store'
-import tinycolor from 'tinycolor2'
-
-
+import BaseShape from './base_shape'
 
 /**
  *  The input data should contain circle objects with keys:
@@ -18,45 +14,17 @@ import tinycolor from 'tinycolor2'
  * 'backwards' and not have to worry about negative radii (svg doesn't allow). 
  */
 
-class Circle {
+class Circle extends BaseShape {
     constructor(svg, data, imWidth, imHeight) {
-        this.svg = svg
-        this.data = data
-        this.imWidth = imWidth || 1
-        this.imHeight = imHeight || 1
+        super(svg, data, imWidth, imHeight)
     }
 
-    get imageDimensions() {
-        return [this.imWidth, this.imHeight]
-    }
-    set imageDimensions(val) {
-        this.imWidth = val[0]
-        this.imHeight = val[1]
-    }
-
-    get selectedId() {
-        return store.getters['drawshapes/selectedId']
-    }
-    set selectedId(val) {
-        store.commit('drawshapes/selectedId', val)
-    }
-
-    clicked = (d,i) => {
-        //if (d.defaultPrevented) return; // dragged
-
-        this.svg.select('#'+d.id).select('.main-circle')
-            .attr("stroke", "black")
-
-        this.selectedId = d.id
-        this.draw()
-    }
-
-    draggedHandle = (d,i) => {
+    handleDragged = d => {
         d.rx += d3.event.dx / this.imWidth
         d.ry += d3.event.dy / this.imHeight
     }
 
-    dragged = (d,i) => {
+    circleDragged = d => {
         this.selectedId = d.id // make this the selected shape
         d.x += d3.event.dx / this.imWidth
         d.y += d3.event.dy / this.imHeight
@@ -73,13 +41,12 @@ class Circle {
             .attr("class", "circle-selection selectable-shape")
             .attr('id', d => d.id)
             .call(d3.drag()
-                .on("drag", this.dragged)
+                .on("drag", this.circleDragged)
             )
             .on('click', this.clicked)
             .on('mouseover', function () {
                 d3.select(this).style('cursor', 'grab')
             })
-
 
         let circle = g.selectAll('.main-circle')
             .data(d => [d])
@@ -92,7 +59,7 @@ class Circle {
                 .attr('stroke', d => d.color)
                 .attr('stroke-width', d => d.id == this.selectedId ? 3 : 1)
 
-        let centerx = g.selectAll('.center-cross-x')
+        let centerX = g.selectAll('.center-cross-x')
             .data(d => [d])
             .join('line')
                 .attr('class', 'center-cross-x')
@@ -102,7 +69,7 @@ class Circle {
                 .attr('y2', d => d.y * this.imHeight)
                 .attr('stroke', d => d.color)
                 .attr('stroke-width', 1)
-        let centery = g.selectAll('.center-cross-y')
+        let centerY = g.selectAll('.center-cross-y')
             .data(d => [d])
             .join('line')
                 .attr('class', 'center-cross-y')
@@ -147,8 +114,7 @@ class Circle {
                         .style('opacity', 0)
                         .style('cursor', 'default')
                 })
-                .call(d3.drag().on("drag", this.draggedHandle))
-
+                .call(d3.drag().on("drag", this.handleDragged))
     }
 }
 

@@ -7,7 +7,7 @@
       <!-- The actual image view component -->
       <image-view 
         :site="sitecode" 
-        :marked_stars="marked_stars" />
+        :markedStars="markedStars" />
 
       <hr>
       <b-collapse class="card" position="is-top" :open="false" style="padding:0">
@@ -81,9 +81,9 @@
               <div class="blank-row" />
 
               <tr> <td class="info-panel-val" align="right">RA: </td>
-                  <td>{{rightAscension || "---"}}</td> </tr>
+                  <td><ra-display  :ra_hours_decimal="current_image.right_ascension" :can_copy="true" /> </td> </tr>
               <tr> <td class="info-panel-val" align="right">Dec: </td>
-                  <td>{{declination || "---"}}</td> </tr>
+                  <td><dec-display  :dec_deg_decimal="current_image.declination" :can_copy="true" /> </td> </tr>
 
               <tr> <td class="info-panel-val" align="right">azimuth: </td>
                   <td>{{current_image.azimuth || "---"}}</td> </tr>
@@ -114,6 +114,10 @@
         </div>
       </side-info-panel>
 
+      large / small fits exists
+      {{large_fits_exists}}
+      {{small_fits_exists}}
+
 
       <line-profile-inspection />
 
@@ -125,7 +129,7 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+          :disabled="!large_fits_exists || !small_fits_exists" 
           v-model="imageStatsLargeFile">
           Use full resolution file (slower!)
         </b-switch>
@@ -143,7 +147,7 @@
               <button 
                 class="button" 
                 :class="{'is-loading':region_info_loading}"
-                :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+                :disabled="!large_fits_exists && !small_fits_exists" 
                 @click="getRegionStats(true)">
                 inspect region
               </button>
@@ -153,7 +157,7 @@
             <button 
               class="button" 
               :class="{'is-loading':image_info_loading}"
-              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+              :disabled="!large_fits_exists && !small_fits_exists" 
               @click="getRegionStats(false)">
               inspect image
             </button>
@@ -182,20 +186,20 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+          :disabled="!large_fits_exists || !small_fits_exists" 
           v-model="starInspectorLargeFile">
           Use full resolution file (slower!)
         </b-switch>
 
-        <p class="warning-text" v-if="!current_image.ex10_fits_exists">{{"missing small fits"}}</p>
-        <p class="warning-text" v-if="!current_image.ex01_fits_exists">{{"missing full fits"}}</p>
+        <p class="warning-text" v-if="!small_fits_exists">{{"missing small fits"}}</p>
+        <p class="warning-text" v-if="!large_fits_exists">{{"missing full fits"}}</p>
 
         <b-field>
           <p class="control">
             <button 
               class="button" 
               :class="{'is-loading': inspect_region_loading}"
-              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+              :disabled="!large_fits_exists && !small_fits_exists" 
               @click="getStarProfiles">
               inspect region
             </button>
@@ -204,7 +208,7 @@
             <button 
               class="button" 
               :class="{'is-loading': inspect_image_loading}"
-              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+              :disabled="!large_fits_exists && !small_fits_exists" 
               @click="getStarProfiles(false)">
               inspect image
             </button>
@@ -280,9 +284,6 @@
             @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
             <span>remove shape</span>
           </b-button>
-          
-
-
       </side-info-panel>
 
       <!--js9-devtools/-->
@@ -291,7 +292,6 @@
     </div>
 
   </div>
-
 
   <!-- Modal popup window showing the full fits header. -->
   <b-modal :active.sync="showFitsHeaderModal" >
@@ -348,6 +348,8 @@ import ImageFilter from "@/components/ImageFilter";
 import ImageInfoPanel from "@/components/ImageInfoPanel";
 import SideInfoPanel from "@/components/SideInfoPanel";
 import LineProfileInspection from "@/components/LineProfileInspection";
+import RaDisplay from "@/components/display/RaDisplay"
+import DecDisplay from "@/components/display/DecDisplay"
 import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
 import axios from 'axios'
@@ -366,6 +368,8 @@ export default {
       Js9Devtools,
       SideInfoPanel,
       LineProfileInspection,
+      RaDisplay,
+      DecDisplay,
   },
   data() {
     return {
@@ -851,6 +855,8 @@ export default {
     ...mapState("images", [
       'recent_images',
       'current_image', 
+    ]),
+    ...mapGetters("images", [
       'small_fits_exists',
       'large_fits_exists'
     ]),
@@ -864,7 +870,7 @@ export default {
       'selectedId',
       'selectionExists',
       'selectedShapeType',
-      ]),
+    ]),
     activeDrawShape: {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},
       set(val) { this.$store.dispatch('drawshapes/activeDrawShape', val )}
@@ -882,7 +888,7 @@ export default {
       }
     },
 
-    marked_stars() {
+    markedStars() {
       const brightest_star = {
         x: this.brightest_relative_pos_x,
         y: this.brightest_relative_pos_y,
@@ -935,7 +941,7 @@ export default {
     },
     rightAscension() {
       if (this.current_image.right_ascension){
-        return this.current_image.right_ascension.toFixed(2)
+        return this.current_image.right_ascension
       }
       return "---"
     },

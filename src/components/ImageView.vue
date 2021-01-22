@@ -152,7 +152,7 @@ export default {
 
   props: {
     site: String,
-    marked_stars: Array,
+    markedStars: Array,
   },
 
   data() {
@@ -178,7 +178,6 @@ export default {
   },
 
   created() {
-    //this.$store.commit("site_config/setActiveSite", this.site);
     this.$store.dispatch("images/load_latest_images");
   },
 
@@ -241,8 +240,8 @@ export default {
       this.updateAll()
       this.subframeDefinedWithFile = this.current_image.base_filename
     },
-    marked_stars() {
-      this.drawStarmarkers.updateData(this.marked_stars)
+    markedStars() {
+      this.drawStarmarkers.updateData(this.markedStars)
       this.drawStarmarkers.draw()
     }
   },
@@ -254,16 +253,11 @@ export default {
 
       this.svg = d3.select('#image_svg')
 
-      this.svg.append('rect')
-        .attr('width', this.imageWidth)
-        .attr('height', this.imageHeight)
-        .attr('fill', 'blue')
-
       this.drawPoints = new Point(this.svg, this.points, this.imageWidth, this.imageHeight)
       this.drawLines = new Line(this.svg, this.lines, this.imageWidth, this.imageHeight)
       this.drawRects = new Rect(this.svg, this.rects, this.imageWidth, this.imageHeight)
       this.drawCircles = new Circle(this.svg, this.circles, this.imageWidth, this.imageHeight)
-      this.drawStarmarkers = new Starmarker(this.svg, this.marked_stars, this.imageWidth, this.imageHeight)
+      this.drawStarmarkers = new Starmarker(this.svg, this.markedStars, this.imageWidth, this.imageHeight)
 
       // Event actions to perform on the image window element
       this.svg
@@ -302,8 +296,8 @@ export default {
       if (this.js9IsVisible) {
         let resize_opts = {
           id: "myJS9",
-          width: width, // adjust for 15px padding
-          height: width,
+          width: width, 
+          height: height,
         }
         this.$store.dispatch('js9/resizeDisplay', resize_opts)
       }
@@ -367,10 +361,10 @@ export default {
         })
         this.svg.on("mousemove", () => {
           let mouse = d3.mouse(this.svg.node())
-          let newPoint = this.points[this.points.length - 1]
-          this.selectedId = newPoint.id
-          newPoint.x = mouse[0] / this.imageWidth
-          newPoint.y = mouse[1] / this.imageHeight
+          let theNewPoint = this.points[this.points.length - 1]
+          this.selectedId = theNewPoint.id
+          theNewPoint.x = mouse[0] / this.imageWidth
+          theNewPoint.y = mouse[1] / this.imageHeight
         })
       // Drawing a new circle
       } else if (this.activeDrawShape == 'circle') {
