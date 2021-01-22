@@ -1,30 +1,12 @@
 import * as d3 from 'd3'
-import store from '../../store'
+import BaseShape from './base_shape'
 
-class Line {
+class Line extends BaseShape {
     constructor(svg, data, imWidth, imHeight) {
-        this.svg = svg
-        this.data = data
-        this.imWidth = imWidth || 0
-        this.imHeight = imHeight || 0
+        super(svg, data, imWidth, imHeight)
     }
 
-    get imageDimensions() {
-        return [this.imWidth, this.imHeight]
-    }
-    set imageDimensions(val) {
-        this.imWidth = val[0] || 0
-        this.imHeight = val[1] || 0
-        this.draw()
-    }
-    get selectedId() {
-        return store.getters['drawshapes/selectedId']
-    }
-    set selectedId(val) {
-        store.commit('drawshapes/selectedId', val)
-    }
-
-    handleLineMouseOver = (d, i) => {
+    mouseover = d => {
         d3.select('#'+d.id)
             .style('opacity', 0.9)
             .style('cursor', 'grab')
@@ -38,34 +20,23 @@ class Line {
             .style('opacity', 0.8)
     }
 
-    dragstarted = (d) => {
-        this.selectedId = d.id  // make this the selected shape
-    }
-
-    clicked = (d, i) => {
-        if (d.defaultPrevented) return; // dragged, so don't do click routine.
-
-        this.svg.select(d.id).select('.main-line')
-            .attr("stroke", "black")
-    }
-
-    dragged = (d,i) => {
+    dragged = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
         d.x2 += d3.event.dx / this.imWidth
         d.y2 += d3.event.dy / this.imHeight
     }
 
-    dragended() {
+    dragended = () => {
         d3.selectAll('g')
             .attr('pointer-events', 'all')
     }
 
-    handle1dragged = (d,i) => {
+    handle1dragged = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
     }
-    handle2dragged = (d,i) => {
+    handle2dragged = d => {
         d.x2 += d3.event.dx / this.imWidth
         d.y2 += d3.event.dy / this.imHeight
     }
@@ -111,7 +82,7 @@ class Line {
                 .attr('stroke-width', 25)
                 .attr('stroke', 'white')
                 .style('opacity', '0')
-                .on('mouseover', this.handleLineMouseOver)
+                .on('mouseover', this.mouseover)
                 .on('mouseout', this.mouseout)
 
         let dragHandle1Area = g.selectAll('.drag-handle-1-area')

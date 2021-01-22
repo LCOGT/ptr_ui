@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import store from '../../store'
+import BaseShape from './base_shape'
 
 /**
  * 
@@ -16,18 +16,9 @@ import store from '../../store'
  * svg doesn't allow. 
  */
 
-class Rect {
-    constructor(svg, data, width, height) {
-        this.svg = svg
-        this.data = data
-        this.imWidth = width || 1
-        this.imHeight = height || 1
-    }
-
-    set imageDimensions(val) {
-        this.imWidth = val[0] || 1
-        this.imHeight = val[1] || 1
-        this.draw()
+class Rect extends BaseShape {
+    constructor(svg, data, imWidth, imHeight) {
+        super(svg, data, imWidth, imHeight)
     }
 
     // Rectangle helpers:
@@ -38,13 +29,6 @@ class Rect {
     midx(r) { return (r.x1 + r.x2) * this.imWidth / 2 }
     midy(r) { return (r.y1 + r.y2) * this.imHeight / 2 }
     
-    get selectedId() {
-        return store.getters['drawshapes/selectedId']
-    }
-    set selectedId(val) {
-        store.commit('drawshapes/selectedId', val)
-    }
-
     handleLineMouseOver(d, i) {  // Add interactivity
         // Use D3 to select element, change color and size
         d3.select(this)
@@ -52,34 +36,26 @@ class Rect {
             .attr('stroke', 'orange')
     }
 
-    dragstarted = d => {
-        this.selectedId = d.id
-    }
-
-    dragged = (d, i) => {
+    dragged = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.x2 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
         d.y2 += d3.event.dy / this.imHeight
     }
 
-    dragended() {
-        // placeholder for now
-    }
-
-    dragHandle1 = (d,i) => {
+    dragHandle1 = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
     }
-    dragHandle2 = (d,i) => {
+    dragHandle2 = d => {
         d.x2 += d3.event.dx / this.imWidth
         d.y1 += d3.event.dy / this.imHeight
     }
-    dragHandle3 = (d,i) => {
+    dragHandle3 = d => {
         d.x1 += d3.event.dx / this.imWidth
         d.y2 += d3.event.dy / this.imHeight
     }
-    dragHandle4 = (d,i) => {
+    dragHandle4 = d => {
         d.x2 += d3.event.dx / this.imWidth
         d.y2 += d3.event.dy / this.imHeight
     }
@@ -100,7 +76,6 @@ class Rect {
             .call(d3.drag()
                 .on("start", this.dragstarted)
                 .on("drag", this.dragged)
-                .on("end", this.dragended)
             )
             .on('mouseover', function () {
                 d3.select(this).style('cursor', 'grab')

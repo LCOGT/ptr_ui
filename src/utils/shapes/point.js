@@ -1,40 +1,11 @@
 import * as d3 from 'd3'
-import store from '../../store'
+import BaseShape from './base_shape'
 
-class Point {
+class Point extends BaseShape {
     constructor(svg, data, imWidth, imHeight) {
-        this.svg = svg
-        this.data = data
-        this.imWidth = imWidth || 1
-        this.imHeight = imHeight || 1
-
+        super(svg, data, imWidth, imHeight)
     }
 
-    get imageDimensions() {
-        return [this.imWidth, this.imHeight]
-    }
-    set imageDimensions(val) {
-        this.imWidth = val[0] || 1
-        this.imHeight = val[1] || 1
-        this.draw()
-    }
-    get selectedId() {
-        return store.getters['drawshapes/selectedId']
-    }
-    set selectedId(val) {
-        store.commit('drawshapes/selectedId', val)
-    }
-
-    clicked = (d, i) => {
-        if (d.defaultPrevented) return; // dragged
-
-        this.svg.select(d.id).selectAll('.main-point')
-            .attr("stroke", "black")
-    }
-
-    dragstarted = d => {
-        this.selectedId = d.id
-    }
     dragged = (d,i) => {
         d.x += d3.event.dx / this.imWidth
         d.y += d3.event.dy / this.imHeight
@@ -86,7 +57,6 @@ class Point {
                 .call(d3.drag()
                     .on("start", this.dragstarted)
                     .on("drag", this.dragged)
-                    .on("end", this.dragended)
                 )
     }
 }
