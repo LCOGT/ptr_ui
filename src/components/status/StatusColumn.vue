@@ -12,12 +12,22 @@
             class="val"
             :class="{'spacer': item.val=='spacer'}"
             :style="customStyle(item)"
-            >{{item.val}}</div>
+            >
+            <ra-display v-if="item.name == 'Ra'" :ra_hours_decimal="parseFloat(item.val)" :can_copy="true"/>
+            <dec-display v-else-if="item.name == 'Dec'" :dec_deg_decimal="parseFloat(item.val)" :can_copy="true"/>
+            <span v-else> {{item.val}} </span>
+            </div>
     </div>
 </template>
 
 <script>
+import RaDisplay from "@/components/display/RaDisplay"
+import DecDisplay from "@/components/display/DecDisplay"
 export default {
+    components: {
+        RaDisplay,
+        DecDisplay,
+    },
     props: {
         'statusList': Array,
         'isOffline': Boolean,

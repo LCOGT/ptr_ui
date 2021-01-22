@@ -2,7 +2,7 @@
     <p class="heading"><b-tag type="is-light">{{device_name}}</b-tag> {{device_type}} Status: </p> 
     <table>
         <tr v-for="(value,name) in device_status" v-bind:key="name">
-        <td class="is-size-7">  {{name}}:  </td><td class="is-size-7">{{value}}</td>
+        <td class="is-size-7">  {{name}}:  </td><td class="is-size-2">{{value}}</td>
         </tr>
     </table>
 </section>
