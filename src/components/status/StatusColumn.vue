@@ -13,9 +13,9 @@
             :class="{'spacer': item.val=='spacer'}"
             :style="customStyle(item)"
             >
-            <ra-display v-if="item.name == 'Ra'" :ra_hours_decimal="parseFloat(item.val)" :can_copy="true"/>
-            <dec-display v-else-if="item.name == 'Dec'" :dec_deg_decimal="parseFloat(item.val)" :can_copy="true"/>
-            <span v-else> {{item.val}} </span>
+                <ra-display v-if="item.name == 'Ra'" :ra_hours_decimal="parseFloat(item.val)" :can_copy="false"/>
+                <dec-display v-else-if="item.name == 'Dec'" :dec_deg_decimal="parseFloat(item.val)" :can_copy="false"/>
+                <span v-else> {{item.val}} </span>
             </div>
     </div>
 </template>
