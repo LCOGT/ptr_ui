@@ -114,11 +114,6 @@
         </div>
       </side-info-panel>
 
-      large / small fits exists
-      {{large_fits_exists}}
-      {{small_fits_exists}}
-
-
       <line-profile-inspection />
 
       <!-- image statistics -->
