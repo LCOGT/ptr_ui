@@ -85,7 +85,7 @@ class Circle {
                 .attr('stroke', d => d.color)
                 .attr('stroke-width', d => d.id == this.selectedId ? 3 : 1)
 
-        let centerx = g.selectAll('.center-cross-x')
+        let centerX = g.selectAll('.center-cross-x')
             .data(d => [d])
             .join('line')
                 .attr('class', 'center-cross-x')
@@ -95,7 +95,7 @@ class Circle {
                 .attr('y2', d => d.y * this.imHeight)
                 .attr('stroke', d => d.color)
                 .attr('stroke-width', 1)
-        let centery = g.selectAll('.center-cross-y')
+        let centerY = g.selectAll('.center-cross-y')
             .data(d => [d])
             .join('line')
                 .attr('class', 'center-cross-y')

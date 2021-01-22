@@ -84,7 +84,7 @@ var helpers = {
         return deg > 0 ? deg / 15 : (deg + 360) / 15
     },
     clamp: (val, min, max) => {
-        return val > max ? max : val < min ? min : val;
+        return Math.max(Math.min(val, max), min)
     },
     xydistance: (a,b) => {
         var x1,x2,y1,y2;
