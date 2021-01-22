@@ -7,16 +7,29 @@
       <!-- The actual image view component -->
       <image-view 
         :site="sitecode" 
-        :median_star_pos_x="median_relative_pos_x"
-        :median_star_pos_y="median_relative_pos_y"
-        :median_plot_color="median_plot_color"
-        :u_brightest_star_pos_x="u_brightest_relative_pos_x"
-        :u_brightest_star_pos_y="u_brightest_relative_pos_y"
-        :u_brightest_plot_color="u_brightest_plot_color"
-        :brightest_star_pos_x="brightest_relative_pos_x"
-        :brightest_star_pos_y="brightest_relative_pos_y"
-        :brightest_plot_color="brightest_plot_color"
-        />
+        :markedStars="markedStars" />
+
+      <hr>
+      <b-collapse class="card" position="is-top" :open="false" style="padding:0">
+        <div
+          slot="trigger" 
+          slot-scope="props"
+          class="card-header"
+          >
+          <p class="card-header-title">
+              Table of images
+          </p>
+          <a class="card-header-icon">
+              <b-icon
+                  :icon="props.open ? 'menu-down' : 'menu-up'">
+              </b-icon>
+          </a>
+        </div>
+        <div class="card-content" style="padding:0">
+          <images-table/>
+        </div>
+      </b-collapse>
+
     </div>
 
     <!-- Collapsible panels on the right of the image --> 
@@ -79,9 +92,31 @@
               <tr> <td class="info-panel-val" align="right">airmass: </td>
                   <td>{{current_image.airmass || "---"}}</td> </tr>
           </table>
-          <div style="height: 1em;"/>
+          <div style="height: 2em;"/>
+          <b-field label="downloads:" style="width: 100%">
+            <p class="control">
+              <a class="button has-text-white" 
+                :disabled="!small_fits_exists"
+                @click="download_fits_file(current_image.base_filename, 'EX10')">
+                <b-icon icon="download" size="is-small" />
+                <span>small fits</span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button has-text-white" 
+                :disabled="!large_fits_exists"
+                @click="download_fits_file(current_image.base_filename, 'EX01')">
+                <b-icon icon="download" size="is-small" />
+                <span>large fits</span>
+              </a>
+            </p>
+          </b-field>
         </div>
       </side-info-panel>
+
+      large / small fits exists
+      {{large_fits_exists}}
+      {{small_fits_exists}}
 
 
       <!-- image statistics -->
@@ -92,7 +127,7 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+          :disabled="!large_fits_exists || !small_fits_exists" 
           v-model="imageStatsLargeFile">
           Use full resolution file (slower!)
         </b-switch>
@@ -110,7 +145,7 @@
               <button 
                 class="button" 
                 :class="{'is-loading':region_info_loading}"
-                :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+                :disabled="!large_fits_exists && !small_fits_exists" 
                 @click="getRegionStats(true)">
                 inspect region
               </button>
@@ -120,7 +155,7 @@
             <button 
               class="button" 
               :class="{'is-loading':image_info_loading}"
-              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+              :disabled="!large_fits_exists && !small_fits_exists" 
               @click="getRegionStats(false)">
               inspect image
             </button>
@@ -149,20 +184,20 @@
           class="is-small" 
           type="is-info" 
           style="margin-bottom: 1em;"
-          :disabled="!current_image.ex01_fits_exists || !current_image.ex10_fits_exists" 
+          :disabled="!large_fits_exists || !small_fits_exists" 
           v-model="starInspectorLargeFile">
           Use full resolution file (slower!)
         </b-switch>
 
-        <p class="warning-text" v-if="!current_image.ex10_fits_exists">{{"missing small fits"}}</p>
-        <p class="warning-text" v-if="!current_image.ex01_fits_exists">{{"missing full fits"}}</p>
+        <p class="warning-text" v-if="!small_fits_exists">{{"missing small fits"}}</p>
+        <p class="warning-text" v-if="!large_fits_exists">{{"missing full fits"}}</p>
 
         <b-field>
           <p class="control">
             <button 
               class="button" 
               :class="{'is-loading': inspect_region_loading}"
-              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+              :disabled="!large_fits_exists && !small_fits_exists" 
               @click="getStarProfiles">
               inspect region
             </button>
@@ -171,7 +206,7 @@
             <button 
               class="button" 
               :class="{'is-loading': inspect_image_loading}"
-              :disabled="!current_image.ex01_fits_exists && !current_image.ex10_fits_exists" 
+              :disabled="!large_fits_exists && !small_fits_exists" 
               @click="getStarProfiles(false)">
               inspect image
             </button>
@@ -202,32 +237,59 @@
         </table>
       </side-info-panel>
 
+      <!-- shape selection tools -->
+      <side-info-panel :startOpen="false">
+        <p slot="title">Selection Tools</p>
+
+        <b-field>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="none">
+              none
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="point">
+              <span class="iconify" data-icon="radix-icons:dot" data-inline="false"></span>
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="line">
+              <span class="iconify" data-icon="mdi:vector-line" data-inline="false"></span>
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="circle">
+              <span class="iconify" data-icon="mdi:vector-circle-variant" data-inline="false"></span>
+          </b-radio-button>
+          <b-radio-button v-model="activeDrawShape"
+              native-value="rect">
+              <span class="iconify" data-icon="mdi:vector-rectangle" data-inline="false"></span>
+          </b-radio-button>
+        </b-field>
+
+          <p>Selected Shape: </p>
+          <table v-if="selectedId != 'none'" style="margin: 1em;">
+            <template v-for="(val, key) in selectedShape">
+              <tr v-if="selectedId != 'none'" v-bind:key="key">
+                <td align="right">{{key}}</td>
+                <td style="padding-left: 1em;">{{val}}</td>
+              </tr>
+            </template>
+          </table>
+          <div v-else>nothing selected</div>
+          <b-button 
+            class="button"
+            type="is-danger"
+            :disabled="selectedId == 'none'"
+            icon-right="delete"
+            @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
+            <span>remove shape</span>
+          </b-button>
+      </side-info-panel>
+
       <!--js9-devtools/-->
       <image-filter :sitecode="sitecode"/>
       <!--image-navigation-panel/-->
     </div>
 
   </div>
-
-  <b-collapse class="card" position="is-top" :open="false" style="padding:0">
-    <div
-      slot="trigger" 
-      slot-scope="props"
-      class="card-header"
-      >
-      <p class="card-header-title">
-          Table of images
-      </p>
-      <a class="card-header-icon">
-          <b-icon
-              :icon="props.open ? 'menu-down' : 'menu-up'">
-          </b-icon>
-      </a>
-    </div>
-    <div class="card-content" style="padding:0">
-      <images-table/>
-    </div>
-  </b-collapse>
 
   <!-- Modal popup window showing the full fits header. -->
   <b-modal :active.sync="showFitsHeaderModal" >
@@ -289,6 +351,7 @@ import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
 import axios from 'axios'
 import * as d3 from 'd3'
+import helpers from "@/utils/helpers"
 
 export default {
   name: "SubpageData",
@@ -404,11 +467,20 @@ export default {
       }
 
       if (useSubregion) {
+
+        if (this.selectedShapeType != "rects") {
+          console.log(this.selectedShapeType)
+          this.$buefy.toast.open({
+            type: 'is-warning',
+            message: 'Region must be a rectangle.'
+          })
+          return;
+        } 
         this.inspect_region_loading = true;
-        body.region_x0 = this.subframe_x0
-        body.region_x1 = this.subframe_x1
-        body.region_y0 = this.subframe_y0
-        body.region_y1 = this.subframe_y1
+        body.region_x0 = helpers.clamp(this.selectedShape.x1, 0, 1)
+        body.region_x1 = helpers.clamp(this.selectedShape.x2, 0, 1)
+        body.region_y0 = helpers.clamp(this.selectedShape.y1, 0, 1)
+        body.region_y1 = helpers.clamp(this.selectedShape.y2, 0, 1)
       }
       else { this.inspect_image_loading = true; }
 
@@ -687,11 +759,20 @@ export default {
         "fitstype": fitstype,
       }
       if (useSubregion) {
+
+        if (this.selectedShapeType != "rects") {
+          console.log(this.selectedShapeType)
+          this.$buefy.toast.open({
+            type: 'is-warning',
+            message: 'Region must be a rectangle.'
+          })
+          return;
+        } 
         this.region_info_loading = true;
-        body.region_x0 = this.subframe_x0,
-        body.region_x1 = this.subframe_x1,
-        body.region_y0 = this.subframe_y0,
-        body.region_y1 = this.subframe_y1
+        body.region_x0 = helpers.clamp(this.selectedShape.x1, 0, 1)
+        body.region_x1 = helpers.clamp(this.selectedShape.x2, 0, 1)
+        body.region_y0 = helpers.clamp(this.selectedShape.y1, 0, 1)
+        body.region_y1 = helpers.clamp(this.selectedShape.y2, 0, 1)
       }
       else { this.image_info_loading = true;}
       if (fitstype == "10") { this.ex10_isLoading = true;}
@@ -740,7 +821,15 @@ export default {
     showFitsHeader() {
       this.refreshFitsHeader()
       this.showFitsHeaderModal = true
-    }
+    },
+    async download_fits_file(base_filename, ex_type) {
+      const params = {
+        base_filename: base_filename, 
+        ex_type: ex_type
+      }
+      const fits_url = await this.$store.dispatch('images/get_fits_url', params)
+      window.location.assign(fits_url)
+    },
   },
   watch: {
     current_image() {
@@ -763,11 +852,56 @@ export default {
       'recent_images',
       'current_image', 
     ]),
+    ...mapGetters("images", [
+      'small_fits_exists',
+      'large_fits_exists'
+    ]),
 
     ...mapGetters("site_config", [
       "site_config", 
       "available_sites"
     ]),
+    
+    ...mapGetters("drawshapes", [
+      'selectedId',
+      'selectionExists',
+      'selectedShapeType',
+    ]),
+    activeDrawShape: {
+      get() { return this.$store.getters['drawshapes/activeDrawShape']},
+      set(val) { this.$store.dispatch('drawshapes/activeDrawShape', val )}
+    },
+    selectedShape: {
+      get() { return this.$store.getters['drawshapes/selectedShape']},
+      set(val) { this.$store.dispatch('drawshapes/selectedShape', val )}
+    },
+
+    brightest_star_display() {
+      return {
+        x: this.brightest_relative_pos_x,
+        y: this.brightest_relative_pos_y,
+        color: this.u_brightest_plot_color,
+      }
+    },
+
+    markedStars() {
+      const brightest_star = {
+        x: this.brightest_relative_pos_x,
+        y: this.brightest_relative_pos_y,
+        color: this.brightest_plot_color,
+      }
+      const brightest_unsaturated = {
+        x: this.u_brightest_relative_pos_x,
+        y: this.u_brightest_relative_pos_y,
+        color: this.u_brightest_plot_color,
+      }
+      return [ brightest_star,brightest_unsaturated ]
+    },
+
+    activeDrawShape: {
+      get() { return this.$store.getters['drawshapes/activeDrawShape']},
+      set(val) { this.$store.commit('drawshapes/activeDrawShape', val)}
+    },
 
     // Vuex mapping for the value that toggles whether to show all the site
     // images or just the user's images.

@@ -40,8 +40,8 @@ const getters = {
     user_images: state => state.user_images,
     show_user_data_only: state => state.show_user_data_only,
 
-    large_fits_exists: state => !state.current_image.ex01_fits_exists,
-    small_fits_exists: state => !state.current_image.ex10_fits_exists,
+    large_fits_exists: state => state.current_image.ex01_fits_exists,
+    small_fits_exists: state => state.current_image.ex10_fits_exists,
 }
 
 const mutations = {
