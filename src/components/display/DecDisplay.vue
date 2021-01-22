@@ -1,14 +1,8 @@
 
 <template>
-  <div 
-    class="wrapper"
-    v-if="dec_deg_decimal"
-    >
-    <div
-      @click="handleClick"
-      title="click to change format"
-      class="dec-display" >
-    {{declinationDisplayVal}} 
+  <div class="wrapper" v-if="dec_deg_decimal" >
+    <div @click="handleClick" title="click to change format" class="dec-display" >
+      {{declinationDisplayVal}} 
     </div>
     <b-icon 
       @click.native="copy"
@@ -43,6 +37,8 @@ export default {
 
       displayFormatOptions: ["decimalDegrees", "sexagesimalWithUnits", "sexagesimalPlain"],
       displayFormatSelected: 0, // index of the list above
+
+      decimalPrecision: 4  // number of decimals to show
     }
   },
 
@@ -52,7 +48,6 @@ export default {
     },
 
     copy() {
-      console.log('copying ', this.declinationDisplayVal)
       navigator.clipboard.writeText(this.declinationDisplayVal)
       this.$buefy.toast.open({
         message: "Coppied " + this.declinationDisplayVal + " to clipboard",
@@ -69,7 +64,8 @@ export default {
       let decimalSeconds = remainder * 60 
       let seconds = parseInt(decimalSeconds)
 
-      if (degrees < 10 && degrees > -10) {  // test if digit needs a 0 padding.
+      // Zero padding if single digit
+      if (degrees < 10 && degrees > -10) {  // dec can be negative
         degrees = '0' + degrees
       } 
       if (minutes < 10) {
@@ -95,7 +91,7 @@ export default {
     },
     declinationDisplayVal() {
       if (this.displayFormat == "decimalDegrees") {
-        return this.dec_deg_decimal.toFixed(4)
+        return this.dec_deg_decimal.toFixed(this.decimalPrecision)
       }
       if (this.displayFormat == "sexagesimalPlain") {
         return this.toSexagesimal(this.dec_deg_decimal, false)

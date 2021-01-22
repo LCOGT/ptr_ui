@@ -1,13 +1,7 @@
 <template>
-  <div 
-    class="wrapper"
-    v-if="ra_hours_decimal"
-    >
-    <div
-      @click="handleClick"
-      title="click to change format"
-      class="ra-display" >
-    {{rightAscension}} 
+  <div class="wrapper" v-if="ra_hours_decimal" >
+    <div @click="handleClick" title="click to change format" class="ra-display" > 
+      {{rightAscension}} 
     </div>
     <b-icon 
       @click.native="copy"
@@ -40,6 +34,8 @@ export default {
 
       displayFormatOptions: ["decimalHours", "sexagesimalWithUnits", "sexagesimalPlain"],
       displayFormatSelected: 0, // index of the list above
+
+      decimalPrecision: 5,  // number of decimals to show
     }
   },
 
@@ -49,7 +45,6 @@ export default {
     },
 
     copy() {
-      console.log('copying ', this.rightAscension)
       navigator.clipboard.writeText(this.rightAscension)
       this.$buefy.toast.open({
         message: "Coppied " + this.rightAscension + " to clipboard",
@@ -66,6 +61,7 @@ export default {
       let decimal_seconds = remainder * 60 
       let seconds = parseInt(decimal_seconds)
 
+      // Zero padding if single digit
       if (hours < 10) {
         hours = '0' + hours
       } 
@@ -92,7 +88,7 @@ export default {
     },
     rightAscension() {
       if (this.displayFormat == "decimalHours") {
-        return this.ra_hours_decimal.toFixed(5)
+        return this.ra_hours_decimal.toFixed(this.decimalPrecision)  
       }
       if (this.displayFormat == "sexagesimalPlain") {
         return this.toSexagesimal(this.ra_hours_decimal, false)
