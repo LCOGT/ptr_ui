@@ -7,7 +7,7 @@
       <!-- The actual image view component -->
       <image-view 
         :site="sitecode" 
-        :marked_stars="marked_stars" />
+        :markedStars="markedStars" />
 
       <hr>
       <b-collapse class="card" position="is-top" :open="false" style="padding:0">
@@ -874,7 +874,7 @@ export default {
       }
     },
 
-    marked_stars() {
+    markedStars() {
       const brightest_star = {
         x: this.brightest_relative_pos_x,
         y: this.brightest_relative_pos_y,

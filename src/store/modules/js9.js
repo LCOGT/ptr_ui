@@ -157,7 +157,7 @@ const actions = {
         let resize_opts = {
             id: "myJS9",
             width: imageWindow.width, 
-            height: imageWindow.width,
+            height: imageWindow.height,
         }
 
         await dispatch('resizeDisplay', resize_opts)
