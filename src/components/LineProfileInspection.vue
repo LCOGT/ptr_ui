@@ -85,8 +85,8 @@ export default {
         .call(d3.axisBottom(this.xScale).ticks(this.width / 80).tickSizeOuter(0))
     },
 
+    // Responsive sizing
     resizeObserver() {
-
       const updateSize = (w,h) => {
         this.width = w
         this.height = h
@@ -100,7 +100,7 @@ export default {
         }
       });
       let imageEl = document.getElementById('line-inspection-chart')
-      // Observe one or multiple elements
+      // Set observers on the element(s)
       ro.observe(imageEl);
     },
 
@@ -117,14 +117,10 @@ export default {
       this.analysisInProgress = true
       this.lineProfileResults = []
 
-      const url = "http://quickanalysis.photonranch.org/lineprofile"
-      //const url = "http://localhost:5000/lineprofile" // temporary
-
+      const url = this.quickanalysis_endpoint + '/lineprofile'
       const lineSelection = this.subframeFromShape
 
-      console.log(lineSelection)
       // Ensure the line falls inside the image boundaries
-      // TODO: this produces a bad line! Need to find the intercept of the non-clamped variable.
       for (const coord in lineSelection) {
         if (lineSelection[coord] < 0 || lineSelection[coord] > 1) {
           this.analysisInProgress = false
@@ -135,13 +131,12 @@ export default {
           return;
         }
       }
-      console.log(lineSelection)
 
       // Choose a starting point so that the line goes from left to right.
       const x0IsLeft = lineSelection.x0 < lineSelection.x1
       const startingPoint = {
         x: x0IsLeft ? lineSelection.x0 : lineSelection.x1,
-        y: x0IsLeft ? lineSelection.y0: lineSelection.y1,
+        y: x0IsLeft ? lineSelection.y0 : lineSelection.y1,
       }
       const endingPoint = {
         x: x0IsLeft ? lineSelection.x1 : lineSelection.x0,
@@ -156,7 +151,6 @@ export default {
 
       axios.post(url, payload).then(response => {
         this.analysisInProgress = false
-        console.log(response)
         const profile = response.data.data // this is the data to plot
         this.lineProfileResults = profile
       }).catch(e => {
@@ -165,7 +159,7 @@ export default {
           message: "There was a problem computing the line profile."
         })
         this.analysisInProgress = false
-        console.log(e)
+        console.warn(e)
       })
     },
 
@@ -184,6 +178,8 @@ export default {
       'selectedShapeType',
       'subframeFromShape',
     ]),
+
+    ...mapState('dev', ['quickanalysis_endpoint']),
 
     xScale() {
       let margin = this.chartMargin

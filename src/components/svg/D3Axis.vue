@@ -25,7 +25,6 @@
 <script>
 /**
  * Creates a tick display
- * TODO: Need to make this work on all axis
  */
 export default {
   props: {

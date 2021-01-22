@@ -110,10 +110,6 @@
         </b-button>
         </b-field>
 
-        <!--b-field label="crosshairs">
-          <b-switch type="is-info" v-model="show_crosshairs"></b-switch>
-        </b-field-->
-
       </div>
 
     </div>
