@@ -114,10 +114,7 @@
         </div>
       </side-info-panel>
 
-      large / small fits exists
-      {{large_fits_exists}}
-      {{small_fits_exists}}
-
+      <line-profile-inspection />
 
       <!-- image statistics -->
       <side-info-panel :startOpen="false">
@@ -345,6 +342,7 @@ import ImageNavigationPanel from "@/components/ImageNavigationPanel";
 import ImageFilter from "@/components/ImageFilter";
 import ImageInfoPanel from "@/components/ImageInfoPanel";
 import SideInfoPanel from "@/components/SideInfoPanel";
+import LineProfileInspection from "@/components/LineProfileInspection";
 import RaDisplay from "@/components/display/RaDisplay"
 import DecDisplay from "@/components/display/DecDisplay"
 import moment from 'moment'
@@ -364,6 +362,7 @@ export default {
       ImageFilter,
       Js9Devtools,
       SideInfoPanel,
+      LineProfileInspection,
       RaDisplay,
       DecDisplay,
   },

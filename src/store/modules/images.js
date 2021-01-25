@@ -42,6 +42,15 @@ const getters = {
 
     large_fits_exists: state => state.current_image.ex01_fits_exists,
     small_fits_exists: state => state.current_image.ex10_fits_exists,
+
+    small_fits_filename: (state, getters) => {
+        if (!getters.small_fits_exists) return ''
+        return getters.current_image.base_filename + '-EX10.fits.bz2'
+    },
+    large_fits_filename: (state, getters) => {
+        if (!getters.large_fits_exists) return ''
+        return getters.current_image.base_filename + '-EX01.fits.bz2'
+    },
 }
 
 const mutations = {
