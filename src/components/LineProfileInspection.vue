@@ -192,7 +192,7 @@ export default {
     yScale() {
       let margin = this.chartMargin
       return (
-        d3.scaleLog()
+        d3.scaleSymlog()
           .domain([d3.min(this.lineProfileResults), d3.max(this.lineProfileResults)])
           .range([this.height - margin.bottom, margin.top])
       )
@@ -201,12 +201,12 @@ export default {
     linePath() {
       this.drawYAxis()
       this.drawXAxis()
-      return (
-        d3
+      const line = d3
           .line()
           .x((d,i) => this.xScale(i))
           .y((d,i) => this.yScale(d))(this.lineProfileResults)
-      )
+      console.log(line)
+      return line
     },
   }
 
