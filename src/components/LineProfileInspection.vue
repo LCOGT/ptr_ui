@@ -21,8 +21,7 @@
       </button>
     </b-field>
 
-    <!--div id="line-inspection-chart" /-->
-    <div id="line-inspection-chart" style="width: 100%; height: 250px;">
+    <div id="line-inspection-chart">
       <svg :viewbox="`0 0 100 ${height}`">
         <path :d="linePath" fill="none" stroke="steelblue" stroke-width="1.5" ></path>
         <g id="line-y-axis" />
@@ -205,7 +204,6 @@ export default {
           .line()
           .x((d,i) => this.xScale(i))
           .y((d,i) => this.yScale(d))(this.lineProfileResults)
-      console.log(line)
       return line
     },
   }
@@ -215,6 +213,8 @@ export default {
 
 <style lang="scss" scoped>
 #line-inspection-chart {
+  width: 100%;
+  height: 250px;
   svg {
     width: 100%;
     height: 100%;
