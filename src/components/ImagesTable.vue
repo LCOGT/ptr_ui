@@ -16,11 +16,11 @@
             </b-table-column>
 
             <b-table-column field="right_ascension" label="Right Ascension" v-slot="props">
-                {{ get_right_ascension(props.row) }} 
+                <ra-display :ra_hours_decimal="props.row.right_ascension" />
             </b-table-column>
 
             <b-table-column field="declination" label="Declination" v-slot="props">
-                {{ get_declination(props.row) }} 
+                <dec-display :dec_deg_decimal="props.row.declination" />
             </b-table-column>
 
             <b-table-column field="exposure_time" label="Exposure Time" v-slot="props">
@@ -48,8 +48,14 @@
 </template>
 
 <script>
+import RaDisplay from '@/components/display/RaDisplay'
+import DecDisplay from '@/components/display/DecDisplay'
 import { mapGetters } from 'vuex'
     export default {
+        components: {
+            RaDisplay,
+            DecDisplay,
+        },
         data() {
             return {
                 isEmpty: false,

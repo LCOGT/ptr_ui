@@ -10,6 +10,7 @@ import js9 from './modules/js9'
 import command_params from './modules/command_params'
 import user_data from './modules/user_data'
 import calendar from './modules/calendar'
+import drawshapes from './modules/drawshapes'
 
 Vue.use(Vuex)
 
@@ -34,5 +35,6 @@ export default new Vuex.Store({
         js9,
         auth,
         calendar,
+        drawshapes,
     },
 })

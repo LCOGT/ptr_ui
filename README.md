@@ -1,29 +1,5 @@
-# ptr-mock
+# Photon Ranch UI
 
-## Project setup
-```
-npm install
-```
+This is the frontend application used to interface with photon ranch observatories. 
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+![Screenshot](public/img/README_screenshot.png)

@@ -142,10 +142,10 @@ export const commands_mixin = {
 
             const options = await this.getAuthHeader()
             let form = formCreatorFunction(...args).form
-            const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.sitecode}`
+            const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.active_site}`
 
             form.timestamp = parseInt(Date.now() / 1000)
-            form.site = this.sitecode
+            form.site = this.active_site
             form.mount = this.active_mount
 
             console.log(form)
@@ -250,10 +250,6 @@ export const commands_mixin = {
 
             'subframeIsActive',
             'subframeDefinedWithFile',
-            'subframe_x0',
-            'subframe_y0',
-            'subframe_x1',
-            'subframe_y1',
 
             'camera_areas_selection',
             'camera_note',
@@ -280,6 +276,11 @@ export const commands_mixin = {
 
             'screen_brightness',
         ]),
+
+        subframe_x0() { return this.$store.getters['drawshapes/subframeFromShape'].x0 },
+        subframe_y0() { return this.$store.getters['drawshapes/subframeFromShape'].y0 },
+        subframe_x1() { return this.$store.getters['drawshapes/subframeFromShape'].x1 },
+        subframe_y1() { return this.$store.getters['drawshapes/subframeFromShape'].y1 },
 
         // Get username if user is logged in
         username() {
