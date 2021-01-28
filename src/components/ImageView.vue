@@ -83,6 +83,9 @@
         </b-field>
 
         <b-field>
+          <b-field label="crosshairs" style="margin-right: 10px;" >
+            <b-switch type="is-info" v-model="show_crosshairs"></b-switch>
+          </b-field>
           <b-field>
             <b-radio-button v-model="activeDrawShape" native-value="none"> none </b-radio-button>
             <b-radio-button v-model="activeDrawShape" native-value="point">
