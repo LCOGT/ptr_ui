@@ -10,20 +10,20 @@
               Home
             </b-navbar-item>
             <b-navbar-item tag="router-link" 
-              :to="{ path: '/site/' + sitecode + '/observe'}">
-              Observe
-            </b-navbar-item>
-            <b-navbar-item tag="router-link" 
               :to="{ path: '/site/' + sitecode + '/targets'}">
               Targets
             </b-navbar-item>
             <b-navbar-item tag="router-link" 
-              :to="{ path: '/site/' + sitecode + '/projects'}">
-              Projects
+              :to="{ path: '/site/' + sitecode + '/observe'}">
+              Observe
             </b-navbar-item>
             <b-navbar-item tag="router-link" 
               :to="{ path: '/site/' + sitecode + '/calendar'}">
               Calendar
+            </b-navbar-item>
+            <b-navbar-item tag="router-link" 
+              :to="{ path: '/site/' + sitecode + '/projects'}">
+              Projects
             </b-navbar-item>
         </template>
 
