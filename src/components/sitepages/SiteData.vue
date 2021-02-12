@@ -97,7 +97,7 @@
             <p class="control">
               <a class="button has-text-white" 
                 :disabled="!small_fits_exists"
-                @click="download_fits_file(current_image.base_filename, 'EX10')">
+                @click="download_fits_file(current_image.base_filename, current_image.data_type, '10')">
                 <b-icon icon="download" size="is-small" />
                 <span>small fits</span>
               </a>
@@ -105,7 +105,7 @@
             <p class="control">
               <a class="button has-text-white" 
                 :disabled="!large_fits_exists"
-                @click="download_fits_file(current_image.base_filename, 'EX01')">
+                @click="download_fits_file(current_image.base_filename, current_image.data_type, '01')">
                 <b-icon icon="download" size="is-small" />
                 <span>large fits</span>
               </a>
@@ -129,8 +129,8 @@
           Use full resolution file (slower!)
         </b-switch>
 
-        <p class="warning-text" v-if="!current_image.ex10_fits_exists">{{"missing small fits"}}</p>
-        <p class="warning-text" v-if="!current_image.ex01_fits_exists">{{"missing full fits"}}</p>
+        <p class="warning-text" v-if="!current_image.fits_10_exists">{{"missing small fits"}}</p>
+        <p class="warning-text" v-if="!current_image.fits_01_exists">{{"missing full fits"}}</p>
 
         <b-field>
           <p class="control">
@@ -390,7 +390,7 @@ export default {
       region_info_loading: false,
       image_info_loading: false,
 
-      ex10_isLoading: false,
+      fits_10_is_loading: false,
 
       // Analysize the full sized raw file (default is 768px reduced file)
       imageStatsLargeFile: false,
@@ -774,7 +774,7 @@ export default {
         body.region_y1 = helpers.clamp(this.selectedShape.y2, 0, 1)
       }
       else { this.image_info_loading = true;}
-      if (fitstype == "10") { this.ex10_isLoading = true;}
+      if (fitstype == "10") { this.fits_10_is_loading = true;}
       axios.post(url, body)
         .then(response => {this.displayRegionStats(response, fitstype)})
         .catch(response => {this.regionStatsReset(fitstype)})
@@ -783,7 +783,7 @@ export default {
       //if (fitstype == "00") { this.ex00_isLoading = false;}
       this.image_info_loading = false;
       this.region_info_loading = false;
-      if (fitstype == "10") { this.ex10_isLoading = false;}
+      if (fitstype == "10") { this.fits_10_is_loading = false;}
       this.region_min = "--"
       this.region_max = "--"
       this.region_median = "--"
@@ -795,7 +795,7 @@ export default {
       console.log(http_response)
       this.image_info_loading = false;
       this.region_info_loading = false;
-      if (fitstype == "10") { this.ex10_isLoading = false;}
+      if (fitstype == "10") { this.fits_10_is_loading = false;}
       let data = http_response.data
       this.region_min = parseFloat(data.min).toFixed(3)
       this.region_max = parseFloat(data.max).toFixed(3)
@@ -821,10 +821,11 @@ export default {
       this.refreshFitsHeader()
       this.showFitsHeaderModal = true
     },
-    async download_fits_file(base_filename, ex_type) {
+    async download_fits_file(base_filename, data_type, reduction_level) {
       const params = {
         base_filename: base_filename, 
-        ex_type: ex_type
+        data_type: data_type,
+        reduction_level: reduction_level,
       }
       const fits_url = await this.$store.dispatch('images/get_fits_url', params)
       window.location.assign(fits_url)
