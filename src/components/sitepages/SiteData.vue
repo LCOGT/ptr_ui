@@ -4,6 +4,7 @@
   <div class="columns is-touch">
 
     <div class="img-view column" style="padding: 0; margin: 1em;">
+      <div> <histogram-viewer :counts="hist_counts" :edges="hist_edges"/></div>
       <!-- The actual image view component -->
       <image-view 
         :site="sitecode" 
@@ -55,7 +56,7 @@
 
 
       <!-- Basic image info and a button to reveal the full fits header -->
-      <side-info-panel :startOpen="true">
+      <side-info-panel :startOpen="false">
 
         <p class="level" slot="title">
           Image Info 
@@ -114,6 +115,44 @@
         </div>
       </side-info-panel>
 
+
+      <!-- Histogram panel -->
+      <side-info-panel :startOpen="true">
+        <p slot="title">histogram</p>
+
+        <b-switch 
+          class="is-small" 
+          type="is-info" 
+          style="margin-bottom: 1em;"
+          :disabled="!large_fits_exists" 
+          v-model="analysisWithLargeFile">
+          Use full resolution file (slower!)
+        </b-switch>
+
+        <b-field>
+          <p class="control">
+            <button 
+              title="Get histogram from the selected rectangle region." 
+              class="button" 
+              :class="{'is-loading':region_histogram_loading}"
+              :disabled="!large_fits_exists && !small_fits_exists" 
+              @click="getHistogram(true)">
+              from region
+            </button>
+          </p>
+          <p class="control">
+            <button 
+              class="button" 
+              :class="{'is-loading':image_histogram_loading}"
+              :disabled="!large_fits_exists && !small_fits_exists" 
+              @click="getHistogram(false)">
+              from image
+            </button>
+          </p>
+        </b-field>
+
+      </side-info-panel>
+
       <line-profile-inspection />
 
       <!-- image statistics -->
@@ -134,19 +173,14 @@
 
         <b-field>
           <p class="control">
-            <b-tooltip 
-              label="Only inspect the selected region (red rectangle)." 
-              position="is-top" 
-              multilined
-              type="is-black">
-              <button 
-                class="button" 
-                :class="{'is-loading':region_info_loading}"
-                :disabled="!large_fits_exists && !small_fits_exists" 
-                @click="getRegionStats(true)">
-                inspect region
-              </button>
-            </b-tooltip>
+            <button 
+              title="Only inspect the selected rectangle region." 
+              class="button" 
+              :class="{'is-loading':region_info_loading}"
+              :disabled="!large_fits_exists && !small_fits_exists" 
+              @click="getRegionStats(true)">
+              inspect region
+            </button>
           </p>
           <p class="control">
             <button 
@@ -170,6 +204,10 @@
                 <td>{{region_mean}}</td> </tr>
             <tr> <td class="info-panel-val" align="right">std: </td>
                 <td>{{region_std}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">mode: </td>
+                <td>{{region_mode}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">MAD: </td>
+                <td>{{region_MAD}}</td> </tr>
         </table>
       </side-info-panel>
 
@@ -345,6 +383,7 @@ import SideInfoPanel from "@/components/SideInfoPanel";
 import LineProfileInspection from "@/components/LineProfileInspection";
 import RaDisplay from "@/components/display/RaDisplay"
 import DecDisplay from "@/components/display/DecDisplay"
+import HistogramViewer from "@/components/HistogramViewer"
 import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
 import axios from 'axios'
@@ -365,6 +404,7 @@ export default {
       LineProfileInspection,
       RaDisplay,
       DecDisplay,
+      HistogramViewer,
   },
   data() {
     return {
@@ -395,12 +435,15 @@ export default {
       // Analysize the full sized raw file (default is 768px reduced file)
       imageStatsLargeFile: false,
       starInspectorLargeFile: false,
+      analysisWithLargeFile: false,
 
       region_min: '--',
       region_max: '--',
       region_median: '--',
       region_mean: '--',
+      region_mode: '--',
       region_std: '--',
+      region_MAD: '--',
 
       num_good_stars: '--',
       pixscale: 1,
@@ -430,6 +473,11 @@ export default {
       starProfileToolActive: false,
       inspect_region_loading: false,
       inspect_image_loading: false,
+
+      region_histogram_loading: false,
+      image_histogram_loading: false,
+      hist_counts: [0,2,3,1],
+      hist_edges: [0,1,2,3,5]
 
 
     }
@@ -751,11 +799,13 @@ export default {
     getRegionStats(useSubregion=true) {
 
       let fitstype = this.imageStatsLargeFile ? "EX01" : "EX10" // Determine the size of the image to analyze.
-      let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
+      //let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
+      let url = this.$store.state.dev.quickanalysis_endpoint + '/statistics'
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
         "fitstype": fitstype,
+        "full_filename": this.current_image.base_filename + '-' + fitstype + '.fits.bz2'
       }
       if (useSubregion) {
 
@@ -768,41 +818,95 @@ export default {
           return;
         } 
         this.region_info_loading = true;
-        body.region_x0 = helpers.clamp(this.selectedShape.x1, 0, 1)
-        body.region_x1 = helpers.clamp(this.selectedShape.x2, 0, 1)
-        body.region_y0 = helpers.clamp(this.selectedShape.y1, 0, 1)
-        body.region_y1 = helpers.clamp(this.selectedShape.y2, 0, 1)
+        //body.region_x0 = helpers.clamp(this.selectedShape.x1, 0, 1)
+        //body.region_x1 = helpers.clamp(this.selectedShape.x2, 0, 1)
+        //body.region_y0 = helpers.clamp(this.selectedShape.y1, 0, 1)
+        //body.region_y1 = helpers.clamp(this.selectedShape.y2, 0, 1)
+        body.subregion = {
+          shape: 'rect',
+          x0: helpers.clamp(this.selectedShape.x1, 0, 1),
+          y0: helpers.clamp(this.selectedShape.y1, 0, 1),
+          x1: helpers.clamp(this.selectedShape.x2, 0, 1),
+          y1: helpers.clamp(this.selectedShape.y2, 0, 1),
+        }
       }
       else { this.image_info_loading = true;}
-      if (fitstype == "10") { this.ex10_isLoading = true;}
+
       axios.post(url, body)
         .then(response => {this.displayRegionStats(response, fitstype)})
-        .catch(response => {this.regionStatsReset(fitstype)})
+        .catch(response => {this.resetRegionStats(fitstype)})
     },
-    regionStatsReset(fitstype) {
+    resetRegionStats(fitstype) {
       //if (fitstype == "00") { this.ex00_isLoading = false;}
       this.image_info_loading = false;
       this.region_info_loading = false;
-      if (fitstype == "10") { this.ex10_isLoading = false;}
+      if (fitstype == "EX10") { this.ex10_isLoading = false;}
       this.region_min = "--"
       this.region_max = "--"
       this.region_median = "--"
       this.region_mean = "--"
       this.region_std = "--"
-
+      this.region_mode = "--"
+      this.region_MAD = "--"
     },
     displayRegionStats(http_response, fitstype) {
       console.log(http_response)
       this.image_info_loading = false;
       this.region_info_loading = false;
       if (fitstype == "10") { this.ex10_isLoading = false;}
-      let data = http_response.data
-      this.region_min = parseFloat(data.min).toFixed(3)
-      this.region_max = parseFloat(data.max).toFixed(3)
-      this.region_median = parseFloat(data.median).toFixed(3)
-      this.region_mean = parseFloat(data.mean).toFixed(3)
-      this.region_std = parseFloat(data.std).toFixed(3)
+      let data = http_response.data.stats
+      this.region_min = parseFloat(data.min)
+      this.region_max = parseFloat(data.max)
+      this.region_median = parseFloat(data.median)
+      this.region_mean = parseFloat(data.mean).toFixed(1)
+      this.region_std = parseFloat(data.std).toFixed(1)
+      this.region_mode = parseFloat(data.mode)
+      this.region_MAD = parseFloat(data.median_abs_deviation).toFixed(2)
     },
+
+    getHistogram(useSubregion=true) {
+      let fitstype = this.analysisWithLargeFile ? "EX01" : "EX10" // Determine the size of the image to analyze.
+      let url = this.$store.state.dev.quickanalysis_endpoint + '/histogram'
+      let body = {
+        "full_filename": this.current_image.base_filename + '-' + fitstype + '.fits.bz2'
+      }
+      if (useSubregion) {
+
+        if (this.selectedShapeType != "rects") {
+          console.log(this.selectedShapeType)
+          this.$buefy.toast.open({
+            type: 'is-warning',
+            message: 'Region must be a rectangle.'
+          })
+          return;
+        } 
+        this.region_histogram_loading = true;
+        body.subregion = {
+          shape: 'rect',
+          x0: helpers.clamp(this.selectedShape.x1, 0, 1),
+          y0: helpers.clamp(this.selectedShape.y1, 0, 1),
+          x1: helpers.clamp(this.selectedShape.x2, 0, 1),
+          y1: helpers.clamp(this.selectedShape.y2, 0, 1),
+        }
+      }
+      else { this.image_histogram_loading = true;}
+
+      axios.post(url, body)
+        .then(response => {
+          console.log(response)
+          this.image_histogram_loading = false;
+          this.region_histogram_loading = false;
+          this.hist_counts = response.data.histogram.counts 
+          this.hist_edges = response.data.histogram.edges
+        }) .catch(err => {
+          console.warn('Error getting histogram: ',err )
+          this.image_histogram_loading = false;
+          this.region_histogram_loading = false;
+          this.hist_counts = [0,0]
+          this.hist_edges = [0,0.5,1]
+        })
+    },
+
     refreshFitsHeader() {
       // First check if image is placeholder. If so, nothing to show.
       if (this.current_image.base_filename == "placeholder image") {
@@ -837,7 +941,7 @@ export default {
       // Reset the star profile graph and remove the star markers
       // TODO: cache the results of full image analysis and reload when 
       // switching back to the image.
-      this.regionStatsReset("10")
+      this.resetRegionStats("EX10")
       this.drawEmptyStarProfiles()
       this.reset_star_markers()
     },
