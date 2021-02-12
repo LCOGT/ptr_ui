@@ -462,7 +462,8 @@ export default {
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
-        "fitstype": this.starInspectorLargeFile ? "EX01" : "EX10",
+        "data_type": this.current_image.data_type,
+        "reduction_level": this.starInspectorLargeFile ? "01" : "10",
       }
 
       if (useSubregion) {
@@ -750,12 +751,13 @@ export default {
     },
     getRegionStats(useSubregion=true) {
 
-      let fitstype = this.imageStatsLargeFile ? "EX01" : "EX10" // Determine the size of the image to analyze.
-      let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
+      const image_size = this.imageStatsLargeFile ? "01" : "10" // Determine the size of the image to analyze.
+      const url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
-        "fitstype": fitstype,
+        "data_type": this.current_image.data_type,
+        "reduction_level": image_size,
       }
       if (useSubregion) {
 
