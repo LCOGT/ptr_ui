@@ -1,5 +1,5 @@
 <template>
-  <side-info-panel :startOpen="true">
+  <side-info-panel :startOpen="false">
     <p slot="title">line profile</p>
 
     <b-switch 

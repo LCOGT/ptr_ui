@@ -19,7 +19,8 @@ const state = {
     logs_ws_endpoint: "wss://l932c9n1r3.execute-api.us-east-1.amazonaws.com/prod",  // prod
     //logs_ws_endpoint: "wss://8t7v3l1ok5.execute-api.us-east-1.amazonaws.com/dev", // dev
 
-    quickanalysis_endpoint: "https://quickanalysis.photonranch.org",
+    //quickanalysis_endpoint: "https://quickanalysis.photonranch.org",
+    quickanalysis_endpoint: "http://localhost:5000",
 }
 
 // getters
