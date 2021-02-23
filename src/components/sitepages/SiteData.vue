@@ -4,7 +4,6 @@
   <div class="columns is-touch">
 
     <div class="img-view column" style="padding: 0; margin: 1em;">
-      <div> <histogram-viewer :counts="hist_counts" :edges="hist_edges"/></div>
       <!-- The actual image view component -->
       <image-view 
         :site="sitecode" 
@@ -56,12 +55,12 @@
 
 
       <!-- Basic image info and a button to reveal the full fits header -->
-      <side-info-panel :startOpen="false">
+      <side-info-panel :startOpen="true">
 
         <p class="level" slot="title">
           Image Info 
-          <b-button class="button " outlined style="margin-left: 1em;" @click="showFitsHeader">show fits header</b-button>
         </p>
+          <b-button class="button " outlined style="margin-left: 1em;" @click="showFitsHeader">show fits header</b-button>
 
         <div style="margin: 1em;">
           <table class="info-panel-table">
@@ -98,7 +97,7 @@
             <p class="control">
               <a class="button has-text-white" 
                 :disabled="!small_fits_exists"
-                @click="download_fits_file(current_image.base_filename, 'EX10')">
+                @click="download_fits_file(current_image.base_filename, current_image.data_type, '10')">
                 <b-icon icon="download" size="is-small" />
                 <span>small fits</span>
               </a>
@@ -106,109 +105,13 @@
             <p class="control">
               <a class="button has-text-white" 
                 :disabled="!large_fits_exists"
-                @click="download_fits_file(current_image.base_filename, 'EX01')">
+                @click="download_fits_file(current_image.base_filename, current_image.data_type, '01')">
                 <b-icon icon="download" size="is-small" />
                 <span>large fits</span>
               </a>
             </p>
           </b-field>
         </div>
-      </side-info-panel>
-
-
-      <!-- Histogram panel -->
-      <side-info-panel :startOpen="true">
-        <p slot="title">histogram</p>
-
-        <b-switch 
-          class="is-small" 
-          type="is-info" 
-          style="margin-bottom: 1em;"
-          :disabled="!large_fits_exists" 
-          v-model="analysisWithLargeFile">
-          Use full resolution file (slower!)
-        </b-switch>
-
-        <b-field>
-          <p class="control">
-            <button 
-              title="Get histogram from the selected rectangle region." 
-              class="button" 
-              :class="{'is-loading':region_histogram_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getHistogram(true)">
-              from region
-            </button>
-          </p>
-          <p class="control">
-            <button 
-              class="button" 
-              :class="{'is-loading':image_histogram_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getHistogram(false)">
-              from image
-            </button>
-          </p>
-        </b-field>
-
-      </side-info-panel>
-
-      <line-profile-inspection />
-
-      <!-- image statistics -->
-      <side-info-panel :startOpen="false">
-        <p slot="title">region statistics</p>
-
-        <b-switch 
-          class="is-small" 
-          type="is-info" 
-          style="margin-bottom: 1em;"
-          :disabled="!large_fits_exists || !small_fits_exists" 
-          v-model="imageStatsLargeFile">
-          Use full resolution file (slower!)
-        </b-switch>
-
-        <p class="warning-text" v-if="!current_image.ex10_fits_exists">{{"missing small fits"}}</p>
-        <p class="warning-text" v-if="!current_image.ex01_fits_exists">{{"missing full fits"}}</p>
-
-        <b-field>
-          <p class="control">
-            <button 
-              title="Only inspect the selected rectangle region." 
-              class="button" 
-              :class="{'is-loading':region_info_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getRegionStats(true)">
-              inspect region
-            </button>
-          </p>
-          <p class="control">
-            <button 
-              class="button" 
-              :class="{'is-loading':image_info_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getRegionStats(false)">
-              inspect image
-            </button>
-          </p>
-        </b-field>
-
-        <table class="info-panel-table">
-            <tr> <td class="info-panel-val" align="right">min: </td>
-                <td>{{region_min}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">max: </td>
-                <td>{{region_max}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">median: </td>
-                <td>{{region_median}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">mean: </td>
-                <td>{{region_mean}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">std: </td>
-                <td>{{region_std}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">mode: </td>
-                <td>{{region_mode}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">MAD: </td>
-                <td>{{region_MAD}}</td> </tr>
-        </table>
       </side-info-panel>
 
       <!-- star inspector -->
@@ -269,6 +172,94 @@
         <table class="info-panel-table">
             <tr> <td class="info-panel-val" align="right">number of stars detected: </td>
                 <td>{{num_good_stars}}</td> </tr>
+        </table>
+      </side-info-panel>
+
+      <!-- Histogram panel -->
+      <side-info-panel :startOpen="true">
+        <p slot="title">histogram</p>
+
+        <b-field>
+          <p class="control">
+            <button 
+              title="Get histogram from the selected rectangle region." 
+              class="button" 
+              :class="{'is-loading':region_histogram_loading}"
+              :disabled="!large_fits_exists && !small_fits_exists" 
+              @click="getHistogram(true)">
+              from region
+            </button>
+          </p>
+          <p class="control">
+            <button 
+              class="button" 
+              :class="{'is-loading':image_histogram_loading}"
+              :disabled="!large_fits_exists && !small_fits_exists" 
+              @click="getHistogram(false)">
+              from image
+            </button>
+          </p>
+        </b-field>
+        <p class="is-size-7 pl-1 mb-3">Double click to reset the zoom</p>
+        <histogram-viewer :counts="hist_counts" :edges="hist_edges"/>
+
+      </side-info-panel>
+
+      <line-profile-inspection />
+
+      <!-- image statistics -->
+      <side-info-panel :startOpen="false">
+        <p slot="title">region statistics</p>
+
+        <b-switch 
+          class="is-small" 
+          type="is-info" 
+          style="margin-bottom: 1em;"
+          :disabled="!large_fits_exists || !small_fits_exists" 
+          v-model="imageStatsLargeFile">
+          Use full resolution file (slower!)
+        </b-switch>
+
+        <p class="warning-text" v-if="!current_image.fits_10_exists">{{"missing small fits"}}</p>
+        <p class="warning-text" v-if="!current_image.fits_01_exists">{{"missing full fits"}}</p>
+
+        <b-field>
+          <p class="control">
+            <button 
+              title="Only inspect the selected rectangle region." 
+              class="button" 
+              :class="{'is-loading':region_stats_loading}"
+              :disabled="!large_fits_exists && !small_fits_exists" 
+              @click="getRegionStats(true)">
+              inspect region
+            </button>
+          </p>
+          <p class="control">
+            <button 
+              class="button" 
+              :class="{'is-loading':image_stats_loading}"
+              :disabled="!large_fits_exists && !small_fits_exists" 
+              @click="getRegionStats(false)">
+              inspect image
+            </button>
+          </p>
+        </b-field>
+
+        <table class="info-panel-table">
+            <tr> <td class="info-panel-val" align="right">min: </td>
+                <td>{{region_min}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">max: </td>
+                <td>{{region_max}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">median: </td>
+                <td>{{region_median}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">mean: </td>
+                <td>{{region_mean}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">std: </td>
+                <td>{{region_std}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">mode: </td>
+                <td>{{region_mode}}</td> </tr>
+            <tr> <td class="info-panel-val" align="right">MAD: </td>
+                <td>{{region_MAD}}</td> </tr>
         </table>
       </side-info-panel>
 
@@ -427,10 +418,9 @@ export default {
         },
       ],
 
-      region_info_loading: false,
-      image_info_loading: false,
+      region_stats_loading: false,
+      image_stats_loading: false,
 
-      ex10_isLoading: false,
 
       // Analysize the full sized raw file (default is 768px reduced file)
       imageStatsLargeFile: false,
@@ -476,8 +466,9 @@ export default {
 
       region_histogram_loading: false,
       image_histogram_loading: false,
-      hist_counts: [0,2,3,1],
-      hist_edges: [0,1,2,3,5]
+      
+      hist_counts: [0],
+      hist_edges: [0,1],
 
 
     }
@@ -510,7 +501,8 @@ export default {
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
-        "fitstype": this.starInspectorLargeFile ? "EX01" : "EX10",
+        "data_type": this.current_image.data_type,
+        "reduction_level": this.starInspectorLargeFile ? "01" : "10",
       }
 
       if (useSubregion) {
@@ -798,15 +790,18 @@ export default {
     },
     getRegionStats(useSubregion=true) {
 
-      let fitstype = this.imageStatsLargeFile ? "EX01" : "EX10" // Determine the size of the image to analyze.
-      //let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
-      let url = this.$store.state.dev.quickanalysis_endpoint + '/statistics'
+      const image_size = this.imageStatsLargeFile ? "01" : "10" // Determine the size of the image to analyze.
+      const full_filename = this.imageStatsLargeFile ? this.large_fits_filename : this.small_fits_filename
+      //const url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
+      const url = this.$store.state.dev.quickanalysis_endpoint + '/statistics'
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
-        "fitstype": fitstype,
-        "full_filename": this.current_image.base_filename + '-' + fitstype + '.fits.bz2'
+        "data_type": this.current_image.data_type,
+        "reduction_level": image_size,
+        "full_filename": full_filename,
       }
+      console.log(body)
       if (useSubregion) {
 
         if (this.selectedShapeType != "rects") {
@@ -817,11 +812,7 @@ export default {
           })
           return;
         } 
-        this.region_info_loading = true;
-        //body.region_x0 = helpers.clamp(this.selectedShape.x1, 0, 1)
-        //body.region_x1 = helpers.clamp(this.selectedShape.x2, 0, 1)
-        //body.region_y0 = helpers.clamp(this.selectedShape.y1, 0, 1)
-        //body.region_y1 = helpers.clamp(this.selectedShape.y2, 0, 1)
+        this.region_stats_loading= true;
         body.subregion = {
           shape: 'rect',
           x0: helpers.clamp(this.selectedShape.x1, 0, 1),
@@ -830,17 +821,16 @@ export default {
           y1: helpers.clamp(this.selectedShape.y2, 0, 1),
         }
       }
-      else { this.image_info_loading = true;}
+      else { this.image_stats_loading = true;}
 
       axios.post(url, body)
-        .then(response => {this.displayRegionStats(response, fitstype)})
-        .catch(response => {this.resetRegionStats(fitstype)})
+        .then(response => {this.displayRegionStats(response)})
+        .catch(response => {this.resetRegionStats()})
     },
-    resetRegionStats(fitstype) {
-      //if (fitstype == "00") { this.ex00_isLoading = false;}
-      this.image_info_loading = false;
-      this.region_info_loading = false;
-      if (fitstype == "EX10") { this.ex10_isLoading = false;}
+    resetRegionStats() {
+      this.image_stats_loading = false;
+      this.region_stats_loading= false;
+
       this.region_min = "--"
       this.region_max = "--"
       this.region_median = "--"
@@ -849,26 +839,27 @@ export default {
       this.region_mode = "--"
       this.region_MAD = "--"
     },
-    displayRegionStats(http_response, fitstype) {
+    displayRegionStats(http_response) {
       console.log(http_response)
-      this.image_info_loading = false;
-      this.region_info_loading = false;
-      if (fitstype == "10") { this.ex10_isLoading = false;}
+      this.image_stats_loading = false;
+      this.region_stats_loading= false;
+
+
       let data = http_response.data.stats
       this.region_min = parseFloat(data.min)
       this.region_max = parseFloat(data.max)
       this.region_median = parseFloat(data.median)
-      this.region_mean = parseFloat(data.mean).toFixed(1)
-      this.region_std = parseFloat(data.std).toFixed(1)
+      this.region_mean = parseFloat(data.mean).toFixed(3)
+      this.region_std = parseFloat(data.std).toFixed(3)
       this.region_mode = parseFloat(data.mode)
-      this.region_MAD = parseFloat(data.median_abs_deviation).toFixed(2)
+      this.region_MAD = parseFloat(data.median_abs_deviation)
     },
 
     getHistogram(useSubregion=true) {
-      let fitstype = this.analysisWithLargeFile ? "EX01" : "EX10" // Determine the size of the image to analyze.
-      let url = this.$store.state.dev.quickanalysis_endpoint + '/histogram'
+      const url = this.$store.state.dev.quickanalysis_endpoint + '/histogram-clipped'
       let body = {
-        "full_filename": this.current_image.base_filename + '-' + fitstype + '.fits.bz2'
+        "full_filename": this.large_fits_filename,
+        "clip_percent": 0.001,
       }
       if (useSubregion) {
 
@@ -893,7 +884,6 @@ export default {
 
       axios.post(url, body)
         .then(response => {
-          console.log(response)
           this.image_histogram_loading = false;
           this.region_histogram_loading = false;
           this.hist_counts = response.data.histogram.counts 
@@ -905,6 +895,11 @@ export default {
           this.hist_counts = [0,0]
           this.hist_edges = [0,0.5,1]
         })
+    },
+
+    resetHistogram() {
+      this.hist_counts = [0]
+      this.hist_edges = [0,1]
     },
 
     refreshFitsHeader() {
@@ -925,10 +920,11 @@ export default {
       this.refreshFitsHeader()
       this.showFitsHeaderModal = true
     },
-    async download_fits_file(base_filename, ex_type) {
+    async download_fits_file(base_filename, data_type, reduction_level) {
       const params = {
         base_filename: base_filename, 
-        ex_type: ex_type
+        data_type: data_type,
+        reduction_level: reduction_level,
       }
       const fits_url = await this.$store.dispatch('images/get_fits_url', params)
       window.location.assign(fits_url)
@@ -941,7 +937,8 @@ export default {
       // Reset the star profile graph and remove the star markers
       // TODO: cache the results of full image analysis and reload when 
       // switching back to the image.
-      this.resetRegionStats("EX10")
+      this.resetRegionStats()
+      this.resetHistogram()
       this.drawEmptyStarProfiles()
       this.reset_star_markers()
     },
@@ -957,7 +954,9 @@ export default {
     ]),
     ...mapGetters("images", [
       'small_fits_exists',
-      'large_fits_exists'
+      'large_fits_exists',
+      'small_fits_filename', 
+      'large_fits_filename',
     ]),
 
     ...mapGetters("site_config", [

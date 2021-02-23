@@ -98,7 +98,7 @@
     <div id="moon-info">
       <p>Moon is above the horizon</p>
       <p>---</p>
-      <p>Illumination: &emsp;{{moon_hover_data.illumination}} %</p>
+      <p>Illumination: &emsp;{{(moon_hover_data.illumination * 100).toFixed(1)}} %</p>
       <p>Rise: &emsp;&emsp;&emsp;&emsp;&ensp;{{moon_hover_data.rise}}</p>
       <p>Transit: &emsp;&emsp;&emsp;&ensp;{{moon_hover_data.transit}}</p>
       <p>Set: &emsp;&emsp;&emsp;&emsp;&emsp;{{moon_hover_data.set}}</p>

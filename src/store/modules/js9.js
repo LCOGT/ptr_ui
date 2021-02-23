@@ -45,7 +45,7 @@ const actions = {
         })
     },
 
-    async loadImage({ rootState, state, commit, dispatch }, { base_filename, site, zoom, flip,}) {
+    async loadImage({ rootState, rootGetters, state, commit, dispatch }, { base_filename, site, zoom, flip,}) {
 
         // Make sure js9 is ready to load an image
         await dispatch('waitForJs9Ready')
@@ -81,7 +81,7 @@ const actions = {
             let apiName = rootState.dev.active_api;
             let path = '/download';
             let body = {
-                object_name: `${base_filename}-EX10.fits.bz2`,
+                object_name: rootGetters['images/small_fits_filename']
             }
             console.log('url: ', apiName+path)
             const resp = await axios.post(apiName+path, body);
