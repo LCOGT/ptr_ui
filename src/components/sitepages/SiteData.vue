@@ -858,7 +858,7 @@ export default {
     getHistogram(useSubregion=true) {
       const url = this.$store.state.dev.quickanalysis_endpoint + '/histogram-clipped'
       let body = {
-        "full_filename": this.large_fits_filename,
+        "full_filename": this.best_available_full_filename,
         "clip_percent": 0.001,
       }
       if (useSubregion) {
@@ -958,6 +958,11 @@ export default {
       'small_fits_filename', 
       'large_fits_filename',
     ]),
+    best_available_full_filename() {
+      return this.large_fits_exists 
+        ? this.large_fits_filename 
+        : this.small_fits_filename
+    },
 
     ...mapGetters("site_config", [
       "site_config", 
