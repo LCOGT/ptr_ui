@@ -55,7 +55,7 @@
 
 
       <!-- Basic image info and a button to reveal the full fits header -->
-      <side-info-panel :startOpen="true">
+      <side-info-panel :startOpen="false">
 
         <p class="level" slot="title">
           Image Info 
@@ -175,38 +175,6 @@
         </table>
       </side-info-panel>
 
-      <!-- Histogram panel -->
-      <side-info-panel :startOpen="true">
-        <p slot="title">histogram</p>
-
-        <b-field>
-          <p class="control">
-            <button 
-              title="Get histogram from the selected rectangle region." 
-              class="button" 
-              :class="{'is-loading':region_histogram_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getHistogram(true)">
-              from region
-            </button>
-          </p>
-          <p class="control">
-            <button 
-              class="button" 
-              :class="{'is-loading':image_histogram_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getHistogram(false)">
-              from image
-            </button>
-          </p>
-        </b-field>
-        <p class="is-size-7 pl-1 mb-3">Double click to reset the zoom</p>
-        <histogram-viewer :counts="hist_counts" :edges="hist_edges"/>
-
-      </side-info-panel>
-
-      <line-profile-inspection />
-
       <!-- image statistics -->
       <side-info-panel :startOpen="false">
         <p slot="title">region statistics</p>
@@ -263,56 +231,39 @@
         </table>
       </side-info-panel>
 
-      <!-- shape selection tools -->
+      <!-- Histogram panel -->
       <side-info-panel :startOpen="false">
-        <p slot="title">Selection Tools</p>
+        <p slot="title">histogram</p>
 
         <b-field>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="none">
-              none
-          </b-radio-button>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="point">
-              <span class="iconify" data-icon="radix-icons:dot" data-inline="false"></span>
-          </b-radio-button>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="line">
-              <span class="iconify" data-icon="mdi:vector-line" data-inline="false"></span>
-          </b-radio-button>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="circle">
-              <span class="iconify" data-icon="mdi:vector-circle-variant" data-inline="false"></span>
-          </b-radio-button>
-          <b-radio-button v-model="activeDrawShape"
-              native-value="rect">
-              <span class="iconify" data-icon="mdi:vector-rectangle" data-inline="false"></span>
-          </b-radio-button>
+          <p class="control">
+            <button 
+              title="Get histogram from the selected rectangle region." 
+              class="button" 
+              :class="{'is-loading':region_histogram_loading}"
+              :disabled="!large_fits_exists && !small_fits_exists" 
+              @click="getHistogram(true)">
+              from region
+            </button>
+          </p>
+          <p class="control">
+            <button 
+              class="button" 
+              :class="{'is-loading':image_histogram_loading}"
+              :disabled="!large_fits_exists && !small_fits_exists" 
+              @click="getHistogram(false)">
+              from image
+            </button>
+          </p>
         </b-field>
+        <p class="is-size-7 pl-1 mb-3">Double click to reset the zoom</p>
+        <histogram-viewer :counts="hist_counts" :edges="hist_edges"/>
 
-          <p>Selected Shape: </p>
-          <table v-if="selectedId != 'none'" style="margin: 1em;">
-            <template v-for="(val, key) in selectedShape">
-              <tr v-if="selectedId != 'none'" v-bind:key="key">
-                <td align="right">{{key}}</td>
-                <td style="padding-left: 1em;">{{val}}</td>
-              </tr>
-            </template>
-          </table>
-          <div v-else>nothing selected</div>
-          <b-button 
-            class="button"
-            type="is-danger"
-            :disabled="selectedId == 'none'"
-            icon-right="delete"
-            @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
-            <span>remove shape</span>
-          </b-button>
       </side-info-panel>
 
-      <!--js9-devtools/-->
+      <line-profile-inspection />
+
       <image-filter :sitecode="sitecode"/>
-      <!--image-navigation-panel/-->
     </div>
 
   </div>
