@@ -53,67 +53,6 @@
         </b-radio-button>
       </b-field>
 
-
-      <!-- Basic image info and a button to reveal the full fits header -->
-      <side-info-panel :startOpen="false">
-
-        <p class="level" slot="title">
-          Image Info 
-        </p>
-          <b-button class="button " outlined style="margin-left: 1em;" @click="showFitsHeader">show fits header</b-button>
-
-        <div style="margin: 1em;">
-          <table class="info-panel-table">
-              <tr> <td class="info-panel-val" align="right">filename: </td>
-                  <td>{{current_image.base_filename || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">date: </td>
-                  <td>{{captureDate || "---" }}</td></tr>
-              <tr> <td class="info-panel-val" align="right">time: </td>
-                  <td>{{captureTime + " GMT"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">site: </td>
-                  <td>{{current_image.site || "---"}}</td> </tr>
-              <div class="blank-row" />
-
-              <tr> <td class="info-panel-val" align="right">exposure: </td>
-                  <td>{{current_image.exposure_time || "---"}} s</td> </tr>
-              <tr> <td class="info-panel-val" align="right">filter: </td>
-                  <td>{{current_image.filter_used || "---"}}</td> </tr>
-              <div class="blank-row" />
-
-              <tr> <td class="info-panel-val" align="right">RA: </td>
-                  <td><ra-display  :ra_hours_decimal="current_image.right_ascension" :can_copy="true" /> </td> </tr>
-              <tr> <td class="info-panel-val" align="right">Dec: </td>
-                  <td><dec-display  :dec_deg_decimal="current_image.declination" :can_copy="true" /> </td> </tr>
-
-              <tr> <td class="info-panel-val" align="right">azimuth: </td>
-                  <td>{{current_image.azimuth || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">altitude: </td>
-                  <td>{{current_image.altitude || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">airmass: </td>
-                  <td>{{current_image.airmass || "---"}}</td> </tr>
-          </table>
-          <div style="height: 2em;"/>
-          <b-field label="downloads:" style="width: 100%">
-            <p class="control">
-              <a class="button has-text-white" 
-                :disabled="!small_fits_exists"
-                @click="download_fits_file(current_image.base_filename, current_image.data_type, '10')">
-                <b-icon icon="download" size="is-small" />
-                <span>small fits</span>
-              </a>
-            </p>
-            <p class="control">
-              <a class="button has-text-white" 
-                :disabled="!large_fits_exists"
-                @click="download_fits_file(current_image.base_filename, current_image.data_type, '01')">
-                <b-icon icon="download" size="is-small" />
-                <span>large fits</span>
-              </a>
-            </p>
-          </b-field>
-        </div>
-      </side-info-panel>
-
       <!-- star inspector -->
       <side-info-panel :startOpen="false">
         <p slot="title">star inspector</p>
@@ -262,6 +201,67 @@
       </side-info-panel>
 
       <line-profile-inspection />
+
+      <!-- Basic image info and a button to reveal the full fits header -->
+      <side-info-panel :startOpen="false">
+
+        <p class="level" slot="title">
+          Image Info 
+        </p>
+          <b-button class="button " outlined style="margin-left: 1em;" @click="showFitsHeader">show fits header</b-button>
+
+        <div style="margin: 1em;">
+          <table class="info-panel-table">
+              <tr> <td class="info-panel-val" align="right">filename: </td>
+                  <td>{{current_image.base_filename || "---"}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">date: </td>
+                  <td>{{captureDate || "---" }}</td></tr>
+              <tr> <td class="info-panel-val" align="right">time: </td>
+                  <td>{{captureTime + " GMT"}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">site: </td>
+                  <td>{{current_image.site || "---"}}</td> </tr>
+              <div class="blank-row" />
+
+              <tr> <td class="info-panel-val" align="right">exposure: </td>
+                  <td>{{current_image.exposure_time || "---"}} s</td> </tr>
+              <tr> <td class="info-panel-val" align="right">filter: </td>
+                  <td>{{current_image.filter_used || "---"}}</td> </tr>
+              <div class="blank-row" />
+
+              <tr> <td class="info-panel-val" align="right">RA: </td>
+                  <td><ra-display  :ra_hours_decimal="current_image.right_ascension" :can_copy="true" /> </td> </tr>
+              <tr> <td class="info-panel-val" align="right">Dec: </td>
+                  <td><dec-display  :dec_deg_decimal="current_image.declination" :can_copy="true" /> </td> </tr>
+
+              <tr> <td class="info-panel-val" align="right">azimuth: </td>
+                  <td>{{current_image.azimuth || "---"}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">altitude: </td>
+                  <td>{{current_image.altitude || "---"}}</td> </tr>
+              <tr> <td class="info-panel-val" align="right">airmass: </td>
+                  <td>{{current_image.airmass || "---"}}</td> </tr>
+          </table>
+          <div style="height: 2em;"/>
+          <b-field label="downloads:" style="width: 100%">
+            <p class="control">
+              <a class="button has-text-white" 
+                :disabled="!small_fits_exists"
+                @click="download_fits_file(current_image.base_filename, current_image.data_type, '10')">
+                <b-icon icon="download" size="is-small" />
+                <span>small fits</span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button has-text-white" 
+                :disabled="!large_fits_exists"
+                @click="download_fits_file(current_image.base_filename, current_image.data_type, '01')">
+                <b-icon icon="download" size="is-small" />
+                <span>large fits</span>
+              </a>
+            </p>
+          </b-field>
+        </div>
+      </side-info-panel>
+
 
       <image-filter :sitecode="sitecode"/>
     </div>
