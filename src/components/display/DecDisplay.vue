@@ -112,7 +112,7 @@ export default {
 }
 
 .dec-display {
-  width: 80px;
+  min-width: 80px;
 }
 .dec-display:hover {
   cursor: pointer;

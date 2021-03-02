@@ -2,6 +2,15 @@
   <div id="component" v-on:keyup.right="setNextImage" v-on:keyup.left="setPreviousImage" >
     <div id="image-window" ref="imagewindow">
 
+      <div class="image-info-bar">
+        <div class="image-info-bar-item">{{current_image.site}}</div>
+        <div class="image-info-bar-item">{{current_image.exposure_time}}s</div>
+        <div class="image-info-bar-item">{{current_image.filter_used}}</div>
+        <div/>
+        <div class="image-info-bar-item" style="display:flex">ra: <ra-display :ra_hours_decimal="current_image.right_ascension"/></div>
+        <div class="image-info-bar-item" style="display:flex">dec: <dec-display :dec_deg_decimal="current_image.declination"/></div>
+      </div>
+
       <!-- The main image view -->
       <div class="image-div" ref="image_div">
 
@@ -134,6 +143,9 @@ import BackgroundElement from "@/components/svg/BackgroundElement"
 import SvgContextMenu from "@/components/SvgContextMenu"
 import RectSelection from "@/components/svg/RectSelection"
 
+import RaDisplay from "@/components/display/RaDisplay"
+import DecDisplay from "@/components/display/DecDisplay"
+
 import { Point, Line, Rect, Circle, Starmarker }from "@/utils/drawshapes"
 
 export default {
@@ -145,6 +157,8 @@ export default {
     ImageCrosshairs,
     BackgroundElement,
     RectSelection,
+    RaDisplay,
+    DecDisplay,
   },
 
   mixins: [commands_mixin],
@@ -510,6 +524,16 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.image-info-bar {
+  color: #aaa;
+  width: 100%;
+  background-color: #1e2223;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns:50px 50px 50px 1fr 120px 120px;
+  grid-auto-flow: column;
 }
 
 .cursor-is-crosshair:hover {
