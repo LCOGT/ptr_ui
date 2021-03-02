@@ -49,22 +49,26 @@
 
     <hr>
 
-    <b-field    
-        label="Project"
-        horizontal
-        >
-        <b-select v-model="project_name_and_created">
-
-            <option value="none">none</option>
-            <option
-                v-for="(project, index) in user_projects" 
-                :key="index"
-                :value="`${project.project_name}#${project.created_at}`" 
-                aria-role="listitem">
-                <span>{{project.project_name}}</span>
-            </option>
-
-        </b-select>
+    <b-field horizontal label="Project">
+        <div style="display:flex">
+            <b-select v-model="project_name_and_created">
+                <option value="none">none</option>
+                <option
+                    v-for="(project, index) in displayedProjects" 
+                    :key="index"
+                    :value="`${project.project_name}#${project.created_at}`" 
+                    aria-role="listitem">
+                    <span>{{project.project_name}}</span>
+                </option>
+            </b-select>
+            <b-checkbox 
+                v-if="userIsAdmin" 
+                v-model="show_everyones_projects"
+                class="pl-3" 
+                style="color: #aaa; margin-left: auto;">
+                [admin] show everyone's projects
+            </b-checkbox>
+        </div>
     </b-field>
 
     <b-field label="Note" horizontal >
@@ -147,6 +151,9 @@ export default {
             // Pos 10 to 80, including two single quotes containing the value
             max_fits_header_length: 68, 
 
+            show_everyones_projects: false,
+            istrue: true,
+
             submitIsLoading: false,
             modifyIsLoading: false,
             deleteIsLoading: false,
@@ -167,14 +174,52 @@ export default {
     mounted() {
         this.startStr = moment(this.eventDetails.startStr).tz(this.timezone).format()
         this.endStr = moment(this.eventDetails.endStr).tz(this.timezone).format()
+
+        // If an admin opens an event they didn't create, we want them to be able to see the associated project.
+        // So we set 'show_everyones_projects' = true
+        if (this.eventDetails.creator != this.$auth.user.name && this.userIsAdmin) {
+            this.show_everyones_projects = true
+        }
+    },
+
+    watch: {
+        
+        // Refresh the list of available projects if an admin wants to see everything
+        show_everyones_projects: function () {
+            if (this.show_everyones_projects) {
+                this.$store.dispatch('user_data/fetchAllProjects')
+            }
+            else {
+                this.$store.dispatch('user_data/fetchUserProjects', this.$auth.user.sub)
+            }
+        }
     },
     computed: {
         ...mapState('user_data', [
             'user_projects',
+            'all_projects',
+            'user_projects_is_loading',
+            'all_projects_is_loading',
         ]),
         ...mapGetters('site_config', [
             'timezone',
         ]),
+        displayedProjects() {
+            if (this.show_everyones_projects) {
+                return this.all_projects;
+            }
+            else {
+                return this.user_projects;
+            }
+        },
+        projectsIsLoading() {
+            if (this.show_everyones_projects) {
+                return this.all_projects_is_loading;
+            }
+            else {
+                return this.user_projects_is_loading;
+            }
+        },
         nightOf() {
             //console.log(moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY'))
             return moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY')
@@ -250,7 +295,16 @@ export default {
             }
             console.log('modified event: ', m_event)
             return m_event
-        }
+        },
+        userIsAdmin() {
+            try {
+                let user = this.$auth.user 
+                let roles = user['https://photonranch.org/user_metadata'].roles
+                return roles.includes('admin')
+            } catch {
+                return false
+            }
+        },
     },
     methods: {
         handleSubmit() {
