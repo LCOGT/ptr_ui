@@ -600,19 +600,19 @@ div.log-line:last-of-type * {
     font-size: 10px;
 }
 // Blinking status colored dot indicators
-@keyframes fade {
-    from { opacity: 1.0; }
-    50% { opacity: 0.1; }
-    to { opacity: 1.0; }
-}
-@-webkit-keyframes fade {
-    from { opacity: 1.0; }
-    50% { opacity: 0.1; }
-    to { opacity: 1.0; }
-}
+//@keyframes fade {
+    //from { opacity: 1.0; }
+    //50% { opacity: 0.1; }
+    //to { opacity: 1.0; }
+//}
+//@-webkit-keyframes fade {
+    //from { opacity: 1.0; }
+    //50% { opacity: 0.1; }
+    //to { opacity: 1.0; }
+//}
 .status-on {
-    animation: fade 4000ms infinite;
-    -webkit-animation: fade 4000ms infinite;
+    //animation: fade 4000ms infinite;
+    //-webkit-animation: fade 4000ms infinite;
     
     /* Center the content */
     align-items: center;
