@@ -12,16 +12,6 @@ async function getAuthRequestHeader() {
         token = await instance.getTokenSilently(); 
     } catch(err) {
         console.warn("Token request stopped.")
-        //console.warn(err)
-        //console.warn('Did not acquire the needed token. Stopping request.')
-        
-        //// small popup notification
-        //Toast.open({
-            //duration: 5000,
-            //message: "Oops! You aren't authorized to do that.",
-            //position: 'is-bottom',
-            //type: 'is-danger' ,
-        //})
     }
 
     let header = {
@@ -43,6 +33,9 @@ const state = {
 
     user_projects: [],
     user_projects_is_loading: false,
+
+    all_projects: [],
+    all_projects_is_loading: false,
 }
 
 // getters
@@ -76,17 +69,17 @@ const actions = {
     },
     async fetchAllProjects({ commit, rootState}) {
         
-        commit('user_projects_is_loading', true)
+        commit('all_projects_is_loading', true)
 
         const url = rootState.dev.projects_endpoint + '/get-all-projects'
         const body = {}
         let header = await getAuthRequestHeader()
 
         axios.post(url, body, header).then(response => {
-            commit('user_projects_is_loading', false)
-            commit('user_projects', response.data)
+            commit('all_projects_is_loading', false)
+            commit('all_projects', response.data)
         }).catch(err => {
-            commit('user_projects_is_loading', false)
+            commit('all_projects_is_loading', false)
             console.log('error fetching user projects: ', err)
         })
     },
@@ -184,6 +177,9 @@ const mutations = {
 
     user_projects(state, val) { state.user_projects = val},
     user_projects_is_loading(state, val) { state.user_projects_is_loading = val},
+
+    all_projects(state, val) { state.all_projects = val},
+    all_projects_is_loading(state, val) { state.all_projects_is_loading = val},
 }
 
 export default {

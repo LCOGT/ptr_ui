@@ -9,7 +9,7 @@
         </b-switch>
     </div>
     <b-table
-        :data="user_projects"
+        :data="projectsToDisplay"
         :loading="user_projects_is_loading"
         :empty="user_projects=={}"
         :focusable="isFocusable"
@@ -57,7 +57,7 @@
         <template slot="bottom-left">
             <button 
                 class="button is-text" 
-                :class="{'is-loading': user_events_is_loading}"
+                :class="{'is-loading': projectsIsLoading}"
                 @click="$store.dispatch('user_data/fetchUserProjects', user.sub)" 
                 >
                 <span class="icon is-large has-text-grey-lighter">
@@ -70,10 +70,6 @@
             <section class="section">
                 <div class="content has-text-grey has-text-centered">
                     <p>
-                        <b-icon
-                            icon="emoticon-sad"
-                            size="is-large">
-                        </b-icon>
                     </p>
                     <p>Nothing here.</p>
                 </div>
@@ -134,8 +130,8 @@ export default {
             this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
         },
 
-        show_everyones_projects(value) {
-            if (value) {
+        show_everyones_projects(show_all_projects) {
+            if (show_all_projects) {
                 this.$store.dispatch('user_data/fetchAllProjects')
             } else {
                 this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
@@ -186,7 +182,25 @@ export default {
             'user_events_is_loading',
             'user_projects',
             'user_projects_is_loading',
+            'all_projects',
+            'all_projects_is_loading',
         ]),
+        projectsToDisplay() {
+            if (this.show_everyones_projects) {
+                return this.all_projects;
+            }
+            else {
+                return this.user_projects
+            }
+        },
+        projectsIsLoading() {
+            if (this.show_everyones_projects) {
+                return this.all_projects_is_loading;
+            }
+            else {
+                return this.user_projects_is_loading;
+            }
+        },
         userIsAdmin() {
             try {
                 let user = this.$auth.user 
