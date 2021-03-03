@@ -101,7 +101,7 @@ import moment from 'moment';
 import { status_mixin } from '@/mixins/status_mixin'
 import { user_status_mixin } from '@/mixins/user_status_mixin'
 import StatusColumn from '@/components/status/StatusColumn'
-import SiteSiderealTime from '@/components/SiteSiderealTime'
+import SiteSiderealTime from '@/components/display/SiteSiderealTime'
 export default {
     name: 'SiteStatusFooterMobile',
     mixins: [status_mixin, user_status_mixin],
