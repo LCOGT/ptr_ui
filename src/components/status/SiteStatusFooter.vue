@@ -47,8 +47,6 @@
                 <div id="status-2-expanded" 
                     class="container"
                     v-if="status_bar_2_expanded">
-                    <div></div>
-                    <div></div>
                     <div>
                         <status-column 
                             style="padding: 0;"
@@ -70,54 +68,50 @@
 
                     <site-reservation-status :sitecode="site" />
 
-                    <!-- chat module -->
-                    <div>
-                        <!-- List of online users -->
-                        <div class="menu-label"> online users </div>
-                        <ul class="online-users-list">
-                        <li v-for="(user, idx) in displayedOnlineUsers" 
-                            v-bind:key="idx">
-                            <span style="font-weight:lighter;">{{user}}</span>
-                        </li>
-                        </ul>
-                        
-                        <!-- Chat module. Also feeds online users list. -->
-                        <chat-module 
-                        style="min-width: 250px;"
-                        :sitecode="sitecode" 
-                        :username="username"
-                        @whosonline="makeOnlineUsersList" />
-
-                    </div>
-
-
-
                 </div>
                 <div id="status-2-primary" class="container">
                     <div>
                         <div style="display: flex; flex-direction: column;">
-                            <div class="online-status">
+                            <div class="online-status" :title="`status age: ${status_age_display.val}`">
                                 <div :class="{'status-on':isOnline, 'status-off':!isOnline}" ></div>
                                 <p v-if="isOnline" style="font-weight: bold; color: greenyellow;">online</p>
                                 <p v-if="!isOnline" style="font-weight: bold; color: orangered;">offline</p>
                             </div>
-                            <div class="sidereal-time" :class="{'offline': !isOnline}">
-                                <site-sidereal-time v-if="site_longitude" :longitude="site_longitude"/> 
+
+                            <div style="display: flex; flex-wrap: wrap; height: 55px; overflow: hidden;">
+                                <div class="mr-5">
+                                    <site-sidereal-time
+                                        class="sidereal-time" 
+                                        :class="{'offline': !isOnline}" 
+                                        v-if="site_longitude" 
+                                        :longitude="site_longitude"/> 
+                                    <div class="sidereal-label">LMST</div>
+                                </div>
+                                <div class="mr-5">
+                                
+                                    <site-local-time 
+                                        class="sidereal-time" 
+                                        :class="{'offline': !isOnline}"
+                                        v-if="timezone" 
+                                        :timezone="timezone" />
+                                    <div class="sidereal-label ">Obs Time</div>
+                                </div>
+                                <div class="mr-1">
+                                    <utc-time 
+                                        class="sidereal-time" 
+                                        :class="{'offline': !isOnline}"
+                                        v-if="timezone" 
+                                        :timezone="timezone" />
+                                    <div class="sidereal-label">UTC Time</div>
+                                </div>
                             </div>
-                            <div class="sidereal-label">
-                                sidereal time
-                            </div>
+
+
                         </div>
 
                     </div>
                     <div>
                         <div style="margin-left: 50%; border-left: solid 1px grey; height: 100%; width: 1px;"/>
-                    </div>
-                    <div>
-                        <status-column 
-                            style="padding: 0;"
-                            :isOffline="!isOnline"
-                            :statusList="status_age_enclosure_status"/>
                     </div>
                     <div>
                         <status-column 
@@ -174,7 +168,9 @@ import moment from 'moment';
 import { status_mixin } from '../../mixins/status_mixin'
 import { user_status_mixin } from '../../mixins/user_status_mixin'
 import StatusColumn from '@/components/status/StatusColumn'
-import SiteSiderealTime from '@/components/SiteSiderealTime'
+import SiteSiderealTime from '@/components/display/SiteSiderealTime'
+import SiteLocalTime from '@/components/display/SiteLocalTime'
+import UtcTime from '@/components/display/UtcTime'
 import SiteReservationStatus from '@/components/SiteReservationStatus'
 import ChatModule from '@/components/ChatModule'
 export default {
@@ -183,6 +179,8 @@ export default {
     components: {
         StatusColumn,
         SiteSiderealTime,
+        SiteLocalTime,
+        UtcTime,
         SiteReservationStatus,
         ChatModule,
     },
@@ -286,7 +284,7 @@ export default {
     },
     computed: {
 
-        ...mapGetters('site_config', ['site_longitude']),
+        ...mapGetters('site_config', ['site_longitude', 'timezone']),
 
         // Sitecode and site both refer to the 3-leter site abbreviation.
         // They are duplicated because the status mixin expects 'sitecode'.
@@ -296,14 +294,9 @@ export default {
 
 
         // Assemble the list of status elements for the status-column components
-        status_age_enclosure_status() {
-            return [
-                {"name": "Status Age", ...this.status_age_display},
-                {"name": "Enclosure", "val": this.enclosure_status},
-            ]
-        },
         open_safety_status() {
             return [
+                {"name": "Enclosure", "val": this.enclosure_status},
                 {"name": "Weather OK", ...this.weather_ok},
                 {"name": "Open OK", ...this.open_ok},
             ]
@@ -331,6 +324,7 @@ export default {
             }
             else return false;
         },
+
 
         /**
          *  This will return either the single latest log message, or the full
@@ -493,6 +487,7 @@ div.log-line:last-of-type * {
 
 
 
+
 /**
  * Style rules for the bottom status bar
  */
@@ -520,7 +515,7 @@ div.log-line:last-of-type * {
     padding-top: 1em;
     border-bottom: 1px solid grey;
     display:grid;
-    grid-template-columns: 100px 50px repeat(5,5px);// $status-col-width);
+    grid-template-columns: 100px 50px repeat(6,5px);// $status-col-width);
     grid-column-gap: 30px;
     // align with the .container margins:
     padding-left: #{$toggle-button-width / 2};
@@ -529,7 +524,7 @@ div.log-line:last-of-type * {
 }
 @media screen and (min-width: 768px) and (max-width: 949px ) {
     #status-2-primary {
-        grid-template-columns: 90px 50px repeat(3, $status-col-width);
+        grid-template-columns: 70px 50px repeat(4, $status-col-width);
     }
     #status-2-primary > div:nth-child(n+6) {
         display: none;
@@ -537,7 +532,7 @@ div.log-line:last-of-type * {
 }
 @media screen and (min-width: 950px) and (max-width: 1023px ) {
     #status-2-primary {
-        grid-template-columns: 90px 50px repeat(4, $status-col-width);
+        grid-template-columns: 70px 50px repeat(4, $status-col-width);
     }
     #status-2-primary > div:nth-child(n+7) {
         display: none;
@@ -545,23 +540,23 @@ div.log-line:last-of-type * {
 }
 @media screen and (min-width: 1024px) and (max-width: 1215px ) {
     #status-2-primary {
-        grid-template-columns: 90px 50px repeat(5, $status-col-width);
+        grid-template-columns: 215px 50px repeat(5, $status-col-width);
     }
-    #status-2-primary > div:nth-child(n+7) {
+    #status-2-primary > div:nth-child(n+6) {
         display: none;
     }
 }
 @media screen and (min-width: 1216px) and (max-width: 1407px ) {
     #status-2-primary {
-        grid-template-columns: 90px 50px repeat(6, $status-col-width);
+        grid-template-columns: 215px 50px repeat(6, $status-col-width);
     }
-    #status-2-primary > div:nth-child(n+8) {
+    #status-2-primary > div:nth-child(n+7) {
         display: none;
     }
 }
 @media screen and (min-width: 1408px) {
     #status-2-primary {
-        grid-template-columns: 90px 50px repeat(7, $status-col-width);
+        grid-template-columns: 215px 50px repeat(7, $status-col-width);
     }
     #status-2-primary > div:nth-child(n+9) {
         display: none;
