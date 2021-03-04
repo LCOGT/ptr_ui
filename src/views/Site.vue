@@ -1,7 +1,7 @@
 <template>
   <div class="page">
 
-    <b-navbar wrapper-class="container site-menu" class="is-hidden-touch is-hidden-desktop-only">
+    <b-navbar wrapper-class="container site-menu" :mobile-burger="false" class="is-hidden-touch">
         <template slot="brand">
         </template>
         <template slot="start">
@@ -48,21 +48,21 @@
       </b-tab-item>
     </b-tabs-->
 
-    <div class="mobile-site-menu is-hidden-widescreen">
+    <div class="mobile-site-menu is-hidden-desktop">
       <router-link :to="'/site/'+sitecode+'/home'">
         <button class="button" >Home</button>
-      </router-link>
-      <router-link :to="'/site/'+sitecode+'/observe'">
-        <button class="button" >Observe</button>
       </router-link>
       <router-link :to="'/site/'+sitecode+'/targets'">
         <button class="button" >Targets</button>
       </router-link>
-      <router-link :to="'/site/'+sitecode+'/projects'">
-        <button class="button" >Projects</button>
+      <router-link :to="'/site/'+sitecode+'/observe'">
+        <button class="button" >Observe</button>
       </router-link>
       <router-link :to="'/site/'+sitecode+'/calendar'">
         <button class="button" >Calendar</button>
+      </router-link>
+      <router-link :to="'/site/'+sitecode+'/projects'">
+        <button class="button" >Projects</button>
       </router-link>
     </div>
 
@@ -380,6 +380,7 @@ export default {
   width: 20%;
   font-size: 12px;
   background-color: $dark;
+  border: 1px solid $grey-dark;
 }
 
 
