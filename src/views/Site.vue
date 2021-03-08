@@ -1,7 +1,7 @@
 <template>
   <div class="page">
 
-    <b-navbar wrapper-class="container site-menu" :mobile-burger="false" class="is-hidden-touch">
+    <b-navbar wrapper-class="container is-fluid site-menu" :mobile-burger="false" class="is-hidden-touch">
         <template slot="brand">
         </template>
         <template slot="start">
@@ -31,22 +31,7 @@
         </template>
     </b-navbar>
     
-    <div class="container page-view">
-
-    <!--b-tabs type="is-boxed">
-      <b-tab-item>
-        <template #header>
-          <b-icon icon="information-outline"></b-icon>
-          <span> Issues <b-tag rounded> 3 </b-tag> </span>
-        </template>
-      </b-tab-item>
-      <b-tab-item>
-        <template #header>
-          <b-icon icon="source-pull"></b-icon>
-          <span> Pull Requests <b-tag rounded>5</b-tag> </span>
-        </template>
-      </b-tab-item>
-    </b-tabs-->
+    <div class="container is-fluid page-view">
 
     <div class="mobile-site-menu is-hidden-desktop">
       <router-link :to="'/site/'+sitecode+'/home'">
@@ -67,7 +52,8 @@
     </div>
 
     <div style="height: 1em"></div>
-    <div class="columns" style="margin: 1em;">
+
+    <div class="columns main-page-content" >
 
       <div class="column menu-column is-2 is-hidden-touch is-hidden-desktop-only" v-if="false">
 
@@ -347,6 +333,19 @@ export default {
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
 @import "../style/_variables.scss";
 
+
+
+
+
+.main-page-content {
+  margin: 1em;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+
+
 .menu-column {
   height: auto;
   padding: 0 auto;
@@ -386,7 +385,7 @@ export default {
 
 .page-view {
   /* min height: screen + footer + visual buffer */
-  min-height: 100vh;
+  //min-height: 100vh;
 }
 
 

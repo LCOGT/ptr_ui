@@ -3,6 +3,7 @@
   <div class="wrapper container">
   
   <div class="content-column">
+
     <b-modal :active.sync="telescopeModal"
       trap-focus
       :can-cancel="['escape']"
@@ -17,7 +18,7 @@
       />
     </b-modal>
 
-    <div class="b-tabs" style="position: relative;">
+    <div v-if="false" class="b-tabs" style="position: relative;">
 
       <!-- Enclosure Tab -->
       <b-dropdown :trap-focus="true" :append-to-body="true">
@@ -790,15 +791,9 @@
     </div>
   </div>
 
+  <!--div class="spacer" style="height: 2em;" /-->
 
-  <div class="spacer" style="height: 2em;" />
-
-
-
-  <site-data 
-    :sitecode="sitecode" 
-    :deviceStatus="deviceStatus"
-    />
+  <site-data :deviceStatus="deviceStatus" />
 
   <!--log-stream :site="sitecode" /-->
 
@@ -809,6 +804,7 @@
 import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { status_mixin } from '../../mixins/status_mixin'
+import { user_mixin } from '../../mixins/user_mixin'
 import helpers from '@/utils/helpers'
 import store from '../../store/index'
 
@@ -843,17 +839,12 @@ export default {
     StatusColumn,
     LogStream,
   },
-  mixins: [commands_mixin, status_mixin],
+  mixins: [commands_mixin, status_mixin, user_mixin],
   props: ['sitecode'],
   data () {
     return {
 
       self: this,
-
-      selectInstruments: [
-        {name: 'telescope', model: 'active_telescope'},
-        {name: 'camera', model: 'active_camera'},
-      ],
 
       // This is a setInterval object initialized in `created()`. 
       // Fetches status every few seconds.
@@ -975,52 +966,16 @@ export default {
       this.$store.dispatch('images/set_latest_image')
     },
 
-    // Get axios request config object (the headers) with auth token
-    async getAuthHeader() {
-      let token, configWithAuth;
-      try {
-        token = await this.$auth.getTokenSilently(); 
-      } catch(err) {
-        console.error(err)
-        console.warn('Did not acquire the needed token. Stopping request.')
-        
-        // small popup notification
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: "Oops! You need to be logged in to do that.",
-          position: 'is-bottom',
-          type: 'is-danger' ,
-        })
-      }
-
-      return {
-        'headers': {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    },
   },
 
   watch: {
     // If the user changes the chip area parameter, deactivate the subframe.
-    camera_areas_selection: function(newVal, oldVal) {
+    camera_areas_selection() {
       this.subframeIsActive = false;
     }
   },
 
   computed: {
-
-    userIsAdmin() {
-      try {
-        let user = this.$auth.user 
-        let roles = user['https://photonranch.org/user_metadata'].roles
-        return roles.includes('admin')
-      } catch {
-        return false
-      }
-    },
 
     ...mapGetters('images', [
       'current_image',
@@ -1052,11 +1007,6 @@ export default {
     ]),
 
       
-    status_age() {
-      let status_timestamp = this.deviceStatus.timestamp
-      return (this.local_timestamp/1000 - status_timestamp).toFixed(1)
-    },
-
     selected_script: {
       get() { return this.$store.getters['selectedScript']},
       set(val) { this.$store.commit('selectedScript', val)},

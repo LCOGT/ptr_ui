@@ -1,91 +1,133 @@
 
 <template>
-    <div>
+    <div class="command-tab-accordion-wrapper">
       <b-collapse
         class="accordion"
         animation="no animation"
-        v-for="(collapse, index) of [
-                {
-                    title: 'Enclosure',
-                    text: 'Text 1'
-                },
-                {
-                    title: 'Screen',
-                    text: 'Text 2'
-                },
-                {
-                    title: 'Telescope',
-                    text: 'Text 2'
-                },
-                {
-                    title: 'Rotator/Focuser',
-                    text: 'Text 2'
-                },
-                {
-                    title: 'Inst. Selector',
-                    text: 'Text 2'
-                },
-                {
-                    title: 'Camera',
-                    text: 'Text 2'
-                },
-                {
-                    title: 'Sequencer',
-                    text: 'Text 2'
-                },
-                {
-                    title: 'Settings',
-                    text: 'Text 4'
-                }
-                ]"
+        v-for="(instrument, index) of instruments"
         :key="index"
-        :open="accordionIsOpen == index"
-        @open="accordionIsOpen = index">
+        :class="{'active': instrumentOpenView == index }"
+        :open="instrumentOpenView == index"
+        @open="instrumentOpenView = index"
+        @close="instrumentOpenView = -1"
+        >
 
         <div
           slot="trigger"
           slot-scope="props"
           class="accordion-header"
+          :class="{'active': props.open}"
           role="button">
-          <p class="accordion-header-title">
-            {{ collapse.title }}
-          </p>
-          <a class="accordion-header-icon">
-            <b-icon
-              :icon="props.open ? 'menu-down' : 'menu-up'">
-            </b-icon>
-          </a>
+
+          <div 
+            class="instrument-type-label"
+            :class="{'subtitle, m-0': props.open}">
+            {{instrument}}
+          </div>
+          <div style="flex-grow: 1;"/>
+          <div class="instrument-instance-label">selected instr</div>
+
         </div>
 
-        <div class="accordion-content">
-          <div class="content">
-            {{ collapse.text }}
-          </div>
-        </div>
+            <component class="accordion-content" v-bind:is="instrument"/>
 
     </b-collapse>
     </div>
 </template>
 
+<script>
+import { Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
+  Camera, Sequencer, Settings, } from '@/components/InstrumentControls'
+
+export default {
+  name: "CommandTabAccordion",
+  components: {
+    Enclosure,
+    Screen,
+    Telescope,
+    Rotator,
+    Focuser,
+    InstrumentSelector,
+    Camera,
+    Sequencer,
+    Settings,
+  },
+  data() {
+    return {
+      instrumentOpenView: -1, // init with all collapsed
+      instruments: [
+        'Enclosure',
+        'Screen', 
+        'Telescope',
+        'Rotator',
+        'Focuser',
+        'InstrumentSelector',
+        'Camera', 
+        'Sequencer',
+        'Settings',
+      ],
+
+    }
+  },
+
+  
+}
+</script>
+
 
 
 <style lang="scss" scoped>
 @import "@/style/buefy-styles.scss";
+@import "@/style/_variables.scss";
+
+//$max-content-height: calc(vh - 75px - 60px - 30px - 117 px - )
+
+$accordion-header-background: $grey-darker;
 
 .accordion {
+  outline: none;
   padding-bottom: 0;
   border: 1px solid $grey-dark;
+  min-width: 340px;
+  overflow: hidden;
 }
+
 .accordion-header {
-  padding-left: 5px;
+  padding: 5px 15px;
+  background-color: $accordion-header-background;
   display:flex;
-  background-color: $grey-darker;
-  justify-content: space-between;
-  border-bottom: 1px solid $grey;
+  align-content: center;
+  .instrument-type-label {
+    color: $grey-light;
+    font-style: italic;
+  }
+  .instrument-instance-label {
+    padding-top: 3px;
+    font-size: 0.8em;
+    font-variant: small-caps;
+    color: $grey-lighter;
+  }
 }
+
+.accordion-header.active {
+  background-color:darken($accordion-header-background, 2);
+  border: 1px solid $grey-light;
+  border-bottom: none;
+  .instrument-type-label {
+    font-style: unset;
+    font-weight: bold;
+    color: $grey-lighter;
+  }
+  .instrument-instance-label {
+    color: $grey-lighter;
+  }
+}
+
 .accordion-content {
-  background-color: $grey;
-  height: 375px;
+  color: $grey-lighter;
+  background-color:darken($grey-dark, 1);
+  border: 1px solid $grey-light;
+  border-top: none;
 }
 
 </style>
