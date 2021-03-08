@@ -1,0 +1,67 @@
+@import "@/style/_variables.scss";
+
+.b-tabs{
+  background-color: #1e2223;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.instrument-control-wrapper {
+  padding: 1em;
+}
+.instrument-control-wrapper pre {
+  max-width: inherit;
+}
+
+.instrument-control-title-bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:nowrap;
+}
+.instrument-control-title-bar > .title {
+  word-break:keep-all;
+  padding-right: 10px;
+}
+.device-instance-subtitle {
+  margin-bottom:22.5px /* match the margin of .title elements */
+}
+.device-instance-subtitle:hover {
+  cursor:pointer;
+}
+
+.status-column {
+  padding-bottom: 15px;
+  padding-top: 15px;
+}
+
+.status-toggle-bar {
+  height: 1.5em;
+  background-color:#161a1a;
+  text-align: center;
+}
+.status-toggle-bar:hover {
+  cursor: pointer;
+}
+.choose-target {
+  margin-top: 1em;
+}
+.status-val {
+  background-color: black;
+  color:yellowgreen;
+  padding: 2px 10px;
+}
+
+.dropdown-button-command {
+  border: none;
+  background-color: transparent;
+}
+.dropdown-button-command:hover {
+  color:grey;
+  font:bolder;
+}
+
+.wrapper {
+  margin: 0;
+}

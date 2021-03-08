@@ -104,7 +104,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 .wrapper {
   display:flex;
@@ -112,7 +112,7 @@ export default {
 }
 
 .dec-display {
-  min-width: 80px;
+  min-width: 70px;
 }
 .dec-display:hover {
   cursor: pointer;

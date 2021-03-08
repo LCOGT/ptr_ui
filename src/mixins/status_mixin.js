@@ -1,5 +1,5 @@
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import axios from 'axios'
 import { getInstance } from '../auth/index' // get user object: getInstance().user
@@ -226,6 +226,15 @@ export const status_mixin = {
             if (this.dec != '-') { status.push({"name": "Dec", "val": this.dec})}
             if (this.azimuth != '-') { status.push({"name": "Azimuth", "val": this.azimuth})}
             if (this.altitude != '-') { status.push({"name": "Altitude", "val": this.altitude})}
+            if (this.refraction != '-') { status.push({"name": "Refr.", "val": this.refraction})}
+            return status
+        },
+        buildTelescopeTabStatus1Shorter() {
+            let status = []
+            if (this.ra != '-') { status.push({"name": "Ra", "val": this.ra})}
+            if (this.dec != '-') { status.push({"name": "Dec", "val": this.dec})}
+            if (this.azimuth != '-') { status.push({"name": "Az", "val": this.azimuth})}
+            if (this.altitude != '-') { status.push({"name": "Alt", "val": this.altitude})}
             if (this.refraction != '-') { status.push({"name": "Refr.", "val": this.refraction})}
             return status
         },

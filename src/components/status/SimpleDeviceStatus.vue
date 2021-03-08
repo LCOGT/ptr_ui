@@ -1,11 +1,15 @@
-<template><section>
-    <p class="heading"><b-tag type="is-light">{{device_name}}</b-tag> {{device_type}} Status: </p> 
-    <table>
-        <tr v-for="(value,name) in device_status" v-bind:key="name">
-        <td class="is-size-7">  {{name}}:  </td><td class="is-size-2">{{value}}</td>
-        </tr>
-    </table>
-</section>
+<template>
+    <section>
+        <div class="status-heading">
+            <p>{{device_type}} Status: </p>
+            <b-tag type="is-light">{{device_name}}</b-tag> 
+        </div> 
+        <table>
+            <tr v-for="(value,name) in device_status" v-bind:key="name">
+            <td>  {{name}}:  </td><td>{{value}}</td>
+            </tr>
+        </table>
+    </section>
 </template>
 
 <script>
@@ -23,3 +27,7 @@ export default {
 .tag {
     font-size: .85em;
 }
+.status-heading {
+    display:flex;
+}
+</style>

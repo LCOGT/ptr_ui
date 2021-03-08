@@ -3,6 +3,10 @@
 
   <div class="columns is-touch">
 
+    <div class="column is-one-fourth">
+      <command-tab-accordion />
+    </div>
+
     <div class="img-view column" style="padding: 0; margin: 1em;">
       <!-- The actual image view component -->
       <image-view 
@@ -326,6 +330,7 @@ import LineProfileInspection from "@/components/LineProfileInspection";
 import RaDisplay from "@/components/display/RaDisplay"
 import DecDisplay from "@/components/display/DecDisplay"
 import HistogramViewer from "@/components/HistogramViewer"
+import CommandTabAccordion from "@/components/CommandTabAccordion"
 import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
 import axios from 'axios'
@@ -334,19 +339,20 @@ import helpers from "@/utils/helpers"
 
 export default {
   name: "SubpageData",
-  props: ["deviceStatus", "sitecode"],
+  props: ["deviceStatus"],
   components: {
-      ImageView,
-      ImagesTable,
-      ImageInfoPanel,
-      ImageNavigationPanel,
-      ImageFilter,
-      Js9Devtools,
-      SideInfoPanel,
-      LineProfileInspection,
-      RaDisplay,
-      DecDisplay,
-      HistogramViewer,
+    ImageView,
+    ImagesTable,
+    ImageInfoPanel,
+    ImageNavigationPanel,
+    ImageFilter,
+    Js9Devtools,
+    SideInfoPanel,
+    LineProfileInspection,
+    RaDisplay,
+    DecDisplay,
+    HistogramViewer,
+    CommandTabAccordion,
   },
   data() {
     return {
@@ -898,6 +904,10 @@ export default {
     }
   },
   computed: {
+
+    sitecode() {
+      return this.$route.params.site
+    },
 
     ...mapState("images", [
       'recent_images',
