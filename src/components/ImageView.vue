@@ -3,12 +3,20 @@
     <div id="image-window" ref="imagewindow">
 
       <div class="image-info-bar">
-        <div class="image-info-bar-item">{{current_image.site}}</div>
-        <div class="image-info-bar-item">{{current_image.exposure_time}}s</div>
-        <div class="image-info-bar-item">{{current_image.filter_used}}</div>
+        <div class="image-info-bar-item site" v-if="fitsHeaderLoaded && fitsHeader.OBJECT != 'Unspecified' ">obj:&nbsp;{{fitsHeader.OBJECT}}</div>
+        <div class="image-info-bar-item site" v-if="!fitsHeaderLoaded || fitsHeader.OBJECT == 'Unspecified'">site:&nbsp;{{current_image.site}}</div>
+        <div class="image-info-bar-item exptime">exptime:&nbsp;{{current_image.exposure_time}}s</div>
+        <div class="image-info-bar-item filter-used">filter:&nbsp;{{current_image.filter_used}}</div>
         <div/>
-        <div class="image-info-bar-item" style="display:flex">ra: <ra-display :ra_hours_decimal="current_image.right_ascension"/></div>
-        <div class="image-info-bar-item" style="display:flex">dec: <dec-display :dec_deg_decimal="current_image.declination"/></div>
+        <div class="image-info-bar-item ra" style="display:flex">
+          ra:&nbsp;<ra-display :ra_hours_decimal="current_image.right_ascension" :decimal_precision="3"/>
+        </div>
+        <div class="image-info-bar-item dec" style="display:flex">
+          dec:&nbsp;<dec-display :dec_deg_decimal="current_image.declination" :decimal_precision="3"/>
+        </div>
+        <div class="image-info-bar-item airmass">airmass:&nbsp;{{current_image.airmass}}</div>
+        <div class="image-info-bar-item altitude">altitude:&nbsp;{{current_image.altitude}}°</div>
+        <div class="image-info-bar-item obstime">obstime:&nbsp;{{current_image.capture_date | dateToUnix }}</div>
       </div>
 
       <!-- The main image view -->
@@ -135,6 +143,7 @@ import wcs from "@/utils/pix2wcs";
 import { mapGetters, mapState } from "vuex";
 import { commands_mixin } from "../mixins/commands_mixin";
 import { SnackbarProgrammatic as Snackbar } from "buefy";
+import moment from 'moment'
 import * as d3 from "d3";
 
 import JS9 from "@/components/JS9";
@@ -168,6 +177,12 @@ export default {
     markedStars: Array,
   },
 
+  filters: {
+    dateToUnix(date) {
+      return (new Date(date).getTime() / 1000).toFixed(0)
+    }
+  },
+
   data() {
     return {
       // The image that is selected and visible in the main viewer.
@@ -186,6 +201,8 @@ export default {
 
       js9width: 200,
       js9height: 500,
+
+      fitsHeader: {},
 
     };
   },
@@ -222,6 +239,8 @@ export default {
       if (this.js9IsVisible) {
         this.js9LoadImage(newVal)
       }
+
+      this.getFitsHeader() 
     },
 
     lines: {
@@ -440,6 +459,20 @@ export default {
         this.js9IsVisible = true;
       }
     },
+    getFitsHeader() {
+      // First check if image is placeholder. If so, nothing to show.
+      if (this.current_image.base_filename == "placeholder image") {
+        this.fitsHeader = {}
+        return
+      }
+      this.headerIsLoading = true 
+      let url = `https://api.photonranch.org/api/fitsheader/${this.current_image.base_filename}/`
+      let response = axios.get(url).then(response => {
+        this.fitsHeader = response.data
+      }).finally(() => {
+        this.headerIsLoading = false
+      })
+    },
 
   },
   computed: {
@@ -448,6 +481,10 @@ export default {
       "recent_images",
       "current_image",
     ]),
+
+    fitsHeaderLoaded() {
+      return Object.keys(this.fitsHeader).length > 0
+    },
 
     js9IsVisible: {
       get() { return this.$store.getters['js9/instanceIsVisible']},
@@ -482,14 +519,13 @@ export default {
     activeDrawShape: {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},
       set(val) { this.$store.commit('drawshapes/activeDrawShape', val)}
-
     }
 
   }
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 #component {
   display: flex;
   flex-direction: column;
@@ -531,9 +567,32 @@ export default {
   width: 100%;
   background-color: #1e2223;
   display: grid;
-  grid-template-rows: 1fr;
-  grid-template-columns:50px 50px 50px 1fr 120px 120px;
-  grid-auto-flow: column;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(2, 90px) 1fr repeat(2, 120px);
+  grid-template-areas: 'site exptime . ra dec'
+                       'filter-used obstime . airmass altitude';
+  grid-column-gap: 10px;
+  padding: 1px 3px;
+  
+  .image-info-bar-item {
+    text-align: left;
+
+    span {
+      width: 40px;
+      color: red;
+    }
+  }
+  
+
+  .site { grid-area: site; }
+  .filter-used { grid-area: filter-used; }
+  .exptime { grid-area: exptime; }
+  .ra { grid-area: ra; }
+  .dec { grid-area: dec; }
+  .airmass { grid-area: airmass; }
+  .altitude { grid-area: altitude; }
+  .obstime { grid-area: obstime; }
+
 }
 
 .cursor-is-crosshair:hover {
