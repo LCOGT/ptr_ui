@@ -24,6 +24,10 @@ export default {
     can_copy: {
       type: Boolean,
       default: false,
+    },
+    decimal_precision: {
+      type: Number,
+      default: 5,
     }
   },
 
@@ -35,7 +39,6 @@ export default {
       displayFormatOptions: ["decimalHours", "sexagesimalWithUnits", "sexagesimalPlain"],
       displayFormatSelected: 0, // index of the list above
 
-      decimalPrecision: 5,  // number of decimals to show
     }
   },
 
@@ -88,7 +91,7 @@ export default {
     },
     rightAscension() {
       if (this.displayFormat == "decimalHours") {
-        return this.ra_hours_decimal.toFixed(this.decimalPrecision)  
+        return this.ra_hours_decimal.toFixed(this.decimal_precision) + '°'  
       }
       if (this.displayFormat == "sexagesimalPlain") {
         return this.toSexagesimal(this.ra_hours_decimal, false)
