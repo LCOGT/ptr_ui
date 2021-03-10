@@ -347,7 +347,7 @@
         <hr>
 
         <b-tooltip 
-            v-if="!this.project_is_loaded"
+            v-if="!this.modifying_existing_project"
             :active="!$auth.isAuthenticated" 
             label="You must be logged in to create a project." >
             <button 
@@ -358,7 +358,7 @@
         </b-tooltip>
 
         <b-tooltip 
-            v-if="this.project_is_loaded"
+            v-if="this.modifying_existing_project"
             :active="!$auth.isAuthenticated" 
             label="You must be logged in to modify a project." >
             <button 
@@ -398,13 +398,13 @@ export default {
     },
 
     watch: {
-        project_to_load(project) {
+        project_to_load({ project, is_existing_project }) {
 
             if (project == "") {
                 this.clearProjectForm()
             }
 
-            this.project_is_loaded = true
+            this.modifying_existing_project = is_existing_project
             this.loaded_project_name = project.project_name
             this.loaded_project_created_at = project.created_at
             this.loaded_site_tags = project.site_tags
@@ -487,7 +487,7 @@ export default {
             /***********   End Project Parameters   **********/
             /*************************************************/
 
-            project_is_loaded: false,
+            modifying_existing_project: false,
             loaded_project_name: '',
             loaded_project_created_at: '',
 
@@ -586,7 +586,7 @@ export default {
         },
 
         clearProjectForm() {
-            this.project_is_loaded = false
+            this.modifying_existing_project = false
             this.loaded_project_name = ''
             this.loaded_project_created_at = ''
 
@@ -886,7 +886,7 @@ export default {
         // True if we're modifying a project and the name is changed.
         project_name_changed() {
             if (
-                this.project_is_loaded
+                this.modifying_existing_project
                 && this.loaded_project_name != this.project_name
             ) {
                 return true
