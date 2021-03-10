@@ -34,16 +34,19 @@
                 <dec-display :dec_deg_decimal="parseFloat(props.row.project_targets[0].dec)" /> 
             </b-table-column>
 
-            <b-table-column field="edit" label="" v-slot="props">
+            <b-table-column field="edit" label="" v-slot="props" width="180px">
                 <button 
-                    class="button is-info is-small" 
+                    class="button is-info is-small mr-3" 
                     @click="getProject(props.row.project_name, props.row.created_at)" 
                     >
                     edit
                 </button>
-            </b-table-column>
-
-            <b-table-column field="delete" label="" v-slot="props">
+                <button 
+                    class="button is-info is-small mr-3" 
+                    @click="cloneProject(props.row.project_name, props.row.created_at)" 
+                    >
+                    clone
+                </button>
                 <button 
                     class="button is-danger is-small" 
                     @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created_at': props.row.created_at})" 
@@ -157,6 +160,28 @@ export default {
             var s = Math.floor(d.asHours()) + moment.utc(ms).format(":mm");
             return s
         },
+        cloneProject(project_name, created_at) {
+            
+            let request_params = {
+                project_name: project_name,
+                created_at: created_at,
+            }
+            let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
+            axios.post(project_endpoint, request_params).then(response => {
+                console.log(response)
+                let project = response.data
+                project.created_at = moment().utc().format()
+
+                let project_loader = {
+                    project: project,
+                    is_existing_project: false
+                }
+
+                this.$emit('load_project_form', project_loader)
+            }).catch(err => {
+                console.log(error)
+            })
+        },
         getProject(project_name, created_at) {
             
             let request_params = {
@@ -166,7 +191,11 @@ export default {
             let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
             axios.post(project_endpoint, request_params).then(response => {
                 console.log(response)
-                this.$emit('load_project_form', response.data)
+                let project_loader = {
+                    project: response.data,
+                    is_existing_project: true,
+                }
+                this.$emit('load_project_form', project_loader)
             }).catch(err => {
                 console.log(error)
             })
