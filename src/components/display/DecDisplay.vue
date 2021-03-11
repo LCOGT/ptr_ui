@@ -27,6 +27,10 @@ export default {
     can_copy: {
       type: Boolean,
       default: false,
+    },
+    decimal_precision: {
+      type: Number,
+      default: 4,
     }
   },
 
@@ -38,7 +42,6 @@ export default {
       displayFormatOptions: ["decimalDegrees", "sexagesimalWithUnits", "sexagesimalPlain"],
       displayFormatSelected: 0, // index of the list above
 
-      decimalPrecision: 4  // number of decimals to show
     }
   },
 
@@ -66,7 +69,8 @@ export default {
 
       // Zero padding if single digit
       if (degrees < 10 && degrees > -10) {  // dec can be negative
-        degrees = '0' + degrees
+        if (degrees < 0) { degrees = '-0' + Math.abs(degrees)} // add the minus sign before the zero
+        else { degrees = '0' + degrees}
       } 
       if (minutes < 10) {
         minutes = '0' + minutes
@@ -91,7 +95,7 @@ export default {
     },
     declinationDisplayVal() {
       if (this.displayFormat == "decimalDegrees") {
-        return this.dec_deg_decimal.toFixed(this.decimalPrecision)
+        return this.dec_deg_decimal.toFixed(this.decimal_precision) + '°'
       }
       if (this.displayFormat == "sexagesimalPlain") {
         return this.toSexagesimal(this.dec_deg_decimal, false)
