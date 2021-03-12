@@ -1,6 +1,6 @@
 <template>
 
-  <div class="wrapper container">
+  <div class="wrapper">
   
   <div class="content-column">
 
@@ -1112,7 +1112,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+
+@import "@/style/_responsive.scss";
+
+.wrapper {
+  margin: 0;
+}
 
 .b-tabs{
   background-color: #1e2223;
@@ -1182,8 +1188,5 @@ export default {
   font:bolder;
 }
 
-.wrapper {
-  margin: 0;
-}
 
 </style>

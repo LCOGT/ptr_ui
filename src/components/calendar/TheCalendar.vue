@@ -7,10 +7,13 @@
     <!--button class="level-item button is-danger" @click="ping">ping</button-->
     <!--button class="level-item button is-danger" @click="updateNowIndicator">refresh</button-->
     <!--div>{{currentUserScheduled}}</div-->
+    <!--button @click="resize">resize</button-->
+
 
     <FullCalendar
       class="demo-app-calendar"
       ref="fullCalendar"
+      height="parent"
       :views="fc_views"
       :defaultView="fc_defaultView"
       :header="fc_header"
@@ -31,7 +34,6 @@
       :nowIndicator="fc_nowIndicator"
       :now="fc_now"
       :progressiveEventRendering="fc_progressiveEventRendering"
-      :aspect-ratio="fc_aspectRatio"
       :themeSystem="fc_themeSystem"
       :schedulerLicenseKey="fc_schedulerLicenseKey"
       :eventSources="fc_eventSources"
@@ -58,19 +60,6 @@
           <button v-if="isLoading" class="level-item button is-text is-loading">loading</button>
         </div>
       </div>
-    </div>
-
-
-    <div class="fc-settings-box">
-      <div>
-        <p class="menu-label">Settings</p>
-        <div class="field">
-            <b-switch v-model="display_moon">
-                Show moon events
-            </b-switch>
-        </div>
-      </div>
-
     </div>
 
     <!-- popup for creating calendar events -->
@@ -154,6 +143,9 @@ export default {
 
     // Timezone of the site
     "fc_timeZone",
+
+    "showMoonEvents",
+    
   ],
 
   mounted() {
@@ -182,7 +174,7 @@ export default {
     user() {
       this.refreshCalendarView();
     },
-    display_moon() {
+    showMoonEvents() {
       this.refreshCalendarView();
     }
   },
@@ -295,7 +287,6 @@ export default {
       fc_weekends: true, // whether to show weekends in week view
       fc_nowIndicator: false, // whether to draw line indicating current time in grid views.
       fc_progressiveEventRendering: true,
-      fc_aspectRatio: 1.2, // calendar window width/height
       fc_themeSystem: "bootstrap", // uses bootstrap css (see <style> below)
       fc_schedulerLicenseKey: "GPL-My-Project-Is-Open-Source", // free use of scheduler/resources
       // fullcalendar plugins
@@ -316,9 +307,6 @@ export default {
       // We need to know whether the component is mounted to access the 
       // $refs.fullCalendar.getApi() method. 
       isMounted: false,
-
-      // Users can toggle whether the visible moon times are on the calendar. 
-      display_moon: true,
 
       moon_cache: {},
 
@@ -518,7 +506,7 @@ export default {
     // moon visibility
     async getMoonRiseSet(info) {
 
-      if (!this.display_moon) {
+      if (!this.showMoonEvents) {
         return [];
       }
       const ms_per_day = 86400000;
@@ -1131,13 +1119,6 @@ export default {
   }
 }
 
-.fc-settings-box {
-  background-color: black;
-  border-radius: 8px;
-  padding: 1em;
-  margin-bottom: 1em;
-}
-
 /* the line showing the current time */
 .fc-now-indicator {
   &.fc-now-indicator-line {
@@ -1192,6 +1173,9 @@ export default {
   font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 14px;
 }
+ .demo-app-calendar {
+   position: relative;
+ }
 
 .demo-app-top {
   margin: 0 0 3em;
@@ -1199,6 +1183,7 @@ export default {
 
 .calendar-container {
   margin: 0 auto;
+  height: 100%;
 }
 
 .sr-only {

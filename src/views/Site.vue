@@ -31,7 +31,7 @@
         </template>
     </b-navbar>
     
-    <div class="container is-fluid page-view">
+    <div class=" page-view">
 
     <div class="mobile-site-menu is-hidden-desktop">
       <router-link :to="'/site/'+sitecode+'/home'">
@@ -51,7 +51,6 @@
       </router-link>
     </div>
 
-    <div style="height: 1em"></div>
 
     <div class="columns main-page-content" >
 
@@ -331,20 +330,15 @@ export default {
 
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
-@import "../style/_variables.scss";
-
-
-
-
+@import "@/style/_variables.scss";
+@import "@/style/_responsive.scss";
 
 .main-page-content {
-  margin: 1em;
-  height: 100%;
+  //margin: 1em;
+  //height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
 }
-
-
 
 .menu-column {
   height: auto;
@@ -355,18 +349,9 @@ export default {
   max-width: 250px;
 }
 
-
-
 .subpage-menu {
   margin-bottom: 3em;
 }
-.online-users-list {
-  margin-bottom: 20px;
-}
-.online-users-list > * {
-  padding-left: 1em;
-}
-
 
 .mobile-site-menu {
   width: 100%;
@@ -386,6 +371,7 @@ export default {
 .page-view {
   /* min height: screen + footer + visual buffer */
   //min-height: 100vh;
+  //height: calc(100vh - $top-bottom-height - 50px);
 }
 
 
