@@ -1,4 +1,5 @@
-<template><div>
+<template>
+  <div class="site-home-wrapper">
 
     <div class="level site-welcome-text">
         <div class="level-item">
@@ -34,10 +35,7 @@
 
 
     <div style="height: 2em;" />
-
-
-
-</div>
+  </div>
 </template>
 
 
@@ -79,7 +77,11 @@ export default {
 
 
 <style scoped>
-
+.site-home-wrapper {
+  margin: 0 auto;
+  width: 90vw;
+  max-width: 1150px;
+}
 .site-welcome-text {
     font: 64px "Share Tech Mono", monospace;
 }

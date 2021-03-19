@@ -36,7 +36,7 @@ export default {
 
       // total chart dimensions (changed by resizeObserver) in pixels
       chart_width: 600,
-      chart_height: 150,
+      chart_height: 300,
 
       // Number of ticks on each axis
       x_ticks: 4,

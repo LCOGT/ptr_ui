@@ -74,8 +74,8 @@
     </b-field>
 
     <b-field horizontal label="Subframe">
-      <p>{{ subframeIsActive ? "Active" : "Not Active"}}</p>
-      <p>({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
+      <p class="is-size-7">{{ subframeIsActive ? "Active" : "Not Active"}}</p>
+      <p class="is-size-7">({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
       <button class="button is-small" v-if="subframeIsActive" @click="function(){subframeIsActive = false}"> deactivate </button>
       <button class="button is-small" v-if="!subframeIsActive" @click="function(){subframeIsActive = true}"> activate </button>
     </b-field>

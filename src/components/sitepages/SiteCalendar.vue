@@ -3,6 +3,7 @@
 
 
     <the-calendar 
+      class="the-calendar"
       v-if="timezone"
       :fc_timeZone="timezone"
       :calendarSite="sitecode" 
@@ -147,34 +148,39 @@ $content-padding: 2em;
 $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 
 .cal-page-wrapper {
-  overflow-y: auto;
   width: 100%;
   padding: $content-padding;
-  @include md {
+  @include tablet {
     display: grid;
     grid-template-rows: 50vh 1fr 1fr;
     grid-template-columns: 1fr;
   }
 
-  @include lg {
+  @include desktop {
     display: grid;
     grid-template-columns: 2fr 1fr;
+    //grid-template-rows: $calendar-height;
     grid-template-rows: $calendar-height;
   }
+}
 
+.the-calendar {
+  @include desktop {
+    height: calc(100vh - 360px); //hacky, but make it so you don't need to scroll to see full calendar
+  }
 }
 
 .calendar-adjacent {
   padding: 2em;
   display:flex;
 
-  @include md {
+  @include tablet {
     flex-direction: row;
     padding: 2em 0;
     margin: 0;
   }
 
-  @include lg {
+  @include desktop {
     flex-direction: column;
     margin: 1em;
   }

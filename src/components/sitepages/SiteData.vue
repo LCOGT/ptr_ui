@@ -1,276 +1,235 @@
 <template>
-  <section>
+  <div style="display:flex; justify-content: center;">
+  <div class="site-data-wrapper">
 
-  <div class="columns is-touch">
-
-    <div class="column is-one-fourth">
-      <command-tab-accordion />
-    </div>
-
-    <div class="img-view column" style="padding: 0; margin: 1em;">
-      <!-- The actual image view component -->
+    <div class="image-display-area">
+      <image-info-bar 
+        class="image-info-bar"
+        v-if="Object.keys(current_image).length > 0"
+        :current_image="current_image"
+        :fits_header="fitsHeader"
+        />
       <image-view 
+        class="image-view"
         :site="sitecode" 
         :markedStars="markedStars" />
-
-      <hr>
-      <b-collapse class="card" position="is-top" :open="false" style="padding:0">
-        <div
-          slot="trigger" 
-          slot-scope="props"
-          class="card-header"
-          >
-          <p class="card-header-title">
-              Table of images
-          </p>
-          <a class="card-header-icon">
-              <b-icon
-                  :icon="props.open ? 'menu-down' : 'menu-up'">
-              </b-icon>
-          </a>
-        </div>
-        <div class="card-content" style="padding:0">
-          <images-table/>
-        </div>
-      </b-collapse>
-
+      <thumbnail-row 
+        :images="recent_images" 
+        :selected_image="current_image.image_id" 
+        @thumbnailClicked="setActiveImage"/>
+      <image-navigation-toolbar class="mt-5"/>
     </div>
+
 
     <!-- Collapsible panels on the right of the image --> 
-    <div class="nav-panel column" style="max-width: 300px;">  
+    <div class="image-tools-area" >  
+
+      <b-tabs v-model="activeImageToolsTab">
+
+        <b-tab-item label="controls">
+          <command-tabs-accordion class="command-tab-accordion is-hidden-desktop"/>
+          <command-tabs-wide class="command-tabs-wide is-hidden-touch" />
+        </b-tab-item>
+
+        <b-tab-item label="analysis" class="analysis-tab-item">
+
+          <div class="shapes-toolbar" > <div>Draw a region: </div> <shapes-toolbar /> </div>
+
+          <!--div style="border-bottom: 1px solid #555; margin-bottom: 1em;" /-->
+          <!--div style="height: 20px" /-->
+
+          <div class="analysis-tools">
+            <div class="analysis-tools-tab-buttons">
+              <div 
+                :class="{'active': activeAnalysisTab=='star inspector'}" 
+                @click="activeAnalysisTab='star inspector'"
+                class="analysis-tool-button">star inspector</div>
+              <div 
+                :class="{'active': activeAnalysisTab=='statistics'}" 
+                @click="activeAnalysisTab='statistics'"
+                class="analysis-tool-button">statistics</div>
+              <div 
+                :class="{'active': activeAnalysisTab=='histogram'}" 
+                @click="activeAnalysisTab='histogram'"
+                class="analysis-tool-button">histogram</div>
+              <div 
+                :class="{'active': activeAnalysisTab=='line profile'}" 
+                @click="activeAnalysisTab='line profile'" 
+                class="analysis-tool-button">line profile</div>
+              <div 
+                :class="{'active': activeAnalysisTab=='image info'}" 
+                @click="activeAnalysisTab='image info'"
+                class="analysis-tool-button">image info</div>
+              <div 
+                :class="{'active': activeAnalysisTab=='misc'}" 
+                @click="activeAnalysisTab='misc'"
+                class="analysis-tool-button">misc</div>
+            </div>
+            <div class="analysis-tools-content">
+
+              <star-profile v-if="activeAnalysisTab=='star inspector'" />
+
+              <div v-if="activeAnalysisTab=='statistics'" >
+
+                <b-field>
+                  <p class="control">
+                    <button 
+                      title="Only inspect the selected rectangle region." 
+                      class="button" 
+                      :class="{'is-loading':region_stats_loading}"
+                      :disabled="!large_fits_exists && !small_fits_exists" 
+                      @click="getRegionStats(true)">
+                      inspect region
+                    </button>
+                  </p>
+                  <p class="control">
+                    <button 
+                      class="button" 
+                      :class="{'is-loading':image_stats_loading}"
+                      :disabled="!large_fits_exists && !small_fits_exists" 
+                      @click="getRegionStats(false)">
+                      inspect image
+                    </button>
+                  </p>
+                </b-field>
+
+                <table class="info-panel-table">
+                    <tr> <td class="info-panel-val" align="right">min: </td>
+                        <td>{{region_min}}</td> </tr>
+                    <tr> <td class="info-panel-val" align="right">max: </td>
+                        <td>{{region_max}}</td> </tr>
+                    <tr> <td class="info-panel-val" align="right">median: </td>
+                        <td>{{region_median}}</td> </tr>
+                    <tr> <td class="info-panel-val" align="right">mean: </td>
+                        <td>{{region_mean}}</td> </tr>
+                    <tr> <td class="info-panel-val" align="right">std: </td>
+                        <td>{{region_std}}</td> </tr>
+                    <tr> <td class="info-panel-val" align="right">mode: </td>
+                        <td>{{region_mode}}</td> </tr>
+                    <tr> <td class="info-panel-val" align="right">MAD: </td>
+                        <td>{{region_MAD}}</td> </tr>
+                </table>
+              </div>
+
+              <div v-if="activeAnalysisTab=='histogram'" >
+                <b-field>
+                  <p class="control">
+                    <button 
+                      title="Get histogram from the selected rectangle region." 
+                      class="button" 
+                      :class="{'is-loading':region_histogram_loading}"
+                      :disabled="!large_fits_exists && !small_fits_exists" 
+                      @click="getHistogram(true)">
+                      inspect region
+                    </button>
+                  </p>
+                  <p class="control">
+                    <button 
+                      class="button" 
+                      :class="{'is-loading':image_histogram_loading}"
+                      :disabled="!large_fits_exists && !small_fits_exists" 
+                      @click="getHistogram(false)">
+                      inspect image
+                    </button>
+                  </p>
+                </b-field>
+                <p class="is-size-7 pl-1 mb-3">Double click to reset the zoom</p>
+                <histogram-viewer :counts="hist_counts" :edges="hist_edges"/>
+              </div>
+
+              <div v-if="activeAnalysisTab=='line profile'" >
+                <line-profile-inspection />
+              </div>
+
+              <div v-if="activeAnalysisTab=='image info'" >
+                <b-button class="button ml-1 mt-3" outlined  @click="showFitsHeader">show fits header</b-button>
+
+                <div style="margin: 1em; display:flex; flex-direction: column;">
+                  <table class="info-panel-table">
+                      <tr> <td class="info-panel-val" align="right">filename: </td>
+                          <td>{{current_image.base_filename || "---"}}</td> </tr>
+                      <tr> <td class="info-panel-val" align="right">date: </td>
+                          <td>{{captureDate || "---" }}</td></tr>
+                      <tr> <td class="info-panel-val" align="right">time: </td>
+                          <td>{{captureTime + " GMT"}}</td> </tr>
+                      <tr> <td class="info-panel-val" align="right">site: </td>
+                          <td>{{current_image.site || "---"}}</td> </tr>
+
+                      <div class="blank-row" />
 
 
-      <!-- Toggle display of all site images or just the user's images. -->
-      <b-field>
-        <b-radio-button expanded 
-          v-model="show_user_data_only"
-          :native-value="true"
-          :disabled="!$auth.isAuthenticated"
-          >
-          <span>My Data</span>
-        </b-radio-button>
+                      <tr> <td class="info-panel-val" align="right">exposure: </td>
+                          <td>{{current_image.exposure_time || "---"}} s</td> </tr>
+                      <tr> <td class="info-panel-val" align="right">filter: </td>
+                          <td>{{current_image.filter_used || "---"}}</td> </tr>
 
-        <b-radio-button expanded 
-          v-model="show_user_data_only"
-          :native-value="false">
-          <span>All Data</span>
-        </b-radio-button>
-      </b-field>
+                      <div class="blank-row" />
 
-      <!-- star inspector -->
-      <side-info-panel :startOpen="false">
-        <p slot="title">star inspector</p>
+                      <tr> <td class="info-panel-val" align="right">RA: </td>
+                          <td><ra-display  :ra_hours_decimal="current_image.right_ascension" :can_copy="true" /> </td> </tr>
+                      <tr> <td class="info-panel-val" align="right">Dec: </td>
+                          <td><dec-display  :dec_deg_decimal="current_image.declination" :can_copy="true" /> </td> </tr>
 
-        <b-switch 
-          class="is-small" 
-          type="is-info" 
-          style="margin-bottom: 1em;"
-          :disabled="!large_fits_exists || !small_fits_exists" 
-          v-model="starInspectorLargeFile">
-          Use full resolution file (slower!)
-        </b-switch>
+                      <tr> <td class="info-panel-val" align="right">azimuth: </td>
+                          <td>{{current_image.azimuth || "---"}}</td> </tr>
+                      <tr> <td class="info-panel-val" align="right">altitude: </td>
+                          <td>{{current_image.altitude || "---"}}</td> </tr>
+                      <tr> <td class="info-panel-val" align="right">airmass: </td>
+                          <td>{{current_image.airmass || "---"}}</td> </tr>
+                  </table>
+                </div>
+              </div>
 
-        <p class="warning-text" v-if="!small_fits_exists">{{"missing small fits"}}</p>
-        <p class="warning-text" v-if="!large_fits_exists">{{"missing full fits"}}</p>
+              <div v-if="activeAnalysisTab=='misc'" >
+                <!-- Toggle display of all site images or just the user's images. -->
+                <b-field>
+                  <b-radio-button expanded 
+                    v-model="show_user_data_only"
+                    :native-value="true"
+                    :disabled="!$auth.isAuthenticated"
+                    >
+                    <span>My Data</span>
+                  </b-radio-button>
 
-        <b-field>
-          <p class="control">
-            <button 
-              class="button" 
-              :class="{'is-loading': inspect_region_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getStarProfiles">
-              inspect region
-            </button>
-          </p>
-          <p class="control">
-            <button 
-              class="button" 
-              :class="{'is-loading': inspect_image_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getStarProfiles(false)">
-              inspect image
-            </button>
-          </p>
-        </b-field>
+                  <b-radio-button expanded 
+                    v-model="show_user_data_only"
+                    :native-value="false">
+                    <span>All Data</span>
+                  </b-radio-button>
+                </b-field>
+                <image-filter :sitecode="sitecode"/>
+              </div>
 
-        <hr>
-        <div id="brightest_star_profile" />
-        <table class="info-panel-table">
-            <tr> <td class="info-panel-val" align="right">Half-Flux Diameter: </td>
-                <td>{{brightest_hfd}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">Gaussian FWHM: </td>
-                <td>{{brightest_fwhm}}</td> </tr>
-        </table>
-        <hr>
-        <div id="u_brightest_star_profile" />
-        <table class="info-panel-table">
-            <tr> <td class="info-panel-val" align="right">Half-Flux Diameter: </td>
-                <td>{{u_brightest_hfd}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">Gaussian FWHM: </td>
-                <td>{{u_brightest_fwhm}}</td> </tr>
-        </table>
-        <hr>
-        <div id="median_star_profile" />
-        <table class="info-panel-table">
-            <tr> <td class="info-panel-val" align="right">number of stars detected: </td>
-                <td>{{num_good_stars}}</td> </tr>
-        </table>
-      </side-info-panel>
+            </div>
 
-      <!-- image statistics -->
-      <side-info-panel :startOpen="false">
-        <p slot="title">region statistics</p>
+          </div>
+        </b-tab-item>
 
-        <b-switch 
-          class="is-small" 
-          type="is-info" 
-          style="margin-bottom: 1em;"
-          :disabled="!large_fits_exists || !small_fits_exists" 
-          v-model="imageStatsLargeFile">
-          Use full resolution file (slower!)
-        </b-switch>
+        <b-tab-item label="data" disabled>
+          
+          <!-- TODO: 'disable' the other image filter tools if this is turned on. -->
+          <div class="recent-images-toggle-pane">
+            <b-field label="live data" horizontal>
+              <b-switch label="show recent images" />
+            </b-field>
+          </div>
 
-        <p class="warning-text" v-if="!current_image.fits_10_exists">{{"missing small fits"}}</p>
-        <p class="warning-text" v-if="!current_image.fits_01_exists">{{"missing full fits"}}</p>
+          <div class="data-query-filters">
+            <div>add search filters here</div>
+          </div>
 
-        <b-field>
-          <p class="control">
-            <button 
-              title="Only inspect the selected rectangle region." 
-              class="button" 
-              :class="{'is-loading':region_stats_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getRegionStats(true)">
-              inspect region
-            </button>
-          </p>
-          <p class="control">
-            <button 
-              class="button" 
-              :class="{'is-loading':image_stats_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getRegionStats(false)">
-              inspect image
-            </button>
-          </p>
-        </b-field>
-
-        <table class="info-panel-table">
-            <tr> <td class="info-panel-val" align="right">min: </td>
-                <td>{{region_min}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">max: </td>
-                <td>{{region_max}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">median: </td>
-                <td>{{region_median}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">mean: </td>
-                <td>{{region_mean}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">std: </td>
-                <td>{{region_std}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">mode: </td>
-                <td>{{region_mode}}</td> </tr>
-            <tr> <td class="info-panel-val" align="right">MAD: </td>
-                <td>{{region_MAD}}</td> </tr>
-        </table>
-      </side-info-panel>
-
-      <!-- Histogram panel -->
-      <side-info-panel :startOpen="false">
-        <p slot="title">histogram</p>
-
-        <b-field>
-          <p class="control">
-            <button 
-              title="Get histogram from the selected rectangle region." 
-              class="button" 
-              :class="{'is-loading':region_histogram_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getHistogram(true)">
-              from region
-            </button>
-          </p>
-          <p class="control">
-            <button 
-              class="button" 
-              :class="{'is-loading':image_histogram_loading}"
-              :disabled="!large_fits_exists && !small_fits_exists" 
-              @click="getHistogram(false)">
-              from image
-            </button>
-          </p>
-        </b-field>
-        <p class="is-size-7 pl-1 mb-3">Double click to reset the zoom</p>
-        <histogram-viewer :counts="hist_counts" :edges="hist_edges"/>
-
-      </side-info-panel>
-
-      <line-profile-inspection />
-
-      <!-- Basic image info and a button to reveal the full fits header -->
-      <side-info-panel :startOpen="false">
-
-        <p class="level" slot="title">
-          Image Info 
-        </p>
-          <b-button class="button " outlined style="margin-left: 1em;" @click="showFitsHeader">show fits header</b-button>
-
-        <div style="margin: 1em;">
-          <table class="info-panel-table">
-              <tr> <td class="info-panel-val" align="right">filename: </td>
-                  <td>{{current_image.base_filename || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">date: </td>
-                  <td>{{captureDate || "---" }}</td></tr>
-              <tr> <td class="info-panel-val" align="right">time: </td>
-                  <td>{{captureTime + " GMT"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">site: </td>
-                  <td>{{current_image.site || "---"}}</td> </tr>
-              <div class="blank-row" />
-
-              <tr> <td class="info-panel-val" align="right">exposure: </td>
-                  <td>{{current_image.exposure_time || "---"}} s</td> </tr>
-              <tr> <td class="info-panel-val" align="right">filter: </td>
-                  <td>{{current_image.filter_used || "---"}}</td> </tr>
-              <div class="blank-row" />
-
-              <tr> <td class="info-panel-val" align="right">RA: </td>
-                  <td><ra-display  :ra_hours_decimal="current_image.right_ascension" :can_copy="true" /> </td> </tr>
-              <tr> <td class="info-panel-val" align="right">Dec: </td>
-                  <td><dec-display  :dec_deg_decimal="current_image.declination" :can_copy="true" /> </td> </tr>
-
-              <tr> <td class="info-panel-val" align="right">azimuth: </td>
-                  <td>{{current_image.azimuth || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">altitude: </td>
-                  <td>{{current_image.altitude || "---"}}</td> </tr>
-              <tr> <td class="info-panel-val" align="right">airmass: </td>
-                  <td>{{current_image.airmass || "---"}}</td> </tr>
-          </table>
-          <div style="height: 2em;"/>
-          <b-field label="downloads:" style="width: 100%">
-            <p class="control">
-              <a class="button has-text-white" 
-                :disabled="!small_fits_exists"
-                @click="download_fits_file(current_image.base_filename, current_image.data_type, '10')">
-                <b-icon icon="download" size="is-small" />
-                <span>small fits</span>
-              </a>
-            </p>
-            <p class="control">
-              <a class="button has-text-white" 
-                :disabled="!large_fits_exists"
-                @click="download_fits_file(current_image.base_filename, current_image.data_type, '01')">
-                <b-icon icon="download" size="is-small" />
-                <span>large fits</span>
-              </a>
-            </p>
-          </b-field>
-        </div>
-      </side-info-panel>
+          <div class="data-query-quick-buttons">
+            <b-button> last 24hrs </b-button>
+            <b-button> last 24hrs </b-button>
+            <b-button> last 24hrs </b-button>
+          </div>
 
 
-      <image-filter :sitecode="sitecode"/>
+        </b-tab-item>
+
+      </b-tabs>
     </div>
 
-  </div>
 
   <!-- Modal popup window showing the full fits header. -->
   <b-modal :active.sync="showFitsHeaderModal" >
@@ -310,10 +269,8 @@
     </div>
   </b-modal>
 
-  <div style="height: 400px;"></div>
-
-
-</section>
+</div>
+</div>
 </template>
 
 
@@ -330,7 +287,15 @@ import LineProfileInspection from "@/components/LineProfileInspection";
 import RaDisplay from "@/components/display/RaDisplay"
 import DecDisplay from "@/components/display/DecDisplay"
 import HistogramViewer from "@/components/HistogramViewer"
-import CommandTabAccordion from "@/components/CommandTabAccordion"
+import CommandTabsAccordion from "@/components/CommandTabsAccordion"
+import CommandTabsWide from "@/components/CommandTabsWide"
+import ImageInfoBar from "@/components/ImageDisplay/ImageInfoBar"
+import ThumbnailRow from "@/components/ImageDisplay/ThumbnailRow"
+import ImageNavigationToolbar from "@/components/ImageDisplay/ImageNavigationToolbar"
+import ShapesToolbar from "@/components/ImageDisplay/ShapesToolbar"
+
+import StarProfile from '@/components/AnalysisTools/StarProfile'
+
 import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
 import axios from 'axios'
@@ -352,11 +317,20 @@ export default {
     RaDisplay,
     DecDisplay,
     HistogramViewer,
-    CommandTabAccordion,
+    CommandTabsAccordion,
+    CommandTabsWide,
+    ImageInfoBar,
+    ThumbnailRow,
+    ImageNavigationToolbar,
+    ShapesToolbar,
+    StarProfile,
   },
   data() {
     return {
       accordionIsOpen: 1,
+
+      activeAnalysisTab: 'star inspector',
+      activeImageToolsTab: 0,
 
       fitsHeader: {},
       showFitsHeaderModal: false,
@@ -378,49 +352,6 @@ export default {
       region_stats_loading: false,
       image_stats_loading: false,
 
-
-      // Analysize the full sized raw file (default is 768px reduced file)
-      imageStatsLargeFile: false,
-      starInspectorLargeFile: false,
-      analysisWithLargeFile: false,
-
-      region_min: '--',
-      region_max: '--',
-      region_median: '--',
-      region_mean: '--',
-      region_mode: '--',
-      region_std: '--',
-      region_MAD: '--',
-
-      num_good_stars: '--',
-      pixscale: 1,
-
-      median_plot_color: '#209cee',
-      median_fwhm: '--',
-      median_hfd: '--',
-      median_profile: [0,0],
-      median_relative_pos_x: -1,
-      median_relative_pos_y: -1,
-
-      brightest_plot_color: '#efea5a',
-      brightest_fwhm: '--',
-      brightest_hfd: '--',
-      brightest_profile: [0,0],
-      brightest_relative_pos_x: -1,
-      brightest_relative_pos_y: -1,
-
-      // Unsaturated brightest object
-      u_brightest_plot_color: '#209cee',
-      u_brightest_fwhm: '--',
-      u_brightest_hfd: '--',
-      u_brightest_profile: [0,0],
-      u_brightest_relative_pos_x: -1,
-      u_brightest_relative_pos_y: -1,
-
-      starProfileToolActive: false,
-      inspect_region_loading: false,
-      inspect_image_loading: false,
-
       region_histogram_loading: false,
       image_histogram_loading: false,
       
@@ -430,333 +361,23 @@ export default {
 
     }
   },
-  mounted(){
-    // Draw empty plots for the star profiles
-    this.drawEmptyStarProfiles()
-  },
   methods: {
 
-    reset_star_markers() {
-      this.brightest_relative_pos_x = -1
-      this.brightest_relative_pos_y = -1
-      this.u_brightest_relative_pos_x = -1
-      this.u_brightest_relative_pos_y = -1
-    },
-
-    drawEmptyStarProfiles() {
-      // Draw empty plots for the star profiles
-      this.plotStarProfile([0], {}, 1, "#brightest_star_profile", 
-        {plot_color: "#efea5a"},
-        {title: "Brightest Star Profile", x_axis_label: "arcseconds"})
-
-      this.plotStarProfile([0], {}, 1, "#u_brightest_star_profile", 
-        {plot_color: "#209cee"},
-        {title: "Brightest Unsaturated Star Profile", x_axis_label: "arcseconds"})
-    },
-    getStarProfiles(useSubregion=true) {
-      let url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/starprofiles"
-      let body = {
-        "site": this.sitecode,
-        "base_filename": this.current_image.base_filename,
-        "data_type": this.current_image.data_type,
-        "reduction_level": this.starInspectorLargeFile ? "01" : "10",
-      }
-
-      if (useSubregion) {
-
-        if (this.selectedShapeType != "rects") {
-          console.log(this.selectedShapeType)
-          this.$buefy.toast.open({
-            type: 'is-warning',
-            message: 'Region must be a rectangle.'
-          })
-          return;
-        } 
-        this.inspect_region_loading = true;
-        body.region_x0 = helpers.clamp(this.selectedShape.x1, 0, 1)
-        body.region_x1 = helpers.clamp(this.selectedShape.x2, 0, 1)
-        body.region_y0 = helpers.clamp(this.selectedShape.y1, 0, 1)
-        body.region_y1 = helpers.clamp(this.selectedShape.y2, 0, 1)
-      }
-      else { this.inspect_image_loading = true; }
-
-      // Request the computed data from our backend
-      axios.post(url, body)
-        .then(response => {this.displayStarProfiles(response)})
-        .catch(response => {this.starProfilesReset(response)})
-    },
-    starProfilesReset(response) {
-      this.inspect_region_loading = false;
-      this.inspect_image_loading = false;
-      this.median_fwhm = '--'
-      this.brightest_fwhm = '--'
-      this.u_brightest_fwhm = '--'
-    },
-    displayStarProfiles(response) {
-      this.inspect_region_loading = false;
-      this.inspect_image_loading = false;
-      console.log(response)
-
-      // Handle the case where no stars are found.
-      if (response.data.num_good_stars == 0) {
-        console.log('no good stars')
-        this.median_fwhm = '--'
-        this.brightest_fwhm = '--'
-        this.u_brightest_fwhm = '--'
-        this.num_good_stars = 0
-
-        // Small popup notification
-        // TODO: include a 'tell me more' button with possible reasons for failure.
-        this.$buefy.toast.open({
-            message: 'No good stars were found in the selected region.',
-            type: 'is-warning',
-            position: 'is-top',
-            actionText: 'Tell me more...',
-            duration: 6000,
-            onAction: () => {
-              this.$beufy.toast.open(
-                `<p class="image is-4by3">
-                    <img src="https://buefy.org/static/img/placeholder-1280x960.png">
-                </p>`
-              )}
-        })
-      }
-
-      // Otherwise, do this if good stars were found
-      else {
-        console.log('good stars were found')
-        let med_star = response.data.median_star
-        let region_coords = response.data.region_coords
-
-        // Brightest unsaturated star profile.
-        if (response.data.brightest_unsaturated) {
-          let u_bright_star = response.data.brightest_unsaturated
-          this.u_brightest_fwhm = (u_bright_star.gaussian_fwhm *u_bright_star.pixscale).toFixed(2) + '"' 
-          this.u_brightest_hfd = (u_bright_star.hfd*u_bright_star.pixscale).toFixed(2) + '"' 
-          this.u_brightest_relative_pos_x = (u_bright_star.x / u_bright_star.naxis1) + region_coords.x0
-          this.u_brightest_relative_pos_y = (u_bright_star.y / u_bright_star.naxis2) + region_coords.y0
-          // Plot the brightest unsaturated star profile
-          console.log('plotting brightest unsaturated star profile')
-          let ub_profile = u_bright_star.radial_profile 
-          let ub_gauss = {
-            mean: u_bright_star.gaussian_mean,
-            stddev: u_bright_star.gaussian_stddev,
-            amplitude: u_bright_star.gaussian_amplitude,
-          }
-          let ub_pixscale = u_bright_star.pixscale 
-          let ub_element_id = "#u_brightest_star_profile" 
-          let ub_formatting = {
-            margin_top: 50,
-            margin_right: 25,
-            margin_bottom: 50,
-            margin_left: 45,
-            plot_color: "#209cee",
-            x_axis_ticks: 8,
-            y_axis_ticks: 5,
-          }
-          let ub_labels = {
-            title: "Brightest Unsaturated Star Profile",
-            x_axis_label: "arcseconds",
-          }
-          this.plotStarProfile(ub_profile, ub_gauss, ub_pixscale, ub_element_id, ub_formatting, ub_labels)
-        }
-
-        // Brightest star profile
-        if (response.data.brightest_star) {
-          console.log('plotting brightest star')
-          let bright_star = response.data.brightest_star
-          this.brightest_fwhm = (bright_star.gaussian_fwhm *bright_star.pixscale).toFixed(2) + '"' 
-          this.brightest_hfd = (bright_star.hfd*bright_star.pixscale).toFixed(2) + '"' 
-          this.brightest_relative_pos_x = (bright_star.x / bright_star.naxis1) + region_coords.x0
-          this.brightest_relative_pos_y = (bright_star.y / bright_star.naxis2) + region_coords.y0
-          // Plot the brightest star profile
-          let b_profile = bright_star.radial_profile 
-          let b_gauss = {
-            mean: bright_star.gaussian_mean,
-            stddev: bright_star.gaussian_stddev,
-            amplitude: bright_star.gaussian_amplitude,
-          }
-          let b_pixscale = bright_star.pixscale 
-          let b_element_id = "#brightest_star_profile" 
-          let b_formatting = {
-            margin_top: 50,
-            margin_right: 25,
-            margin_bottom: 50,
-            margin_left: 45,
-            plot_color: "#efea5a",
-            x_axis_ticks: 8,
-            y_axis_ticks: 5,
-          }
-          let b_labels = {
-            title: "Brightest Star Profile",
-            x_axis_label: "arcseconds",
-          }
-          this.plotStarProfile(b_profile, b_gauss, b_pixscale, b_element_id, b_formatting, b_labels)
-        }
-
-        
-
-        // Get the fwhm from the gaussian fit
-        this.median_fwhm = (med_star.gaussian_fwhm * med_star.pixscale).toFixed(2) + '"' 
-        this.median_hfd = (med_star.hfd* med_star.pixscale).toFixed(2) + '"' 
-
-        // Get the positions of the stars to show in the image display.
-        this.median_relative_pos_x = (med_star.x / med_star.naxis1) + region_coords.x0
-        this.median_relative_pos_y = (med_star.y / med_star.naxis2) + region_coords.y0
-        this.num_good_stars = response.data.num_good_stars
-
-        // Plot the median star profile
-        let m_profile = med_star.radial_profile
-        let m_gauss = {
-          mean: med_star.gaussian_mean,
-          stddev: med_star.gaussian_stddev,
-          amplitude: med_star.gaussian_amplitude,
-        }
-        let m_pixscale = med_star.pixscale
-        let m_element_id = "#median_star_profile"
-        let m_formatting = {
-          margin_top: 50,
-          margin_right: 25,
-          margin_bottom: 50,
-          margin_left: 45,
-          plot_color: "#209cee",
-          x_axis_ticks: 8,
-          y_axis_ticks: 5,
-        }
-        let m_labels = {
-          title: "Median Star Profile",
-          x_axis_label: "arcseconds",
-        }
-        //this.plotStarProfile(m_profile, m_gauss, m_pixscale, m_element_id, m_formatting, m_labels)
-
-
-
-        console.log('finished plotting star profiles')
-      }
-    },
-    plotStarProfile( profile, gaussian, pixscale=1, el_id, formatting_opts, label_options ) {
-
-      // Parse the input arguments, and define defaults.
-      const margin = {
-        top: formatting_opts.margin_top || 50,
-        right: formatting_opts.margin_right || 25,
-        bottom: formatting_opts.margin_bottom || 50,
-        left: formatting_opts.margin_left || 45,
-      }
-      const width = formatting_opts.width || 180
-      const height = formatting_opts.height || 100
-      let x_axis_ticks = formatting_opts.x_axis_ticks || 8
-      let y_axis_ticks = formatting_opts.y_axis_ticks || 5
-      let plot_color = formatting_opts.plot_color || "#ff0000"
-
-      let title = label_options.title
-      let x_axis_label = label_options.x_axis_label
-
-      let n = profile.length // The number of datapoints.
-      let x_domain = (n-1) * pixscale // from above, scaled to use units of arcseconds
-
-      // Calculate gaussian fit from the backend-provided parameters
-      let g_mean = gaussian.mean || 0
-      let g_stddev = gaussian.stddev || 0
-      let g_amplitude = gaussian.amplitude || 0
-      let gaussian_dist = x => {
-        return g_amplitude * Math.exp(-0.5 * Math.pow((x - g_mean) / g_stddev, 2))
-      }
-      let gaussian_array = Array(n).fill().map((_,i) => gaussian_dist(i))
-
-
-      // Remove previous plot data
-      d3.select(el_id).select("svg").remove()
-
-      // X scale will use the index of our data, scaled from pix to arcseconds
-      let xScale = d3.scaleLinear()
-        .domain([0, x_domain]) // input
-        .range([0, width]); // output
-
-      // Y scale will use the max in the star profile
-      let yScale = d3.scaleLinear()
-        .domain([0,Math.max(...profile)]) // input 
-        .range([height, 0]); // output 
-
-      // d3's line generator
-      // TODO: replace with the gaussian fit instead of connecting the dots.
-      let line = d3.line()
-        .x(function(d, i) { return xScale(i * pixscale); }) // covnert to arcseconds
-        .y(function(d) { return yScale(d); }) // set the y values for the line generator 
-        .curve(d3.curveMonotoneX) // apply smoothing to the line
-
-
-      // Add the SVG to the page
-      let svg = d3.select(el_id).append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-      // Call the x axis in a group tag
-      svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(xScale).ticks(x_axis_ticks)); // Create an axis component with d3.axisBottom
-
-      // Call the y axis in a group tag
-      svg.append("g")
-        .attr("class", "y axis")
-        .call(d3.axisLeft(yScale).ticks(y_axis_ticks)); // Create an axis component with d3.axisLeft
-          
-      // Draw the plot title
-      svg.append("text")             
-        .attr("x", width/2)
-        .attr("y",-15)
-        .style("text-anchor", "middle")
-        .style("fill", "#fff")
-        .text(title);
-
-      // Draw the x-axis label
-      svg.append("text")             
-        .attr("x", width)
-        .attr("y", height + 30)
-        .style("text-anchor", "middle")
-        .style("font-size", "10px")
-        .style("fill", "#fff")
-        .text(x_axis_label);
-
-      // Plot the line fit only if the gaussian array is valid, and roughly 
-      // centered over 0.
-      if (gaussian_array[0] && Math.abs(g_mean) < 1) { 
-        // Append the path, bind the data, and call the line generator 
-        svg.append("path")
-          .datum(gaussian_array) // 10. Binds data to the line 
-          .style("fill", "none")
-          .style("stroke", plot_color)
-          .style("stroke-width","2px")
-          .attr("class", "line") // Assign a class for styling 
-          .attr("d", line); // 11. Calls the line generator 
-      }
-
-      // Appends a circle for each datapoint 
-      svg.selectAll(".dot")
-        .data(profile)
-      .enter().append("circle") // Uses the enter().append() method
-        .style("stroke", plot_color)
-        .attr("class", "dot") // Assign a class for styling
-        .attr("cx", function(d, i) { return xScale(i * pixscale) }) // convert array index (pixels) to arcsec
-        .attr("cy", function(d) { return yScale(d) })
-        .attr("r", 2);
-
-    },
     getRegionStats(useSubregion=true) {
 
-      const image_size = this.imageStatsLargeFile ? "01" : "10" // Determine the size of the image to analyze.
-      const full_filename = this.imageStatsLargeFile ? this.large_fits_filename : this.small_fits_filename
-      //const url = "https://41uhbm23rf.execute-api.us-east-1.amazonaws.com/dev/regionstats"
       const url = this.$store.state.dev.quickanalysis_endpoint + '/statistics'
+
+      // Extract parts of the filename required by the analysis api
+      let filename = this.best_available_full_filename.split('.')[0]
+      let data_type = filename.slice(filename.length-4, filename.length-2)
+      let reduction_level = filename.slice(filename.length-2, filename.length)
+
       let body = {
         "site": this.sitecode,
         "base_filename": this.current_image.base_filename,
-        "data_type": this.current_image.data_type,
-        "reduction_level": image_size,
-        "full_filename": full_filename,
+        "data_type": data_type,
+        "reduction_level": reduction_level,
+        "full_filename": this.best_available_full_filename,
       }
       console.log(body)
       if (useSubregion) {
@@ -873,31 +494,23 @@ export default {
         this.headerIsLoading = false
       })
     },
+
+    // Activated by clicking on an image thumbnail. Displays that image
+    // in the main view.
+    setActiveImage(image) {
+      this.$store.dispatch("images/set_current_image", image);
+    },
+
     showFitsHeader() {
       this.refreshFitsHeader()
       this.showFitsHeaderModal = true
-    },
-    async download_fits_file(base_filename, data_type, reduction_level) {
-      const params = {
-        base_filename: base_filename, 
-        data_type: data_type,
-        reduction_level: reduction_level,
-      }
-      const fits_url = await this.$store.dispatch('images/get_fits_url', params)
-      window.location.assign(fits_url)
     },
   },
   watch: {
     current_image() {
       if (this.showFitsHeaderModal) this.refreshFitsHeader(); 
-
-      // Reset the star profile graph and remove the star markers
-      // TODO: cache the results of full image analysis and reload when 
-      // switching back to the image.
       this.resetRegionStats()
       this.resetHistogram()
-      this.drawEmptyStarProfiles()
-      this.reset_star_markers()
     },
     show_user_data_only() {
       this.$store.dispatch('images/load_latest_images')
@@ -943,33 +556,16 @@ export default {
       get() { return this.$store.getters['drawshapes/selectedShape']},
       set(val) { this.$store.dispatch('drawshapes/selectedShape', val )}
     },
-
-    brightest_star_display() {
-      return {
-        x: this.brightest_relative_pos_x,
-        y: this.brightest_relative_pos_y,
-        color: this.u_brightest_plot_color,
-      }
+    
+    crosshairsVisible: {
+      get() { return this.$store.getters['drawshapes/crosshairsVisible']},
+      set(val) { this.$store.dispatch('drawshapes/crosshairsVisible')}
     },
 
     markedStars() {
-      const brightest_star = {
-        x: this.brightest_relative_pos_x,
-        y: this.brightest_relative_pos_y,
-        color: this.brightest_plot_color,
-      }
-      const brightest_unsaturated = {
-        x: this.u_brightest_relative_pos_x,
-        y: this.u_brightest_relative_pos_y,
-        color: this.u_brightest_plot_color,
-      }
-      return [ brightest_star,brightest_unsaturated ]
+      return this.$store.getters['starprofile/marked_stars']
     },
 
-    activeDrawShape: {
-      get() { return this.$store.getters['drawshapes/activeDrawShape']},
-      set(val) { this.$store.commit('drawshapes/activeDrawShape', val)}
-    },
 
     // Vuex mapping for the value that toggles whether to show all the site
     // images or just the user's images.
@@ -987,6 +583,10 @@ export default {
         })
       }
       return tableData
+    },
+
+    fitsHeaderLoaded() {
+      return Object.keys(this.fitsHeader).length > 0
     },
 
     captureDate() {
@@ -1040,10 +640,134 @@ export default {
 
 
 <style lang="scss" scoped>
+$tabs-toggle-link-border-width: 10px;
 @import "@/style/buefy-styles.scss";
+@import "@/style/_responsive.scss";
+
+$site-data-wrapper-padding: 2em;
+$infobar-height: 50px;
+$thumbnails-height: 70px;
+$controls-height: 55px;
+
+// Available height for the image after subracting the top navbars, bottom status display, and
+// the ui elements around the image. 
+$square-image-height: calc(
+  100vh - #{
+    $top-bottom-height 
+    + $infobar-height 
+    + $thumbnails-height 
+    } 
+  - #{(2 * $site-data-wrapper-padding)});
+$max-div-width: $square-image-height;
+
+$visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-wrapper-padding)}});
+
+.analysis-tools {
+  background-color: $grey-darker;
+
+}
+.analysis-tools-tab-buttons {
+  background-color: $body-background-color;
+  display: flex;
+  flex-wrap: wrap;
+  color: $grey-lighter;
+  margin-bottom: 1em;
+}
+.analysis-tool-button {
+  padding: 5px 8px;
+  border-right: 1px solid lighten($grey-dark, 4); 
+  background-color: $body-background-color;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &.active {
+    background-color: $grey-darker;
+    font-weight: bold;
+  }
+}
+.analysis-tools-content {
+  padding: 1em;
+  height: max-content;
+}
 
 
 
+.site-data-wrapper {
+  margin: 0 auto;
+  padding: $site-data-wrapper-padding;
+  display: flex;
+  flex-direction: column;
+
+  @include desktop {
+    display: grid;
+    grid-gap: 2em;
+    grid-template-columns:  auto 1fr;
+    grid-template-rows: 1fr;//$visible-content-height;
+    grid-template-areas: 'image tools';
+  }
+}
+
+.image-display-area {
+  padding-left: 2em;
+  grid-area: image;
+  height: 100%;
+  max-height: $visible-content-height;
+  width: 100%;
+  display: grid;
+  grid-template-rows: $infobar-height auto $thumbnails-height 80px 1fr;
+  grid-template-columns: auto;
+  overflow: hidden;
+
+  @include fullhd {
+    max-width: calc(#{$visible-content-height} * 0.85);
+  }
+}
+
+.image-tools-area {
+  grid-area: tools;
+  width: 100%;
+
+  @include desktop {
+    width: 500px;
+  }
+
+  @include widescreen {
+    width: 600px;
+  }
+
+  @include fullhd {
+    width: 720px;
+  }
+
+}
+
+
+.command-tab-accordion {
+  width: 100%;
+  @include desktop {
+    max-width: 380px;
+  }
+}
+
+.analysis-tabs {
+  margin-bottom: 3em;
+}
+
+.analysis-tab-item {
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+}
+
+.shapes-toolbar {
+  width: 100%;
+  padding: 1em 2em;
+  margin: 0 0 1em;
+  background-color: $grey-darker;
+}
 
 table.info-panel-table { color: #dbdee0; }
 .blank-row { height: 1.5em; }
@@ -1051,10 +775,6 @@ table.info-panel-table { color: #dbdee0; }
     font-weight: bold;
     padding-right: 1em;
     padding-bottom: 5px;
-}
-
-.nav-panel > * {
-  padding-bottom: 1em;
 }
 
 .warning-text {

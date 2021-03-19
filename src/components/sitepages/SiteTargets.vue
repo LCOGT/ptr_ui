@@ -1,5 +1,5 @@
 <template>
-<section class="site-targets">
+<section class="site-targets-wrapper">
 
     <div class="page-layout">
 
@@ -242,11 +242,28 @@ export default {
 </script>
 
 
-<style scoped>
-@import "https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css";
+<style lang="scss" scoped>
+@import url("https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css");
+@import "@/style/_responsive.scss";
 
-.site-targets {
-    width: 100%;
+.site-targets-wrapper {
+  padding-top: 2em; 
+  margin: 0 auto; 
+  width: 100%;
+
+  @include tablet {
+    width: 90vw;
+  }
+  @include desktop {
+    max-width: 800px;
+  }
+  @include widescreen {
+    max-width: 1000px;
+  }
+  @include fullhd {
+    max-width: 1250px;
+  }
+  
 }
 
 .page-layout{
@@ -279,6 +296,7 @@ export default {
 }
 .skychart-box {
     width: 100%;
+    max-width: calc(90vh - #{$top-bottom-height});
     height: 100%;
 }
 

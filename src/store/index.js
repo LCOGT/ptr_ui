@@ -12,6 +12,8 @@ import user_data from './modules/user_data'
 import calendar from './modules/calendar'
 import drawshapes from './modules/drawshapes'
 
+import starprofile from './modules/AnalysisTools/starprofile'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -36,5 +38,6 @@ export default new Vuex.Store({
         auth,
         calendar,
         drawshapes,
+        starprofile,
     },
 })
