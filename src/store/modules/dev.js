@@ -7,6 +7,7 @@
 const state = {
     active_api: "https://api.photonranch.org/api", 
     //active_api: "https://api.photonranch.org/test", 
+
     jobs_api: "https://jobs.photonranch.org/jobs",
     //jobs_api: "https://jobs.photonranch.org/test",
     calendar_api: "https://calendar.photonranch.org/dev",
@@ -20,6 +21,7 @@ const state = {
     //logs_ws_endpoint: "wss://8t7v3l1ok5.execute-api.us-east-1.amazonaws.com/dev", // dev
 
     quickanalysis_endpoint: "https://quickanalysis.photonranch.org",
+    //quickanalysis_endpoint: "http://localhost:5000",
 }
 
 // getters

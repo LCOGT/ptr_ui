@@ -9,7 +9,7 @@
         </b-switch>
     </div>
     <b-table
-        :data="user_projects"
+        :data="projectsToDisplay"
         :loading="user_projects_is_loading"
         :empty="user_projects=={}"
         :focusable="isFocusable"
@@ -34,16 +34,19 @@
                 <dec-display :dec_deg_decimal="parseFloat(props.row.project_targets[0].dec)" /> 
             </b-table-column>
 
-            <b-table-column field="edit" label="" v-slot="props">
+            <b-table-column field="edit" label="" v-slot="props" width="180px">
                 <button 
-                    class="button is-info is-small" 
+                    class="button is-info is-small mr-3" 
                     @click="getProject(props.row.project_name, props.row.created_at)" 
                     >
                     edit
                 </button>
-            </b-table-column>
-
-            <b-table-column field="delete" label="" v-slot="props">
+                <button 
+                    class="button is-info is-small mr-3" 
+                    @click="cloneProject(props.row.project_name, props.row.created_at)" 
+                    >
+                    clone
+                </button>
                 <button 
                     class="button is-danger is-small" 
                     @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created_at': props.row.created_at})" 
@@ -57,7 +60,7 @@
         <template slot="bottom-left">
             <button 
                 class="button is-text" 
-                :class="{'is-loading': user_events_is_loading}"
+                :class="{'is-loading': projectsIsLoading}"
                 @click="$store.dispatch('user_data/fetchUserProjects', user.sub)" 
                 >
                 <span class="icon is-large has-text-grey-lighter">
@@ -70,10 +73,6 @@
             <section class="section">
                 <div class="content has-text-grey has-text-centered">
                     <p>
-                        <b-icon
-                            icon="emoticon-sad"
-                            size="is-large">
-                        </b-icon>
                     </p>
                     <p>Nothing here.</p>
                 </div>
@@ -134,8 +133,8 @@ export default {
             this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
         },
 
-        show_everyones_projects(value) {
-            if (value) {
+        show_everyones_projects(show_all_projects) {
+            if (show_all_projects) {
                 this.$store.dispatch('user_data/fetchAllProjects')
             } else {
                 this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
@@ -161,6 +160,28 @@ export default {
             var s = Math.floor(d.asHours()) + moment.utc(ms).format(":mm");
             return s
         },
+        cloneProject(project_name, created_at) {
+            
+            let request_params = {
+                project_name: project_name,
+                created_at: created_at,
+            }
+            let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
+            axios.post(project_endpoint, request_params).then(response => {
+                console.log(response)
+                let project = response.data
+                project.created_at = moment().utc().format()
+
+                let project_loader = {
+                    project: project,
+                    is_existing_project: false
+                }
+
+                this.$emit('load_project_form', project_loader)
+            }).catch(err => {
+                console.log(error)
+            })
+        },
         getProject(project_name, created_at) {
             
             let request_params = {
@@ -170,7 +191,11 @@ export default {
             let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
             axios.post(project_endpoint, request_params).then(response => {
                 console.log(response)
-                this.$emit('load_project_form', response.data)
+                let project_loader = {
+                    project: response.data,
+                    is_existing_project: true,
+                }
+                this.$emit('load_project_form', project_loader)
             }).catch(err => {
                 console.log(error)
             })
@@ -186,7 +211,25 @@ export default {
             'user_events_is_loading',
             'user_projects',
             'user_projects_is_loading',
+            'all_projects',
+            'all_projects_is_loading',
         ]),
+        projectsToDisplay() {
+            if (this.show_everyones_projects) {
+                return this.all_projects;
+            }
+            else {
+                return this.user_projects
+            }
+        },
+        projectsIsLoading() {
+            if (this.show_everyones_projects) {
+                return this.all_projects_is_loading;
+            }
+            else {
+                return this.user_projects_is_loading;
+            }
+        },
         userIsAdmin() {
             try {
                 let user = this.$auth.user 
