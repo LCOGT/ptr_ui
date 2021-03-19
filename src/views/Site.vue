@@ -1,7 +1,7 @@
 <template>
   <div class="page">
 
-    <b-navbar wrapper-class="container is-fluid site-menu" :mobile-burger="false" class="is-hidden-touch">
+    <b-navbar wrapper-class="container site-menu" :mobile-burger="false" class="is-hidden-touch">
         <template slot="brand">
         </template>
         <template slot="start">
@@ -334,10 +334,7 @@ export default {
 @import "@/style/_responsive.scss";
 
 .main-page-content {
-  //margin: 1em;
-  //height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  width: 100vw;
 }
 
 .menu-column {

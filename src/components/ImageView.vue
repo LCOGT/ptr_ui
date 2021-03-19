@@ -1,23 +1,5 @@
 <template>
-  <div id="component" v-on:keyup.right="setNextImage" v-on:keyup.left="setPreviousImage" >
-    <div id="image-window" ref="imagewindow">
-
-      <div class="image-info-bar">
-        <div class="image-info-bar-item site" v-if="fitsHeaderLoaded && fitsHeader.OBJECT != 'Unspecified' ">obj:&nbsp;{{fitsHeader.OBJECT}}</div>
-        <div class="image-info-bar-item site" v-if="!fitsHeaderLoaded || fitsHeader.OBJECT == 'Unspecified'">site:&nbsp;{{current_image.site}}</div>
-        <div class="image-info-bar-item exptime">exptime:&nbsp;{{current_image.exposure_time}}s</div>
-        <div class="image-info-bar-item filter-used">filter:&nbsp;{{current_image.filter_used}}</div>
-        <div/>
-        <div class="image-info-bar-item ra" style="display:flex">
-          ra:&nbsp;<ra-display :ra_hours_decimal="current_image.right_ascension" :decimal_precision="3"/>
-        </div>
-        <div class="image-info-bar-item dec" style="display:flex">
-          dec:&nbsp;<dec-display :dec_deg_decimal="current_image.declination" :decimal_precision="3"/>
-        </div>
-        <div class="image-info-bar-item airmass">airmass:&nbsp;{{current_image.airmass}}</div>
-        <div class="image-info-bar-item altitude">altitude:&nbsp;{{current_image.altitude}}°</div>
-        <div class="image-info-bar-item obstime">obstime:&nbsp;{{current_image.capture_date | dateToUnix }}</div>
-      </div>
+  <div class="image-view-wrapper">
 
       <!-- The main image view -->
       <div class="image-div" ref="image_div">
@@ -26,16 +8,15 @@
           id='image_svg' 
           ref="svgElement" 
           :class="{'cursor-is-crosshair': activeDrawShape!='none'}" 
-          v-show="!js9IsVisible"
-          >
+          v-show="!js9IsVisible">
           <image-crosshairs 
             :width="imageWidth"
             :height="imageHeight"
-            :isVisible="show_crosshairs"
+            :isVisible="crosshairsVisible"
             color="yellow"/>
           <background-element id="svg-background" :width="imageWidth" :height="imageHeight" />
-
         </svg>
+
         <svg-context-menu svgId="image_svg" />
 
         <img
@@ -53,87 +34,7 @@
 
       </div>
 
-      <!-- Row of selectable image thumbnails under the main view. -->
-      <div class="recent_images">
-        <div 
-            class="recent_image" 
-            style="display: flex;"
-            v-for="(item, index) in recent_images" 
-            v-bind:key="index" >
-          <img 
-              style="width: 60px; height: 60px;"
-              v-bind:src="item.jpg_url"
-              onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
-              v-bind:title="item.base_filename"
-              v-bind:class="{'selected_thumbnail' : item.image_id == current_image.image_id}"
-              @click="setActiveImage(item)" >
-        </div>
-      </div>
-
-      <!-- Controls in the top row above the main view --> 
-      <div class="controls">
-        <b-field grouped>
-          <b-field> 
-            <button title="open the JS9 analysis tools"
-              class="button" @click="toggleAnalysis">JS9</button> </b-field>
-          <b-field>
-            <p class="control">
-              <button 
-                class="button level-item" title="go to the latest image" 
-                @click="setLatestImage">
-                <b-icon icon="chevron-double-left"/>
-              </button>
-            </p>
-            <p class="control">
-              <button class="button level-item" title="previous image"
-                @click="$store.dispatch('images/set_previous_image')">
-                <b-icon icon="chevron-left" />
-              </button>
-            </p>
-            <p class="control">
-              <button class="button level-item" title="next image"
-                @click="$store.dispatch('images/set_next_image')">
-                <b-icon icon="chevron-right" />
-              </button>
-            </p>
-          </b-field>
-        </b-field>
-
-        <b-field>
-          <b-field label="crosshairs" style="margin-right: 10px;" >
-            <b-switch type="is-info" v-model="show_crosshairs"></b-switch>
-          </b-field>
-          <b-field>
-            <b-radio-button v-model="activeDrawShape" native-value="none"> none </b-radio-button>
-            <b-radio-button v-model="activeDrawShape" native-value="point">
-                <span class="iconify" data-icon="radix-icons:dot" data-inline="false"></span>
-            </b-radio-button>
-            <b-radio-button v-model="activeDrawShape" native-value="line">
-                <span class="iconify" data-icon="mdi:vector-line" data-inline="false"></span>
-            </b-radio-button>
-            <b-radio-button v-model="activeDrawShape" native-value="circle">
-                <span class="iconify" data-icon="mdi:vector-circle-variant" data-inline="false"></span>
-            </b-radio-button>
-            <b-radio-button v-model="activeDrawShape" native-value="rect">
-                <span class="iconify" data-icon="mdi:vector-rectangle" data-inline="false"></span>
-            </b-radio-button>
-          </b-field>
-
-          <b-button 
-            class="button"
-            title="Remove selected shape"
-            style="margin-left: 10px;"
-            type="is-danger"
-            :disabled="selectedId == 'none'"
-            icon-right="delete"
-            @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
-          </b-button>
-        </b-field>
-
-      </div>
-
     </div>
-  </div>
 </template>
 
 <script>
@@ -142,16 +43,16 @@ import axios from 'axios';
 import wcs from "@/utils/pix2wcs";
 import { mapGetters, mapState } from "vuex";
 import { commands_mixin } from "../mixins/commands_mixin";
-import { SnackbarProgrammatic as Snackbar } from "buefy";
-import moment from 'moment'
 import * as d3 from "d3";
 
 import JS9 from "@/components/JS9";
 import ImageCrosshairs from "@/components/svg/ImageCrosshairs"
 import BackgroundElement from "@/components/svg/BackgroundElement"
-import SvgContextMenu from "@/components/SvgContextMenu"
+import SvgContextMenu from "@/components/svg/SvgContextMenu"
 import RectSelection from "@/components/svg/RectSelection"
 
+import ImageInfoBar from "@/components/ImageDisplay/ImageInfoBar"
+import ThumbnailRow from "@/components/ImageDisplay/ThumbnailRow"
 import RaDisplay from "@/components/display/RaDisplay"
 import DecDisplay from "@/components/display/DecDisplay"
 
@@ -166,6 +67,8 @@ export default {
     ImageCrosshairs,
     BackgroundElement,
     RectSelection,
+    ImageInfoBar,
+    ThumbnailRow,
     RaDisplay,
     DecDisplay,
   },
@@ -177,11 +80,6 @@ export default {
     markedStars: Array,
   },
 
-  filters: {
-    dateToUnix(date) {
-      return (new Date(date).getTime() / 1000).toFixed(0)
-    }
-  },
 
   data() {
     return {
@@ -202,7 +100,6 @@ export default {
       js9width: 200,
       js9height: 500,
 
-      fitsHeader: {},
 
     };
   },
@@ -215,7 +112,7 @@ export default {
     this.init()
 
     // Updates whenever the rendered image size changes
-    var ro = new ResizeObserver(entries => {
+    this.ro = new ResizeObserver(entries => {
       for (let entry of entries) {
         const cr = entry.contentRect;
         this.onImageResize(cr.width, cr.height)
@@ -225,7 +122,8 @@ export default {
     });
     let imageEl = document.getElementById('main-image')
     // Observe one or multiple elements
-    ro.observe(imageEl);
+    this.ro.observe(imageEl);
+
   },
 
   watch: {
@@ -240,11 +138,11 @@ export default {
         this.js9LoadImage(newVal)
       }
 
-      this.getFitsHeader() 
     },
 
     lines: {
       handler: function() {
+        console.log('redawing lines')
         this.drawLines.draw()
       },
       deep: true,
@@ -252,23 +150,27 @@ export default {
     
     points: {
       handler: function() {
+        console.log('redawing poitns')
         this.drawPoints.draw()
       },
       deep: true,
     },
     rects: {
       handler: function() {
+        console.log('redawingw rects')
         this.drawRects.draw()
       },
       deep: true,
     },
     circles: {
       handler: function() {
+        console.log('redawing circles')
         this.drawCircles.draw()
       },
       deep: true,
     },
     selectedId() {
+      console.log('redrawing all; selected id changed')
       this.updateAll()
       this.subframeDefinedWithFile = this.current_image.base_filename
     },
@@ -311,11 +213,17 @@ export default {
 
     onImageResize(width, height) {
 
+      console.log('resizing image', width, height)
+
       // This happens when we load js9, since the jpg display goes away. 
       if (width == 0 && height == 0) return;
 
       this.imageWidth = parseInt(width)
       this.imageHeight = parseInt(height)
+
+      // Keep the svg in sync with image width (height is 100% for both).
+      this.svg.attr('width', width)
+      this.svg.attr('height', height)
 
       // Update the svg drawing tools
       this.drawPoints.imageDimensions = [width, height]
@@ -324,6 +232,12 @@ export default {
       this.drawCircles.imageDimensions = [width, height]
       this.drawStarmarkers.imageDimensions = [width, height]
 
+
+      // This is fed to js9 just before displaying to set the matching size. 
+      this.js9width=parseInt(width)
+      this.js9height=parseInt(height)
+      this.$store.commit('js9/js9Width', parseInt(width))
+      this.$store.commit('js9/js9Height', parseInt(height))
       // Update the js9 size
       if (this.js9IsVisible) {
         let resize_opts = {
@@ -333,10 +247,6 @@ export default {
         }
         this.$store.dispatch('js9/resizeDisplay', resize_opts)
       }
-
-      // This is fed to js9 just before displaying to set the matching size. 
-      this.js9width=parseInt(width)
-      this.js9height=parseInt(height)
 
     },
 
@@ -429,13 +339,6 @@ export default {
       this.mouseIsDown = false;
     },
 
-
-    // Activated by clicking on an image thumbnail. Displays that image
-    // in the main view.
-    setActiveImage(image) {
-      this.$store.dispatch("images/set_current_image", image);
-    },
-
     // Display the latest image in the view.
     setLatestImage() {
       this.$store.dispatch("images/load_latest_images");
@@ -459,20 +362,6 @@ export default {
         this.js9IsVisible = true;
       }
     },
-    getFitsHeader() {
-      // First check if image is placeholder. If so, nothing to show.
-      if (this.current_image.base_filename == "placeholder image") {
-        this.fitsHeader = {}
-        return
-      }
-      this.headerIsLoading = true 
-      let url = `https://api.photonranch.org/api/fitsheader/${this.current_image.base_filename}/`
-      let response = axios.get(url).then(response => {
-        this.fitsHeader = response.data
-      }).finally(() => {
-        this.headerIsLoading = false
-      })
-    },
 
   },
   computed: {
@@ -482,9 +371,6 @@ export default {
       "current_image",
     ]),
 
-    fitsHeaderLoaded() {
-      return Object.keys(this.fitsHeader).length > 0
-    },
 
     js9IsVisible: {
       get() { return this.$store.getters['js9/instanceIsVisible']},
@@ -519,101 +405,71 @@ export default {
     activeDrawShape: {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},
       set(val) { this.$store.commit('drawshapes/activeDrawShape', val)}
-    }
+    },
+
+    crosshairsVisible: {
+      get() { return this.$store.getters['drawshapes/crosshairsVisible']},
+      set(val) { this.$store.commit('drawshapes/crosshairsVisible', val)}
+    },
 
   }
 };
 </script>
 
 <style scoped lang="scss">
-#component {
+@import "@/style/_responsive.scss";
+
+$infobar-height: 50px;
+$thumbnails-height: 65px;
+$controls-height: 55px;
+
+$square-image-height: calc(
+  100vh - #{
+    $top-bottom-height 
+    + $infobar-height 
+    + $thumbnails-height 
+    + $controls-height} 
+  - 4em);
+$max-div-width: $square-image-height;
+
+//.image-view-wrapper::before{ content: "#{$max-div-width}"}
+
+.image-view-wrapper {
   display: flex;
   flex-direction: column;
-  text-align: center;
-  width: auto;
-  margin: 0 auto;
-}
-#js9-window {
-  display: block;
-}
-.controls {
-  margin-top: 1em;
-  display: flex;
-  justify-content: space-between;
-  overflow-x:auto;
-  overflow-y:visible;
 }
 
 .image-div {
   position: relative;
-  width: 100%;
-  height: 100%;
+  width:100%;
 }
 
 #main-image {
+  top: 0;
+  left: 0;
+  //height: 100%;
   width: 100%;
-  height: 100%;
 }
 #image_svg {
   position:absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
 }
 
-.image-info-bar {
-  color: #aaa;
-  width: 100%;
-  background-color: #1e2223;
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  grid-template-columns: repeat(2, 90px) 1fr repeat(2, 120px);
-  grid-template-areas: 'site exptime . ra dec'
-                       'filter-used obstime . airmass altitude';
-  grid-column-gap: 10px;
-  padding: 1px 3px;
-  
-  .image-info-bar-item {
-    text-align: left;
-
-    span {
-      width: 40px;
-      color: red;
-    }
-  }
-  
-
-  .site { grid-area: site; }
-  .filter-used { grid-area: filter-used; }
-  .exptime { grid-area: exptime; }
-  .ra { grid-area: ra; }
-  .dec { grid-area: dec; }
-  .airmass { grid-area: airmass; }
-  .altitude { grid-area: altitude; }
-  .obstime { grid-area: obstime; }
-
+#js9-window {
+  display: block;
 }
-
 .cursor-is-crosshair:hover {
   cursor: crosshair;
 }
-
-.recent_images {
-  min-height: 65px;
+.controls {
+  //height: $controls-height;
+  max-width: $max-div-width;
+  margin-top: 1em;
   display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  flex-direction: row;
-}
-.recent_image {
-  height: 60px;
-  margin: 5px;
-  margin-left: 0;
-  cursor: pointer;
-  flex: 0 0 auto;
-}
-.selected_thumbnail {
-  border: 3px solid rgb(241, 183, 36);
+  justify-content: space-between;
+  overflow-x:auto;
+  overflow-y:visible;
 }
 </style>

@@ -25,7 +25,7 @@
             {{instrument}}
           </div>
           <div style="flex-grow: 1;"/>
-          <div class="instrument-instance-label">selected instr</div>
+          <div class="instrument-instance-label">{{selected_instrument(instrument)}}</div>
 
         </div>
 
@@ -69,6 +69,17 @@ export default {
 
     }
   },
+  methods: {
+    selected_instrument(instrument) {
+      let inst = instrument.toLowerCase()
+      if (['enclosure', 'screen', 'telescope', 'mount', 'rotator', 'focuser', 'camera', 'sequencer'].includes(inst)) {
+        return this.$store.getters['site_config/'+inst]
+      }
+      else {
+        return ''
+      }
+    },
+  }
 
   
 }

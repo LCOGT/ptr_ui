@@ -1,15 +1,5 @@
 <template>
-  <side-info-panel :startOpen="false">
-    <p slot="title">line profile</p>
-
-    <b-switch 
-      class="is-small" 
-      type="is-info" 
-      style="margin-bottom: 1em;"
-      :disabled="!large_fits_exists" 
-      v-model="useLargeFits">
-      Use full resolution file (slower!)
-    </b-switch>
+  <div>
 
     <b-field>
       <button 
@@ -28,8 +18,7 @@
         <g id="line-x-axis" />
       </svg>
     </div>
-
-  </side-info-panel>
+  </div>
 </template>
 
 <script>
