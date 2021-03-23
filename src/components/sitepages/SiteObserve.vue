@@ -348,9 +348,9 @@ export default {
   margin: 0;
   height: 100%;
 
-  @include desktop {
-    height: calc(100vh - #{$top-bottom-height});
-  }
+  //@include desktop {
+    //height: calc(100vh - #{$top-bottom-height});
+  //}
 }
 
 .b-tabs{

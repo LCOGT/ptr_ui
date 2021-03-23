@@ -1,97 +1,96 @@
 <template>
-    <div>
-        <b-collapse class="card" :open="false" aria-id="contentIdForA11y3">
-            <div
-                slot="trigger" 
-                slot-scope="props"
-                class="card-header"
-                role="button"
-                aria-controls="contentIdForA11y3">
-                <p class="card-header-title">
-                    <i class="fa fa-search fa-fw"></i>&nbsp;
-                    Filter tool
-                </p>
-                <a class="card-header-icon">
-                    <b-icon
-                        :icon="props.open ? 'menu-down' : 'menu-up'">
-                    </b-icon>
-                </a>
+  <div>
+    <b-collapse  :open="false" aria-id="contentIdForA11y3">
+      <div
+        slot="trigger"
+        slot-scope="props"
+        class="collapsable-header"
+        role="button"
+        aria-controls="contentIdForA11y3"
+        style="display: flex"
+      >
+        <p> search filters </p>
+        <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"> </b-icon> 
+      </div>
+
+      <div class="notification">
+        <div class="content">
+          <form class="review-form" @submit.prevent="onSubmit">
+            <b-field label="Filename">
+              <b-input v-model="filename" placeholder="(Optional)"></b-input>
+            </b-field>
+
+            <b-field label="Filter">
+              <b-select v-model="filter" placeholder="--">
+                <option v-for="filter_option in filter_options">
+                  {{ filter_option }}
+                </option>
+              </b-select>
+            </b-field>
+
+            <b-field label="Start date">
+              <b-datepicker
+                placeholder="Type or select a date..."
+                v-model="start_date"
+                icon="calendar-today"
+                editable
+              >
+              </b-datepicker>
+            </b-field>
+
+            <b-field label="End date">
+              <b-datepicker
+                placeholder="Type or select a date..."
+                v-model="end_date"
+                icon="calendar-today"
+                editable
+              >
+              </b-datepicker>
+            </b-field>
+
+            <div class="columns">
+              <div class="column">
+                <b-field label="Exposure time (s)">
+                  <b-input
+                    type="number"
+                    step="any"
+                    min="0"
+                    v-model="exp_time_min"
+                    placeholder="min"
+                  >
+                  </b-input>
+                </b-field>
+              </div>
+              <div class="column">
+                <b-field label="(range optional)">
+                  <b-input
+                    type="number"
+                    step="any"
+                    min="0"
+                    v-model="exp_time_max"
+                    placeholder="max"
+                  >
+                  </b-input>
+                </b-field>
+              </div>
             </div>
-            <div class="notification">
-                <div class="content">
-                    <form class="review-form" @submit.prevent="onSubmit">
-                        <b-field label="Filename">
-                            <b-input v-model="filename" placeholder="(Optional)"></b-input>
-                        </b-field>
 
-                        <b-field label="Filter">
-                            <b-select v-model="filter" placeholder="--">
-                                <option v-for="filter_option in filter_options">
-                                    {{ filter_option }}
-                                </option>
-                            </b-select>
-                        </b-field>
-
-                        <b-field label="Start date">
-                            <b-datepicker
-                                placeholder="Type or select a date..."
-                                v-model="start_date"
-                                icon="calendar-today"
-                                editable>
-                            </b-datepicker>
-                        </b-field>
-
-                        <b-field label="End date">
-                            <b-datepicker
-                                placeholder="Type or select a date..."
-                                v-model="end_date"
-                                icon="calendar-today"
-                                editable>
-                            </b-datepicker>
-                        </b-field>
-
-                        <div class="columns">
-                            <div class="column">
-                                <b-field label="Exposure time (s)"> 
-                                    <b-input
-                                    type="number"
-                                    step="any"
-                                    min="0"
-                                    v-model="exp_time_min"
-                                    placeholder="min">
-                                    </b-input> 
-                                </b-field> 
-                            </div> 
-                            <div class="column"> 
-                                <b-field label="(range optional)">
-                                    <b-input
-                                    type="number"
-                                    step="any"
-                                    min="0"
-                                    v-model="exp_time_max"
-                                    placeholder="max">
-                                    </b-input>
-                                </b-field> 
-                            </div> 
-                        </div>
-
-                        <div style="display: flex;">                          
-                        <p>
-                            <input type="submit" class="button" value="Submit">  
-                        </p>  
-                        <button
-                        @click="removeFilter"
-                        class="button"
-                        style="float: left;"
-                        aria-controls="contentIdForA11y1">
-                        <i style="font-size:14px" class="fa">&#xf0e2;</i>
-                        </button>
-                        </div> 
-                    </form>
-                </div>
+            <div style="display: flex; justify-content:space-between;">
+              <button
+                @click="reset_fields"
+                class="button"
+                style="float: left"
+                aria-controls="contentIdForA11y1"
+              >
+                <i style="font-size: 14px" class="fa">&#xf0e2;</i>
+              </button>
+              <input type="submit" class="button" value="Submit" />
             </div>
-        </b-collapse>
-    </div>
+          </form>
+        </div>
+      </div>
+    </b-collapse>
+  </div>
 </template>
 
 <script>
@@ -133,13 +132,13 @@ export default {
         "dif_r",
         "dif_i",
         "dif_zs",
-        "dark"
-      ]
+        "dark",
+      ],
     };
   },
 
   methods: {
-    removeFilter() {
+    reset_fields() {
       //Clear form fields
       this.site = null;
       this.start_date = null;
@@ -172,14 +171,28 @@ export default {
         site: this.sitecode,
         start_date: startDate,
         end_date: endDate,
-        filter: this.filter
+        filter: this.filter,
       };
 
       this.$store.dispatch("images/get_filtered_images", filterparams);
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "@/style/_variables";
+@import "@/style/_responsive";
+
+.collapsable-header {
+  padding: 2px 1em;
+  display:flex;
+  justify-content: space-between;
+  background-color: darken($grey-dark,4) ;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 </style>

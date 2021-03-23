@@ -5,6 +5,7 @@
 
 //import { API } from 'aws-amplify'
 import axios from 'axios'
+import moment from 'moment'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
 import { data } from 'jquery'
 
@@ -32,6 +33,9 @@ const state = {
     user_images: [],
 
     show_user_data_only: false,
+
+    // determines whether 'current_images' is set to show the most recent images with live updates.
+    live_data: true, 
 }
 
 const getters = {
@@ -60,6 +64,7 @@ const mutations = {
     setRecentImages(state, recent_image_list) { state.recent_images = recent_image_list; },
     setUserImages(state, user_images_list) { state.user_images = user_images_list },
     show_user_data_only(state, val) { state.show_user_data_only = val},
+    live_data(state, val) { state.live_data = val},
 }
 
 const actions = {
@@ -182,6 +187,7 @@ const actions = {
      *  This action will retrieve a list of images filtered by the parameters in filter_params
      */
     get_filtered_images({ commit, dispatch, rootState }, filter_params) {
+        dispatch('toggle_live_data', false)
         console.log(filter_params)
         let apiName = rootState.dev.active_api;
         let url = apiName + '/filtered_images';
@@ -204,6 +210,34 @@ const actions = {
         }).catch(error => {
             console.warn(error)
         });
+    },
+
+    get_last_24hrs({ commit, dispatch, rootState}) {
+      dispatch('toggle_live_data', false)
+      let apiName = rootState.dev.active_api;
+      let url = apiName + '/filtered_images';
+      let body = { 
+          method: "GET",
+          params: {
+            start_date: moment().add(-1, 'days').format("YYYY-MM-DD hh:mm:ss"),
+            end_date: moment().format("YYYY-MM-DD hh:mm:ss"),
+          },
+          baseURL: apiName,
+          url: url,
+      }
+      axios(body).then(response => {
+          response = response.data
+
+          // Empty response:
+          if (response.length == 0) { 
+              dispatch('display_placeholder_image') 
+              return; 
+          }
+
+          commit('setRecentImages',response)
+      }).catch(error => {
+          console.warn(error)
+      });
     },
 
     /**
@@ -262,6 +296,14 @@ const actions = {
         }).catch(error => {
             //console.log(error)
         });
+    },
+
+    toggle_live_data({ commit, dispatch }, val) {
+      console.log('live_data set to ', val)
+      commit('live_data', val)
+      if (val) {
+        dispatch('load_latest_images')
+      }
     },
 
     // Load and display a single placeholder image for a site.
