@@ -2,7 +2,7 @@
   <div id="app">
     <the-menu />
 
-    <router-view></router-view>
+    <router-view class="router-view"></router-view>
 
     <!-- This is the home for the JS9 DOM elements. They are hidden here and only 
     visible when moved into the js9 component. This avoid js9-reloading issues. -->
@@ -35,5 +35,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped lang="scss">
+.router-view {
+  height: calc(100vh - 75px);
+  overflow-y: scroll;
+  overflow-x:hidden;;
+}
 </style>

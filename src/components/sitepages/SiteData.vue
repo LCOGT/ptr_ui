@@ -205,24 +205,25 @@
           </div>
         </b-tab-item>
 
-        <b-tab-item label="data" disabled>
+        <b-tab-item label="data" class="data-tab">
           
           <!-- TODO: 'disable' the other image filter tools if this is turned on. -->
-          <div class="recent-images-toggle-pane">
+          <div class="live-data-toggle-pane">
             <b-field label="live data" horizontal>
-              <b-switch label="show recent images" />
+              <b-switch v-model="liveData" label="show recent images" />
+              <p class="is-italic has-text-weight-light">(stream the latest images as they arrive)</p>
             </b-field>
           </div>
 
-          <div class="data-query-filters">
-            <div>add search filters here</div>
+          <div class="data-query-filters mb-4">
+            <image-filter />
           </div>
 
-          <div class="data-query-quick-buttons">
-            <b-button> last 24hrs </b-button>
-            <b-button> last 24hrs </b-button>
-            <b-button> last 24hrs </b-button>
+          <div class="data-query-quick-buttons mb-4">
+            <b-button class="is-small" @click="$store.dispatch('images/get_last_24hrs')"> all sites - last 24hrs </b-button>
           </div>
+
+          <images-table :image_array="recent_images" class="mb-4"/>
 
 
         </b-tab-item>
@@ -330,7 +331,7 @@ export default {
       accordionIsOpen: 1,
 
       activeAnalysisTab: 'star inspector',
-      activeImageToolsTab: 0,
+      activeImageToolsTab: 2,
 
       fitsHeader: {},
       showFitsHeaderModal: false,
@@ -548,6 +549,7 @@ export default {
       'selectionExists',
       'selectedShapeType',
     ]),
+
     activeDrawShape: {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},
       set(val) { this.$store.dispatch('drawshapes/activeDrawShape', val )}
@@ -564,6 +566,11 @@ export default {
 
     markedStars() {
       return this.$store.getters['starprofile/marked_stars']
+    },
+
+    liveData: {
+      get() { return this.$store.state.images.live_data },
+      set(val) { this.$store.dispatch('images/toggle_live_data', val)}
     },
 
 
@@ -751,6 +758,10 @@ $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-w
   }
 }
 
+.live-data-toggle-pane{
+    margin-bottom: 1em;
+}
+
 .analysis-tabs {
   margin-bottom: 3em;
 }
@@ -759,7 +770,6 @@ $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-w
   display:flex;
   flex-direction: column;
   justify-content: space-between;
-
 }
 
 .shapes-toolbar {

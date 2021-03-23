@@ -121,14 +121,12 @@
     </div>
 
     <site-status-footer 
-      class="is-hidden-mobile"
-      :site="sitecode" 
-      style="position: sticky; bottom: 0;"/>
+      class="is-hidden-mobile status-footer"
+      :site="sitecode" />
 
     <site-status-footer-mobile 
-      class="is-hidden-tablet"
-      :site="sitecode" 
-      style="position: sticky; bottom: 0;"/>
+      class="is-hidden-tablet status-footer"
+      :site="sitecode" />
 
   </div>
 </template>
@@ -335,15 +333,13 @@ export default {
 
 .main-page-content {
   width: 100vw;
+  margin-bottom: 150px;
+  height: 100%;
 }
 
 .menu-column {
   height: auto;
   padding: 0 auto;
-}
-
-.status-column {
-  max-width: 250px;
 }
 
 .subpage-menu {
@@ -364,11 +360,10 @@ export default {
   border: 1px solid $grey-dark;
 }
 
-
-.page-view {
-  /* min height: screen + footer + visual buffer */
-  //min-height: 100vh;
-  //height: calc(100vh - $top-bottom-height - 50px);
+.status-footer {
+  position:sticky; 
+  bottom: 0; 
+  width: 100vw;
 }
 
 
