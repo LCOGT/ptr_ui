@@ -28,6 +28,8 @@
               </b-select>
             </b-field>
 
+            <div class="columns">
+              <div class="column">
             <b-field label="Start date">
               <b-datepicker
                 placeholder="Type or select a date..."
@@ -37,7 +39,8 @@
               >
               </b-datepicker>
             </b-field>
-
+            </div>
+            <div class="column">
             <b-field label="End date">
               <b-datepicker
                 placeholder="Type or select a date..."
@@ -47,6 +50,8 @@
               >
               </b-datepicker>
             </b-field>
+            </div>
+            </div>
 
             <div class="columns">
               <div class="column">
