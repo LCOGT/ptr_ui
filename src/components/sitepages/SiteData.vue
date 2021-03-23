@@ -331,7 +331,7 @@ export default {
       accordionIsOpen: 1,
 
       activeAnalysisTab: 'star inspector',
-      activeImageToolsTab: 2,
+      activeImageToolsTab: 0,
 
       fitsHeader: {},
       showFitsHeaderModal: false,
@@ -706,6 +706,7 @@ $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-w
   padding: $site-data-wrapper-padding;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 
   @include desktop {
     display: grid;
