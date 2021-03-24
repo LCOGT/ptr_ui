@@ -71,8 +71,22 @@ export default {
     this.timeInterval = setInterval(this.updateTime, 1000);
     window.moment = moment; // use moment lib in browser devtools
   },
+  mounted() {
+
+    // Load the users projects so they can add them to calendar events. 
+    if (this.user) {
+      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+    }
+  },
   destroyed() {
     clearInterval(this.timeInterval);
+  },
+  watch: {
+
+    // Update the user's schedulable projects if the user changes. 
+    user() {
+      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+    }
   },
   methods: {
     displayUtcTime(time) {
