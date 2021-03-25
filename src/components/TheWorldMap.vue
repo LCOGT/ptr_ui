@@ -7,7 +7,7 @@
 <script>
 import nite from '@/utils/nite-overlay'
 import axios from 'axios'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 // import test1 from '@/utils/test';
 
 export default {
@@ -32,6 +32,7 @@ export default {
     
     const element = document.getElementById(this.mapName)
     const options = {
+      scrollwheel: false,
       zoom: 2,
       center: new google.maps.LatLng(sun_pos.lat, sun_pos.lng + 180),
       styles: [
@@ -404,7 +405,7 @@ export default {
     async redrawMapSites() {
       // Fetch the list of sites to display on the map
       let sitesOpenStatus = await this.getSiteOpenStatus()
-      let sites = this.sitesForMap.reverse()
+      let sites = this.all_sites.reverse()
 
       // For each site, draw a marker with a popup (on click) to visit the site.
       sites.forEach(site => {
@@ -431,28 +432,15 @@ export default {
   },
 
   watch: {
-    sitesForMap() {
+    all_sites() {
       this.redrawMapSites()
     }
   },
   
   computed: {
     ...mapState('site_config', ['global_config']),
-
-    sitesForMap() {
-      let sites = []
-      Object.keys(this.global_config).forEach(site => {
-        let s = {
-          "name":this.global_config[site].name.toString(),
-          "site":this.global_config[site].site.toString(),
-          "latitude":  parseFloat(this.global_config[site].latitude),
-          "longitude": parseFloat(this.global_config[site].longitude),
-        }
-        sites.push(s)
-      })
-      return sites
-    }
-  }
+    ...mapGetters('site_config', ['all_sites']),
+  },
 }
 </script>
 

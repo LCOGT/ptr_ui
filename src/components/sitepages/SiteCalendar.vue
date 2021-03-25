@@ -72,9 +72,8 @@ export default {
     window.moment = moment; // use moment lib in browser devtools
   },
   mounted() {
-
     // Load the users projects so they can add them to calendar events. 
-    if (this.user) {
+    if (this.$auth.isAuthenticated) {
       this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
     }
   },
@@ -82,7 +81,6 @@ export default {
     clearInterval(this.timeInterval);
   },
   watch: {
-
     // Update the user's schedulable projects if the user changes. 
     user() {
       this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
