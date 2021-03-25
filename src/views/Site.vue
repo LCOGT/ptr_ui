@@ -53,60 +53,6 @@
 
 
     <div class="columns main-page-content" >
-
-      <div class="column menu-column is-2 is-hidden-touch is-hidden-desktop-only" v-if="false">
-
-
-        <!-- Site menu for desktop or larger. Replaces bottom menu. -->
-        <b-menu class="subpage-menu">
-          <b-menu-list label="Menu">
-              <b-menu-item 
-                icon="home" 
-                label="Site Home" 
-                tag="router-link" 
-                :to="'/site/'+sitecode+'/home'"></b-menu-item>
-              <b-menu-item 
-                icon="telescope" 
-                tag="router-link"
-                :to="'/site/' + sitecode + '/observe'" 
-                label="Observe"></b-menu-item>
-              <b-menu-item 
-                icon="target" 
-                tag="router-link"
-                :to="'/site/' + sitecode + '/targets'" 
-                label="Target Explorer"></b-menu-item>
-              <b-menu-item 
-                icon="folder-multiple-image"
-                tag="router-link"
-                :to="'/site/' + sitecode + '/projects'" 
-                label="Projects"></b-menu-item>
-              <b-menu-item 
-                icon="calendar"
-                tag="router-link"
-                :to="'/site/' + sitecode + '/calendar'" 
-                label="Calendar"></b-menu-item>
-          </b-menu-list>
-        </b-menu>
-
-        <!-- List of online users -->
-        <div class="menu-label"> online users </div>
-        <ul class="online-users-list">
-          <li v-for="(user, idx) in displayedOnlineUsers"
-            v-bind:key="idx">
-              <!--b-icon icon="circle" size="is-small" type="is-success"/-->
-              <span style="font-weight:lighter;">{{user}}</span>
-          </li>
-        </ul>
-        
-        <!-- Chat module. Also feeds online users list. -->
-        <chat-module 
-          :sitecode="sitecode" 
-          :username="username"
-          @whosonline="makeOnlineUsersList" />
-
-        <div style="height:3em;"/>
-      </div>
-
       <!-- Primary content of the page. Selects from the various site subpages. -->
       <!-- Note: wait for parent (this component) to mount before loading child components. 
       Otherwise, props may initially load as null. -->

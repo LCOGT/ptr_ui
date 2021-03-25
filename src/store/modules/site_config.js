@@ -4,6 +4,7 @@
  */
 
 //import { API } from 'aws-amplify'
+import _ from 'lodash'
 import axios from 'axios'
 
 var initial_state = function() {
@@ -88,6 +89,20 @@ const getters = {
     weather: state => state.selected_weather,
     sequencer: state => state.selected_sequencer,
 
+    all_sites: state => {
+      let sites = []
+      Object.keys(state.global_config).forEach(site => {
+        let s = {
+          "name": state.global_config[site].name.toString(),
+          "site": state.global_config[site].site.toString(),
+          "latitude":  parseFloat(state.global_config[site].latitude),
+          "longitude": parseFloat(state.global_config[site].longitude),
+        }
+        sites.push(s)
+      })
+      sites = _.orderBy(sites, [s => s.site], ['asc'])
+      return sites
+    },
 
     /* Getters for specific device attributes (implemented here as needed) */
     focuser_reference: state => {
@@ -306,7 +321,7 @@ const actions = {
         let apiName = rootState.dev.active_api;
         let path = '/all/config/';
         return axios.get(apiName+path).then(response => {
-            console.log(response.data)
+            console.log('updated config: ',response.data)
             window.localStorage.setItem('global_config', JSON.stringify(response.data))
             //console.log(JSON.parse(window.localStorage.getItem('global_config')))
             commit('setGlobalConfig', response.data)

@@ -46,6 +46,7 @@
     "fabric": "^2.7.0",
     "isomorphic-ws": "^4.0.1",
     "jquery": "^3.5.1",
+    "lodash": "^4.17.15",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
     "npm-check": "^5.9.2",
