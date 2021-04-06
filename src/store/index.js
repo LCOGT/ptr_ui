@@ -12,7 +12,6 @@ import user_data from './modules/user_data'
 import calendar from './modules/calendar'
 import drawshapes from './modules/drawshapes'
 import sitestatus from './modules/sitestatus'
-
 import starprofile from './modules/analysistools/starprofile'
 
 Vue.use(Vuex)

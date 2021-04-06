@@ -1,4 +1,5 @@
 
+
 // initial state
 const state = {
   region_stats_loading: false,
