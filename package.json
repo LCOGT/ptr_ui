@@ -49,6 +49,7 @@
     "lodash": "^4.17.15",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
+    "normalizr": "^3.6.1",
     "npm-check": "^5.9.2",
     "perf_hooks": "0.0.1",
     "reconnecting-websocket": "^4.4.0",

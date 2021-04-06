@@ -22,114 +22,11 @@ export const status_mixin = {
     data() {
         return {
 
-            deviceStatus: {},
-
-            status_ws: '',
-
-            local_timestamp: Date.now(),
-            update_time_interval: '',
-
             display_colors: {
                 "red": "orangered",
                 "yellow": "yellow",
                 "green": "greenyellow",
             }
-        }
-    },
-
-    mounted() {
-
-        // Keep an updated timestamp to calculate the status age
-        this.update_time_interval = setInterval(() => this.local_timestamp = Date.now(), 1000)
-
-        // Connect to websocket to get state of devices/weather
-        let status_ws_url = 'wss://2q5zz6ppch.execute-api.us-east-1.amazonaws.com/dev'
-        status_ws_url += `?site=${encodeURIComponent(this.sitecode)}`
-        this.status_ws= new ReconnectingWebSocket(status_ws_url)
-        this.status_ws.onmessage = (message) => {
-        let data = JSON.parse(message.data);
-            let statusType = data.statusType
-            let status = data.status
-            let status_timestamp = data.server_timestamp_ms
-
-            status.server_timestamp_ms = data.server_timestamp_ms
-
-            if (statusType == "deviceStatus"){
-                this.deviceStatus = status
-            }
-        }
-        
-        // Load initial status
-        this.getSiteDeviceStatus()
-    },
-
-    beforeDestroy() {
-        clearInterval(this.update_time_interval)
-    },
-
-
-    methods: {
-
-        // Changes the site that the status websocket recieves updates for.
-        updateStatusSubscriptionSite(site) {
-            this.status_ws.send(JSON.stringify({"action": "updateSubscriberSite", "site": site}))
-        },
-
-        async getSiteDeviceStatus() {
-            let url = `https://status.photonranch.org/status/${this.sitecode}/device_status`
-            let response = await axios.get(url)
-            let status = response.data.Item.status
-            status.server_timestamp_ms = response.data.Item.server_timestamp_ms
-            this.deviceStatus = status
-
-        },
-
-        decimalToHHMMSS(time) {
-            // prevent return value of NaN:NaN:NaN
-            if (typeof parseFloat(time) != "number") {return '--:--:--'}
-
-            // -1.00 should translate to -01:00:00
-            let negative = false;
-            if (parseFloat(time) < 0) { negative = true }
-            time = Math.abs(time)
-
-            let hhmmss = ''
-            let h, m, s;
-            h = parseInt(time)
-            m = parseInt(60 * (time - h))
-            s = parseInt(3600 * (time - h) % 60)
-            if (h<10) { h = '0'+h}
-            if (m<10) { m = '0'+m}
-            if (s<10) { s = '0'+s}
-            if (negative) {h = '-'+h}
-            hhmmss = `${h}:${m}:${s}`
-            return hhmmss
-        },
-        parseTrueFalse(s) {
-            if (undefined == s) { 
-                return false; 
-            }
-            if (typeof s === "boolean") {
-                return s
-            }
-            else if (s.toLowerCase()=="true") {return true}
-            else if (s.toLowerCase()=="false") {return false}
-            console.error("Could not parse true or false. Check for bad behavior.")
-            console.log(s)
-            return false
-        },
-
-
-    },
-
-    watch: {
-        site() {
-
-            // Change status subscriptions to the new site
-            this.updateStatusSubscriptionSite(this.sitecode)
-
-            // Get status for the new site.
-            this.getSiteDeviceStatus()
         }
     },
 
@@ -281,20 +178,6 @@ export const status_mixin = {
             return status
         },
 
-
-        ...mapGetters('site_config', [
-            'site_config',
-            'enclosure',
-            'mount',
-            'telescope',
-            'camera',
-            'filter_wheel',
-            'focuser',
-            'rotator',
-            'screen',
-            'weather',
-        ]),
-
         status_age_display() {
             if (this.status_age < 60) { 
                 return {
@@ -333,10 +216,6 @@ export const status_mixin = {
                 }
             }
         },
-        status_age() {
-            let status_timestamp = this.deviceStatus.server_timestamp_ms
-            return parseFloat(((this.local_timestamp - status_timestamp)/1000).toFixed(1))
-        },
         status_age_days() {
             let timestring = ''
             let days = parseInt(this.status_age / 86400)
@@ -365,351 +244,74 @@ export const status_mixin = {
             return parseInt(this.status_age) + 's '
         },
 
-        /**
-         * Enclosure status
-         */
-        enclosure_state() {
-            try {
-                return this.deviceStatus.enclosure[this.enclosure] || {}
-            } catch { return {} }
-        },
-        enclosure_status() {
-            return (this.enclosure_state.shutter_status || this.enclosure_state.roof_status || '-')
-        },
-        enclosure_mode() {
-            return (this.enclosure_state.enclosure_mode || '-')
-        },
+        ...mapState('sitestatus', {
+          "deviceStatus": status
+        }),
+        ...mapGetters('sitestatus', [
 
-        /**
-         * Weather status
-         */
-        weather_state() {
-            try {
-                return this.deviceStatus.observing_conditions[this.weather] || {}
-            } catch { return {} }
-        },
-        weather_ok() {
-            let color = this.display_colors.red
-            let val = this.weather_state.wx_ok || '-'
-            if (val == "Yes") { color = this.display_colors.green }
+          'status_age',
 
-            return {
-                "val": val,
-                "color": color
-            }
-        },
-        open_ok() {
-            let color = this.display_colors.red
-            let val = this.weather_state.open_ok || '-'
-            if (val == "Yes") { color = this.display_colors.green }
+          'enclosure_state', 
+          'enclosure_status',
+          'enclosure_mode',
+          
+          'weather_state',
+          'weather_ok',
+          'open_ok',
+          'sky_temp',
+          'air_temp',
+          'humidity',
+          'dewpoint',
+          'wind',
+          'surface',
+          'ambient',
+          'meas_sky_mpsas',
+          'calc_sky_mpsas',
 
-            return {
-                "val": val,
-                "color": color
-            }
-        },
-        sky_temp() {
-            return (this.weather_state.sky_temp_C || '-') + ' °C'
-        },
-        air_temp() {
-            return (this.weather_state.temperature_C || '-') + ' °C'
-        },
-        humidity() {
-            return (this.weather_state['humidity_%'] || '-') + ' %'
-        },
-        dewpoint() {
-            return (this.weather_state.dewpoint_C || '-') + ' °C'
-        },
-        wind() {
-            return (this.weather_state['wind_m/s'] || '-') + ' m/s'
-        },
-        surface() {
-            return (this.weather_state.calc_HSI_lux || '-') + ' lux'
-        },
-        ambient() {
-            return (this.weather_state.ambient_light || '-') 
-        },
-        meas_sky_mpsas() {
-            return (this.weather_state.meas_sky_mpsas || '-')
-        },
-        calc_sky_mpsas() {
-            return (this.weather_state.calc_sky_mpsas || '-')
-        },
+          'mount_state',
+          'mount_is_slewing',
+          'mount_is_parked',
+          'mount_is_tracking',
+          'mount_activity',
 
+          'telescope_state',
+          'ra',
+          'dec',
+          'azimuth',
+          'altitude',
+          'sidereal_time',
+          'zenith_distance',
+          'airmass',
+          'refraction',
+          'hour_angle',
 
-        /**
-         * Mount state
-         */
-        mount_state() {
-            try {
-                return this.deviceStatus.mount[this.mount]
-            } catch { return {} }
-        },
-        mount_is_slewing() {
-            return (this.mount_state.is_slewing || '-')
-        },
-        mount_is_parked() {
-            return (this.mount_state.is_parked || '-')
-        },
-        mount_is_tracking() {
-            return (this.mount_state.is_tracking|| '-')
-        },
-        mount_activity() {
-            let activity = "idle"
+          'camera_state',
+          'camera_status',
 
-            if (!this.mount_state) {return "offline"}
+          'filter_wheel_state',
+          'filter_wheel_moving',
+          'filter_name',
 
-            if (this.parseTrueFalse(this.mount_state.is_parked)) {
-                activity = "parked"
-            }
-            else if (this.parseTrueFalse(this.mount_state.is_tracking)) {
-                activity = "tracking"
-            }
-            else if (this.parseTrueFalse(this.mount_state.is_slewing)) {
-                activity = "slewing"
-            }
-            return activity
-        },
+          'focuser_state',
+          'focus_position',
+          'focus_comp',
+          'focus_filter_offset',
+          'focus_temperature',
+          'focus_moving',
 
+          'rotator_state',
+          'rotator_position',
+          'rotator_moving',
 
-        /**
-         * Telescope state
-         */
-        telescope_state() {
-            try {
-                return this.deviceStatus.telescope[this.telescope]
-            } catch(error) { return {} }
-        },
-        ra() {
-            if (this.telescope_state && 'right_ascension' in this.telescope_state) {
-                return (parseFloat(this.telescope_state.right_ascension).toFixed(4) || '-')
-            } else {
-                return '-'
-            }
-        },
-        dec() {
-            if (this.telescope_state && 'declination' in this.telescope_state) {
-                return (parseFloat(this.telescope_state.declination).toFixed(4) || '-')
-            } else {
-                return '-'
-            }
-        },
-        azimuth() {
-            if (this.telescope_state && 'azimuth' in this.telescope_state) {
-                return this.telescope_state.azimuth
-            } else {
-                return '-'
-            }
-        },
-        altitude() {
-            if (this.telescope_state && 'altitude' in this.telescope_state) {
-                return (this.telescope_state.altitude || '-')
-            } else {
-                return '-'
-            }
-        },
-        sidereal_time() {
-            if (this.telescope_state && 'sidereal_time' in this.telescope_state ){
-                return (parseFloat(this.telescope_state.sidereal_time) || '-')
-            } else {
-                return '-'
-            }
-        },
-        zenith_distance() {
-            if (this.telescope_state && 'zenith_distance' in this.telescope_state ){
-                return (this.telescope_state.zenith_distance || '-')
-            } else {
-                return '-'
-            }
-        },
-        airmass() {
-            if (this.telescope_state && 'airmass' in this.telescope_state ){
-                return (this.telescope_state.airmass|| '-')
-            } else {
-                return '-'
-            }
-        },
-        refraction() {
-            if (this.telescope_state && 'refraction' in this.telescope_state ){
-                return (this.telescope_state.refraction || '-')
-            } else {
-                return '-'
-            }
-        },
-        hour_angle() {
-            if (this.telescope_state 
-                    && "right_ascension" in this.telescope_state 
-                    && "sidereal_time" in this.telescope_state) {
-                let ha = this.telescope_state.sidereal_time - this.telescope_state.right_ascension
-                if (ha < -12) {
-                    ha += 24 // hours, since we're in decimal
-                }
-                ha = ha.toFixed(3)
-                if (ha > 0) {
-                    ha = '+'+ha
-                }
-                return ha
-            }
-            else { return '-' }
-        },
+          'screen_state',
+          'screen_status',
+          'screen_bright_setting',
 
+          'sequencer_state',
+          'active_script',
+          'sequencer_busy',
 
-
-
-        /**
-         * Camera state
-         */
-        camera_state() {
-            try {
-                return this.deviceStatus.camera[this.camera]
-            } catch(error) { return {} }
-        },
-        camera_status() {
-            try {
-                return this.camera_state.status || '-'
-            } catch(error) { return '-' }
-        },
-
-
-
-
-        /**
-         * Filter Wheel state
-         */
-        filter_wheel_state () {
-            try {
-                return this.deviceStatus.filter_wheel[this.filter_wheel]
-            } catch(error) { return {} }
-        },
-        filter_name() {
-            if (this.filter_wheel_state && 'filter_name' in this.filter_wheel_state){
-                return (this.filter_wheel_state.filter_name|| '-')
-            } else {
-                return '-'
-            }
-        },
-        filter_wheel_moving() {
-            if (this.filter_wheel_state && 'wheel_is_moving' in this.filter_wheel_state){
-                return this.parseTrueFalse(this.filter_wheel_state.wheel_is_moving) ? "moving":"idle"
-            } else {
-                return '-'
-            }
-        },
-
-
-        /**
-         * Focuser state
-         */
-        focuser_state() {
-            try {
-                return this.deviceStatus.focuser[this.focuser]
-            } catch(error) { return {} }
-        },
-        focus_position() {
-            if (this.focuser_state && 'focus_position' in this.focuser_state){
-                return this.focuser_state.focus_position + " μm"
-            } else {
-                return '-'
-            }
-        },
-        focus_comp() {
-            if (this.focuser_state && 'comp' in this.focuser_state){
-                return String(this.focuser_state.comp) + " μm"
-            } else {
-                return '-'
-            }
-        },
-        focus_filter_offset() {
-            if (this.focuser_state && 'filter_offset' in this.focuser_state){
-                return this.focuser_state.filter_offset + " μm"
-            } else {
-                return '-'
-            }
-        },
-        focus_temperature() {
-            if (this.focuser_state && 'focus_temperature' in this.focuser_state){
-                return this.focuser_state.focus_temperature + " ℃"
-            } else {
-                return '-'
-            }
-        },
-        focus_moving() {
-            if (this.focuser_state && 'focus_moving' in this.focuser_state){
-                return this.parseTrueFalse(this.focuser_state.focus_moving) ? "moving" : "idle"
-            } else {
-                return '-'
-            }
-        },
-
-        /**
-         * Rotator state
-         */
-        rotator_state() {
-            try {
-                return this.deviceStatus.rotator[this.rotator]
-            } catch(error) { return {} }
-        },
-        rotator_position() {
-            if (this.rotator_state && 'position_angle' in this.rotator_state){
-                return this.rotator_state.position_angle + "°"
-            } else {
-                return '-'
-            }
-        },
-        rotator_moving() {
-            if (this.rotator_state && 'rotator_moving' in this.rotator_state){
-                return this.parseTrueFalse(this.rotator_state.rotator_moving) ? "rotating" : "idle"
-            } else {
-                return '-'
-            }
-        },
-
-        /**
-         * Screen state
-         */
-        screen_state () {
-            try {
-                return this.deviceStatus.screen[this.screen]
-            } catch(error) { return {} }
-        },
-        screen_status() {
-            if (this.screen_state && 'dark_setting' in this.screen_state){
-                return this.screen_state.dark_setting.split(' ')[2]
-            } else {
-                return '-'
-            }
-        },
-        screen_bright_setting() {
-            if (this.screen_state && 'bright_setting' in this.screen_state){
-                return this.screen_state.bright_setting + ' %'
-            } else {
-                return '-'
-            }
-        },
-
-        /**
-         * Sequencer state
-         */
-        sequencer_state () {
-            try {
-                return this.deviceStatus.sequencer
-            } catch(error) { return {} }
-        },
-        active_script() {
-            if (this.sequencer_state && 'active_script' in this.sequencer_state){
-                return this.sequencer_state.active_script
-            } else {
-                return '-'
-            }
-        },
-        sequencer_busy() {
-            if (this.sequencer_state && 'sequencer_busy' in this.sequencer_state){
-                return this.sequencer_state.sequencer_busy
-            } else {
-                return '-'
-            }
-        },
+        ]),
     },
-
 
 }
