@@ -7,7 +7,7 @@
 <script>
 import nite from '@/utils/nite-overlay'
 import axios from 'axios'
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 // import test1 from '@/utils/test';
 
 export default {
@@ -397,19 +397,24 @@ export default {
       return 'yellow'
     },
 
-    async getSiteOpenStatus() {
-      let resp = await axios.get(`https://status.photonranch.org/status/allopenstatus`)
-      return resp.data
-    },
+    //async getSiteOpenStatus() {
+      //this.$store.dispatch('sitestatus/getSiteOpenStatus')
+      //let resp = await axios.get(`https://status.photonranch.org/status/allopenstatus`)
+      //return resp.data
+    //},
 
     async redrawMapSites() {
       // Fetch the list of sites to display on the map
-      let sitesOpenStatus = await this.getSiteOpenStatus()
+      await this.$store.dispatch('sitestatus/getSiteOpenStatus')
       let sites = this.all_sites.reverse()
 
       // For each site, draw a marker with a popup (on click) to visit the site.
       sites.forEach(site => {
-        let icon_color = this.getSiteMapColor(sitesOpenStatus[site.site])
+
+        // Skip if the site doesn't have any status available
+        if (!Object.keys(this.site_open_status).includes(site.site)) { return }
+
+        let icon_color = this.getSiteMapColor(this.site_open_status[site.site])
         var marker = new google.maps.Marker({
           position: { lat: site.latitude, lng: site.longitude },
           map: this.map,
@@ -419,7 +424,7 @@ export default {
           title: site.name,
         })
         let siteInfoWindow = new google.maps.InfoWindow({
-          content: this.renderSiteContent(site.name, site.site, sitesOpenStatus[site.site])
+          content: this.renderSiteContent(site.name, site.site, this.site_open_status[site.site])
         })
         this.infoWindows.push(siteInfoWindow)
         marker.addListener('click', () => {
@@ -440,6 +445,8 @@ export default {
   computed: {
     ...mapState('site_config', ['global_config']),
     ...mapGetters('site_config', ['all_sites']),
+    ...mapState('sitestatus', ['site_open_status']),
+    ...mapActions('sitestatus', ['getSiteOpenStatus']),
   },
 }
 </script>

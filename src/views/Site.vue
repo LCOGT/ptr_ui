@@ -128,7 +128,7 @@ export default {
       // Websocket for status updates
       status_ws: '',
 
-      deviceStatus: {
+      //deviceStatus: {
         /*
         mount: {},
         telescope: {},
@@ -141,7 +141,7 @@ export default {
         observingConditions: {},
         timestamp: {},
         */
-      },
+      //},
 
       flatSampleStatuss: [
           {"name": "enclosure", "val": "open"},
@@ -152,13 +152,12 @@ export default {
           {"name": "age", "val": "seconds"},
       ],
 
-      current_time_millis: moment().valueOf(),
-      current_time_millis_updater: '', // setInterval object
-
     }
   },
 
   async created () {
+    this.$store.dispatch('sitestatus/openStatusConnection')
+    this.$store.dispatch('sitestatus/updateSite', this.sitecode)
 
     this.$store.commit('site_config/setActiveSite', this.sitecode)
 
@@ -180,17 +179,14 @@ export default {
         this.$store.dispatch('images/update_new_image', base_filename)
       });
     }
-
-    // Update current_time_millis every second. For reservation countdown. 
-    this.current_time_millis_updater = setInterval(() => {
-      this.current_time_millis = moment().valueOf()
-    }, 1000)
+    
 
   },
 
   beforeDestroy() {
     this.$store.dispatch('site_config/remove_active_site')
-    clearTimeout(this.current_time_millis)
+    this.$store.dispatch('sitestatus/closeStatusConnection')
+
   },
 
   // Make sure that the props change when switching from /site/saf/observe to /site/wmd/observe
@@ -198,6 +194,7 @@ export default {
     sitecode() {
 
       this.$store.commit('site_config/setActiveSite', this.sitecode)
+      this.$store.dispatch('sitestatus/updateSite', this.sitecode)
 
       this.setDefaultDevices()
 
@@ -216,6 +213,7 @@ export default {
   },
 
   async mounted() {
+    console.log('site mounted')
 
     // Update timestamp every second (sent with command)
     setInterval(() => {
@@ -223,6 +221,7 @@ export default {
     }, 1000)
 
     this.siteIsMounted = true; // child components are ready to render now
+
   },
 
   computed: {
@@ -252,6 +251,7 @@ export default {
   },
 
   methods: {
+
     // Format the displayed list of online users
     makeOnlineUsersList(listOfUsers) {
       let theList = new Set(listOfUsers) // Remove duplicates

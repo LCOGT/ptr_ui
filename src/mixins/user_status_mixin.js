@@ -120,7 +120,6 @@ export const user_status_mixin = {
 
         /** Websocket Connections **/
         connect_to_logs_ws(site) {
-            console.log('connecting to user status websocket with site ', site)
 
             if (!site) return;
 
