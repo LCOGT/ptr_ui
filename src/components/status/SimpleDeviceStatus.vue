@@ -6,7 +6,9 @@
         </div> 
         <table>
             <tr v-for="(value,name) in device_status" v-bind:key="name">
-            <td>  {{name}}:  </td><td>{{value}}</td>
+            <td>  {{name}}:  </td>
+            <td v-if="typeof value == 'boolean'" style="text-transform: capitalize;"> {{value}}</td>
+            <td v-else> {{value}} </td>
             </tr>
         </table>
     </section>
