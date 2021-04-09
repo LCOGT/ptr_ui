@@ -91,6 +91,7 @@ const getters = {
 
     all_sites: state => {
       let sites = []
+      console.log(Object.keys(state.global_config))
       Object.keys(state.global_config).forEach(site => {
         let s = {
           "name": state.global_config[site].name.toString(),
