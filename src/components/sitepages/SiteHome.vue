@@ -22,11 +22,11 @@
 
     <!-- This is a temporary solution only. Does not scale. -->
     <!-- Add ClearDarkSky charts to site homepage -->
-    <div class="level" v-if="sitecode=='wmd'">
+    <div class="level" v-if="sitecode.toLowerCase()=='mrc'">
         <a href=https://www.cleardarksky.com/c/SaBarbCAkey.html>
         <img src="https://www.cleardarksky.com/c/SaBarbCAcsk.gif?c=1594801"></a>
     </div>
-    <div class="level" v-if="sitecode=='saf'">
+    <div class="level" v-if="sitecode.toLowerCase()=='saf'">
         <a href=https://www.cleardarksky.com/c/LmyRdgObNMkey.html>
         <img src="https://www.cleardarksky.com/c/LmyRdgObNMcsk.gif?c=1594801"></a>
     </div>
