@@ -1,10 +1,32 @@
 <template>
   <div class="site-home-wrapper">
 
-    <div class="level site-welcome-text">
+    <div class="level site-welcome-text mt-5">
         <div class="level-item">
         Welcome to {{sitecode.toUpperCase()}}
         </div>
+    </div>
+
+    <div v-if="'site_in_automatic' in mount_state" style="display: flex">
+      <div style="margin-left: 1rem; color: grey;">Site mode: </div>
+      <div style=" margin-left: 1rem;">{{mount_state.site_in_automatic ? "Auto" : "Manual"}}</div>
+      <div style="flex-grow: 1; max-width: 50px;"></div>
+      <command-button 
+        admin
+        class="is-small"
+        v-if="'site_in_automatic' in mount_state && mount_state.site_in_automatic" 
+        :data="site_manual_command" 
+        :disabled="!userIsAdmin"
+        style="margin-bottom: 1em; width:50%;" 
+        />
+      <command-button 
+        admin
+        class="is-small"
+        v-if="'site_in_automatic' in mount_state && !mount_state.site_in_automatic" 
+        :data="site_automatic_command" 
+        style="margin-bottom: 1em; width:50%;" 
+        :disabled="!userIsAdmin"
+        />
     </div>
 
     <div class="spacer" style="height: 2em;" />
@@ -44,16 +66,20 @@ import TheDeviceSelectors from '@/components/TheDeviceSelectors'
 import TheDomeCam from '@/components/TheDomeCam'
 import { mapGetters } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
+import { status_mixin } from '../../mixins/status_mixin'
+import { user_mixin } from '../../mixins/user_mixin'
 import LeafletMap from '@/components/LeafletMap'
 import SiteEventsModal from '@/components/SiteEventsModal'
+import CommandButton from '@/components/CommandButton'
 import moment from 'moment'
 import axios from 'axios'
 
 export default {
     name: "SiteHome",
     props: ["deviceStatus", "sitecode"],
-    mixins: [commands_mixin],
+    mixins: [commands_mixin, status_mixin, user_mixin],
     components: {
+        CommandButton, 
         TheDeviceSelectors,
         TheDomeCam,
         LeafletMap,
