@@ -87,6 +87,7 @@ export const commands_mixin = {
                     instance: device,
                     user_name: this.username,
                     user_id: this.user_id,
+                    user_roles: this.user_roles, 
                     timestamp: parseInt(Date.now() / 1000),
                     action: action,
                     required_params: req_params || {},
@@ -298,6 +299,15 @@ export const commands_mixin = {
             else {
                 return 'anonymous'
             }
+        },
+        user_roles() {
+          try {
+            let user = this.$auth.user 
+            let roles = user['https://photonranch.org/user_metadata'].roles
+            return roles
+          } catch {
+            return []
+          }
         },
 
         // The `selected_${device}` computed properties are used for two way
