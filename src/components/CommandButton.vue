@@ -1,12 +1,12 @@
 <template>
-    <a 
+    <button 
         class="button" 
         v-on:click="handleClick" 
         v-bind:class="{ 'is-loading': isLoading, 'is-admin': admin }"
         :disabled="isDisabled"
         >
         <slot name="title"> {{ data.name }} </slot>
-    </a>
+    </button>
 </template>
 
 <script>

@@ -64,6 +64,7 @@ export default {
     }
   },
   mounted() {
+    console.log(this.sites)
     this.updateAllSiteImages()
 
     // Draw observatories with colors to denote weather/open status
