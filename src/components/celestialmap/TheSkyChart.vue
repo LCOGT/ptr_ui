@@ -16,11 +16,13 @@
 import Celestial from '@/components/celestialmap/celestial'
 import mapConfigs from '@/components/celestialmap/mapConfigs'
 import helpers from '@/utils/helpers'
+import { status_mixin } from '@/mixins/status_mixin'
 import { mapGetters } from 'vuex'
 
 export default {
     name: 'TheSkyChart',
-    props: ["deviceStatus"],
+    //props: ["deviceStatus"],
+    mixins: [status_mixin],
     data () {
         return {
             mapClickedX: -1,
@@ -102,7 +104,7 @@ export default {
                 Celestial.container.selectAll(".point").each(function(d) {
                     //Celestial.setStyle(style.crosshair_style);
                     var p_coords = ([helpers.hour2degree(0), 0]);
-                    var t_coords = ([helpers.hour2degree(this.mountRa), this.mountDec]);
+                    var t_coords = ([helpers.hour2degree(this.ra), this.dec]);
                     // Limit selectable regions to coordinates on the map with Celestial.clip().
                     if (Celestial.clip(p_coords)) {
                         p_coords = Celestial.mapProjection(p_coords);
@@ -263,7 +265,7 @@ export default {
                 // However, crosshairs are updated by themselves so an entire repaint is avoided.
                 Celestial.setStyle(styles.crosshair);
                 var p_coords = ([helpers.hour2degree(that.selectedRa), that.selectedDec]);
-                var t_coords = ([helpers.hour2degree(that.mountRa), that.mountDec]);
+                var t_coords = ([helpers.hour2degree(that.ra), that.dec]);
                 // Limit selectable regions to coordinates on the map with Celestial.clip().
                 if (Celestial.clip(p_coords)) {
                     //Celestial.Canvas.symbol()
@@ -399,34 +401,11 @@ export default {
         ]),
 
         all_mount_state() {
-            return this.deviceStatus.mount
+            return this.mount_state
         },
         all_telescope_state() {
-            return this.deviceStatus.telescope
+            return this.telescope_state
         },
-        //site_latitude() {
-            //return this.siteConfig.latitude
-        //},
-        //site_longitude() {
-            //return this.siteConfig.longitude
-        //},
-
-        mountRa () {
-            try {
-                let ra = this.all_telescope_state[this.active_telescope].right_ascension
-                return parseFloat(ra)
-            } catch {
-                return -1
-            }
-        }, 
-        mountDec () {
-            try {
-                let dec = this.all_telescope_state[this.active_telescope].declination
-                return parseFloat(dec)
-            } catch {
-                return -1
-            }
-        }, 
 
         // mount command parameters
         cmd_ra: {
