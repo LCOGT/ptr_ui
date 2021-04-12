@@ -65,29 +65,18 @@ const router = new VueRouter({
       path: '/site/:sitecode/:subpage',
       name: 'site',
       component: site,
-      props: true,
+      props: route => {
+        return {
+          sitecode: route.params.sitecode.toLowerCase(),
+          subpage: route.params.subpage.toLowerCase()
+        }
+      }
       //beforeEnter: authGuard,
     },
   ]
 })
 
 export default router
-
-//router.afterEach(async (to, fVrom, next) => {
-  ////window.location.reload(true)
-  //axios({
-    //method: 'get',
-    //url: '/manifest.json',
-    //contentType:    'application/json; charset=utf-8',
-    //dataType:       'json',
-    //cache:          false
-  //}).then((data, textStatus, jqxhr)=>{
-    //console.log(data)
-    //console.log(data.headers.value)
-    //console.log(textStatus)
-    //console.log(jqxhr)
-  //})
-//})
 
 //router.beforeEach(async (to, from , next) => {
   //if(to.meta.requiresAuth) {
