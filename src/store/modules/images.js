@@ -110,7 +110,7 @@ const actions = {
         // No need to get the latest if the new image is from a different site.
         let site = rootState.site_config.selected_site;
         // Get the image's site of origin from the beginning of the filename.
-        let image_site_origin = new_base_filename.substr(0,3) 
+        let image_site_origin = new_base_filename.split('-')[0]
         if (site != image_site_origin) {
             return;
         }
