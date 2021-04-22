@@ -129,6 +129,8 @@
             mount_screenflat_command,
             mount_skyflat_command,
             mount_home_command,
+            mount_ngp_command,
+            mount_sgp_command,
             mount_park_command,
             mount_raSidDec0_command,
             mount_stop_command,

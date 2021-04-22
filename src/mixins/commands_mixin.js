@@ -484,6 +484,14 @@ export const commands_mixin = {
         mount_tracking_off_command() {
             return this.base_command( 'mount', 'set_tracking_off', 'Stop Tracking' )
         },
+        mount_ngp_command () {
+            // slew to the north galactic pole
+            return this.base_command( 'mount', 'move_to_ngp', 'North Galactic Pole' )
+        },
+        mount_sgp_command () {
+            // slew to the south galactic pole
+            return this.base_command( 'mount', 'move_to_sgp', 'South Galactic Pole' )
+        },
         mount_park_command () {
             return this.base_command( 'mount', 'park', 'park' )
         },
