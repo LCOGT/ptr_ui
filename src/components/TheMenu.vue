@@ -147,13 +147,14 @@ export default {
       const status_age_online = 300 // max number of seconds to be considered online
       let status
       try { 
-        console.log(site)
         status = this.site_open_status[site]
-        console.log(status)
       } catch {
         return 'no-status'
       }
-      console.log(status.status_age_s)
+
+      if (status === undefined) {
+        return 'no-status'
+      }
 
       if (parseFloat(status.status_age_s) > status_age_online) { return 'no-status' }
       if (!status.hasWeatherStatus) { return 'status-blue'}
