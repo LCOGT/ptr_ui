@@ -54,11 +54,11 @@
     </div>
 
 
-    <div v-if="'site_in_automatic' in mount_state" style="display: flex">
+    <div v-if="mount_state && 'site_in_automatic' in mount_state" style="display: flex">
       <command-button 
         admin
         class="is-small"
-        v-if="'site_in_automatic' in mount_state && mount_state.site_in_automatic" 
+        v-if="mount_state && 'site_in_automatic' in mount_state && mount_state.site_in_automatic" 
         :data="site_manual_command" 
         :disabled="!userIsAdmin"
         style="margin-bottom: 1em; width:50%;" 
@@ -66,7 +66,7 @@
       <command-button 
         admin
         class="is-small"
-        v-if="'site_in_automatic' in mount_state && !mount_state.site_in_automatic" 
+        v-if="mount_state && 'site_in_automatic' in mount_state && !mount_state.site_in_automatic" 
         :data="site_automatic_command" 
         style="margin-bottom: 1em; width:50%;" 
         :disabled="!userIsAdmin"
