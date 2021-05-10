@@ -721,7 +721,6 @@ $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-w
   padding-left: 2em;
   grid-area: image;
   height: 100%;
-  max-height: $visible-content-height;
   width: 100%;
   display: grid;
   grid-template-rows: $infobar-height auto $thumbnails-height 80px 1fr;
@@ -730,6 +729,10 @@ $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-w
 
   @include fullhd {
     max-width: calc(#{$visible-content-height} * 0.85);
+  }
+
+  .image-info-bar {
+    max-width: 100%;
   }
 }
 

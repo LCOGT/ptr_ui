@@ -62,11 +62,12 @@ export default {
   background-color: #1e2223;
   display: grid;
   grid-template-rows: 1fr 1fr;
-  grid-template-columns:  90px 220px 1fr repeat(2, 120px);
+  grid-template-columns:  1fr 2fr 0.5fr 1fr 1fr;
   grid-template-areas: 'site exptime . ra dec'
                        'filter-used obstime . airmass altitude';
   grid-column-gap: 10px;
   padding: 1px 3px;
+  font-size: 9pt;
   
   .image-info-bar-item {
     text-align: left;

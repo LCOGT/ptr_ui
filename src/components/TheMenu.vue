@@ -17,7 +17,7 @@
 
         <template slot="start">
 
-            <b-navbar-dropdown label="sites" :close-on-click="true">
+            <b-navbar-dropdown label="sites" :close-on-click="true" @click.native="updateSiteStatus"> 
                 <template v-for="(site, index) in available_sites">
                   <b-navbar-item tag="router-link" 
                     :to="{ path: '/site/' + site+ '/observe'}"
@@ -139,12 +139,24 @@ export default {
       }).then($router.go)
     },
 
+    updateSiteStatus() {
+      console.log('hello')
+      this.$store.dispatch('sitestatus/getSiteOpenStatus')
+    },
     siteOnlineClass(site) {
       const status_age_online = 300 // max number of seconds to be considered online
-      const status = this.site_open_status[site]
+      let status
+      try { 
+        console.log(site)
+        status = this.site_open_status[site]
+        console.log(status)
+      } catch {
+        return 'no-status'
+      }
+      console.log(status.status_age_s)
 
       if (parseFloat(status.status_age_s) > status_age_online) { return 'no-status' }
-      if (!status.hasWeatherStatus) { return 'status-yellow'}
+      if (!status.hasWeatherStatus) { return 'status-blue'}
       if (status.weather_ok && status.open_ok) {return 'status-green'}
       if (status.weather_ok || status.open_ok) {return 'status-yellow'}
       return 'status-yellow'
@@ -180,6 +192,12 @@ nav {
   padding-right: 3px;
   font-size: 10px;
   color: yellow;
+}
+.status-blue {
+  opacity: 0.8;
+  padding-right: 3px;
+  font-size: 10px;
+  color: lightskyblue;
 }
 .no-status {
   padding-right: 3px;

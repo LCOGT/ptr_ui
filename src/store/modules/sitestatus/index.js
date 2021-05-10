@@ -235,6 +235,7 @@ const actions = {
   async getSiteOpenStatus({commit, rootState }) {
     const url = rootState.dev.status_endpoint + '/allopenstatus'
     const response = await Axios.get(url)
+    console.log(response.data)
     commit('siteOpenStatus', response.data)
   },
 
@@ -270,7 +271,7 @@ const actions = {
   },
 
   // Keeps track of current time, used to calculate the status age. 
-  startClock({commit}) {
+  startClock({commit, dispatch}) {
     setInterval(() => {
       let now = Date.now()
       commit('updateLocalClock', now)
