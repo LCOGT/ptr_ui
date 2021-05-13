@@ -3,11 +3,10 @@
   <div class="instrument-control-wrapper">
 
     <b-field>
-      <b-select v-model="selector_position">
-        <option :value="0">Main Cam</option>
-        <option :value="1">Hi-res spectograph</option>
-        <option :value="2">Planet Cam</option>
-        <option :value="3">Low-res Spectograph</option>
+      <b-select v-model="selector_position" >
+        <template v-for="(inst, idx) in selector_config.instruments">
+          <option :value="idx" :key="idx">{{inst}}</option> 
+        </template>
       </b-select>
     </b-field>
 
@@ -16,6 +15,7 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
+import { mapState } from 'vuex'
 import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
@@ -38,6 +38,15 @@ export default {
     sitecode() {
       return this.$route.params.sitecode
     },
+    ...mapState('site_config', ['selected_selector']),
+
+    selector_config() {
+      let conf = this.$store.state.site_config.global_config[this.sitecode].selector[this.$store.state.site_config.selected_selector]
+      console.log(conf)
+      return conf
+    },
+
+
     selector_position: {
       get() { return this.$store.getters['command_params/selector_position'] },
       set(val) { 

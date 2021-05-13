@@ -125,8 +125,8 @@
 
     <br>
     <div class="buttons has-addons">
-      <command-button :data="camera_expose_command" style="width: 70%" class="is-small"/>
-      <command-button :data="camera_cancel_command" style="width: 30%" class="is-small"/>
+      <command-button :data="camera_expose_command" style="width: 70%; z-index=50;" class="is-small is-success is-outlined"/>
+      <command-button :data="camera_cancel_command" style="width: 30%" class="is-small is-outlined"/>
     </div>
 
     <br>

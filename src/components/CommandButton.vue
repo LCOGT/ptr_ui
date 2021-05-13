@@ -12,6 +12,7 @@
 <script>
 import axios from 'axios'
 import { mapGetters } from 'vuex'
+import { commands_mixin } from '@/mixins/commands_mixin'
 
 export default {
     props: {
@@ -24,6 +25,7 @@ export default {
             type: Boolean,
         },
     },
+    mixins: [commands_mixin],
     data () {
         return {
             isLoading: false,
@@ -31,56 +33,6 @@ export default {
     },
     methods: {
 
-        async getAuthHeader() {
-            let token, configWithAuth;
-            try {
-                token = await this.$auth.getTokenSilently(); 
-            } catch(err) {
-                console.error(err)
-                console.warn('Did not acquire the needed token. Stopping request.')
-                
-                // small popup notification
-                this.$buefy.toast.open({
-                    duration: 5000,
-                    message: "Oops! You need to be logged in to do that.",
-                    position: 'is-bottom',
-                    type: 'is-danger' ,
-                })
-                //return {}
-            }
-
-            return {
-                'headers': {
-                    'Content-Type': 'application/json;charset=UTF-8',
-                    'Access-Control-Allow-Origin': '*',
-                    'Authorization': `Bearer ${token}`
-                }
-            }
-        },
-
-        handleNotAuthorizedResponse(error) {
-            if (error.response) {
-                // Request made and server responded
-                console.log("error message", error.response.data);
-                console.log("error status", error.response.status);
-                console.log("error headers", error.response.headers);
-                // small popup notification describing error
-                this.$buefy.toast.open({
-                    duration: 5000,
-                    message: `${error.response.status} error: ${error.response.data}`,
-                    position: 'is-bottom',
-                    type: 'is-danger' ,
-                })
-            } else if (error.request) {
-                // The request was made but no response was received
-                console.warn("The request was made but no response was received.")
-                console.log(error.request);
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.warn("Something happened in setting up the request that triggered an error.")
-                console.log('Error', error.message);
-            }
-        },
 
         async handleClick () {
 

@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
   Camera, Sequencer, Settings, } from '@/components/InstrumentControls'
 
@@ -45,22 +46,6 @@ export default {
     Sequencer,
     Settings,
   },
-  data() {
-    return {
-      instruments: [
-        'Enclosure',
-        'Screen', 
-        'Telescope',
-        'Rotator',
-        'Focuser',
-        'InstrumentSelector',
-        'Camera', 
-        'Sequencer',
-        'Settings',
-      ],
-
-    }
-  },
   methods: {
     selected_instrument(instrument) {
       let inst = instrument.toLowerCase()
@@ -71,6 +56,32 @@ export default {
         return ''
       }
     },
+  },
+
+  computed: {
+    ...mapState('site_config', [
+      'selector_exists',
+    ]),
+
+    instruments() {
+      let inst = []
+      inst.push(...[
+        'Enclosure',
+        'Screen', 
+        'Telescope',
+        'Rotator',
+        'Focuser',
+      ])
+      if (this.selector_exists) {
+        inst.push('InstrumentSelector')
+      }
+      inst.push(...[
+        'Camera', 
+        'Sequencer',
+        'Settings',
+      ])
+      return inst
+    }
   }
   
 }
