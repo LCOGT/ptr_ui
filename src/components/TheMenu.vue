@@ -140,7 +140,6 @@ export default {
     },
 
     updateSiteStatus() {
-      console.log('hello')
       this.$store.dispatch('sitestatus/getSiteOpenStatus')
     },
     siteOnlineClass(site) {
