@@ -18,6 +18,8 @@ export const commands_mixin = {
     data() {
         return {
 
+          command_is_sending: false,
+
             // Camera Fields
             camera_image_type_options: [
                 'light', 
@@ -51,6 +53,83 @@ export const commands_mixin = {
 
     methods: {
 
+
+        /**
+         * The following set of methods are used for sending the command via http request to the jobs service
+         * in aws. 
+         */
+        async getAuthHeader() {
+            let token;
+            try {
+                token = await this.$auth.getTokenSilently(); 
+            } catch(err) {
+                console.error(err)
+                console.warn('Did not acquire the needed token. Stopping request.')
+                
+                // small popup notification
+                this.$buefy.toast.open({
+                    duration: 5000,
+                    message: "Oops! You need to be logged in to do that.",
+                    position: 'is-bottom',
+                    type: 'is-danger' ,
+                })
+            }
+            return {
+                'headers': {
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        },
+        handleNotAuthorizedResponse(error) {
+            if (error.response) {
+                // Request made and server responded
+                console.log("error message", error.response.data);
+                console.log("error status", error.response.status);
+                console.log("error headers", error.response.headers);
+                // small popup notification describing error
+                this.$buefy.toast.open({
+                    duration: 5000,
+                    message: `${error.response.status} error: ${error.response.data}`,
+                    position: 'is-bottom',
+                    type: 'is-danger' ,
+                })
+            } else if (error.request) {
+                console.warn("The request was made but no response was received.")
+                console.log(error.request);
+            } else {
+                console.warn("Something happened in setting up the request that triggered an error.")
+                console.log('Error', error.message);
+            }
+        },
+        async send_site_command(command) {
+
+            this.command_is_sending = true
+
+            if (this.active_site == '' || this.active_mount == '') {
+                console.log('No site and/or mount specified for the command. Command has been cancelled.')
+                this.command_is_sending = false
+                return
+            }
+
+            command.site = this.active_site
+            command.mount = this.active_mount
+            command.timestamp = parseInt(Date.now() / 1000)
+
+            const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.active_site}`
+            const options = await this.getAuthHeader()
+            axios.post(url, command, options).then(response => {
+                this.command_is_sending = false
+                console.log("command response: ",response.data)
+            }).catch(error => {
+                this.command_is_sending = false;
+                console.log(error)
+                this.handleNotAuthorizedResponse(error)
+            })
+
+        },
+
         /**
          * This method is used in the 'computed' properties that are fed to
          * the CommandButton components. Whenever a command button is clicked, 
@@ -76,6 +155,7 @@ export const commands_mixin = {
                 case 'focuser': device = this.active_focuser; break;
                 case 'screen': device = this.active_screen; break;
                 case 'sequencer': device = this.active_sequencer; break;
+                case 'selector': device = 'selector'; break;
             }
 
             let the_base_command = {

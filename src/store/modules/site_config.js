@@ -209,6 +209,9 @@ const getters = {
         : 0
     },
     site_longitude: state => {
+      console.log('in longitude, did_config_load_yet: ', state.did_config_load_yet)
+      console.log('in longitude, is_site_selected: ', state.is_site_selected)
+      console.log('in longitude, selected_site: ', state.selected_site)
         return (state.did_config_load_yet && state.is_site_selected)
         ? parseFloat(state.global_config[state.selected_site].longitude)
         : 0

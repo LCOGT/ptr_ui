@@ -4,10 +4,10 @@
 
     <b-field>
       <b-select v-model="selector_position">
-        <option :value="1">Camera 1 (val=1)</option>
-        <option :value="2">Low-res Spectograph (val=2)</option>
-        <option :value="3">Camera 2 (val=3)</option>
-        <option :value="4">Hi-res spectograph (val=4)</option>
+        <option :value="0">Main Cam</option>
+        <option :value="1">Hi-res spectograph</option>
+        <option :value="2">Planet Cam</option>
+        <option :value="3">Low-res Spectograph</option>
       </b-select>
     </b-field>
 
@@ -40,8 +40,22 @@ export default {
     },
     selector_position: {
       get() { return this.$store.getters['command_params/selector_position'] },
-      set(val) { this.$store.commit('command_params/selector_position', val) }
+      set(val) { 
+        this.$store.commit('command_params/selector_position', val);
+        // Also send the selection to the site as a command. 
+        let command_body = this.base_command(
+          'selector', 
+          'new_selection', 
+          '', 
+          {
+            'port': val
+          },
+          {}
+        )
+        this.send_site_command(command_body.form)
+      }
     },
+
     subframeIsActive: {
       get() { return this.$store.getters['command_params/subframeIsActive']},
       set(val) { this.$store.commit('command_params/subframeIsActive', val)},
