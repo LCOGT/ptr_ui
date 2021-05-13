@@ -27,6 +27,9 @@ var initial_state = function() {
         selected_screen: '',
         selected_weather: '',
 
+        selector_exists: false,
+        selected_selector: '',
+
         camera_areas_selection: '',
         filter_wheel_options_selection: '',
     };
@@ -49,6 +52,7 @@ const state = {
     global_config: JSON.parse(window.localStorage.getItem('global_config') || '{}'),
     is_site_selected: false,
     did_config_load_yet: false,
+
     selected_site: '',
     selected_enclosure: '',
     selected_mount: '',
@@ -60,6 +64,9 @@ const state = {
     selected_screen: '',
     selected_weather:'',
     selected_sequencer:'',
+
+    selector_exists: false,
+    selected_selector: '',
 
 }
 
@@ -88,6 +95,7 @@ const getters = {
     screen: state => state.selected_screen,
     weather: state => state.selected_weather,
     sequencer: state => state.selected_sequencer,
+    selector: state => state.selected_selector,
 
     all_sites: state => {
       let sites = []
@@ -312,6 +320,15 @@ const mutations = {
     setActiveScreen(state, screen) { state.selected_screen = screen },
     setActiveWeather(state, weather) { state.selected_weather = weather},
     setActiveSequencer(state, sequencer) { state.selected_sequencer = sequencer},
+    setActiveSelector(state, selector) {
+      if (selector == '') {
+        state.selector_exists = false;
+        state.selected_selector = ''
+      } else {
+        state.selector_exists = true;
+        state.selected_selector = selector;
+      }
+    },
 
 }
 
@@ -360,6 +377,14 @@ const actions = {
         commit('setActiveRotator', defaults.rotator)
         commit('setActiveSequencer', defaults.sequencer)
         commit('setActiveScreen', defaults.screen)
+
+        // handle optional instrument selector
+        if (Object.keys(state.global_config[site]).includes('selector')) {
+          commit('setActiveSelector', defaults.selector)
+        }
+        else {
+          commit('setActiveSelector', '')
+        }
 
         // Set initial values in command fields
         if (rootGetters['command_params/filter_wheel_options_selection'] == '') {
