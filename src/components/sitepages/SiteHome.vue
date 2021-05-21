@@ -76,7 +76,7 @@ import axios from 'axios'
 
 export default {
     name: "SiteHome",
-    props: ["deviceStatus", "sitecode"],
+    props: ["sitecode"],
     mixins: [commands_mixin, status_mixin, user_mixin],
     components: {
         CommandButton, 

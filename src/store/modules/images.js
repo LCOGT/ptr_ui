@@ -22,8 +22,10 @@ const state = {
 
     // 'current_image' defines what image is currently displayed.
     current_image: {
-        pg_url: "https://via.placeholder.com/768x768.jpg/151718?text=...",
         jpg_url: "../assets/1px.gif"
+    },
+    info_image: {
+      jpg_url: ""
     },
 
     // recent_images is updated whenever the action 'load_latest_images' is called.
@@ -57,6 +59,9 @@ const getters = {
         const image = getters.current_image
         return `${image.base_filename}-${image.data_type}01.fits.bz2`
     },
+
+    info_image_is_active: state => state.current_image == state.info_image,
+    info_image_exists: state => state.info_image.jpg_url != "",
 }
 
 const mutations = {
@@ -65,6 +70,7 @@ const mutations = {
     setUserImages(state, user_images_list) { state.user_images = user_images_list },
     show_user_data_only(state, val) { state.show_user_data_only = val},
     live_data(state, val) { state.live_data = val},
+    setInfoImage(state, val) { state.info_image = val},
 }
 
 const actions = {
@@ -124,11 +130,8 @@ const actions = {
         // otherwise add it to the stack. 
         axios.get(apiName+path).then(async response => {
 
-            console.log('update_new_image response: ', response.data)
-
             // Empty response. If this runs, something is wrong. 
             if (response.data.length == 0) { 
-                console.warn('add_latest_image query returned 0 images.')
                 //dispatch('display_placeholder_image') 
                 return; 
             }
@@ -179,7 +182,6 @@ const actions = {
             else {
                 console.warn("Error in vuex 'images/update_new_image': ", error)
             }
-
         });
     },
 
@@ -188,7 +190,6 @@ const actions = {
      */
     get_filtered_images({ commit, dispatch, rootState }, filter_params) {
         dispatch('toggle_live_data', false)
-        console.log(filter_params)
         let apiName = rootState.dev.active_api;
         let url = apiName + '/filtered_images';
         let body = { 
@@ -296,10 +297,27 @@ const actions = {
         }).catch(error => {
             //console.log(error)
         });
+
+        dispatch('load_latest_info_image')
+    },
+
+    load_latest_info_image({ state, commit, rootState}) {
+      const site = rootState.site_config.selected_site;
+      const base_url = rootState.dev.active_api
+      const url = base_url + `/infoimage/${site}`
+      axios.get(url).then(response => {
+        // Only update the current image if currently set to the old info image
+        // Don't want to yank the focus from the user
+        if (state.current_image.s3_directory == 'info-images') {
+          commit('setCurrentImage', response.data)
+        }
+        commit('setInfoImage', response.data)
+      }).catch(error => {
+        commit('setInfoImage', {jpg_url: ""})  // reset to default empty value
+      })
     },
 
     toggle_live_data({ commit, dispatch }, val) {
-      console.log('live_data set to ', val)
       commit('live_data', val)
       if (val) {
         dispatch('load_latest_images')
@@ -334,6 +352,9 @@ const actions = {
         commit('setCurrentImage', the_current_image)
     },
 
+    set_info_image_as_current_image({commit, state}) {
+      commit('setCurrentImage', state.info_image)
+    },
 
     set_next_image({ commit, state }) {
         let next_image
@@ -361,10 +382,8 @@ const actions = {
         let body = {
             object_name: `${base_filename}-${data_type}${reduction_level}.fits.bz2`
         }
-        console.log(path, body)
         const fits_url = await axios.post(apiName+path, body);
 
-        console.log(fits_url.data)
         return fits_url.data;
     },
 

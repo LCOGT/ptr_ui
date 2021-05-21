@@ -13,10 +13,16 @@
         class="image-view"
         :site="sitecode" 
         :markedStars="markedStars" />
-      <thumbnail-row 
-        :images="recent_images" 
-        :selected_image="current_image.image_id" 
-        @thumbnailClicked="setActiveImage"/>
+        
+      <div style="display:flex;">
+        <info-image-thumb v-if="info_image_exists"/>
+        <div v-if="info_image_exists" style="border-left: dashed #999; margin: 5px 8px;"/>
+        <thumbnail-row 
+          :images="recent_images" 
+          :selected_image="current_image.image_id" 
+          @thumbnailClicked="setActiveImage"/>
+        </div>
+
       <image-navigation-toolbar class="mt-5"/>
     </div>
 
@@ -138,7 +144,7 @@
               </div>
 
               <div v-if="activeAnalysisTab=='line profile'" >
-                <line-profile-inspection />
+                <line-profile-inspection :disabled="!large_fits_exists && !small_fits_exists" />
               </div>
 
               <div v-if="activeAnalysisTab=='image info'" >
@@ -225,7 +231,6 @@
 
           <images-table :image_array="recent_images" class="mb-4"/>
 
-
         </b-tab-item>
 
       </b-tabs>
@@ -291,6 +296,7 @@ import HistogramViewer from "@/components/HistogramViewer"
 import CommandTabsAccordion from "@/components/CommandTabsAccordion"
 import CommandTabsWide from "@/components/CommandTabsWide"
 import ImageInfoBar from "@/components/ImageDisplay/ImageInfoBar"
+import InfoImageThumb from "@/components/ImageDisplay/InfoImageThumb"
 import ThumbnailRow from "@/components/ImageDisplay/ThumbnailRow"
 import ImageNavigationToolbar from "@/components/ImageDisplay/ImageNavigationToolbar"
 import ShapesToolbar from "@/components/ImageDisplay/ShapesToolbar"
@@ -321,6 +327,7 @@ export default {
     CommandTabsAccordion,
     CommandTabsWide,
     ImageInfoBar,
+    InfoImageThumb,
     ThumbnailRow,
     ImageNavigationToolbar,
     ShapesToolbar,
@@ -379,6 +386,7 @@ export default {
         "data_type": data_type,
         "reduction_level": reduction_level,
         "full_filename": this.best_available_full_filename,
+        "s3_directory": this.current_image.s3_directory || "data",
       }
       console.log(body)
       if (useSubregion) {
@@ -438,6 +446,7 @@ export default {
       const url = this.$store.state.dev.quickanalysis_endpoint + '/histogram-clipped'
       let body = {
         "full_filename": this.best_available_full_filename,
+        "s3_directory": this.current_image.s3_directory || "data",
         "clip_percent": 0.001,
       }
       if (useSubregion) {
@@ -482,13 +491,16 @@ export default {
     },
 
     refreshFitsHeader() {
+      this.fitsHeader = {}
+
       // First check if image is placeholder. If so, nothing to show.
       if (this.current_image.base_filename == "placeholder image") {
         this.fitsHeader = {}
         return
       }
       this.headerIsLoading = true 
-      let url = `https://api.photonranch.org/api/fitsheader/${this.current_image.base_filename}/`
+      //let url = `https://api.photonranch.org/api/fitsheader/${this.current_image.base_filename}/`
+      let url = this.$store.state.dev.active_api + `/fitsheader/${this.current_image.base_filename}/`
       let response = axios.get(url).then(response => {
         this.fitsHeader = response.data
       }).finally(() => {
@@ -532,8 +544,12 @@ export default {
       'large_fits_exists',
       'small_fits_filename', 
       'large_fits_filename',
+      'info_image_exists',
     ]),
     best_available_full_filename() {
+      console.log('large fits exists: ', this.large_fits_exists)
+      console.log('large fits filename: ', this.large_fits_filename)
+      console.log('small fits filename: ', this.small_fits_filename)
       return this.large_fits_exists 
         ? this.large_fits_filename 
         : this.small_fits_filename

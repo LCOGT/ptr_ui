@@ -8,7 +8,6 @@ import _ from 'lodash'
 import axios from 'axios'
 
 var initial_state = function() {
-    console.log('initializing site_config state')
     let apiName = this.$store.getters['dev/api'];
     let path = '/all/config/';
     let state = {
@@ -35,15 +34,12 @@ var initial_state = function() {
     };
     //API.get(apiName, path).then(response => {
     axios.get(apiName+path).then(response => {
-        console.log('about to fetch config from api')
         state.global_config = response.data;
         state.did_config_load_yet = true;
         state.is_site_selected = false;
     }).catch(error => {
         console.log(error)
     });
-    //console.log('initial config state: ')
-    //console.log(state)
     return state;
 }
 
@@ -99,7 +95,6 @@ const getters = {
 
     all_sites: state => {
       let sites = []
-      console.log(Object.keys(state.global_config))
       Object.keys(state.global_config).forEach(site => {
         let s = {
           "name": state.global_config[site].name.toString(),
@@ -217,9 +212,6 @@ const getters = {
         : 0
     },
     site_longitude: state => {
-      console.log('in longitude, did_config_load_yet: ', state.did_config_load_yet)
-      console.log('in longitude, is_site_selected: ', state.is_site_selected)
-      console.log('in longitude, selected_site: ', state.selected_site)
         return (state.did_config_load_yet && state.is_site_selected)
         ? parseFloat(state.global_config[state.selected_site].longitude)
         : 0
@@ -342,7 +334,6 @@ const actions = {
         let apiName = rootState.dev.active_api;
         let path = '/all/config/';
         return axios.get(apiName+path).then(response => {
-            console.log('updated config: ',response.data)
             window.localStorage.setItem('global_config', JSON.stringify(response.data))
             //console.log(JSON.parse(window.localStorage.getItem('global_config')))
             commit('setGlobalConfig', response.data)
@@ -359,11 +350,6 @@ const actions = {
     },
 
     set_default_active_devices({ state, commit, getters, rootGetters}, site) {
-        //console.log('global_config: ')
-        //console.log(state.global_config)
-        //console.log(typeof state.global_config)
-        //console.log('site: ', site)
-        //console.log('global_config[site]: ', state.global_config[site])
         let defaults = state.global_config[site].defaults
 
         commit('setActiveSite', site)
@@ -379,7 +365,8 @@ const actions = {
         commit('setActiveScreen', defaults.screen)
 
         // handle optional instrument selector
-        if (Object.keys(state.global_config[site]).includes('selector')) {
+        if (Object.keys(state.global_config[site]).includes('selector')
+          && Object.keys(state.global_config[site].defaults).includes('selector')) {
           commit('setActiveSelector', defaults.selector)
         }
         else {

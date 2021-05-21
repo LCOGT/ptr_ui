@@ -30,7 +30,7 @@
       <p class="control">
         <a class="button has-text-white is-small" 
           :disabled="!small_fits_exists"
-          @click="download_fits_file(current_image.base_filename, current_image.data_type, '10')">
+          @click="download_current_fits('small')">
           <b-icon icon="download" size="is-small" />
           <span>small fits</span>
         </a>
@@ -38,7 +38,7 @@
       <p class="control">
         <a class="button has-text-white is-small" 
           :disabled="!large_fits_exists"
-          @click="download_fits_file(current_image.base_filename, current_image.data_type, '01')">
+          @click="download_current_fits('large')">
           <b-icon icon="download" size="is-small" />
           <span>large fits</span>
         </a>
@@ -57,6 +57,42 @@ export default {
   },
 
   methods: {
+    /**
+     * Allows users to download a fits file (from the current image displayed).
+     */
+    async download_current_fits(size) {
+      let fits_url = ""
+
+      // First we need to get the url that points to the file we want to download
+      // If the file is from an info image...
+      if (this.current_image.s3_directory == "info-images" && size == "small") {
+        fits_url = this.current_image.fits_10_url
+      }
+      else if (this.current_image.s3_directory == "info-images" && size == "large") {
+        fits_url = this.current_image.fits_01_url
+      }
+      // If the file is from a regular image...
+      else if ( this.current_image.s3_directory == "data" && size == "small") {
+        let params = {
+          base_filename: this.current_image.base_filename, 
+          data_type: this.current_image.data_type,
+          reduction_level: '10',
+        }
+        fits_url = await this.$store.dispatch('images/get_fits_url', params)
+      }
+      else if ( this.current_image.s3_directory == "data" && size == "large") {
+        let params = {
+          base_filename: this.current_image.base_filename, 
+          data_type: this.current_image.data_type,
+          reduction_level: '01',
+        }
+        fits_url = await this.$store.dispatch('images/get_fits_url', params)
+      }
+
+      // The following line downloads the file
+      window.location.assign(fits_url)
+
+    },
     async download_fits_file(base_filename, data_type, reduction_level) {
       const params = {
         base_filename: base_filename, 
@@ -91,6 +127,8 @@ export default {
       "current_image",
       "small_fits_exists",
       "large_fits_exists",
+      "small_fits_filename",
+      "large_fits_filename",
     ]),
 
     js9IsVisible: {
