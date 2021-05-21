@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import { commands_mixin } from '../../mixins/commands_mixin'
 import { mapState } from 'vuex'
+import { commands_mixin } from '../../mixins/commands_mixin'
 import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
@@ -41,8 +41,11 @@ export default {
     ...mapState('site_config', ['selected_selector']),
 
     selector_config() {
-      let conf = this.$store.state.site_config.global_config[this.sitecode].selector[this.$store.state.site_config.selected_selector]
-      console.log(conf)
+      let selected_selector = this.$store.getters['site_config/selector']
+      console.log('selected selector: ', selected_selector)
+      let conf = this.$store.state.site_config.global_config[this.sitecode]
+        .selector[selected_selector]
+      console.log('selector_config: ', conf)
       return conf
     },
 

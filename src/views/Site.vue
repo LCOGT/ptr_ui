@@ -155,32 +155,7 @@ export default {
     }
   },
 
-  async created () {
-    this.$store.dispatch('sitestatus/openStatusConnection')
-    this.$store.dispatch('sitestatus/updateSite', this.sitecode)
-
-    this.$store.commit('site_config/setActiveSite', this.sitecode)
-
-    // Load the active reservations for this site. 
-    this.$store.dispatch('calendar/fetchActiveReservations', this.sitecode)
-
-    await this.setDefaultDevices()
-
-    // Listen for new images on websocket, and refresh the list when a new image arrives.
-    // Note: this happens for a new image on any site, not just the one being viewed.
-    this.$store.dispatch('images/load_latest_images')
-    this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
-    this.imageSubscriber.onmessage = (message) => {
-      let data = JSON.parse(message.data);
-      data["messages"].forEach((message) => {
-        console.log("new image: ",message)
-        // Refresh the image list
-        let base_filename = message.content.messages[0]
-        this.$store.dispatch('images/update_new_image', base_filename)
-      });
-    }
-    
-
+  async created() {
   },
 
   beforeDestroy() {
@@ -193,6 +168,7 @@ export default {
   watch: {
     sitecode() {
 
+      console.log('new sitecode in site watcher: ', this.sitecode)
       this.$store.commit('site_config/setActiveSite', this.sitecode)
       this.$store.dispatch('sitestatus/updateSite', this.sitecode)
 
@@ -206,6 +182,7 @@ export default {
 
       console.log('Sitecode changed. Refreshing latest images.')
       this.$store.dispatch('images/load_latest_images')
+      this.$store.dispatch('images/load_latest_info_image')
 
       // Refresh the active reservations list for the new site.
       this.$store.dispatch('calendar/fetchActiveReservations', this.sitecode)
@@ -213,7 +190,41 @@ export default {
   },
 
   async mounted() {
-    console.log('site mounted')
+    const site = this.$route.params.sitecode
+    this.$store.dispatch('sitestatus/openStatusConnection')
+    this.$store.dispatch('sitestatus/updateSite', site)
+
+    this.$store.commit('site_config/setActiveSite', site)
+
+    // Load the active reservations for this site. 
+    this.$store.dispatch('calendar/fetchActiveReservations', site)
+
+    await this.setDefaultDevices()
+
+    // Listen for new images on websocket, and refresh the list when a new image arrives.
+    // Note: this happens for a new image on any site, not just the one being viewed.
+    this.$store.dispatch('images/load_latest_images')
+    this.imageSubscriber = new ReconnectingWebSocket("wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev")
+    this.imageSubscriber.onmessage = (message) => {
+      let data = JSON.parse(message.data);
+      data["messages"].forEach((message) => {
+        console.log("new image: ",message)
+        let content = message.content.messages[0]
+        // Refresh the image list
+        let base_filename = content.base_filename
+        console.log('new image: ', base_filename)
+        let image_type = content.s3_directory
+        // TODO: improve websocket message content so we know whether to fetch data or info-image.
+        if (image_type == "data") {
+          this.$store.dispatch('images/update_new_image', base_filename)
+        }
+        else if (image_type == "info-images") {
+          this.$store.dispatch('images/load_latest_info_image')
+        }
+      });
+    }
+    
+
 
     // Update timestamp every second (sent with command)
     setInterval(() => {

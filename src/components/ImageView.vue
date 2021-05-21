@@ -24,7 +24,8 @@
           ref="image" 
           rel="preload"
           alt="no jpg available"
-          onerror="this.onerror=null;this.src='https://via.placeholder.com/768?text=no+jpg+preview+available'"
+          onerror1="this.onerror=null;this.src='https://via.placeholder.com/768?text=no+jpg+preview+available'"
+          onerror="this.onerror=null;this.src='@/assets/README_screenshot.png'"
           v-show="!js9IsVisible"
           :src="current_image.jpg_url" />
 
@@ -117,7 +118,6 @@ export default {
         const cr = entry.contentRect;
         this.onImageResize(cr.width, cr.height)
         this.updateAll()
-        //console.log(cr)
       }
     });
     let imageEl = document.getElementById('main-image')
@@ -142,7 +142,6 @@ export default {
 
     lines: {
       handler: function() {
-        console.log('redawing lines')
         this.drawLines.draw()
       },
       deep: true,
@@ -150,27 +149,23 @@ export default {
     
     points: {
       handler: function() {
-        console.log('redawing poitns')
         this.drawPoints.draw()
       },
       deep: true,
     },
     rects: {
       handler: function() {
-        console.log('redawingw rects')
         this.drawRects.draw()
       },
       deep: true,
     },
     circles: {
       handler: function() {
-        console.log('redawing circles')
         this.drawCircles.draw()
       },
       deep: true,
     },
     selectedId() {
-      console.log('redrawing all; selected id changed')
       this.updateAll()
       this.subframeDefinedWithFile = this.current_image.base_filename
     },
@@ -197,7 +192,7 @@ export default {
       this.svg
         .on("mousedown", this.handleMouseDown) 
         .on("mouseup", this.handleMouseUp)
-        .on('keyup', e => console.log(e.key))
+        //.on('keyup', e => console.log(e.key))
 
       this.updateAll()
     },
@@ -212,8 +207,6 @@ export default {
 
 
     onImageResize(width, height) {
-
-      console.log('resizing image', width, height)
 
       // This happens when we load js9, since the jpg display goes away. 
       if (width == 0 && height == 0) return;

@@ -5,6 +5,7 @@
       <button 
         title="first draw a line on the image to inspect"
         @click="getLineProfile"
+        :disabled="disabled"
         class="button" 
         :class="{'is-loading': analysisInProgress}">
         get line profile
@@ -35,6 +36,13 @@ export default {
   components: {
     SideInfoPanel,
     D3Axis,
+  },
+
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
@@ -133,6 +141,7 @@ export default {
       
       const payload = {
         full_filename: this.useLargeFits ? this.large_fits_filename : this.small_fits_filename,
+        s3_directory: this.current_image.s3_directory || "data",
         start: startingPoint,
         end: endingPoint,
       }
