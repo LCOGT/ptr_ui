@@ -397,12 +397,6 @@ export default {
       return 'yellow'
     },
 
-    //async getSiteOpenStatus() {
-      //this.$store.dispatch('sitestatus/getSiteOpenStatus')
-      //let resp = await axios.get(`https://status.photonranch.org/status/allopenstatus`)
-      //return resp.data
-    //},
-
     async redrawMapSites() {
       // Fetch the list of sites to display on the map
       await this.$store.dispatch('sitestatus/getSiteOpenStatus')

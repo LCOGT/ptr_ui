@@ -10,14 +10,23 @@
           'online': isOnline(s.site)
           }">
 
-        <div class="card-header subtitle">{{s.name}}</div>
+        <div class="card-header subtitle">
+          <router-link :to="'/site/'+s.site+'/observe'">
+            <span style="color: white">{{s.name}}</span>
+          </router-link>
+        </div>
+
         <div class="card-image">
           <router-link :to="'/site/'+s.site+'/observe'">
             <figure class="image is-2by1"> <img :src="site_images[s.site]" /> </figure>
           </router-link>
         </div>
 
-        <div class="card-content">
+        <!-- 
+          NOTE: Wayne requested that these cards be less busy and suggested that the 
+          links were distracting (2021/05/25) 
+        -->
+        <!--div class="card-content">
           <div class="quick-links">
             <router-link :to="'/site/'+s.site+'/home'"> home</router-link>
             &nbsp;|&nbsp;
@@ -30,8 +39,8 @@
             <router-link :to="'/site/'+s.site+'/projects'"> projects</router-link>
           </div>
           <hr style="border-bottom: 1px solid grey;">
-          <!--site-reservation-status :sitecode="s.site" /-->
-        </div>
+          <site-reservation-status :sitecode="s.site" />
+        </div-->
 
       </div>
     </template>
@@ -82,7 +91,7 @@ export default {
   },
   methods: {
     getSiteOpenStatus() {
-      const url = `https://status.photonranch.org/status/allopenstatus`
+      const url = this.$store.state.dev.status_endpoint + '/allopenstatus'
       axios.get(url).then(resp => {
         this.site_online_status = _.orderBy(resp.data, [s => s.site], ['asc'])
       })
