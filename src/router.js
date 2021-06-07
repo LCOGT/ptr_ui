@@ -2,6 +2,7 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from './store'
 
 import Home from './views/Home.vue'
 import Profile from './views/Profile.vue'
@@ -70,8 +71,7 @@ const router = new VueRouter({
           sitecode: route.params.sitecode.toLowerCase(),
           subpage: route.params.subpage.toLowerCase()
         }
-      }
-      //beforeEnter: authGuard,
+      },
     },
   ]
 })

@@ -15,6 +15,8 @@ const state = {
 
     projects_endpoint: "https://projects.photonranch.org/dev", // prod endpoint
 
+    images_websocket: "wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev",
+
     logs_endpoint: "https://logs.photonranch.org/logs",  // prod
     //logs_endpoint: "https://logs.photonranch.org/dev",  // dev
 

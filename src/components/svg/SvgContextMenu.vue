@@ -42,10 +42,12 @@ export default {
 
   beforeDestroy() {
     const chartComponent = document.getElementById(this.svgId);
-    chartComponent.removeEventListener(
-      "contextmenu",
-      this.setContextMenuCoords
-    );
+    if (chartComponent) {
+      chartComponent.removeEventListener(
+        "contextmenu",
+        this.setContextMenuCoords
+      );
+    }
   },
 
   methods: {

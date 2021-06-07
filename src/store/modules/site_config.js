@@ -291,7 +291,6 @@ const getters = {
     all_telescopes: state => state.global_config[state.selected_site]['telescope'],
 
     global_config: state => state.global_config,
-    site_config: state => sitecode => state.global_config[sitecode] || {},
 }
 const mutations = {
     setGlobalConfig(state, config) { 
@@ -299,6 +298,7 @@ const mutations = {
         state.did_config_load_yet = true;
     },
     setActiveSite(state, site) { 
+        console.log('setting active site', site)
         state.selected_site = site; 
         state.is_site_selected = true 
     },
@@ -335,7 +335,6 @@ const actions = {
         let path = '/all/config/';
         return axios.get(apiName+path).then(response => {
             window.localStorage.setItem('global_config', JSON.stringify(response.data))
-            //console.log(JSON.parse(window.localStorage.getItem('global_config')))
             commit('setGlobalConfig', response.data)
         }).catch(error => {
             console.log(error)

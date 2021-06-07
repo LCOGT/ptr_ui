@@ -41,9 +41,4 @@ $fullhd-min: 1408px;
    @media (min-width: $screen+'px') { @content; }
 }
 
-
-$top-bottom-height: 0px;
-
-@include desktop {
-  $top-bottom-height: 284px;
-}
+$top-bottom-height: 284px;

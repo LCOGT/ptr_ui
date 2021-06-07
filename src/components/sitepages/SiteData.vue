@@ -14,16 +14,17 @@
         :site="sitecode" 
         :markedStars="markedStars" />
         
-      <div style="display:flex;">
-        <info-image-thumb v-if="info_image_exists"/>
-        <div v-if="info_image_exists" style="border-left: dashed #999; margin: 5px 8px;"/>
+      <div class="thumbnail-row">
+        <info-image-thumb class="info-thumbs" v-if="info_images_exist"/>
+        <div class="thumb-divider" v-if="info_images_exist" />
         <thumbnail-row 
+          class="data-thumbs"
           :images="recent_images" 
           :selected_image="current_image.image_id" 
           @thumbnailClicked="setActiveImage"/>
-        </div>
+      </div>
 
-      <image-navigation-toolbar class="mt-5"/>
+      <image-navigation-toolbar class="mt-3"/>
     </div>
 
 
@@ -544,7 +545,7 @@ export default {
       'large_fits_exists',
       'small_fits_filename', 
       'large_fits_filename',
-      'info_image_exists',
+      'info_images_exist',
     ]),
     best_available_full_filename() {
       console.log('large fits exists: ', this.large_fits_exists)
@@ -669,7 +670,7 @@ $tabs-toggle-link-border-width: 10px;
 
 $site-data-wrapper-padding: 2em;
 $infobar-height: 50px;
-$thumbnails-height: 70px;
+$thumbnails-height: 100px;
 $controls-height: 55px;
 
 // Available height for the image after subracting the top navbars, bottom status display, and
@@ -684,6 +685,22 @@ $square-image-height: calc(
 $max-div-width: $square-image-height;
 
 $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-wrapper-padding)}});
+
+// Row of image thumbnails
+.thumbnail-row {
+  display:flex;
+}
+.info-thumbs {
+  flex-shrink: 0;
+}
+.thumb-divider {
+  border-left: dashed #999; 
+  margin: 0 8px;
+  height: 60px;
+}
+.data-thumbs {
+  flex-grow: 1;
+}
 
 .analysis-tools {
   background-color: $grey-darker;
@@ -718,14 +735,16 @@ $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-w
 
 
 .site-data-wrapper {
-  margin: 0 auto;
-  padding: $site-data-wrapper-padding;
+  margin: 1em auto;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  max-width: 100vw;
 
   @include desktop {
+    margin-top: 0;
     display: grid;
+    padding: $site-data-wrapper-padding;
     grid-gap: 2em;
     grid-template-columns:  auto 1fr;
     grid-template-rows: 1fr;//$visible-content-height;
@@ -734,17 +753,16 @@ $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-w
 }
 
 .image-display-area {
-  padding-left: 2em;
+  padding: 0 2em;
   grid-area: image;
-  height: 100%;
   width: 100%;
   display: grid;
-  grid-template-rows: $infobar-height auto $thumbnails-height 80px 1fr;
+  grid-template-rows: $infobar-height auto auto 80px 1fr;
   grid-template-columns: auto;
   overflow: hidden;
 
   @include fullhd {
-    max-width: calc(#{$visible-content-height} * 0.85);
+    max-width: calc(#{$visible-content-height} * 0.80);
   }
 
   .image-info-bar {
@@ -754,6 +772,7 @@ $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-w
 
 .image-tools-area {
   grid-area: tools;
+  padding-left: 1em;
   width: 100%;
 
   @include desktop {
