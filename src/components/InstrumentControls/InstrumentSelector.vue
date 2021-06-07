@@ -42,10 +42,8 @@ export default {
 
     selector_config() {
       let selected_selector = this.$store.getters['site_config/selector']
-      console.log('selected selector: ', selected_selector)
       let conf = this.$store.state.site_config.global_config[this.sitecode]
         .selector[selected_selector]
-      console.log('selector_config: ', conf)
       return conf
     },
 

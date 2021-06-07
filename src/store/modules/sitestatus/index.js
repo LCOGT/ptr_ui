@@ -215,7 +215,6 @@ const actions = {
     status_ws = new ReconnectingWebSocket(status_ws_url)
     status_ws.onmessage = message => {
       let data = JSON.parse(message.data);
-      console.log(data)
       let statusType = data.statusType
       let status = data.status
       commit('serverTimestampMs', data.server_timestamp_ms)
@@ -235,7 +234,6 @@ const actions = {
   async getSiteOpenStatus({commit, rootState }) {
     const url = rootState.dev.status_endpoint + '/allopenstatus'
     const response = await Axios.get(url)
-    console.log(response.data)
     commit('siteOpenStatus', response.data)
   },
 

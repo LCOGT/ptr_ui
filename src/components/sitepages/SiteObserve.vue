@@ -126,7 +126,7 @@ export default {
     this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
     this.jobsSub.onmessage = (message) => {
       let newJob = JSON.parse(message.data)
-      console.log(newJob)
+      //console.log(newJob)
       if (newJob.ulid in Object.keys(this.focuserJobs)) {
         this.focuserJobs[newJob.ulid].status = newJob.statusId.split("#")[0]
       }
@@ -154,16 +154,8 @@ export default {
 
   methods: {
 
-    /**
-     * Set the default devices for this site.
-     */
-    async setDefaultDevices() {
-      this.$store.dispatch('site_config/set_default_active_devices', this.sitecode)
-    },
-
-
     focuserJobPost(data) {
-      console.log('focuser job post: ',data)
+      //console.log('focuser job post: ',data)
       let statusItem = {
         "status": data.statusId.split("#")[0],
         "deviceType": data.deviceType,

@@ -26,7 +26,7 @@
         </p>
       </b-field>
     </b-field>
-    <b-field class="is-hidden-mobile">
+    <b-field>
       <p class="control">
         <a class="button has-text-white is-small" 
           :disabled="!small_fits_exists"
@@ -146,6 +146,7 @@ export default {
 .image-toolbar-wrapper {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
 }
 

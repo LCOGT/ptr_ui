@@ -129,7 +129,7 @@ export default {
     this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
     this.jobsSub.onmessage = (message) => {
       let newJob = JSON.parse(message.data)
-      console.log(newJob)
+      //console.log(newJob)
       if (newJob.ulid in Object.keys(this.focuserJobs)) {
         this.focuserJobs[newJob.ulid].status = newJob.statusId.split("#")[0]
       }

@@ -41,7 +41,7 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
-import {mapGetters} from 'vuex'
+import {mapState} from 'vuex'
 export default {
     name: 'SiteEventsModal',
     props: ['sitecode'],
@@ -54,8 +54,8 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('site_config', ['site_config']),
-        timezone() { return this.site_config(this.sitecode).TZ_database_name},
+        ...mapState('site_config', ['global_config']),
+        timezone() { return this.global_config[this.sitecode].TZ_database_name},
 
         columns() {
             return [

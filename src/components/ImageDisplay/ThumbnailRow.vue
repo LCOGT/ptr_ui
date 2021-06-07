@@ -1,16 +1,16 @@
 <template>
   <div class="images">
-    <div 
-      class="recent-image" 
-      v-for="(item, index) in images" 
-      v-bind:key="index" >
+    <template
+      v-for="(item, index) in images" >
       <img 
-        v-bind:src="item.jpg_url"
+        :key="index" 
+        :src="item.jpg_url"
         onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
-        v-bind:title="item.base_filename"
-        v-bind:class="{'selected_thumbnail' : item.image_id == selected_image}"
+        :title="item.base_filename"
+        :class="{'selected_thumbnail' : item.image_id == selected_image}"
+        class="recent-image" 
         @click="setActiveImage(item)" >
-    </div>
+    </template>
   </div>
 </template>
 
@@ -39,22 +39,20 @@ export default {
 <style lang="scss" scoped>
 
 .images {
-  height: 85px;
   display: flex;
-  flex-wrap: nowrap;
   overflow-x: auto;
-  flex-direction: row;
+  overflow-y: hidden;
 }
 .recent-image {
-  height: 60px;
-  margin: 5px;
-  margin-left: 0;
   cursor: pointer;
+  margin: 0;
+  margin-bottom: 5px;
   flex: 0 0 auto;
-  img {
-    width: 60px;
-    height: 60px;
-  }
+  width: 60px;
+  height: 60px;
+}
+.recent-image:not(:first-child) {
+  margin-left: 5px;
 }
 .selected_thumbnail {
   border: 3px solid rgb(241, 183, 36);

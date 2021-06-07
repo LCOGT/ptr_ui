@@ -4,10 +4,10 @@
  */
 
 //import { API } from 'aws-amplify'
+import Vue from 'vue'
 import axios from 'axios'
 import moment from 'moment'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
-import { data } from 'jquery'
 
 function user_id() {
     if (getInstance().user) {
@@ -24,9 +24,13 @@ const state = {
     current_image: {
         jpg_url: "../assets/1px.gif"
     },
-    info_image: {
-      jpg_url: ""
-    },
+
+    // info images in three separate channels. 
+    info_images: [
+      { jpg_url: '', },
+      { jpg_url: '', },
+      { jpg_url: '', },
+    ],
 
     // recent_images is updated whenever the action 'load_latest_images' is called.
     recent_images: [],
@@ -60,8 +64,8 @@ const getters = {
         return `${image.base_filename}-${image.data_type}01.fits.bz2`
     },
 
-    info_image_is_active: state => state.current_image == state.info_image,
-    info_image_exists: state => state.info_image.jpg_url != "",
+    info_image_is_active: state => state.current_image.s3_direcotry == 'info-images',
+    info_images_exist: state => state.info_images.some(i => 'channel' in i),
 }
 
 const mutations = {
@@ -70,7 +74,7 @@ const mutations = {
     setUserImages(state, user_images_list) { state.user_images = user_images_list },
     show_user_data_only(state, val) { state.show_user_data_only = val},
     live_data(state, val) { state.live_data = val},
-    setInfoImage(state, val) { state.info_image = val},
+    setInfoImage(state, val) { Vue.set(state.info_images, val.channel, val.info_image) },
 }
 
 const actions = {
@@ -298,23 +302,27 @@ const actions = {
             //console.log(error)
         });
 
-        dispatch('load_latest_info_image')
+        dispatch('load_latest_info_images')
     },
 
-    load_latest_info_image({ state, commit, rootState}) {
+    load_latest_info_images({ state, commit, rootState}) {
       const site = rootState.site_config.selected_site;
       const base_url = rootState.dev.active_api
-      const url = base_url + `/infoimage/${site}`
-      axios.get(url).then(response => {
-        // Only update the current image if currently set to the old info image
-        // Don't want to yank the focus from the user
-        if (state.current_image.s3_directory == 'info-images') {
-          commit('setCurrentImage', response.data)
-        }
-        commit('setInfoImage', response.data)
-      }).catch(error => {
-        commit('setInfoImage', {jpg_url: ""})  // reset to default empty value
-      })
+
+      // query each of the three channels
+      for (let channel = 0; channel < 3; channel ++) {
+        const url = base_url + `/infoimage/${site}/${channel + 1}`
+        axios.get(url).then(response => {
+          // Only update the current image if currently set to the old info image
+          // Don't want to yank the focus from the user
+          if (state.current_image.s3_directory == 'info-images') {
+            commit('setCurrentImage', response.data)
+          }
+          commit('setInfoImage', {info_image: response.data, channel: channel})
+        }).catch(error => {
+          commit('setInfoImage', {info_image: {jpg_url: ""}, channel: channel})  // reset to default empty value
+        })
+      }
     },
 
     toggle_live_data({ commit, dispatch }, val) {
@@ -352,8 +360,8 @@ const actions = {
         commit('setCurrentImage', the_current_image)
     },
 
-    set_info_image_as_current_image({commit, state}) {
-      commit('setCurrentImage', state.info_image)
+    set_info_image_as_current_image({commit, state}, channel) {
+      commit('setCurrentImage', state.info_images[channel])
     },
 
     set_next_image({ commit, state }) {

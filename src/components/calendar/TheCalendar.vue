@@ -233,16 +233,11 @@ export default {
     },
 
     ...mapGetters("site_config", [
-      "site_config",
       "global_config",
       "site_latitude",
       "site_longitude",
       "timezone",
     ]),
-
-    //...mapGetters("site_config", {
-      //fc_timeZone: "timezone", // rename to match fc namespacing.
-    //}),
 
     user() {
       return this.$auth.user;
@@ -689,10 +684,10 @@ export default {
       let twilightEvents = [];
 
       let site_lat = parseFloat(
-        this.site_config(this.calendarSite)["latitude"]
+        this.global_config[this.calendarSite]["latitude"]
       );
       let site_lng = parseFloat(
-        this.site_config(this.calendarSite)["longitude"]
+        this.global_config[this.calendarSite]["longitude"]
       );
 
       // Compute events for each day.
