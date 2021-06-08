@@ -1,7 +1,8 @@
 import { display_colors } from './status_utils'
 
 const weather_state = (state, getters, rootState) => {
-  if (Object.keys(state.observing_conditions).includes(rootState.site_config.selected_weather)) {
+  if (Object.keys(state.observing_conditions).includes(rootState.site_config.selected_weather)
+      && state.observing_conditions[rootState.site_config.selected_weather] != null) {
     return state.observing_conditions[rootState.site_config.selected_weather]
   } else {
     return {}
