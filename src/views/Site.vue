@@ -145,6 +145,7 @@ export default {
       // Change status subscriptions to the new site
       this.$store.dispatch('sitestatus/updateSite', this.sitecode)
 
+      this.$store.dispatch('images/display_placeholder_image')
       this.$store.dispatch('images/load_latest_images')
       this.$store.dispatch('images/load_latest_info_images')
 

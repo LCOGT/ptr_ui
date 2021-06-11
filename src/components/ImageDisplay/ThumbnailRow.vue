@@ -4,7 +4,7 @@
       v-for="(item, index) in images" >
       <img 
         :key="index" 
-        :src="item.jpg_url"
+        :src="thumbnailWithFallback(item)"
         onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
         :title="item.base_filename"
         :class="{'selected_thumbnail' : item.image_id == selected_image}"
@@ -32,6 +32,10 @@ export default {
     setActiveImage(item) {
       this.$emit('thumbnailClicked', item)
     },
+
+		thumbnailWithFallback(item) {
+			return item.jpg_thumbnail_url || item.jpg_url
+		}
   },
 }
 </script>
@@ -48,7 +52,6 @@ export default {
   margin: 0;
   margin-bottom: 5px;
   flex: 0 0 auto;
-  width: 60px;
   height: 60px;
 }
 .recent-image:not(:first-child) {
