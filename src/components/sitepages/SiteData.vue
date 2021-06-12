@@ -668,7 +668,7 @@ $tabs-toggle-link-border-width: 10px;
 @import "@/style/buefy-styles.scss";
 @import "@/style/_responsive.scss";
 
-$site-data-wrapper-padding: 2em;
+$site-data-wrapper-padding: 1em;
 $infobar-height: 50px;
 $thumbnails-height: 100px;
 $controls-height: 55px;
@@ -684,7 +684,7 @@ $square-image-height: calc(
   - #{(2 * $site-data-wrapper-padding)});
 $max-div-width: $square-image-height;
 
-$visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-wrapper-padding)}});
+$visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-wrapper-padding)}});
 
 // Row of image thumbnails
 .thumbnail-row {
@@ -762,7 +762,7 @@ $visible-content-height: calc(100vh - #{$top-bottom-height - #{(2 * $site-data-w
   overflow: hidden;
 
   @include fullhd {
-    max-width: calc(#{$visible-content-height} * 0.80);
+    max-width: 800px;//calc(#{$visible-content-height} * 0.80);
   }
 
   .image-info-bar {

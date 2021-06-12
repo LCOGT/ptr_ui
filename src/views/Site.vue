@@ -2,8 +2,6 @@
   <div class="page">
 
     <b-navbar wrapper-class="container site-menu" :mobile-burger="false" class="is-hidden-touch">
-        <template slot="brand">
-        </template>
         <template slot="start">
             <b-navbar-item tag="router-link" 
               :to="{ path: '/site/' + sitecode + '/home'}">
@@ -27,8 +25,6 @@
             </b-navbar-item>
         </template>
 
-        <template slot="end">
-        </template>
     </b-navbar>
     
     <div class=" page-view">
@@ -216,6 +212,21 @@ export default {
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:700&display=swap');
 @import "@/style/_variables.scss";
 @import "@/style/_responsive.scss";
+
+.navbar {
+	min-height: unset;
+	height: 40px;
+	.container.site-menu {
+		min-height: unset;
+		height: 0;
+	}
+	.navbar-item {
+		height: 40px;
+		margin-top: 0;
+		margin-bottom: 0;
+		align-items: unset;
+	}
+}
 
 .main-page-content {
   width: 100vw;
