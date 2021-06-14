@@ -483,6 +483,15 @@ export const commands_mixin = {
         { object: obj }
       )
     },
+    mount_slew_hadec_command() {
+      let ha = emptyString(this.mount_ra.toString())
+      let dec = emptyString(this.mount_dec.toString())
+      let obj = emptyString(this.mount_object.toString())
+      return this.base_command('mount', 'go', 'slew to HA/Dec',
+        { ha: ha, dec: dec, frame: this.telescope_coordinate_frame },
+        { object: obj }
+      )
+    },
     mount_slew_azalt_command() {
       let az = emptyString(this.mount_ra.toString())
       let alt = emptyString(this.mount_dec.toString())

@@ -76,7 +76,7 @@
       <div style=" margin-left: 1rem;">{{mount_state.site_in_automatic ? "Auto" : "Manual"}}</div>
     </div>
 
-    <b-field horizontal label="Ra/Az/Long">
+    <b-field horizontal label="Ra/Ha/Az/Long">
       <b-field>
         <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
         <!--p class="control"><span class="button is-static is-small">hrs</span></p-->
@@ -109,6 +109,10 @@
     <b-field>
       <p class="control">
         <command-button :data="mount_slew_radec_command" 
+          style="margin-bottom: 1em;" class="is-small"/>
+      </p>
+      <p class="control">
+        <command-button :data="mount_slew_hadec_command" 
           style="margin-bottom: 1em;" class="is-small"/>
       </p>
       <p class="control">
