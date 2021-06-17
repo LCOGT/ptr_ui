@@ -302,6 +302,10 @@ const mutations = {
         state.selected_site = site; 
         state.is_site_selected = true 
     },
+		removeActiveSite(state) {
+			state.selected_site = ''
+			state.is_site_selected = false
+		},
     setActiveEnclosure(state, enclosure) { state.selected_enclosure = enclosure },
     setActiveMount(state, mount) { state.selected_mount = mount },
     setActiveTelescope(state, telescope) { state.selected_telescope = telescope },
@@ -381,7 +385,7 @@ const actions = {
                 )
         }
 
-        if (rootGetters['command_params/camera_areas_selection'] == '') {
+        if (rootGetters['command_params/camera_areas_selection'] == '' && getters.camera_areas != undefined) {
             let areaSelection = getters.camera_areas[0]
             commit('command_params/camera_areas_selection', 
                     areaSelection,

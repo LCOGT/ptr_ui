@@ -52,12 +52,12 @@
     </div>
 
     <div class="buttons has-addons" style="margin-bottom: 10px;">
-      <b-button class="button is-small is-success" 
+      <b-button class="button is-small is-success" outlined
         @click="script_run_command" 
         style="width: 65%;"> run script</b-button>
       <b-button class="button is-small" 
         @click="script_stop_command" 
-        style="width: 35%"> stop script</b-button>
+        style="width: 35%; border-left: 1px solid #48c775;"> stop script</b-button>
     </div>
 
     <div class="status-toggle-bar" 
