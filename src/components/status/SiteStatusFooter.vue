@@ -20,9 +20,9 @@
         >
           <div class="log-timestamp">
             <b-tooltip
-              position="is-right"
+              position="is-top"
               type="is-dark"
-              :label="timestamp_to_date(log.timestamp)"
+              :label="timezone /*timestamp_to_date(log.timestamp)*/"
             >
               {{ timestamp_to_logdate(log.timestamp) }}
             </b-tooltip>
@@ -119,6 +119,7 @@
                     v-if="timezone"
                     :timezone="timezone"
                   />
+									<div v-else class="sidereal-time"> -- </div>
                   <div class="sidereal-label">Obs Time</div>
                 </div>
                 <div class="mr-1">
@@ -128,6 +129,7 @@
                     v-if="timezone"
                     :timezone="timezone"
                   />
+									<div v-else class="sidereal-time"> -- </div>
                   <div class="sidereal-label">UTC Time</div>
                 </div>
               </div>
@@ -301,7 +303,7 @@ export default {
     //  in the log UI
     timestamp_to_logdate(timestamp) {
       const timestamp_ms = timestamp * 1000;
-      return moment(timestamp_ms).format("HH:mm:ss");
+      return moment(timestamp_ms).format("YYYY/MM/DD HH:mm:ss");
     },
 
     // Used to format the time for the timestmap tooltip.
@@ -450,7 +452,7 @@ $log-critical: $danger;
 
 .log-line {
   display: grid;
-  grid-template-columns: 7em 1fr;
+  grid-template-columns: 12em 1fr;
   width: 100%;
 }
 .log-timestamp {
@@ -516,6 +518,7 @@ div.log-line:last-of-type * {
   grid-template-columns: 1fr 60px;
   background-color: $main-status-background;
   border-top: 1px grey solid;
+  border-bottom: 1px $grey-dark solid;
   overflow-x: hidden;
 }
 #status-2-primary {
@@ -526,8 +529,8 @@ div.log-line:last-of-type * {
   grid-column-gap: 20px;
   // align with the .container margins:
   padding-left: #{$toggle-button-width / 2};
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 #status-2-expanded {
   padding-bottom: 1em;

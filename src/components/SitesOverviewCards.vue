@@ -12,7 +12,7 @@
 
         <div class="card-header subtitle">
           <router-link :to="'/site/'+s.site+'/observe'">
-            <span style="color: white">{{s.name}}</span>
+            <span style="color: white; height: 2em;">{{s.name}}</span>
           </router-link>
         </div>
 
@@ -21,26 +21,6 @@
             <figure class="image is-2by1"> <img :src="site_images[s.site]" /> </figure>
           </router-link>
         </div>
-
-        <!-- 
-          NOTE: Wayne requested that these cards be less busy and suggested that the 
-          links were distracting (2021/05/25) 
-        -->
-        <!--div class="card-content">
-          <div class="quick-links">
-            <router-link :to="'/site/'+s.site+'/home'"> home</router-link>
-            &nbsp;|&nbsp;
-            <router-link :to="'/site/'+s.site+'/targets'"> targets</router-link>
-            &nbsp;|&nbsp;
-            <router-link :to="'/site/'+s.site+'/observe'"> observe</router-link>
-            &nbsp;|&nbsp;
-            <router-link :to="'/site/'+s.site+'/calendar'"> calendar</router-link>
-            &nbsp;|&nbsp;
-            <router-link :to="'/site/'+s.site+'/projects'"> projects</router-link>
-          </div>
-          <hr style="border-bottom: 1px solid grey;">
-          <site-reservation-status :sitecode="s.site" />
-        </div-->
 
       </div>
     </template>
@@ -149,6 +129,13 @@ export default {
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     grid-gap: 1rem;
   }
+}
+
+.subtitle {
+	padding: 0.25em;
+	line-height: 1.25;
+	height: 3em;
+	margin-bottom: 0 !important;
 }
 
 .quick-links {
