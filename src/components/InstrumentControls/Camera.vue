@@ -10,6 +10,8 @@
       :isOffline="!isOnline"
     />
 
+		<div style="border-bottom: 1px solid grey; margin: 1em 0;" />
+
     <b-field horizontal label="Expose">
         <b-field>
             <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>

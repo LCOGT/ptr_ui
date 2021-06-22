@@ -19,9 +19,9 @@
             <div class="instrument-instance-label">{{selected_instrument(instrument)}}</div>
           </div>
           <component class="accordion-content" v-bind:is="instrument"/>
-          <div class="accordion-content p-3 mt-4 is-size-7 has-text-centered is-italic has-text-weight-light is-family-code">
+          <!--div class="accordion-content p-3 mt-4 is-size-7 has-text-centered is-italic has-text-weight-light is-family-code">
             TODO: better status display here
-          </div>
+          </div-->
         </b-tab-item>
       </template>
     </b-tabs>

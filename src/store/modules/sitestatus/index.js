@@ -11,6 +11,7 @@ import focuser_getters from "./focuser_getters"
 import rotator_getters from "./rotator_getters"
 import screen_getters from "./screen_getters"
 import sequencer_getters from "./sequencer_getters"
+import selector_getters from "./selector_getters"
 
 /* Example Status:
 {
@@ -154,6 +155,7 @@ const state = {
   rotator: {},
   filter_wheel: {},
   sequencer: {},
+  selector: {},
 }
 
 const getters = {
@@ -170,6 +172,7 @@ const getters = {
   ...rotator_getters,
   ...screen_getters,
   ...sequencer_getters,
+  ...selector_getters,
 }
 
 const mutations = {
@@ -194,6 +197,7 @@ const mutations = {
       'rotator',
       'filter_wheel',
       'sequencer',
+			'selector',
     ]
 
     // Set the status for each device-type
