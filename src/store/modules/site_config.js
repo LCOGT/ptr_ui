@@ -369,7 +369,8 @@ const actions = {
 
         // handle optional instrument selector
         if (Object.keys(state.global_config[site]).includes('selector')
-          && Object.keys(state.global_config[site].defaults).includes('selector')) {
+          && Object.keys(state.global_config[site].defaults).includes('selector')
+					&& state.global_config[site].defaults.selector !== null) {
           commit('setActiveSelector', defaults.selector)
         }
         else {
