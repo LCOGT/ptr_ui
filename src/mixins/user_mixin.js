@@ -13,6 +13,11 @@ export const user_mixin = {
       }
     },
 
+		userIsAuthenticated() {
+			let user = this.$auth.user
+			return user !== undefined
+		}
+
   }
 
 }
