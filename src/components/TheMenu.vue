@@ -24,7 +24,8 @@
                     v-bind:key="index"
                     v-if="global_config[site]">
                     <span :class="siteOnlineClass(site)">&#9679;&nbsp;</span>
-                    {{global_config[site].name}}
+                    <span style="font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</span>
+										<span style="color: silver;">{{global_config[site].name}}</span>
                   </b-navbar-item>
                 </template>
                 <hr class="navbar-divider">
