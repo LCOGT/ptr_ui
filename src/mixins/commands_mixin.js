@@ -455,12 +455,12 @@ export const commands_mixin = {
       return this.base_command('enclosure', 'close', 'Request Roof to Close')
     },
     enclosure_manual_command() {
-      return this.base_command('enclosure', 'setManual', 'Set enclosure mode: manual',
+      return this.base_command('enclosure', 'setManual', 'Set enclosure mode to manual',
         {},
         { username: this.username })
     },
     enclosure_auto_command() {
-      return this.base_command('enclosure', 'setAuto', 'Set enclosure mode: auto',
+      return this.base_command('enclosure', 'setAuto', 'Set enclosure mode to auto',
         {},
         { username: this.username })
     },
@@ -470,7 +470,7 @@ export const commands_mixin = {
         { username: this.username })
     },
     site_automatic_command() {
-      return this.base_command('mount', 'set_site_automatic', 'Set site mode to automatic',
+      return this.base_command('mount', 'set_site_automatic', 'Set site mode to auto',
         {},
         { username: this.username })
     },

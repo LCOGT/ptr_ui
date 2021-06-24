@@ -9,20 +9,48 @@
       :isOffline="!isOnline"
     />
 
-    <command-button 
-      admin
-      class="is-small"
-      v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Manual'" 
-      :data="enclosure_manual_command" 
-      style="margin-bottom: 1em; width: 100%;" 
-      />
-    <command-button 
-      admin
-      class="is-small"
-      v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Automatic'" 
-      :data="enclosure_auto_command" 
-      style="margin-bottom: 1em; width: 100%;" 
-      />
+
+    <div v-if="mount_state && 'site_in_automatic' in mount_state" style="display: flex">
+			<command-button 
+				admin
+				class="is-small"
+				v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Manual'" 
+				:data="enclosure_manual_command" 
+				style="margin-bottom: 1em; width: 50%;" 
+				/>
+			<command-button 
+				admin
+				class="is-small"
+				v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Automatic'" 
+				:data="enclosure_auto_command" 
+				style="margin-bottom: 1em; width: 50%;" 
+				/>
+        <div style="flex-grow: 1;"></div>
+      <div style="margin-left: 1rem; color: grey;">Enclosure mode: </div>
+      <div style=" margin-left: 1rem;">{{enclosure_state.enclosure_mode}}</div>
+    </div>
+
+    <div v-if="mount_state && 'site_in_automatic' in mount_state" style="display: flex">
+      <command-button 
+        admin
+        class="is-small"
+        v-if="mount_state && 'site_in_automatic' in mount_state && mount_state.site_in_automatic" 
+        :data="site_manual_command" 
+        :disabled="!userIsAdmin"
+        style="margin-bottom: 1em; width:50%;" 
+        />
+      <command-button 
+        admin
+        class="is-small"
+        v-if="mount_state && 'site_in_automatic' in mount_state && !mount_state.site_in_automatic" 
+        :data="site_automatic_command" 
+        style="margin-bottom: 1em; width:50%;" 
+        :disabled="!userIsAdmin"
+        />
+        <div style="flex-grow: 1;"></div>
+      <div style="margin-left: 1rem; color: grey;">Site mode: </div>
+      <div style=" margin-left: 1rem;">{{mount_state.site_in_automatic ? "Auto" : "Manual"}}</div>
+    </div>
 
     <b-field>
       <p class="control">

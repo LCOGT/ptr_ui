@@ -53,29 +53,6 @@
         :statusList="buildTelescopeTabStatus2"/>
     </div>
 
-
-    <div v-if="mount_state && 'site_in_automatic' in mount_state" style="display: flex">
-      <command-button 
-        admin
-        class="is-small"
-        v-if="mount_state && 'site_in_automatic' in mount_state && mount_state.site_in_automatic" 
-        :data="site_manual_command" 
-        :disabled="!userIsAdmin"
-        style="margin-bottom: 1em; width:50%;" 
-        />
-      <command-button 
-        admin
-        class="is-small"
-        v-if="mount_state && 'site_in_automatic' in mount_state && !mount_state.site_in_automatic" 
-        :data="site_automatic_command" 
-        style="margin-bottom: 1em; width:50%;" 
-        :disabled="!userIsAdmin"
-        />
-        <div style="flex-grow: 1;"></div>
-      <div style="margin-left: 1rem; color: grey;">Site mode: </div>
-      <div style=" margin-left: 1rem;">{{mount_state.site_in_automatic ? "Auto" : "Manual"}}</div>
-    </div>
-
     <b-field horizontal label="Ra/Ha/Az/Long">
       <b-field>
         <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
