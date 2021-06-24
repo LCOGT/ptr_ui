@@ -202,9 +202,9 @@ const mutations = {
 
     // Set the status for each device-type
     device_types.forEach(device_type => {
-      hasKey(status,device_type) 
-        ? state[device_type] = status[device_type]
-        : state[device_type] = {}
+      if (hasKey(status,device_type)) {
+      	state[device_type] = status[device_type]
+			}
     })
   }
 }
@@ -221,8 +221,16 @@ const actions = {
       let data = JSON.parse(message.data);
       let statusType = data.statusType
       let status = data.status
-      commit('serverTimestampMs', data.server_timestamp_ms)
-      commit('status', status)
+
+			// TODO: handle the different statusTypes distinctly.
+			if (statusType == "deviceStatus") {
+				commit('serverTimestampMs', data.server_timestamp_ms)
+				commit('status', status)
+			}
+			if (statusType == "wxEncStatus") {
+				commit('serverTimestampMs', data.server_timestamp_ms)
+				commit('status', status)
+			}
     }
 
     // Initialize status with the latest report
