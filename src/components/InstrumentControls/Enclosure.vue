@@ -9,48 +9,18 @@
       :isOffline="!isOnline"
     />
 
+		<div style="border-bottom: 0.5px solid grey; margin: 1em 0;" />
 
-    <div v-if="mount_state && 'site_in_automatic' in mount_state" style="display: flex">
-			<command-button 
-				admin
-				class="is-small"
-				v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Manual'" 
-				:data="enclosure_manual_command" 
-				style="margin-bottom: 1em; width: 50%;" 
-				/>
-			<command-button 
-				admin
-				class="is-small"
-				v-if="userIsAdmin && enclosure_state.enclosure_mode != 'Automatic'" 
-				:data="enclosure_auto_command" 
-				style="margin-bottom: 1em; width: 50%;" 
-				/>
-        <div style="flex-grow: 1;"></div>
-      <div style="margin-left: 1rem; color: grey;">Enclosure mode: </div>
-      <div style=" margin-left: 1rem;">{{enclosure_state.enclosure_mode}}</div>
-    </div>
-
-    <div v-if="mount_state && 'site_in_automatic' in mount_state" style="display: flex">
-      <command-button 
-        admin
-        class="is-small"
-        v-if="mount_state && 'site_in_automatic' in mount_state && mount_state.site_in_automatic" 
-        :data="site_manual_command" 
-        :disabled="!userIsAdmin"
-        style="margin-bottom: 1em; width:50%;" 
-        />
-      <command-button 
-        admin
-        class="is-small"
-        v-if="mount_state && 'site_in_automatic' in mount_state && !mount_state.site_in_automatic" 
-        :data="site_automatic_command" 
-        style="margin-bottom: 1em; width:50%;" 
-        :disabled="!userIsAdmin"
-        />
-        <div style="flex-grow: 1;"></div>
-      <div style="margin-left: 1rem; color: grey;">Site mode: </div>
-      <div style=" margin-left: 1rem;">{{mount_state.site_in_automatic ? "Auto" : "Manual"}}</div>
-    </div>
+    <b-field label="Set Enclosure Mode" v-if="userIsAdmin" class="is-small" style="margin-bottom: 2em;">
+      <b-select v-model="selected_enclosure_mode" size="is-small" >
+				<option value="setAuto" >Automatic</option> 
+				<option value="setManual">Manual</option> 
+				<option value="setStayClosed">Stay Closed</option> 
+      </b-select>
+			<p class="control">
+				<button class="button is-admin is-small" :disabled="!userIsAuthenticated" @click="set_enclosure_mode" > apply </button>
+			</p>
+    </b-field>
 
     <b-field>
       <p class="control">
@@ -104,8 +74,25 @@ export default {
   data() {
     return {
       isExpandedStatusVisible: false,
+			selected_enclosure_mode: "setAuto",
     }
   },
+
+	methods: {
+
+		set_enclosure_mode() {
+			const command_body = this.base_command(
+				'enclosure',  // inst type
+				this.selected_enclosure_mode,  // action setAuto setManual setStayClosed
+				'',	 // name (only used for rendering button names) 
+				{}, // reqired params
+				{ username: this.username } // optional params
+			)
+			this.send_site_command(command_body.form)
+
+		}
+
+	},
 
   computed: {
     sitecode() {
@@ -118,4 +105,9 @@ export default {
 
 <style scoped lang="scss">
 @import "./instrument_controls_common.scss";
+
+.is-admin {
+    background-color: rgba(68, 0, 255, 0.164);
+    border-color: rgba(76, 0, 255, 0.541);
+}
 </style>

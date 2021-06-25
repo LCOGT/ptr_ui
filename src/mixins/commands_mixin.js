@@ -464,16 +464,11 @@ export const commands_mixin = {
         {},
         { username: this.username })
     },
-    site_manual_command() {
-      return this.base_command('mount', 'set_site_manual', 'Set site mode to manual',
+		enclosure_stayclosed_command() {
+      return this.base_command('enclosure', 'stayClosed', 'Set enclosure to stay closed',
         {},
         { username: this.username })
-    },
-    site_automatic_command() {
-      return this.base_command('mount', 'set_site_automatic', 'Set site mode to auto',
-        {},
-        { username: this.username })
-    },
+		},
     mount_slew_radec_command() {
       let ra = emptyString(this.mount_ra.toString())
       let dec = emptyString(this.mount_dec.toString())
