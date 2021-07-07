@@ -326,7 +326,7 @@
             </b-field>
             
             <section v-if="showAdvancedInputs" style="max-width: 50%;">
-            <b-field label="Site tags">
+            <b-field label="Site tags" style="margin-bottom: 0.5em;">
                 <b-taginput
                     v-model="project_constraints.site_tags"
                     type="is-light"
@@ -342,6 +342,17 @@
                 </b-taginput>
             </b-field>
             </section>
+
+            <b-field v-if="showAdvancedInputs" label="Generic Instrument">
+								<b-select v-model="project_constraints.generic_instrument">
+										<option value="Main Camera">Main Camera</option>
+										<option value="Auxiliary Camera">Auxiliary Camera</option>
+										<option value="Echelle Spectrometer">Echelle Spectrometer</option>
+										<option value="UXEX Spectrometer">UXEX Spectrometer</option>
+										<option value="Planet Camera">Planet Camera</option>
+										<option value="IR Photometer">IR Photometer</option>
+								</b-select>
+            </b-field>
 
         </div>
         <hr>
@@ -459,6 +470,7 @@ export default {
 
             project_constraints: {
                 site_tags: [],
+								generic_instrument: 'Main Camera',
 
                 meridian_flip: 'flip_ok', // can be ['flip_ok', 'no_flip', 'east_only', 'west_only']
                 ra_offset: 0.0,
@@ -590,7 +602,7 @@ export default {
             this.loaded_project_name = ''
             this.loaded_project_created_at = ''
 
-            this.project_name = ""
+            this.project_name = '' 
             this.project_events = []
             this.site_tags = []
             this.targets = [
@@ -620,6 +632,7 @@ export default {
             this.exposures_index = 1
             this.project_constraints = {
                 site_tags: [],
+								generic_instrument: '',
 
                 ra_offset: 0.0,
                 ra_offset_units: 'deg',

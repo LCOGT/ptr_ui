@@ -112,7 +112,7 @@ export default {
 }
 
 .ra-display {
-  min-width: 80px;
+  min-width: 70px;
 }
 .ra-display:hover {
   cursor: pointer;

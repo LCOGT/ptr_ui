@@ -4,10 +4,16 @@
       class="menu-item"
       @click="$store.dispatch('drawshapes/deleteSelectedShape')"
     >
-      remove shape
+      remove this shape
+    </div>
+    <div 
+      class="menu-item"
+      @click="$store.dispatch('drawshapes/deleteAllShapes')"
+    >
+      remove all shapes
     </div>
     <div
-      v-if="selectedShapeType in ['rects', 'circles']"
+      v-if="selectedShapeType in ['rects']"
       class="menu-item"
       @click="setSelectedRectAsSubframe"
     >
@@ -36,10 +42,12 @@ export default {
 
   beforeDestroy() {
     const chartComponent = document.getElementById(this.svgId);
-    chartComponent.removeEventListener(
-      "contextmenu",
-      this.setContextMenuCoords
-    );
+    if (chartComponent) {
+      chartComponent.removeEventListener(
+        "contextmenu",
+        this.setContextMenuCoords
+      );
+    }
   },
 
   methods: {

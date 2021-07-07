@@ -102,7 +102,8 @@ const actions = {
                     //dispatch('crosshairOff')
 
                     // upload to enable server side tasks
-                    JS9.UploadFITSFile()
+                    // Skip for now since we don't use it and don't want to maintain server.
+                    //JS9.UploadFITSFile()
 
                     console.warn('setting zoom level')
                     // set zoom level

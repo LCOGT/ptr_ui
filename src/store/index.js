@@ -11,10 +11,12 @@ import command_params from './modules/command_params'
 import user_data from './modules/user_data'
 import calendar from './modules/calendar'
 import drawshapes from './modules/drawshapes'
+import sitestatus from './modules/sitestatus'
+import starprofile from './modules/analysistools/starprofile'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
     plugins: [
         // Vuex normally doesn't save between page reloads.
         // Use this plugin to save state for the duration of a browser session.
@@ -36,5 +38,11 @@ export default new Vuex.Store({
         auth,
         calendar,
         drawshapes,
+        sitestatus,
+        starprofile,
     },
 })
+
+store.dispatch('sitestatus/startClock')
+
+export default store

@@ -10,9 +10,12 @@ const state = {
 
     jobs_api: "https://jobs.photonranch.org/jobs",
     //jobs_api: "https://jobs.photonranch.org/test",
+
     calendar_api: "https://calendar.photonranch.org/dev",
 
     projects_endpoint: "https://projects.photonranch.org/dev", // prod endpoint
+
+    images_websocket: "wss://6raa648v43.execute-api.us-east-1.amazonaws.com/dev",
 
     logs_endpoint: "https://logs.photonranch.org/logs",  // prod
     //logs_endpoint: "https://logs.photonranch.org/dev",  // dev
@@ -22,6 +25,12 @@ const state = {
 
     quickanalysis_endpoint: "https://quickanalysis.photonranch.org",
     //quickanalysis_endpoint: "http://localhost:5000",
+
+    status_ws_endpoint: 'wss://rsxw4oba56.execute-api.us-east-1.amazonaws.com/dev',
+    //status_ws_endpoint: 'wss://uplin1n79d.execute-api.us-east-1.amazonaws.com/test',
+
+    status_endpoint: 'https://status.photonranch.org/status',
+    //status_endpoint: 'https://status.photonranch.org/test',
 }
 
 // getters
@@ -49,4 +58,5 @@ export default {
     getters,
     actions,
     mutations
+
 }

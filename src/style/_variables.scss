@@ -121,11 +121,17 @@ $navbar-dropdown-item-hover-background-color: transparent;
 $navbar-dropdown-item-active-background-color: transparent;
 $navbar-dropdown-item-active-color: $link;
 
+
 $dropdown-content-background-color: $grey-dark;
 $dropdown-item-color: $grey-lighter;
 $dropdown-item-hover-color: $text;
 //$dropdown-divider-background-color: red;
 $dropdown-content-shadow: 	0 0.5em 1em -0.125em rgba($scheme-invert, 0.9), 0 0px 0 1px rgba(255,255,255, 0.5);
+
+$datepicker-item-color: $grey-light;
+$datepicker-item-disabled-color: $grey;
+$datepicker-item-hover-color: $grey-lighter;
+$datepicker-item-hover-background-color: lighten($dropdown-content-background-color, 2);
 
 $progress-value-background-color: $grey-lighter;
 

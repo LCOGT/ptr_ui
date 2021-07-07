@@ -17,13 +17,15 @@
 
         <template slot="start">
 
-            <b-navbar-dropdown label="sites" :close-on-click="true">
+            <b-navbar-dropdown label="sites" :close-on-click="true" @click.native="updateSiteStatus"> 
                 <template v-for="(site, index) in available_sites">
                   <b-navbar-item tag="router-link" 
                     :to="{ path: '/site/' + site+ '/observe'}"
                     v-bind:key="index"
                     v-if="global_config[site]">
-                    {{global_config[site].name}}
+                    <span :class="siteOnlineClass(site)">&#9679;&nbsp;</span>
+                    <span style="font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</span>
+										<span style="color: silver;">{{global_config[site].name}}</span>
                   </b-navbar-item>
                 </template>
                 <hr class="navbar-divider">
@@ -92,6 +94,8 @@ export default {
       'site',
     ]),
 
+    ...mapState('sitestatus', ['site_open_status']),
+
     userIsAdmin() {
       try {
         let user = this.$auth.user 
@@ -134,6 +138,29 @@ export default {
       this.$auth.logout({
         returnTo: window.location.origin
       }).then($router.go)
+    },
+
+    updateSiteStatus() {
+      this.$store.dispatch('sitestatus/getSiteOpenStatus')
+    },
+    siteOnlineClass(site) {
+      const status_age_online = 300 // max number of seconds to be considered online
+      let status
+      try { 
+        status = this.site_open_status[site]
+      } catch {
+        return 'no-status'
+      }
+
+      if (status === undefined) {
+        return 'no-status'
+      }
+
+      if (parseFloat(status.status_age_s) > status_age_online) { return 'no-status' }
+      if (!status.hasWeatherStatus) { return 'status-blue'}
+      if (status.weather_ok && status.open_ok) {return 'status-green'}
+      if (status.weather_ok || status.open_ok) {return 'status-yellow'}
+      return 'status-yellow'
     }
   }
 };
@@ -153,5 +180,29 @@ nav {
 .navbar {
   border-radius: 0;
   z-index:31; /* so the navbar doesn't cover fullscreen modals */
+}
+
+.status-green {
+  opacity: 0.8;
+  padding-right: 3px;
+  font-size: 10px;
+  color: lime;
+}
+.status-yellow {
+  opacity: 0.8;
+  padding-right: 3px;
+  font-size: 10px;
+  color: yellow;
+}
+.status-blue {
+  opacity: 0.8;
+  padding-right: 3px;
+  font-size: 10px;
+  color: lightskyblue;
+}
+.no-status {
+  padding-right: 3px;
+  font-size: 10px;
+  opacity: 0;
 }
 </style>

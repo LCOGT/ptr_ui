@@ -1,6 +1,7 @@
-<template><div>
+<template>
+  <div class="site-home-wrapper">
 
-    <div class="level site-welcome-text">
+    <div class="level site-welcome-text mt-5">
         <div class="level-item">
         Welcome to {{sitecode.toUpperCase()}}
         </div>
@@ -21,11 +22,11 @@
 
     <!-- This is a temporary solution only. Does not scale. -->
     <!-- Add ClearDarkSky charts to site homepage -->
-    <div class="level" v-if="sitecode=='wmd'">
+    <div class="level" v-if="sitecode.toLowerCase()=='mrc'">
         <a href=https://www.cleardarksky.com/c/SaBarbCAkey.html>
         <img src="https://www.cleardarksky.com/c/SaBarbCAcsk.gif?c=1594801"></a>
     </div>
-    <div class="level" v-if="sitecode=='saf'">
+    <div class="level" v-if="sitecode.toLowerCase()=='saf'">
         <a href=https://www.cleardarksky.com/c/LmyRdgObNMkey.html>
         <img src="https://www.cleardarksky.com/c/LmyRdgObNMcsk.gif?c=1594801"></a>
     </div>
@@ -34,28 +35,27 @@
 
 
     <div style="height: 2em;" />
-
-
-
-</div>
+  </div>
 </template>
 
 
 <script>
 import TheDeviceSelectors from '@/components/TheDeviceSelectors'
 import TheDomeCam from '@/components/TheDomeCam'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
+import { status_mixin } from '../../mixins/status_mixin'
+import { user_mixin } from '../../mixins/user_mixin'
 import LeafletMap from '@/components/LeafletMap'
 import SiteEventsModal from '@/components/SiteEventsModal'
-import moment from 'moment'
-import axios from 'axios'
+import CommandButton from '@/components/CommandButton'
 
 export default {
     name: "SiteHome",
-    props: ["deviceStatus", "sitecode"],
-    mixins: [commands_mixin],
+    props: ["sitecode"],
+    mixins: [commands_mixin, status_mixin, user_mixin],
     components: {
+        CommandButton, 
         TheDeviceSelectors,
         TheDomeCam,
         LeafletMap,
@@ -66,10 +66,10 @@ export default {
     },
     computed: {
         ...mapGetters('images', ['current_image']),
-        ...mapGetters('site_config', ['site_config']),
+        ...mapState('site_config', ['global_config']),
 
-        latitude() { return this.site_config(this.sitecode).latitude },
-        longitude() { return this.site_config(this.sitecode).longitude },
+        latitude() { return this.global_config[this.sitecode].latitude },
+        longitude() { return this.global_config[this.sitecode].longitude },
     }
     
     
@@ -79,7 +79,11 @@ export default {
 
 
 <style scoped>
-
+.site-home-wrapper {
+  margin: 0 auto;
+  width: 90vw;
+  max-width: 1150px;
+}
 .site-welcome-text {
     font: 64px "Share Tech Mono", monospace;
 }

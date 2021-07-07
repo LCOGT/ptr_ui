@@ -20,6 +20,15 @@ function user_id() {
         return 'anonymous'
     }
 }
+function user_roles() {
+  if (getInstance().user) {
+    let user = getInstance().user
+    let roles = user['https://photonranch.org/user_metadata'].roles
+    return roles
+  } else {
+    return []
+  }
+}
 // Get axios request config object (the headers) with auth token
 async function getAuthHeader() {
     let token, configWithAuth;
@@ -362,6 +371,7 @@ const actions = {
             instance: rootState.site_config.selected_sequencer,
             user_name: username(),
             user_id: user_id(),
+            user_roles: user_roles(),
             timestamp: parseInt(Date.now() / 1000),
             action: 'run',
             required_params: {
@@ -423,6 +433,7 @@ const actions = {
             instance: 'sequencer',
             user_name: username(),
             user_id: user_id(),
+            user_roles: user_roles(),
             timestamp: parseInt(Date.now() / 1000),
             action: 'stop',
             required_params: {},

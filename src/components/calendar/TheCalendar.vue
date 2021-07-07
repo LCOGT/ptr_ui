@@ -7,14 +7,18 @@
     <!--button class="level-item button is-danger" @click="ping">ping</button-->
     <!--button class="level-item button is-danger" @click="updateNowIndicator">refresh</button-->
     <!--div>{{currentUserScheduled}}</div-->
+    <!--button @click="resize">resize</button-->
+
 
     <FullCalendar
       class="demo-app-calendar"
       ref="fullCalendar"
+      height="parent"
       :views="fc_views"
       :defaultView="fc_defaultView"
       :header="fc_header"
       :slotDuration="fc_slotDuration"
+      :slotLabelInterval="fc_slotLabelInterval"
       :slotLabelFormat="fc_slotLabelFormat"
       :eventTimeFormat="fc_eventTimeFormat"
       :timeZone="fc_timeZone"
@@ -30,7 +34,6 @@
       :nowIndicator="fc_nowIndicator"
       :now="fc_now"
       :progressiveEventRendering="fc_progressiveEventRendering"
-      :aspect-ratio="fc_aspectRatio"
       :themeSystem="fc_themeSystem"
       :schedulerLicenseKey="fc_schedulerLicenseKey"
       :eventSources="fc_eventSources"
@@ -57,19 +60,6 @@
           <button v-if="isLoading" class="level-item button is-text is-loading">loading</button>
         </div>
       </div>
-    </div>
-
-
-    <div class="fc-settings-box">
-      <div>
-        <p class="menu-label">Settings</p>
-        <div class="field">
-            <b-switch v-model="display_moon">
-                Show moon events
-            </b-switch>
-        </div>
-      </div>
-
     </div>
 
     <!-- popup for creating calendar events -->
@@ -153,6 +143,9 @@ export default {
 
     // Timezone of the site
     "fc_timeZone",
+
+    "showMoonEvents",
+    
   ],
 
   mounted() {
@@ -181,7 +174,7 @@ export default {
     user() {
       this.refreshCalendarView();
     },
-    display_moon() {
+    showMoonEvents() {
       this.refreshCalendarView();
     }
   },
@@ -240,16 +233,11 @@ export default {
     },
 
     ...mapGetters("site_config", [
-      "site_config",
       "global_config",
       "site_latitude",
       "site_longitude",
       "timezone",
     ]),
-
-    //...mapGetters("site_config", {
-      //fc_timeZone: "timezone", // rename to match fc namespacing.
-    //}),
 
     user() {
       return this.$auth.user;
@@ -280,7 +268,8 @@ export default {
         center: "title",
         right: "dayGridMonth,timeGridWeek,listWeek",
       },
-      fc_slotDuration: "00:30:00", // horizontal guides; affects event drag precision
+      fc_slotDuration: "00:15:00", // horizontal guides; affects event drag precision
+      fc_slotLabelInterval: "01:00:00",
       fc_eventTimeFormat: { hour: "numeric", minute: "2-digit", hour12: false }, // 24hr times on events
       fc_slotLabelFormat: { hour: "numeric", minute: "2-digit", hour12: false }, // 24hr time on axis labels
       fc_minTime: "12:00:00", // start the day column at noon
@@ -293,7 +282,6 @@ export default {
       fc_weekends: true, // whether to show weekends in week view
       fc_nowIndicator: false, // whether to draw line indicating current time in grid views.
       fc_progressiveEventRendering: true,
-      fc_aspectRatio: 1.2, // calendar window width/height
       fc_themeSystem: "bootstrap", // uses bootstrap css (see <style> below)
       fc_schedulerLicenseKey: "GPL-My-Project-Is-Open-Source", // free use of scheduler/resources
       // fullcalendar plugins
@@ -314,9 +302,6 @@ export default {
       // We need to know whether the component is mounted to access the 
       // $refs.fullCalendar.getApi() method. 
       isMounted: false,
-
-      // Users can toggle whether the visible moon times are on the calendar. 
-      display_moon: true,
 
       moon_cache: {},
 
@@ -516,7 +501,7 @@ export default {
     // moon visibility
     async getMoonRiseSet(info) {
 
-      if (!this.display_moon) {
+      if (!this.showMoonEvents) {
         return [];
       }
       const ms_per_day = 86400000;
@@ -699,10 +684,10 @@ export default {
       let twilightEvents = [];
 
       let site_lat = parseFloat(
-        this.site_config(this.calendarSite)["latitude"]
+        this.global_config[this.calendarSite]["latitude"]
       );
       let site_lng = parseFloat(
-        this.site_config(this.calendarSite)["longitude"]
+        this.global_config[this.calendarSite]["longitude"]
       );
 
       // Compute events for each day.
@@ -1102,24 +1087,46 @@ export default {
 <!-- TODO: reduce the bootstrap css (below) to the minimum required for button groups. -->
 <style lang='scss'>
 
-.fc-settings-box {
-  background-color: black;
-  border-radius: 8px;
-  padding: 1em;
-  margin-bottom: 1em;
+// Calendar grid styling
+.fc table * {
+  border-color: #444;
+  border-width: 1.8px;
+}
+.fc-minor td {
+  border-width: 0.3px;
+  border-color: #333;
+}
+.fc-time-grid .fc-slats td {
+  height: 0.6em;
+  border-bottom: 0;
+}
+
+// Prevent the row time labels from changing the row heights
+.fc-axis {
+  position: relative;
+  span {
+    color: #aaa;
+    position:absolute;
+    left: 5px;
+    top: -1px;
+    overflow:visible;
+    font-size: 0.9em;
+  }
 }
 
 /* the line showing the current time */
-.fc-now-indicator.fc-now-indicator-line {
-  border-color: rgb(255, 0, 0);
-  z-index: 15;
-  opacity: 1;
-  background-color: red;
-}
-.fc-now-indicator.fc-now-indicator-arrow {
-  border-color: rgb(255, 0, 0);
-  z-index: 15;
-  opacity: 1;
+.fc-now-indicator {
+  &.fc-now-indicator-line {
+    border-color: rgb(255, 0, 0);
+    z-index: 15;
+    opacity: 1;
+    background-color: red;
+  }
+  &.fc-now-indicator-arrow {
+    border-color: rgb(255, 0, 0);
+    z-index: 15;
+    opacity: 1;
+  }
 }
 
 #moon-info {
@@ -1155,14 +1162,15 @@ export default {
   opacity: 0.8;
   transition: 0.2s;
 }
+
 /*@import url("https://bootswatch.com/4/darkly/bootstrap.min.css");*/
 .demo-app {
   font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
   font-size: 14px;
 }
-.fc table * {
-  border-color: #444;
-}
+ .demo-app-calendar {
+   position: relative;
+ }
 
 .demo-app-top {
   margin: 0 0 3em;
@@ -1170,6 +1178,7 @@ export default {
 
 .calendar-container {
   margin: 0 auto;
+  height: 100%;
 }
 
 .sr-only {

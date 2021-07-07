@@ -47,17 +47,11 @@ $link-active: darken($link, 5);
 $link-focus-border: $grey-light;
 
 // Dark Colors
-$body-background-color: $grey-dark;
 $text: $grey-light;
 
 $background: $grey-darker;
-$body-background-color: $black;
 $body-color: $light;
 $text: $light;
-
-
-// This is the empty edge space around divs with .container.is-fluid
-$gap: 100px;
 
 // Import Bulma and Buefy styles
 

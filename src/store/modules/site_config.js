@@ -4,10 +4,10 @@
  */
 
 //import { API } from 'aws-amplify'
+import _ from 'lodash'
 import axios from 'axios'
 
 var initial_state = function() {
-    console.log('initializing site_config state')
     let apiName = this.$store.getters['dev/api'];
     let path = '/all/config/';
     let state = {
@@ -26,20 +26,20 @@ var initial_state = function() {
         selected_screen: '',
         selected_weather: '',
 
+        selector_exists: false,
+        selected_selector: '',
+
         camera_areas_selection: '',
         filter_wheel_options_selection: '',
     };
     //API.get(apiName, path).then(response => {
     axios.get(apiName+path).then(response => {
-        console.log('about to fetch config from api')
         state.global_config = response.data;
         state.did_config_load_yet = true;
         state.is_site_selected = false;
     }).catch(error => {
         console.log(error)
     });
-    //console.log('initial config state: ')
-    //console.log(state)
     return state;
 }
 
@@ -48,6 +48,7 @@ const state = {
     global_config: JSON.parse(window.localStorage.getItem('global_config') || '{}'),
     is_site_selected: false,
     did_config_load_yet: false,
+
     selected_site: '',
     selected_enclosure: '',
     selected_mount: '',
@@ -59,6 +60,9 @@ const state = {
     selected_screen: '',
     selected_weather:'',
     selected_sequencer:'',
+
+    selector_exists: false,
+    selected_selector: '',
 
 }
 
@@ -87,7 +91,22 @@ const getters = {
     screen: state => state.selected_screen,
     weather: state => state.selected_weather,
     sequencer: state => state.selected_sequencer,
+    selector: state => state.selected_selector,
 
+    all_sites: state => {
+      let sites = []
+      Object.keys(state.global_config).forEach(site => {
+        let s = {
+          "name": state.global_config[site].name.toString(),
+          "site": state.global_config[site].site.toString(),
+          "latitude":  parseFloat(state.global_config[site].latitude),
+          "longitude": parseFloat(state.global_config[site].longitude),
+        }
+        sites.push(s)
+      })
+      sites = _.orderBy(sites, [s => s.site], ['asc'])
+      return sites
+    },
 
     /* Getters for specific device attributes (implemented here as needed) */
     focuser_reference: state => {
@@ -272,7 +291,6 @@ const getters = {
     all_telescopes: state => state.global_config[state.selected_site]['telescope'],
 
     global_config: state => state.global_config,
-    site_config: state => sitecode => state.global_config[sitecode] || {},
 }
 const mutations = {
     setGlobalConfig(state, config) { 
@@ -280,9 +298,14 @@ const mutations = {
         state.did_config_load_yet = true;
     },
     setActiveSite(state, site) { 
+        console.log('setting active site', site)
         state.selected_site = site; 
         state.is_site_selected = true 
     },
+		removeActiveSite(state) {
+			state.selected_site = ''
+			state.is_site_selected = false
+		},
     setActiveEnclosure(state, enclosure) { state.selected_enclosure = enclosure },
     setActiveMount(state, mount) { state.selected_mount = mount },
     setActiveTelescope(state, telescope) { state.selected_telescope = telescope },
@@ -293,6 +316,15 @@ const mutations = {
     setActiveScreen(state, screen) { state.selected_screen = screen },
     setActiveWeather(state, weather) { state.selected_weather = weather},
     setActiveSequencer(state, sequencer) { state.selected_sequencer = sequencer},
+    setActiveSelector(state, selector) {
+      if (selector == '') {
+        state.selector_exists = false;
+        state.selected_selector = ''
+      } else {
+        state.selector_exists = true;
+        state.selected_selector = selector;
+      }
+    },
 
 }
 
@@ -306,9 +338,7 @@ const actions = {
         let apiName = rootState.dev.active_api;
         let path = '/all/config/';
         return axios.get(apiName+path).then(response => {
-            console.log(response.data)
             window.localStorage.setItem('global_config', JSON.stringify(response.data))
-            //console.log(JSON.parse(window.localStorage.getItem('global_config')))
             commit('setGlobalConfig', response.data)
         }).catch(error => {
             console.log(error)
@@ -323,11 +353,6 @@ const actions = {
     },
 
     set_default_active_devices({ state, commit, getters, rootGetters}, site) {
-        //console.log('global_config: ')
-        //console.log(state.global_config)
-        //console.log(typeof state.global_config)
-        //console.log('site: ', site)
-        //console.log('global_config[site]: ', state.global_config[site])
         let defaults = state.global_config[site].defaults
 
         commit('setActiveSite', site)
@@ -342,6 +367,16 @@ const actions = {
         commit('setActiveSequencer', defaults.sequencer)
         commit('setActiveScreen', defaults.screen)
 
+        // handle optional instrument selector
+        if (Object.keys(state.global_config[site]).includes('selector')
+          && Object.keys(state.global_config[site].defaults).includes('selector')
+					&& state.global_config[site].defaults.selector !== null) {
+          commit('setActiveSelector', defaults.selector)
+        }
+        else {
+          commit('setActiveSelector', '')
+        }
+
         // Set initial values in command fields
         if (rootGetters['command_params/filter_wheel_options_selection'] == '') {
             let filterSelection= getters.filter_wheel_options[0][0]
@@ -351,7 +386,7 @@ const actions = {
                 )
         }
 
-        if (rootGetters['command_params/camera_areas_selection'] == '') {
+        if (rootGetters['command_params/camera_areas_selection'] == '' && getters.camera_areas != undefined) {
             let areaSelection = getters.camera_areas[0]
             commit('command_params/camera_areas_selection', 
                     areaSelection,

@@ -1,38 +1,39 @@
 <template>
-  <div>
-    <div class="level">
-      <div class="level-left">
-        <div
-          class="level-item"
-          style="display:flex; flex-direction:column; align-items: flex-start;"
-        >
-          <div>Time at {{sitecode.toUpperCase()}}:</div>
-          <div class="time-display">{{siteTime}}</div>
-        </div>
-      </div>
-      <div class="level-right">
-        <div
-          class="level-item"
-          style="display:flex; flex-direction:column; align-items: flex-start;"
-        >
-          <div>UTC Time:</div>
-          <div class="time-display">{{utcTime}}</div>
-        </div>
-      </div>
-    </div>
+  <div class="cal-page-wrapper">
+
 
     <the-calendar 
+      class="the-calendar"
       v-if="timezone"
       :fc_timeZone="timezone"
       :calendarSite="sitecode" 
       :fc_resources="listOfObservatories" 
+      :showMoonEvents="showMoonEvents"
       />
 
+    <div class="calendar-adjacent">
 
+      <site-reservation-status :sitecode="sitecode" class=""/>
+
+      <div class="projects-section">
+        <p>Projects will be shown here.</p>
+        <p>You will be able to drag them onto the calendar to schedule them.</p>   
+      </div>
+
+      <div class="fc-settings-box">
+        <div>
+          <p class="menu-label">Settings</p>
+          <div class="field">
+              <b-switch v-model="showMoonEvents">
+                  Show moon events
+              </b-switch>
+          </div>
+        </div>
+      </div>
+
+    </div>
     <!--button class="button" @click="getUserEvents">get user events</button-->
 
-    <p class="subtitle">Upcoming reservations for {{username}}</p>
-    <user-events-table :user="user" />
   </div>
 </template>
 
@@ -40,6 +41,7 @@
 <script>
 import TheCalendar from "@/components/calendar/TheCalendar";
 import UserEventsTable from "@/components/UserEventsTable";
+import SiteReservationStatus from "@/components/SiteReservationStatus"
 import { mapState, mapGetters } from "vuex";
 import axios from "axios";
 import moment from "moment";
@@ -50,12 +52,15 @@ export default {
   components: {
     TheCalendar,
     UserEventsTable,
+    SiteReservationStatus,
   },
   data() {
     return {
       localTime: "-",
       siteTime: "-",
       utcTime: "-",
+
+      showMoonEvents: true,
 
       // URL for the calendar backend api
       //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
@@ -66,8 +71,20 @@ export default {
     this.timeInterval = setInterval(this.updateTime, 1000);
     window.moment = moment; // use moment lib in browser devtools
   },
+  mounted() {
+    // Load the users projects so they can add them to calendar events. 
+    if (this.$auth.isAuthenticated) {
+      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+    }
+  },
   destroyed() {
     clearInterval(this.timeInterval);
+  },
+  watch: {
+    // Update the user's schedulable projects if the user changes. 
+    user() {
+      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+    }
   },
   methods: {
     displayUtcTime(time) {
@@ -135,10 +152,66 @@ export default {
 </script>
 
 
-<style scoped>
-.time-display {
-  font-size: 1.3em;
+<style scoped lang="scss">
+@import "@/style/_responsive.scss";
+
+$content-view-height: calc(100vh - #{$top-bottom-height});
+$content-padding: 2em;
+$calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
+
+.cal-page-wrapper {
+  width: 100%;
+  padding: $content-padding;
+  @include tablet {
+    display: grid;
+    grid-template-rows: 50vh 1fr 1fr;
+    grid-template-columns: 1fr;
+  }
+
+  @include desktop {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    //grid-template-rows: $calendar-height;
+    grid-template-rows: $calendar-height;
+  }
 }
+
+.the-calendar {
+  @include desktop {
+    height: calc(100vh - 360px); //hacky, but make it so you don't need to scroll to see full calendar
+  }
+}
+
+.calendar-adjacent {
+  padding: 2em;
+  display:flex;
+
+  @include tablet {
+    flex-direction: row;
+    padding: 2em 0;
+    margin: 0;
+  }
+
+  @include desktop {
+    flex-direction: column;
+    margin: 1em;
+  }
+
+  & > div {
+    padding: 1em;
+    margin: 1em;
+    width: 100%;
+    border-radius: 8px;
+    background-color:rgba(10,10,10,0.8);
+  }
+}
+
+.projects-section {
+}
+
+.fc-settings-box {
+}
+
 #moon-info {
   position: absolute;
   visibility: hidden;

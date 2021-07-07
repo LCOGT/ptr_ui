@@ -34,7 +34,7 @@ const state = {
 
     filter_wheel_options_selection: '',
 
-    selector_position: 1, // the chosen inst. selector position.
+    selector_position: 0, // the chosen inst. selector position.
 
     focuser_relative: '',
     focuser_absolute: '',

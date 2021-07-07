@@ -2,6 +2,7 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from './store'
 
 import Home from './views/Home.vue'
 import Profile from './views/Profile.vue'
@@ -65,29 +66,17 @@ const router = new VueRouter({
       path: '/site/:sitecode/:subpage',
       name: 'site',
       component: site,
-      props: true,
-      //beforeEnter: authGuard,
+      props: route => {
+        return {
+          sitecode: route.params.sitecode.toLowerCase(),
+          subpage: route.params.subpage.toLowerCase()
+        }
+      },
     },
   ]
 })
 
 export default router
-
-//router.afterEach(async (to, fVrom, next) => {
-  ////window.location.reload(true)
-  //axios({
-    //method: 'get',
-    //url: '/manifest.json',
-    //contentType:    'application/json; charset=utf-8',
-    //dataType:       'json',
-    //cache:          false
-  //}).then((data, textStatus, jqxhr)=>{
-    //console.log(data)
-    //console.log(data.headers.value)
-    //console.log(textStatus)
-    //console.log(jqxhr)
-  //})
-//})
 
 //router.beforeEach(async (to, from , next) => {
   //if(to.meta.requiresAuth) {
