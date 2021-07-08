@@ -146,12 +146,12 @@ export default {
   },
 
   beforeRouteUpdate(to, from, next) {
-		const sitecode = to.params.sitecode.toLowerCase()
-		// Update the active devices
-    this.$store.dispatch( "site_config/set_default_active_devices", sitecode);
-		// Update to the new status
+    const sitecode = to.params.sitecode.toLowerCase();
+    // Update the active devices
+    this.$store.dispatch("site_config/set_default_active_devices", sitecode);
+    // Update to the new status
     this.$store.dispatch("sitestatus/updateSite", sitecode);
-		// Refresh the images
+    // Refresh the images
     this.$store.dispatch("images/display_placeholder_image");
     this.$store.dispatch("images/load_latest_images");
     this.$store.dispatch("images/load_latest_info_images");
@@ -191,6 +191,7 @@ export default {
   methods: {
     // TODO: move this to the vuex images module, like status
     setupImagesWebsocket() {
+
       // Listen for new images on websocket, and refresh the list when a new image arrives.
       // Note: this happens for a new image on any site, not just the one being viewed.
       this.$store.dispatch("images/load_latest_images");
