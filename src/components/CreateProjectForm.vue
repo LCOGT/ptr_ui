@@ -276,6 +276,20 @@
                     class="project-input" 
                     v-model="project_constraints.max_ha"></b-numberinput>
             </b-field>
+
+            <b-field 
+                v-if="showAdvancedInputs"
+                label="Min distance from zenith (degrees)" 
+                :type="{'is-danger': warn.min_zenith_dist}" >
+                <b-numberinput 
+                    step="0.1" 
+                    type="is-button"
+                    max="7.5" 
+                    controls-position="compact" 
+                    class="project-input" 
+                    v-model="project_constraints.min_zenith_dist"></b-numberinput>
+            </b-field>
+
             <b-field 
                 style="max-width: 150px;"
                 v-if="showAdvancedInputs"
@@ -480,6 +494,7 @@ export default {
                 position_angle: 0,
 
                 max_ha: 4, // decimal hours
+                min_zenith_dist: 0, // degrees
                 max_airmass: 2.0,
 
                 lunar_dist_min: 30, // deg
@@ -550,6 +565,7 @@ export default {
                 user_diffuser: false,
                 prefer_bessell: false,
                 max_ha: false,
+                min_zenith_dist: false,
                 max_airmass: false,
                 lunar_dist_min: false,
                 lunar_phase_max: false,
@@ -641,6 +657,7 @@ export default {
                 position_angle: 0,
 
                 max_ha: 4, // decimal hours
+                min_zenith_dist: 0, // deg
                 max_airmass: 2.0,
 
                 lunar_dist_min: 30, // deg
