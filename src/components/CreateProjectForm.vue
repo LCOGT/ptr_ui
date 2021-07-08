@@ -358,14 +358,14 @@
             </section>
 
             <b-field v-if="showAdvancedInputs" label="Generic Instrument">
-								<b-select v-model="project_constraints.generic_instrument">
-										<option value="Main Camera">Main Camera</option>
-										<option value="Auxiliary Camera">Auxiliary Camera</option>
-										<option value="Echelle Spectrometer">Echelle Spectrometer</option>
-										<option value="UXEX Spectrometer">UXEX Spectrometer</option>
-										<option value="Planet Camera">Planet Camera</option>
-										<option value="IR Photometer">IR Photometer</option>
-								</b-select>
+                <b-select v-model="project_constraints.generic_instrument">
+                    <option value="Main Camera">Main Camera</option>
+                    <option value="Auxiliary Camera">Auxiliary Camera</option>
+                    <option value="Echelle Spectrometer">Echelle Spectrometer</option>
+                    <option value="UXEX Spectrometer">UXEX Spectrometer</option>
+                    <option value="Planet Camera">Planet Camera</option>
+                    <option value="IR Photometer">IR Photometer</option>
+                </b-select>
             </b-field>
 
         </div>
@@ -507,6 +507,7 @@ export default {
                 close_on_block_completion: false,
                 add_center_to_mosaic: false,
                 dark_sky_setting: false,
+                generic_instrument: "Main Camera",
             },
 
 
@@ -670,6 +671,7 @@ export default {
                 close_on_block_completion: false,
                 add_center_to_mosaic: false,
                 dark_sky_setting: false,
+                generic_instrument: "Main Camera",
             }
         },
 
