@@ -213,8 +213,21 @@ const actions = {
 
   // Opens a websocket connection and subscribes to updates at the site specified by store.site
   openStatusConnection({ state, commit, dispatch, rootState }) {
+
+    // TESTING the new datastreaming service websocket
+    let datastreamurl = "wss://datastream.photonranch.org/dev"
+    //let datastreamurl = "wss://vf1aj2a25k.execute-api.us-east-1.amazonaws.com/dev"
+    datastreamurl += `?site=${encodeURIComponent(rootState.site_config.selected_site)}`
+    this.datastream = new ReconnectingWebSocket(datastreamurl)
+    this.datastream.onmessage = msg => {
+      console.log(msg)
+      console.log(msg)
+      console.log(msg)
+      console.log(msg)
+    }
+
     let status_ws_url = rootState.dev.status_ws_endpoint
-    status_ws_url += `?site=${encodeURIComponent(state.site)}`
+    status_ws_url += `?site=${encodeURIComponent(rootState.site_config.selected_site)}`
 
     status_ws = new ReconnectingWebSocket(status_ws_url)
     status_ws.onmessage = message => {
