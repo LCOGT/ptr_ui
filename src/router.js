@@ -24,6 +24,7 @@ import { authGuard } from "./auth/authGuard";
 import calendarPage from './views/calendarPage.vue'
 import JobsMonitor from './views/JobsMonitor.vue'
 import UserData from './views/UserData.vue'
+import PlanTargets from './views/PlanTargets'
 import axios from 'axios'
 
 
@@ -52,6 +53,7 @@ const router = new VueRouter({
     },
 
     { path: '/about', name: 'about', component: About },
+    { path: '/plantargets', name: 'plan targets', component: PlanTargets},
     { path: '/info/reservations', name: 'reservations', component: ReservationInfo},
 
 
