@@ -3,7 +3,7 @@
   <div class="the-form">
     <form id="targform" @submit.prevent>
         <b-field label="Photon Ranch Location" class= "control is-expanded">
-          <b-select id="lcloffset" v-model="user.lcloffset" required @input="setLatLong">
+          <b-select id="lcltime" v-model="user.lcltime" required @input="setLatLong">
             <option v-for="s in site_info"
             :lat="s.latitude"
             :lon="s.longitude"
@@ -39,7 +39,7 @@
           </p>
         </div>
       <b-field grouped>
-        <div v-if="user.lcloffset !== 'X'">
+        <div v-if="user.lcltime !== 'X'">
           <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="user.tzinfo" required>My timezone</b-radio>
           <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="user.tzinfo" required> UTC</b-radio>
           <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="user.tzinfo">Local timezone</b-radio>
@@ -50,15 +50,13 @@
         </div>
       </b-field>
       <div class="the-button">
-      <b-field grouped group-multiline class="buttons">
+      <b-field class="buttons">
         <b-button @click="submitForm" type="submit">Find Easy Targets</b-button>
       </b-field>
       </div>
     </form>
   </div>
-  <div class="results">
-    <pre> {{ testy }} </pre>
-    <pre> {{ $data.user }} </pre>
+  <div class="results" id="results">
     <div class="columns">
       <div v-for="target in targlist" :target="target" :key="target.name">
         <TargetCard :target="target" />
@@ -69,6 +67,7 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import axios from 'axios';
 import moment from 'moment';
 import TargetCard from '@/components/TargetCard.vue';
@@ -90,44 +89,36 @@ export default {
         lat1: '',
         lon1: '',
         dateobs: '',
-        timeobs: '',
         tzinfo: 'my',
         offset: '',
-        lcloffset: 'X',
+        lcltime: '',
+        lcloffset: '',
       },
     };
   },
   created: function() {
     const url = "https://api.photonranch.org/api/all/config"
     axios.get(url).then(response => {
-      let site = ''
-      for (site in response.data) {
-        this.site_info[site] = {
+      for (let site in response.data) {
+        Vue.set(this.site_info, site, {
           latitude: response.data[site].latitude,
           longitude: response.data[site].longitude,
           name: response.data[site].name,
           siteoffset: response.data[site].TZ_database_name
-        }
+        })
       }
-    console.log(this.site_info)
-    return this.site_info;
     })
-  },
-  computed: {
-    testy: function (){
-        return this.site_info;
-    }
   },
   methods: {
     setLatLong() {
-      const ddl = document.getElementById('lcloffset');
+      const ddl = document.getElementById('lcltime');
       const selectedOption = ddl.options[ddl.selectedIndex];
       this.user.lat1 = selectedOption.getAttribute('lat');
       this.user.lon1 = selectedOption.getAttribute('lon');
     },
     submitForm() {
       this.user.offset = new Date(this.user.dateobs).getTimezoneOffset();
-      this.user.lcloffset = moment.utc(this.user.dateobs).tz("US/Central").utcOffset()
+      this.user.lcloffset = moment.utc(this.user.dateobs).tz(this.user.lcltime).utcOffset()
 
       var diclist = [];
 
@@ -138,7 +129,6 @@ export default {
       } else if (this.user.tzinfo == 'lcl') {
         var starttime=moment(this.user.dateobs).subtract(this.user.offset+this.user.lcloffset, 'm').toDate()
       }
-
 
       var endtime = moment(starttime).add(30, 'm').toDate();
       for (var i = 0; i < this.easylist.length; ++i) {
@@ -156,9 +146,12 @@ export default {
             "altend": altend
             })
         }
-      } 
+      }
       console.log(diclist)
       this.targlist=diclist;
+
+      if (window.screen.availWidth<970) {
+        setTimeout(function(){ document.getElementById("results").scrollIntoView({behavior: 'smooth'}); }, 30);}
     },
   },
 };
@@ -176,6 +169,7 @@ export default {
   .the-form {
     max-width: 326px;
     margin-left: 8%;
+    margin-bottom: 4%;
   }
   .the-page{
     margin-top:2%;
