@@ -77,7 +77,7 @@ var helpers = {
         return [hrz_altitude, hrz_azimuth]
     },
 
-    siderealTimetimesens: function(lon, date) {
+    siderealTimeWithDate: function(lon, date) {
         /* Local Sidereal Time with reference to J2000
         *(edited to accept date)
         *
@@ -89,6 +89,7 @@ var helpers = {
         *       d    is the days from J2000, including the fraction of a day
         *       UT   is the universal time in decimal hours
         *       lon is your longitude in decimal degrees, East positive.
+        *       date is a Date object, e.g. "2021-07-28T07:00:00.000Z"
         */
 
         var lmst, lon;
@@ -125,9 +126,9 @@ var helpers = {
 
         return lmst;
     },
-    eq2altaztimesens: function (ra, dec, lat, lon, date ) {
+    eq2altazWithDate: function (ra, dec, lat, lon, date ) {
         // compute hour angle in degrees
-        var sidereal = this.siderealTimetimesens(lon, date)
+        var sidereal = this.siderealTimeWithDate(lon, date)
         var ha = sidereal - ra;
         if (ha < 0) ha = ha + 360;
 
