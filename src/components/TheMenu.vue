@@ -48,6 +48,9 @@
                     analysis
                 </b-navbar-item>
             </b-navbar-dropdown-->
+            <b-navbar-item tag="router-link" :to="{ path: '/plantargets' }">
+                    find targets
+            </b-navbar-item>
 
         </template>
 

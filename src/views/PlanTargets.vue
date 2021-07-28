@@ -1,0 +1,204 @@
+<template>
+<section class="the-page">
+  <div class="the-form">
+    <form id="targform" @submit.prevent>
+        <b-field label="Photon Ranch Location" class= "control is-expanded">
+          <b-select id="lcloffset" v-model="user.lcloffset" required @input="setLatLong">
+            <option v-for="s in site_info"
+            :lat="s.latitude"
+            :lon="s.longitude"
+            :value="s.siteoffset"
+            >{{s.name}}</option>
+            <option lat="" lon="" value="X">None</option>
+          </b-select>
+        </b-field
+        <br>
+        <div class="field has-addons">
+          <p class="control is-expanded">
+            <b-field label="Latitude">
+              <b-input type="text" id="lat1" v-model="user.lat1"/>
+            </b-field>
+          </p>
+          <p class="control is-expanded">
+            <b-field label="Longitude">
+              <b-input type="text" id="lon1" v-model="user.lon1"/>
+            </b-field>
+          </p>
+        </div>
+        <div class="field has-addons">
+          <p class="control">
+            <b-field label="Date/Time">
+              <b-datetimepicker 
+                id="dateobs" 
+                v-model="user.dateobs"
+                :timepicker="{ incrementMinutes:30 }"
+                required 
+                inline />
+            </b-field>
+          </p>
+          </p>
+        </div>
+      <b-field grouped>
+        <div v-if="user.lcloffset !== 'X'">
+          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="user.tzinfo" required>My timezone</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="user.tzinfo" required> UTC</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="user.tzinfo">Local timezone</b-radio>
+        </div>
+        <div v-else>
+          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="user.tzinfo" required>My timezone</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="user.tzinfo" required> UTC</b-radio>
+        </div>
+      </b-field>
+      <div class="the-button">
+      <b-field grouped group-multiline class="buttons">
+        <b-button @click="submitForm" type="submit">Find Easy Targets</b-button>
+      </b-field>
+      </div>
+    </form>
+  </div>
+  <div class="results">
+    <pre> {{ testy }} </pre>
+    <pre> {{ $data.user }} </pre>
+    <div class="columns">
+      <div v-for="target in targlist" :target="target" :key="target.name">
+        <TargetCard :target="target" />
+      </div>
+    </div>
+  </div>
+</section>
+</template>
+
+<script>
+import axios from 'axios';
+import moment from 'moment';
+import TargetCard from '@/components/TargetCard.vue';
+import list from '../../public/data/easytargets.json';
+import helpers from '@/utils/helpers';
+
+export default {
+  name: 'PlanTargets',
+  components: {
+    TargetCard,
+  },
+  data() {
+    return {
+      site_info: {},
+      easylist: list,
+      target: {},
+      targlist: '',
+      user: {
+        lat1: '',
+        lon1: '',
+        dateobs: '',
+        timeobs: '',
+        tzinfo: 'my',
+        offset: '',
+        lcloffset: 'X',
+      },
+    };
+  },
+  created: function() {
+    const url = "https://api.photonranch.org/api/all/config"
+    axios.get(url).then(response => {
+      let site = ''
+      for (site in response.data) {
+        this.site_info[site] = {
+          latitude: response.data[site].latitude,
+          longitude: response.data[site].longitude,
+          name: response.data[site].name,
+          siteoffset: response.data[site].TZ_database_name
+        }
+      }
+    console.log(this.site_info)
+    return this.site_info;
+    })
+  },
+  computed: {
+    testy: function (){
+        return this.site_info;
+    }
+  },
+  methods: {
+    setLatLong() {
+      const ddl = document.getElementById('lcloffset');
+      const selectedOption = ddl.options[ddl.selectedIndex];
+      this.user.lat1 = selectedOption.getAttribute('lat');
+      this.user.lon1 = selectedOption.getAttribute('lon');
+    },
+    submitForm() {
+      this.user.offset = new Date(this.user.dateobs).getTimezoneOffset();
+      this.user.lcloffset = moment.utc(this.user.dateobs).tz("US/Central").utcOffset()
+
+      var diclist = [];
+
+      if (this.user.tzinfo == 'my') {
+        var starttime=this.user.dateobs
+      } else if (this.user.tzinfo == 'utc') {
+        var starttime=moment(this.user.dateobs).subtract(this.user.offset, 'm').toDate()
+      } else if (this.user.tzinfo == 'lcl') {
+        var starttime=moment(this.user.dateobs).subtract(this.user.offset+this.user.lcloffset, 'm').toDate()
+      }
+
+
+      var endtime = moment(starttime).add(30, 'm').toDate();
+      for (var i = 0; i < this.easylist.length; ++i) {
+        var altstart = helpers.eq2altaztimesens(this.easylist[i].ra, this.easylist[i].dec, this.user.lat1, this.user.lon1, starttime)[0]
+        var altend = helpers.eq2altaztimesens(this.easylist[i].ra, this.easylist[i].dec, this.user.lat1, this.user.lon1, endtime)[0]
+        if (altstart>35 && altend>35) {
+          diclist.push({
+            "name": this.easylist[i].name, 
+            "type": this.easylist[i].group, 
+            "image": "/targs/DefaultTargetImages/"+this.easylist[i].name.replace(/ /g, "")+".jpg",
+            "ra": this.easylist[i].ra,
+            "dec": this.easylist[i].dec,
+            "starttime": starttime,
+            "altstart": altstart,
+            "altend": altend
+            })
+        }
+      } 
+      console.log(diclist)
+      this.targlist=diclist;
+    },
+  },
+};
+</script>
+
+<style lang="css" scoped>
+  .{targlist {
+    margin-top: 100px;
+  }}
+  .columns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:center;
+  }
+  .the-form {
+    max-width: 326px;
+    margin-left: 8%;
+  }
+  .the-page{
+    margin-top:2%;
+    display:flex;
+  }
+  .the-button{
+    display:flex;
+    justify-content:center;
+  }
+
+  @media(max-width:970px){
+    .the-form {
+    max-width: 326px;
+    margin-left: 0px;
+    }
+    .the-page{
+      flex-direction:column;
+      align-items:center;
+    }
+    .results{
+      justify-content:center;
+      align-items:center;
+    }
+  }
+
+</style>
