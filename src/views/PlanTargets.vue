@@ -49,11 +49,11 @@
           <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="user.tzinfo" required> UTC</b-radio>
         </div>
       </b-field>
-      <div class="the-button">
-      <b-field class="buttons">
-        <b-button @click="submitForm" type="submit">Find Easy Targets</b-button>
-      </b-field>
-      </div>
+        <div class="the-button">
+          <b-field class="buttons">
+            <b-button @click="submitForm" type="submit">Find Easy Targets</b-button>
+          </b-field>
+        </div>
     </form>
   </div>
   <div class="results" id="results">
