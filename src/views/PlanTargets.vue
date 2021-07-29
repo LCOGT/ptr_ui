@@ -32,6 +32,7 @@
                 id="dateobs" 
                 v-model="user.dateobs"
                 :timepicker="{ incrementMinutes:30 }"
+                :datetime-parser="(d) => {new Date(d)}"
                 required 
                 inline />
             </b-field>
@@ -55,8 +56,6 @@
         </div>
     </form>
   </div>
-  <pre> {{ $data.user }} </pre>
-  <pre> {{ site_info.mrc.name }} </pre>
   <div class="results" id="results">
     <div class="target-columns">
       <div v-for="target in targlist" :target="target" :key="target.name">
@@ -89,7 +88,7 @@ export default {
       user: {
         lat1: '',
         lon1: '',
-        dateobs: '',
+        dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000),
         tzinfo: 'my',
         offset: '',
         localtime: '',
