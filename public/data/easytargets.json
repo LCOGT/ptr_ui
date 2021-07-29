@@ -1,0 +1,1381 @@
+[
+   {
+     "group": "Young Open cluster",
+     "name": "NGC 2453",
+     "timeofyear": "Dec-Feb",
+     "ra": 116.90273,
+     "dec": -27.193
+   },
+   {
+     "group": "Young Open cluster",
+     "name": "NGC 4755",
+     "timeofyear": "Mar-May",
+     "ra": 193.4160417,
+     "dec": -60.35886111
+   },
+   {
+     "group": "Young Open cluster",
+     "name": "NGC 3293",
+     "timeofyear": "Mar-May",
+     "ra": 158.85,
+     "dec": -58.2333
+   },
+   {
+     "group": "Young Open cluster",
+     "name": "NGC 6231",
+     "timeofyear": "Jun-Aug",
+     "ra": 253.53009,
+     "dec": -41.82267
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 2506",
+     "timeofyear": "Dec-Feb",
+     "ra": 120.0041667,
+     "dec": -10.77
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 2477",
+     "timeofyear": "Dec-Feb",
+     "ra": 118.0416667,
+     "dec": -38.53
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "Collinder 261",
+     "timeofyear": "Mar-May",
+     "ra": 189.54385,
+     "dec": -68.36794
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "IC 4651",
+     "timeofyear": "Jun-Aug",
+     "ra": 261.2041667,
+     "dec": -49.93333333
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 2204",
+     "timeofyear": "Sep-Nov",
+     "ra": 93.8875,
+     "dec": -18.665
+   },
+   {
+     "group": "Globular cluster",
+     "name": "NGC 2298",
+     "timeofyear": "Dec-Feb",
+     "ra": 102.24664,
+     "dec": -36.00531
+   },
+   {
+     "group": "Globular cluster",
+     "name": "NGC 5139",
+     "timeofyear": "Mar-May",
+     "ra": 201.69648,
+     "dec": -47.48017
+   },
+   {
+     "group": "Globular cluster",
+     "name": "M4",
+     "timeofyear": "Mar-May",
+     "ra": 245.89675,
+     "dec": -26.52575
+   },
+   {
+     "group": "Globular cluster",
+     "name": "M80",
+     "timeofyear": "Jun-Aug",
+     "ra": 244.26004,
+     "dec": -22.97608
+   },
+   {
+     "group": "Globular cluster",
+     "name": "NGC 104",
+     "timeofyear": "Sep-Nov",
+     "ra": 6.02369,
+     "dec": -72.08228
+   },
+   {
+     "group": "Globular cluster",
+     "name": "NGC 288",
+     "timeofyear": "Sep-Nov",
+     "ra": 13.1885,
+     "dec": -26.58261111
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "NGC 2997",
+     "timeofyear": "Dec-Feb",
+     "ra": 146.41147,
+     "dec": -31.19093
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "M83",
+     "timeofyear": "Mar-May",
+     "ra": 204.25182,
+     "dec": -29.86716
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "IC 5332",
+     "timeofyear": "Jun-Aug",
+     "ra": 353.6145333,
+     "dec": -36.10108056
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "NGC 1187",
+     "timeofyear": "Sep-Nov",
+     "ra": 45.65662132,
+     "dec": -22.86735086
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "NGC 2442",
+     "timeofyear": "Dec-Feb",
+     "ra": 114.0993417,
+     "dec": -69.53082222
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "NGC 5068",
+     "timeofyear": "Mar-May",
+     "ra": 199.7283625,
+     "dec": -21.0391
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "NGC 6744",
+     "timeofyear": "Jun-Aug",
+     "ra": 287.4420792,
+     "dec": -63.85753889
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "NGC 1365",
+     "timeofyear": "Sep-Nov",
+     "ra": 53.40191,
+     "dec": -36.14066
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 1549",
+     "timeofyear": "Dec-Feb",
+     "ra": 63.93842,
+     "dec": -55.59236
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 4696",
+     "timeofyear": "Mar-May",
+     "ra": 192.2053208,
+     "dec": -41.31108889
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "IC 1459",
+     "timeofyear": "Jun-Aug",
+     "ra": 344.29419,
+     "dec": -36.46222
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 1399",
+     "timeofyear": "Sep-Nov",
+     "ra": 54.62117917,
+     "dec": -35.45074167
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 1427A",
+     "timeofyear": "Sep-Nov",
+     "ra": 55.0375,
+     "dec": -35.62611111
+   },
+   {
+     "group": "Irregular Galaxy",
+     "name": "NGC 3109",
+     "timeofyear": "Mar-May",
+     "ra": 150.77865,
+     "dec": -26.15957
+   },
+   {
+     "group": "Irregular Galaxy",
+     "name": "IC 4710",
+     "timeofyear": "Jun-Aug",
+     "ra": 277.1582042,
+     "dec": -66.98227778
+   },
+   {
+     "group": "Starburst Galaxy",
+     "name": "NGC 5128",
+     "timeofyear": "Mar-May",
+     "ra": 201.36506,
+     "dec": -43.01911
+   },
+   {
+     "group": "Starburst Galaxy",
+     "name": "NGC 253",
+     "timeofyear": "Sep-Nov",
+     "ra": 11.88805833,
+     "dec": -25.2888
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC 1553",
+     "timeofyear": "Dec-Feb",
+     "ra": 64.04363,
+     "dec": -55.78003
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC 3585",
+     "timeofyear": "Mar-May",
+     "ra": 168.32129,
+     "dec": -26.75499
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC 6861",
+     "timeofyear": "Jun-Aug",
+     "ra": 301.8333,
+     "dec": -48.3703
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC 1316",
+     "timeofyear": "Sep-Nov",
+     "ra": 50.67412,
+     "dec": -37.2082
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 1532",
+     "timeofyear": "Dec-Feb",
+     "ra": 63.01806,
+     "dec": -32.87421
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 1512",
+     "timeofyear": "Dec-Feb",
+     "ra": 60.92041,
+     "dec": -43.37748
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 3256",
+     "timeofyear": "Mar-May",
+     "ra": 156.96368,
+     "dec": -43.90376
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 6872",
+     "timeofyear": "Jun-Aug",
+     "ra": 304.23501,
+     "dec": -70.76808
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 1097",
+     "timeofyear": "Sep-Nov",
+     "ra": 41.57941,
+     "dec": -30.27491
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "NGC 2915",
+     "timeofyear": "Dec-Feb",
+     "ra": 141.55417,
+     "dec": -76.62672
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "Sculptor Dwarf Galaxy",
+     "timeofyear": "Sep-Nov",
+     "ra": 15.03916667,
+     "dec": -33.70888889
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "Phoenix Dwarf",
+     "timeofyear": "Sep-Nov",
+     "ra": 27.77625,
+     "dec": -44.44472222
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Antlia Cluster",
+     "timeofyear": "Dec-Feb",
+     "ra": 157.4212321,
+     "dec": -35.3258079
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 1060",
+     "timeofyear": "",
+     "ra": 159.15,
+     "dec": -27.51777778
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Virgo Cluster",
+     "timeofyear": "",
+     "ra": 186.61288,
+     "dec": 12.7524
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 3526",
+     "timeofyear": "Mar-May",
+     "ra": 192.2158333,
+     "dec": -41.30583333
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Fornax Cluster",
+     "timeofyear": "Sep-Nov",
+     "ra": 54.625,
+     "dec": -35.455
+   },
+   {
+     "group": "Emission nebula",
+     "name": "NGC 2014",
+     "timeofyear": "Dec-Feb",
+     "ra": 83.0968,
+     "dec": -67.68882
+   },
+   {
+     "group": "Emission nebula",
+     "name": "NGC 6334",
+     "timeofyear": "Mar-May",
+     "ra": 260.212,
+     "dec": -36.115
+   },
+   {
+     "group": "Emission nebula",
+     "name": "RCW 120",
+     "timeofyear": "Mar-May",
+     "ra": 258.1,
+     "dec": -38.46666667
+   },
+   {
+     "group": "Emission nebula",
+     "name": "M8",
+     "timeofyear": "Jun-Aug",
+     "ra": 270.90417,
+     "dec": -24.38667
+   },
+   {
+     "group": "Emission nebula",
+     "name": "NGC 6729",
+     "timeofyear": "Jun-Aug",
+     "ra": 285.4433333,
+     "dec": -36.96111111
+   },
+   {
+     "group": "Emission nebula",
+     "name": "NGC 1763",
+     "timeofyear": "Sep-Nov",
+     "ra": 74.21458333,
+     "dec": -66.40694444
+   },
+   {
+     "group": "Emission nebula",
+     "name": "NGC 1936",
+     "timeofyear": "Sep-Nov",
+     "ra": 80.55221667,
+     "dec": -67.97553333
+   },
+   {
+     "group": "Star forming region",
+     "name": "NGC 2070",
+     "timeofyear": "Dec-Feb",
+     "ra": 84.675,
+     "dec": -69.1
+   },
+   {
+     "group": "Star forming region",
+     "name": "NGC 3603",
+     "timeofyear": "Mar-May",
+     "ra": 168.8275,
+     "dec": -61.25722
+   },
+   {
+     "group": "Star forming region",
+     "name": "M20",
+     "timeofyear": "Jun-Aug",
+     "ra": 270.675,
+     "dec": -22.97167
+   },
+   {
+     "group": "Star forming region",
+     "name": "NGC 346",
+     "timeofyear": "Sep-Nov",
+     "ra": 14.77121,
+     "dec": -72.1759
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "NGC 2899",
+     "timeofyear": "Dec-Feb",
+     "ra": 141.76195,
+     "dec": -56.10586
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "ESO 378-1",
+     "timeofyear": "Mar-May",
+     "ra": 171.682363,
+     "dec": -34.36977188
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "IC 5148",
+     "timeofyear": "Jun-Aug",
+     "ra": 329.89607,
+     "dec": -39.38523
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "NGC 7293",
+     "timeofyear": "Sep-Nov",
+     "ra": 337.41035,
+     "dec": -20.83715
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "NGC 1360",
+     "timeofyear": "",
+     "ra": 53.31102999,
+     "dec": -25.8716614
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "IC 2220",
+     "timeofyear": "Dec-Feb",
+     "ra": 119.21375,
+     "dec": -59.12528
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "NGC 3372",
+     "timeofyear": "Mar-May",
+     "ra": 161.07617,
+     "dec": -59.89217
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "NGC 6559",
+     "timeofyear": "Jun-Aug",
+     "ra": 272.5,
+     "dec": -24
+   },
+   {
+     "group": "Supernova Remnant",
+     "name": "NGC 2736",
+     "timeofyear": "Dec-Feb",
+     "ra": 135.0708,
+     "dec": -45.9158
+   },
+   {
+     "group": "Supernova Remnant",
+     "name": "LMC N49",
+     "timeofyear": "",
+     "ra": 81.50158,
+     "dec": -66.084
+   },
+   {
+     "group": "Supernova Remnant",
+     "name": "RCW 86",
+     "timeofyear": "Mar-May",
+     "ra": 220.12083,
+     "dec": -62.645
+   },
+   {
+     "group": "Supernova Remnant",
+     "name": "RCW 103",
+     "timeofyear": "Jun-Aug",
+     "ra": 244.3875,
+     "dec": -51.03333
+   },
+   {
+     "group": "Young Open cluster",
+     "name": "NGC 2169",
+     "timeofyear": "Dec-Feb",
+     "ra": 92.1,
+     "dec": 13.99
+   },
+   {
+     "group": "Young Open cluster",
+     "name": "M16",
+     "timeofyear": "Jun-Aug",
+     "ra": 274.7,
+     "dec": -13.80667
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "Trumpler 5",
+     "timeofyear": "",
+     "ra": 99.12,
+     "dec": 9.47
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 6749",
+     "timeofyear": "Mar-May",
+     "ra": 286.314,
+     "dec": 1.9
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 6802",
+     "timeofyear": "Jun-Aug",
+     "ra": 292.65,
+     "dec": 20.25944444
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 1817",
+     "timeofyear": "Sep-Nov",
+     "ra": 78.0625,
+     "dec": 16.69
+   },
+   {
+     "group": "Globular cluster",
+     "name": "Sextans C",
+     "timeofyear": "Dec-Feb",
+     "ra": 151.379,
+     "dec": -0.07094
+   },
+   {
+     "group": "Globular cluster",
+     "name": "NGC 5053",
+     "timeofyear": "Mar-May",
+     "ra": 199.11196,
+     "dec": "+17.70083"
+   },
+   {
+     "group": "Globular cluster",
+     "name": "M71",
+     "timeofyear": "Jun-Aug",
+     "ra": 298.4437083,
+     "dec": "+18.77919444"
+   },
+   {
+     "group": "Globular cluster",
+     "name": "M15",
+     "timeofyear": "Sep-Nov",
+     "ra": 322.49304,
+     "dec": 12.167
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "M96",
+     "timeofyear": "Dec-Feb",
+     "ra": 161.6906,
+     "dec": 11.81994
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "M88",
+     "timeofyear": "Mar-May",
+     "ra": 187.99673,
+     "dec": "+14.42041"
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "M90",
+     "timeofyear": "",
+     "ra": 189.20911,
+     "dec": "+13.16370"
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "NGC 5364",
+     "timeofyear": "",
+     "ra": 209.05002,
+     "dec": 5.01446
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "NGC 7606",
+     "timeofyear": "Jun-Aug",
+     "ra": 349.77002,
+     "dec": -8.48514
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "NGC 7814",
+     "timeofyear": "Sep-Nov",
+     "ra": 0.81227917,
+     "dec": 16.14522778
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "M91",
+     "timeofyear": "Mar-May",
+     "ra": 188.86012,
+     "dec": 14.49632
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "NGC 6384",
+     "timeofyear": "Jun-Aug",
+     "ra": 263.10126,
+     "dec": 7.06027
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "NGC 1300",
+     "timeofyear": "Sep-Nov",
+     "ra": 49.92102,
+     "dec": -19.41115
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "M59",
+     "timeofyear": "Dec-Feb",
+     "ra": 190.50967,
+     "dec": "+11.64693"
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "M49",
+     "timeofyear": "Mar-May",
+     "ra": 187.44499,
+     "dec": "+08.00041"
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "M87",
+     "timeofyear": "",
+     "ra": 187.7059308,
+     "dec": 12.39112329
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 7619",
+     "timeofyear": "Jun-Aug",
+     "ra": 350.06052,
+     "dec": 8.20629
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 1600",
+     "timeofyear": "Sep-Nov",
+     "ra": 67.916075,
+     "dec": -5.08610278
+   },
+   {
+     "group": "Irregular Galaxy",
+     "name": "IC 3583",
+     "timeofyear": "Mar-May",
+     "ra": 189.1814917,
+     "dec": "+13.25914722"
+   },
+   {
+     "group": "Irregular Galaxy",
+     "name": "NGC 6822",
+     "timeofyear": "Jun-Aug",
+     "ra": 296.23416,
+     "dec": -14.79758
+   },
+   {
+     "group": "Irregular Galaxy",
+     "name": "IC 1613",
+     "timeofyear": "Sep-Nov",
+     "ra": 16.22583,
+     "dec": 2.13333
+   },
+   {
+     "group": "Starburst Galaxy",
+     "name": "NGC 4666",
+     "timeofyear": "Mar-May",
+     "ra": 191.28615,
+     "dec": -0.46191
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC 3115",
+     "timeofyear": "Dec-Feb",
+     "ra": 151.30824,
+     "dec": -7.71858
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "M84",
+     "timeofyear": "Mar-May",
+     "ra": 186.2656,
+     "dec": 12.88698
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC3115",
+     "timeofyear": "",
+     "ra": 151.30824,
+     "dec": -7.71858
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC 676",
+     "timeofyear": "Sep-Nov",
+     "ra": 27.2375,
+     "dec": 5.9075
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC 660",
+     "timeofyear": "",
+     "ra": 25.75979,
+     "dec": 13.64568
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 3227",
+     "timeofyear": "Dec-Feb",
+     "ra": 155.87737,
+     "dec": 19.86508
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC4038",
+     "timeofyear": "Mar-May",
+     "ra": 180.47848,
+     "dec": -18.87743
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 6240",
+     "timeofyear": "Jun-Aug",
+     "ra": 253.24525,
+     "dec": 2.40099
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 520",
+     "timeofyear": "Sep-Nov",
+     "ra": 21.14613,
+     "dec": 3.79241
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "PGC 29488",
+     "timeofyear": "Dec-Feb",
+     "ra": 152.11717,
+     "dec": "+12.30488"
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "Sextans A",
+     "timeofyear": "Mar-May",
+     "ra": 152.7520833,
+     "dec": -4.69166667
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "SagDIG",
+     "timeofyear": "Jun-Aug",
+     "ra": 292.4958,
+     "dec": -17.6781
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 744",
+     "timeofyear": "Dec-Feb",
+     "ra": 136.83309,
+     "dec": 16.65624
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 2151",
+     "timeofyear": "Mar-May",
+     "ra": 241.34715,
+     "dec": "+17.75676"
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 2366",
+     "timeofyear": "Jun-Aug",
+     "ra": 325.705875,
+     "dec": -6.85441667
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 412",
+     "timeofyear": "Sep-Nov",
+     "ra": 46.571667,
+     "dec": -0.142944
+   },
+   {
+     "group": "Emission nebula",
+     "name": "NGC 2359",
+     "timeofyear": "Dec-Feb",
+     "ra": 109.625,
+     "dec": -13.22666667
+   },
+   {
+     "group": "Emission nebula",
+     "name": "IC 1284",
+     "timeofyear": "Jun-Aug",
+     "ra": 274.425,
+     "dec": -19.66667
+   },
+   {
+     "group": "Emission nebula",
+     "name": "NGC 2024",
+     "timeofyear": "Sep-Nov",
+     "ra": 85.42916667,
+     "dec": -1.84166667
+   },
+   {
+     "group": "Star forming region",
+     "name": "M42",
+     "timeofyear": "Dec-Feb",
+     "ra": 83.82208,
+     "dec": -5.39111
+   },
+   {
+     "group": "Star forming region",
+     "name": "M17",
+     "timeofyear": "Jun-Aug",
+     "ra": 275.29876,
+     "dec": -16.14433
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "NGC 2392",
+     "timeofyear": "Dec-Feb",
+     "ra": 112.29486,
+     "dec": 20.9118
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "NGC 3242",
+     "timeofyear": "Mar-May",
+     "ra": 156.19222,
+     "dec": -18.6423
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "NGC 6781",
+     "timeofyear": "Jun-Aug",
+     "ra": 289.61704,
+     "dec": 6.53869
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "NGC 246",
+     "timeofyear": "Sep-Nov",
+     "ra": 11.76392533,
+     "dec": -11.87193753
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "IC 4601",
+     "timeofyear": "Dec-Feb",
+     "ra": 245.10833,
+     "dec": -20.16
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "M48",
+     "timeofyear": "Dec-Feb",
+     "ra": 86.69083,
+     "dec": 0.07917
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "NGC 6590",
+     "timeofyear": "Jun-Aug",
+     "ra": 274.275,
+     "dec": -19.865
+   },
+   {
+     "group": "Young Open cluster",
+     "name": "NGC 2192",
+     "timeofyear": "Dec-Feb",
+     "ra": 93.82,
+     "dec": 39.868
+   },
+   {
+     "group": "Young Open cluster",
+     "name": "IC 5146",
+     "timeofyear": "Jun-Aug",
+     "ra": 328.35,
+     "dec": 47.26667
+   },
+   {
+     "group": "Young Open cluster",
+     "name": "IC 1848",
+     "timeofyear": "Sep-Nov",
+     "ra": 42.777,
+     "dec": 60.41
+   },
+   {
+     "group": "Young Open cluster",
+     "name": "NGC 663",
+     "timeofyear": "Sep-Nov",
+     "ra": 26.5375,
+     "dec": 61.235
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 2266",
+     "timeofyear": "Dec-Feb",
+     "ra": 100.834,
+     "dec": 26.985
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 752",
+     "timeofyear": "Mar-May",
+     "ra": 29.42083333,
+     "dec": 37.785
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 6791",
+     "timeofyear": "Jun-Aug",
+     "ra": 290.2208333,
+     "dec": 37.77166667
+   },
+   {
+     "group": "Old Open Cluster",
+     "name": "NGC 7789",
+     "timeofyear": "Sep-Nov",
+     "ra": 359.35,
+     "dec": 56.70833333
+   },
+   {
+     "group": "Globular cluster",
+     "name": "NGC 2419",
+     "timeofyear": "Dec-Feb",
+     "ra": 114.53508,
+     "dec": "+38.88017"
+   },
+   {
+     "group": "Globular cluster",
+     "name": "M13",
+     "timeofyear": "Mar-May",
+     "ra": 250.42348,
+     "dec": 36.46132
+   },
+   {
+     "group": "Globular cluster",
+     "name": "M92",
+     "timeofyear": "Jun-Aug",
+     "ra": 259.28079,
+     "dec": "+43.13594"
+   },
+   {
+     "group": "Globular cluster",
+     "name": "Palomar 2",
+     "timeofyear": "Sep-Nov",
+     "ra": 71.524625,
+     "dec": "+31.38150000"
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "NGC 3184",
+     "timeofyear": "Dec-Feb",
+     "ra": 154.57038,
+     "dec": 41.42322
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "M101",
+     "timeofyear": "Mar-May",
+     "ra": 210.80243,
+     "dec": 54.34875
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "M51",
+     "timeofyear": "Mar-May",
+     "ra": 202.46957,
+     "dec": "+47.19526"
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "M106",
+     "timeofyear": "Mar-May",
+     "ra": 184.74008,
+     "dec": 47.30372
+   },
+   {
+     "group": "Spiral Galaxy",
+     "name": "M33",
+     "timeofyear": "Sep-Nov",
+     "ra": 23.4621,
+     "dec": "+30.65994"
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "M109",
+     "timeofyear": "Dec-Feb",
+     "ra": 179.39993,
+     "dec": 53.37452
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "NGC 2903",
+     "timeofyear": "Mar-May",
+     "ra": 143.04213,
+     "dec": 21.50083
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "NGC 6951",
+     "timeofyear": "Jun-Aug",
+     "ra": 309.30883,
+     "dec": 66.10558
+   },
+   {
+     "group": "Barred Spiral Galaxy",
+     "name": "NGC 925",
+     "timeofyear": "Sep-Nov",
+     "ra": 36.82047,
+     "dec": 22.57888
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 3610",
+     "timeofyear": "Dec-Feb",
+     "ra": 169.6053167,
+     "dec": 58.78624722
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 4125",
+     "timeofyear": "Mar-May",
+     "ra": 182.0250708,
+     "dec": 65.17413333
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 4589",
+     "timeofyear": "",
+     "ra": 189.3541,
+     "dec": 74.1919
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "NGC 5982",
+     "timeofyear": "Jun-Aug",
+     "ra": 234.66574,
+     "dec": 59.35589
+   },
+   {
+     "group": "Elliptical Galaxy",
+     "name": "Maffei 1",
+     "timeofyear": "Sep-Nov",
+     "ra": 3914779,
+     "dec": 59.65459
+   },
+   {
+     "group": "Irregular Galaxy",
+     "name": "NGC 2366",
+     "timeofyear": "Dec-Feb",
+     "ra": "112.225112.21604",
+     "dec": 69.20864
+   },
+   {
+     "group": "Irregular Galaxy",
+     "name": "NGC 4449",
+     "timeofyear": "Mar-May",
+     "ra": 187.04632,
+     "dec": 40.09356
+   },
+   {
+     "group": "Irregular Galaxy",
+     "name": "IC 1727",
+     "timeofyear": "Sep-Nov",
+     "ra": 26.87454,
+     "dec": 27.33335
+   },
+   {
+     "group": "Starburst Galaxy",
+     "name": "M82",
+     "timeofyear": "Dec-Feb",
+     "ra": 148.96846,
+     "dec": 69.6797
+   },
+   {
+     "group": "Starburst Galaxy",
+     "name": "NGC 3921",
+     "timeofyear": "Mar-May",
+     "ra": 177.77864,
+     "dec": 50.07872
+   },
+   {
+     "group": "Starburst Galaxy",
+     "name": "M64",
+     "timeofyear": "Mar-May",
+     "ra": 194.18207,
+     "dec": 21.68266
+   },
+   {
+     "group": "Starburst Galaxy",
+     "name": "NGC 6946",
+     "timeofyear": "Jun-Aug",
+     "ra": 308.71805,
+     "dec": 60.15368
+   },
+   {
+     "group": "Starburst Galaxy",
+     "name": "IC 10",
+     "timeofyear": "Sep-Nov",
+     "ra": 5.0965,
+     "dec": 59.29297
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC 2655",
+     "timeofyear": "Dec-Feb",
+     "ra": 133.90721,
+     "dec": 78.22308
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC4111",
+     "timeofyear": "Mar-May",
+     "ra": 181.76303,
+     "dec": 43.06539
+   },
+   {
+     "group": "Lenticular Galaxy",
+     "name": "NGC 252",
+     "timeofyear": "Sep-Nov",
+     "ra": 12.00618,
+     "dec": 27.62382
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 4676A",
+     "timeofyear": "Mar-May",
+     "ra": 191.5419167,
+     "dec": 30.73184444
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "Arp 293",
+     "timeofyear": "Jun-Aug",
+     "ra": 254.61583,
+     "dec": 58.94667
+   },
+   {
+     "group": "Interacting Galaxies",
+     "name": "NGC 7752",
+     "timeofyear": "Sep-Nov",
+     "ra": 356.75804,
+     "dec": 29.47466
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "PGC 34176",
+     "timeofyear": "Dec-Feb",
+     "ra": 168.3672083,
+     "dec": "+22.15280556"
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "NGC 4214",
+     "timeofyear": "Mar-May",
+     "ra": 183.91322,
+     "dec": 36.32689
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "NGC 5474",
+     "timeofyear": "",
+     "ra": 211.2567,
+     "dec": 53.66221
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "Draco Dwarf Galaxy",
+     "timeofyear": "Jun-Aug",
+     "ra": 260.05973,
+     "dec": 57.92122
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "NGC 1569",
+     "timeofyear": "Sep-Nov",
+     "ra": 67.70494167,
+     "dec": "+64.84792222"
+   },
+   {
+     "group": "Dwarf Galaxy",
+     "name": "M32",
+     "timeofyear": "",
+     "ra": 10.67427,
+     "dec": 40.86517
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 569",
+     "timeofyear": "Dec-Feb",
+     "ra": 107.29333,
+     "dec": 48.61944
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 1656",
+     "timeofyear": "Mar-May",
+     "ra": 194.948,
+     "dec": "+27.98578"
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 2218",
+     "timeofyear": "Mar-May",
+     "ra": 248.975,
+     "dec": 66.21666667
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 2255",
+     "timeofyear": "Jun-Aug",
+     "ra": 258.2085,
+     "dec": 64.05294444
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Abell 426",
+     "timeofyear": "Sep-Nov",
+     "ra": 49.94527,
+     "dec": 41.51375
+   },
+   {
+     "group": "Galaxy cluster",
+     "name": "Perseus Cluster",
+     "timeofyear": "",
+     "ra": 49.8414,
+     "dec": 41.50885
+   },
+   {
+     "group": "Emission nebula",
+     "name": "NGC 1499",
+     "timeofyear": "Dec-Feb",
+     "ra": 60.825,
+     "dec": 36.42167
+   },
+   {
+     "group": "Emission nebula",
+     "name": "Sh2-106",
+     "timeofyear": "Jun-Aug",
+     "ra": 306.86141,
+     "dec": "+37.37976"
+   },
+   {
+     "group": "Emission nebula",
+     "name": "NGC 1491",
+     "timeofyear": "Sep-Nov",
+     "ra": 60.81819,
+     "dec": "+51.31549"
+   },
+   {
+     "group": "Emission nebula",
+     "name": "Sh2-201",
+     "timeofyear": "Sep-Nov",
+     "ra": 45.8244583,
+     "dec": "+60.46455018"
+   },
+   {
+     "group": "Star forming region",
+     "name": "NGC 1579",
+     "timeofyear": "Dec-Feb",
+     "ra": 67.546,
+     "dec": 35.279
+   },
+   {
+     "group": "Star forming region",
+     "name": "IC 1396A",
+     "timeofyear": "Jun-Aug",
+     "ra": 324,
+     "dec": 57.4
+   },
+   {
+     "group": "Star forming region",
+     "name": "NGC 7822",
+     "timeofyear": "Sep-Nov",
+     "ra": 0.28575,
+     "dec": "+67.42138889"
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "M97",
+     "timeofyear": "Dec-Feb",
+     "ra": 168.6988,
+     "dec": 55.01902
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "M27",
+     "timeofyear": "Jun-Aug",
+     "ra": 299.90151,
+     "dec": 22.7212
+   },
+   {
+     "group": "Planetary nebula",
+     "name": "M76",
+     "timeofyear": "Sep-Nov",
+     "ra": 25.58192,
+     "dec": 51.57543
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "IC 444",
+     "timeofyear": "Dec-Feb",
+     "ra": 94.69494,
+     "dec": 23.32381
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "IC 5076",
+     "timeofyear": "Jun-Aug",
+     "ra": 314,
+     "dec": 47.4
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "Sh2-185",
+     "timeofyear": "Sep-Nov",
+     "ra": 15,
+     "dec": 60.98333
+   },
+   {
+     "group": "Reflection nebula",
+     "name": "NGC 1333",
+     "timeofyear": "Sep-Nov",
+     "ra": 52.297,
+     "dec": 31.31
+   },
+   {
+     "group": "Supernova Remnant",
+     "name": "M1",
+     "timeofyear": "Dec-Feb",
+     "ra": 83.63346,
+     "dec": 22.0152
+   },
+   {
+     "group": "Supernova Remnant",
+     "name": "NGC 6960",
+     "timeofyear": "Jun-Aug",
+     "ra": 311.40833,
+     "dec": 30.70833
+   },
+   {
+     "group": "Supernova Remnant",
+     "name": "IC 443",
+     "timeofyear": "Sep-Nov",
+     "ra": 94.51125,
+     "dec": 22.66
+   }
+ ]

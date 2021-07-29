@@ -77,6 +77,91 @@ var helpers = {
         return [hrz_altitude, hrz_azimuth]
     },
 
+    siderealTimeWithDate: function(lon, date) {
+        /* Local Sidereal Time with reference to J2000
+        *(edited to accept date)
+        *
+        * Equations courtesy of www.stargazing.net/kepler/altaz.html 
+        * and www.aberdeenastro.org.uk/sidereal_time.htm
+
+        *  LST = 100.46 + 0.985647 * d + lon + 15*UT
+        *
+        *       d    is the days from J2000, including the fraction of a day
+        *       UT   is the universal time in decimal hours
+        *       lon is your longitude in decimal degrees, East positive.
+        *       date is a javascript Date object
+        */
+
+        var lmst, lon;
+        var epoch_date;
+        var today_time;
+        var epoch_time;
+        var milli_since_epoch;
+        var d, h, m, s;
+        var UT;
+
+        lon = parseFloat(lon)
+
+
+        // Calculate days since J2000
+        epoch_date = new Date(2000, 0, 1, 12, 0, 0);
+        
+        today_time = date.getTime();
+        epoch_time = epoch_date.getTime();
+
+        milli_since_epoch = today_time-epoch_time;
+        d = milli_since_epoch/86400000;
+
+        // Calculate UT: universal time in decimal hours
+        h = date.getUTCHours();
+        m = date.getUTCMinutes();
+        s = date.getUTCSeconds();
+        UT = h + m/60 + s/3600;
+
+        // Local Sidereal Time:
+        lmst = (100.46 + 0.985647*d + lon + 15*UT);
+        if (lmst<0) {
+            lmst = lmst +360
+        }
+
+        return lmst;
+    },
+    eq2altazWithDate: function (ra, dec, lat, lon, date ) {
+        /* Returns alt/az of a target at a given observation location and date
+        * @param {number} ra, dec The right ascension and declination of the object
+        * @param {number} lat, lon The latitude and longitude of the observer
+        * @param {Date} date The date and time of observation, javascript Date object
+        * @return {number} alt, az The altitude and azimuth of the object
+        */
+
+        // compute hour angle in degrees
+        var sidereal = this.siderealTimeWithDate(lon, date)
+        var ha = sidereal - ra;
+        if (ha < 0) ha = ha + 360;
+
+        // convert degrees to radians
+        ha  = ha*Math.PI/180
+        dec = dec*Math.PI/180
+        lat = lat*Math.PI/180
+
+        // compute altitude in radians
+        var sin_alt = Math.sin(dec)*Math.sin(lat) + Math.cos(dec)*Math.cos(lat)*Math.cos(ha);
+        var alt = Math.asin(sin_alt);
+        
+        // compute azimuth in radians
+        // divide by zero error at poles or if alt = 90 deg
+        var cos_az = (Math.sin(dec) - Math.sin(alt)*Math.sin(lat))/(Math.cos(alt)*Math.cos(lat));
+        var az  = Math.acos(cos_az);
+
+        // convert radians to degrees
+        var hrz_altitude = alt*180/Math.PI;
+        var hrz_azimuth  = az*180/Math.PI;
+
+        // choose hemisphere
+        if (Math.sin(ha) > 0) hrz_azimuth = 360 - hrz_azimuth;
+        return [hrz_altitude, hrz_azimuth]
+    },
+
     hour2degree: ra => {
         return ra > 12? (ra - 24) * 15 : ra * 15;
     },
