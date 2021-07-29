@@ -10,18 +10,18 @@
             :lon="s.longitude"
             :value="s.siteoffset"
             >{{s.name}}</option>
-            <option lat="" lon="" value="X">None</option>
+            <option lat="" lon="" value="X">Custom Latitude and Longitude</option>
           </b-select>
         </b-field>
         <div class="field has-addons">
           <p class="control is-expanded">
             <b-field label="Latitude">
-              <b-input type="text" id="lat1" v-model="user.lat1" required/>
+              <b-input type="text" id="lat1" v-model="user.lat1" required :disabled="user.localtime!='X'"/>
             </b-field>
           </p>
           <p class="control is-expanded">
             <b-field label="Longitude">
-              <b-input type="text" id="lon1" v-model="user.lon1" required/>
+              <b-input type="text" id="lon1" v-model="user.lon1" required :disabled="user.localtime!='X'"/>
             </b-field>
           </p>
         </div>
@@ -56,6 +56,7 @@
     </form>
   </div>
   <pre> {{ $data.user }} </pre>
+  <pre> {{ site_info.mrc.name }} </pre>
   <div class="results" id="results">
     <div class="target-columns">
       <div v-for="target in targlist" :target="target" :key="target.name">
@@ -107,6 +108,9 @@ export default {
           siteoffset: response.data[site].TZ_database_name
         })
       }
+      Vue.set(this.user, 'localtime', this.site_info.mrc.siteoffset)
+      Vue.set(this.user, 'lat1', this.site_info.mrc.latitude)
+      Vue.set(this.user, 'lon1', this.site_info.mrc.longitude)
       console.log(error)
     })
     .catch(error => {
