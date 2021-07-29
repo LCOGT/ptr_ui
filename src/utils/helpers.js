@@ -89,7 +89,7 @@ var helpers = {
         *       d    is the days from J2000, including the fraction of a day
         *       UT   is the universal time in decimal hours
         *       lon is your longitude in decimal degrees, East positive.
-        *       date is a Date object, e.g. "2021-07-28T07:00:00.000Z"
+        *       date is a javascript Date object
         */
 
         var lmst, lon;
@@ -127,6 +127,13 @@ var helpers = {
         return lmst;
     },
     eq2altazWithDate: function (ra, dec, lat, lon, date ) {
+        /* Returns alt/az of a target at a given observation location and date
+        * @param {number} ra, dec The right ascension and declination of the object
+        * @param {number} lat, lon The latitude and longitude of the observer
+        * @param {Date} date The date and time of observation, javascript Date object
+        * @return {number} alt, az The altitude and azimuth of the object
+        */
+
         // compute hour angle in degrees
         var sidereal = this.siderealTimeWithDate(lon, date)
         var ha = sidereal - ra;

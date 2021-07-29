@@ -3,7 +3,7 @@
   <div class="the-form">
     <form id="targform" @submit.prevent>
         <b-field label="Photon Ranch Location" class= "control is-expanded">
-          <b-select id="localtime" v-model="user.localtime" @input="setLatLong">
+          <b-select id="localtime" v-model="localtime" @input="setLatLong">
             <option v-for="s in site_info"
             :key="s.name"
             :lat="s.latitude"
@@ -16,12 +16,12 @@
         <div class="field has-addons">
           <p class="control is-expanded">
             <b-field label="Latitude">
-              <b-input type="text" id="lat1" v-model="user.lat1" required :disabled="user.localtime!='X'"/>
+              <b-input type="text" id="lat1" v-model="lat1" required :disabled="localtime!='X'"/>
             </b-field>
           </p>
           <p class="control is-expanded">
             <b-field label="Longitude">
-              <b-input type="text" id="lon1" v-model="user.lon1" required :disabled="user.localtime!='X'"/>
+              <b-input type="text" id="lon1" v-model="lon1" required :disabled="localtime!='X'"/>
             </b-field>
           </p>
         </div>
@@ -30,7 +30,7 @@
             <b-field label="Date/Time">
               <b-datetimepicker 
                 id="dateobs" 
-                v-model="user.dateobs"
+                v-model="dateobs"
                 :timepicker="{ incrementMinutes:30 }"
                 :datetime-parser="(d) => {new Date(d)}"
                 required 
@@ -39,14 +39,14 @@
           </p>
         </div>
       <b-field grouped>
-        <div v-if="user.localtime !== 'X'">
-          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="user.tzinfo" required>My timezone</b-radio>
-          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="user.tzinfo" required> UTC</b-radio>
-          <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="user.tzinfo">Local timezone</b-radio>
+        <div v-if="localtime !== 'X'">
+          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required>My timezone</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required> UTC</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo">Local timezone</b-radio>
         </div>
         <div v-else>
-          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="user.tzinfo" required>My timezone</b-radio>
-          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="user.tzinfo" required> UTC</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required>My timezone</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required> UTC</b-radio>
         </div>
       </b-field>
         <div class="the-button">
@@ -85,15 +85,13 @@ export default {
       easylist: list,
       target: {},
       targlist: '',
-      user: {
-        lat1: '',
-        lon1: '',
-        dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000),
-        tzinfo: 'my',
-        offset: '',
-        localtime: '',
-        localoffset: '',
-      },
+      lat1: '',
+      lon1: '',
+      dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000),
+      tzinfo: 'my',
+      offset: '',
+      localtime: '',
+      localoffset: '',
     };
   },
   created: function() {
@@ -107,10 +105,9 @@ export default {
           siteoffset: response.data[site].TZ_database_name
         })
       }
-      Vue.set(this.user, 'localtime', this.site_info.mrc.siteoffset)
-      Vue.set(this.user, 'lat1', this.site_info.mrc.latitude)
-      Vue.set(this.user, 'lon1', this.site_info.mrc.longitude)
-      console.log(error)
+      Vue.set(this, 'localtime', this.site_info.mrc.siteoffset)
+      Vue.set(this, 'lat1', this.site_info.mrc.latitude)
+      Vue.set(this, 'lon1', this.site_info.mrc.longitude)
     })
     .catch(error => {
       console.log(error)
@@ -119,27 +116,27 @@ export default {
   methods: {
     setLatLong() {
       const selectedOption = document.getElementById('localtime').options[document.getElementById('localtime').selectedIndex];
-      this.user.lat1 = selectedOption.getAttribute('lat');
-      this.user.lon1 = selectedOption.getAttribute('lon');
+      this.lat1 = selectedOption.getAttribute('lat');
+      this.lon1 = selectedOption.getAttribute('lon');
     },
     submitForm() {
-      this.user.offset = new Date(this.user.dateobs).getTimezoneOffset();
-      this.user.localoffset = moment.utc(this.user.dateobs).tz(this.user.localtime).utcOffset()
+      this.offset = new Date(this.dateobs).getTimezoneOffset();
+      this.localoffset = moment.utc(this.dateobs).tz(this.localtime).utcOffset()
 
       var diclist = [];
 
-      if (this.user.tzinfo == 'my') {
-        var starttime=this.user.dateobs
-      } else if (this.user.tzinfo == 'utc') {
-        var starttime=moment(this.user.dateobs).subtract(this.user.offset, 'm').toDate()
-      } else if (this.user.tzinfo == 'lcl') {
-        var starttime=moment(this.user.dateobs).subtract(this.user.offset+this.user.localoffset, 'm').toDate()
+      if (this.tzinfo == 'my') {
+        var starttime=this.dateobs
+      } else if (this.tzinfo == 'utc') {
+        var starttime=moment(this.dateobs).subtract(this.offset, 'm').toDate()
+      } else if (this.tzinfo == 'lcl') {
+        var starttime=moment(this.dateobs).subtract(this.offset+this.localoffset, 'm').toDate()
       }
 
       var endtime = moment(starttime).add(30, 'm').toDate();
       for (var i = 0; i < this.easylist.length; ++i) {
-        var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.user.lat1, this.user.lon1, starttime)[0]
-        var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.user.lat1, this.user.lon1, endtime)[0]
+        var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, starttime)[0]
+        var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, endtime)[0]
         if (altstart>35 && altend>35) {
           diclist.push({
             "name": this.easylist[i].name, 
@@ -153,7 +150,7 @@ export default {
             })
         }
       }
-      console.log(diclist)
+
       this.targlist=diclist;
 
       if (window.screen.availWidth<970) {
@@ -175,7 +172,7 @@ export default {
     margin-bottom: 4%;
   }
   .the-page{
-    margin-top:2%;
+    padding-top:2%;
     display:flex;
   }
   .the-button{
