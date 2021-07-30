@@ -31,7 +31,7 @@
               <b-datetimepicker 
                 id="dateobs" 
                 v-model="dateobs"
-                :timepicker="{ incrementMinutes:30 }"
+                :timepicker="{ incrementMinutes:30, hourFormat:timeformat}"
                 :datetime-parser="(d) => {new Date(d)}"
                 required 
                 inline />
@@ -40,9 +40,9 @@
         </div>
       <b-field grouped>
         <div v-if="localtime !== 'X'">
-          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required>My timezone</b-radio>
-          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required> UTC</b-radio>
-          <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo">Local timezone</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat">My timezone</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat"> UTC</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat">Local timezone</b-radio>
         </div>
         <div v-else>
           <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required>My timezone</b-radio>
@@ -56,6 +56,7 @@
         </div>
     </form>
   </div>
+  <pre> {{ $data.tzinfo }} </pre>
   <div class="results" id="results">
     <div class="target-columns">
       <div v-for="target in targlist" :target="target" :key="target.name">
@@ -92,6 +93,7 @@ export default {
       offset: '',
       localtime: '',
       localoffset: '',
+      timeformat: undefined,
     };
   },
   created: function() {
@@ -118,6 +120,15 @@ export default {
       const selectedOption = document.getElementById('localtime').options[document.getElementById('localtime').selectedIndex];
       this.lat1 = selectedOption.getAttribute('lat');
       this.lon1 = selectedOption.getAttribute('lon');
+    },
+    changeTimeFormat($event) {
+      if (this.tzinfo == 'utc') {
+        this.timeformat = '24';
+        console.log(this.timeformat);
+      } else {
+        this.timeformat = undefined;
+        console.log(this.timeformat);
+      }
     },
     submitForm() {
       this.offset = new Date(this.dateobs).getTimezoneOffset();

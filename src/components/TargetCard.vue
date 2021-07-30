@@ -1,6 +1,6 @@
 <template>
   <div class="target-card">
-    <div class="card">
+    <div class="tcard">
       <img :src="`${target.image}`"/>
       <div class="target-name">
         <h2>{{ target.name }}</h2>
@@ -25,7 +25,7 @@ export default {
 };
 </script>
 <style lang="scss">
-  .card {
+  .tcard {
     position: relative;
     height: 250px;
     width: 250px;
