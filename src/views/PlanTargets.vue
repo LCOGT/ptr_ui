@@ -148,7 +148,7 @@ export default {
       for (var i = 0; i < this.easylist.length; ++i) {
         var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, starttime)[0]
         var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, endtime)[0]
-        if (altstart>35 && altend>35) {
+        if (altstart>45 && altend>45) {
           diclist.push({
             "name": this.easylist[i].name,
             "nickname": this.easylist[i].alt, 
