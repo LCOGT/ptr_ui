@@ -2,9 +2,8 @@
   <div class="target-card">
     <div class="tcard">
       <img :src="`${target.image}`"/>
-      <div class="target-name">
-        <h2>{{ target.name }}</h2>
-      </div>
+        <h2 class="target-name">{{ target.name }}</h2>
+        <h4 class="target-nickname">{{ target.nickname }}</h4>
         <h3 class="target-type">{{ target.type }}</h3>
     </div>
   </div>
@@ -39,9 +38,16 @@ export default {
     font-size: x-large;
     color: white;
     position: absolute;
-    top:5%;
+    top:15px;
     left:5%;
 
+  }
+  .target-nickname {
+    font-size: medium;
+    color: white;
+    position: absolute;
+    top:18%;
+    left:5%;
   }
   .target-type {
     font-size: x-large;

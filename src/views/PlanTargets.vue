@@ -150,7 +150,8 @@ export default {
         var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, endtime)[0]
         if (altstart>35 && altend>35) {
           diclist.push({
-            "name": this.easylist[i].name, 
+            "name": this.easylist[i].name,
+            "nickname": this.easylist[i].alt, 
             "type": this.easylist[i].group, 
             "image": "/targs/DefaultTargetImages/"+this.easylist[i].name.replace(/ /g, "")+".jpg",
             "ra": this.easylist[i].ra,

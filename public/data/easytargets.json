@@ -801,14 +801,6 @@
  },
  {
    "group": "Lenticular Galaxy",
-   "name": "NGC 3115",
-   "timeofyear": "Dec-Feb",
-   "ra": "151.30824",
-   "dec": -7.71858,
-   "alt": ""
- },
- {
-   "group": "Lenticular Galaxy",
    "name": "M84",
    "timeofyear": "Mar-May",
    "ra": "186.2656",
