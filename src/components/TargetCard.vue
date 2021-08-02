@@ -1,6 +1,6 @@
 <template>
   <div class="target-card">
-    <div class="tcard">
+    <div class="card">
       <img :src="`${target.image}`"/>
         <h2 class="target-name">{{ target.name }}</h2>
         <h4 class="target-nickname">{{ target.nickname }}</h4>
@@ -23,8 +23,8 @@ export default {
   },
 };
 </script>
-<style lang="scss">
-  .tcard {
+<style lang="scss" scoped>
+  .card {
     position: relative;
     height: 250px;
     width: 250px;
@@ -40,7 +40,6 @@ export default {
     position: absolute;
     top:15px;
     left:5%;
-
   }
   .target-nickname {
     font-size: medium;

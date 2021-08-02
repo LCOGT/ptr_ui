@@ -56,7 +56,6 @@
         </div>
     </form>
   </div>
-  <pre> {{ $data.tzinfo }} </pre>
   <div class="results" id="results">
     <div class="target-columns">
       <div v-for="target in targlist" :target="target" :key="target.name">
