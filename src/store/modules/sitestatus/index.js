@@ -137,6 +137,7 @@ const empty_status = {
 
 // This value holds the websocket connection used to get status updates
 let status_ws = ''
+let datastream_ws = ''
 
 const state = {
   site: 'no site',
@@ -177,7 +178,7 @@ const getters = {
 
 const mutations = {
   site(state, val) { state.site = val },
-  serverTimestampMs(state, time) { state.timestamp = time },
+  serverTimestampMs(state, time) { console.log('setting server timestamp'); state.timestamp = time },
   updateLocalClock(state, time) { state.now = time },
 
   siteOpenStatus(state, val) { state.site_open_status = val },
@@ -214,29 +215,19 @@ const actions = {
   // Opens a websocket connection and subscribes to updates at the site specified by store.site
   openStatusConnection({ state, commit, dispatch, rootState }) {
 
-    // TESTING the new datastreaming service websocket
-    let datastreamurl = "wss://datastream.photonranch.org/dev"
-    //let datastreamurl = "wss://vf1aj2a25k.execute-api.us-east-1.amazonaws.com/dev"
-    datastreamurl += `?site=${encodeURIComponent(rootState.site_config.selected_site)}`
-    this.datastream = new ReconnectingWebSocket(datastreamurl)
-    this.datastream.onmessage = msg => {
-      console.log(msg)
-      console.log(msg)
-      console.log(msg)
-      console.log(msg)
-    }
-
     let status_ws_url = rootState.dev.status_ws_endpoint
     status_ws_url += `?site=${encodeURIComponent(rootState.site_config.selected_site)}`
 
     status_ws = new ReconnectingWebSocket(status_ws_url)
     status_ws.onmessage = message => {
+      console.warn('regular status socket message')
       let data = JSON.parse(message.data);
       let statusType = data.statusType
       let status = data.status
 
 			// TODO: handle the different statusTypes distinctly.
 			if (statusType == "deviceStatus") {
+        console.log(data)
 				commit('serverTimestampMs', data.server_timestamp_ms)
 				commit('status', status)
 			}
@@ -250,9 +241,20 @@ const actions = {
     dispatch('getLatestStatus')
   },
 
+  // Update the websocket subscription to get data for a different.
+  updateSite({commit, dispatch}, site) {
+    commit('site', site)
+    dispatch('getLatestStatus')
+    status_ws.send(JSON.stringify({
+      action: "updateSubscriberSite",
+      site: site,
+    }))
+  },
+
   // Closes the websocket connection
   closeStatusConnection() {
     status_ws.close()
+    datastream_ws.close()
   },
 
   // Get and update the 'open' status of all sites. Used for the global map site indicators. 
@@ -264,8 +266,12 @@ const actions = {
 
   // Get a single status object for a site. Used to initialize values when loading a new site. 
   async getLatestStatus({ state, commit, dispatch, rootState }) {
-    let url = rootState.dev.status_endpoint + `/${state.site}/device_status`
+    console.log('getting latest status for site ', rootState.site_config.selected_site)
+    let url = rootState.dev.status_endpoint + `/${rootState.site_config.selected_site}/device_status`
     let response = await Axios.get(url)
+    console.log(url)
+    console.log(response)
+    console.log(response.data)
 
     // If the site has no status available, commit a default empty status to the store
     if (!Object.keys(response.data).includes('status')) {
@@ -277,15 +283,6 @@ const actions = {
     commit('status', status)
   },
 
-  // Update the websocket subscription to get data for a different.
-  updateSite({commit, dispatch}, site) {
-    commit('site', site)
-    dispatch('getLatestStatus')
-    status_ws.send(JSON.stringify({
-      action: "updateSubscriberSite",
-      site: site,
-    }))
-  },
 
   // Reset to empty values. Used for sites without any status available.
   clearStatus({commit, dispatch}) {

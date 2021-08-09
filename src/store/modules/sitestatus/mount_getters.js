@@ -14,19 +14,33 @@ const parseTrueFalse = s => {
 const mount_state = (state, getters, rootState) => {
   try {
     return state.mount[rootState.site_config.selected_mount]
-  } catch { return {} }
+  } catch { 
+    return {} 
+  }
 }
 
 const mount_is_slewing = (state, getters) => {
-  return (getters.mount_state.is_slewing || '-')
+  try {
+    return getters.mount_state.is_slewing
+  } catch { 
+    return '-' 
+  }
 }
 
 const mount_is_parked = (state, getters) => {
-  return (getters.mount_state.is_parked || '-')
+  try {
+    return getters.mount_state.is_parked
+  } catch { 
+    return '-' 
+  }
 }
 
 const mount_is_tracking = (state, getters) => {
-  return (getters.mount_state.is_tracking || '-')
+  try {
+    return getters.mount_state.is_tracking
+  } catch { 
+    return '-' 
+  }
 }
 
 const mount_activity = (state, getters) => {

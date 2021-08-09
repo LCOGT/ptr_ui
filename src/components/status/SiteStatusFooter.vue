@@ -228,8 +228,6 @@ export default {
 
   data() {
     return {
-      displayedOnlineUsers: new Set([]),
-
       status_bar_1_expanded: false,
       status_bar_2_expanded: false,
     };
@@ -263,15 +261,6 @@ export default {
         return this.$auth.user.name;
       }
       return "anonymous";
-    },
-
-    // Format the displayed list of online users
-    makeOnlineUsersList(listOfUsers) {
-      let theList = new Set(listOfUsers); // Remove duplicates
-      theList.delete("anonymous");
-      theList.delete(this.username);
-      if (this.username != "anonymous") theList.add(`${this.username} (me)`);
-      this.displayedOnlineUsers = theList;
     },
 
     toggle_status_bar_height_1() {

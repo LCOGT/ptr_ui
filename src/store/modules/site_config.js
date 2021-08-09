@@ -298,7 +298,6 @@ const mutations = {
         state.did_config_load_yet = true;
     },
     setActiveSite(state, site) { 
-        console.log('setting active site', site)
         state.selected_site = site; 
         state.is_site_selected = true 
     },
