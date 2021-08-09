@@ -131,33 +131,38 @@ export default {
   beforeRouteEnter(to, from, next) {
     const sitecode = to.params.sitecode.toLowerCase();
     next((vm) => {
+      // Update the active devices
       vm.$store.dispatch("site_config/set_default_active_devices", sitecode);
 
-      // Set status subscriptions to the new site
-      vm.$store.dispatch("sitestatus/openStatusConnection");
-      vm.$store.dispatch("sitestatus/updateSite", sitecode);
+      // Subscribe to datastream for the new site
+      vm.$store.dispatch("datastreamer/openDatastreamConnection", sitecode)
 
+      // Refresh the images and status
+      vm.$store.dispatch("images/display_placeholder_image");
       vm.$store.dispatch("images/load_latest_images");
       vm.$store.dispatch("images/load_latest_info_images");
+      vm.$store.dispatch("sitestatus/getLatestStatus")
+      vm.$store.dispatch("userstatus/fetch_recent_logs")
 
-      // Refresh the active reservations list for the new site.
+      // Refresh the active reservations list
       vm.$store.dispatch("calendar/fetchActiveReservations", sitecode);
     });
   },
 
   beforeRouteUpdate(to, from, next) {
-    const sitecode = to.params.sitecode.toLowerCase();
-    // Update the active devices
-    this.$store.dispatch("site_config/set_default_active_devices", sitecode);
-    // Update to the new status
-    this.$store.dispatch("sitestatus/updateSite", sitecode);
-    // Refresh the images
-    this.$store.dispatch("images/display_placeholder_image");
-    this.$store.dispatch("images/load_latest_images");
-    this.$store.dispatch("images/load_latest_info_images");
-    // Refresh the active reservations list
-    this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
+    console.log('in BEFORE ROUTE UPDATE')
+    const new_site = to.params.sitecode.toLowerCase();
+
+    this.site_changed_routine(new_site)
+
     next();
+  },
+
+  beforeRouteLeave(to, from, next) {
+    console.log('in BEFORE ROUTE LEAVE')
+    //this.$store.dispatch('sitestatus/closeStatusConnection')
+    this.$store.dispatch('datastreamer/closeDatastreamConnection')
+    next()
   },
 
   beforeDestroy() {
@@ -166,7 +171,7 @@ export default {
   },
 
   mounted() {
-    this.setupImagesWebsocket();
+    //this.setupImagesWebsocket();
 
     // Update timestamp every second (sent with command)
     setInterval(() => {
@@ -189,30 +194,54 @@ export default {
   },
 
   methods: {
+
+    // Do this whenever the selected site changes
+    site_changed_routine(sitecode) {
+      console.log('site changed to ', sitecode)
+
+      // Update the active devices
+      this.$store.dispatch("site_config/set_default_active_devices", sitecode);
+
+      // Subscribe to datastream for the new site
+      this.$store.dispatch("datastreamer/updateSite", sitecode);
+
+      // Refresh the images and status
+      this.$store.dispatch("images/display_placeholder_image");
+      this.$store.dispatch("images/load_latest_images");
+      this.$store.dispatch("images/load_latest_info_images");
+      this.$store.dispatch("sitestatus/getLatestStatus")
+      this.$store.dispatch("userstatus/fetch_recent_logs")
+
+      // Refresh the active reservations list
+      this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
+
+    },
+
     // TODO: move this to the vuex images module, like status
     setupImagesWebsocket() {
 
       // Listen for new images on websocket, and refresh the list when a new image arrives.
       // Note: this happens for a new image on any site, not just the one being viewed.
       this.$store.dispatch("images/load_latest_images");
-      const images_ws_url = this.$store.state.dev.images_websocket;
-      this.imageSubscriber = new ReconnectingWebSocket(images_ws_url);
+      //const images_ws_url = this.$store.state.dev.images_websocket;
+      //this.imageSubscriber = new ReconnectingWebSocket(images_ws_url);
 
-      const message_handler = (response) => {
-        const data = JSON.parse(response.data);
-        data["messages"].forEach((message) => {
-          const content = message.content.messages[0];
-          const base_filename = content.base_filename;
-          //console.log('new image: ', base_filename)
-          const image_type = content.s3_directory;
-          if (image_type == "data") {
-            this.$store.dispatch("images/update_new_image", base_filename);
-          } else if (image_type == "info-images") {
-            this.$store.dispatch("images/load_latest_info_images");
-          }
-        });
-      };
-      this.imageSubscriber.onmessage = message_handler;
+      //const message_handler = (response) => {
+        //console.log('images websocket msg', response)
+        //const data = JSON.parse(response.data);
+        //data["messages"].forEach((message) => {
+          //const content = message.content.messages[0];
+          //const base_filename = content.base_filename;
+          ////console.log('new image: ', base_filename)
+          //const image_type = content.s3_directory;
+          //if (image_type == "data") {
+            //this.$store.dispatch("images/update_new_image", base_filename);
+          //} else if (image_type == "info-images") {
+            //this.$store.dispatch("images/load_latest_info_images");
+          //}
+        //});
+      //};
+      //this.imageSubscriber.onmessage = message_handler;
     },
   },
 };
