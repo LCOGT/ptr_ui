@@ -13,6 +13,7 @@ import calendar from './modules/calendar'
 import drawshapes from './modules/drawshapes'
 import sitestatus from './modules/sitestatus'
 import starprofile from './modules/analysistools/starprofile'
+import userstatus from './modules/userstatus'
 
 Vue.use(Vuex)
 
@@ -40,6 +41,7 @@ const store = new Vuex.Store({
         drawshapes,
         sitestatus,
         starprofile,
+        userstatus
     },
 })
 

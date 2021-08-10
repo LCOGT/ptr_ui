@@ -23,9 +23,10 @@
                     :to="{ path: '/site/' + site+ '/observe'}"
                     v-bind:key="index"
                     v-if="global_config[site]">
-                    <span :class="siteOnlineClass(site)">&#9679;&nbsp;</span>
+                    <div :class="siteOnlineClass(site)">&#9679;&nbsp;</div>
                     <span style="font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</span>
 										<span style="color: silver;">{{global_config[site].name}}</span>
+                    <span></span>
                   </b-navbar-item>
                 </template>
                 <hr class="navbar-divider">
@@ -115,16 +116,6 @@ export default {
          siteName += ' - ' + this.site.toUpperCase()
       }
       return siteName
-    },
-
-    userIsAdmin() {
-      try {
-        let user = this.$auth.user 
-        let roles = user['https://photonranch.org/user_metadata'].roles
-        return roles.includes('admin')
-      } catch {
-        return false
-      }
     },
 
   },
