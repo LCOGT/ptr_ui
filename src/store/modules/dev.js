@@ -29,8 +29,8 @@ const state = {
     status_ws_endpoint: 'wss://rsxw4oba56.execute-api.us-east-1.amazonaws.com/dev',
     //status_ws_endpoint: 'wss://uplin1n79d.execute-api.us-east-1.amazonaws.com/test',
 
-    //status_endpoint: 'https://status.photonranch.org/status',
-    status_endpoint: 'https://status.photonranch.org/test',
+    status_endpoint: 'https://status.photonranch.org/status',
+    //status_endpoint: 'https://status.photonranch.org/test',
 }
 
 // getters
