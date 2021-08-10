@@ -69,7 +69,7 @@ const getters = {
 
 const mutations = {
   site(state, val) { state.site = val },
-  serverTimestampMs(state, time) { console.log('setting server timestamp'); state.timestamp = time },
+  serverTimestampMs(state, time) { state.timestamp = time },
   updateLocalClock(state, time) { state.now = time },
 
   siteOpenStatus(state, val) { state.site_open_status = val },
@@ -102,51 +102,6 @@ const mutations = {
 }
 
 const actions = {
-
-  //// Opens a websocket connection and subscribes to updates at the site specified by store.site
-  //openStatusConnection({ state, commit, dispatch, rootState }) {
-
-    //let status_ws_url = rootState.dev.status_ws_endpoint
-    //status_ws_url += `?site=${encodeURIComponent(rootState.site_config.selected_site)}`
-
-    //status_ws = new ReconnectingWebSocket(status_ws_url)
-    //status_ws.onmessage = message => {
-      //console.warn('regular status socket message')
-      //let data = JSON.parse(message.data);
-      //let statusType = data.statusType
-      //let status = data.status
-
-			//// TODO: handle the different statusTypes distinctly.
-			//if (statusType == "deviceStatus") {
-        //console.log(data)
-				//commit('serverTimestampMs', data.server_timestamp_ms)
-				//commit('status', status)
-			//}
-			//if (statusType == "wxEncStatus") {
-				//commit('serverTimestampMs', data.server_timestamp_ms)
-				//commit('status', status)
-			//}
-    //}
-
-    //// Initialize status with the latest report
-    //dispatch('getLatestStatus')
-  //},
-
-  //// Update the websocket subscription to get data for a different.
-  //updateSite({commit, dispatch}, site) {
-    //commit('site', site)
-    //dispatch('getLatestStatus')
-    //status_ws.send(JSON.stringify({
-      //action: "updateSubscriberSite",
-      //site: site,
-    //}))
-  //},
-
-  //// Closes the websocket connection
-  //closeStatusConnection() {
-    //status_ws.close()
-    //datastream_ws.close()
-  //},
 
   // Get and update the 'open' status of all sites. Used for the global map site indicators. 
   async getSiteOpenStatus({commit, rootState }) {

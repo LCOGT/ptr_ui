@@ -104,8 +104,6 @@ import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 
-import ReconnectingWebSocket from 'reconnecting-websocket'
-
 export default {
   name: "Focuser",
   mixins: [commands_mixin, status_mixin, user_mixin],
@@ -119,40 +117,16 @@ export default {
       isExpandedStatusVisible: false,
 
       focuserStatus: 'nothing yet',
-      jobSub: '', //ws connection
       focuserJobs: {},
     }
   },
 
   created() {
-    // This websocket subscribes to changes in job status
-    this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
-    this.jobsSub.onmessage = (message) => {
-      let newJob = JSON.parse(message.data)
-      //console.log(newJob)
-      if (newJob.ulid in Object.keys(this.focuserJobs)) {
-        this.focuserJobs[newJob.ulid].status = newJob.statusId.split("#")[0]
-      }
-      else {
-        let jobStatus = {
-          "status": newJob.statusId.split("#")[0],
-          "deviceType": newJob.deviceType,
-        }
-        this.focuserJobs[newJob.ulid] = jobStatus
-      }
-      this.focuserStatus = newJob
-      //this.$set(this.jobIds, newJob.ulid, newJob)
-    }
   },
 
   methods: {
     focuserJobPost(data) {
       console.log('focuser job post: ',data)
-      let statusItem = {
-        "status": data.statusId.split("#")[0],
-        "deviceType": data.deviceType,
-      }
-      this.focuserJobs[data.ulid] = statusItem
     },
 
   },
