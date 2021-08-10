@@ -1,5 +1,4 @@
-import store from '../../../store'
-
+import store from '../store'
 
  /** STATUS handler **/
 const status_stream_handler = message => {
@@ -30,12 +29,17 @@ const new_data_stream_handler = message => {
  /** USER STATUS handler **/
 const user_status_handler = message => {
   const new_log = message
-  console.log('new log', new_log)
   store.commit("userstatus/add_log", new_log)
+}
+
+ /** JOBS handler **/
+const jobs_handler = message => {
+  console.log('new job ws update', message)
 }
 
 export default {
   status_stream_handler,
   new_data_stream_handler,
   user_status_handler,
+  jobs_handler
 }
