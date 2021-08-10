@@ -122,24 +122,10 @@ export const user_status_mixin = {
 
         /** Websocket Connections **/
         connect_to_logs_ws(site) {
-
-            if (!site) return;
-
-            // Connect to websocket
-            let url = this.logs_ws_endpoint
-            url += `?site=${encodeURIComponent(site)}`
-
-            this.user_status_websocket = new ReconnectingWebSocket(url)
-
-            // Define websocket incoming message behavior
-            this.user_status_websocket.onmessage = this.handle_new_log
+            return 
         },
         close_logs_websocket() {
-            try {
-                this.user_status_websocket.close()
-            } catch {
-                return;
-            }
+            return 
         },
 
 

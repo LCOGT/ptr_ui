@@ -101,12 +101,9 @@ import SiteCalendar from "@/components/sitepages/SiteCalendar";
 import SiteProjects from "@/components/sitepages/SiteProjects";
 import SiteData from "@/components/sitepages/SiteData";
 
-import axios from "axios";
-import moment from "moment";
-import ReconnectingWebSocket from "reconnecting-websocket";
-
 import { commands_mixin } from "../mixins/commands_mixin";
 import { status_mixin } from "../mixins/status_mixin";
+import datastreamer from "@/datastreamer";
 
 export default {
   name: "Site",
@@ -135,16 +132,14 @@ export default {
       vm.$store.dispatch("site_config/set_default_active_devices", sitecode);
 
       // Subscribe to datastream for the new site
-      vm.$store.dispatch("datastreamer/openDatastreamConnection", sitecode)
+      datastreamer.open_connection(sitecode)
 
-      // Refresh the images and status
+      // get initial data/valuse for images, status, calendar
       vm.$store.dispatch("images/display_placeholder_image");
       vm.$store.dispatch("images/load_latest_images");
       vm.$store.dispatch("images/load_latest_info_images");
       vm.$store.dispatch("sitestatus/getLatestStatus")
       vm.$store.dispatch("userstatus/fetch_recent_logs")
-
-      // Refresh the active reservations list
       vm.$store.dispatch("calendar/fetchActiveReservations", sitecode);
     });
   },
@@ -159,15 +154,15 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
-    console.log('in BEFORE ROUTE LEAVE')
-    //this.$store.dispatch('sitestatus/closeStatusConnection')
-    this.$store.dispatch('datastreamer/closeDatastreamConnection')
+    //console.log('in BEFORE ROUTE LEAVE')
+    datastreamer.close()
     next()
   },
 
   beforeDestroy() {
     this.$store.commit("site_config/removeActiveSite");
     this.$store.dispatch("images/display_placeholder_image");
+    datastreamer.close()
   },
 
   mounted() {
@@ -203,46 +198,18 @@ export default {
       this.$store.dispatch("site_config/set_default_active_devices", sitecode);
 
       // Subscribe to datastream for the new site
-      this.$store.dispatch("datastreamer/updateSite", sitecode);
+      datastreamer.update_site(sitecode)
 
-      // Refresh the images and status
+      // get initial data/valuse for images, status, calendar
       this.$store.dispatch("images/display_placeholder_image");
       this.$store.dispatch("images/load_latest_images");
       this.$store.dispatch("images/load_latest_info_images");
       this.$store.dispatch("sitestatus/getLatestStatus")
       this.$store.dispatch("userstatus/fetch_recent_logs")
-
-      // Refresh the active reservations list
       this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
 
     },
 
-    // TODO: move this to the vuex images module, like status
-    setupImagesWebsocket() {
-
-      // Listen for new images on websocket, and refresh the list when a new image arrives.
-      // Note: this happens for a new image on any site, not just the one being viewed.
-      this.$store.dispatch("images/load_latest_images");
-      //const images_ws_url = this.$store.state.dev.images_websocket;
-      //this.imageSubscriber = new ReconnectingWebSocket(images_ws_url);
-
-      //const message_handler = (response) => {
-        //console.log('images websocket msg', response)
-        //const data = JSON.parse(response.data);
-        //data["messages"].forEach((message) => {
-          //const content = message.content.messages[0];
-          //const base_filename = content.base_filename;
-          ////console.log('new image: ', base_filename)
-          //const image_type = content.s3_directory;
-          //if (image_type == "data") {
-            //this.$store.dispatch("images/update_new_image", base_filename);
-          //} else if (image_type == "info-images") {
-            //this.$store.dispatch("images/load_latest_info_images");
-          //}
-        //});
-      //};
-      //this.imageSubscriber.onmessage = message_handler;
-    },
   },
 };
 </script>

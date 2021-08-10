@@ -41,7 +41,6 @@ const actions = {
         axios.get(url).then(logs => {
             //console.log(logs.data)
             let new_logs_list = [...logs.data].sort((a,b) => a.timestamp - b.timestamp)
-            console.log('new logs list: ', new_logs_list)
             commit('replace_logs_list', new_logs_list)
         }).catch(error => {
             console.log(Object.keys(error.response))
