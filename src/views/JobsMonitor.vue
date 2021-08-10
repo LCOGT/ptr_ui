@@ -44,7 +44,6 @@
 </template>
 
 <script>
-import ReconnectingWebSocket from 'reconnecting-websocket';
 import axios from 'axios';
 import { commands_mixin } from '../mixins/commands_mixin'
 
@@ -59,20 +58,7 @@ export default {
       tosend: '',
     }
   },
-  mounted() {
-    this.start()
-  },
   methods: {
-
-    start() {
-      // This websocket subscribes to changes in job status
-      this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
-      this.jobsSub.onconnect = this.getJobs()
-      this.jobsSub.onmessage = (message) => {
-        let newJob = JSON.parse(message.data)
-        this.$set(this.jobIds, newJob.ulid, newJob)
-      }
-    },
 
     // Create a string describing a lenth of time. Used to describe age of a command.
     timeAgo(milliseconds) {

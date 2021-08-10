@@ -7,16 +7,12 @@ let websocket = ''
 const datastreamer = {
 
   open_connection(sitecode) {
-
     this.close()
-
     let datastreamurl = `wss://datastream.photonranch.org/dev` 
                       + `?site=${encodeURIComponent(sitecode)}`
     websocket = new ReconnectingWebSocket(datastreamurl)
-
     websocket.onmessage = msg => {
         let payload = JSON.parse(msg.data)
-        console.log('ds msg: ', payload)
 
         if (payload.topic == "sitestatus") {
             topic_handlers.status_stream_handler(payload.data)
