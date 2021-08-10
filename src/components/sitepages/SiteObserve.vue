@@ -34,8 +34,6 @@ import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
-import helpers from '@/utils/helpers'
-import store from '../../store/index'
 
 // Components
 import CommandButton from '@/components/CommandButton'
@@ -49,9 +47,6 @@ import SkychartModal from '@/components/SkychartModal'
 import ImagesTable from '@/components/ImagesTable'
 import StatusColumn from '@/components/status/StatusColumn'
 import LogStream from '@/components/LogStream'
-
-import ReconnectingWebSocket from 'reconnecting-websocket'
-import axios from 'axios';
 
 export default {
   name: 'SiteObserve',
@@ -100,17 +95,6 @@ export default {
       isScreenStatusVisible: false,
       isSequencerStatusVisible: false,
 
-      // testign job status
-      focuserStatus: 'nothing yet',
-      jobSub: '', //ws connection
-
-      // logs websocket
-      logs_ws: '', //ws connection
-
-
-      focuserJobs: {},
-
-
       // Full screen modal for sky map and mount commands
       telescopeModal: false,
 
@@ -120,26 +104,6 @@ export default {
   created() {
     // This interval is stopped in the `beforeDestroy` lifecycle hook.
     this.update_time_interval = setInterval(this.update_time, 1000)
-
-
-    // This websocket subscribes to changes in job status
-    this.jobsSub = new ReconnectingWebSocket("wss://1tlv47sxw4.execute-api.us-east-1.amazonaws.com/dev")
-    this.jobsSub.onmessage = (message) => {
-      let newJob = JSON.parse(message.data)
-      //console.log(newJob)
-      if (newJob.ulid in Object.keys(this.focuserJobs)) {
-        this.focuserJobs[newJob.ulid].status = newJob.statusId.split("#")[0]
-      }
-      else {
-        let jobStatus = {
-          "status": newJob.statusId.split("#")[0],
-          "deviceType": newJob.deviceType,
-        }
-        this.focuserJobs[newJob.ulid] = jobStatus
-      }
-      this.focuserStatus = newJob
-      //this.$set(this.jobIds, newJob.ulid, newJob)
-    }
 
     // set default values from config
     // TODO: this should go in a better place
@@ -153,15 +117,6 @@ export default {
 
 
   methods: {
-
-    focuserJobPost(data) {
-      //console.log('focuser job post: ',data)
-      let statusItem = {
-        "status": data.statusId.split("#")[0],
-        "deviceType": data.deviceType,
-      }
-      this.focuserJobs[data.ulid] = statusItem
-    },
 
     update_time() {
       this.local_timestamp= Date.now()
