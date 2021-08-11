@@ -15,7 +15,7 @@
       <b-select v-model="selected_enclosure_mode" size="is-small" >
 				<option value="setAuto" >Automatic</option> 
 				<option value="setManual">Manual</option> 
-				<option value="setStayClosed">Stay Closed</option> 
+				<option value="shutDown">Shut down</option> 
       </b-select>
 			<p class="control">
 				<button class="button is-admin is-small" :disabled="!userIsAuthenticated" @click="set_enclosure_mode" > apply </button>

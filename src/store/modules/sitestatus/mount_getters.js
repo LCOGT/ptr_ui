@@ -60,11 +60,6 @@ const mount_activity = (state, getters) => {
   return activity
 }
 
-
-
-
-
-
 export default {
   mount_state,
   mount_is_slewing,

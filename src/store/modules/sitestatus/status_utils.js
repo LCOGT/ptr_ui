@@ -14,7 +14,8 @@ const parseTrueFalse = s => {
 const display_colors = {
   red: "orangered",
   yellow: "yellow",
-  green: "greenyellow"
+  green: "greenyellow",
+  missing: "grey",
 }
 
 export {
