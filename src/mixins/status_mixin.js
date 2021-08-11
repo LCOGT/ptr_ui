@@ -58,7 +58,7 @@ export const status_mixin = {
 
             status.push({"name": "spacer", "val": "spacer"}) 
 
-            if (this.enclosure_status != '-'){ status.push({"name": "Enclosure", "val": this.enclosure_status}) }
+            if (this.enclosure_mode != '-'){ status.push({"name": "Enc. Mode", "val": this.enclosure_mode}) }
             if (this.sky_temp != '-'){ status.push({"name": "Sky Temp", "val": this.sky_temp}) }
             if (this.air_temp != '-'){ status.push({"name": "Air Temp", "val": this.air_temp}) }
             if (this.humidity != '-'){ status.push({"name": "Humidity", "val": this.humidity}) }
@@ -267,6 +267,8 @@ export const status_mixin = {
           'ambient',
           'meas_sky_mpsas',
           'calc_sky_mpsas',
+          'wx_hold',
+          'hold_duration',
 
           'mount_state',
           'mount_is_slewing',

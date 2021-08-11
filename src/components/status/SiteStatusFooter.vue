@@ -156,6 +156,13 @@
             <status-column
               style="padding: 0"
               :isOffline="!isOnline"
+              :statusList="open_safety_status_2"
+            />
+          </div>
+          <div>
+            <status-column
+              style="padding: 0"
+              :isOffline="!isOnline"
               :statusList="ra_dec_ha_status"
             />
           </div>
@@ -177,13 +184,6 @@
               style="padding: 0"
               :isOffline="!isOnline"
               :statusList="buildRotatorTabStatus"
-            />
-          </div>
-          <div>
-            <status-column
-              style="padding: 0"
-              :isOffline="!isOnline"
-              :statusList="buildCameraTabStatus"
             />
           </div>
         </div>
@@ -319,6 +319,13 @@ export default {
         { name: "Open OK", ...this.open_ok },
       ];
     },
+    open_safety_status_2() {
+      return [
+        { name: "Enc. Mode", val: this.enclosure_mode },
+        { name: "Weather hold", ...this.wx_hold },
+        { name: "Hold Duration", ...this.hold_duration },
+      ]
+    },
     ra_dec_ha_status() {
       return [
         { name: "Ra", val: this.ra },
@@ -385,7 +392,7 @@ export default {
 }
 
 $toggle-button-width: 60px;
-$status-col-width: 150px;
+$status-col-width: 200px;
 
 $main-status-background: #0f1313;
 $user-status-background: darken($main-status-background, 3);

@@ -9,11 +9,21 @@ const enclosure_state = (state, getters, rootState) => {
 
 // should rename this to 'enclosure_open_status' or similar
 const enclosure_status = (state, getters, rootState) => {
-  return getters.enclosure_state.shutter_status || getters.enclosure_state.roof_status || '-'
+  try {
+    return getters.enclosure_state.shutter_status 
+      || getters.enclosure_state.roof_status 
+      || '-'
+  } catch { 
+    return {} 
+  }
 }
 
 const enclosure_mode = (state, getters, rootState) => {
-  return getters.enclosure_state.enclosure_mode
+  try {
+    return getters.enclosure_state.enclosure_mode
+  } catch { 
+    return {} 
+  }
 }
 
 export default {

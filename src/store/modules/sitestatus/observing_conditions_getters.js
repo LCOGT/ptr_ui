@@ -65,6 +65,38 @@ const calc_sky_mpsas = (state, getters) => {
   return (getters.weather_state.calc_sky_mpsas || '-')
 }
 
+const wx_hold = (state, getters) => {
+  if (!Object.keys(getters.weather_state).includes('wx_hold')) {
+    return {
+      val: "missing",
+      color: "grey",
+    }
+  }
+  let color = display_colors.red
+  let is_holding = getters.weather_state.wx_hold || true
+  if (is_holding) { color = display_colors.green }
+  return {
+    "val": is_holding ? 'ACTIVE' : 'Expired',
+    "color": color
+  }
+}
+
+const hold_duration = (state, getters) => {
+  if (!Object.keys(getters.weather_state).includes('hold_duration')) {
+    return {
+      val: "missing",
+      color: "grey",
+    }
+  }
+  let color = display_colors.red
+  let hold_duration = getters.weather_state.hold_duration
+  if (hold_duration > 0) { color = display_colors.green }
+  return {
+    "val": hold_duration,
+    "color": color
+  }
+}
+
 
 export default {
   weather_state,
@@ -79,4 +111,6 @@ export default {
   ambient,
   meas_sky_mpsas,
   calc_sky_mpsas,
+  wx_hold,
+  hold_duration,
 }
