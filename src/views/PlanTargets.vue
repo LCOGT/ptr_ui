@@ -3,7 +3,7 @@
   <div class="the-form">
     <form id="targform" @submit.prevent>
         <b-field label="Photon Ranch Location" class= "control is-expanded">
-          <b-select id="localtime" v-model="localtime" @input="setLatLong">
+          <b-select id="observatorytime" v-model="observatorytime" @input="setLatLong">
             <option v-for="s in site_info"
             :key="s.name"
             :lat="s.latitude"
@@ -16,12 +16,12 @@
         <div class="field has-addons">
           <p class="control is-expanded">
             <b-field label="Latitude">
-              <b-input type="text" id="lat1" v-model="lat1" required :disabled="localtime!='X'"/>
+              <b-input type="text" id="lat1" v-model="lat1" required :disabled="observatorytime!='X'"/>
             </b-field>
           </p>
           <p class="control is-expanded">
             <b-field label="Longitude">
-              <b-input type="text" id="lon1" v-model="lon1" required :disabled="localtime!='X'"/>
+              <b-input type="text" id="lon1" v-model="lon1" required :disabled="observatorytime!='X'"/>
             </b-field>
           </p>
         </div>
@@ -34,19 +34,20 @@
                 :timepicker="{ incrementMinutes:30, hourFormat:timeformat}"
                 :datetime-parser="(d) => {new Date(d)}"
                 required 
-                inline />
+                inline 
+                @input="changeDate"/>
             </b-field>
           </p>
         </div>
       <b-field grouped>
-        <div v-if="localtime !== 'X'">
+        <div v-if="observatorytime !== 'X'">
           <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat">My time</b-radio>
           <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat"> UTC</b-radio>
           <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat">Observatory time</b-radio>
         </div>
         <div v-else>
-          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required>My time zone</b-radio>
-          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required> UTC</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat">My time</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat"> UTC</b-radio>
         </div>
       </b-field>
         <div class="the-button">
@@ -87,13 +88,28 @@ export default {
       targlist: '',
       lat1: '',
       lon1: '',
-      dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000),
+      dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour
+      dateobsreal: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour,
       tzinfo: 'my',
-      offset: '',
-      localtime: '',
-      localoffset: '',
+      observatorytime: '',
       timeformat: undefined,
     };
+  },
+  computed: {
+    offset() {
+      return new Date(this.dateobs).getTimezoneOffset()
+    },
+    observatoryoffset() {
+      return moment.utc(this.dateobs).tz(this.observatorytime).utcOffset()
+    },
+    dateobsutc() {
+      return moment(this.dateobsreal).add(this.offset, 'm').toDate()
+      //Start time of observation date in "UTC" (ignore timezone info in moment obj)
+    },
+    dateobsobs() {
+      return moment(this.dateobsreal).add(this.offset+this.observatoryoffset, 'm').toDate()
+      //Start time of observation date in "observatory time" (ignore timezone info in moment obj)
+    },
   },
   created: function() {
     const url = "https://api.photonranch.org/api/all/config"
@@ -106,7 +122,7 @@ export default {
           siteoffset: response.data[site].TZ_database_name
         })
       }
-      Vue.set(this, 'localtime', this.site_info.mrc.siteoffset)
+      Vue.set(this, 'observatorytime', this.site_info.mrc.siteoffset)
       Vue.set(this, 'lat1', this.site_info.mrc.latitude)
       Vue.set(this, 'lon1', this.site_info.mrc.longitude)
     })
@@ -116,34 +132,40 @@ export default {
   },
   methods: {
     setLatLong() {
-      const selectedOption = document.getElementById('localtime').options[document.getElementById('localtime').selectedIndex];
+      const selectedOption = document.getElementById('observatorytime').options[document.getElementById('observatorytime').selectedIndex];
       this.lat1 = selectedOption.getAttribute('lat');
       this.lon1 = selectedOption.getAttribute('lon');
+
+      this.observatoryoffset = moment.utc(this.dateobs).tz(this.observatorytime).utcOffset()
+    },
+    changeDate() {
+      if (this.tzinfo == 'my') {
+        this.dateobsreal = this.dateobs
+      } else if (this.tzinfo == 'utc') {
+        this.dateobsreal = moment(this.dateobs).subtract(this.offset, 'm').toDate()
+      } else if (this.tzinfo == 'lcl') {
+        this.dateobsreal = moment(this.dateobs).subtract(this.offset+this.observatoryoffset, 'm').toDate()
+      }
     },
     changeTimeFormat() {
-      if (this.tzinfo == 'utc') {
+      if (this.tzinfo == 'my') {
+        this.timeformat = undefined; //undefined defaults to user's prefered time display
+        this.dateobs = this.dateobsreal
+      } else if (this.tzinfo == 'utc') {
         this.timeformat = '24';
-      } else {
-        this.timeformat = undefined; //undefined defaults to user's computer
+        this.dateobs = this.dateobsutc
+      } else if (this.tzinfo == 'lcl') {
+        this.timeformat = undefined; //undefined defaults to user's prefered time display
+        this.dateobs = this.dateobsobs
       }
     },
     submitForm() {
-      this.offset = new Date(this.dateobs).getTimezoneOffset();
-      this.localoffset = moment.utc(this.dateobs).tz(this.localtime).utcOffset()
-
+      this.offset = new Date(this.dateobsreal).getTimezoneOffset();
       var diclist = [];
 
-      if (this.tzinfo == 'my') {
-        var starttime=this.dateobs
-      } else if (this.tzinfo == 'utc') {
-        var starttime=moment(this.dateobs).subtract(this.offset, 'm').toDate()
-      } else if (this.tzinfo == 'lcl') {
-        var starttime=moment(this.dateobs).subtract(this.offset+this.localoffset, 'm').toDate()
-      }
-
-      var endtime = moment(starttime).add(30, 'm').toDate();
+      var endtime = moment(this.dateobsreal).add(30, 'm').toDate();
       for (var i = 0; i < this.easylist.length; ++i) {
-        var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, starttime)[0]
+        var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, this.dateobsreal)[0]
         var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, endtime)[0]
         if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
           diclist.push({
@@ -153,7 +175,7 @@ export default {
             "image": "/targs/DefaultTargetImages/"+this.easylist[i].name.replace(/ /g, "")+".jpg",
             "ra": this.easylist[i].ra,
             "dec": this.easylist[i].dec,
-            "starttime": starttime,
+            "starttime": this.dateobsreal,
             "altstart": altstart,
             "altend": altend
             })
