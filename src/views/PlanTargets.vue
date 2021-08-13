@@ -40,12 +40,12 @@
         </div>
       <b-field grouped>
         <div v-if="localtime !== 'X'">
-          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat">My timezone</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat">My time</b-radio>
           <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat"> UTC</b-radio>
-          <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat">Local timezone</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat">Observatory time</b-radio>
         </div>
         <div v-else>
-          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required>My timezone</b-radio>
+          <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required>My time zone</b-radio>
           <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required> UTC</b-radio>
         </div>
       </b-field>
@@ -120,13 +120,11 @@ export default {
       this.lat1 = selectedOption.getAttribute('lat');
       this.lon1 = selectedOption.getAttribute('lon');
     },
-    changeTimeFormat($event) {
+    changeTimeFormat() {
       if (this.tzinfo == 'utc') {
         this.timeformat = '24';
-        console.log(this.timeformat);
       } else {
-        this.timeformat = undefined;
-        console.log(this.timeformat);
+        this.timeformat = undefined; //undefined defaults to user's computer
       }
     },
     submitForm() {
@@ -147,7 +145,7 @@ export default {
       for (var i = 0; i < this.easylist.length; ++i) {
         var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, starttime)[0]
         var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, endtime)[0]
-        if (altstart>45 && altend>45) {
+        if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
           diclist.push({
             "name": this.easylist[i].name,
             "nickname": this.easylist[i].alt, 

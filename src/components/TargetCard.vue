@@ -2,9 +2,9 @@
   <div class="target-card">
     <div class="card">
       <img :src="`${target.image}`"/>
-        <h2 class="target-name">{{ target.name }}</h2>
-        <h4 class="target-nickname">{{ target.nickname }}</h4>
-        <h3 class="target-type">{{ target.type }}</h3>
+        <h2 class="target-name"><span class= "card-text">{{ target.name }}</span></h2>
+        <h4 class="target-nickname"><span class= "card-text">{{ target.nickname }}</span></h4>
+        <h3 class="target-type"><span class= "card-text">{{ target.type }}</span></h3>
     </div>
   </div>
 </template>
@@ -36,23 +36,24 @@ export default {
   }
   .target-name {
     font-size: x-large;
-    color: white;
     position: absolute;
     top:15px;
     left:5%;
   }
   .target-nickname {
     font-size: medium;
-    color: white;
     position: absolute;
     top:18%;
     left:5%;
   }
   .target-type {
     font-size: x-large;
-    color: white;
     position: absolute;
     top:80%;
     left:5%;
+  }
+  .card-text {
+    background-color: black;
+    color: white;
   }
 </style>
