@@ -16,12 +16,19 @@
         <div class="field has-addons">
           <p class="control is-expanded">
             <b-field label="Latitude">
-              <b-input type="text" id="lat1" v-model="lat1" required :disabled="observatorytime!='X'"/>
+              <b-input type="text" id="lat1" v-model="lat1" required :disabled="observatorytime!=='X'"/>
             </b-field>
           </p>
           <p class="control is-expanded">
             <b-field label="Longitude">
-              <b-input type="text" id="lon1" v-model="lon1" required :disabled="observatorytime!='X'"/>
+              <b-input type="text" id="lon1" v-model="lon1" required :disabled="observatorytime!=='X'"/>
+            </b-field>
+          </p>
+        </div>
+        <div v-if="observatorytime =='X'" class="field">
+          <p class="control is-expanded">
+            <b-field label="Observatory UTC Offset (in min)">
+              <b-numberinput v-model="customobservatoryoffset" :controls="false" :required = "tzinfo == 'lcl'"></b-numberinput>
             </b-field>
           </p>
         </div>
@@ -31,7 +38,7 @@
               <b-datetimepicker 
                 id="dateobs" 
                 v-model="dateobs"
-                :timepicker="{ incrementMinutes:30, hourFormat:timeformat}"
+                :timepicker="{ incrementMinutes:15, hourFormat:timeformat}"
                 :datetime-parser="(d) => {new Date(d)}"
                 required 
                 inline 
@@ -39,17 +46,19 @@
             </b-field>
           </p>
         </div>
-      <b-field grouped>
-        <div v-if="observatorytime !== 'X'">
+      <div v-if="observatorytime !=='X' || customobservatoryoffset !== ''" class="field">
+        <b-field grouped>
           <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat">My time</b-radio>
           <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat"> UTC</b-radio>
           <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat">Observatory time</b-radio>
-        </div>
-        <div v-else>
+        </b-field>
+      </div>
+      <div v-else class="field">
+        <b-field grouped>
           <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat">My time</b-radio>
           <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat"> UTC</b-radio>
-        </div>
-      </b-field>
+        </b-field>
+      </div>
         <div class="the-button">
           <b-field class="buttons">
             <b-button @click="submitForm" type="submit">Find Easy Targets</b-button>
@@ -88,19 +97,24 @@ export default {
       targlist: '',
       lat1: '',
       lon1: '',
+      customobservatoryoffset: '',
       dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour
       dateobsreal: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour,
       tzinfo: 'my',
-      observatorytime: '',
+      observatorytime: 'America/Los_Angeles',
       timeformat: undefined,
     };
   },
   computed: {
     offset() {
-      return new Date(this.dateobs).getTimezoneOffset()
+      return new Date(this.dateobsreal).getTimezoneOffset()
     },
     observatoryoffset() {
-      return moment.utc(this.dateobs).tz(this.observatorytime).utcOffset()
+      if (this.observatorytime =='X') {
+        return this.customobservatoryoffset
+      } else {
+        return moment.utc(this.dateobs).tz(this.observatorytime).utcOffset()
+      }
     },
     dateobsutc() {
       return moment(this.dateobsreal).add(this.offset, 'm').toDate()
@@ -136,7 +150,6 @@ export default {
       this.lat1 = selectedOption.getAttribute('lat');
       this.lon1 = selectedOption.getAttribute('lon');
 
-      this.observatoryoffset = moment.utc(this.dateobs).tz(this.observatorytime).utcOffset()
     },
     changeDate() {
       if (this.tzinfo == 'my') {
@@ -160,7 +173,6 @@ export default {
       }
     },
     submitForm() {
-      this.offset = new Date(this.dateobsreal).getTimezoneOffset();
       var diclist = [];
 
       var endtime = moment(this.dateobsreal).add(30, 'm').toDate();
