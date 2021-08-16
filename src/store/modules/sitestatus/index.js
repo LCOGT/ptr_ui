@@ -16,18 +16,16 @@ const hasKey = (obj, key) => { return Object.keys(obj).includes(key) }
 
 // Used to reset the status to an empty state
 const empty_status = {
-  status: {
-    observing_conditions: {},
-    enclosure: {},
-    screen: {},
-    focuser: {},
-    camera: {},
-    telescope: {},
-    mount: {},
-    rotator: {},
-    filter_wheel: {},
-    sequencer: {},
-  }
+  observing_conditions: {},
+  enclosure: {},
+  screen: {},
+  focuser: {},
+  camera: {},
+  telescope: {},
+  mount: {},
+  rotator: {},
+  filter_wheel: {},
+  sequencer: {},
 }
 
 const state = {
@@ -130,7 +128,7 @@ const actions = {
   },
 
   // Reset to empty values. Used for sites without any status available.
-  clearStatus({commit, dispatch}) {
+  clearStatus({commit}) {
     commit('status',empty_status)
     commit('serverTimestampMs', 0)
   },
