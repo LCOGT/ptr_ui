@@ -127,6 +127,7 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     const sitecode = to.params.sitecode.toLowerCase();
+    console.log('IN BEFOREROUTEENTER, site: ', sitecode)
     next((vm) => {
       // Update the active devices
       vm.$store.dispatch("site_config/set_default_active_devices", sitecode);
@@ -138,6 +139,7 @@ export default {
       vm.$store.dispatch("images/display_placeholder_image");
       vm.$store.dispatch("images/load_latest_images");
       vm.$store.dispatch("images/load_latest_info_images");
+      vm.$store.dispatch("sitestatus/clearStatus")
       vm.$store.dispatch("sitestatus/getLatestStatus")
       vm.$store.dispatch("userstatus/fetch_recent_logs")
       vm.$store.dispatch("calendar/fetchActiveReservations", sitecode);
@@ -145,8 +147,8 @@ export default {
   },
 
   beforeRouteUpdate(to, from, next) {
-    console.log('in BEFORE ROUTE UPDATE')
     const new_site = to.params.sitecode.toLowerCase();
+    console.log('in BEFORE ROUTE UPDATE, site: ', new_site)
 
     this.site_changed_routine(new_site)
 
@@ -186,9 +188,19 @@ export default {
       "screen",
       "weather",
     ]),
+    ...mapGetters("sitestatus", [
+      "weather_state"
+    ]),
   },
 
   methods: {
+
+    button1() {
+      this.$store.dispatch("sitestatus/clearStatus")
+    },
+    button2() {
+      console.log('hi')
+    },
 
     // Do this whenever the selected site changes
     site_changed_routine(sitecode) {
@@ -204,6 +216,7 @@ export default {
       this.$store.dispatch("images/display_placeholder_image");
       this.$store.dispatch("images/load_latest_images");
       this.$store.dispatch("images/load_latest_info_images");
+      this.$store.dispatch("sitestatus/clearStatus")
       this.$store.dispatch("sitestatus/getLatestStatus")
       this.$store.dispatch("userstatus/fetch_recent_logs")
       this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
