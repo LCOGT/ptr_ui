@@ -76,7 +76,7 @@ const wx_hold = (state, getters) => {
   let is_holding = getters.weather_state.wx_hold || true
   if (!is_holding) { color = display_colors.green }
   return {
-    "val": is_holding ? 'ACTIVE' : 'Expired',
+    "val": is_holding ? 'ACTIVE' : 'Off',
     "color": color
   }
 }
