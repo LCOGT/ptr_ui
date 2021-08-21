@@ -17,6 +17,72 @@ function emptyString(s) {
     return s == '' ? 'empty' : s;
 }
 
+function status_age_display(status_age, display_colors) {
+    if (status_age < 60) {
+        return {
+            "val": status_age_seconds(status_age),
+            "color": display_colors.green,
+        }
+    } else if (status_age< 300) {
+        return {
+            "val": status_age_minutes(status_age),
+            "color": display_colors.green,
+        }
+    } else if (status_age < 600) {
+        return {
+            "val": status_age_minutes(status_age),
+            "color": display_colors.yellow,
+        }
+    } else if (status_age < 3600) {
+        return {
+            "val": status_age_minutes(status_age),
+            "color": display_colors.red,
+        }
+    } else if (status_age < 86400) {
+        return {
+            "val": status_age_hours(status_age),
+            "color": display_colors.red,
+        }
+    } else if (status_age < 18000 * 86400) {
+        return {
+            "val": status_age_days(status_age),
+            "color": display_colors.red,
+        }
+    } else {
+        return {
+            "val": 'unavailable',
+            "color": display_colors.red,
+        }
+    }
+}
+function status_age_days(timestamp_ms) {
+    let timestring = ''
+    let days = parseInt(timestamp_ms / 86400)
+    let hours = parseInt((timestamp_ms % 86400) / 3600)
+    timestring += days + 'd  '
+    timestring += hours + 'h  '
+    return timestring
+}
+function status_age_hours(timestamp_ms) {
+    let timestring = ''
+    let hours = parseInt(timestamp_ms / 3600)
+    let minutes = parseInt((timestamp_ms % 3600) / 60)
+    timestring += hours + 'h  '
+    timestring += minutes + 'm  '
+    return timestring
+}
+function status_age_minutes(timestamp_ms) {
+    let timestring = ''
+    let minutes = parseInt(timestamp_ms / 60)
+    let seconds = parseInt(timestamp_ms % 60)
+    timestring += minutes += 'm  '
+    timestring += seconds += 's  '
+    return timestring
+}
+function status_age_seconds(timestamp_ms) {
+    return parseInt(timestamp_ms) + 's '
+}
+
 export const status_mixin = {
 
     data() {
@@ -52,7 +118,11 @@ export const status_mixin = {
 
         buildWeatherStatus() {
             let status = []
-            //status.push({"name": "Status Age", ...this.status_age_display})
+
+            status.push({"name": "Wx Status Age", ...status_age_display(this.wx_status_age, this.display_colors)})
+
+            status.push({"name": "spacer", "val": "spacer"}) 
+
             if (this.weather_ok.val != '-'){ status.push({"name": "Weather ok", ...this.weather_ok}) }
             if (this.open_ok.val != '-'){ status.push({"name": "Open Ok", ...this.open_ok}) }
 
@@ -71,12 +141,18 @@ export const status_mixin = {
             return status 
         },
         buildGeneralStatus() {
-            return [
-                {"name": "Status Age", ...this.status_age_display},
+            let general_status = [
+                {"name": "Status Age", ...status_age_display(this.device_status_age, this.display_colors)},
                 
                 {"name": "spacer", "val": "spacer"},
 
                 {"name": "Enclosure", "val": this.enclosure_status},
+
+                {"name": "spacer", "val": "spacer"},
+
+                {"name": "Dome Az", "val": this.dome_azimuth },
+                {"name": "Dome Slewing", "val": this.dome_slewing },
+                {"name": "Dome Synced", "val": this.enclosure_synchronized},
 
                 {"name": "spacer", "val": "spacer"},
 
@@ -87,6 +163,8 @@ export const status_mixin = {
                 {"name": "Airmass", "val": this.airmass},
                 {"name": "HA", "val": this.hour_angle},
             ]
+            if (!this.enclosure_synchronized) { general_status.pop(6)}
+            return general_status
         },
         buildFocusRotatorCameraStatus() {
             let status = [
@@ -98,6 +176,10 @@ export const status_mixin = {
                 {"name": "spacer", "val": "spacer"},
             ]
             return status
+        },
+        buildExpandedTelescopeStatus() {
+            let status = []
+            status.push({name: ""})
         },
         buildTargetPageStatus() {
             let status = []
@@ -178,6 +260,7 @@ export const status_mixin = {
             return status
         },
 
+        /* still used in components that import this mixin */
         status_age_display() {
             if (this.status_age < 60) { 
                 return {
@@ -250,10 +333,15 @@ export const status_mixin = {
         ...mapGetters('sitestatus', [
 
           'status_age',
+          'wx_status_age',
+          'device_status_age',
 
           'enclosure_state', 
           'enclosure_status',
           'enclosure_mode',
+          'dome_azimuth',
+          'dome_slewing',
+          'enclosure_synchronized',
           
           'weather_state',
           'weather_ok',

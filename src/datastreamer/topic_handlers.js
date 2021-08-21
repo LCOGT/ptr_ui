@@ -6,11 +6,15 @@ const status_stream_handler = message => {
   let status = message.status
   // TODO: handle the different statusTypes distinctly.
   if (statusType == "deviceStatus") {
+    console.log('NEW DEVICE')
     store.commit('sitestatus/serverTimestampMs', message.server_timestamp_ms)
+    store.commit('sitestatus/deviceServerTimestampMs', message.server_timestamp_ms)
     store.commit('sitestatus/status', status)
   }
   if (statusType == "wxEncStatus") {
+    console.log('NEW WEATHER')
     store.commit('sitestatus/serverTimestampMs', message.server_timestamp_ms)
+    store.commit('sitestatus/weatherServerTimestampMs', message.server_timestamp_ms)
     store.commit('sitestatus/status', status)
   }
 }
