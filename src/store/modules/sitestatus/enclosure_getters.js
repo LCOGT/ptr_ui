@@ -26,8 +26,35 @@ const enclosure_mode = (state, getters, rootState) => {
   }
 }
 
+const dome_azimuth = (state, getters, rootState) => {
+  try {
+    return getters.enclosure_state.dome_azimuth
+  } catch {
+    return '-'
+  }
+}
+
+const dome_slewing = (state, getters, rootState) => {
+  try {
+    return getters.enclosure_state.dome_slewing
+  } catch {
+    return '-'
+  }
+}
+
+const enclosure_synchronized = (state, getters, rootState) => {
+  try {
+    return getters.enclosure_state.enclosure_synch
+  } catch {
+    return '-'
+  }
+}
+
 export default {
   enclosure_state,
   enclosure_status,
   enclosure_mode,
+  dome_azimuth,
+  dome_slewing,
+  enclosure_synchronized,
 }

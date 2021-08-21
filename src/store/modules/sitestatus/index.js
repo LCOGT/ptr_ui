@@ -32,6 +32,8 @@ const state = {
   site: 'no site',
   status: {},
   timestamp: '',
+  weather_timestamp: '',
+  device_timestamp: '',
   now: Date.now(),
   site_open_status: {},
 
@@ -52,6 +54,8 @@ const getters = {
 
   site: state => state.site,
   status_age: state => (state.now - state.timestamp) / 1000,
+  wx_status_age: state => (state.now - state.weather_timestamp) / 1000,
+  device_status_age: state => (state.now - state.device_timestamp) / 1000,
   ...observing_conditions_getters,
   ...enclosure_getters,
   ...mount_getters,
@@ -67,7 +71,10 @@ const getters = {
 
 const mutations = {
   site(state, val) { state.site = val },
+
   serverTimestampMs(state, time) { state.timestamp = time },
+  deviceServerTimestampMs(state, time) { state.device_timestamp = time },
+  weatherServerTimestampMs(state, time) { state.weather_timestamp = time },
   updateLocalClock(state, time) { state.now = time },
 
   siteOpenStatus(state, val) { state.site_open_status = val },
@@ -123,14 +130,31 @@ const actions = {
       return
     }
     let status = response.data.status
+
+    // Set the global status age to the most recent timestamp
     commit('serverTimestampMs', response.data.server_timestamp_ms)
+
+    // Get the deviceStatus age specifically 
+    dispatch('getDeviceStatusAge')
+
+    // For now, assume the weather status timestamp is the same as the most recent timestamp.
+    // TODO: fetch weather status timestamp explicitly.
+    commit('weatherServerTimestampMs', response.data.server_timestamp_ms) 
     commit('status', status)
+  },
+
+  async getDeviceStatusAge({ commit, rootState }) {
+    let url = rootState.dev.status_endpoint + `/${rootState.site_config.selected_site}/device_status`
+    let response = await Axios.get(url)
+    commit('deviceServerTimestampMs', response.data.server_timestamp_ms)
   },
 
   // Reset to empty values. Used for sites without any status available.
   clearStatus({commit}) {
     commit('status',empty_status)
     commit('serverTimestampMs', 0)
+    commit('weatherServerTimestampMs', 0)
+    commit('deviceServerTimestampMs', 0)
   },
 
   // Keeps track of current time, used to calculate the status age. 

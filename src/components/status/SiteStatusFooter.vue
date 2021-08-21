@@ -54,14 +54,14 @@
             <status-column
               style="padding: 0"
               :isOffline="!isOnline"
-              :statusList="buildGeneralStatus"
+              :statusList="buildWeatherStatus"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
               :isOffline="!isOnline"
-              :statusList="buildWeatherStatus"
+              :statusList="buildGeneralStatus"
             />
           </div>
           <div>
@@ -71,8 +71,7 @@
               :statusList="buildFocusRotatorCameraStatus"
             />
           </div>
-
-          <site-reservation-status :sitecode="site" />
+          <!--site-reservation-status :sitecode="site" /-->
         </div>
         <div id="status-2-primary" class="container">
           <div>
