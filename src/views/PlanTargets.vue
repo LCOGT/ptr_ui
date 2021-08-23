@@ -27,8 +27,8 @@
         </div>
         <div v-if="observatorytime =='X'" class="field">
           <p class="control is-expanded">
-            <b-field label="Observatory UTC Offset (in min)">
-              <b-numberinput v-model="customobservatoryoffset" :controls="false" :required = "tzinfo == 'lcl'"></b-numberinput>
+            <b-field label="Observatory UTC Offset (in hours)">
+              <b-numberinput v-model="customobservatoryoffset" step=0.01 :controls="false" :required = "tzinfo == 'lcl'"></b-numberinput>
             </b-field>
           </p>
         </div>
@@ -97,7 +97,7 @@ export default {
       targlist: '',
       lat1: '',
       lon1: '',
-      customobservatoryoffset: '',
+      customobservatoryoffset: new Date().getTimezoneOffset()/-60,
       dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour
       dateobsreal: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour,
       tzinfo: 'my',
@@ -111,7 +111,7 @@ export default {
     },
     observatoryoffset() {
       if (this.observatorytime =='X') {
-        return this.customobservatoryoffset
+        return this.customobservatoryoffset*60
       } else {
         return moment.utc(this.dateobs).tz(this.observatorytime).utcOffset()
       }
