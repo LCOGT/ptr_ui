@@ -32,8 +32,8 @@ const state = {
   site: 'no site',
   status: {},
   timestamp: '',
-  weather_timestamp: '',
-  device_timestamp: '',
+  latest_weather_timestamp: '',
+  latest_device_timestamp: '',
   now: Date.now(),
   site_open_status: {},
 
@@ -72,9 +72,9 @@ const getters = {
 const mutations = {
   site(state, val) { state.site = val },
 
-  serverTimestampMs(state, time) { state.timestamp = time },
-  deviceServerTimestampMs(state, time) { state.device_timestamp = time },
-  weatherServerTimestampMs(state, time) { state.weather_timestamp = time },
+  latest_status_timestamp_ms(state, time) { state.timestamp = time },
+  latest_device_timestamp_ms(state, time) { state.device_timestamp = time },
+  latest_weather_timestamp_ms(state, time) { state.weather_timestamp = time },
   updateLocalClock(state, time) { state.now = time },
 
   siteOpenStatus(state, val) { state.site_open_status = val },
@@ -132,29 +132,22 @@ const actions = {
     let status = response.data.status
 
     // Set the global status age to the most recent timestamp
-    commit('serverTimestampMs', response.data.server_timestamp_ms)
+    commit('latest_status_timestamp_ms', response.data.latest_status_timestamp_ms)
 
-    // Get the deviceStatus age specifically 
-    dispatch('getDeviceStatusAge')
+    // Set the device status age
+    commit('latest_device_timestamp_ms', response.data.status_age_timestamps_ms.deviceStatus)
 
-    // For now, assume the weather status timestamp is the same as the most recent timestamp.
-    // TODO: fetch weather status timestamp explicitly.
-    commit('weatherServerTimestampMs', response.data.server_timestamp_ms) 
+    // Set the weather status age
+    commit('latest_weather_timestamp_ms', response.data.status_age_timestamps_ms.wxEncStatus)
     commit('status', status)
-  },
-
-  async getDeviceStatusAge({ commit, rootState }) {
-    let url = rootState.dev.status_endpoint + `/${rootState.site_config.selected_site}/device_status`
-    let response = await Axios.get(url)
-    commit('deviceServerTimestampMs', response.data.server_timestamp_ms)
   },
 
   // Reset to empty values. Used for sites without any status available.
   clearStatus({commit}) {
     commit('status',empty_status)
-    commit('serverTimestampMs', 0)
-    commit('weatherServerTimestampMs', 0)
-    commit('deviceServerTimestampMs', 0)
+    commit('latest_status_timestamp_ms', 0)
+    commit('latest_weather_timestamp_ms', 0)
+    commit('latest_device_timestamp_ms', 0)
   },
 
   // Keeps track of current time, used to calculate the status age. 

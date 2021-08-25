@@ -1,75 +1,6 @@
 <template>
 <section class="site-targets-wrapper">
 
-    <div class="page-layout">
-
-        <div class="parameters-box">
-            <div style="display:flex; flex-direction:column; width: 100%;">
-
-                <b-field label="Search for objects...">
-                    <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
-                    <p class="control">
-                        <b-button @click="submit_simbad_query"><b-icon icon="magnify" /></b-button>
-                    </p>
-                </b-field>
-
-                <div style="
-                        width: 100%; 
-                        height:1px;
-                        margin-bottom:10px; 
-                        border-bottom: 1px solid grey;"/>
-                
-                <b-field>
-                    <b-field label="ra/az/long" horizontal>
-                        <b-input 
-                            expanded 
-                            name="subject" 
-                            type="search" 
-                            icon-clickable 
-                            v-model="mount_ra" 
-                            autocomplete="off" />
-                    </b-field>
-                </b-field>
-                <b-field>
-                    <b-field label="dec/alt/lat" horizontal>
-                        <b-input 
-                            expanded
-                            name="subject" 
-                            type="search" 
-                            icon-clickable 
-                            v-model="mount_dec" 
-                            autocomplete="off" />
-                    </b-field>
-                </b-field>
-
-                <div style="
-                        width: 100%; 
-                        height:1px;
-                        margin-bottom:10px; 
-                        border-bottom: 1px solid grey;"/>
-
-                <b-field >
-                    <b-field label="note" horizontal>
-                        <b-input 
-                            name="subject" 
-                            type="search" 
-                            icon-clickable 
-                            v-model="mount_object" 
-                            autocomplete="off" />
-                    </b-field>
-                </b-field>
-                <command-button :data="mount_slew_radec_command" style="" class="is-success">
-                    <p slot="title">Point Telescope</p>
-                </command-button>
-            </div>
-        </div>
-
-        <div class="ptr-aladin-parent-div">
-            <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
-        </div>
-
-    </div>
-
     <div class="skychart-box">
         <the-sky-chart :deviceStatus="deviceStatus" />
     </div>
@@ -247,6 +178,7 @@ export default {
 @import "@/style/_responsive.scss";
 
 .site-targets-wrapper {
+  border: 2px solid red;
   padding-top: 2em; 
   margin: 0 auto; 
   width: 100%;
@@ -295,6 +227,7 @@ export default {
     background-color:grey;
 }
 .skychart-box {
+    border: 2px solid green;
     width: 100%;
     max-width: calc(90vh - #{$top-bottom-height});
     height: 100%;

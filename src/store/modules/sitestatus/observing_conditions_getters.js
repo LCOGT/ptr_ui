@@ -98,6 +98,36 @@ const hold_duration = (state, getters) => {
 }
 
 
+/* 
+Define the status items that are calculated from the wxEncStatus status type. 
+ 
+Then, when the weather status timestamp is old, we can selectively mark these items 
+as stale by making them grey or some other style change. 
+  
+Note: there is a similar item in the enclosure getters, since enclosure and weather
+status are reported together.
+  
+This list must be manually updated when new getters are added!
+*/
+const weather_status_items = () => [
+  'weather_state',
+  'weather_ok',
+  'open_ok',
+  'sky_temp',
+  'air_temp',
+  'humidity',
+  'dewpoint',
+  'wind',
+  'surface',
+  'ambient',
+  'meas_sky_mpsas',
+  'calc_sky_mpsas',
+  'wx_hold',
+  'hold_duration',
+]
+
+
+
 export default {
   weather_state,
   weather_ok,
@@ -113,4 +143,6 @@ export default {
   calc_sky_mpsas,
   wx_hold,
   hold_duration,
+
+  weather_status_items
 }

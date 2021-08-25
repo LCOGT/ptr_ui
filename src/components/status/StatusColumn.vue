@@ -10,7 +10,7 @@
             v-for="(item,key) in statusList"
             v-bind:key="`v-${key}`"
             class="val"
-            :class="{'spacer': item.val=='spacer'}"
+            :class="{'spacer': item.val=='spacer', 'is-stale': item.is_stale}"
             :style="customStyle(item)"
             >
                 <ra-display v-if="item.name == 'Ra'" :ra_hours_decimal="parseFloat(item.val)" :can_copy="false"/>
@@ -38,10 +38,15 @@ export default {
          */
         customStyle(item) {
 
-            // Priority: if site is offline, all status is grey
-            if (this.isOffline) {
+            // Check if the item is stale
+            if (item.is_stale) {
                 return `color: grey;`
             }
+
+            // if site is offline, all status is grey
+            //if (this.isOffline) {
+                //return `color: grey;`
+            //}
 
             // Next check if the status has a color defined
             if ("color" in item) {
@@ -89,5 +94,10 @@ $status-value-background-color: $input-background-color;
     display: inline-block;
     height: 1em; 
     visibility: hidden;
+}
+
+.is-stale > *{
+    //color:grey;
+    //color: pink;
 }
 </style>

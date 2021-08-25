@@ -50,6 +50,26 @@ const enclosure_synchronized = (state, getters, rootState) => {
   }
 }
 
+/* 
+Define the status items that are calculated from the wxEncStatus status type. 
+ 
+Then, when the weather status timestamp is old, we can selectively mark these items 
+as stale by making them grey or some other style change. 
+  
+Note: there is a similar item in the enclosure getters, since enclosure and weather
+status are reported together.
+  
+This list must be manually updated when new getters are added!
+*/
+const enclosure_status_items = () => [
+  'enclosure_state',
+  'enclosure_status',
+  'enclosure_mode',
+  'dome_azimuth',
+  'dome_slewing',
+  'enclosure_synchronized',
+]
+
 export default {
   enclosure_state,
   enclosure_status,
@@ -57,4 +77,6 @@ export default {
   dome_azimuth,
   dome_slewing,
   enclosure_synchronized,
+
+  enclosure_status_items
 }
