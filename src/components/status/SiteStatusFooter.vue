@@ -78,7 +78,7 @@
             <div style="display: flex; flex-direction: column">
               <div
                 class="online-status"
-                :title="`status age: ${status_age_display.val}`"
+                :title="`status age: ${latest_status_age.val}`"
               >
                 <div
                   :class="{ 'status-on': isOnline, 'status-off': !isOnline }"
@@ -313,30 +313,30 @@ export default {
     // Assemble the list of status elements for the status-column components
     open_safety_status() {
       return [
-        { name: "Enclosure", val: this.enclosure_status },
-        { name: "Weather OK", ...this.weather_ok },
-        { name: "Open OK", ...this.open_ok },
+        { name: "Enclosure", val: this.enclosure_status, is_stale: this.wx_is_stale  },
+        { name: "Weather OK", ...this.weather_ok, is_stale: this.wx_is_stale  },
+        { name: "Open OK", ...this.open_ok, is_stale: this.wx_is_stale  },
       ];
     },
     open_safety_status_2() {
       return [
-        { name: "Enc. Mode", val: this.enclosure_mode },
-        { name: "Weather hold", ...this.wx_hold },
-        { name: "Hold Duration", ...this.hold_duration },
+        { name: "Enc. Mode", val: this.enclosure_mode, is_stale: this.wx_is_stale  },
+        { name: "Weather hold", ...this.wx_hold, is_stale: this.wx_is_stale  },
+        { name: "Hold Duration", ...this.hold_duration, is_stale: this.wx_is_stale  },
       ]
     },
     ra_dec_ha_status() {
       return [
-        { name: "Ra", val: this.ra },
-        { name: "Dec", val: this.dec },
-        { name: "HA", val: this.hour_angle },
+        { name: "Ra", val: this.ra, is_stale: this.device_status_is_stale },
+        { name: "Dec", val: this.dec, is_stale: this.device_status_is_stale },
+        { name: "HA", val: this.hour_angle, is_stale: this.device_status_is_stale },
       ];
     },
     az_alt_airmass_status() {
       return [
-        { name: "Azimuth", val: this.azimuth },
-        { name: "Altitude", val: this.altitude },
-        { name: "Airmass", val: this.airmass },
+        { name: "Azimuth", val: this.azimuth, is_stale: this.device_status_is_stale },
+        { name: "Altitude", val: this.altitude, is_stale: this.device_status_is_stale },
+        { name: "Airmass", val: this.airmass, is_stale: this.device_status_is_stale },
       ];
     },
 
