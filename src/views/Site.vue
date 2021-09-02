@@ -1,62 +1,32 @@
 <template>
   <div class="page">
-    <b-navbar
-      wrapper-class="container site-menu"
-      :mobile-burger="false"
-      class="is-hidden-touch"
-    >
-      <template slot="start">
-        <b-navbar-item
-          tag="router-link"
-          :to="{ path: '/site/' + sitecode + '/home' }"
-        >
-          Home
-        </b-navbar-item>
-        <b-navbar-item
-          tag="router-link"
-          :to="{ path: '/site/' + sitecode + '/targets' }"
-        >
-          Targets
-        </b-navbar-item>
-        <b-navbar-item
-          tag="router-link"
-          :to="{ path: '/site/' + sitecode + '/observe' }"
-        >
-          Observe
-        </b-navbar-item>
-        <b-navbar-item
-          tag="router-link"
-          :to="{ path: '/site/' + sitecode + '/calendar' }"
-        >
-          Calendar
-        </b-navbar-item>
-        <b-navbar-item
-          tag="router-link"
-          :to="{ path: '/site/' + sitecode + '/projects' }"
-        >
-          Projects
-        </b-navbar-item>
-      </template>
-    </b-navbar>
 
-    <div class="page-view">
-      <div class="mobile-site-menu is-hidden-desktop">
+    <div class="total-site-menu">
+      <the-menu />
+
+      <div class="mobile-site-menu">
+        <button class="menu-padding"></button>
         <router-link :to="'/site/' + sitecode + '/home'">
-          <button class="button">Home</button>
+          <button class="button" :class="{'selected': active_subpage == 'home'}">Home</button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/targets'">
-          <button class="button">Targets</button>
+          <button class="button" :class="{'selected': active_subpage == 'targets'}">Targets</button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/observe'">
-          <button class="button">Observe</button>
+          <button class="button" :class="{'selected': active_subpage == 'observe'}">Observe</button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/calendar'">
-          <button class="button">Calendar</button>
+          <button class="button" :class="{'selected': active_subpage == 'calendar'}">Calendar</button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/projects'">
-          <button class="button">Projects</button>
+          <button class="button" :class="{'selected': active_subpage == 'projects'}">Projects</button>
         </router-link>
+        <button class="menu-padding" button></button>
       </div>
+
+    </div>
+
+    <div class="page-view">
 
       <div class="columns main-page-content">
         <!-- Primary content of the page. Selects from the various site subpages. -->
@@ -93,6 +63,7 @@ import StatusPanelCollapsible from "@/components/status/StatusPanelCollapsible";
 import StatusRow from "@/components/status/StatusRow";
 import SiteStatusFooter from "@/components/status/SiteStatusFooter";
 import SiteStatusFooterMobile from "@/components/status/SiteStatusFooterMobile";
+import TheMenu from '@/components/TheMenu.vue'
 
 import SiteHome from "@/components/sitepages/SiteHome";
 import SiteObserve from "@/components/sitepages/SiteObserve";
@@ -121,6 +92,7 @@ export default {
     StatusRow,
     SiteStatusFooter,
     SiteStatusFooterMobile,
+    TheMenu,
   },
   props: ["sitecode", "subpage"],
   mixins: [commands_mixin, status_mixin],
@@ -191,16 +163,13 @@ export default {
     ...mapGetters("sitestatus", [
       "weather_state"
     ]),
+
+    active_subpage() {
+      return this.$route.params.subpage
+    }
   },
 
   methods: {
-
-    button1() {
-      this.$store.dispatch("sitestatus/clearStatus")
-    },
-    button2() {
-      console.log('hi')
-    },
 
     // Do this whenever the selected site changes
     site_changed_routine(sitecode) {
@@ -220,7 +189,6 @@ export default {
       this.$store.dispatch("sitestatus/getLatestStatus")
       this.$store.dispatch("userstatus/fetch_recent_logs")
       this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
-
     },
 
   },
@@ -232,7 +200,28 @@ export default {
 @import "@/style/_variables.scss";
 @import "@/style/_responsive.scss";
 
-.navbar {
+.page {
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.total-site-menu {
+  grid-row: 1; 
+}
+.page-view {
+  grid-row: 2;
+  overflow-y: auto;
+}
+.status-footer {
+  grid-row: 3;
+}
+
+.site-navbar {
   min-height: unset;
   height: 40px;
   .container.site-menu {
@@ -248,9 +237,7 @@ export default {
 }
 
 .main-page-content {
-  width: 100vw;
-  margin-bottom: 150px;
-  height: 100%;
+  width: 100%;
 }
 
 .menu-column {
@@ -267,18 +254,41 @@ export default {
   top: 0;
   bottom: 300px;
   z-index: 0;
+  display:flex;
+  margin-bottom: 1em;
+}
+.mobile-site-menu a {
+  width: 100%;
 }
 .mobile-site-menu button {
   border-radius: 0;
-  width: 20%;
   font-size: 12px;
   background-color: $dark;
   border: 1px solid $grey-dark;
+  border-top: 1px solid grey;
+  width: 100%;
+  margin: 0;
+
+  @include tablet {
+    padding: 0 3em;
+  }
+}
+.mobile-site-menu button.menu-padding {
+  display: none;
+  height: 30px;
+
+  @include tablet {
+    display:unset;
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+}
+.mobile-site-menu .selected {
+  background-color: rgba(3, 8, 14, 0.2);
+  font-weight: bolder;
+  font-size: 14px;
+  border: 1px solid grey;
+  border-top: none;
 }
 
-.status-footer {
-  position: sticky;
-  bottom: 0;
-  width: 100vw;
-}
 </style>

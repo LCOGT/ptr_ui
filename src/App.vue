@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <the-menu />
+    <!--the-menu /-->
 
     <router-view class="router-view"></router-view>
 
@@ -38,7 +38,7 @@ export default {
 <style scoped lang="scss">
 .router-view {
   height: calc(100vh - 75px);
-  overflow-y: scroll;
+  //overflow-y: scroll;
   overflow-x:hidden;;
 }
 </style>
