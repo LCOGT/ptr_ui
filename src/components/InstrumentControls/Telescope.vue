@@ -1,20 +1,6 @@
 
 <template>
   <div class="instrument-control-wrapper">
-    <b-modal :active.sync="skychartModalIsOpen"
-      trap-focus
-      :can-cancel="['escape']"
-      scroll="clip"
-      full-screen
-      style="z-index:1000;"
-      >
-
-      <skychart-modal
-        style="background-color:#151718; overflow-y:auto; height: 100%;"
-        :sitecode="sitecode"
-        :deviceStatus="deviceStatus"
-      />
-    </b-modal>
 
     <div class="val" 
       v-if="mount_state && mount_state.message && mount_state.message != '-'">
@@ -86,18 +72,17 @@
     <b-field>
       <p class="control">
         <command-button :data="mount_slew_radec_command" 
-          style="margin-bottom: 1em;" class="is-small"/>
+          style="margin-bottom: 1em;" class="is-small is-success is-outlined"/>
       </p>
       <p class="control">
         <command-button :data="mount_slew_hadec_command" 
-          style="margin-bottom: 1em;" class="is-small"/>
+          style="margin-bottom: 1em; border-left-color: #48c774;" class="is-small"/>
       </p>
       <p class="control">
         <command-button :data="mount_slew_azalt_command" 
           style="margin-bottom: 1em;" class="is-small"/>
       </p>
     </b-field>
-    <br>
 
     <b-dropdown aria-role="list" style="width: 100%;" size="is-small">
       <button class="button is-small" slot="trigger" style="width: 100%;">
@@ -125,16 +110,13 @@
       </template>
     </b-dropdown>
 
-    <b-button class="button" 
-      style="width:100%; margin:1em 0;" 
-      @click=" skychartModalIsOpen = !skychartModalIsOpen" 
-      icon-right="arrow-top-right">view skychart</b-button>
-
+    <div style="height: 1em;"/>
 
     <div class="status-toggle-bar" 
       @click="isExpandedStatusVisible= !isExpandedStatusVisible">
       {{ isExpandedStatusVisible ? 'collapse status' : 'expand status' }}
     </div>
+
 
     <pre v-if="isExpandedStatusVisible">
       <simple-device-status 
