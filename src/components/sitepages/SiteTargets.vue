@@ -1,82 +1,40 @@
 <template>
-<section class="site-targets-wrapper">
+<div id="site-targets-wrapper">
 
-    <div class="page-layout">
+    <div  class="skychart-wrapper">
+        <div class="skychart-center">
+            <the-sky-chart class="the-skychart" :deviceStatus="deviceStatus" />
+        </div>
+    </div>
 
-        <div class="parameters-box">
-            <div style="display:flex; flex-direction:column; width: 100%;">
-
+    <div class="sidebar-wrapper">
+        <a class="sidebar-button button" @click="toggle_expand_sidebar">
+            <b-icon
+                type="is-text"
+                square
+                :icon="sidebar_is_expanded ? 'chevron-right' : 'chevron-left'"
+            />
+        </a>
+        <div class="sidebar-content is-expanded">
+            <div class="targets-page-content-wrapper">
+                <div class="ptr-aladin-parent-div">
+                    <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
+                </div>
                 <b-field label="Search for objects...">
                     <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
                     <p class="control">
                         <b-button @click="submit_simbad_query"><b-icon icon="magnify" /></b-button>
                     </p>
                 </b-field>
-
-                <div style="
-                        width: 100%; 
-                        height:1px;
-                        margin-bottom:10px; 
-                        border-bottom: 1px solid grey;"/>
-                
-                <b-field>
-                    <b-field label="ra/az/long" horizontal>
-                        <b-input 
-                            expanded 
-                            name="subject" 
-                            type="search" 
-                            icon-clickable 
-                            v-model="mount_ra" 
-                            autocomplete="off" />
-                    </b-field>
-                </b-field>
-                <b-field>
-                    <b-field label="dec/alt/lat" horizontal>
-                        <b-input 
-                            expanded
-                            name="subject" 
-                            type="search" 
-                            icon-clickable 
-                            v-model="mount_dec" 
-                            autocomplete="off" />
-                    </b-field>
-                </b-field>
-
-                <div style="
-                        width: 100%; 
-                        height:1px;
-                        margin-bottom:10px; 
-                        border-bottom: 1px solid grey;"/>
-
-                <b-field >
-                    <b-field label="note" horizontal>
-                        <b-input 
-                            name="subject" 
-                            type="search" 
-                            icon-clickable 
-                            v-model="mount_object" 
-                            autocomplete="off" />
-                    </b-field>
-                </b-field>
-                <command-button :data="mount_slew_radec_command" style="" class="is-success">
-                    <p slot="title">Point Telescope</p>
-                </command-button>
+                <command-tabs-accordion 
+                    :controls="['Telescope', 'Camera']" 
+                    :initInstrumentOpenView="0"
+                    class="command-tab-accordion"/>
             </div>
         </div>
-
-        <div class="ptr-aladin-parent-div">
-            <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
-        </div>
-
     </div>
 
-    <div class="skychart-box">
-        <the-sky-chart :deviceStatus="deviceStatus" />
-    </div>
-
-
-
-</section>
+</div>
 </template>
 
 
@@ -85,9 +43,11 @@ import { mapGetters } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { status_mixin } from '../../mixins/status_mixin'
 import helpers from '@/utils/helpers'
+import $ from 'jquery'
 
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import CommandButton from '@/components/CommandButton'
+import CommandTabsAccordion from "@/components/CommandTabsAccordion"
 import Celestial from '@/components/celestialmap/celestial'
 
 export default {
@@ -97,6 +57,7 @@ export default {
     components: {
         CommandButton,
         TheSkyChart,
+        CommandTabsAccordion,
     },
     data() {
         return {
@@ -107,10 +68,13 @@ export default {
 
             telescopeModal: false,
             isComponentModalActive: false,
+
+            sidebar_is_expanded: true,
         }
     },
 
     mounted(){
+        this.start_resize_observer()
 
         this.$loadScript("https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js")
             .then(() => {
@@ -135,9 +99,22 @@ export default {
                 });
                 // cheap way to sync the skymap and mount coordinates to the aladin view.
                 setTimeout(this.sendCoordinatesToSkychart, 1000) 
+
+                // The following code creates an overlay element that hides aladin from mouseevents.
+                // This is mainly to let the user scroll the sidebar without aladin zooming instead.
+                // If the user clicks on aladin, then normal mouse behavior returns.
+                let scroll_hide_overlay = document.createElement('div')
+                scroll_hide_overlay.style.height = '100%'
+                scroll_hide_overlay.style.width = '100%'
+                scroll_hide_overlay.style.position = 'relative'
+                scroll_hide_overlay.style['z-index']= 4 // the aladin-reticleCanvas layer has z-index==3
+                // When user clicks on the aladin window, click and scroll events revert to normal
+                scroll_hide_overlay.setAttribute('onClick', "style.pointerEvents='none'") 
+                document.getElementById('aladin-lite-div').appendChild(scroll_hide_overlay)
             })
-            .catch(() => {
+            .catch(error => {
                 console.log('failed to load Aladin')
+                console.log(error)
             });
 
         // Clicking on the sky chart should update the Aladin view.
@@ -153,6 +130,52 @@ export default {
     },
 
     methods: {
+
+        start_resize_observer() {
+
+            const skychart_wrapper = document.getElementById('site-targets-wrapper')
+
+            // Updates whenever the rendered image size changes
+            let ro = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    const cr = entry.contentRect;
+                    this.on_skychart_wrapper_resize(cr.width, cr.height)
+                }
+            });
+            // Observe one or multiple elements
+            ro.observe(skychart_wrapper);
+        },
+
+        on_skychart_wrapper_resize(width, height) {
+
+            const is_landscape = window.innerWidth > window.innerHeight;  // aspect ratio to inform layout
+            const tablet_min_width = 769 //px, from @/src/style/_responsive.scss
+
+            console.log('skychart wrapper resized: ',width, height)
+            console.log('orientation: ', is_landscape ? 'landscape' : 'portrait')
+
+            if (width > tablet_min_width) {
+                const vertical_padding = 30 // pixels
+                Celestial.resize({width: height - vertical_padding})
+                document.getElementsByClassName('skychart-center')[0].style.width = height - vertical_padding + 'px'
+            }
+
+            if (width <= tablet_min_width) {  // vertical layouts
+                const horizontal_padding = 20 // pixels
+                Celestial.resize({width: width - horizontal_padding})
+                document.getElementsByClassName('skychart-center')[0].style.width = height - horizontal_padding + 'px'
+            }
+
+        },
+        toggle_expand_sidebar() {
+            if (this.sidebar_is_expanded) {
+                document.getElementsByClassName('sidebar-content')[0].classList.remove('is-expanded')
+            }
+            else {
+                document.getElementsByClassName('sidebar-content')[0].classList.add('is-expanded')
+            }
+            this.sidebar_is_expanded = !this.sidebar_is_expanded;
+        },
 
         submit_simbad_query() {
             this.aladin.gotoObject(this.simbad_query, {success: () => {
@@ -222,6 +245,10 @@ export default {
             'weather',
         ]),
 
+        sidebar_expand_button_text() {
+            return this.sidebar_is_expanded ? '>' : '<';
+        },
+
         // command_params
         mount_ra: {
             get() { return this.$store.getters['command_params/mount_ra']},
@@ -245,59 +272,132 @@ export default {
 <style lang="scss" scoped>
 @import url("https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css");
 @import "@/style/_responsive.scss";
+@import "@/style/_variables.scss";
 
-.site-targets-wrapper {
-  padding-top: 2em; 
-  margin: 0 auto; 
-  width: 100%;
+// Button to toggle the sidebar visibility
+$toggle-button-height: 35px;
 
-  @include tablet {
-    width: 90vw;
-  }
-  @include desktop {
-    max-width: 800px;
-  }
-  @include widescreen {
-    max-width: 1000px;
-  }
-  @include fullhd {
-    max-width: 1250px;
-  }
-  
-}
-
-.page-layout{
-    height: min-content;
-    display:flex ;
-    margin-bottom: 30px;
-    flex-wrap: wrap-reverse;
-}
-.parameters-box {
-    padding-top: 20px;
-    margin: 10px;
+#site-targets-wrapper {
     display: flex;
-    min-width: 250px;
-    max-width: 300px;
+    flex-direction: column;
+    position: relative;
+    //border: 1px solid purple;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+
+    @include tablet {
+        flex-direction: row;
+    }
 }
+
+.skychart-wrapper {
+    //border: 1px solid red;
+    flex-grow: 1;
+    flex-shrink: 9;
+    transition: .8s ease-in-out;
+    max-width: 100vw;
+    height: 100%;
+}
+.skychart-center {
+    margin: 0 auto;
+    width: min-content;
+
+    @include tablet {
+        //border: 1px solid white;
+        width: min-content;
+    }
+}
+
+.sidebar-wrapper {
+    //border: 1px solid orange;
+    flex-grow: 1;
+    flex-shrink: 0;
+    transition: all 0.8s ease-in-out;
+    min-width: 150px;
+    max-width: 425px;
+}
+
+
+
+.sidebar-content {
+    //border: 1px solid yellow;
+    height: 100%;
+    width: 100vw;
+    overflow-y: hidden;
+    transform: translateX(100%);
+    transition: .8s ease-in-out;
+
+    @include tablet {
+        position:absolute;
+        top: $toggle-button-height;
+        right: 0;
+        padding: 0;
+        width: unset;
+        height: calc(100% - #{$toggle-button-height});
+    }
+}
+.sidebar-content.is-expanded {
+    transform: translateX(0%);
+}
+
+.targets-page-content-wrapper {
+    width: 90vw;
+    margin: 1em auto;
+
+    @include tablet {
+        width: 100%;
+        height: calc(100% - 1em);
+        color: #eee;
+        overflow: auto;
+
+        padding: 0;
+        padding-left: 1em;
+        margin: 0;
+        margin-top: 1em;
+    }
+}
+
+.sidebar-button{
+    position: fixed;
+    right: 0;
+    display: none;
+    color: whitesmoke;
+    width: 50px;
+    height: $toggle-button-height;
+    line-height:1em;
+    margin-right: 0;
+    margin-left: auto;
+
+    border-top-right-radius: 0;    
+    border-bottom-right-radius: 0;
+    border-right: 0;
+
+    @include tablet {
+        display: block
+    }
+}
+.sidebar-button:hover { cursor: pointer; }
 
 #aladin-lite-div {
-    min-height: 250px;
     width: 100%;
     height: 100%;
-    max-height: 450px;
+
+    @include tablet {
+        width: 410px;
+        height: 300px;
+    }
 }
 .ptr-aladin-parent-div {
-    margin: 10px;
-    min-width: 100px;
-    min-height: 100px;
     width: 100%;
-    flex: 1 0 200px;
+    height: 300px;
     background-color:grey;
+    margin-bottom: 1em;
 }
-.skychart-box {
+
+.command-tab-accordion {
+    margin-bottom: 1em;
     width: 100%;
-    max-width: calc(90vh - #{$top-bottom-height});
-    height: 100%;
 }
 
 </style>

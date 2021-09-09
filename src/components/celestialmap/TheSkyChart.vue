@@ -1,5 +1,4 @@
 <template>
-    <div>
         <div id="celestial-map"></div>
         <!-- The following two elements have been moved to the main index.html file.
             This is because we get errors if the elements are missing whenever the
@@ -9,7 +8,17 @@
         <!--button class="button" @click="rotate">recenter</button-->
         <!--button class="button" @click="zoom">zoom</button-->
         <!--button class="button" @click="animateZoom">zoom2</button-->
-   </div> 
+
+        <!-- TODO, from 9/2/21
+
+        - add resize observer, similar to the observe page with the image display, and resize the sky chart to fill 
+          the width or height of the screen
+        - incorporate the command tab accordion to the side of the screen, with button to slide out or back in
+        - add aladin component that sits above the command accordion and behaves similarly.
+        - eventually we may want to add another sidebar panel to filter the skychart targets displayed.
+
+
+        -->
 </template>
 
 <script>
@@ -138,7 +147,6 @@ export default {
             var galaxies = ['Cg','Sp','Ba','Ir','El','Ln','Px','Sx'];
             var stars = ['Ds', '**', 'star'];
 
-
             // Default to normal object symbols on sky chart, or red tones if requested.
             var styles = mapConfigs.default_object_styles;
             if (mapConfigs.night_colors_status == "on") {styles = mapConfigs.red_obj_styles; }
@@ -149,9 +157,7 @@ export default {
             Celestial.clear();
             Celestial.add({type:"json", file:"/data/all_objects.json", callback: function(error,json) {
                 if (error) {return console.warn(error);}
-
                 var sky_objects = Celestial.getData(json, mapConfigs.config.transform);
-
                 Celestial.container.selectAll(".custom_objects")
                     .data(sky_objects.features)
                     .enter().append("path")
@@ -307,7 +313,6 @@ export default {
         },
 
         rotate() {
-
             // make sure we dont' get an infinite loop due to bad params
             let a = helpers.hour2degree(helpers.siderealTime(this.site_longitude))
             let b = this.site_latitude
@@ -315,27 +320,22 @@ export default {
                 console.warn('bad skymap rotate parameters: ',a,b)
                 return;
             }
-            
             Celestial.rotate({center:[a, b, 0]})
             Celestial.redraw()
         },
 
         zoom() {
             let position = Celestial.getPoint([this.selectedRa, this.selectedDec], 'equatorial')
-
             // Center on the coordinates:
             position = [helpers.hour2degree(position[0]), position[1], 0]
             Celestial.zoomBy(1.3)
             Celestial.rotate({center: position })
-
             Celestial.redraw()
         },
 
         animateZoom() {
-
             Celestial.resize({width: 2000})
             Celestial.redraw()
-
         }
 
 
@@ -421,5 +421,11 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+#celestial-map {
+    //margin: 0 auto;
+    min-width: unset;
+    //width: fit-content;
+}
+
 </style>
