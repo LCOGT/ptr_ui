@@ -1,5 +1,6 @@
 <template>  
   <div>
+    <the-menu />
     <div class="title has-text-centered" style=" margin: 1rem auto;">photon ranch</div>
     <the-world-map name="google" />
     <!--leaflet-map name="leafmap"></leaflet-map-->
@@ -11,6 +12,7 @@
 
 <script>
 import TheWorldMap from "@/components/TheWorldMap";
+import TheMenu from "@/components/TheMenu";
 import LeafletMap from "@/components/LeafletMap";
 import SitesOverviewCards from '@/components/SitesOverviewCards'
 import { mapGetters } from 'vuex'
@@ -20,6 +22,7 @@ export default {
   components: {
     TheWorldMap,
     LeafletMap,
+    TheMenu,
     SitesOverviewCards,
   },
 
