@@ -53,9 +53,19 @@ export default {
     Sequencer,
     Settings,
   },
+  props: {
+    controls: {
+      Type: Array,
+      default: null,
+    },
+    initInstrumentOpenView: {
+      Type: Number,
+      default: -1, // init with all collapsed
+    }
+  },
   data() {
     return {
-      instrumentOpenView: -1, // init with all collapsed
+      instrumentOpenView: this.initInstrumentOpenView
     }
   },
   methods: {
@@ -76,6 +86,8 @@ export default {
     ]),
 
     instruments() {
+
+      // Default display
       let inst = []
       inst.push(...[
         'Enclosure',
@@ -92,7 +104,15 @@ export default {
         'Sequencer',
         'Settings',
       ])
-      return inst
+
+      if (this.controls == null) {
+        return inst
+      }
+      // If a custom controls list was provided via props, use as many of those as possible
+      else {
+        return inst.filter(value => this.controls.includes(value))
+      }
+
     }
   }
 

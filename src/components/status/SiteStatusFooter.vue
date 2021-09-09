@@ -371,6 +371,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/style/_variables.scss";
+@import "@/style/_responsive.scss";
 @import "@/style/buefy-styles.scss";
 
 .online-users-list {
@@ -408,6 +409,7 @@ $log-error: $danger;
 $log-critical: $danger;
 
 .status-bar-1 {
+  position:relative;
   display: grid;
   grid-template-columns: 1fr 60px;
   background-color: $user-status-background;
@@ -509,6 +511,7 @@ div.log-line:last-of-type * {
  */
 
 .status-bar-2 {
+  position:relative;
   display: grid;
   grid-template-columns: 1fr 60px;
   background-color: $main-status-background;
@@ -541,17 +544,17 @@ div.log-line:last-of-type * {
 }
 @media screen and (min-width: 768px) and (max-width: 949px) {
   #status-2-primary {
-    grid-template-columns: 70px 50px repeat(4, $status-col-width);
+    grid-template-columns: 70px 50px repeat(2, $status-col-width);
   }
-  #status-2-primary > div:nth-child(n + 6) {
+  #status-2-primary > div:nth-child(n + 5) {
     display: none;
   }
 }
-@media screen and (min-width: 950px) and (max-width: 1023px) {
+@media screen and (min-width: 950px) and (max-width: $desktop-min) {
   #status-2-primary {
-    grid-template-columns: 70px 50px repeat(4, $status-col-width);
+    grid-template-columns: 70px 50px repeat(3, $status-col-width);
   }
-  #status-2-primary > div:nth-child(n + 7) {
+  #status-2-primary > div:nth-child(n + 6) {
     display: none;
   }
 }
@@ -591,6 +594,7 @@ div.log-line:last-of-type * {
   color: whitesmoke;
   background-color: $toggle-button-color;
   width: $toggle-button-width;
+  z-index: 10;
 }
 
 /**
