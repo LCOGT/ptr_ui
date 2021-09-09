@@ -349,7 +349,7 @@ $toggle-button-height: 35px;
         width: 100%;
         height: calc(100% - 1em);
         color: #eee;
-        overflow: auto;
+        overflow-x: hidden;
 
         padding: 0;
         padding-left: 1em;
@@ -360,6 +360,8 @@ $toggle-button-height: 35px;
 
 .sidebar-button{
     position: fixed;
+    //animation: blinkonce 2s ease;
+    //animation-delay: 2s;
     right: 0;
     display: none;
     color: whitesmoke;
@@ -375,6 +377,14 @@ $toggle-button-height: 35px;
 
     @include tablet {
         display: block
+    }
+}
+.sidebar-wrapper:hover .sidebar-button {
+    animation: blinkonce 1s ease;
+}
+@keyframes blinkonce {
+    30% {
+        width: 60px;
     }
 }
 .sidebar-button:hover { cursor: pointer; }
