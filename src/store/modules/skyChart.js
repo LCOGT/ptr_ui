@@ -39,7 +39,7 @@ const actions = {
 
 // mutations
 const mutations = {
-    selectedRa: (state, ra) => {state.selectedRa = ra}, 
+    selectedRa: (state, ra) => state.selectedRa = ra, 
     selectedDec: (state, dec) => state.selectedDec = dec, 
 }
 

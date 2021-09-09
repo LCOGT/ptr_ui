@@ -42,8 +42,8 @@ select option {
 
 $link: $primary;
 $link-hover: lighten($link, 5);
-$link-focus: darken($link, 5);
-$link-active: darken($link, 5);
+$link-focus: $white;//darken($link, 5);
+$link-active: $white;//darken($link, 5);
 $link-focus-border: $grey-light;
 
 // Dark Colors
