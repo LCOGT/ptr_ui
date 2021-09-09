@@ -28,18 +28,14 @@
 
     <div class="page-view">
 
-      <div class="columns main-page-content">
         <!-- Primary content of the page. Selects from the various site subpages. -->
         <!-- Note: wait for parent (this component) to mount before loading child components. 
       Otherwise, props may initially load as null. -->
-        <div class="column">
           <component
             v-bind:is="`site-${subpage}`"
             :sitecode="sitecode"
             :deviceStatus="deviceStatus"
           />
-        </div>
-      </div>
     </div>
 
     <site-status-footer
