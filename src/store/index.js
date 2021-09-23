@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import auth from './modules/auth'
 import site_config from './modules/site_config'
-import skyChart from './modules/skyChart'
 import images from './modules/images'
 import script_settings from './modules/script_settings'
 import dev from './modules/dev'
@@ -31,7 +30,6 @@ const store = new Vuex.Store({
         site_config,
         command_params,
         script_settings,
-        skyChart,
         images,
         user_data,
         dev,

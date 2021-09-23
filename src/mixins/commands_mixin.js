@@ -267,12 +267,6 @@ export const commands_mixin = {
       'global_config',
     ]),
 
-    // Getters for click coordinates on the sky chart.
-    ...mapGetters('skyChart', {
-      chart_selectedRa: 'selectedRa',
-      chart_selectedDec: 'selectedDec',
-    }),
-
     // User-supplied command parameters
     ...mapGetters('command_params', [
       'telescope_selection',
@@ -494,15 +488,6 @@ export const commands_mixin = {
       return this.base_command('mount', 'go', 'slew to az/alt',
         { az: az, alt: alt, frame: this.telescope_coordinate_frame },
         { object: obj }
-      )
-    },
-    mount_slew_chart_command() {
-      let ra = emptyString(this.chart_selectedRa.toString())
-      let dec = emptyString(this.chart_selectedDec.toString())
-      let obj = emptyString(this.mount_object.toString())
-      return this.base_command('mount', 'go', 'slew to chart position',
-        { ra: ra, dec: dec, },
-        { object: obj, }
       )
     },
     mount_slew_near_tycho() {
