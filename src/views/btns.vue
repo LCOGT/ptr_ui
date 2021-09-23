@@ -30,8 +30,6 @@
         <command-button :data="buttonData.filterB" :isDisabled="true" />
         </div>
         <hr>
-        <button class="button" @click="printObjectTable">all objects from json</button>
-        <button class="button" @click="printTopTenNebula">top 10 nebula by alt</button>
     </div>
 
     <!-- Buttons for site functions -->
@@ -66,7 +64,6 @@ import helpers from '@/utils/helpers'
 import create_commands from '@/utils/create_command'
 import CommandButton from '@/components/CommandButton'
 import all_objects from '../assets/all_objects.json'
-import mapConfigs from '@/components/celestialmap/mapConfigs'
 
 import wcs from '@/utils/pix2wcs'
 
@@ -204,49 +201,6 @@ export default {
         ]
     },
 
-    /**
-     * Print a table of all objects stored in 'all_objects.json'.
-     */
-    printObjectTable() {
-      console.log('printing object table')
-      console.log(all_objects.features)
-      let objs = []
-      for (let i=0;i<all_objects.features.length; i++) {
-        objs.push(this.getObj(all_objects.features[i]))
-      }
-      console.table(objs)
-    },
-
-    /**
-     * Function that ranks objects and returns the top subset.
-     * In this case, find the ten nebula with highest altitude.
-     * Objects referenced from 'all_objects.json'
-     */
-    printTopTenNebula() {
-      // ttn: top ten nebula
-      let ttn = []
-
-      // Function to check if an object's type is in the array of nebula types.
-      function is_neb(obj) {
-        return (mapConfigs.nebula.indexOf(obj.properties.type) > -1)
-      }
-
-      // Comparator to return the higher altitude
-      function compareAlt(a,b) {
-        return b[5] - a[5]
-      }
-
-      // For each object, if it's a nebula, put it in the ttn array.
-      for (let i=0; i<all_objects.features.length; i++) {
-        let obj = all_objects.features[i]
-        if (is_neb(obj)) {
-          ttn.push(this.getObj(obj))
-        } 
-      }
-      // Sort by highest altitude; take the first ten.
-      ttn.sort(compareAlt)
-      console.table(ttn.slice(0,10))
-    },
 
     /**
      * Test a function from pix2wcs.js

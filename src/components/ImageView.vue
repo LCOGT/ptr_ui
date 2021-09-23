@@ -105,10 +105,6 @@ export default {
     };
   },
 
-  created() {
-    this.$store.dispatch("images/load_latest_images");
-  },
-
   mounted() {
     this.init()
 
@@ -330,12 +326,6 @@ export default {
       this.svg.on("mousemove", null)
 
       this.mouseIsDown = false;
-    },
-
-    // Display the latest image in the view.
-    setLatestImage() {
-      this.$store.dispatch("images/load_latest_images");
-      this.$store.dispatch("images/set_latest_image");
     },
 
     js9LoadImage(image) {
