@@ -48,7 +48,9 @@ import $ from 'jquery'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import CommandButton from '@/components/CommandButton'
 import CommandTabsAccordion from "@/components/CommandTabsAccordion"
-import Celestial from '@/components/celestialmap/celestial'
+//import Celestial from '@/components/celestialmap/celestial'
+import celestial from 'd3-celestial'
+let Celestial = celestial.Celestial()
 
 export default {
     name: "SiteTargets",
@@ -82,9 +84,9 @@ export default {
 
                 // Default: load aladin on m33, but use coords in mount fields if possible.
                 let target = "M33"
-                if (parseFloat(this.ra) && parseFloat(this.dec)) {
+                if (parseFloat(this.mount_ra) && parseFloat(this.mount_dec)) {
                     console.log('changing target')
-                    target = `${15*this.ra} ${this.dec}`
+                    target = `${15*this.mount_ra} ${this.mount_dec}`
                 }
 
                 // Initialize Aladin
@@ -119,14 +121,10 @@ export default {
 
         // Clicking on the sky chart should update the Aladin view.
         this.mapEl = document.getElementById("celestial-map")
-        this.mapEl.addEventListener('mousedown', this.handleMapClick)
-        this.mapEl.addEventListener('mouseup', this.handleMapClick)
     },
 
     beforeDestroy() {
-        // Remove event listeners when we're done with this component.
-        this.mapEl.removeEventListener('mousedown', this.handleMapClick)
-        this.mapEl.removeEventListener('mouseup', this.handleMapClick)
+        this.stop_resize_observer()
     },
 
     methods: {
@@ -135,35 +133,54 @@ export default {
 
             const skychart_wrapper = document.getElementById('site-targets-wrapper')
 
-            // Updates whenever the rendered image size changes
-            let ro = new ResizeObserver(entries => {
+            this.resize_observer = new ResizeObserver(entries => {
                 for (let entry of entries) {
                     const cr = entry.contentRect;
                     this.on_skychart_wrapper_resize(cr.width, cr.height)
                 }
             });
             // Observe one or multiple elements
-            ro.observe(skychart_wrapper);
+            this.resize_observer.observe(skychart_wrapper);
+        },
+        stop_resize_observer() {
+            this.resize_observer.disconnect()
         },
 
         on_skychart_wrapper_resize(width, height) {
 
             const is_landscape = window.innerWidth > window.innerHeight;  // aspect ratio to inform layout
+            const skychart_wrapper_is_landscape = width > height;  // This is the visible area between the site menu and status bar
+
+            // Are the width and height within 20px? This is used to avoid a scenario where a
+            // vertical scrollbar (in a horizontal layout) modifies the layout to become vertical, removign
+            // the scrollbar, and looping forever.
+            const skychart_wrapper_nearly_square = Math.abs(width - height) < 20
+
             const tablet_min_width = 769 //px, from @/src/style/_responsive.scss
 
-            console.log('skychart wrapper resized: ',width, height)
-            console.log('orientation: ', is_landscape ? 'landscape' : 'portrait')
+            if (width > tablet_min_width) {  // desktop layouts
 
-            if (width > tablet_min_width) {
-                const vertical_padding = 30 // pixels
-                Celestial.resize({width: height - vertical_padding})
-                document.getElementsByClassName('skychart-center')[0].style.width = height - vertical_padding + 'px'
+                // horizontal layout: skychart should fill the whole height
+                if (skychart_wrapper_is_landscape || skychart_wrapper_nearly_square) {
+                    const vertical_padding = 30 // pixels
+                    Celestial.resize({width: height - vertical_padding})
+                    document.getElementsByClassName('skychart-center')[0].style.width = height - vertical_padding + 'px'
+
+                // vertical layout: skychart should fill the width of the screen
+                } else {
+                    Celestial.resize({width: width})
+                    document.getElementsByClassName('skychart-center')[0].style.width = height + 'px'
+                }
+
             }
 
-            if (width <= tablet_min_width) {  // vertical layouts
-                const horizontal_padding = 20 // pixels
-                Celestial.resize({width: width - horizontal_padding})
-                document.getElementsByClassName('skychart-center')[0].style.width = height - horizontal_padding + 'px'
+            if (width <= tablet_min_width) {  // tablet and smaller layouts
+                // make sure sidebar content is visible
+                if (!this.sidebar_is_expanded) {
+                    this.toggle_expand_sidebar()
+                }
+                Celestial.resize({width: width})
+                document.getElementsByClassName('skychart-center')[0].style.width = height + 'px'
             }
 
         },
@@ -189,7 +206,6 @@ export default {
             var [aladin_ra, aladin_dec] = this.aladin.getRaDec();
             aladin_ra = aladin_ra / 15;
 
-            this.$store.dispatch('skyChart/setSelected', [aladin_ra, aladin_dec] )
             this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(5))
             this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
             this.$store.commit('command_params/mount_object', ' ') // clear teh mount_object entry
@@ -217,13 +233,13 @@ export default {
     watch: {
         // Update the aladin view if the coordinates change. 
         mount_ra() {
-            console.log('moving aladin')
+            //console.log('moving aladin')
             let ra = parseFloat(this.mount_ra) * 15
             let dec = parseFloat(this.mount_dec)
             this.aladin.gotoRaDec(ra, dec)
         },
         mount_dec() {
-            console.log('moving aladin')
+            //console.log('moving aladin')
             let ra = parseFloat(this.mount_ra) * 15
             let dec = parseFloat(this.mount_dec)
             this.aladin.gotoRaDec(ra, dec)
@@ -327,6 +343,7 @@ $toggle-button-height: 35px;
     overflow-y: hidden;
     transform: translateX(100%);
     transition: .8s ease-in-out;
+    z-index: 5;
 
     @include tablet {
         position:absolute;
@@ -370,6 +387,7 @@ $toggle-button-height: 35px;
     line-height:1em;
     margin-right: 0;
     margin-left: auto;
+    z-index: 5;
 
     border-top-right-radius: 0;    
     border-bottom-right-radius: 0;

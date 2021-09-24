@@ -84,14 +84,13 @@
       </p>
     </b-field>
 
-    <b-dropdown aria-role="list" style="width: 100%;" size="is-small">
+    <b-dropdown aria-role="list" style="width: 100%;" size="is-small" scrollable>
       <button class="button is-small" slot="trigger" style="width: 100%;">
           <span>Slew to...</span>
           <b-icon icon="menu-down"></b-icon>
       </button>
       <template
         v-for="(command, idx) in [
-            mount_slew_chart_command,
             mount_screenflat_command,
             mount_skyflat_command,
             mount_home_command,
@@ -116,7 +115,6 @@
       @click="isExpandedStatusVisible= !isExpandedStatusVisible">
       {{ isExpandedStatusVisible ? 'collapse status' : 'expand status' }}
     </div>
-
 
     <pre v-if="isExpandedStatusVisible">
       <simple-device-status 

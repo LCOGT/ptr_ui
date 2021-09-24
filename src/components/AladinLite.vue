@@ -18,9 +18,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
-import helpers from '@/utils/helpers'
-import Celestial from '@/components/celestialmap/celestial'
+import Celestial from 'd3-celestial'
 
 export default {
 
@@ -29,7 +27,6 @@ export default {
         return {
             aladin: '',
             mapEl: '',
-
             simbad_query: '',
         }
     },
@@ -85,7 +82,6 @@ export default {
             var [aladin_ra, aladin_dec] = this.aladin.getRaDec();
             aladin_ra = aladin_ra / 15;
 
-            this.$store.dispatch('skyChart/setSelected', [aladin_ra, aladin_dec] )
             this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(4))
             this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
             this.$store.commit('command_params/mount_object', ' ') // clear teh mount_object entry
