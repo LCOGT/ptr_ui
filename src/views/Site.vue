@@ -33,6 +33,7 @@
       Otherwise, props may initially load as null. -->
           <component
             v-bind:is="`site-${subpage}`"
+            v-if="$store.state.site_config.did_config_load_yet"
             :sitecode="sitecode"
             :deviceStatus="deviceStatus"
           />
@@ -118,7 +119,9 @@ export default {
     const new_site = to.params.sitecode.toLowerCase();
     console.log('in BEFORE ROUTE UPDATE, site: ', new_site)
 
-    this.site_changed_routine(new_site)
+    if (new_site != this.sitecode) {  // only if site changes
+      this.site_changed_routine(new_site)
+    }
 
     next();
   },

@@ -253,7 +253,7 @@ const actions = {
 
         let site = rootState.site_config.selected_site;
         let apiName = rootState.dev.active_api;
-        let querySize = num_images || 50; // How many images to get
+        let querySize = num_images || 25; // How many images to get
         let path = `/${site}/latest_images/${querySize}`;
 
         // Get the current user's id
