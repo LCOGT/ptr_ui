@@ -91,7 +91,7 @@ export default {
     },
     rightAscension() {
       if (this.displayFormat == "decimalHours") {
-        return this.ra_hours_decimal.toFixed(this.decimal_precision) + '°'  
+        return this.ra_hours_decimal.toFixed(this.decimal_precision) + 'h'  
       }
       if (this.displayFormat == "sexagesimalPlain") {
         return this.toSexagesimal(this.ra_hours_decimal, false)
