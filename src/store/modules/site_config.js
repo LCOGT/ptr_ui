@@ -287,7 +287,14 @@ const getters = {
         }
     },
 
-    
+    site_events: state => {
+        try {
+            return state.global_config[state.selected_site].events
+        } catch {
+            return {}
+        }
+    },
+
     all_telescopes: state => state.global_config[state.selected_site]['telescope'],
 
     global_config: state => state.global_config,
