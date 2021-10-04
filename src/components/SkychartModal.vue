@@ -197,7 +197,6 @@ export default {
     computed: {
 
         ...mapGetters('site_config', [
-            'site_config',
             'enclosure',
             'mount',
             'telescope',

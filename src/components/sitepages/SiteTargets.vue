@@ -80,12 +80,10 @@ export default {
 
         this.$loadScript("https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js")
             .then(() => {
-                console.log('Aladin script has finished loading.')
 
                 // Default: load aladin on m33, but use coords in mount fields if possible.
                 let target = "M33"
                 if (parseFloat(this.mount_ra) && parseFloat(this.mount_dec)) {
-                    console.log('changing target')
                     target = `${15*this.mount_ra} ${this.mount_dec}`
                 }
 
@@ -115,8 +113,8 @@ export default {
                 document.getElementById('aladin-lite-div').appendChild(scroll_hide_overlay)
             })
             .catch(error => {
-                console.log('failed to load Aladin')
-                console.log(error)
+                console.warn('failed to load Aladin')
+                console.warn(error)
             });
 
         // Clicking on the sky chart should update the Aladin view.
@@ -233,13 +231,11 @@ export default {
     watch: {
         // Update the aladin view if the coordinates change. 
         mount_ra() {
-            //console.log('moving aladin')
             let ra = parseFloat(this.mount_ra) * 15
             let dec = parseFloat(this.mount_dec)
             this.aladin.gotoRaDec(ra, dec)
         },
         mount_dec() {
-            //console.log('moving aladin')
             let ra = parseFloat(this.mount_ra) * 15
             let dec = parseFloat(this.mount_dec)
             this.aladin.gotoRaDec(ra, dec)
@@ -247,19 +243,6 @@ export default {
 
     },
     computed: {
-
-        ...mapGetters('site_config', [
-            'site_config',
-            'enclosure',
-            'mount',
-            'telescope',
-            'camera',
-            'filter_wheel',
-            'focuser',
-            'rotator',
-            'screen',
-            'weather',
-        ]),
 
         sidebar_expand_button_text() {
             return this.sidebar_is_expanded ? '>' : '<';

@@ -387,8 +387,6 @@ const actions = {
         // Send the command and log the output
         axios.post(url, command, header).then(response => {
             response = response.data
-            console.log(response)
-            console.log(command)
             // Small UI success notification
             Snackbar.open({
                 duration: 5000,
@@ -399,8 +397,6 @@ const actions = {
                 actionText: null,
             });
         }).catch(error => {
-            console.log("error sending script.")
-            console.log(error)
             // Small UI error notification
             Snackbar.open({
                 duration: 5000,
@@ -422,7 +418,6 @@ const actions = {
         // API parameters
         const url = `${rootState.dev.jobs_api}/newjob`//?site=${rootState.site_config.selected_site}`
         const header = await getAuthHeader()
-        console.log(header)
         let site = rootState.site_config.selected_site;
         let mount = rootState.site_config.selected_mount;
 
@@ -443,7 +438,6 @@ const actions = {
         // Send the command and log the output
         axios.post(url, command, header).then(response => {
             response = response.data
-            console.log(response)
             // Small UI success notification
             Snackbar.open({
                 duration: 5000,
@@ -454,8 +448,8 @@ const actions = {
                 actionText: null,
             });
         }).catch(error => {
-            console.log("error sending script.")
-            console.log(error)
+            console.warn("error sending script.")
+            console.warn(error)
             // Small UI error notification
             Snackbar.open({
                 duration: 5000,

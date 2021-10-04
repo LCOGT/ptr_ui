@@ -61,18 +61,12 @@ export default {
         LeafletMap,
         SiteEventsModal,
     },
-    data() {
-        return { }
-    },
     computed: {
-        ...mapGetters('images', ['current_image']),
-        ...mapState('site_config', ['global_config']),
-
-        latitude() { return this.global_config[this.sitecode].latitude },
-        longitude() { return this.global_config[this.sitecode].longitude },
+        ...mapGetters('site_config', {
+            latitude: 'site_latitude',
+            longitude: 'site_longitude', 
+        }),
     }
-    
-    
 }
 
 </script>

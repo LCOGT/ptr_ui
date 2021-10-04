@@ -32,12 +32,12 @@ const actions = {
     waitForJs9Ready({ commit, state }) {
         return new Promise((resolve, reject) => {
 
-            if (state.js9Ready) { console.log('js9 already ready'); console.log(JS9.readied); resolve(true) }
-            else if (JS9.readied) { console.log('js9 already ready'); commit('js9Ready', true); resolve(true); }
-            else {
-                console.log('js9 not ready yet, waiting for event...')
+            if (state.js9Ready) resolve(true);
+            else if (JS9.readied) {
+                commit('js9Ready', true); 
+                resolve(true); 
+            } else {
                 $(document).on("JS9:ready", () => {
-                    console.log('js9 ready event recieved.')
                     commit('js9Ready', true)
                     resolve(true)
                 })
@@ -52,8 +52,8 @@ const actions = {
 
         // Make sure we have the required args
         if (!base_filename || !site) {
-            console.log("Did not load image in js9 due to bad parameters: ")
-            console.log({
+            console.warn("Did not load image in js9 due to bad parameters: ")
+            console.warn({
                 "base_filename": base_filename,
                 "site": site,
             })
@@ -61,7 +61,6 @@ const actions = {
 
         // If the image is already loaded, do nothing
         } else if (base_filename == state.js9_current_image) {
-            console.log("No need to load the same image into js9.")
             return;
 
         // Load the image
@@ -83,7 +82,6 @@ const actions = {
             let body = {
                 object_name: rootGetters['images/small_fits_filename']
             }
-            console.log('url: ', apiName+path)
             const resp = await axios.post(apiName+path, body);
             const imageURL = resp.data
 
@@ -131,10 +129,7 @@ const actions = {
     },
 
     toggleCrosshair({ state }) {
-        console.log('toggle crosshair')
-        console.log('id: ', state.JS9_ID )
         let im = JS9.GetImage({display: state.JS9_ID });
-        console.log('im: ', im)
         JS9.Keyboard.Actions["toggle crosshair"](im)
     },
 
@@ -170,8 +165,8 @@ const actions = {
             return;
         // don't do anything if js9 is not loaded yet
         } else if (!JS9.GetLoadStatus()) {
-            console.log("js9 load status was false")
-            console.log(JS9.GetLoadStatus())
+            console.warn("js9 load status was false")
+            console.warn(JS9.GetLoadStatus())
             return;
         } else {
             // we might want to adjust the zoom level when the window size changes. 

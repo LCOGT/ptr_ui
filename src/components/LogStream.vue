@@ -122,7 +122,6 @@ export default {
                 log_level: this.supported_log_levels[this.getRandomInt(5)],
                 timestamp: this.get_timestamp_seconds()
             }
-            console.log(body)
             this.logs_ws.send(JSON.stringify(body))
         },
 
@@ -134,7 +133,6 @@ export default {
                 site: this.site,
                 timestamp: this.get_timestamp_seconds()
             }
-            //console.log(body.log_message)
             axios.post(url, body)
 
         },
@@ -155,11 +153,8 @@ export default {
         // This function is run whenever the websocket gets a new message.
         handle_new_log(message) {
             const new_log = JSON.parse(message.data)
-            //console.log("new log entry: ")
-            console.log(new_log)
             if (this.isScrolledToBottom(this.$refs.loglist)) {
                 this.logs.push(new_log)
-                //console.log('scroll to bottom')
                 this.$nextTick(this.scrollToBottom)
             }
             else {
@@ -184,7 +179,6 @@ export default {
             url += '&site=' + encodeURIComponent(site_param)
 
             axios.get(url).then(logs => {
-                //console.log(logs.data)
                 this.logs = [...this.logs, ...logs.data].sort((a,b) => a.timestamp - b.timestamp)
                 this.$nextTick(this.scrollToBottom)
             })

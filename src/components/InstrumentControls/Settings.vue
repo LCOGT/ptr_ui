@@ -27,8 +27,8 @@
                 v-model="self['active_'+instrument]" >
                 <option 
                   v-for="(val, index) in available_devices(instrument, sitecode)" 
-                  v-bind:value="val"
-                  v-bind:key="`ota-${index}`"
+                  :value="val"
+                  :key="`ota-${index}`"
                 >
                   {{ val }}
                 </option>
@@ -78,6 +78,9 @@ export default {
   },
 
   computed: {
+    available_devices() {
+      return this.$store.getters['site_config/available_devices']
+    },
     sitecode() {
       return this.$route.params.sitecode
     },

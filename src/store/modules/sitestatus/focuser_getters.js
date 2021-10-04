@@ -1,51 +1,32 @@
 import { parseTrueFalse } from './status_utils'
 
 const focuser_state = (state, getters, rootState) => {
-  if (Object.keys(state.focuser).includes(rootState.site_config.selected_focuser)) {
-    return state.focuser[rootState.site_config.selected_focuser]
-  } else {
-    return {}
-  }
+    return state.focuser[rootState.site_config.selected_focuser] ?? {}
 }
 
 const focus_position = (state, getters) => {
-    if (getters.focuser_state && 'focus_position' in getters.focuser_state){
-        return getters.focuser_state.focus_position + " μm"
-    } else {
-        return '-'
-    }
+    return getters.focuser_state.focus_position + " μm" ?? '-'
 }
 
 const focus_comp = (state, getters) => {
-    if (getters.focuser_state && 'comp' in getters.focuser_state){
-        return String(getters.focuser_state.comp) + " μm"
-    } else {
-        return '-'
-    }
+    return String(getters.focuser_state.comp) + " μm" ?? '-'
 }
 
 const focus_filter_offset = (state, getters) => {
-    if (getters.focuser_state && 'filter_offset' in getters.focuser_state){
-        return getters.focuser_state.filter_offset + " μm"
-    } else {
-        return '-'
-    }
+    return getters.focuser_state.filter_offset + " μm" ?? '-'
 }
 
 const focus_temperature = (state, getters) => {
-    if (getters.focuser_state && 'focus_temperature' in getters.focuser_state){
-        return getters.focuser_state.focus_temperature + " ℃"
-    } else {
-        return '-'
-    }
+    return getters.focuser_state.focus_temperature + " ℃" ?? '-'
 }
 
 const focus_moving = (state, getters) => {
-    if (getters.focuser_state && 'focus_moving' in getters.focuser_state){
-        return parseTrueFalse(getters.focuser_state.focus_moving) ? "moving" : "idle"
-    } else {
-        return '-'
-    }
+  if (typeof getters.focuser_state.focus_moving === undefined) {
+    return '-'
+  }
+  return parseTrueFalse(getters.focuser_state.focus_moving) 
+    ? "moving" 
+    : "idle"
 }
 
 export default {

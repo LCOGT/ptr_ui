@@ -1,27 +1,20 @@
 import { parseTrueFalse } from './status_utils'
 
 const rotator_state = (state, getters, rootState) => {
-  if (Object.keys(state.rotator).includes(rootState.site_config.selected_rotator)) {
-    return state.rotator[rootState.site_config.selected_rotator]
-  } else {
-    return {}
-  }
+  return state.rotator[rootState.site_config.selected_rotator] ?? {}
 }
 
 const rotator_position = (state, getters) => {
-  if (getters.rotator_state && 'position_angle' in getters.rotator_state) {
-    return getters.rotator_state.position_angle + "°"
-  } else {
-    return '-'
-  }
+  return getters.rotator_state.position_angle + "°" ?? '-'
 }
 
 const rotator_moving = (state, getters) => {
-  if (getters.rotator_state && 'rotator_moving' in getters.rotator_state) {
-    return parseTrueFalse(getters.rotator_state.rotator_moving) ? "rotating" : "idle"
-  } else {
+  if (typeof getters.rotator_state.rotator_moving === undefined) {
     return '-'
   }
+  return parseTrueFalse(getters.rotator_state.rotator_moving) 
+    ? "moving" 
+    : "idle"
 }
 
 export default {

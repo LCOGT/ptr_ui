@@ -437,7 +437,6 @@ export default {
   },
   
   computed: {
-    ...mapState('site_config', ['global_config']),
     ...mapGetters('site_config', ['all_sites']),
     ...mapState('sitestatus', ['site_open_status']),
     ...mapActions('sitestatus', ['getSiteOpenStatus']),

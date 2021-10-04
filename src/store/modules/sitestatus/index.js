@@ -117,12 +117,8 @@ const actions = {
 
   // Get a single status object for a site. Used to initialize values when loading a new site. 
   async getLatestStatus({ state, commit, dispatch, rootState }) {
-    console.log('getting latest status for site ', rootState.site_config.selected_site)
     let url = rootState.dev.status_endpoint + `/${rootState.site_config.selected_site}/complete_status`
     let response = await Axios.get(url)
-    console.log(url)
-    console.log(response)
-    console.log(response.data)
 
     // If the site has no status available, commit a default empty status to the store
     if (!Object.keys(response.data).includes('status')) {

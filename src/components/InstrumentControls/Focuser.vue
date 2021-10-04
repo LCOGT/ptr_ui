@@ -73,7 +73,15 @@
 
     <b-field label="Absolute">
       <b-field>
-        <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+        <b-input expanded 
+          name="subject" 
+          size="is-small" 
+          v-model="focuser_absolute" 
+          type="number" 
+          :step="focuser_step_size" 
+          :min="focuser_min" 
+          :max="focuser_max" 
+          autocomplete="off" />
         <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
       </b-field>
     </b-field>
@@ -104,6 +112,8 @@ import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 
+import { mapGetters } from 'vuex'
+
 export default {
   name: "Focuser",
   mixins: [commands_mixin, status_mixin, user_mixin],
@@ -132,6 +142,17 @@ export default {
   },
 
   computed: {
+    ...mapGetters('site_config', [
+      'focuser_reference',
+      'focuser_min',
+      'focuser_max',
+      'focuser_step_size',
+
+      'rotator_min',
+      'rotator_max',
+      'rotator_step_size',
+    ]),
+
     sitecode() {
       return this.$route.params.sitecode
     },

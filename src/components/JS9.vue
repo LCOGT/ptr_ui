@@ -29,7 +29,6 @@ export default {
   },
   beforeMount() {
 
-    console.log(this.JS9)
     // Set the initial display size
     let resize_opts = {
       id: 'myJS9',
@@ -92,7 +91,6 @@ export default {
         return Math.floor(Math.random() * Math.floor(max));
       }
       //var js9ID = "js9-"+getRandomInt(99).toString()
-      //console.log("js9ID: "+js9ID)
       //var anewjs9 = document.createElement("div");
       //anewjs9.class ="JS9"
       //anewjs9.id=js9ID

@@ -1,82 +1,45 @@
 
 const telescope_state = (state, getters, rootState) => {
-  if (Object.keys(state.telescope).includes(rootState.site_config.selected_telescope)) {
-    return state.telescope[rootState.site_config.selected_telescope]
-  } else {
-    return {}
-  }
+    return state.telescope?.[rootState.site_config.selected_telescope] ?? {}
 }
 
 const ra = (state, getters) => {
-    if (getters.telescope_state && 'right_ascension' in getters.telescope_state) {
-        return (parseFloat(getters.telescope_state.right_ascension).toFixed(4) || '-')
-    } else {
-        return '-'
-    }
+    return parseFloat(getters.telescope_state.right_ascension)?.toFixed(4) ?? '-'
 }
 
 const dec = (state, getters) => {
-    if (getters.telescope_state && 'declination' in getters.telescope_state) {
-        return (parseFloat(getters.telescope_state.declination).toFixed(4) || '-')
-    } else {
-        return '-'
-    }
+    return parseFloat(getters.telescope_state.declination)?.toFixed(4) ?? '-'
 }
 
 const azimuth = (state, getters) => {
-    if (getters.telescope_state && 'azimuth' in getters.telescope_state) {
-        return getters.telescope_state.azimuth
-    } else {
-        return '-'
-    }
+    return getters.telescope_state.azimuth ?? '-'
 }
 
 const altitude = (state, getters) => {
-    if (getters.telescope_state && 'altitude' in getters.telescope_state) {
-        return (getters.telescope_state.altitude || '-')
-    } else {
-        return '-'
-    }
+    return getters.telescope_state.altitude ?? '-'
 }
 
-
 const sidereal_time = (state, getters) => {
-    if (getters.telescope_state && 'sidereal_time' in getters.telescope_state ){
-        return (parseFloat(getters.telescope_state.sidereal_time) || '-')
-    } else {
-        return '-'
-    }
+    return parseFloat(getters.telescope_state.sidereal_time) ?? '-'
 }
 
 const zenith_distance = (state, getters) => {
-    if (getters.telescope_state && 'zenith_distance' in getters.telescope_state ){
-        return (getters.telescope_state.zenith_distance || '-')
-    } else {
-        return '-'
-    }
+    return getters.telescope_state.zenith_distance ?? '-'
 }
 
 const airmass = (state, getters) => {
-    if (getters.telescope_state && 'airmass' in getters.telescope_state ){
-        return (getters.telescope_state.airmass|| '-')
-    } else {
-        return '-'
-    }
+    return getters.telescope_state.airmass ?? '-'
 }
 
 const refraction = (state, getters) => {
-    if (getters.telescope_state && 'refraction' in getters.telescope_state ){
-        return (getters.telescope_state.refraction || '-')
-    } else {
-        return '-'
-    }
+    return getters.telescope_state.refraction ?? '-'
 }
 
 const hour_angle = (state, getters) => {
-    if (getters.telescope_state 
-            && "right_ascension" in getters.telescope_state 
-            && "sidereal_time" in getters.telescope_state) {
-        let ha = getters.telescope_state.sidereal_time - getters.telescope_state.right_ascension
+    let ha = getters.telescope_state.sidereal_time - getters.telescope_state.right_ascension
+    if (isNaN(ha)) {
+        return '-' // if sidereal_time or right_ascension is not provided, can't calculate hour_angle.
+    } else {
         if (ha < -12) {
             ha += 24 // hours, since we're in decimal
         }
@@ -86,7 +49,6 @@ const hour_angle = (state, getters) => {
         }
         return ha
     }
-    else { return '-' }
 }
 
 export default {

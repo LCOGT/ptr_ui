@@ -64,7 +64,12 @@ export default {
       return this.$route.params.sitecode
     },
 
-    ...mapState('site_config', ['selected_selector']),
+    ...mapState('site_config', [
+        'selected_selector',
+      ]),
+    ...mapGetters('site_config', {
+      selector_config: 'selected_selector_config',
+    }),
 
 		...mapGetters('sitestatus', [
 				'selector_port',
@@ -81,13 +86,6 @@ export default {
 				{name: 'selector guider', val: this.selector_guider },
 			]
 		},
-
-    selector_config() {
-      let selected_selector = this.$store.getters['site_config/selector']
-      let conf = this.$store.state.site_config.global_config[this.sitecode].selector[selected_selector]
-      return conf || ''
-    },
-
 
     selector_position: {
       get() { return this.$store.getters['command_params/selector_position'] },

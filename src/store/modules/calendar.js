@@ -108,8 +108,8 @@ const actions = {
 
         // In case the api call to get reservations fails: just log it for now
         }).catch(error => {
-            console.log('error getting active site reservations...')
-            console.log(error)
+            console.warn('error getting active site reservations...')
+            console.warn(error)
         })
     }
 
