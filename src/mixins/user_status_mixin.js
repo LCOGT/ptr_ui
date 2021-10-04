@@ -131,39 +131,14 @@ export const user_status_mixin = {
 
         // This function is run whenever the websocket gets a new message.
         handle_new_log(message) {
-            console.log(message)
             const new_log = JSON.parse(message.data)
-            //console.log("new log entry: ")
-            console.log(new_log)
-            //this.user_status_logs.push(new_log)
             this.$store.commit('userstatus/add_log', new_log)
         },
 
         // Fetch logs from the last day and display them in the log window 
         // in chronological order (newest at bottom)
         get_recent_logs() {
-
             this.$store.dispatch('userstatus/fetch_recent_logs')
-
-            //// Fetch any logs that are under a day old
-            //const seconds_per_day = 86400
-            //const after_time_param = this.get_timestamp_seconds() - seconds_per_day
-
-            //// Only fetch logs from the current site
-            //const site_param = this.user_status_active_site
-
-            //// Form the url with query params
-            //let url = this.logs_endpoint + '/recent-logs'
-            //url += '?after_time=' + encodeURIComponent(after_time_param)
-            //url += '&site=' + encodeURIComponent(site_param)
-
-            //axios.get(url).then(logs => {
-                ////console.log(logs.data)
-                //this.user_status_logs = [...logs.data].sort((a,b) => a.timestamp - b.timestamp)
-                ////if (this.user_status_visible){ 
-                    ////this.$nextTick(this.scrollToBottom)
-                ////}
-            //})
         },
 
         // Used to test sending a message.
@@ -175,8 +150,6 @@ export const user_status_mixin = {
                 log_level: this.supported_log_levels[this.getRandomInt(5)],
                 timestamp: this.get_timestamp_seconds()
             }
-            console.log(body)
-            console.log(this.user_status_websocket)
             this.user_status_websocket.send(JSON.stringify(body))
         },
         // Used to test sending a message.
@@ -187,7 +160,6 @@ export const user_status_mixin = {
                 site: this.user_status_active_site,
                 timestamp: this.get_timestamp_seconds()
             }
-            //console.log(body.log_message)
             axios.post(url, body)
         },
     },
@@ -197,7 +169,6 @@ export const user_status_mixin = {
             'logs_ws_endpoint',
             'logs_endpoint',
         ]),
-        ...mapState('site_config', ['site_config', 'global_config']),
         ...mapState('userstatus', ['user_status_logs']),
 
 

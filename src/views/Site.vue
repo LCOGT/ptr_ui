@@ -96,7 +96,7 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     const sitecode = to.params.sitecode.toLowerCase();
-    console.log('IN BEFOREROUTEENTER, site: ', sitecode)
+    //console.log('IN BEFOREROUTEENTER, site: ', sitecode)
     next((vm) => {
       // Update the active devices
       vm.$store.dispatch("site_config/set_default_active_devices", sitecode);
@@ -117,12 +117,11 @@ export default {
 
   beforeRouteUpdate(to, from, next) {
     const new_site = to.params.sitecode.toLowerCase();
-    console.log('in BEFORE ROUTE UPDATE, site: ', new_site)
+    //console.log('in BEFORE ROUTE UPDATE, site: ', new_site)
 
     if (new_site != this.sitecode) {  // only if site changes
       this.site_changed_routine(new_site)
     }
-
     next();
   },
 
@@ -172,7 +171,7 @@ export default {
 
     // Do this whenever the selected site changes
     site_changed_routine(sitecode) {
-      console.log('site changed to ', sitecode)
+      // console.log('site changed to ', sitecode)
 
       // Update the active devices
       this.$store.dispatch("site_config/set_default_active_devices", sitecode);

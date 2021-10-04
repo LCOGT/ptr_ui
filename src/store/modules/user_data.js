@@ -63,8 +63,8 @@ const actions = {
             commit('user_projects', response.data)
         }).catch(err => {
             commit('user_projects_is_loading', false)
-            console.log('error fetching user projects: ', err)
-            console.log("user: ",user_id)
+            console.warn('error fetching user projects: ', err)
+            console.warn("user: ",user_id)
         })
     },
     async fetchAllProjects({ commit, rootState}) {
@@ -80,7 +80,7 @@ const actions = {
             commit('all_projects', response.data)
         }).catch(err => {
             commit('all_projects_is_loading', false)
-            console.log('error fetching user projects: ', err)
+            console.warn('error fetching user projects: ', err)
         })
     },
 
@@ -103,8 +103,8 @@ const actions = {
             commit('user_events', response.data)
         }).catch(err => {
             commit('user_events_is_loading', false)
-            console.log("error fetching user events: ", err)
-            console.log("user: ",user_id)
+            console.warn("error fetching user events: ", err)
+            console.warn("user: ",user_id)
         })
     },
 
@@ -116,12 +116,7 @@ const actions = {
             created_at: created_at
         }
 
-        console.log('delete project request:')
-        console.log(url)
-        console.log(body)
-        console.log(header)
         axios.post(url, body, header).then(async response => {
-            console.log(response)
             let user = await getInstance().user.sub
             dispatch('fetchUserProjects', user)
             Toast.open({
@@ -137,8 +132,8 @@ const actions = {
                 position: 'is-bottom',
                 type: 'is-danger' ,
             })
-            console.log('error deleting project ', err)
-            console.log(err)
+            console.warn('error deleting project ', err)
+            console.warn(err)
         })
     },
 
@@ -158,13 +153,11 @@ const actions = {
             "project_id": project_id,
             "events": [event],
         }
-        console.log(body)
         axios.post(url, body, header).then(async response => {
             let user = await getInstance().user.sub
             dispatch('fetchUserEvents', user)
-            console.log(response.data)
         }).catch(err => {
-            console.log("error fetching user events: ", err)
+            console.warn("error fetching user events: ", err)
         })
     },
 

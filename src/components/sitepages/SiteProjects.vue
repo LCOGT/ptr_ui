@@ -62,6 +62,7 @@ export default {
     displayUtcTime(time) {
       return moment(time).utc().format("MMM D, kk:mm");
     },
+
     updateTime() {
       this.localTime = moment().format("MMM D, kk:mm");
       this.siteTime = moment().tz(this.timezone).format("MMM D, kk:mm");
@@ -69,50 +70,14 @@ export default {
     },
 
     load_project_form(project) {
-      console.log("in parent: loading project in form");
       this.project_to_load = project;
     },
   },
   computed: {
-    ...mapGetters("site_config", ["site_config", "global_config", "timezone"]),
+    ...mapGetters("site_config", [ "timezone" ]),
 
     user() {
       return this.$auth.user;
-    },
-
-    //timezone() {
-    //let tz = {
-    //"wmd": "America/Los_Angeles",
-    //"saf": "America/Denver",
-    //"ALI-sim": "Asia/Kashgar",
-    //}
-    //return  tz[this.sitecode]
-    //},
-
-    // Calendar Resources (Observatories) to feed into the calendar component
-    listOfObservatories() {
-      let all_obs = [];
-      for (let a_site in this.global_config) {
-        let o = this.global_config[a_site];
-        all_obs.push({
-          id: o.site,
-          title: o.name,
-          eventColor: "#7d12ff",
-          //'eventBackgroundColor': '#ab20fd',
-          eventBorderColor: "#200589",
-          eventTextColor: "#fbf8fd",
-          eventClassNames: "",
-          eventOverlap: false, // defines whether events are allowed to overlap
-          eventConstraint: "",
-          eventAllow: "",
-          businessHours: "",
-          children: "",
-          parentId: "",
-          anyOtherPropsHere:
-            "call from key extendedProps of this resource object",
-        });
-      }
-      return all_obs;
     },
   },
 };

@@ -1,16 +1,10 @@
 
 const camera_state = (state, getters, rootState) => {
-  if (Object.keys(state.camera).includes(rootState.site_config.selected_camera)) {
-    return state.camera[rootState.site_config.selected_camera]
-  } else {
-    return {}
-  }
+    return state.camera[rootState.site_config.selected_camera] ?? {}
 }
 
 const camera_status = (state, getters) => {
-  try {
-    return getters.camera_state.status || '-'
-  } catch { return '-'}
+  return getters.camera_state.status ?? '-'
 }
 
 export default {

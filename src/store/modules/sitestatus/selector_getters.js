@@ -1,40 +1,20 @@
 
 
 const selector_state = (state, getters, rootState) => {
-  if (Object.keys(state.selector).includes(rootState.site_config.selected_selector)) {
-    return state.selector[rootState.site_config.selected_selector]
-  } else {
-    return {}
-  }
+  return state.selector[rootState.site_config.selected_selector] ?? {}
 }
 
 const selector_camera = (state, getters) => {
-  if (getters.selector_state && 'camera' in getters.selector_state) {
-    return getters.selector_state.camera
-  } else {
-    return '-'
-  }
+  return getters.selector_state.camera ?? '-'
 }
 const selector_guider  = (state, getters) => {
-  if (getters.selector_state && 'guider' in getters.selector_state) {
-    return getters.selector_state.guider
-  } else {
-    return '-'
-  }
+  return getters.selector_state.guider ?? '-'
 }
 const selector_instrument = (state, getters) => {
-  if (getters.selector_state && 'instrument' in getters.selector_state) {
-    return getters.selector_state.instrument
-  } else {
-    return '-'
-  }
+  return getters.selector_state.instrument ?? '-'
 }
 const selector_port = (state, getters) => {
-  if (getters.selector_state && 'port' in getters.selector_state) {
-    return getters.selector_state.port
-  } else {
-    return '-'
-  }
+  return getters.selector_state.port ?? '-'
 }
 
 export default {

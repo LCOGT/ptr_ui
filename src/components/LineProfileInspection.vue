@@ -146,13 +146,11 @@ export default {
         end: endingPoint,
       }
 
-      console.log(payload)
       axios.post(url, payload).then(response => {
         this.analysisInProgress = false
         const profile = response.data.data // this is the data to plot
         this.lineProfileResults = profile
       }).catch(e => {
-        console.log(e)
         this.$buefy.toast.open({
           type: "is-danger",
           message: "There was a problem computing the line profile."

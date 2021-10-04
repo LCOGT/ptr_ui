@@ -169,7 +169,6 @@ export default {
     },
     methods: {
         setActiveEvent(row) {
-            console.log(row)
             this.activeEvent =row
         },
         setProjectId(project_name, created_at) {
@@ -207,10 +206,6 @@ export default {
         },
     },
     computed: {
-        ...mapGetters('site_config', [
-            'site_config',
-            'global_config',
-        ]), 
         ...mapState('user_data', [
             'user_events',
             'user_events_is_loading',

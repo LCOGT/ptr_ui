@@ -203,7 +203,7 @@ try {
             {onkeyup: JS9Helpers.drawCrosshairCuts, winDims: [0, 0]});
 
 } catch(e) {
-    console.log(e)
+    console.warn(e)
 }
 
 export default JS9Helpers;

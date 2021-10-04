@@ -36,7 +36,6 @@ export default {
   props: ["svgId"],
 
   mounted() {
-    //console.log('mounted context')
     this.createChart();
   },
 
@@ -53,7 +52,6 @@ export default {
   methods: {
     createChart() {
       const vm = this;
-      //console.log('createchart context')
       const chartComponent = document.getElementById(this.svgId);
       chartComponent.addEventListener("contextmenu", this.setContextMenuCoords);
 
@@ -61,7 +59,6 @@ export default {
         .selectAll(".selectable-shape")
         .on("contextmenu", function (d) {
           d3.event.preventDefault();
-          console.log("right click");
           // Make this the selected shape
           vm.$store.commit("drawshapes/selectedId", d.id);
           // Pass the data object (d) and the DOM element (this) to vm.contextMenu.

@@ -1,26 +1,14 @@
 
 const screen_state = (state, getters, rootState) => {
-  if (Object.keys(state.screen).includes(rootState.site_config.selected_screen)) {
-    return state.screen[rootState.site_config.selected_screen]
-  } else {
-    return {}
-  }
+  return state.screen[rootState.site_config.selected_screen] ?? {}
 }
 
 const screen_status = (state, getters) => {
-  if (getters.screen_state && 'dark_setting' in getters.screen_state) {
-    return getters.screen_state.dark_setting.split(' ')[2]
-  } else {
-    return '-'
-  }
+  return getters.screen_state.dark_setting?.split(' ')?.[2] ?? '-'
 }
 
 const screen_bright_setting = (state, getters) => {
-  if (getters.screen_state && 'bright_setting' in getters.screen_state) {
-    return getters.screen_state.bright_setting + ' %'
-  } else {
-    return '-'
-  }
+  return getters.screen_state.bright_setting + ' %' ?? '-'
 }
 
 export default {

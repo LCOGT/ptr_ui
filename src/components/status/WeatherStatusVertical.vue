@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import helpers from '@/utils/helpers'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 export default {
@@ -92,15 +92,6 @@ export default {
     },
     methods: {
 
-        focuserJobPost(data) {
-            console.log('focuser job post: ',data)
-            let statusItem = {
-                "status": data.statusId.split("#")[0],
-                "deviceType": data.deviceType,
-            }
-            this.focuserJobs[data.ulid] = statusItem
-        },
-
         update_time() {
             this.local_timestamp= Date.now()
         },
@@ -127,24 +118,20 @@ export default {
             return hhmmss
         },
 
-
-
-
     },
     computed: {
 
-        ...mapGetters('site_config', [
-            'site_config',
-            'enclosure',
-            'mount',
-            'telescope',
-            'camera',
-            'filter_wheel',
-            'focuser',
-            'rotator',
-            'screen',
-            'weather',
-        ]),
+        ...mapState('site_config', {
+            enclosure: selected_enclosure,
+            mount: selected_mount,
+            telescope: selected_telescope,
+            camera: selected_camera,
+            filter_wheel: selected_filter_wheel,
+            focuser: selected_focuser,
+            rotator: selected_rotator,
+            screen: selected_screen,
+            weather: selected_weather
+        }),
 
         status_age_days() {
             let timestring = ''
@@ -228,8 +215,6 @@ export default {
             return ((this.local_timestamp - status_timestamp)/1000).toFixed(1)
         },
     },
-
-
 
 }
 

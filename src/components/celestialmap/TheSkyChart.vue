@@ -134,8 +134,6 @@ export default {
                 map_coords[0] = helpers.degree2hour(map_coords[0])
                 this.$store.commit('command_params/mount_ra', map_coords[0].toFixed(4)) 
                 this.$store.commit('command_params/mount_dec', map_coords[1].toFixed(4)) 
-            } else {
-                console.log('user clicked outside of map')
             }
         },
         handle_mouseup(e) { },

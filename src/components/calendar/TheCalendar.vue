@@ -103,7 +103,7 @@ import axios from "axios";
 import moment from "moment";
 import titleGenerator from "@/utils/titleGenerator";
 import SunCalc from "suncalc";
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import CalendarEventEditor from "@/components/calendar/CalendarEventEditor";
 
@@ -156,7 +156,6 @@ export default {
 
     this.fullCalendarApi = this.$refs.fullCalendar.getApi()
 
-    //console.log( "timezone: " + this.$refs.fullCalendar.getApi().dateEnv.timeZone);
     this.refreshCalendarView();
     this.nowIndicatorTimeInteval = setInterval(this.updateNowIndicator, 300000);
   },
@@ -232,8 +231,10 @@ export default {
       }
     },
 
+    ...mapState('site_config', [
+      'global_config',
+    ]),
     ...mapGetters("site_config", [
-      "global_config",
       "site_latitude",
       "site_longitude",
       "timezone",
@@ -371,8 +372,6 @@ export default {
       try { // ignore errors caused by the timezone not being loaded yet.
         let moment_today = moment([year, month, day]).utc()
         let moment_yesterday = moment([year, month, day]).utc().add(-1, 'days')
-        //console.log('today: ',moment_today.format())
-        //console.log('yesterday: ',moment_yesterday.format())
 
         let phase_today = Moon.phase(
           moment_today.year(), 
@@ -382,9 +381,6 @@ export default {
           moment_yesterday.year(), 
           moment_yesterday.month(), 
           moment_yesterday.date())
-
-        //console.log(phase_today.phase)
-        //console.log(phase_yesterday.phase)
 
         // If the phase is changed from the previous day, then return it to
         // display on the calendar.
@@ -405,17 +401,11 @@ export default {
       if (dayRenderInfo.view.type == "dayGridMonth" || true) {
 
         try { // ignore errors from the timezone not being loaded yet. 
-          //console.log(dayRenderInfo)
           let date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
-          //console.log(date.format())
-          //console.log('y: ', date.year())
-          //console.log('m: ', date.month())
-          //console.log('d: ', date.date())
           let moon_phase = this.getMoonPhaseDays(
             date.year(), 
             date.month(), 
             date.date())
-          //console.log(moon_phase)
 
           if (moon_phase) {
             dayRenderInfo.el.innerHTML = `<i class="moon-icon mdi \
@@ -560,7 +550,6 @@ export default {
     async getTwilightEvents(info) {
       // Timer start
       let t0 = performance.now();
-      //console.log('info: ', info)
 
       // Get the time range we need to display in the UI.
       let firstDay = info.start.valueOf();
@@ -581,8 +570,6 @@ export default {
         // Define each day by the timestamp a little after 1:01am to avoid DST hell
         allDays.push(day + 3700000);
       }
-
-      //console.log('allDays: ', allDays)
 
       // Generate the twilight events (in proper fullCalendar format)
       // for one day column (evening-of and morning-after the given date.)
@@ -738,9 +725,9 @@ export default {
     handleNotAuthorizedResponse(error) {
       if (error.response) {
         // Request made and server responded
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
+        console.warn(error.response.data);
+        console.warn(error.response.status);
+        console.warn(error.response.headers);
         // small popup notification describing error
         this.$buefy.toast.open({
           duration: 5000,
@@ -750,10 +737,10 @@ export default {
         });
       } else if (error.request) {
         // The request was made but no response was received
-        console.log(error.request);
+        console.warn(error.request);
       } else {
         // Something happened in setting up the request that triggered an Error
-        console.log("Error", error.message);
+        console.warn("Error", error.message);
       }
     },
 
@@ -789,7 +776,6 @@ export default {
      *  This is run when a user clicks on the calendar to create a new event.
      */
     newEventSelected(event) {
-      //console.log(event)
       this.activeEvent.startStr = moment(event.startStr).utc().format();
       this.activeEvent.endStr = moment(event.endStr).utc().format();
       this.activeEvent.title = "new event";
@@ -809,7 +795,6 @@ export default {
      */
     existingEventSelected(arg) {
       let event = arg.event;
-      console.log(event);
       (this.activeEvent.id = event.id),
         (this.activeEvent.startStr = moment(event.start).format());
       this.activeEvent.endStr = moment(event.end).format();
@@ -882,21 +867,13 @@ export default {
         time: moment().utc().format(),
       };
       let response = await axios.post(url, body, header);
-      console.log("userIsScheduled response: ", response);
       this.currentUserScheduled = response.data;
-    },
-    async ping() {
-      let url = "https://api.photonranch.org/api/ping/helloping";
-      let header = await this.getConfigWithAuth();
-      let body = {};
-      console.log(await axios.post(url, body, header));
     },
 
     /**
      * When the user clicks submit, event details are sent to the backend.
      */
     async submitButtonClicked(newEvent) {
-      //console.log('new event creation: ', newEvent)
 
       // Make request headers and include token.
       // Requires user to be logged in.
@@ -952,7 +929,6 @@ export default {
     async deleteButtonClicked(eventToDelete) {
       let config = await this.getConfigWithAuth();
       let url = `${this.backendUrl}/dev/delete`;
-      //console.log('event to delete: ', eventToDelete)
       let body = {
         event_id: eventToDelete.id,
         start: moment(eventToDelete.startStr).utc().format(),
