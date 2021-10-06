@@ -23,14 +23,13 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 export default {
   name: "InstrumentSelector",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -79,12 +78,7 @@ export default {
 		]),
 
 		statusList() {
-			return [
-				{name: 'selector port', val: this.selector_port },
-				{name: 'selector instrument', val: this.selector_instrument },
-				{name: 'selector camera', val: this.selector_camera },
-				{name: 'selector guider', val: this.selector_guider },
-			]
+			return [ this.selector_port, this.selector_instrument, this.selector_camera, this.selector_guider ]
 		},
 
     selector_position: {

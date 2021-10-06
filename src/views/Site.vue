@@ -35,7 +35,6 @@
             v-bind:is="`site-${subpage}`"
             v-if="$store.state.site_config.did_config_load_yet"
             :sitecode="sitecode"
-            :deviceStatus="deviceStatus"
           />
     </div>
 
@@ -70,7 +69,6 @@ import SiteProjects from "@/components/sitepages/SiteProjects";
 import SiteData from "@/components/sitepages/SiteData";
 
 import { commands_mixin } from "../mixins/commands_mixin";
-import { status_mixin } from "../mixins/status_mixin";
 import datastreamer from "@/datastreamer";
 
 export default {
@@ -92,7 +90,7 @@ export default {
     TheMenu,
   },
   props: ["sitecode", "subpage"],
-  mixins: [commands_mixin, status_mixin],
+  mixins: [commands_mixin],
 
   beforeRouteEnter(to, from, next) {
     const sitecode = to.params.sitecode.toLowerCase();

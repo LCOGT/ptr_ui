@@ -1,16 +1,19 @@
 import Axios from "axios"
 
-import enclosure_getters from './enclosure_getters'
-import observing_conditions_getters from './observing_conditions_getters'
-import mount_getters from './mount_getters'
-import telescope_getters from "./telescope_getters"
-import camera_getters from "./camera_getters"
-import filter_wheel_getters from "./filter_wheel_getters"
-import focuser_getters from "./focuser_getters"
-import rotator_getters from "./rotator_getters"
-import screen_getters from "./screen_getters"
-import sequencer_getters from "./sequencer_getters"
-import selector_getters from "./selector_getters"
+import { statusAgeDisplay, STALE_AGE_MS } from './getters/status_utils'
+
+import enclosure_getters from './getters/enclosure_getters'
+import observing_conditions_getters from './getters/observing_conditions_getters'
+import mount_getters from './getters/mount_getters'
+import telescope_getters from "./getters/telescope_getters"
+import camera_getters from "./getters/camera_getters"
+import filter_wheel_getters from "./getters/filter_wheel_getters"
+import focuser_getters from "./getters/focuser_getters"
+import rotator_getters from "./getters/rotator_getters"
+import screen_getters from "./getters/screen_getters"
+import sequencer_getters from "./getters/sequencer_getters"
+import selector_getters from "./getters/selector_getters"
+import accumulated_getters from "./getters/accumulated_getters"
 
 const hasKey = (obj, key) => { return Object.keys(obj).includes(key) }
 
@@ -53,9 +56,19 @@ const state = {
 const getters = {
 
   site: state => state.site,
+  timestamp: state => state.now,
+
+  site_is_online: state => (state.status_age * 1000) < STALE_AGE_MS,
+
   status_age: state => (state.now - state.timestamp) / 1000,
+  status_age_display: (state, getters) => statusAgeDisplay(getters.status_age), 
+
   wx_status_age: state => (state.now - state.weather_timestamp) / 1000,
+  wx_status_age_display: (state, getters) => statusAgeDisplay(getters.wx_status_age),
+
   device_status_age: state => (state.now - state.device_timestamp) / 1000,
+  device_status_age_display: (state, getters) => statusAgeDisplay(getters.device_status_age),
+
   ...observing_conditions_getters,
   ...enclosure_getters,
   ...mount_getters,
@@ -67,6 +80,7 @@ const getters = {
   ...screen_getters,
   ...sequencer_getters,
   ...selector_getters,
+  ...accumulated_getters,
 }
 
 const mutations = {

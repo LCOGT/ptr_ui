@@ -63,6 +63,10 @@ export default {
             timezone: 'timezone',
         }),
 
+        ...mapGetters('sitestatus', [
+            'buildRotatorTabStatus',
+        ]),
+
         columns() {
             return [
                 {

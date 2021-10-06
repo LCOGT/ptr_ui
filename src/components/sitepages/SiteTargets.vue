@@ -3,7 +3,7 @@
 
     <div  class="skychart-wrapper">
         <div class="skychart-center">
-            <the-sky-chart class="the-skychart" :deviceStatus="deviceStatus" />
+            <the-sky-chart class="the-skychart" />
         </div>
     </div>
 
@@ -41,7 +41,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import helpers from '@/utils/helpers'
 import $ from 'jquery'
 
@@ -55,7 +54,7 @@ let Celestial = celestial.Celestial()
 export default {
     name: "SiteTargets",
     props: [ "sitecode"],
-    mixins: [commands_mixin,status_mixin],
+    mixins: [commands_mixin],
     components: {
         CommandButton,
         TheSkyChart,
