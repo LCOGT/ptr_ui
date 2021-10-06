@@ -4,7 +4,7 @@
     <status-column 
       class="status-column"
       :statusList="buildScreenTabStatus" 
-      :isOffline="!isOnline"
+      :isOffline="!site_is_online"
     />
 
     <b-field label="Brightness">
@@ -41,14 +41,14 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
+import { mapGetters } from 'vuex'
 export default {
   name: "Screen",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -64,6 +64,11 @@ export default {
     sitecode() {
       return this.$route.params.sitecode
     },
+    ...mapGetters('sitestatus', [
+      'site_is_online',
+      'buildScreenTabStatus',
+      'screen_state',
+    ]),
     screen_brightness: {
       get() { return this.$store.getters['command_params/screen_brightness'] },
       set(val) {this.$store.commit('command_params/screen_brightness', val)}

@@ -312,7 +312,6 @@ import helpers from "@/utils/helpers"
 
 export default {
   name: "SubpageData",
-  props: ["deviceStatus"],
   components: {
     ImageView,
     ImagesTable,

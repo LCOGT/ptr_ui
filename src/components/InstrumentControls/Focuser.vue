@@ -2,11 +2,11 @@
 <template>
   <div class="instrument-control-wrapper">
 
-    <div class="val" v-if="focuser_state && focuser_state.message">{{focuser_state.message}}</div>
+    <div class="val" v-if="focuser_message.val != '-'">{{focuser_message.val}}</div>
     <status-column 
       class="status-column"
       :statusList="buildFocuserTabStatus" 
-      :isOffline="!isOnline"
+      :isOffline="!site_is_online"
     />
 
     <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
@@ -105,7 +105,6 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 
 import CommandButton from '@/components/CommandButton'
@@ -116,7 +115,7 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: "Focuser",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -131,14 +130,10 @@ export default {
     }
   },
 
-  created() {
-  },
-
   methods: {
     focuserJobPost(data) {
       console.log('focuser job post: ',data)
     },
-
   },
 
   computed: {
@@ -151,6 +146,12 @@ export default {
       'rotator_min',
       'rotator_max',
       'rotator_step_size',
+    ]),
+
+    ...mapGetters('sitestatus', [
+      'site_is_online',
+      'buildFocuserTabStatus',
+      'focuser_message',
     ]),
 
     sitecode() {

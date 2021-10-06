@@ -44,7 +44,6 @@ import TheDeviceSelectors from '@/components/TheDeviceSelectors'
 import TheDomeCam from '@/components/TheDomeCam'
 import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import LeafletMap from '@/components/LeafletMap'
 import SiteEventsModal from '@/components/SiteEventsModal'
@@ -53,7 +52,7 @@ import CommandButton from '@/components/CommandButton'
 export default {
     name: "SiteHome",
     props: ["sitecode"],
-    mixins: [commands_mixin, status_mixin, user_mixin],
+    mixins: [commands_mixin, user_mixin],
     components: {
         CommandButton, 
         TheDeviceSelectors,

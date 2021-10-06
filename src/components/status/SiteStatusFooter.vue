@@ -53,21 +53,21 @@
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!isOnline"
+              :isOffline="!site_is_online"
               :statusList="buildWeatherStatus"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!isOnline"
+              :isOffline="!site_is_online"
               :statusList="buildGeneralStatus"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!isOnline"
+              :isOffline="!site_is_online"
               :statusList="buildFocusRotatorCameraStatus"
             />
           </div>
@@ -78,18 +78,18 @@
             <div style="display: flex; flex-direction: column">
               <div
                 class="online-status"
-                :title="`status age: ${latest_status_age.val}`"
+                :title="`status age: ${status_age_display.val}`"
               >
                 <div
-                  :class="{ 'status-on': isOnline, 'status-off': !isOnline }"
+                  :class="{ 'status-on': site_is_online, 'status-off': !site_is_online}"
                 ></div>
                 <p
-                  v-if="isOnline"
+                  v-if="site_is_online"
                   style="font-weight: bold; color: greenyellow"
                 >
                   online
                 </p>
-                <p v-if="!isOnline" style="font-weight: bold; color: orangered">
+                <p v-if="!site_is_online" style="font-weight: bold; color: orangered">
                   offline
                 </p>
               </div>
@@ -105,7 +105,7 @@
                 <div class="mr-5">
                   <site-sidereal-time
                     class="sidereal-time"
-                    :class="{ offline: !isOnline }"
+                    :class="{ offline: !site_is_online}"
                     v-if="site_longitude"
                     :longitude="site_longitude"
                   />
@@ -114,7 +114,7 @@
                 <div class="mr-5">
                   <site-local-time
                     class="sidereal-time"
-                    :class="{ offline: !isOnline }"
+                    :class="{ offline: !site_is_online}"
                     v-if="timezone"
                     :timezone="timezone"
                   />
@@ -124,7 +124,7 @@
                 <div class="mr-1">
                   <utc-time
                     class="sidereal-time"
-                    :class="{ offline: !isOnline }"
+                    :class="{ offline: !site_is_online}"
                     v-if="timezone"
                     :timezone="timezone"
                   />
@@ -147,41 +147,41 @@
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!isOnline"
+              :isOffline="!site_is_online"
               :statusList="open_safety_status"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!isOnline"
+              :isOffline="!site_is_online"
               :statusList="open_safety_status_2"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!isOnline"
+              :isOffline="!site_is_online"
               :statusList="ra_dec_ha_status"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!isOnline"
+              :isOffline="!site_is_online"
               :statusList="az_alt_airmass_status"
             />
           </div>
           <!--div>
                         <status-column 
                             style="padding: 0;"
-                            :isOffline="!isOnline"
+                            :isOffline="!site_is_online"
                             :statusList="buildFocuserTabStatus"/>
                     </div-->
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!isOnline"
+              :isOffline="!site_is_online"
               :statusList="buildRotatorTabStatus"
             />
           </div>
@@ -202,7 +202,6 @@ import { mapState, mapGetters } from "vuex";
 import ReconnectingWebSocket from "reconnecting-websocket";
 import axios from "axios";
 import moment from "moment";
-import { status_mixin } from "../../mixins/status_mixin";
 import { user_status_mixin } from "../../mixins/user_status_mixin";
 import StatusColumn from "@/components/status/StatusColumn";
 import SiteSiderealTime from "@/components/display/SiteSiderealTime";
@@ -212,7 +211,7 @@ import SiteReservationStatus from "@/components/SiteReservationStatus";
 import ChatModule from "@/components/ChatModule";
 export default {
   name: "SiteStatusFooter",
-  mixins: [status_mixin, user_status_mixin],
+  mixins: [ user_status_mixin],
   components: {
     StatusColumn,
     SiteSiderealTime,
@@ -303,6 +302,30 @@ export default {
   },
   computed: {
     ...mapGetters("site_config", ["site_longitude", "timezone"]),
+    ...mapGetters("sitestatus", [
+        "status_age_display",
+        "status_age",
+        "site_is_online",
+
+        "buildWeatherStatus",
+        "buildGeneralStatus",
+        "buildFocusRotatorCameraStatus",
+        "buildRotatorTabStatus",
+
+        "ra",
+        "dec",
+        "hour_angle",
+        "azimuth",
+        "altitude",
+        "airmass",
+
+        "enclosure_status",
+        "enclosure_mode",
+        "weather_ok",
+        "open_ok",
+        "hold_duration",
+        "wx_hold", 
+      ]),
 
     // Sitecode and site both refer to the 3-leter site abbreviation.
     // They are duplicated because the status mixin expects 'sitecode'.
@@ -313,39 +336,23 @@ export default {
     // Assemble the list of status elements for the status-column components
     open_safety_status() {
       return [
-        { name: "Enclosure", val: this.enclosure_status, is_stale: this.wx_is_stale  },
-        { name: "Weather OK", ...this.weather_ok, is_stale: this.wx_is_stale  },
-        { name: "Open OK", ...this.open_ok, is_stale: this.wx_is_stale  },
+        this.enclosure_status,
+        this.weather_ok,
+        this.open_ok,
       ];
     },
     open_safety_status_2() {
       return [
-        { name: "Enc. Mode", val: this.enclosure_mode, is_stale: this.wx_is_stale  },
-        { name: "Weather hold", ...this.wx_hold, is_stale: this.wx_is_stale  },
-        { name: "Hold Duration", ...this.hold_duration, is_stale: this.wx_is_stale  },
+        this.enclosure_mode,
+        this.wx_hold,
+        this.hold_duration,
       ]
     },
     ra_dec_ha_status() {
-      return [
-        { name: "Ra", val: this.ra, is_stale: this.device_status_is_stale },
-        { name: "Dec", val: this.dec, is_stale: this.device_status_is_stale },
-        { name: "HA", val: this.hour_angle, is_stale: this.device_status_is_stale },
-      ];
+      return [ this.ra, this.dec, this.hour_angle ]
     },
     az_alt_airmass_status() {
-      return [
-        { name: "Azimuth", val: this.azimuth, is_stale: this.device_status_is_stale },
-        { name: "Altitude", val: this.altitude, is_stale: this.device_status_is_stale },
-        { name: "Airmass", val: this.airmass, is_stale: this.device_status_is_stale },
-      ];
-    },
-
-    // Control the status indicator dot in the title bar.
-    isOnline() {
-      // online is defined by status age under 5 minutes
-      if (this.status_age < 300) {
-        return true;
-      } else return false;
+      return [ this.azimuth, this.altitude, this.airmass ]
     },
 
     /**

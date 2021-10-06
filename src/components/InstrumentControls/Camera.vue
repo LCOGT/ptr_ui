@@ -7,7 +7,7 @@
     <status-column 
       class="status-column"
       :statusList="buildCameraTabStatus" 
-      :isOffline="!isOnline"
+      :isOffline="!site_is_online"
     />
 
 		<div style="border-bottom: 1px solid grey; margin: 1em 0;" />
@@ -168,14 +168,14 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
+import { mapGetters } from 'vuex'
 export default {
   name: "Camera",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -198,6 +198,12 @@ export default {
     sitecode() {
       return this.$route.params.sitecode
     },
+    ...mapGetters('sitestatus', [
+      'site_is_online',
+      'buildCameraTabStatus',
+      'camera_state',
+      'filter_wheel_state',
+    ]),
     subframeIsActive: {
       get() { return this.$store.getters['command_params/subframeIsActive']},
       set(val) { this.$store.commit('command_params/subframeIsActive', val)},

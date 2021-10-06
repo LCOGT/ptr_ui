@@ -4,7 +4,7 @@
 
     <status-column 
       class="status-column"
-      :isOffline="!isOnline"
+      :isOffline="!site_is_online"
       :statusList="buildRotatorTabStatus" 
     />
 
@@ -62,14 +62,14 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
+import { mapGetters } from 'vuex'
 export default {
   name: "Rotator",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -85,6 +85,10 @@ export default {
     sitecode() {
       return this.$route.params.sitecode
     },
+    ...mapGetters('sitestatus', [
+      'site_is_online',
+      'buildRotatorTabStatus'
+    ]),
     rotator_relative: {
       get() { return this.$store.getters['command_params/rotator_relative'] },
       set(val) {this.$store.commit('command_params/rotator_relative', val)}
