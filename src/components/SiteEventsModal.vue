@@ -17,7 +17,7 @@
 
                     <div style="padding-left: 10px;">
                         <p>&nbsp;</p>
-                        <button class="button" @click="getSiteEvents('configg')">refresh</button>
+                        <button class="button" @click="getSiteEvents('config')">refresh</button>
                     </div>
                 </div>
             </div>
