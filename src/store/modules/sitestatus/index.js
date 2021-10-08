@@ -117,7 +117,27 @@ const mutations = {
       	state[device_type] = status[device_type]
 			}
     })
+  },
+  
+  resetStatus(state) {
+    const device_types = [
+      'observing_conditions',
+      'enclosure',
+      'screen',
+      'focuser',
+      'camera',
+      'telescope',
+      'mount',
+      'rotator',
+      'filter_wheel',
+      'sequencer',
+			'selector',
+    ]
+    device_types.forEach(device_type => {
+      state[device_type] = {}
+    })
   }
+
 }
 
 const actions = {
@@ -131,30 +151,40 @@ const actions = {
 
   // Get a single status object for a site. Used to initialize values when loading a new site. 
   async getLatestStatus({ state, commit, dispatch, rootState }) {
-    let url = rootState.dev.status_endpoint + `/${rootState.site_config.selected_site}/complete_status`
+    const current_site = rootState.site_config.selected_site
+
+    // Clear the existing status if we load a new site
+    if (state.site != current_site) {
+      dispatch('clearStatus')
+    }
+
+    let url = rootState.dev.status_endpoint + `/${current_site}/complete_status`
     let response = await Axios.get(url)
 
     // If the site has no status available, commit a default empty status to the store
-    if (!Object.keys(response.data).includes('status')) {
-      dispatch('clearStatus')
-      return
+    if (Object.keys(response.data).includes('status')) {
+      let status = response.data.status
+
+      // Set the global status age to the most recent timestamp
+      commit('latest_status_timestamp_ms', response.data.latest_status_timestamp_ms)
+
+      // Set the device status age
+      commit('latest_device_timestamp_ms', response.data.status_age_timestamps_ms.deviceStatus)
+
+      // Set the weather status age
+      commit('latest_weather_timestamp_ms', response.data.status_age_timestamps_ms.wxEncStatus)
+
+      commit('status', status)
+      commit('site', current_site)
+    } else {
+      console.warn(`Status not available for ${current_site}.`)
     }
-    let status = response.data.status
-
-    // Set the global status age to the most recent timestamp
-    commit('latest_status_timestamp_ms', response.data.latest_status_timestamp_ms)
-
-    // Set the device status age
-    commit('latest_device_timestamp_ms', response.data.status_age_timestamps_ms.deviceStatus)
-
-    // Set the weather status age
-    commit('latest_weather_timestamp_ms', response.data.status_age_timestamps_ms.wxEncStatus)
-    commit('status', status)
   },
 
   // Reset to empty values. Used for sites without any status available.
   clearStatus({commit}) {
-    commit('status',empty_status)
+    //commit('status',empty_status)
+    commit('resetStatus')
     commit('latest_status_timestamp_ms', 0)
     commit('latest_weather_timestamp_ms', 0)
     commit('latest_device_timestamp_ms', 0)
