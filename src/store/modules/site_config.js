@@ -3,46 +3,8 @@
  * that are either available for selection or currently selected and active.
  */
 
-//import { API } from 'aws-amplify'
 import _ from 'lodash'
 import axios from 'axios'
-
-var initial_state = function() {
-    let apiName = this.$store.getters['dev/api'];
-    let path = '/all/config/';
-    let state = {
-        did_config_load_yet: false,
-        is_site_selected: false,
-        global_config: {},
-
-        selected_site: '',
-        selected_enclosure: '',
-        selected_mount: '',
-        selected_telescope: '',
-        selected_rotator: '',
-        selected_focuser: '',
-        selected_filter_wheel: '',
-        selected_camera: '',
-        selected_screen: '',
-        selected_weather: '',
-
-        selector_exists: false,
-        selected_selector: '',
-
-        camera_areas_selection: '',
-        filter_wheel_options_selection: '',
-    };
-    //API.get(apiName, path).then(response => {
-    axios.get(apiName+path).then(response => {
-        state.global_config = response.data;
-        state.did_config_load_yet = true;
-        state.is_site_selected = false;
-    }).catch(error => {
-        console.log(error)
-    });
-    return state;
-}
-
 
 const state = {
     global_config: JSON.parse(window.localStorage.getItem('global_config') || '{}'),
@@ -63,35 +25,22 @@ const state = {
 
     selector_exists: false,
     selected_selector: '',
-
 }
 
 
 const getters = {
 
-    available_devices: 
-        state => (deviceType, site) => {
-            if(state.global_config && Object.keys(state.global_config).length != 0) {
-                return Object.keys(state.global_config[site][deviceType])
-            }
-            else { return [] }
-        },
+    site_config: state => {
+        return state.global_config[state.selected_site]; 
+    },
 
-    available_sites: state => Object.keys(state.global_config),
+    available_devices: state => (deviceType, site) => {
+        return Object.keys(state.global_config?.[site]?.[deviceType]) ?? [];
+    },
 
-    // These are the active devices.
-    site: state => state.selected_site,
-    enclosure: state => state.selected_enclosure,
-    mount: state => state.selected_mount,
-    telescope: state => state.selected_telescope,
-    rotator: state => state.selected_rotator,
-    focuser: state => state.selected_focuser,
-    filter_wheel: state => state.selected_filter_wheel,
-    camera: state => state.selected_camera,
-    screen: state => state.selected_screen,
-    weather: state => state.selected_weather,
-    sequencer: state => state.selected_sequencer,
-    selector: state => state.selected_selector,
+    available_sites: state => {
+        return Object.keys(state.global_config);
+    },
 
     all_sites: state => {
       let sites = []
@@ -108,190 +57,112 @@ const getters = {
       return sites
     },
 
+    selected_enclosure_config: (state, getters) => {
+        return getters.site_config?.enclosure?.[state.selected_enclosure] ?? {}
+    },
+    selected_mount_config: (state, getters) => {
+        return getters.site_config?.mount?.[state.selected_mount] ?? {}
+    },
+    selected_telescope_config: (state, getters) => {
+        return getters.site_config?.telescope?.[state.selected_telescope] ?? {}
+    },
+    selected_rotator_config: (state, getters) => {
+        return getters.site_config?.rotator?.[state.selected_rotator] ?? {}
+    },
+    selected_focuser_config: (state, getters) => {
+        return getters.site_config?.focuser?.[state.selected_focuser] ?? {}
+    },
+    selected_filter_wheel_config: (state, getters) => {
+        return getters.site_config?.filter_wheel?.[state.selected_filter_wheel] ?? {}
+    },
+    selected_camera_config: (state, getters) => {
+        return getters.site_config?.camera?.[state.selected_camera] ?? {}
+    },
+    selected_screen_config: (state, getters) => {
+        return getters.site_config?.screen?.[state.selected_screen] ?? {}
+    },
+    selected_weather_config: (state, getters) => {
+        return getters.site_config?.weather?.[state.selected_weather] ?? {}
+    },
+    selected_sequencer_config: (state, getters) => {
+        return getters.site_config?.sequencer?.[state.selected_sequencer] ?? {}
+    },
+    selected_selector_config: (state, getters) => {
+        return getters.site_config?.selector?.[state.selected_selector] ?? {}
+    },
+
+
     /* Getters for specific device attributes (implemented here as needed) */
-    focuser_reference: state => {
-        try {
-            return (
-                parseFloat(state
-                .global_config[state.selected_site]
-                .focuser[state.selected_focuser]
-                .reference
-                )
-            )
-        } catch {
-            return ''
-        }
+    // TODO: better process for setting default fallback values
+    focuser_reference: (state, getters) => {
+        return parseFloat(getters.selected_focuser_config.reference); // ?? '';
     },
-    focuser_min: state => {
-        try {
-            return (
-                parseFloat(state
-                .global_config[state.selected_site]
-                .focuser[state.selected_focuser]
-                .minimum
-                )
-            )
-        } catch {
-            return ''
-        }
+    focuser_min: (state, getters) => {
+        return parseFloat(getters.selected_focuser_config.minimum) ?? 0;
     },
-    focuser_max: state => {
-        try {
-            return (
-                parseFloat(state
-                .global_config[state.selected_site]
-                .focuser[state.selected_focuser]
-                .maximum
-                )
-            )
-        } catch {
-            return ''
-        }
+    focuser_max: (state, getters) => {
+        return parseFloat(getters.selected_focuser_config.maximum) ?? 1;
     },
-    focuser_step_size: state => {
-        try {
-            return (
-                parseFloat(state
-                    .global_config[state.selected_site]
-                    .focuser[state.selected_focuser]
-                    .step_size
-                )
-            )
-        } catch {
-            return 1.0
-        }
+    focuser_step_size: (state, getters) => {
+        return parseFloat(getters.selected_focuser_config.step_size) ?? 1;
     },
-
-
-    rotator_min: state => {
-        try {
-            return (
-                parseFloat(state
-                .global_config[state.selected_site]
-                .rotator[state.selected_rotator]
-                .minimum
-                )
-            )
-        } catch {
-            return ''
-        }
+    rotator_min: (state, getters) => {
+        return parseFloat(getters.selected_rotator_config.minimum) ?? 0;
     },
-    rotator_max: state => {
-        try {
-            return (
-                parseFloat(state
-                .global_config[state.selected_site]
-                .rotator[state.selected_rotator]
-                .maximum
-                )
-            )
-        } catch {
-            return ''
-        }
+    rotator_max: (state, getters) => {
+        return parseFloat(getters.selected_rotator_config.maximum) ?? 1;
     },
-    rotator_step_size: state => {
-        try {
-            return (
-                parseFloat(state
-                    .global_config[state.selected_site]
-                    .rotator[state.selected_rotator]
-                    .step_size
-                )
-            )
-        } catch {
-            return 1.0
-        }
+    rotator_step_size: (state, getters) => {
+        return parseFloat(getters.selected_rotator_config.step_size) ?? 1;
     },
-
 
 
     /* Site properties */
-    site_latitude: state => {
-        return (state.did_config_load_yet && state.is_site_selected)
-        ? parseFloat(state.global_config[state.selected_site].latitude)
-        : 0
+    site_latitude: (state, getters) => {
+        return parseFloat(getters.site_config?.latitude) ?? 0;
     },
-    site_longitude: state => {
-        return (state.did_config_load_yet && state.is_site_selected)
-        ? parseFloat(state.global_config[state.selected_site].longitude)
-        : 0
+    site_longitude: (state, getters) => {
+        return parseFloat(getters.site_config?.longitude) ?? 0;
     },
-
-    timezone: state => {
-        if (state.did_config_load_yet && state.is_site_selected) {
-            return state.global_config[state.selected_site].TZ_database_name
-        }
+    timezone: (state, getters) => {
+        return getters.site_config?.TZ_database_name;
     },
 
 
     /* These getters are used to customize the control form fields. */
     // Available camera areas
-    camera_areas: state => {
-        try {
-            return state.global_config[state.selected_site].camera[state.selected_camera].settings.areas_implemented
-        } catch {
-            return []
-        }
+    camera_areas: (state, getters) => {
+        return getters.selected_camera_config.settings?.areas_implemented ?? [];
     },
-    camera_default_area: state => {
-        try {
-            return state.global_config[state.selected_site].camera[state.selected_camera].settings.default_area
-        } catch {
-            return ""
-        }
+    camera_default_area: (state, getters) => {
+        return getters.selected_camera_config.settings?.default_area ?? [];
+    },
+    camera_bin_options: (state, getters) => {
+        return getters.selected_camera_config.settings?.bin_modes ?? [];
+    },
+    // Does the camera bin or not? Returns string 'True' or 'False'.
+    camera_can_bin: (state, getters) => {
+        return getters.selected_camera_config?.bin_modes?.length;
+    },
+    camera_default_bin: (state, getters) => {
+        return getters.selected_camera_config.settings?.default_bin ?? "";
     },
 
     // Available filters
-    filter_wheel_options: state => {
-        try {
-            let fwo = state.global_config[state.selected_site].filter_wheel[state.selected_filter_wheel].settings.filter_data;
-            let num_filters = fwo.length;
-            // Ignore the first element, which is really just the definitions of the items in the arrays representing each filter.j
-            return fwo.slice(1, num_filters)
-        } catch {
-            return [[]]
-        }
+    filter_wheel_options: (state, getters) => {
+        let fwo = getters.selected_filter_wheel_config.settings?.filter_data;
+        if (fwo == undefined) return [[]]
+        let num_filters = fwo.length;
+        return fwo.slice(1, num_filters)
     },
 
-    camera_bin_options: state => {
-        try {
-            let bins = state.global_config[state.selected_site].camera[state.selected_camera].settings.bin_modes
-            return bins;
-        } catch {
-            return [];
-        }
+    // Get the site events from the selected config (things like nautical dark start, etc)
+    site_events: (state, getters) => {
+        return getters.site_config.events ?? {}
     },
 
-    // Does the camera bin or not? Returns string 'True' or 'False'.
-    camera_can_bin: state => {
-        try {
-            // Check if the array is undefined or zero -> return false; else return true. 
-            return (
-                Array.isArray(state.global_config[state.selected_site].camera[state.selected_camera].settings.bin_modes)
-                && (state.global_config[state.selected_site].camera[state.selected_camera].settings.bin_modes).length
-            ) 
-        } catch {
-            return false
-        }
-    },
-
-    camera_default_bin: state => {
-        try {
-            let default_bin = state.global_config[state.selected_site]
-                    .camera[state.selected_camera]
-                    .settings
-                    .default_bin
-            return default_bin
-        } catch {
-            return ""
-        }
-    },
-
-    
-    all_telescopes: state => state.global_config[state.selected_site]['telescope'],
-
-    global_config: state => state.global_config,
 }
+
 const mutations = {
     setGlobalConfig(state, config) { 
         state.global_config = config;
@@ -340,7 +211,7 @@ const actions = {
             window.localStorage.setItem('global_config', JSON.stringify(response.data))
             commit('setGlobalConfig', response.data)
         }).catch(error => {
-            console.log(error)
+            console.warn(error)
         });
     },
 
@@ -414,11 +285,10 @@ const actions = {
         commit('setActiveRotator', '')
         commit('setActiveSequencer', '')
         commit('setActiveScreen', '')
+        commit('setActiveSelector', '')
     },
 
-
 }
-
 
 
 export default {

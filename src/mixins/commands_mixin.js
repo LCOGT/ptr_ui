@@ -4,7 +4,7 @@
  * TODO: refactor into smaller modules.
  */
 
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { getInstance } from '../auth/index' // get user object: getInstance().user
 import axios from 'axios'
 
@@ -36,7 +36,6 @@ export const commands_mixin = {
         'solar flat',
         'simulation',
       ],
-
       telescope_coordinate_frame_options: [
         'ICRS',
         'J2000',
@@ -47,12 +46,10 @@ export const commands_mixin = {
         'Ecliptic',
         'Galactic',
       ],
-
     }
   },
 
   methods: {
-
 
     /**
      * The following set of methods are used for sending the command via http request to the jobs service
@@ -63,7 +60,7 @@ export const commands_mixin = {
       this.command_is_sending = true
 
       if (this.active_site == '' || this.active_mount == '') {
-        console.log('No site and/or mount specified for the command. Command has been cancelled.')
+        console.warn('No site and/or mount specified for the command. Command has been cancelled.')
         this.command_is_sending = false
         return
       }
@@ -79,7 +76,7 @@ export const commands_mixin = {
         console.log("command response: ", response.data)
       }).catch(error => {
         this.command_is_sending = false;
-        console.log(error)
+        console.warn(error)
         this.handleNotAuthorizedResponse(error)
       })
     },
@@ -140,11 +137,11 @@ export const commands_mixin = {
       } else if (error.request) {
         // The request was made but no response was received
         console.warn("The request was made but no response was received.")
-        console.log(error.request);
+        console.warn(error.request);
       } else {
         // Something happened in setting up the request that triggered an Error
         console.warn("Something happened in setting up the request that triggered an error.")
-        console.log('Error', error.message);
+        console.warn('Error', error.message);
       }
     },
 
@@ -244,9 +241,6 @@ export const commands_mixin = {
     // Getters from the site_config vuex module.
     // Available devices and currently active devices are stored here.
     ...mapGetters('site_config', [
-      'available_devices',
-      'available_sites',
-
       // Device specific properties
       'focuser_reference',
       'focuser_min',
@@ -263,8 +257,6 @@ export const commands_mixin = {
       'filter_wheel_options',
       'camera_bin_options',
       'camera_can_bin',
-
-      'global_config',
     ]),
 
     // User-supplied command parameters
@@ -308,20 +300,10 @@ export const commands_mixin = {
 
     // Get username if user is logged in
     username() {
-      if (getInstance().user) {
-        return getInstance().user.name
-      }
-      else {
-        return 'anonymous'
-      }
+      return getInstance().user?.name ?? 'anonymous'
     },
     user_id() {
-      if (getInstance().user) {
-        return getInstance().user.sub
-      }
-      else {
-        return 'anonymous'
-      }
+      return getInstance().user?.sub ?? 'anonymous'
     },
     user_roles() {
       try {
@@ -333,56 +315,70 @@ export const commands_mixin = {
       }
     },
 
+    ...mapState('site_config', [
+      'selected_site', 
+      'selected_enclosure',
+      'selected_mount',
+      'selected_telescope',
+      'selected_rotator',
+      'selected_focuser',
+      'selected_filter_wheel',
+      'selected_camera',
+      'selected_screen',
+      'selected_weather',
+      'selected_sequencer',
+      'selected_selector',
+    ]),
+
     // The `selected_${device}` computed properties are used for two way
     // binding between vuex (site_config module) and the device 
     // selection inputs. 
     active_site: {
-      get() { return this.$store.getters['site_config/site'] },
+      get() { return this.selected_site },
       set(value) { this.$store.commit('site_config/setActiveSite', value) }
     },
     active_enclosure: {
-      get() { return this.$store.getters['site_config/enclosure'] },
+      get() { return this.selected_enclosure },
       set(value) { this.$store.commit('site_config/setActiveEnclosure', value) }
     },
     active_mount: {
-      get() { return this.$store.getters['site_config/mount'] },
+      get() { return this.selected_mount },
       set(value) { this.$store.commit('site_config/setActiveMount', value) }
     },
     active_telescope: {
-      get() { return this.$store.getters['site_config/telescope'] },
+      get() { return this.selected_telescope },
       set(value) { this.$store.commit('site_config/setActiveTelescope', value) }
-      //set(value) { this.$store.dispatch('site_config/setActiveTelescope', value) }
     },
     active_rotator: {
-      get() { return this.$store.getters['site_config/rotator'] },
+      get() { return this.selected_rotator },
       set(value) { this.$store.commit('site_config/setActiveRotator', value) }
     },
     active_focuser: {
-      get() { return this.$store.getters['site_config/focuser'] },
+      get() { return this.selected_focuser },
       set(value) { this.$store.commit('site_config/setActiveFocuser', value) }
     },
     active_filter_wheel: {
-      get() { return this.$store.getters['site_config/filter_wheel'] },
+      get() { return this.selected_filter_wheel },
       set(value) { this.$store.commit('site_config/setActiveFilterWheel', value) }
     },
     active_camera: {
-      get() { return this.$store.getters['site_config/camera'] },
+      get() { return this.selected_camera },
       set(value) { this.$store.commit('site_config/setActiveCamera', value) }
     },
     active_screen: {
-      get() { return this.$store.getters['site_config/screen'] },
+      get() { return this.selected_screen },
       set(value) { this.$store.commit('site_config/setActiveScreen', value) }
     },
     active_weather: {
-      get() { return this.$store.getters['site_config/weather'] },
+      get() { return this.selected_weather },
       set(value) { this.$store.commit('site_config/setActiveWeather', value) }
     },
     active_sequencer: {
-      get() { return this.$store.getters['site_config/sequencer'] },
+      get() { return this.selected_sequencer },
       set(value) { this.$store.commit('site_config/setActiveSequencer', value) }
     },
     active_selector: {
-      get() { return this.$store.getters['site_config/selector'] },
+      get() { return this.selected_selector },
       set(value) { this.$store.commit('site_config/setActiveSelector', value) }
     },
 

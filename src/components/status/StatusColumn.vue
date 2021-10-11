@@ -23,10 +23,12 @@
 <script>
 import RaDisplay from "@/components/display/RaDisplay"
 import DecDisplay from "@/components/display/DecDisplay"
+import StatusValue from "@/components/status/StatusValue"
 export default {
     components: {
         RaDisplay,
         DecDisplay,
+        StatusValue,
     },
     props: {
         'statusList': Array,
@@ -43,13 +45,8 @@ export default {
                 return `color: grey;`
             }
 
-            // if site is offline, all status is grey
-            //if (this.isOffline) {
-                //return `color: grey;`
-            //}
-
             // Next check if the status has a color defined
-            if ("color" in item) {
+            else if ("color" in item) {
                 return `color: ${item.color};`
             }
         },

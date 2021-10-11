@@ -2,10 +2,7 @@
 <template>
   <div class="instrument-control-wrapper">
 
-    <div class="val" 
-      v-if="sequencer_state && sequencer_state.message">
-      {{sequencer_state.message}}
-    </div>
+    <div class="val" v-if="sequencer_message.val != '-'"> {{sequencer_message.val}} </div>
 
     <b-field label="Script" horizontal>
       <b-field>
@@ -78,7 +75,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
@@ -86,7 +82,7 @@ import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 import ScriptSettings from '@/components/ScriptSettings/ScriptSettings'
 export default {
   name: "Sequencer",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -103,6 +99,10 @@ export default {
   },
 
   computed: {
+    ...mapGetters('sitestatus', [
+      'sequencer_message',
+      'sequencer_state',
+    ]),
     ...mapGetters([
       'scriptHasSettings',
     ]),

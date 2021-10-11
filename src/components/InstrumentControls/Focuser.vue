@@ -2,11 +2,11 @@
 <template>
   <div class="instrument-control-wrapper">
 
-    <div class="val" v-if="focuser_state && focuser_state.message">{{focuser_state.message}}</div>
+    <div class="val" v-if="focuser_message.val != '-'">{{focuser_message.val}}</div>
     <status-column 
       class="status-column"
       :statusList="buildFocuserTabStatus" 
-      :isOffline="!isOnline"
+      :isOffline="!site_is_online"
     />
 
     <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
@@ -73,7 +73,15 @@
 
     <b-field label="Absolute">
       <b-field>
-        <b-input expanded name="subject" size="is-small" v-model="focuser_absolute" type="number" :step="focuser_step_size" :min="focuser_min" :max="focuser_max" autocomplete="off"></b-input>
+        <b-input expanded 
+          name="subject" 
+          size="is-small" 
+          v-model="focuser_absolute" 
+          type="number" 
+          :step="focuser_step_size" 
+          :min="focuser_min" 
+          :max="focuser_max" 
+          autocomplete="off" />
         <p class="control"> <command-button :data="focus_absolute_command" class="is-small"/>  </p>
       </b-field>
     </b-field>
@@ -97,16 +105,17 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 
+import { mapGetters } from 'vuex'
+
 export default {
   name: "Focuser",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -121,17 +130,30 @@ export default {
     }
   },
 
-  created() {
-  },
-
   methods: {
     focuserJobPost(data) {
       console.log('focuser job post: ',data)
     },
-
   },
 
   computed: {
+    ...mapGetters('site_config', [
+      'focuser_reference',
+      'focuser_min',
+      'focuser_max',
+      'focuser_step_size',
+
+      'rotator_min',
+      'rotator_max',
+      'rotator_step_size',
+    ]),
+
+    ...mapGetters('sitestatus', [
+      'site_is_online',
+      'buildFocuserTabStatus',
+      'focuser_message',
+    ]),
+
     sitecode() {
       return this.$route.params.sitecode
     },

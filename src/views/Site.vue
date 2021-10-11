@@ -35,7 +35,6 @@
             v-bind:is="`site-${subpage}`"
             v-if="$store.state.site_config.did_config_load_yet"
             :sitecode="sitecode"
-            :deviceStatus="deviceStatus"
           />
     </div>
 
@@ -70,7 +69,6 @@ import SiteProjects from "@/components/sitepages/SiteProjects";
 import SiteData from "@/components/sitepages/SiteData";
 
 import { commands_mixin } from "../mixins/commands_mixin";
-import { status_mixin } from "../mixins/status_mixin";
 import datastreamer from "@/datastreamer";
 
 export default {
@@ -92,11 +90,11 @@ export default {
     TheMenu,
   },
   props: ["sitecode", "subpage"],
-  mixins: [commands_mixin, status_mixin],
+  mixins: [commands_mixin],
 
   beforeRouteEnter(to, from, next) {
     const sitecode = to.params.sitecode.toLowerCase();
-    console.log('IN BEFOREROUTEENTER, site: ', sitecode)
+    //console.log('IN BEFOREROUTEENTER, site: ', sitecode)
     next((vm) => {
       // Update the active devices
       vm.$store.dispatch("site_config/set_default_active_devices", sitecode);
@@ -117,12 +115,11 @@ export default {
 
   beforeRouteUpdate(to, from, next) {
     const new_site = to.params.sitecode.toLowerCase();
-    console.log('in BEFORE ROUTE UPDATE, site: ', new_site)
+    //console.log('in BEFORE ROUTE UPDATE, site: ', new_site)
 
     if (new_site != this.sitecode) {  // only if site changes
       this.site_changed_routine(new_site)
     }
-
     next();
   },
 
@@ -172,7 +169,7 @@ export default {
 
     // Do this whenever the selected site changes
     site_changed_routine(sitecode) {
-      console.log('site changed to ', sitecode)
+      // console.log('site changed to ', sitecode)
 
       // Update the active devices
       this.$store.dispatch("site_config/set_default_active_devices", sitecode);

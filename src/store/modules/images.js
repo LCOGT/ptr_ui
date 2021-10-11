@@ -298,7 +298,7 @@ const actions = {
             commit('setRecentImages', response)
 
         }).catch(error => {
-            //console.log(error)
+            console.error(error)
         });
 
         dispatch('load_latest_info_images')

@@ -104,13 +104,8 @@ export default {
   },
   computed: {
     ...mapGetters("site_config", [
-      "site_config", 
-      "global_config", 
+      "all_sites",
       "timezone"
-    ]),
-
-    ...mapState("site_config", [
-      "did_config_load_yet"
     ]),
 
     user() {
@@ -126,8 +121,7 @@ export default {
     // Calendar Resources (Observatories) to feed into the calendar component
     listOfObservatories() {
       let all_obs = [];
-      for (let a_site in this.global_config) {
-        let o = this.global_config[a_site];
+      this.all_sites.forEach(o => {
         all_obs.push({
           id: o.site,
           title: o.name,
@@ -144,7 +138,7 @@ export default {
           anyOtherPropsHere:
             "call from key extendedProps of this resource object",
         });
-      }
+      })
       return all_obs;
     },
   },

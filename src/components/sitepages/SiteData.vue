@@ -156,7 +156,7 @@
                       <tr> <td class="info-panel-val" align="right">filename: </td>
                           <td>{{current_image.base_filename || "---"}}</td> </tr>
                       <tr> <td class="info-panel-val" align="right">date: </td>
-                          <td>{{captureDate || "---" }}</td></tr>
+                          <td>{{captureDate}}</td></tr>
                       <tr> <td class="info-panel-val" align="right">time: </td>
                           <td>{{captureTime + " GMT"}}</td> </tr>
                       <tr> <td class="info-panel-val" align="right">site: </td>
@@ -312,7 +312,6 @@ import helpers from "@/utils/helpers"
 
 export default {
   name: "SubpageData",
-  props: ["deviceStatus"],
   components: {
     ImageView,
     ImagesTable,
@@ -389,11 +388,9 @@ export default {
         "full_filename": this.best_available_full_filename,
         "s3_directory": this.current_image.s3_directory || "data",
       }
-      console.log(body)
       if (useSubregion) {
 
         if (this.selectedShapeType != "rects") {
-          console.log(this.selectedShapeType)
           this.$buefy.toast.open({
             type: 'is-warning',
             message: 'Region must be a rectangle.'
@@ -428,7 +425,6 @@ export default {
       this.region_MAD = "--"
     },
     displayRegionStats(http_response) {
-      console.log(http_response)
       this.image_stats_loading = false;
       this.region_stats_loading= false;
 
@@ -453,7 +449,6 @@ export default {
       if (useSubregion) {
 
         if (this.selectedShapeType != "rects") {
-          console.log(this.selectedShapeType)
           this.$buefy.toast.open({
             type: 'is-warning',
             message: 'Region must be a rectangle.'
@@ -540,6 +535,7 @@ export default {
       'recent_images',
       'current_image', 
     ]),
+
     ...mapGetters("images", [
       'small_fits_exists',
       'large_fits_exists',
@@ -547,20 +543,13 @@ export default {
       'large_fits_filename',
       'info_images_exist',
     ]),
+
     best_available_full_filename() {
-      console.log('large fits exists: ', this.large_fits_exists)
-      console.log('large fits filename: ', this.large_fits_filename)
-      console.log('small fits filename: ', this.small_fits_filename)
       return this.large_fits_exists 
         ? this.large_fits_filename 
         : this.small_fits_filename
     },
 
-    ...mapGetters("site_config", [
-      "site_config", 
-      "available_sites"
-    ]),
-    
     ...mapGetters("drawshapes", [
       'selectedId',
       'selectionExists',
@@ -571,6 +560,7 @@ export default {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},
       set(val) { this.$store.dispatch('drawshapes/activeDrawShape', val )}
     },
+
     selectedShape: {
       get() { return this.$store.getters['drawshapes/selectedShape']},
       set(val) { this.$store.dispatch('drawshapes/selectedShape', val )}
@@ -590,7 +580,6 @@ export default {
       set(val) { this.$store.dispatch('images/toggle_live_data', val)}
     },
 
-
     // Vuex mapping for the value that toggles whether to show all the site
     // images or just the user's images.
     show_user_data_only: {
@@ -609,10 +598,6 @@ export default {
       return tableData
     },
 
-    fitsHeaderLoaded() {
-      return Object.keys(this.fitsHeader).length > 0
-    },
-
     captureDate() {
       // Error handling
       if (!this.current_image.capture_date) {
@@ -620,6 +605,7 @@ export default {
       }
       return moment.utc(new Date(this.current_image.capture_date)).format('MMMM DD, YYYY') 
     },
+
     captureTime() {
       // Error handling
       if (!this.current_image.capture_date) {
@@ -627,31 +613,22 @@ export default {
       }
       return moment.utc(new Date(this.current_image.capture_date)).format('HH:mm:ss')
     },
-    rightAscension() {
-      if (this.current_image.right_ascension){
-        return this.current_image.right_ascension
-      }
-      return "---"
-    },
-    declination() {
-      if (this.current_image.declination) {
-        return this.current_image.declination.toFixed(2)
-      }
-      return "---"
-    },
 
     subframe_x0: {
       get() { return this.$store.getters['command_params/subframe_x0']},
       set(val) { this.$store.commit('command_params/subframe_x0', val)},
     },
+
     subframe_y0: {
       get() { return this.$store.getters['command_params/subframe_y0']},
       set(val) { this.$store.commit('command_params/subframe_y0', val)},
     },
+
     subframe_x1: {
       get() { return this.$store.getters['command_params/subframe_x1']},
       set(val) { this.$store.commit('command_params/subframe_x1', val)},
     },
+
     subframe_y1: {
       get() { return this.$store.getters['command_params/subframe_y1']},
       set(val) { this.$store.commit('command_params/subframe_y1', val)},

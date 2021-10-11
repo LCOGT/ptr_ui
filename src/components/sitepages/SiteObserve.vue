@@ -2,27 +2,10 @@
 
   <div class="site-observe-wrapper">
   
-  <div class="content-column">
-
-    <b-modal :active.sync="telescopeModal"
-      trap-focus
-      :can-cancel="['escape']"
-      scroll="clip"
-      full-screen
-      style="z-index:1000;"
-      >
-      <skychart-modal
-        style="background-color:#151718; overflow-y:auto; height: 100%;"
-        :sitecode="sitecode"
-        :deviceStatus="deviceStatus"
-      />
-    </b-modal>
-
-  </div>
 
   <!--div class="spacer" style="height: 2em;" /-->
 
-  <site-data :deviceStatus="deviceStatus" />
+  <site-data />
 
   <!--log-stream :site="sitecode" /-->
 
@@ -32,7 +15,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 
 // Components
@@ -43,7 +25,6 @@ import ScriptSettings from '@/components/ScriptSettings/ScriptSettings'
 import TheDomeCam from '@/components/TheDomeCam'
 import SideInfoPanel from '@/components/SideInfoPanel'
 import SiteData from '@/components/sitepages/SiteData'
-import SkychartModal from '@/components/SkychartModal'
 import ImagesTable from '@/components/ImagesTable'
 import StatusColumn from '@/components/status/StatusColumn'
 import LogStream from '@/components/LogStream'
@@ -58,12 +39,11 @@ export default {
     TheDomeCam,
     SideInfoPanel,
     SiteData,
-    SkychartModal,
     ImagesTable,
     StatusColumn,
     LogStream,
   },
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   props: ['sitecode'],
   data () {
     return {
@@ -95,9 +75,6 @@ export default {
       isScreenStatusVisible: false,
       isSequencerStatusVisible: false,
 
-      // Full screen modal for sky map and mount commands
-      telescopeModal: false,
-
     }
   },
 
@@ -117,31 +94,13 @@ export default {
 
 
   methods: {
-
     update_time() {
       this.local_timestamp= Date.now()
     },
   
-    parseTrueFalse(s) {
-    
-      // In case the input is actually a boolean
-      if (s === true) { return true }
-      if (s === false) {return false}
-
-      if (undefined == s) { 
-        return false; 
-      }
-      else if (s.toLowerCase()=="true") {return true}
-      else if (s.toLowerCase()=="false") {return false}
-      console.error("Could not parse true or false. Check for bad behavior.")
-      console.log(s)
-      return false
-    },
-
     refresh_latest_image() {
       this.$store.dispatch('images/set_latest_image')
     },
-
   },
 
   watch: {
@@ -161,33 +120,14 @@ export default {
     ]),
 
     ...mapGetters('site_config', [
-      'site_config',
-      'available_devices',
-
       'camera_default_bin',
       'camera_default_area',
-
-      'enclosure',
-      'mount',
-      'telescope',
-      'camera',
-      'filter_wheel',
-      'focuser',
-      'rotator',
-      'screen',
-      'weather',
-      'sequencer',
     ]),
 
-    ...mapState('site_config', [
-    ]),
-
-      
     selected_script: {
       get() { return this.$store.getters['selectedScript']},
       set(val) { this.$store.commit('selectedScript', val)},
     },
-
 
     // command_params
     mount_ra: {

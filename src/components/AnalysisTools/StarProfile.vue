@@ -147,7 +147,6 @@ export default {
       if (useSubregion) {
 
         if (this.selectedShapeType != "rects") {
-          console.log(this.selectedShapeType)
           this.$buefy.toast.open({
             type: 'is-warning',
             message: 'Region must be a rectangle.'
@@ -178,11 +177,10 @@ export default {
     display_star_profiles(response) {
       this.inspect_region_loading = false;
       this.inspect_image_loading = false;
-      console.log(response)
 
       // Handle the case where no stars are found.
       if (response.data.num_good_stars == 0) {
-        console.log('no good stars')
+        console.warn('no good stars')
         this.median_fwhm = '--'
         this.brightest_fwhm = '--'
         this.u_brightest_fwhm = '--'
@@ -207,7 +205,6 @@ export default {
 
       // Otherwise, do this if good stars were found
       else {
-        console.log('good stars were found')
         let med_star = response.data.median_star
         let region_coords = response.data.region_coords
 
@@ -219,7 +216,6 @@ export default {
           this.u_brightest_relative_pos_x = (u_bright_star.x / u_bright_star.naxis1) + region_coords.x0
           this.u_brightest_relative_pos_y = (u_bright_star.y / u_bright_star.naxis2) + region_coords.y0
           // Plot the brightest unsaturated star profile
-          console.log('plotting brightest unsaturated star profile')
           let ub_profile = u_bright_star.radial_profile 
           let ub_gauss = {
             mean: u_bright_star.gaussian_mean,
@@ -246,7 +242,6 @@ export default {
 
         // Brightest star profile
         if (response.data.brightest_star) {
-          console.log('plotting brightest star')
           let bright_star = response.data.brightest_star
           this.brightest_fwhm = (bright_star.gaussian_fwhm *bright_star.pixscale).toFixed(2) + '"' 
           this.brightest_hfd = (bright_star.hfd*bright_star.pixscale).toFixed(2) + '"' 

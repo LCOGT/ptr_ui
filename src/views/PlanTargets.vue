@@ -1,4 +1,6 @@
 <template>
+<div>
+<the-menu />
 <section class="the-page">
   <div class="the-form">
     <form id="targform" @submit.prevent>
@@ -74,13 +76,15 @@
     </div>
   </div>
 </section>
+</div>
 </template>
 
 <script>
 import Vue from 'vue';
 import axios from 'axios';
 import moment from 'moment';
-import TargetCard from '@/components/TargetCard.vue';
+import TargetCard from '@/components/TargetCard';
+import TheMenu from '@/components/TheMenu';
 import list from '../../public/data/easytargets.json';
 import helpers from '@/utils/helpers';
 
@@ -88,6 +92,7 @@ export default {
   name: 'PlanTargets',
   components: {
     TargetCard,
+    TheMenu,
   },
   data() {
     return {
@@ -141,7 +146,7 @@ export default {
       Vue.set(this, 'lon1', this.site_info.mrc.longitude)
     })
     .catch(error => {
-      console.log(error)
+      console.warn(error)
     })
   },
   methods: {

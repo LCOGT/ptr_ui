@@ -150,7 +150,6 @@ wcs.readFITSHeader = function(oFile){
 			header[key] = val;
 		}
 		if(str.indexOf('END') == 0) inHeader = 0;
-		//console.log(header)
 	}
 
 	this.header = header;

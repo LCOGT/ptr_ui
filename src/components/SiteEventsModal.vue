@@ -17,10 +17,11 @@
 
                     <div style="padding-left: 10px;">
                         <p>&nbsp;</p>
-                        <button class="button" @click="getSiteEvents">refresh</button>
+                        <button class="button" @click="getSiteEvents('config')">refresh</button>
                     </div>
                 </div>
             </div>
+
 
             <b-table
                 :mobile-cards="false" 
@@ -32,6 +33,9 @@
                 style="width: auto; flex:0"
                 >
             </b-table>
+            <div v-if="site_events.length == 0" class="empty-warning">
+                No events found in the site config.
+            </div>
       
         </div>
     </div>
@@ -41,21 +45,27 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
-import {mapState} from 'vuex'
+import {mapGetters} from 'vuex'
 export default {
     name: 'SiteEventsModal',
     props: ['sitecode'],
     beforeMount() {
-        this.getSiteEvents()
+        this.getSiteEvents('config')
     },
     watch: {
         sitecode() {
-            this.getSiteEvents()
+            this.getSiteEvents('config')
         }
     },
     computed: {
-        ...mapState('site_config', ['global_config']),
-        timezone() { return this.global_config[this.sitecode].TZ_database_name},
+        ...mapGetters('site_config', {
+            config_site_events: 'site_events',
+            timezone: 'timezone',
+        }),
+
+        ...mapGetters('sitestatus', [
+            'buildRotatorTabStatus',
+        ]),
 
         columns() {
             return [
@@ -100,43 +110,64 @@ export default {
     },
     data() {
         return {
-            site_events: JSON.parse(window.localStorage.getItem(`${this.sitecode}Events`)) || [],
+            site_events: [],
             time_display_format: "user", // 'user' or 'observatory',
         }
     },
     methods: {
-        async getSiteEvents() {
-            let url = `https://api.photonranch.org/api/events?site=${this.sitecode}`
-            let site_events = await axios.get(url)
-            site_events = site_events.data
+        async getSiteEvents(source="config") {
 
-            // Function to convert from dublin julian days to unix time
+            let site_events
+
+            // The site events are also calculated at site and sent in the config. 
+            // So to avoid overengineering an unneeeded solution, let's just use that
+            // instead of the (now outdated) calculations running in AWS. 2021-09-27
+            if (source == "config") {
+                site_events = {...this.config_site_events}
+                // convert dublin julian days to julian days to match the output of the photonranch-api results
+                Object.keys(site_events).forEach(key => site_events[key] += 2415020)  
+            } else {
+                let url = `https://api.photonranch.org/api/events?site=${this.sitecode}`
+                site_events = await axios.get(url)
+                site_events = site_events.data
+            }
+
+            // Function to convert from julian days to unix time
             // Subtract difference in JD start vs unix start, then mulitply by 
             // the number of miliseconds in a day.
             let jd2unix = t => (t - 2440587.5) * 86400 * 1000
 
             let tableData = []
 
-            let formatString = 'MM-DD ___ HH:mm'
+            // Configure the time display format
+            let formatString = 'YYYY/MM/DD HH:mm:ss'
 
             for (const property in site_events) {
                 let time = moment(jd2unix(site_events[property]))
-                tableData.push({
-                    key: property.toLowerCase(),
-                    time: time.format('HH:mm'),
-                    user: time.format(formatString),
-                    UTC: time.tz('utc').format(formatString),
-                    observatory: this.timezone ? time.tz(this.timezone).format(formatString) : "unknown",
-                    unix: time.unix(),
-                })
+                // Exclude the 'day_directory' which is not actually a site event
+                if (property != "day_directory") {
+                    tableData.push({
+                        key: property.toLowerCase(),
+                        time: time.format('HH:mm:ss'),
+                        user: time.format(formatString),
+                        UTC: time.tz('utc').format(formatString),
+                        observatory: this.timezone ? time.tz(this.timezone).format(formatString) : "unknown",
+                        unix: time.unix(),
+                    })
+                }
             }
             this.site_events = tableData
-            window.localStorage.setItem(`${this.sitecode}Events`, JSON.stringify(tableData))
         },
     },
 }
 </script>
 
 <style scoped>
+.empty-warning {
+    width: 100%;
+    margin: 10px 0;
+    color: rgb(255, 239, 20);
+    text-align: center;
+}
 
 </style>

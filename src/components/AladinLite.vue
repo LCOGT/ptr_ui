@@ -36,7 +36,6 @@ export default {
         // Default: load aladin on m33, but use coords in mount fields if possible.
         let target = "M33"
         if (parseFloat(this.initRa) && parseFloat(this.initDec)) {
-            console.log('chaging target')
             target = `${15*this.initRa} ${this.initDec}`
         }
 
@@ -112,13 +111,11 @@ export default {
     watch: {
         // Update the aladin view if the coordinates change. 
         mount_ra() {
-            console.log('moving aladin')
             let ra = parseFloat(this.mount_ra) * 15
             let dec = parseFloat(this.mount_dec)
             this.aladin.gotoRaDec(ra, dec)
         },
         mount_dec() {
-            console.log('moving aladin')
             let ra = parseFloat(this.mount_ra) * 15
             let dec = parseFloat(this.mount_dec)
             this.aladin.gotoRaDec(ra, dec)

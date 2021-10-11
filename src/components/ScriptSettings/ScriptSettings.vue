@@ -55,9 +55,6 @@ export default {
         'script': String,
         'show': Boolean,
     },
-    created() {
-        console.log(this.readableNames)
-    },
     methods: {
         camelToSnake(s) {
             return s.replace(/\.?([A-Z]+)/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "")

@@ -23,14 +23,13 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 export default {
   name: "InstrumentSelector",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -64,7 +63,12 @@ export default {
       return this.$route.params.sitecode
     },
 
-    ...mapState('site_config', ['selected_selector']),
+    ...mapState('site_config', [
+        'selected_selector',
+      ]),
+    ...mapGetters('site_config', {
+      selector_config: 'selected_selector_config',
+    }),
 
 		...mapGetters('sitestatus', [
 				'selector_port',
@@ -74,20 +78,8 @@ export default {
 		]),
 
 		statusList() {
-			return [
-				{name: 'selector port', val: this.selector_port },
-				{name: 'selector instrument', val: this.selector_instrument },
-				{name: 'selector camera', val: this.selector_camera },
-				{name: 'selector guider', val: this.selector_guider },
-			]
+			return [ this.selector_port, this.selector_instrument, this.selector_camera, this.selector_guider ]
 		},
-
-    selector_config() {
-      let selected_selector = this.$store.getters['site_config/selector']
-      let conf = this.$store.state.site_config.global_config[this.sitecode].selector[selected_selector]
-      return conf || ''
-    },
-
 
     selector_position: {
       get() { return this.$store.getters['command_params/selector_position'] },

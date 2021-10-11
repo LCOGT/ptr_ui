@@ -98,13 +98,12 @@ import { mapState, mapGetters } from 'vuex'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import axios from 'axios';
 import moment from 'moment';
-import { status_mixin } from '@/mixins/status_mixin'
 import { user_status_mixin } from '@/mixins/user_status_mixin'
 import StatusColumn from '@/components/status/StatusColumn'
 import SiteSiderealTime from '@/components/display/SiteSiderealTime'
 export default {
     name: 'SiteStatusFooterMobile',
-    mixins: [status_mixin, user_status_mixin],
+    mixins: [ user_status_mixin],
     components: {
         StatusColumn,
         SiteSiderealTime
@@ -197,6 +196,12 @@ export default {
     computed: {
 
         ...mapGetters('site_config', ['site_longitude']),
+        ...mapGetters('sitestatus', [
+            'buildWeatherStatus',
+            'buildGeneralStatus',
+            'buildFocuserTabStatus',
+            'buildRotatorTabStatus',
+        ]),
 
         // Sitecode and site both refer to the 3-leter site abbreviation.
         // They are duplicated because the status mixin expects 'sitecode'.

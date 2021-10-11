@@ -1,12 +1,12 @@
 <template>
   <div class="instrument-control-wrapper">
 
-    <div class="val">{{enclosure_state.enclosure_message}}</div>
+    <div class="val">{{enclosure_message.val}}</div>
 
     <status-column 
       class="status-column"
       :statusList="buildEnclosureTabStatus" 
-      :isOffline="!isOnline"
+      :isOffline="!site_is_online"
     />
 
 		<div style="border-bottom: 0.5px solid grey; margin: 1em 0;" />
@@ -58,14 +58,14 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
+import { mapGetters } from 'vuex'
 export default {
   name: "Enclosure", 
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -98,6 +98,12 @@ export default {
     sitecode() {
       return this.$route.params.sitecode
     },
+    ...mapGetters('sitestatus', [
+      'site_is_online',
+      'enclosure_message',
+      'buildEnclosureTabStatus',
+      'enclosure_mode',
+    ])
   },
   
 }

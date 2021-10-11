@@ -44,7 +44,6 @@ import TheDeviceSelectors from '@/components/TheDeviceSelectors'
 import TheDomeCam from '@/components/TheDomeCam'
 import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import LeafletMap from '@/components/LeafletMap'
 import SiteEventsModal from '@/components/SiteEventsModal'
@@ -53,7 +52,7 @@ import CommandButton from '@/components/CommandButton'
 export default {
     name: "SiteHome",
     props: ["sitecode"],
-    mixins: [commands_mixin, status_mixin, user_mixin],
+    mixins: [commands_mixin, user_mixin],
     components: {
         CommandButton, 
         TheDeviceSelectors,
@@ -61,18 +60,12 @@ export default {
         LeafletMap,
         SiteEventsModal,
     },
-    data() {
-        return { }
-    },
     computed: {
-        ...mapGetters('images', ['current_image']),
-        ...mapState('site_config', ['global_config']),
-
-        latitude() { return this.global_config[this.sitecode].latitude },
-        longitude() { return this.global_config[this.sitecode].longitude },
+        ...mapGetters('site_config', {
+            latitude: 'site_latitude',
+            longitude: 'site_longitude', 
+        }),
     }
-    
-    
 }
 
 </script>

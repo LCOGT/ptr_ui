@@ -53,7 +53,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.sites)
     this.updateAllSiteImages()
 
     // Draw observatories with colors to denote weather/open status
@@ -89,7 +88,6 @@ export default {
       const url = this.$store.state.dev.active_api + `/${site}/latest_images/1` 
       axios.get(url).then(response => {
         if (response.data.length > 0) {
-          if (site =='wmd2') {console.log(response)}
           this.$set(this.site_images, site, response.data[0].jpg_url)
         } else {
           this.$set(this.site_images, site, '') 
@@ -109,7 +107,6 @@ export default {
       return _.orderBy(this.sites, [s => s.site], ['asc'])
     },
     ...mapGetters('site_config', [
-      'available_sites',
       'all_sites',
     ])
   }

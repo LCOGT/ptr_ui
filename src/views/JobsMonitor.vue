@@ -87,7 +87,6 @@ export default {
       form.site="wmd"
       form.mount="mount1"
       form.instance="camera1"
-      console.log(form)
       const url = `${this.$store.state.dev.jobs_api}/newjob?site=${form.site}`
       axios.post(url, form, options)
         .then(console.log)
@@ -110,7 +109,6 @@ export default {
         })
         .catch(console.warn)
       
-      console.log(this.jobIds)
     },
 
 

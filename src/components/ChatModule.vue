@@ -260,7 +260,6 @@ export default {
                 "content":this.tosend, 
                 "room": this.sitecode
             };
-            console.log(dataToSend)
             //this.socket.send(JSON.stringify(dataToSend));
             this.siteChat.send(JSON.stringify(dataToSend));
             this.tosend=''
