@@ -27,8 +27,8 @@
                 v-model="self['active_'+instrument]" >
                 <option 
                   v-for="(val, index) in available_devices(instrument, sitecode)" 
-                  v-bind:value="val"
-                  v-bind:key="`ota-${index}`"
+                  :value="val"
+                  :key="`ota-${index}`"
                 >
                   {{ val }}
                 </option>
@@ -49,14 +49,13 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 export default {
   name: "Settings",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
@@ -78,6 +77,9 @@ export default {
   },
 
   computed: {
+    available_devices() {
+      return this.$store.getters['site_config/available_devices']
+    },
     sitecode() {
       return this.$route.params.sitecode
     },

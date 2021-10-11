@@ -221,7 +221,6 @@ export default {
             }
         },
         nightOf() {
-            //console.log(moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY'))
             return moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY')
         },
         startTimeOptions() {
@@ -293,7 +292,6 @@ export default {
                 reservation_note: this.reservation_note,
                 project_id: this.project_name_and_created,
             }
-            console.log('modified event: ', m_event)
             return m_event
         },
         userIsAdmin() {

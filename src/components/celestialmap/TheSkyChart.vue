@@ -24,7 +24,6 @@ import celestial from 'd3-celestial'
 import add_custom_data from '@/components/celestialmap/add_custom_data'
 import { base_config, default_object_styles } from '@/components/celestialmap/skymap_config'
 import helpers from '@/utils/helpers'
-import { status_mixin } from '@/mixins/status_mixin'
 import { mapGetters } from 'vuex'
 
 let Celestial = celestial.Celestial()
@@ -42,7 +41,6 @@ export default {
             default: 200,
         },
     },
-    mixins: [status_mixin],
     data () {
         return {
             // Used to make sure the interaction layer starts up after the main sky chart is loaded
@@ -134,8 +132,6 @@ export default {
                 map_coords[0] = helpers.degree2hour(map_coords[0])
                 this.$store.commit('command_params/mount_ra', map_coords[0].toFixed(4)) 
                 this.$store.commit('command_params/mount_dec', map_coords[1].toFixed(4)) 
-            } else {
-                console.log('user clicked outside of map')
             }
         },
         handle_mouseup(e) { },

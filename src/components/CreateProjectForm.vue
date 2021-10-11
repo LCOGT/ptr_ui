@@ -417,10 +417,6 @@ export default {
         SideInfoPanel,
         TheSkyChart,
     },
-    created() {
-        console.log(this.filter_wheel_options.map(x => x[0]))
-        console.log(this.generic_filter_list)
-    },
 
     watch: {
         project_to_load({ project, is_existing_project }) {
@@ -676,15 +672,13 @@ export default {
         },
 
         getCoordinatesFromName(target_index) {
-            console.log(`This function should get coordinates for ${this.targets[target_index].name}`)
             let query_script = `query id ${this.targets[target_index].name}\\nhd 100`
             let url = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame.jsonp?object=" + encodeURIComponent(this.targets[target_index].name);
 
             axios.get(url).then( response => {
                 let result = JSON.parse(response.data.slice(10,-3))
-                console.log(result)
                 if (!result.Target.Resolver || !result.Target.Resolver.jradeg || !result.Target.Resolver.jdedeg) {
-                    console.log('failed')
+                    console.error('failed to fetch coordinates for ', target_index)
                     this.$buefy.toast.open({
                         message: "Could not resolve object with name "+this.targets[target_index].name,
                         type: "is-danger"
@@ -742,7 +736,6 @@ export default {
                 "project_id": `${project_name}#${created_at}`,
                 "events": project_events.map(e => ({"event_id": e.event_id, "start": e.start})),
             }
-            console.log(body)
             let header = await this.getAuthRequestHeader()
 
             axios.post(url, body, header).then(response => {
@@ -765,7 +758,6 @@ export default {
                 let key = `bin${e.bin}#exposure${e.exposure}#filter${e.filter}`
                 remaining[key] = e.count
             })
-            console.log(remaining)
 
             let project = {
                 project_name: this.project_name,
@@ -795,8 +787,6 @@ export default {
 
                 scheduled_with_events: this.project_events
             }
-
-            console.log('project: ', project)
 
             // Make sure all warnings are false, otherwise don't create the project.
             if (Object.values(this.warn).every(x => !x)) {
@@ -857,8 +847,6 @@ export default {
                 created_at: this.loaded_project_created_at,
                 project_changes: project,
             }
-
-            console.log('project: ', project)
 
             // Make sure all warnings are false, otherwise don't create the project.
             if (Object.values(this.warn).every(x => !x)) {
@@ -929,8 +917,6 @@ export default {
 
         ...mapGetters('site_config', [
             'available_sites',
-            'site_config',
-            'global_config',
             'filter_wheel_options'
         ]), 
         ...mapState('user_data', [

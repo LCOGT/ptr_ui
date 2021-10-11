@@ -168,44 +168,35 @@ export default {
             }
             let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
             axios.post(project_endpoint, request_params).then(response => {
-                console.log(response)
                 let project = response.data
                 project.created_at = moment().utc().format()
-
                 let project_loader = {
                     project: project,
                     is_existing_project: false
                 }
-
                 this.$emit('load_project_form', project_loader)
             }).catch(err => {
-                console.log(error)
+                console.warn(err)
             })
         },
         getProject(project_name, created_at) {
-            
             let request_params = {
                 project_name: project_name,
                 created_at: created_at,
             }
             let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
             axios.post(project_endpoint, request_params).then(response => {
-                console.log(response)
                 let project_loader = {
                     project: response.data,
                     is_existing_project: true,
                 }
                 this.$emit('load_project_form', project_loader)
             }).catch(err => {
-                console.log(error)
+                console.warn(err)
             })
         },
     },
     computed: {
-        ...mapGetters('site_config', [
-            'site_config',
-            'global_config',
-        ]), 
         ...mapState('user_data', [
             'user_events',
             'user_events_is_loading',
@@ -215,20 +206,14 @@ export default {
             'all_projects_is_loading',
         ]),
         projectsToDisplay() {
-            if (this.show_everyones_projects) {
-                return this.all_projects;
-            }
-            else {
-                return this.user_projects
-            }
+            return this.show_everyones_projects 
+                ? this.all_projects 
+                : this.user_projects;
         },
         projectsIsLoading() {
-            if (this.show_everyones_projects) {
-                return this.all_projects_is_loading;
-            }
-            else {
-                return this.user_projects_is_loading;
-            }
+            return this.show_everyones_projects 
+                ? this.all_projects_is_loading 
+                : this.user_projects_is_loading;
         },
         userIsAdmin() {
             try {

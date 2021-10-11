@@ -5,7 +5,7 @@ function idToShapelistName(id) {
     if (id[0] == 'l') return 'lines'
     if (id[0] == 'r') return 'rects'
     if (id[0] == 'c') return 'circles'
-    console.log('unknown shape type from id: ', id)
+    console.warn('unknown shape type from id: ', id)
 }
 
 const simpleId = () => Math.random().toString(36).slice(-6)

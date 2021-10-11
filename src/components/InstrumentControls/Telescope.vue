@@ -3,12 +3,12 @@
   <div class="instrument-control-wrapper">
 
     <div class="val" 
-      v-if="mount_state && mount_state.message && mount_state.message != '-'">
-      {{mount_state.message}}
+      v-if="mount_message.val != '-'">
+      {{mount_message}}
     </div>
     <div class="val" 
-      v-if="telescope_state && telescope_state.message && telescope_state.message != '-'">
-      {{telescope_state.message}}
+      v-if="telescope_message.val != '-'">
+      {{telescope_message}}
     </div>
 
     <b-field>
@@ -31,11 +31,11 @@
         style="font-size: 0.8em;"
         class="status-column"
         :statusList="buildTelescopeTabStatus1Shorter"
-        :isOffline="!isOnline" />
+        :isOffline="!site_is_online" />
       <status-column
         style="font-size: 0.8em;"
         class="status-column column"
-        :isOffline="!isOnline"
+        :isOffline="!site_is_online"
         :statusList="buildTelescopeTabStatus2"/>
     </div>
 
@@ -132,25 +132,22 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
-import { status_mixin } from '../../mixins/status_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
-import SkychartModal from '@/components/SkychartModal'
+import { mapGetters } from 'vuex'
 export default {
-  name: "Screen",
-  mixins: [commands_mixin, status_mixin, user_mixin],
+  name: "Telescope",
+  mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
     StatusColumn,
     SimpleDeviceStatus,
-    SkychartModal,
   },
   data() {
     return {
       isExpandedStatusVisible: false,
-      skychartModalIsOpen: false,
     }
   },
 
@@ -158,6 +155,16 @@ export default {
     sitecode() {
       return this.$route.params.sitecode
     },
+
+    ...mapGetters('sitestatus', [
+      'site_is_online',
+      'mount_state',
+      'telescope_state',
+      'buildTelescopeTabStatus1Shorter',
+      'buildTelescopeTabStatus2',
+      'telescope_message',
+      'mount_message',
+    ]),
 
     mount_ra: {
       get() { return this.$store.getters['command_params/mount_ra']},

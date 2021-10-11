@@ -110,7 +110,6 @@ export default {
   methods: {
 
     handleKeyup(e) {
-      console.log(e.key)
       if (e.key == "delete") {
         this.$store.dispatch('drawshapes/deleteShape', this.rect_id)
       }

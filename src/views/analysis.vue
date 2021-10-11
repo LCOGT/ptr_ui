@@ -88,7 +88,6 @@ export default {
   methods: {
 
     onResize(event) {
-      console.log('window has been resized', event) 
       this.$store.dispatch('js9/resizeForCrosshairs')
     },
 
@@ -126,12 +125,9 @@ export default {
   beforeDestroy() {
     // Unregister the event listener before destroying this Vue instance
     window.removeEventListener('resize', this.onResize)
-
   },
 
   computed: {
-    ...mapGetters("site_config", ["available_sites"]),
-
     ...mapGetters("images", {
       recent_images: "recent_images",
       current_image: "current_image"
@@ -142,7 +138,7 @@ export default {
     ]),
 
     active_site: {
-      get() { return this.$store.getters["site_config/site"]; },
+      get() { return this.$store.state.site_config.selected_site; },
       set(value) { this.$store.commit("site_config/setActiveSite", value); }
     }
   }

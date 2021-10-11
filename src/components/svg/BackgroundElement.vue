@@ -64,7 +64,6 @@ export default {
         actionText: "Center on pixels",
         queue: false,
         onAction: () => {
-          console.log("slew to " + position[0]/ this.width + ", " + position[1]/ this.height);
           this.send_pixels_center_command(
             position[0],
             position[1],

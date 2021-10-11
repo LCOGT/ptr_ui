@@ -3,10 +3,10 @@
 
         <template slot="brand">
             <b-navbar-item tag="router-link" class="menu-title" :to="{ path: '/' }">
-              <span v-if="site==''" style="margin: 0;" class="title">photon ranch</span>
-              <span v-if="site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp;</span>
-              <span v-if="site!=''" class="is-hidden-tablet">&nbsp;&nbsp;<b-icon icon="home"/>&nbsp;</span>
-              <span v-if="site!=''" style="margin: 0;" class="subtitle">>&nbsp;{{site.toUpperCase()}}</span>
+              <span v-if="selected_site==''" style="margin: 0;" class="title">photon ranch</span>
+              <span v-if="selected_site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp;</span>
+              <span v-if="selected_site!=''" class="is-hidden-tablet">&nbsp;&nbsp;<b-icon icon="home"/>&nbsp;</span>
+              <span v-if="selected_site!=''" style="margin: 0;" class="subtitle">>&nbsp;{{selected_site.toUpperCase()}}</span>
               <!--span>&nbspv5</span-->
                 <!--img
                     src="img/icons/logo-via-logohub.png"
@@ -92,10 +92,12 @@ export default {
     return {}
   },
   computed: {
+    ...mapState('site_config', [
+      'selected_site',
+      'global_config'
+    ]),
     ...mapGetters('site_config', [
       'available_sites', 
-      'global_config',
-      'site',
     ]),
 
     ...mapState('sitestatus', ['site_open_status']),
@@ -112,8 +114,8 @@ export default {
 
     menu_name() {
       let siteName = ''
-      if (this.site != '') { 
-         siteName += ' - ' + this.site.toUpperCase()
+      if (this.selected_site != '') { 
+         siteName += ' - ' + this.selected_site.toUpperCase()
       }
       return siteName
     },

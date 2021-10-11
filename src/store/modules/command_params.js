@@ -125,8 +125,6 @@ const mutations = {
 const actions = {
     // This action does nothing. It exists for easy reference.
     empty({ commit }, payload) {
-        console.log('action called from command_params')
-        //console.log(payload)
         //commit('mutation_name', value)
     },
 }

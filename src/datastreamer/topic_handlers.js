@@ -9,11 +9,17 @@ const status_stream_handler = message => {
     store.commit('sitestatus/latest_status_timestamp_ms', message.server_timestamp_ms)
     store.commit('sitestatus/latest_device_timestamp_ms', message.server_timestamp_ms)
     store.commit('sitestatus/status', status)
+
+    let now = Date.now()
+    store.commit('sitestatus/updateLocalClock', now)
   }
   if (statusType == "wxEncStatus") {
     store.commit('sitestatus/latest_status_timestamp_ms', message.server_timestamp_ms)
     store.commit('sitestatus/latest_weather_timestamp_ms', message.server_timestamp_ms)
     store.commit('sitestatus/status', status)
+
+    let now = Date.now()
+    store.commit('sitestatus/updateLocalClock', now)
   }
 }
 
