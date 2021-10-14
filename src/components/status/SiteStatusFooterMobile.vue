@@ -3,11 +3,9 @@
     <div class="site-status-footer-mobile-wrapper">
 
         <div class="status-tabs">
-
             <div class="button main-status-button" @click="toggle_main_status">
                 status
             </div>
-
             <div class="button user-status-button" @click="toggle_user_status">
                 logs
             </div>
@@ -27,13 +25,13 @@
                     <div class="main-status-header">
                         <div class="online-status">
                             <div style="display:flex; align-items:center;">
-                                <div :class="{'status-on':isOnline, 'status-off':!isOnline}" ></div>
-                                <p v-if="isOnline" style="font-weight: bold; color: greenyellow;">online</p>
-                                <p v-if="!isOnline" style="font-weight: bold; color: orangered;">offline</p>
+                                <div :class="{'status-on':site_is_online, 'status-off':!site_is_online}" ></div>
+                                <p v-if="site_is_online" style="font-weight: bold; color: greenyellow;">online</p>
+                                <p v-if="!site_is_online" style="font-weight: bold; color: orangered;">offline</p>
                             </div>
                         </div>
                         <div style="display:flex; flex-direction:column; align-items:center;">
-                            <div class="sidereal-time" :class="{'offline': !isOnline}">
+                            <div class="sidereal-time" :class="{'offline': !site_is_online}">
                                 <site-sidereal-time :longitude="site_longitude"/> 
                             </div>
                             <div class="sidereal-label">
@@ -45,15 +43,14 @@
 
                         <status-column 
                             style="padding: 0;"
-                            :isOffline="!isOnline"
-                            :statusList="buildGeneralStatus"/>
+                            :isOffline="!site_is_online"
+                            :statusList="status_display_left"/>
 
                         <status-column 
                             style="padding: 0;"
-                            :isOffline="!isOnline"
-                            :statusList="buildWeatherStatus"/>
+                            :isOffline="!site_is_online"
+                            :statusList="status_display_right"/>
                     </div>
-
                 </div>
 
                 <!-- User Status Display -->
@@ -94,9 +91,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
-import ReconnectingWebSocket from 'reconnecting-websocket'
-import axios from 'axios';
+import { mapGetters } from 'vuex'
 import moment from 'moment';
 import { user_status_mixin } from '@/mixins/user_status_mixin'
 import StatusColumn from '@/components/status/StatusColumn'
@@ -197,38 +192,63 @@ export default {
 
         ...mapGetters('site_config', ['site_longitude']),
         ...mapGetters('sitestatus', [
-            'buildWeatherStatus',
-            'buildGeneralStatus',
-            'buildFocuserTabStatus',
-            'buildRotatorTabStatus',
+            'site_is_online',
+
+            'weather_ok',
+            'open_ok',
+            'enclosure_status',
+            'enclosure_mode',
+            'dome_azimuth',
+            'dome_slewing',
+            'enclosure_synchronized',
+
+            'sky_temp',
+            'air_temp',
+            'humidity',
+            'dewpoint',
+            'wind',
+            'surface',
+            'ambient',
+            'meas_sky_mpsas',
+            'calc_sky_mpsas',
         ]),
 
-        // Sitecode and site both refer to the 3-leter site abbreviation.
-        // They are duplicated because the status mixin expects 'sitecode'.
-        sitecode() {
-            return this.site;
+        status_display_left() {
+            const spacer = {name: 'spacer', val: 'spacer'}
+            let status = [
+                this.weather_ok,
+                this.open_ok,
+                spacer,
+                this.enclosure_status,
+                this.enclosure_mode,
+                spacer,
+                this.dome_azimuth,
+                this.dome_slewing,
+                this.enclosure_synchronized
+            ]
+            return status
         },
-
-        // Control the status indicator dot in the title bar.
-        isOnline() {
-            // online is defined by status age under 5 minutes
-            if (this.status_age < 300) {
-                return true
-            }
-            else return false;
+        status_display_right() {
+            let status = [
+                this.sky_temp,
+                this.air_temp,
+                this.humidity,
+                this.dewpoint,
+                this.wind,
+                this.surface,
+                this.meas_sky_mpsas,
+                this.calc_sky_mpsas,
+            ]
+            return status
         },
-        
     },
-
 
 }
 </script>
 
-
 <style lang="scss" scoped>
 @import "@/style/_variables.scss";
 @import "@/style/buefy-styles.scss";
-
 
 $main-status-background: #0f1313;
 $user-status-background: darken($main-status-background, 3);
@@ -236,7 +256,6 @@ $toggle-button-color: darken($main-status-background, 5);
 
 $status-tab-height: 37.5px; //button height
 $status-tab-color: darken($main-status-background, 3);
-
 
 .site-status-footer-mobile-wrapper {
     z-index: 1;
@@ -265,7 +284,6 @@ $status-tab-color: darken($main-status-background, 3);
     cursor: pointer;
 }
 
-
 .overlay {
     height: 100%;
     bottom: $status-tab-height;
@@ -292,7 +310,6 @@ $status-tab-color: darken($main-status-background, 3);
     border: 1px solid lighten($main-status-background, 6);
 }
 
-
 .main-status-mobile {
     width: 100%;
     height: 100%;
@@ -313,9 +330,12 @@ $status-tab-color: darken($main-status-background, 3);
 .main-status-items {
     display:flex;
     padding:1em;
-
 }
-
+.main-status-items * {
+    max-width: 50%;
+    padding: 3%;
+    font-size: 70%;
+}
 
 .user-status-mobile {
     background-color: $user-status-background;
@@ -326,13 +346,11 @@ $status-tab-color: darken($main-status-background, 3);
 /**
  *  User status (log) styles 
  */
-
 $log-debug: #aaa;
 $log-info: #bbb;
 $log-warning: $warning;
 $log-error: $danger;
 $log-critical: $danger;
-
 
 .user-status.expanded {
     display: flex;
@@ -416,8 +434,6 @@ div.log-line:last-of-type * {
 .log-line:hover * {
     color:white;
 }
-
-
 
 /**
  * Individual Status Items

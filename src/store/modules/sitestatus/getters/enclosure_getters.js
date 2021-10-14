@@ -11,7 +11,7 @@ const enclosure_state = (state, getters, rootState) => {
 
 // should rename this to 'enclosure_open_status' or similar
 const enclosure_status = (state, getters) => {
-  let name = 'Enclosure'
+  let name = 'Enc. Status'
   let val = '-'
   let is_stale = true
   if ('shutter_status' in Object.keys(getters.enclosure_state)) {

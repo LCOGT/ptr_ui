@@ -51,7 +51,6 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
 import CommandButton from "@/components/CommandButton";
 import ChatModule from "@/components/ChatModule";
 import SideInfoPanel from "@/components/SideInfoPanel";
@@ -145,21 +144,6 @@ export default {
   },
 
   computed: {
-    ...mapGetters("site_config", [
-      "enclosure",
-      "mount",
-      "telescope",
-      "camera",
-      "filter_wheel",
-      "focuser",
-      "rotator",
-      "screen",
-      "weather",
-    ]),
-    ...mapGetters("sitestatus", [
-      "weather_state"
-    ]),
-
     active_subpage() {
       return this.$route.params.subpage
     }
