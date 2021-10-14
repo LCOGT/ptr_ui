@@ -425,10 +425,6 @@ export default {
       ]
       return status
     },
-    device_status_display_3() {
-      let status = []
-      return status
-    },
 
     // Status columns appearing in the always-visible status area
     primary_status_group_1() {
