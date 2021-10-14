@@ -196,7 +196,7 @@ export default {
 
             'weather_ok',
             'open_ok',
-            'enclosure_status',
+            'enclosure_open_status',
             'enclosure_mode',
             'dome_azimuth',
             'dome_slewing',
@@ -219,7 +219,7 @@ export default {
                 this.weather_ok,
                 this.open_ok,
                 spacer,
-                this.enclosure_status,
+                this.enclosure_open_status,
                 this.enclosure_mode,
                 spacer,
                 this.dome_azimuth,

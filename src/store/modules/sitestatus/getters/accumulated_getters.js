@@ -5,7 +5,7 @@ const statusListSpacer = { name: "spacer", val: "spacer" }
 const buildEnclosureTabStatus = (state, getters) => {
     let status = []
     if (getters.enclosure_mode.val != '-')      { status.push(getters.enclosure_mode) }
-    if (getters.enclosure_status.val != '-')    { status.push(getters.enclosure_status) }
+    if (getters.enclosure_open_status.val != '-')    { status.push(getters.enclosure_open_status) }
     if (getters.open_ok.val != '-')             { status.push(getters.open_ok) }
     return status
 }
