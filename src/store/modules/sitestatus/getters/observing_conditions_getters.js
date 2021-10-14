@@ -63,6 +63,7 @@ const wind = (state, getters) => {
   return { name, val, is_stale }
 }
 
+// surface brightness
 const surface = (state, getters) => {
   let name = 'Surface'
   let val = get_val(getters, 'calc_HSI_lux') + ' lux'
@@ -77,6 +78,7 @@ const ambient = (state, getters) => {
   return { name, val, is_stale }
 }
 
+// measured sky magnitudes per square arc second
 const meas_sky_mpsas = (state, getters) => {
   let name = 'Meas. mpsas'
   let val = get_val(getters, 'meas_sky_mpsas') 
@@ -84,6 +86,7 @@ const meas_sky_mpsas = (state, getters) => {
   return { name, val, is_stale }
 }
 
+// calculated sky magnitudes per square arc second
 const calc_sky_mpsas = (state, getters) => {
   let name = 'Calc. mpsas'
   let val = get_val(getters, 'calc_sky_mpsas')

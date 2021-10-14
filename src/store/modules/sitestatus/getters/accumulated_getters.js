@@ -4,8 +4,6 @@ const statusListSpacer = { name: "spacer", val: "spacer" }
 
 const buildWeatherStatus = (state, getters) => {
     let status = []
-                                             status.push({"name": "Wx Status Age", ...statusAgeDisplay(getters.wx_status_age)})
-                                             status.push({"name": "spacer", "val": "spacer"}) 
     if (getters.weather_ok.val != '-')     { status.push(getters.weather_ok) }
     if (getters.open_ok.val != '-')        { status.push(getters.open_ok) }
                                              status.push({"name": "spacer", "val": "spacer"}) 
@@ -24,8 +22,6 @@ const buildWeatherStatus = (state, getters) => {
 
 const buildGeneralStatus = (state, getters) => {
     let general_status = [
-        { "name": "Status Age", ...statusAgeDisplay(getters.device_status_age) },
-            statusListSpacer,
         getters.enclosure_status,
             statusListSpacer,
         getters.dome_azimuth, 
