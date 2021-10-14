@@ -350,7 +350,7 @@ export default {
         "wx_hold", 
         "hold_duration",
 
-        "enclosure_status",
+        "enclosure_open_status",
         "enclosure_mode",
         "dome_azimuth",
         "dome_slewing",
@@ -372,7 +372,7 @@ export default {
         this.weather_ok,
         this.open_ok,
         spacer,
-        this.enclosure_status,
+        this.enclosure_open_status,
         this.enclosure_mode,
         spacer,
         this.dome_azimuth,
@@ -433,7 +433,7 @@ export default {
     // Status columns appearing in the always-visible status area
     primary_status_group_1() {
       return [
-        this.enclosure_status,
+        this.enclosure_open_status,
         this.weather_ok,
         this.open_ok,
       ];
@@ -715,7 +715,6 @@ div.log-line:last-of-type * {
   padding: 0 8px;
   color: lightgray;
   margin-bottom: 20px;
-  //padding-bottom: 2px;
   background-color: $background;
   display:flex;
   justify-content: space-between;
