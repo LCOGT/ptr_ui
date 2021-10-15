@@ -50,28 +50,45 @@
           class="container"
           v-if="status_bar_2_expanded"
         >
-          <div>
-            <status-column
-              style="padding: 0"
-              :isOffline="!site_is_online"
-              :statusList="buildWeatherStatus"
-            />
+
+          <div class="status-container">
+            <div class="status-container-header">
+              Weather + Enclosure
+              <div class="status-container-header-status-age">
+                <status-column :statusList="[wx_status_age_display]" />
+              </div>
+            </div>
+            <div class="status-container-content">
+              <status-column
+                style="padding: 0"
+                :statusList="weather_status_display_1"
+              />
+              <status-column
+                style="padding: 0"
+                :statusList="weather_status_display_2"
+              />
+            </div>
           </div>
-          <div>
-            <status-column
-              style="padding: 0"
-              :isOffline="!site_is_online"
-              :statusList="buildGeneralStatus"
-            />
+
+          <div class="status-container">
+            <div class="status-container-header">
+              Device Status
+              <div class="status-container-header-status-age">
+                <status-column :statusList="[device_status_age_display]" />
+              </div>
+            </div>
+            <div class="status-container-content">
+              <status-column
+                style="padding: 0"
+                :statusList="device_status_display_1"
+              />
+              <status-column
+                style="padding: 0"
+                :statusList="device_status_display_2"
+              />
+            </div>
           </div>
-          <div>
-            <status-column
-              style="padding: 0"
-              :isOffline="!site_is_online"
-              :statusList="buildFocusRotatorCameraStatus"
-            />
-          </div>
-          <!--site-reservation-status :sitecode="site" /-->
+
         </div>
         <div id="status-2-primary" class="container">
           <div>
@@ -148,41 +165,35 @@
             <status-column
               style="padding: 0"
               :isOffline="!site_is_online"
-              :statusList="open_safety_status"
+              :statusList="primary_status_group_1"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
               :isOffline="!site_is_online"
-              :statusList="open_safety_status_2"
+              :statusList="primary_status_group_2"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
               :isOffline="!site_is_online"
-              :statusList="ra_dec_ha_status"
+              :statusList="primary_status_group_3"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
               :isOffline="!site_is_online"
-              :statusList="az_alt_airmass_status"
+              :statusList="primary_status_group_4"
             />
           </div>
-          <!--div>
-                        <status-column 
-                            style="padding: 0;"
-                            :isOffline="!site_is_online"
-                            :statusList="buildFocuserTabStatus"/>
-                    </div-->
           <div>
             <status-column
               style="padding: 0"
               :isOffline="!site_is_online"
-              :statusList="buildRotatorTabStatus"
+              :statusList="primary_status_group_5"
             />
           </div>
         </div>
@@ -198,9 +209,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
-import ReconnectingWebSocket from "reconnecting-websocket";
-import axios from "axios";
+import { mapGetters } from "vuex";
 import moment from "moment";
 import { user_status_mixin } from "../../mixins/user_status_mixin";
 import StatusColumn from "@/components/status/StatusColumn";
@@ -208,7 +217,6 @@ import SiteSiderealTime from "@/components/display/SiteSiderealTime";
 import SiteLocalTime from "@/components/display/SiteLocalTime";
 import UtcTime from "@/components/display/UtcTime";
 import SiteReservationStatus from "@/components/SiteReservationStatus";
-import ChatModule from "@/components/ChatModule";
 export default {
   name: "SiteStatusFooter",
   mixins: [ user_status_mixin],
@@ -218,7 +226,6 @@ export default {
     SiteLocalTime,
     UtcTime,
     SiteReservationStatus,
-    ChatModule,
   },
   props: {
     site: String,
@@ -303,13 +310,13 @@ export default {
   computed: {
     ...mapGetters("site_config", ["site_longitude", "timezone"]),
     ...mapGetters("sitestatus", [
-        "status_age_display",
         "status_age",
+        "status_age_display",
+        "wx_status_age_display",
+        "wx_status_age",
+        "device_status_age",
+        "device_status_age_display",
         "site_is_online",
-
-        "buildWeatherStatus",
-        "buildGeneralStatus",
-        "buildFocusRotatorCameraStatus",
         "buildRotatorTabStatus",
 
         "ra",
@@ -318,41 +325,141 @@ export default {
         "azimuth",
         "altitude",
         "airmass",
+        "refraction",
+        "zenith_distance",
 
-        "enclosure_status",
-        "enclosure_mode",
+        "filter_name",
+        "filter_wheel_moving",
+        "focus_position",
+        "focus_moving",
+        "rotator_position",
+        "rotator_moving",
+        "camera_status",
+
         "weather_ok",
         "open_ok",
-        "hold_duration",
+        "sky_temp",
+        "air_temp",
+        "humidity",
+        "dewpoint",
+        "wind",
+        "surface",
+        "ambient",
+        "meas_sky_mpsas",
+        "calc_sky_mpsas",
         "wx_hold", 
+        "hold_duration",
+
+        "enclosure_open_status",
+        "enclosure_mode",
+        "dome_azimuth",
+        "dome_slewing",
+        "enclosure_synchronized",
       ]),
 
-    // Sitecode and site both refer to the 3-leter site abbreviation.
-    // They are duplicated because the status mixin expects 'sitecode'.
-    sitecode() {
-      return this.site;
+    // Status ages for display
+    wx_status_age_display() {
+      return {name: "status age: ", ...this.$store.getters['sitestatus/wx_status_age_display']}
+    },
+    device_status_age_display() {
+      return {name: "status age: ", ...this.$store.getters['sitestatus/device_status_age_display']}
     },
 
-    // Assemble the list of status elements for the status-column components
-    open_safety_status() {
+    // Status columns visible in the expanded status view
+    weather_status_display_1() {
+      const spacer = {name: 'spacer', val: 'spacer'}
+      let status = [
+        this.weather_ok,
+        this.open_ok,
+        spacer,
+        this.enclosure_open_status,
+        this.enclosure_mode,
+        spacer,
+        this.dome_azimuth,
+        this.dome_slewing,
+        this.enclosure_synchronized
+      ]
+      return status
+    },
+    weather_status_display_2() {
+      let status = [
+        this.sky_temp,
+        this.air_temp,
+        this.humidity,
+        this.dewpoint,
+        this.wind,
+        this.surface,
+        this.ambient,
+        this.meas_sky_mpsas,
+        this.calc_sky_mpsas,
+      ]
+      return status
+    },
+    device_status_display_1() {
+      const spacer = {name: 'spacer', val: 'spacer'}
+      let status = [
+        this.ra,
+        this.dec,
+        spacer,
+        this.azimuth,
+        this.altitude,
+        spacer,
+        this.hour_angle,
+        this.airmass,
+        this.zenith_distance,
+        this.refraction,
+      ]
+      return status
+    },
+    device_status_display_2() {
+      const spacer = {name: 'spacer', val: 'spacer'}
+      let status = [
+        this.filter_name,
+        this.filter_wheel_moving,
+        spacer,
+        this.focus_position,
+        this.focus_moving,
+        spacer,
+        this.rotator_position,
+        this.rotator_moving,
+      ]
+      return status
+    },
+
+    // Status columns appearing in the always-visible status area
+    primary_status_group_1() {
       return [
-        this.enclosure_status,
+        this.enclosure_open_status,
         this.weather_ok,
         this.open_ok,
       ];
     },
-    open_safety_status_2() {
+    primary_status_group_2() {
       return [
         this.enclosure_mode,
         this.wx_hold,
         this.hold_duration,
       ]
     },
-    ra_dec_ha_status() {
-      return [ this.ra, this.dec, this.hour_angle ]
+    primary_status_group_3() {
+      return [ 
+        this.ra, 
+        this.dec, 
+        this.hour_angle 
+      ]
     },
-    az_alt_airmass_status() {
-      return [ this.azimuth, this.altitude, this.airmass ]
+    primary_status_group_4() {
+      return [ 
+        this.azimuth, 
+        this.altitude, 
+        this.airmass 
+      ]
+    },
+    primary_status_group_5() {
+      return [ 
+        this.camera_status,
+        this.filter_name,
+      ]
     },
 
     /**
@@ -526,6 +633,8 @@ div.log-line:last-of-type * {
   border-bottom: 1px $grey-dark solid;
   overflow-x: hidden;
 }
+
+// This is the site status content that is always displayed
 #status-2-primary {
   display: grid;
   grid-template-rows: 1fr;
@@ -536,19 +645,22 @@ div.log-line:last-of-type * {
   padding-left: #{$toggle-button-width / 2};
   margin-top: 10px;
   margin-bottom: 10px;
+  display:flex;
+  gap: 20px;
 }
+
+// This is the site status for the expanded view
 #status-2-expanded {
   padding-bottom: 1em;
   padding-top: 1em;
   border-bottom: 1px solid grey;
-  display: grid;
-  grid-template-columns: 100px 50px repeat(6, 5px); // $status-col-width);
-  grid-column-gap: 30px;
   // align with the .container margins:
   padding-left: #{$toggle-button-width / 2};
   display: flex;
   flex-wrap: wrap;
+  gap: 40px;
 }
+
 @media screen and (min-width: 768px) and (max-width: 949px) {
   #status-2-primary {
     grid-template-columns: 70px 50px repeat(2, $status-col-width);
@@ -588,6 +700,29 @@ div.log-line:last-of-type * {
   #status-2-primary > div:nth-child(n + 9) {
     display: none;
   }
+}
+
+// Style the status container boxes in the expanded status panel
+.status-container {
+  border: 0px solid red;
+}
+.status-container-header {
+  border: 1px solid lighten($grey-dark, 3);
+  padding: 0 8px;
+  color: lightgray;
+  margin-bottom: 20px;
+  background-color: $background;
+  display:flex;
+  justify-content: space-between;
+}
+.status-container-header-status-age {
+  padding: 0;
+}
+.status-container-content {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: flex-start;
 }
 
 /** 

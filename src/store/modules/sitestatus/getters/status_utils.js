@@ -9,7 +9,7 @@ const display_colors = {
 }
 
 function isItemStale(getters, device_state, status_key) {
-  let now = getters.timestamp  // use a getter so this stays reactive
+  let now = getters.now // use a getter so this stays reactive
   let status_timestamp = getters[device_state][status_key]?.timestamp
   if (typeof status_timestamp == 'undefined') { return true }
   return now - status_timestamp > STALE_AGE_MS

@@ -8,7 +8,8 @@ const camera_status = (state, getters) => {
   let name = 'Camera'
   let val = getters.camera_state.status?.val ?? getters.camera_state.status ?? '-'
   let is_stale = isItemStale(getters, 'camera_state', 'status')
-  return { name, val, is_stale }
+  let custom_styles = "width:unset;"
+  return { name, val, is_stale, custom_styles }
 }
 
 export default {

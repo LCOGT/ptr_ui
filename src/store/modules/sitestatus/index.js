@@ -35,8 +35,6 @@ const state = {
   site: 'no site',
   status: {},
   timestamp: '',
-  latest_weather_timestamp: '',
-  latest_device_timestamp: '',
   now: Date.now(),
   site_open_status: {},
 
@@ -56,18 +54,18 @@ const state = {
 const getters = {
 
   site: state => state.site,
-  timestamp: state => state.now,
-
-  site_is_online: state => (state.status_age * 1000) < STALE_AGE_MS,
-
-  status_age: state => (state.now - state.timestamp) / 1000,
-  status_age_display: (state, getters) => statusAgeDisplay(getters.status_age), 
+  now: state => state.now,
 
   wx_status_age: state => (state.now - state.weather_timestamp) / 1000,
   wx_status_age_display: (state, getters) => statusAgeDisplay(getters.wx_status_age),
 
   device_status_age: state => (state.now - state.device_timestamp) / 1000,
   device_status_age_display: (state, getters) => statusAgeDisplay(getters.device_status_age),
+
+  status_age: (state, getters) => (Math.min(getters.wx_status_age, getters.device_status_age)),
+  status_age_display: (state, getters) => statusAgeDisplay(getters.status_age), 
+
+  site_is_online: (state, getters) => (getters.status_age * 1000) < STALE_AGE_MS,
 
   ...observing_conditions_getters,
   ...enclosure_getters,
