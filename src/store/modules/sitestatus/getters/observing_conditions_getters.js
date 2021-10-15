@@ -63,6 +63,7 @@ const wind = (state, getters) => {
   return { name, val, is_stale }
 }
 
+// surface brightness
 const surface = (state, getters) => {
   let name = 'Surface'
   let val = get_val(getters, 'calc_HSI_lux') + ' lux'
@@ -77,6 +78,7 @@ const ambient = (state, getters) => {
   return { name, val, is_stale }
 }
 
+// measured sky magnitudes per square arc second
 const meas_sky_mpsas = (state, getters) => {
   let name = 'Meas. mpsas'
   let val = get_val(getters, 'meas_sky_mpsas') 
@@ -84,6 +86,7 @@ const meas_sky_mpsas = (state, getters) => {
   return { name, val, is_stale }
 }
 
+// calculated sky magnitudes per square arc second
 const calc_sky_mpsas = (state, getters) => {
   let name = 'Calc. mpsas'
   let val = get_val(getters, 'calc_sky_mpsas')
@@ -123,37 +126,6 @@ const hold_duration = (state, getters) => {
   return { name, val, is_stale, color }
 }
 
-
-/* 
-Define the status items that are calculated from the wxEncStatus status type. 
- 
-Then, when the weather status timestamp is old, we can selectively mark these items 
-as stale by making them grey or some other style change. 
-  
-Note: there is a similar item in the enclosure getters, since enclosure and weather
-status are reported together.
-  
-This list must be manually updated when new getters are added!
-*/
-const weather_status_items = () => [
-  'weather_state',
-  'weather_ok',
-  'open_ok',
-  'sky_temp',
-  'air_temp',
-  'humidity',
-  'dewpoint',
-  'wind',
-  'surface',
-  'ambient',
-  'meas_sky_mpsas',
-  'calc_sky_mpsas',
-  'wx_hold',
-  'hold_duration',
-]
-
-
-
 export default {
   weather_state,
   weather_ok,
@@ -169,6 +141,4 @@ export default {
   calc_sky_mpsas,
   wx_hold,
   hold_duration,
-
-  weather_status_items
 }

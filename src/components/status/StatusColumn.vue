@@ -10,8 +10,8 @@
             v-for="(item,key) in statusList"
             v-bind:key="`v-${key}`"
             class="val"
-            :class="{'spacer': item.val=='spacer', 'is-stale': item.is_stale}"
             :style="customStyle(item)"
+            :class="{'spacer': item.val=='spacer', 'is-stale': item.is_stale}"
             >
                 <ra-display v-if="item.name == 'Ra'" :ra_hours_decimal="parseFloat(item.val)" :can_copy="false"/>
                 <dec-display v-else-if="item.name == 'Dec'" :dec_deg_decimal="parseFloat(item.val)" :can_copy="false"/>
@@ -31,8 +31,14 @@ export default {
         StatusValue,
     },
     props: {
-        'statusList': Array,
-        'isOffline': Boolean,
+        'statusList': {
+            type: Array,
+            default: () => [],
+        },
+        'isOffline': {
+            type: Boolean,
+            default: false,
+        }
     },
     methods: {
         /**
@@ -40,15 +46,24 @@ export default {
          */
         customStyle(item) {
 
+            let style = ""
+
             // Check if the item is stale
             if (item.is_stale) {
-                return `color: grey;`
+                style += `color: grey;`
             }
 
             // Next check if the status has a color defined
             else if ("color" in item) {
-                return `color: ${item.color};`
+                style += `color: ${item.color};`
             }
+
+            // Check for general style overrides
+            if ("custom_styles" in item) {
+                style += item.custom_styles
+            }
+
+            return style
         },
     }
 }
@@ -80,11 +95,12 @@ $status-value-background-color: $input-background-color;
 }
 .val{
   color: lightgray;
-  //background-color: $status-value-background-color;
+  background-color: $status-value-background-color;
   border: 1px solid lighten($grey-dark, 3);
   padding: 0 8px;
   white-space: nowrap;
   grid-column-start:2;
+  width: 10ch;
 }
 
 .spacer {
@@ -93,6 +109,9 @@ $status-value-background-color: $input-background-color;
     visibility: hidden;
 }
 
+.is-stale {
+    background-color: rgba(0,0,0,0);
+}
 .is-stale > *{
     //color:grey;
     //color: pink;

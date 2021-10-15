@@ -44,7 +44,6 @@ const mount_activity = (state, getters) => {
   }
   else if (parseTrueFalse(getters.mount_state.is_parked?.val)) { 
     val = "parked" 
-    //is_stale = (getters.timestamp - get_timestamp(getters, 'is')) > STALE_AGE_MS
     is_stale = isItemStale(getters, 'mount_state', 'is_parked')
   }
   else if (parseTrueFalse(getters.mount_state.is_tracking?.val)) { 

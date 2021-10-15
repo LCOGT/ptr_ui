@@ -9,9 +9,8 @@ const enclosure_state = (state, getters, rootState) => {
     return state.enclosure?.[rootState.site_config.selected_enclosure] ?? {}
 }
 
-// should rename this to 'enclosure_open_status' or similar
-const enclosure_status = (state, getters) => {
-  let name = 'Enclosure'
+const enclosure_open_status = (state, getters) => {
+  let name = 'Enc. Status'
   let val = '-'
   let is_stale = true
   if ('shutter_status' in Object.keys(getters.enclosure_state)) {
@@ -59,34 +58,12 @@ const enclosure_message = (state, getters) => {
   return { name, val, is_stale }
 }
 
-/* 
-Define the status items that are calculated from the wxEncStatus status type. 
- 
-Then, when the weather status timestamp is old, we can selectively mark these items 
-as stale by making them grey or some other style change. 
-  
-Note: there is a similar item in the enclosure getters, since enclosure and weather
-status are reported together.
-  
-This list must be manually updated when new getters are added!
-*/
-const enclosure_status_items = () => [
-  'enclosure_state',
-  'enclosure_status',
-  'enclosure_mode',
-  'dome_azimuth',
-  'dome_slewing',
-  'enclosure_synchronized',
-]
-
 export default {
   enclosure_state,
-  enclosure_status,
+  enclosure_open_status,
   enclosure_mode,
   dome_azimuth,
   dome_slewing,
   enclosure_synchronized,
   enclosure_message,
-
-  enclosure_status_items
 }
