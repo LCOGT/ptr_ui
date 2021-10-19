@@ -2,6 +2,7 @@
 const STALE_AGE_MS = 1000 * 60 * 5 // 5 minutes before status is reported to be stale
 
 const display_colors = {
+  default: "lightgrey",
   red: "orangered",
   yellow: "yellow",
   green: "greenyellow",

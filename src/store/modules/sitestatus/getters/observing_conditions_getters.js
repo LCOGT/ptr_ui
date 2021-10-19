@@ -97,15 +97,20 @@ const calc_sky_mpsas = (state, getters) => {
 const wx_hold = (state, getters) => {
   let name = 'Wx Hold'
   let val
-  let color = display_colors.red
+  let color = display_colors.default
   let is_stale = isItemStale(getters, 'weather_state', 'wx_hold')
   if (!Object.keys(getters.weather_state).includes('wx_hold')) {
     val = 'missing'
     color = 'grey'
   } else {
-    let is_holding = getters.weather_state.wx_hold || true
-    if (!is_holding) { color = display_colors.green }
-    val = is_holding ? 'ACTIVE' : 'Off'
+    let is_holding = getters.weather_state.wx_hold.val
+    if (is_holding) { 
+      color = display_colors.red
+      val = "TRUE"
+    } else {
+      color = display_colors.green
+      val = 'No Hold'
+    }
   }
   return { name, val, is_stale, color }
 }
@@ -119,9 +124,9 @@ const hold_duration = (state, getters) => {
     val = "missing"
     color = "grey"
   } else {
-    color = display_colors.green
+    color = display_colors.default
     val = get_val(getters, 'hold_duration')
-    if (val > 0) { color = display_colors.red }
+    if (getters.weather_state?.wx_hold?.val) { color = display_colors.red }
   }
   return { name, val, is_stale, color }
 }
