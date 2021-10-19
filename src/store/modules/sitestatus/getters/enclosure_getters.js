@@ -13,10 +13,10 @@ const enclosure_open_status = (state, getters) => {
   let name = 'Enc. Status'
   let val = '-'
   let is_stale = true
-  if ('shutter_status' in Object.keys(getters.enclosure_state)) {
+  if (Object.keys(getters.enclosure_state).includes('shutter_status')) {
     val = get_val(getters, 'shutter_status')
     is_stale = isItemStale(getters, 'enclosure_state', 'shutter_status')
-  } else if ('roof_status' in Object.keys(getters.enclosure_state)) {
+  } else if (Object.keys(getters.enclosure_state).includes('roof_status')) {
     val = get_val(getters, 'shutter_status')
     is_stale = isItemStale(getters, 'enclosure_state', 'roof_status')
   }
@@ -46,8 +46,8 @@ const dome_slewing = (state, getters) => {
 
 const enclosure_synchronized = (state, getters) => {
   let name = 'Enc. Synced'
-  let val = get_val(getters, 'enclosure_synch')
-  let is_stale = isItemStale(getters, 'enclosure_state', 'enclosure_synch')
+  let val = get_val(getters, 'enclosure_synchronized')
+  let is_stale = isItemStale(getters, 'enclosure_state', 'enclosure_synchronized')
   return { name, val, is_stale }
 }
 
