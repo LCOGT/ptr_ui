@@ -55,6 +55,8 @@ const distance = (p1, p2) => {
 
 
 const draw_star = (Celestial, quadtree, styles, starbase, starexp, d) => {
+    if (!Celestial.customData.stars.show) return;
+    if (d.properties.mag > Celestial.customData.stars.minMagnitude) return;
     let pt = Celestial.mapProjection(d.geometry.coordinates)
     let r = starSize(d, starbase, starexp);
     Celestial.setStyle(styles.star)
@@ -80,11 +82,13 @@ const draw_star = (Celestial, quadtree, styles, starbase, starexp, d) => {
 
 
 const draw_galaxy = (Celestial, quadtree, styles, d) => {
+    if (!Celestial.customData.galaxies.show) return;
     let pt = Celestial.mapProjection(d.geometry.coordinates)
     let mag = d.properties.mag
     let m = d.properties.messier
     let s = 9;
     let r = s / Math.sqrt(3);
+    if (mag > Celestial.customData.galaxies.minMagnitude || mag < Celestial.customData.galaxies.maxMagnitude) return
     styles.galaxy.opacity = Math.pow((3.0/mag),1.5)/2 + 0.5; // arbitrary dimming calc
     Celestial.setStyle(styles.galaxy);
     Celestial.context.beginPath();
@@ -106,11 +110,13 @@ const draw_galaxy = (Celestial, quadtree, styles, d) => {
 
 
 const draw_nebula = (Celestial, quadtree, styles, d) => {
+    if (!Celestial.customData.nebula.show) return;
     let pt = Celestial.mapProjection(d.geometry.coordinates)
     let mag = d.properties.mag
     let m = d.properties.messier
     let s = 8;
     let r = s / 1.5;
+    if (mag > Celestial.customData.nebula.minMagnitude || mag < Celestial.customData.nebula.maxMagnitude) return
     styles.nebula.opacity = Math.pow((5.5/mag),1.3); 
     Celestial.setStyle(styles.nebula);
     Celestial.context.beginPath();
@@ -133,11 +139,13 @@ const draw_nebula = (Celestial, quadtree, styles, d) => {
 
 
 const draw_globular_cluster = (Celestial, quadtree, styles, d) => {
+    if (!Celestial.customData.globularClusters.show) return;
     let pt = Celestial.mapProjection(d.geometry.coordinates)
     let mag = d.properties.mag
     let m = d.properties.messier
     let s = 8;
     let r = s / 1.5;
+    if (mag > Celestial.customData.globularClusters.minMagnitude || mag < Celestial.customData.globularClusters.maxMagnitude) return
     styles.globular_cluster.opacity = Math.pow((5.5/mag),6);
     Celestial.setStyle(styles.globular_cluster);
     Celestial.map(d)
@@ -158,11 +166,13 @@ const draw_globular_cluster = (Celestial, quadtree, styles, d) => {
 
 
 const draw_open_cluster = (Celestial, quadtree, styles, d) => {
+    if (!Celestial.customData.openClusters.show) return;
     let pt = Celestial.mapProjection(d.geometry.coordinates)
     let mag = d.properties.mag
     let m = d.properties.messier
     let s = 8;
     let r = s / 1.5;
+    if (mag > Celestial.customData.openClusters.minMagnitude || mag < Celestial.customData.openClusters.maxMagnitude) return
     styles.open_cluster.opacity = Math.pow((4.5/mag),2)/2 + 0.7;
     Celestial.setStyle(styles.open_cluster);
     Celestial.map(d)
@@ -180,7 +190,6 @@ const draw_open_cluster = (Celestial, quadtree, styles, d) => {
         Celestial.context.fillText('M'+m, pt[0]+r, pt[1]-r);
     }
 }
-
 
 const draw_generic = (Celestial, styles, d) => {
     let pt = Celestial.mapProjection(d.geometry.coordinates)

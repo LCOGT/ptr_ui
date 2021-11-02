@@ -4,16 +4,13 @@ let base_config = {
     projectionRatio: null, // Optional override for default projection ratio
     transform: "equatorial", // Coordinate transformation: equatorial (default), ecliptic, galactic, supergalactic
 
-    // Initial center coordinates in equatorial transformation [hours, degrees, degrees],
-    // otherwise [degrees, degrees, degrees], 3rd parameter is orientation, null = default center
-    // NOTE: don't set center here; load in component where site lat/lng is known. 
-    //center: [helpers.hour2degree(helpers.siderealTime(-119)), 34,],       
-    follow: "center",   // on which coordinates to center the map, default: zenith, if location enabled, otherwise center
+    follow: "zenith",   // on which coordinates to center the map, default: zenith, if location enabled, otherwise center
 
     orientationfixed: true,  // Keep orientation angle the same as center[2]
     //geopos: [34,-119],    // optional initial geographic position [lat,lon] in degrees, overrides center
+    // Note: set geopos in the vue component mounted hook based on site coordinates
 
-    background: { fill: "#080f17", stroke: " #17202a", opacity: 1 }, // Background style
+    background: { fill: "#080f17", stroke: " #17202a", opacity: 0.5 }, // Background style
     adaptable: false,    // Sizes are increased with higher zoom-levels
     interactive: false, // Enable zooming and rotation with mousewheel and dragging
     form: false,        // Display settings form
@@ -31,6 +28,7 @@ let base_config = {
     controls: false,    // Display zoom controls
     lang: "",           // Language for names, so far only for constellations: de: german, es: spanish
                         // Default:en or empty string for english
+
     container: "celestial-map",   // ID of parent element, e.g. div
     datapath: "/data",  // Path/URL to data files, empty = subfolder 'data'
     stars: {
@@ -49,7 +47,7 @@ let base_config = {
         propernameLimit: 3,  // Show proper names for stars brighter than propernameLimit
 
         size: 7,       // Maximum size (radius) of star circle in pixels
-        exponent: -0.5, // Scale exponent for star size, larger = more linear
+        exponent: -0.4, // Scale exponent for star size, larger = more linear
         data: 'stars.6.json' // Data source for stellar data
         //data: 'stars.8.json' // Alternative deeper data source for stellar data
     },
@@ -62,9 +60,9 @@ let base_config = {
         nameStyle: { fill: "#cccccc", font: "9px Helvetica, Arial, serif", align: "left", baseline: "top" },
         size: 6,    // Optional seperate scale size for DSOs, null = stars.size
         exponent: 2, // Scale exponent for DSO size, larger = more non-linear
-        data: 'messier.json',  // Data source for DSOs
-        //data: 'dsos.6.json'  // Alternative broader data source for DSOs
-        //data: 'dsos.14.json' // Alternative deeper data source for DSOs
+        //data: 'messier.json',  // Data source for DSOs
+        data: 'dsos.6.json',  // Alternative broader data source for DSOs
+        //data: 'dsos.14.json', // Alternative deeper data source for DSOs
         symbols: {  //DSO symbol styles
             gg: { shape: "circle", fill: "#ff0000" },                                 // Galaxy cluster
             g: { shape: "ellipse", fill: "#ff0000" },                                // Generic galaxy
@@ -105,7 +103,7 @@ let base_config = {
         which: ["sol", "mer", "ven", "ter", "lun", "mar", "jup", "sat", "ura", "nep"],
         // Font styles for planetary symbols
         symbolStyle: {
-            fill: "#00ccff", font: "bold 17px 'Lucida Sans Unicode', Consolas, sans-serif",
+            //fill: "#00ccff", font: "bold 17px 'Lucida Sans Unicode', Consolas, sans-serif",
             align: "center", baseline: "middle"
         },
         symbolType: "disk",
@@ -137,11 +135,11 @@ let base_config = {
         graticule: {
             show: true, stroke: "#cccccc", width: 0.3, opacity: 0.4,      // Show graticule lines
             // grid values: "outline", "center", or [lat,...] specific position
-            lon: { pos: ["outline"], opacity: 0.6, fill: "lightblue", font: "12px Helvetica, Arial, sans-serif" },
+            lon: { pos: "outline", opacity: 0.6, fill: "lightblue", font: "12px Helvetica, Arial, sans-serif" },
             // grid values: "outline", "center", or [lon,...] specific position
-            lat: { pos: ["center"], opacity: 0.5, fill: "lightblue", font: "12px Helvetica, Arial, sans-serif" }
+            lat: { pos: "center", opacity: 0.5, fill: "lightblue", font: "12px Helvetica, Arial, sans-serif" }
         },
-        equatorial: { show: false, stroke: "#aaaaaa", width: 1.3, opacity: 0.4 },    // Show equatorial plane
+        equatorial: { show: true, stroke: "#aaaaaa", width: 1.3, opacity: 0.4 },    // Show equatorial plane
         ecliptic: { show: true, stroke: "#66cc66", width: 1.3, opacity: 0.3 },      // Show ecliptic plane
         galactic: { show: false, stroke: "#cc6666", width: 1.3, opacity: 0.7 },     // Show galactic plane
         supergalactic: { show: false, stroke: "#cc66cc", width: 1.3, opacity: 0.7 } // Show supergalactic plane
@@ -155,9 +153,9 @@ let base_config = {
         opacity: 0.5
     },
     daylight: {  // Show daylight marker (tbi)
-        show:false,
-        fill: "#fff",
-        opacity: 0.4
+        show: false,
+        fill: "#f00",
+        opacity: 0.1
     }
 }
 
@@ -294,7 +292,6 @@ const red_chart_styles = {
         },
     }
 }
-
 
 export {
     base_config,
