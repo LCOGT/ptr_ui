@@ -22,7 +22,7 @@
 import InteractionCanvas from "@/components/celestialmap/InteractionCanvas"
 import celestial from 'd3-celestial'
 import add_custom_data from '@/components/celestialmap/add_custom_data'
-import { base_config, default_object_styles } from '@/components/celestialmap/skymap_config'
+import { base_config } from '@/components/celestialmap/skymap_config'
 import helpers from '@/utils/helpers'
 import { mapGetters } from 'vuex'
 
@@ -32,14 +32,104 @@ export default {
     name: 'TheSkyChart',
     components: { InteractionCanvas },
     props: {
-        width: {
-            type: Number,
-            default: 200,
+        showStars: {
+            type: Boolean,
+            default: true,
         },
-        height: {
-            type: Number,
-            default: 200,
+        showGalaxies: {
+            type: Boolean,
+            default: true,
         },
+        showNebula: {
+            type: Boolean,
+            default: true,
+        },
+        showGlobularClusters: {
+            type: Boolean,
+            default: true,
+        },
+        showOpenClusters: {
+            type: Boolean,
+            default: true,
+        },
+        showMoon: {
+            type: Boolean,
+            default: true,
+        },
+        showSun: {
+            type: Boolean,
+            default: true,
+        },
+        showDaylight: {
+            type: Boolean,
+            default: false,
+        },
+        showMilkyWay: {
+            type: Boolean,
+            default: true,
+        },
+        showPlanets: {
+            type: Boolean,
+            default: true,
+        },
+
+        starMagMin: {
+            type: Number,
+            default: 5,
+        },
+        starMagMax: {
+            type: Number,
+            default: 0,
+        },
+        galaxyMagMin: {
+            type: Number,
+            default: 10,
+        },
+        galaxyMagMax: {
+            type: Number,
+            default: 0,
+        },
+        nebulaMagMin: {
+            type: Number,
+            default: 10,
+        },
+        nebulaMagMax: {
+            type: Number,
+            default: 0,
+        },
+        globularClusterMagMin: {
+            type: Number,
+            default: 10,
+        },
+        globularClusterMagMax: {
+            type: Number,
+            default: 0,
+        },
+        openClusterMagMin: {
+            type: Number,
+            default: 10,
+        },
+        openClusterMagMax: {
+            type: Number,
+            default: 0,
+        },
+
+        use_custom_date_location: {
+            type: Boolean,
+            default: false,
+        },
+        show_live_chart: {
+            type: Boolean,
+            default: true,
+        },
+        date: {
+            type: Date,
+            required: false, 
+        },
+        location: {
+            type: Array,
+            default: () => [0,0]
+        }
     },
     data () {
         return {
@@ -56,18 +146,54 @@ export default {
 
             // Whether or not the mouse is hovering over the sky part of the map.
             mouse_in_sky: false,
+             
+            resize_observer: '',
         }
     },
-    mounted() {
 
+    mounted() {
         let config = base_config
 
         // Set the map config to show the sky for the selected observatory site
-        config.center = [
-            helpers.hour2degree(helpers.siderealTime(parseFloat(this.site_longitude))), 
-            parseFloat(this.site_latitude)
-        ]
-        config.follow = "center"
+        //config.center = [
+            //helpers.hour2degree(helpers.siderealTime(parseFloat(this.site_longitude))), 
+            //parseFloat(this.site_latitude)
+        //]
+        config.follow = "zenith"
+        config.geopos = [this.site_latitude, this.site_longitude]
+
+        config.stars.show = this.showStars
+        config.stars.limit = this.starMagMin
+        config.mw.show = this.showMilkyWay
+        config.planets.which = this.planetsList
+
+        Celestial.customData = {
+            stars: {
+                show: this.showStars,
+                minMagnitude: this.starMagMin, 
+                maxMagnitude: this.starMagMax,
+            },
+            galaxies: {
+                show: this.showGalaxies,
+                minMagnitude: this.galaxyMagMin,
+                maxMagnitude: this.galaxyMagMax,
+            },
+            nebula: {
+                show: this.showNebula,
+                minMagnitude: this.nebulaMagMin,
+                maxMagnitude: this.nebulaMagMax,
+            },
+            globularClusters: {
+                show: this.showGlobularClusters,
+                minMagnitude: this.globularClusterMagMin,
+                maxMagnitude: this.globularClusterMagMax,
+            },
+            openClusters: {
+                show: this.showOpenClusters,
+                minMagnitude: this.openClusterMagMin,
+                maxMagnitude: this.openClusterMagMax,
+            },
+        }
 
         // Add custom data to display on the map
         const custom_data_path = "/data/all_objects.json"
@@ -109,7 +235,6 @@ export default {
         this.update_telescope_crosshairs()
         this.update_user_crosshairs()
 
-
         // Update the center of the map every minute
         this.updateMapCenterInterval = setInterval(this.rotate, 6000)
     },
@@ -142,15 +267,8 @@ export default {
         },
 
         rotate() {
-            const a = helpers.hour2degree(helpers.siderealTime(this.site_longitude))
-            const b = this.site_latitude
-            // make sure we dont' get an infinite loop due to bad params
-            if (!a && !b) {
-                console.warn('bad skymap rotate parameters: ', a, b)
-                return;
-            }
-            Celestial.rotate({center:[a, b, 0], follow: "center", transform: "equatorial"})
-            Celestial.redraw()
+            if (this.use_custom_date_location) return
+            Celestial.date(new Date())
         },
 
         // Transform x,y array in raw pixels to relative coordinates (vals in [0,1])
@@ -182,6 +300,7 @@ export default {
 
         // Update the user crosshair position 
         update_user_crosshairs() {
+            console.log([this.ra_user_input, this.dec_user_input])
             let user_coords = ([helpers.hour2degree(this.ra_user_input), this.dec_user_input]);
             let pixel_coords = Celestial.mapProjection(user_coords)
             if (Celestial.clip(user_coords)) {
@@ -190,11 +309,35 @@ export default {
                 this.user_crosshairs = [-1, -1]
             }
             this.redraw_interaction_layer()
+        },
+
+        update_date_location() {
+            Celestial.location(this.location)
+            Celestial.date(this.date)
         }
 
     },
 
     watch: {
+        show_live_chart() {
+            if (this.show_live_chart) {
+                Celestial.location(this.site_latitude, this.site_longitude)
+                Celestial.date(new Date())
+            }
+        },
+        use_custom_date_location() {
+            if (!this.use_custom_date_location) return;
+            this.update_date_location()
+        },
+        date() {
+            if (!this.use_custom_date_location) return;
+            this.update_date_location()
+        },
+        location() {
+            if (!this.use_custom_date_location) return;
+            this.update_date_location()
+        },
+
         // Update the chart if the mount pointing has changed
         mount_pointing_ra() {  this.update_telescope_crosshairs() },
         mount_pointing_dec() { this.update_telescope_crosshairs() },
@@ -205,9 +348,103 @@ export default {
 
         site_latitude() { this.rotate() },
         site_longitude() { this.rotate() },
+
+        showStars() {
+            Celestial.apply({ stars: { show: this.showStars } })
+            Celestial.customData.stars.show = this.showStars
+            Celestial.redraw()
+        },
+        showGalaxies() {
+            Celestial.customData.galaxies.show = this.showGalaxies
+            Celestial.redraw()
+        },
+        showNebula() {
+            Celestial.customData.nebula.show = this.showNebula
+            Celestial.redraw()
+        },
+        showGlobularClusters() {
+            Celestial.customData.globularClusters.show = this.showGlobularClusters
+            Celestial.redraw()
+        },
+        showOpenClusters() {
+            Celestial.customData.openClusters.show = this.showOpenClusters
+            Celestial.redraw()
+        },
+        showMoon() {
+            Celestial.reload({ planets: { which: this.planetsList}})
+        },
+        showSun() {
+            Celestial.reload({ planets: { which: this.planetsList}})
+        },
+        showPlanets() {
+            Celestial.reload({ planets: { which: this.planetsList}})
+        },
+        showDaylight() {
+            Celestial.apply({ daylight: { show: this.showDaylight}})
+        },
+        showMilkyWay() {
+            Celestial.apply({ mw: { show: this.showMilkyWay}})
+        },
+        starMagMin() {
+            Celestial.apply({ stars: { limit: this.starMagMin }})
+            Celestial.customData.stars.minMagnitude = this.starMagMin
+            Celestial.redraw()
+        },
+        starMagMax() {
+            Celestial.customData.stars.maxMagnitude = this.starMagMax
+            Celestial.redraw()
+        },
+        galaxyMagMin() {
+            Celestial.customData.galaxies.minMagnitude = this.galaxyMagMin
+            Celestial.redraw()
+        },
+        galaxyMagMax() {
+            Celestial.customData.galaxies.maxMagnitude = this.galaxyMagMax
+            Celestial.redraw()
+        },
+        nebulaMagMin() {
+            Celestial.customData.nebula.minMagnitude = this.nebulaMagMin
+            Celestial.redraw()
+        },
+        nebulaMagMax() {
+            Celestial.customData.nebula.maxMagnitude = this.nebulaMagMax
+            Celestial.redraw()
+        },
+        globularClusterMagMin() {
+            Celestial.customData.globularClusters.minMagnitude = this.globularClusterMagMin
+            Celestial.redraw()
+        },
+        globularClusterMagMax() {
+            Celestial.customData.globularClusters.maxMagnitude = this.globularClusterMagMax
+            Celestial.redraw()
+        },
+        openClusterMagMin() {
+            Celestial.customData.openClusters.minMagnitude = this.openClusterMagMin
+            Celestial.redraw()
+        },
+        openClusterMagMax() {
+            Celestial.customData.openClusters.maxMagnitude = this.openClusterMagMax
+            Celestial.redraw()
+        },
     },
 
     computed: {
+
+        // list of planets to display
+        planetsList() {
+            let planets = []
+
+            if(this.showPlanets) {
+                planets = [ "mer", "ven", "ter", "mar", "jup", "sat", "ura", "nep"]
+            }
+            if (this.showSun) {
+                planets.push('sol')
+            }
+            if (this.showMoon) {
+                planets.push('lun')
+            }
+            return planets
+        },
         ...mapGetters('site_config', [
             'site_latitude',
             'site_longitude',

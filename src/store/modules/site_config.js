@@ -50,6 +50,7 @@ const getters = {
           "site": state.global_config[site].site.toString(),
           "latitude":  parseFloat(state.global_config[site].latitude),
           "longitude": parseFloat(state.global_config[site].longitude),
+          "TZ_database_name": state.global_config[site].TZ_database_name,
         }
         sites.push(s)
       })

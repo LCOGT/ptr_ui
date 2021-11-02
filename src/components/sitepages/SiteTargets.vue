@@ -3,33 +3,177 @@
 
     <div  class="skychart-wrapper">
         <div class="skychart-center">
-            <the-sky-chart class="the-skychart" />
+            <the-sky-chart class="the-skychart" 
+                :showStars="showStars" 
+                :showGalaxies="showGalaxies" 
+                :showNebula="showNebula" 
+                :showGlobularClusters="showGlobularClusters" 
+                :showOpenClusters="showOpenClusters" 
+
+                :showMoon="showMoon"
+                :showSun="showSun"
+                :showDaylight="showDaylight"
+                :showMilkyWay="showMilkyWay"
+                :showPlanets="showPlanets"
+
+                :starMagMin="starMagMin"
+                :starMagMax="starMagMax"
+                :galaxyMagMin="galaxyMagMin"
+                :galaxyMagMax="galaxyMagMax"
+                :nebulaMagMin="nebulaMagMin"
+                :nebulaMagMax="nebulaMagMax"
+                :globularClusterMagMin="globularClusterMagMin"
+                :globularClusterMagMax="globularClusterMagMax"
+                :openClusterMagMin="openClusterMagMin"
+                :openClusterMagMax="openClusterMagMax"
+
+                :use_custom_date_location="use_custom_date_location"
+                :show_live_chart="isLiveSkyDisplay"
+                :date="skychart_date"
+                :location="skychart_location"
+                />
         </div>
     </div>
 
     <div class="sidebar-wrapper">
-        <a class="sidebar-button button" @click="toggle_expand_sidebar">
-            <b-icon
-                type="is-text"
-                square
-                :icon="sidebar_is_expanded ? 'chevron-right' : 'chevron-left'"
-            />
+        <a class="sidebar-button" @click="toggle_expand_sidebar">
+            <div style="display: flex;">
+                {{sidebar_is_expanded ? 'hide' : 'show'}}
+                <b-icon
+                    type="is-text"
+                    square
+                    :icon="sidebar_is_expanded ? 'chevron-right' : 'chevron-left'"
+                />
+            </div>
         </a>
         <div class="sidebar-content is-expanded">
             <div class="targets-page-content-wrapper">
+
                 <div class="ptr-aladin-parent-div">
                     <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
                 </div>
-                <b-field label="Search for objects...">
-                    <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
-                    <p class="control">
-                        <b-button @click="submit_simbad_query"><b-icon icon="magnify" /></b-button>
-                    </p>
-                </b-field>
-                <command-tabs-accordion 
-                    :controls="['Telescope', 'Camera']" 
-                    :initInstrumentOpenView="0"
-                    class="command-tab-accordion"/>
+
+                <div class="sidebar-tabs">
+                <div 
+                    :class="{'active': activeSidebarTab=='telescope controls'}" 
+                    @click="activeSidebarTab='telescope controls'"
+                    class="sidebar-tab-button">telescope controls</div>
+                <div 
+                    :class="{'active': activeSidebarTab=='chart settings'}" 
+                    @click="activeSidebarTab='chart settings'"
+                    class="sidebar-tab-button">chart settings</div>
+                </div>
+
+                <div class="sidebar-tab-content">
+                    <div v-if="activeSidebarTab=='telescope controls'"> 
+                        <b-field label="Search for objects...">
+                            <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
+                            <p class="control">
+                                <b-button @click="submit_simbad_query"><b-icon icon="magnify" /></b-button>
+                            </p>
+                        </b-field>
+                        <command-tabs-accordion 
+                            :controls="['Telescope', 'Camera']" 
+                            :initInstrumentOpenView="0"
+                            class="command-tab-accordion"/>
+                    </div>
+
+                    <div v-if="activeSidebarTab=='chart settings'">
+
+
+                        <div>
+
+                            <b-field>
+                                <b-checkbox v-model="isLiveSkyDisplay" type="is-danger">
+                                    <span style="text-transform:uppercase;">live</span> sky display
+                                </b-checkbox>
+                            </b-field>
+                            <date-time-location-picker 
+                                @update_time_and_place="update_skychart_time_and_place"
+                                :default_observatory="sitecode" 
+                                :is_disabled="isLiveSkyDisplay" />
+                        </div>
+                        <div class="horizontal-separator"></div>
+
+                        <div class="object-filter-label">Stars</div>
+                        <div class="object-filter-group"> 
+                            <b-switch style="margin-bottom: 0.75rem;" :rounded="false" v-model="showStars"></b-switch> 
+                            <b-field label-position="on-border" label="max mag">
+                                <b-input style="width: 80px;" size="is-small" label="max mag" type="number" min="-2" max="8" v-model="starMagMax" />
+                            </b-field>
+                            <b-field label-position="on-border" label="min mag">
+                                <b-input style="width: 80px;" size="is-small" label="min mag" type="number" min="-2" max="8" v-model="starMagMin" />
+                            </b-field>
+                            <b-field/>
+                        </div>
+                        <div class="object-filter-label">Galaxies</div>
+                        <div class="object-filter-group"> 
+                            <b-switch style="margin-bottom: 0.75rem;" :rounded="false" v-model="showGalaxies"></b-switch> 
+                            <b-field label-position="on-border" label="max mag">
+                                <b-input style="width: 80px;" size="is-small" label="max mag" type="number" min="0" max="25" v-model="galaxyMagMax" />
+                            </b-field>
+                            <b-field label-position="on-border" label="min mag">
+                                <b-input style="width: 80px;" size="is-small" label="min mag" type="number" min="0" max="25" v-model="galaxyMagMin" />
+                            </b-field>
+                            <b-field/>
+                        </div>
+                        <div class="object-filter-label">Nebula</div>
+                        <div class="object-filter-group"> 
+                            <b-switch style="margin-bottom: 0.75rem;" :rounded="false" v-model="showNebula"></b-switch> 
+                            <b-field label-position="on-border" label="max mag">
+                                <b-input style="width: 80px;" size="is-small" label="max mag" type="number"  min="0" max="25" v-model="nebulaMagMax" />
+                            </b-field>
+                            <b-field label-position="on-border" label="min mag">
+                                <b-input style="width: 80px;" size="is-small" label="min mag" type="number"  min="0" max="25" v-model="nebulaMagMin" />
+                            </b-field>
+                            <b-field/>
+                        </div>
+                        <div class="object-filter-label">Globular Clusters</div>
+                        <div class="object-filter-group"> 
+                            <b-switch style="margin-bottom: 0.75rem;" :rounded="false" v-model="showGlobularClusters"></b-switch> 
+                            <b-field label-position="on-border" label="max mag">
+                                <b-input style="width: 80px;" size="is-small" label="max mag" type="number"  min="0" max="25" v-model="globularClusterMagMax" />
+                            </b-field>
+                            <b-field label-position="on-border" label="min mag">
+                                <b-input style="width: 80px;" size="is-small" label="min mag" type="number"  min="0" max="25" v-model="globularClusterMagMin" />
+                            </b-field>
+                            <b-field/>
+                        </div>
+                        <div class="object-filter-label">Open Clusters</div>
+                        <div class="object-filter-group"> 
+                            <b-switch style="margin-bottom: 0.75rem;" :rounded="false" v-model="showOpenClusters"></b-switch> 
+                            <b-field label-position="on-border" label="max mag">
+                                <b-input style="width: 80px;" size="is-small" label="max mag" type="number"  min="0" max="25" v-model="openClusterMagMax" />
+                            </b-field>
+                            <b-field label-position="on-border" label="min mag">
+                                <b-input style="width: 80px;" size="is-small" label="min mag" type="number" min="0" max="25" v-model="openClusterMagMin" />
+                            </b-field>
+                            <b-field/>
+                        </div>
+
+                        <div class="horizontal-separator"></div>
+
+                        <div style="display: flex; justify-content: space-between;">
+                            <b-field label="daylight">
+                                <b-switch style="margin-bottom: 0.75rem;" v-model="showDaylight"></b-switch> 
+                            </b-field>
+                            <b-field label="moon">
+                                <b-switch style="margin-bottom: 0.75rem;" v-model="showMoon"></b-switch> 
+                            </b-field>
+                            <b-field label="sun">
+                                <b-switch style="margin-bottom: 0.75rem;" v-model="showSun"></b-switch> 
+                            </b-field>
+                            <b-field label="milky way">
+                                <b-switch style="margin-bottom: 0.75rem;" v-model="showMilkyWay"></b-switch> 
+                            </b-field>
+                            <b-field label="planets">
+                                <b-switch style="margin-bottom: 0.75rem;" v-model="showPlanets"></b-switch> 
+                            </b-field>
+                        </div>
+
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -39,12 +183,10 @@
 
 
 <script>
-import { mapGetters } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
-import helpers from '@/utils/helpers'
-import $ from 'jquery'
 
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
+import DateTimeLocationPicker from '@/components/celestialmap/DateTimeLocationPicker'
 import CommandButton from '@/components/CommandButton'
 import CommandTabsAccordion from "@/components/CommandTabsAccordion"
 //import Celestial from '@/components/celestialmap/celestial'
@@ -59,6 +201,7 @@ export default {
         CommandButton,
         TheSkyChart,
         CommandTabsAccordion,
+        DateTimeLocationPicker,
     },
     data() {
         return {
@@ -71,6 +214,39 @@ export default {
             isComponentModalActive: false,
 
             sidebar_is_expanded: true,
+            activeSidebarTab: 'telescope controls',
+
+            // Whether to show the live sky at site or a chart based on manual date/location settings.
+            // Options are 'live' or 'manual'.
+            chartDatetimeSource: 'live',
+
+            isLiveSkyDisplay: true,
+
+            showStars: true,
+            showGalaxies: true,
+            showNebula: true,
+            showGlobularClusters: true,
+            showOpenClusters: true,
+            showMoon: true,
+            showSun: true,
+            showDaylight: false,
+            showMilkyWay: true,
+            showPlanets: true,
+
+            starMagMin: 6,
+            starMagMax: 0,
+            galaxyMagMin: 10,
+            galaxyMagMax: 0,
+            nebulaMagMin: 10,
+            nebulaMagMax: 0,
+            globularClusterMagMin: 10,
+            globularClusterMagMax: 0,
+            openClusterMagMin: 10,
+            openClusterMagMax: 0,
+
+            use_custom_date_location: false,
+            skychart_date: new Date(),
+            skychart_location: [0,0]
         }
     },
 
@@ -181,6 +357,16 @@ export default {
             }
 
         },
+
+        toggle_daylight() {
+            Celestial.apply({daylight: { show: true }})
+        },
+
+        update_skychart_time_and_place(time_and_place) {
+            this.use_custom_date_location = true
+            this.skychart_date = time_and_place.date
+            this.skychart_location = time_and_place.location
+        },
         toggle_expand_sidebar() {
             if (this.sidebar_is_expanded) {
                 document.getElementsByClassName('sidebar-content')[0].classList.remove('is-expanded')
@@ -273,7 +459,13 @@ export default {
 @import "@/style/_variables.scss";
 
 // Button to toggle the sidebar visibility
-$toggle-button-height: 35px;
+$toggle-button-height: 32px;
+
+.horizontal-separator {
+    width: 100%;
+    border-bottom: 1px solid silver;
+    margin: 1em 0;
+}
 
 #site-targets-wrapper {
     display: flex;
@@ -329,20 +521,57 @@ $toggle-button-height: 35px;
 
     @include tablet {
         position:absolute;
-        top: $toggle-button-height;
+        //top: $toggle-button-height;
+        top: 0;
         right: 0;
         padding: 0;
         width: unset;
-        height: calc(100% - #{$toggle-button-height});
+        width: 410px;
+        //height: calc(100% - #{$toggle-button-height});
+        height: 100%;
     }
 }
 .sidebar-content.is-expanded {
     transform: translateX(0%);
 }
 
+.object-filter-group {
+    padding-top: 10px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.sidebar-tabs {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+}
+.sidebar-tab-button {
+
+    padding: 5px 8px;
+    border-right: 1px solid lighten($grey-dark, 4); 
+    background-color: $body-background-color;
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    &.active {
+        background-color: $grey-darker;
+        font-weight: bold;
+    }
+}
+.sidebar-tab-content {
+    padding: 1em;
+    background-color: $background;
+}
+
+
 .targets-page-content-wrapper {
     width: 90vw;
-    margin: 1em auto;
+    margin: 0em auto;
+    margin-bottom: 5em;
 
     @include tablet {
         width: 100%;
@@ -352,29 +581,29 @@ $toggle-button-height: 35px;
 
         padding: 0;
         padding-left: 1em;
+        padding-top: 1em;
         margin: 0;
-        margin-top: 1em;
     }
 }
 
 .sidebar-button{
     position: fixed;
-    //animation: blinkonce 2s ease;
-    //animation-delay: 2s;
     right: 0;
-    display: none;
-    color: whitesmoke;
-    width: 50px;
+    z-index: 6;
+
+    width: 70px;
     height: $toggle-button-height;
-    line-height:1em;
-    margin-right: 0;
-    margin-left: auto;
-    z-index: 5;
+    color: whitesmoke;
 
-    border-top-right-radius: 0;    
-    border-bottom-right-radius: 0;
-    border-right: 0;
+    padding: 5px 8px;
+    border: 1px solid grey; 
+    background-color: $body-background-color;
 
+    &:hover {
+        cursor: pointer;
+    }
+
+    display: none;
     @include tablet {
         display: block
     }
@@ -384,7 +613,7 @@ $toggle-button-height: 35px;
 }
 @keyframes blinkonce {
     30% {
-        width: 60px;
+        width: 75px;
     }
 }
 .sidebar-button:hover { cursor: pointer; }
@@ -402,7 +631,7 @@ $toggle-button-height: 35px;
     width: 100%;
     height: 300px;
     background-color:grey;
-    margin-bottom: 1em;
+    margin-bottom: 3em;
 }
 
 .command-tab-accordion {

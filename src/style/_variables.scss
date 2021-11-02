@@ -80,12 +80,11 @@ $input-hover-color: $grey-lighter;
 $input-hover-border-color: $grey;
 $input-focus-color: $grey;
 $input-disabled-color:$grey-lighter;
-$input-disabled-background-color: $grey;
 $input-arrow: lighten($link, 10);
 $input-icon-color: $grey;
 $input-icon-active-color: $grey-lighter;
 $input-hover-color: $grey-light;
-$input-disabled-background-color: $grey-light;
+$input-disabled-background-color: $grey;
 $input-disabled-border: $grey-lighter;
 //$input-shadow
 //$input-focus-box-shadow-size
@@ -136,4 +135,3 @@ $datepicker-item-hover-background-color: lighten($dropdown-content-background-co
 $progress-value-background-color: $grey-lighter;
 
 $bulmaswatch-import-font: true !default;
-
