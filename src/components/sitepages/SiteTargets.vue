@@ -429,6 +429,8 @@ export default {
             this.aladin.gotoRaDec(ra, dec)
         },
 
+        // If the live sky display is activated, send the active site's lat/lng to the
+        // skychart component
         isLiveSkyDisplay() {
             if (this.isLiveSkyDisplay) {
                 this.skychart_location = [this.site_latitude, this.site_longitude]
