@@ -54,14 +54,15 @@
                 </div>
 
                 <div class="sidebar-tabs">
-                <div 
-                    :class="{'active': activeSidebarTab=='telescope controls'}" 
-                    @click="activeSidebarTab='telescope controls'"
-                    class="sidebar-tab-button">telescope controls</div>
-                <div 
-                    :class="{'active': activeSidebarTab=='chart settings'}" 
-                    @click="activeSidebarTab='chart settings'"
-                    class="sidebar-tab-button">chart settings</div>
+                    <div 
+                        :class="{'active': activeSidebarTab=='chart settings'}" 
+                        @click="activeSidebarTab='chart settings'"
+                        class="sidebar-tab-button">chart settings</div>
+                    <div 
+                        :class="{'active': activeSidebarTab=='telescope controls'}" 
+                        @click="activeSidebarTab='telescope controls'"
+                        class="sidebar-tab-button">telescope controls</div>
+                    <div class="sidebar-tab-button tab-spacer"/>
                 </div>
 
                 <div class="sidebar-tab-content">
@@ -79,7 +80,6 @@
                     </div>
 
                     <div v-if="activeSidebarTab=='chart settings'">
-
 
                         <div>
 
@@ -549,9 +549,11 @@ $toggle-button-height: 32px;
 }
 .sidebar-tab-button {
 
+    font-size: 16px;
     padding: 5px 8px;
     border-right: 1px solid lighten($grey-dark, 4); 
     background-color: $body-background-color;
+    border-bottom: 1px solid silver;
 
     &:hover {
         cursor: pointer;
@@ -560,6 +562,12 @@ $toggle-button-height: 32px;
     &.active {
         background-color: $grey-darker;
         font-weight: bold;
+        border: 1px solid silver;
+        border-bottom: none;
+    }
+    &.tab-spacer {
+        flex-grow: 1;
+        border-bottom: 1px solid silver;
     }
 }
 .sidebar-tab-content {

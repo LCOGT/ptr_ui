@@ -1,6 +1,9 @@
 let base_config = {
+
+
     width: 0,     // Default width, 0 = full parent width; height is determined by projection
-    projection: "stereographic",  // Map projection used: airy, aitoff, armadillo, august, azimuthalEqualArea, azimuthalEquidistant, baker, berghaus, boggs, bonne, bromley, collignon, craig, craster, cylindricalEqualArea, cylindricalStereographic, eckert1, eckert2, eckert3, eckert4, eckert5, eckert6, eisenlohr, equirectangular, fahey, foucaut, ginzburg4, ginzburg5, ginzburg6, ginzburg8, ginzburg9, gringorten, hammer, hatano, healpix, hill, homolosine, kavrayskiy7, lagrange, larrivee, laskowski, loximuthal, mercator, miller, mollweide, mtFlatPolarParabolic, mtFlatPolarQuartic, mtFlatPolarSinusoidal, naturalEarth, nellHammer, orthographic, patterson, polyconic, rectangularPolyconic, robinson, sinusoidal, stereographic, times, twoPointEquidistant, vanDerGrinten, vanDerGrinten2, vanDerGrinten3, vanDerGrinten4, wagner4, wagner6, wagner7, wiechel, winkel3
+    //projection: "stereographic",  // Map projection used: airy, aitoff, armadillo, august, azimuthalEqualArea, azimuthalEquidistant, baker, berghaus, boggs, bonne, bromley, collignon, craig, craster, cylindricalEqualArea, cylindricalStereographic, eckert1, eckert2, eckert3, eckert4, eckert5, eckert6, eisenlohr, equirectangular, fahey, foucaut, ginzburg4, ginzburg5, ginzburg6, ginzburg8, ginzburg9, gringorten, hammer, hatano, healpix, hill, homolosine, kavrayskiy7, lagrange, larrivee, laskowski, loximuthal, mercator, miller, mollweide, mtFlatPolarParabolic, mtFlatPolarQuartic, mtFlatPolarSinusoidal, naturalEarth, nellHammer, orthographic, patterson, polyconic, rectangularPolyconic, robinson, sinusoidal, stereographic, times, twoPointEquidistant, vanDerGrinten, vanDerGrinten2, vanDerGrinten3, vanDerGrinten4, wagner4, wagner6, wagner7, wiechel, winkel3
+    projection: "airy",  // Map projection used: airy, aitoff, armadillo, august, azimuthalEqualArea, azimuthalEquidistant, baker, berghaus, boggs, bonne, bromley, collignon, craig, craster, cylindricalEqualArea, cylindricalStereographic, eckert1, eckert2, eckert3, eckert4, eckert5, eckert6, eisenlohr, equirectangular, fahey, foucaut, ginzburg4, ginzburg5, ginzburg6, ginzburg8, ginzburg9, gringorten, hammer, hatano, healpix, hill, homolosine, kavrayskiy7, lagrange, larrivee, laskowski, loximuthal, mercator, miller, mollweide, mtFlatPolarParabolic, mtFlatPolarQuartic, mtFlatPolarSinusoidal, naturalEarth, nellHammer, orthographic, patterson, polyconic, rectangularPolyconic, robinson, sinusoidal, stereographic, times, twoPointEquidistant, vanDerGrinten, vanDerGrinten2, vanDerGrinten3, vanDerGrinten4, wagner4, wagner6, wagner7, wiechel, winkel3
     projectionRatio: null, // Optional override for default projection ratio
     transform: "equatorial", // Coordinate transformation: equatorial (default), ecliptic, galactic, supergalactic
 
@@ -14,6 +17,7 @@ let base_config = {
     adaptable: false,    // Sizes are increased with higher zoom-levels
     interactive: false, // Enable zooming and rotation with mousewheel and dragging
     form: false,        // Display settings form
+    disableAnimations: true,    
     // Set visiblity for each group of fields of the form
     formFields: {
         location: true,
@@ -28,6 +32,8 @@ let base_config = {
     controls: false,    // Display zoom controls
     lang: "",           // Language for names, so far only for constellations: de: german, es: spanish
                         // Default:en or empty string for english
+    
+    settimezone: false, // Just use the provided UTC time when using Celestial.date(); ignore timezone.
 
     container: "celestial-map",   // ID of parent element, e.g. div
     datapath: "/data",  // Path/URL to data files, empty = subfolder 'data'
@@ -128,14 +134,14 @@ let base_config = {
         namesType: "desig",
     },
     mw: {
-        show: true,    // Show Milky Way as filled polygons
+        show:true,    // Show Milky Way as filled polygons
         style: { fill: "#fef9e7", opacity: 0.10 }
     },
     lines: {
         graticule: {
             show: true, stroke: "#cccccc", width: 0.3, opacity: 0.4,      // Show graticule lines
             // grid values: "outline", "center", or [lat,...] specific position
-            lon: { pos: "outline", opacity: 0.6, fill: "lightblue", font: "12px Helvetica, Arial, sans-serif" },
+            lon: { pos: "center", opacity: 0.6, fill: "lightblue", font: "12px Helvetica, Arial, sans-serif" },
             // grid values: "outline", "center", or [lon,...] specific position
             lat: { pos: "center", opacity: 0.5, fill: "lightblue", font: "12px Helvetica, Arial, sans-serif" }
         },
@@ -146,7 +152,7 @@ let base_config = {
         //mars: { show: false, stroke:"#cc0000", width:1.3, opacity:.7 }
     },
     horizon: {  //Show horizon marker, if geo-position and date-time is set
-        show: false,
+        show: true,
         stroke: "#000099", // Line
         width: 1.0,
         fill: "#000000", // Area below horizon
