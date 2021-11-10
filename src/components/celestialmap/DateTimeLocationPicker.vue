@@ -19,22 +19,23 @@
                 </b-select>
             </b-field>
         </p>
-        <p class="control">
-          <b-field label="Latitude">
+        <p class="control" style="max-width: 90px;" >
+          <b-field label="Latitude" >
             <b-input
-              type="text"
               size="is-small"
-              v-model="selected_latitude"
+              lazy
+              v-model.number="selected_latitude"
               :disabled="selected_observatory !== 'custom'"
             />
           </b-field>
         </p>
-        <p class="control">
+        <p class="control" style="max-width: 90px;">
           <b-field label="Longitude">
             <b-input
               type="text"
               size="is-small"
-              v-model="selected_longitude"
+              lazy
+              v-model.number="selected_longitude"
               :disabled="selected_observatory !== 'custom'"
             />
           </b-field>
@@ -108,7 +109,8 @@
         </p>
         <p class="control">
             <b-field label="timezone" label-position="on-border">
-                <b-select size="is-small" v-model="selected_timezone">
+                <b-select size="is-small" v-model="datetime_picker_timezone_selection">
+                    <option value="site">site</option>
                     <option style="width: 80px;" value="user">user</option>
                     <option value="utc">utc</option>
                     <option value="custom">custom</option>
@@ -119,8 +121,8 @@
             <b-field label="UTC offset" label-position="on-border" title="+/- hours">
                 <b-input 
                     size="is-small" 
-                    v-model="custom_observatory_offset"
-                    :disabled="selected_timezone != 'custom' "
+                    v-model="datetime_picker_timezone_offset"
+                    :disabled="datetime_picker_timezone_selection != 'custom' "
                     style="width: 80px;"></b-input>
             </b-field>
         </p>
@@ -139,9 +141,8 @@
 <script>
 
 // TODO: make these settings persistant using vuex to store state
-
-
 import { mapState, mapGetters } from 'vuex'
+import { utc_offset_from_coordinates } from '@/utils/timezones'
 export default {
     name: "DateTimeLocationPicker",
     props: {
@@ -158,17 +159,18 @@ export default {
         return {
 
             selected_observatory: '',
-            selected_latitude: '',
-            selected_longitude: '',
-            custom_latitude: '',
-            custom_longitude: '',
+            selected_latitude: 0,
+            selected_longitude: 0,
+            custom_latitude: 0,
+            custom_longitude: 0,
 
             // Rounded to nearest half hour
             selected_datetime: new Date(Math.round(new Date().getTime() / (30 * 60 * 1000)) * (30 * 60 * 1000)),
-            selected_timezone: 'user',
+            datetime_picker_timezone_selection: 'user',
 
-            // Initialize with user's timezone offset
-            custom_observatory_offset: new Date().getTimezoneOffset() / -60,
+            // Flip the sign because getTimezoneOffset uses the opposite of most offset conventions
+            // Divide by 60 to convert minutes to hours.
+            datetime_picker_timezone_offset: new Date().getTimezoneOffset() / -60, 
 
             // Occasionally set to '24' for utc displays, but undefined defaults to users system clock preference
             time_format: undefined,
@@ -178,27 +180,40 @@ export default {
             offset_days: 0,
             offset_hours: 0,
             offset_minutes: 0,
-
         }
     },
     mounted() {
         this.selected_observatory = this.default_observatory
         this.set_lat_lng(this.selected_observatory)
+
+        // initialize the custom lat/lng to be the site's coordinates instead of 0,0
+        this.custom_latitude = this.selected_latitude
+        this.custom_longitude = this.selected_longitude
+
     },
     methods: {
+
+        roundDate(date, minutes=15) {
+            const msPerMinute = 6e4
+            const msInterval = minutes * msPerMinute
+            return new Date(Math.round(date.getTime() / msInterval) * msInterval)
+        },
+
         /* @return A timezone offset in minutes */
         getOffset(timeZone = 'UTC', date = new Date()) {
             const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
             const tzDate = new Date(date.toLocaleString('en-US', { timeZone }));
             return (tzDate.getTime() - utcDate.getTime()) / 6e4;
         },
-        set_lat_lng(site) {
+
+        async set_lat_lng(site) {
             if (site == 'custom') {
                 this.selected_latitude = this.custom_latitude
                 this.selected_longitude = this.custom_longitude
             } else {
                 this.selected_latitude = this.global_config[site].latitude
                 this.selected_longitude = this.global_config[site].longitude
+
             }
         },
 
@@ -213,9 +228,11 @@ export default {
          * @returns {Array} object.location: [latitude, longitude] in decimal degrees for the specified location  
          */
         apply_settings(from_offset) {
-            let display_date
 
-            // calculate time from offset
+            // default: assume user selected a specific date/time
+            let display_date = this.selected_datetime_tz_corrected
+
+            // BUT if the user chose an offset time, use that instead
             if (from_offset ?? false) {
                 let ms_per_minute = 60 * 1000
                 let ms_per_hour = 60 * ms_per_minute
@@ -235,67 +252,92 @@ export default {
 
                 let time_now = Date.now()
                 display_date = new Date(time_now + offset_ms)
-            
-            // or get the specified date 
-            } else {
-
-                // requested timezone offset from UTC
-                let requested_offset_ms = this.custom_observatory_offset * 60 * 60 * 1000 // convert hours to ms
-
-                // user's timezone offset from UTC
-                let user_offset = new Date().getTimezoneOffset() * 60 * 1000 // convert minutes to ms
-                console.log(user_offset)
-
-                // First, get the requested date if it was specified in UTC
-                // (this is because js dates use the user's timezone when created)
-                let utc_display_date = new Date(this.selected_datetime.getTime() + user_offset)
-                console.log('utc: ', utc_display_date)
-
-                // Then, we can apply the requested timezone offset to the UTC time
-                display_date = new Date(utc_display_date.getTime() + requested_offset_ms)
-                console.log('requested: ', display_date)
             }
 
             let time_and_place = {
                 date: display_date,
-                tz_offset_minutes: this.selected_timezone * 60,
                 location: [this.selected_latitude, this.selected_longitude],
             }
 
             // Send the results to the parent component
             this.$emit('update_time_and_place', time_and_place)
         },
-    },
-    watch: {
 
-        selected_timezone(new_timezone) {
-            if (new_timezone == 'user') {
-                this.custom_observatory_offset = new Date().getTimezoneOffset() / -60 // convert to +/- hours from UTC
-            } else if (new_timezone == 'utc') {
-                this.custom_observatory_offset = 0
-            }
+        get_site_tz_name(site) {
+            return this.global_config[site].TZ_database_name
         },
 
+        calculate_site_tz_offset() {
+            if (this.datetime_picker_timezone_selection == 'user') {
+                // NOTE: getTimezoneOffset returns minutes with the opposite sign of the conventional UTC offset display
+                // So UTC-8 would return 480, while UTC+8 would return -480.
+                // We divide by -60 to convert to hours in the conventional +/- signage. 
+                this.datetime_picker_timezone_offset = new Date().getTimezoneOffset() / -60 
+            } else if (this.datetime_picker_timezone_selection == 'utc') {
+                this.datetime_picker_timezone_offset = 0
+            } else if (this.datetime_picker_timezone_selection == 'site') {
+                let site_tz = this.get_site_tz_name(this.selected_observatory)
+                this.datetime_picker_timezone_offset = this.getOffset(site_tz, this.selected_datetime) / 60 // convert minutes to hours
+            } 
+        },
+
+    },
+
+    watch: {
+        datetime_picker_timezone_selection() {
+            this.calculate_site_tz_offset()
+        },
         // Save any custom lat/lng user inputs so that we can redisplay them if the user switches back to a custom site
         selected_latitude() {
-            if (this.selected_observatory == "custom") { this.custom_latitude = this.selected_latitude }
+            if (this.selected_observatory == "custom") { 
+                this.custom_latitude = this.selected_latitude 
+                this.datetime_picker_timezone_offset = utc_offset_from_coordinates(
+                        this.selected_latitude, 
+                        this.selected_longitude, 
+                        this.selected_datetime
+                    )
+            }
         },
         selected_longitude() {
-            if (this.selected_observatory == "custom") { this.custom_latitude = this.selected_latitude }
+            if (this.selected_observatory == "custom") { 
+                this.custom_longitude = this.selected_longitude 
+                this.datetime_picker_timezone_offset = utc_offset_from_coordinates(
+                        this.selected_latitude, 
+                        this.selected_longitude, 
+                        this.selected_datetime
+                    )
+            } 
         },
-        selected_observatory() {
-            if (this.selected_observatory == "custom") {
-
-                // If using a custom lat/lng location, then the 'site' tz doesn't make sense. Switch to utc.
-                if (this.selected_timezone == 'site') {
-                    this.selected_timezone = 'utc'
-                }
+        // If the user changes the observatory selected for the sky display, update the lat/lng coords and timezone data
+        selected_observatory(site) {
+            this.set_lat_lng(site)
+            if (site == "custom") {
+                this.datetime_picker_timezone_offset = utc_offset_from_coordinates(this.selected_latitude, this.selected_longitude, this.selected_datetime)
             }
-            this.selected_latitude = this.global_config?.[this.selected_observatory]?.latitude ?? 0
-            this.selected_longitude = this.global_config?.[this.selected_observatory]?.longitude ?? 0
         },
     },
     computed: {
+
+        // The selected_datetime is a js date object defined by a user selection in the datetime picker.
+        // It assumes the year/month/day/hour/minute expression is defined in the user's timezone.
+        // But the user actually has a field to select other timezones if they wish.
+        // Solution: this computed property returns a date that accounts for the selected timezone.
+        selected_datetime_tz_corrected() {
+            // requested timezone offset from UTC
+            let requested_offset_ms = this.datetime_picker_timezone_offset * 60 * 60 * 1000 // convert hours to ms
+
+            // user's timezone offset from UTC
+            // NOTE: getTimezoneOffset returns minutes with the opposite sign of the conventional UTC offset display
+            // So UTC-8 would return 480, while UTC+8 would return -480.
+            // We multiply by (60 * 1000 * -1) to convert minutes to milliseconds with the normal +/- sign usage. 
+            let user_offset_ms = new Date().getTimezoneOffset() * 60 * 1000 * -1  // convert minutes to ms
+
+            // The difference between the user's tz and the requested tz
+            let offset_difference_ms = user_offset_ms - requested_offset_ms
+
+            // (this is because js dates use the user's timezone when created)
+            return new Date(this.selected_datetime.getTime() + offset_difference_ms)
+        },
         ...mapState('site_config', ['global_config']),
         ...mapGetters('site_config', [ 'all_sites', ]),
     },
