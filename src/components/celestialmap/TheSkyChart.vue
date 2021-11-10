@@ -154,14 +154,6 @@ export default {
     mounted() {
         let config = base_config
 
-        // Set the map config to show the sky for the selected observatory site
-        //config.center = [
-            //helpers.hour2degree(helpers.siderealTime(parseFloat(this.site_longitude))), 
-            //parseFloat(this.site_latitude)
-        //]
-        config.follow = "zenith"
-        config.geopos = [this.site_latitude, this.site_longitude]
-
         config.stars.show = this.showStars
         config.stars.limit = this.starMagMin
         config.mw.show = this.showMilkyWay
@@ -201,6 +193,9 @@ export default {
 
         // Load the configuration and display the map
         Celestial.display(config)
+
+        // Set the location to display
+        Celestial.location([this.site_latitude, this.site_longitude])
 
         // This toggles the v-if in the interaction layer canvas.
         // We need to make sure the map canvas is loaded first, otherwise 
@@ -300,7 +295,6 @@ export default {
 
         // Update the user crosshair position 
         update_user_crosshairs() {
-            console.log([this.ra_user_input, this.dec_user_input])
             let user_coords = ([helpers.hour2degree(this.ra_user_input), this.dec_user_input]);
             let pixel_coords = Celestial.mapProjection(user_coords)
             if (Celestial.clip(user_coords)) {
