@@ -85,7 +85,8 @@
 
                             <b-field>
                                 <b-checkbox v-model="isLiveSkyDisplay" type="is-danger">
-                                    <span style="text-transform:uppercase;">live</span> sky display
+                                    LIVE sky display for 
+                                    <span style="text-transform:uppercase;">{{this.sitecode}}</span>
                                 </b-checkbox>
                             </b-field>
                             <date-time-location-picker 
@@ -184,6 +185,8 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
+
+import { mapGetters } from 'vuex'
 
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import DateTimeLocationPicker from '@/components/celestialmap/DateTimeLocationPicker'
@@ -426,6 +429,12 @@ export default {
             this.aladin.gotoRaDec(ra, dec)
         },
 
+        isLiveSkyDisplay() {
+            if (this.isLiveSkyDisplay) {
+                this.skychart_location = [this.site_latitude, this.site_longitude]
+            }
+        }
+
     },
     computed: {
 
@@ -446,6 +455,11 @@ export default {
             get() { return this.$store.getters['command_params/mount_object']},
             set(val) { this.$store.commit('command_params/mount_object', val)},
         },
+
+        ...mapGetters('site_config', [
+            'site_latitude',
+            'site_longitude'
+        ])
     },
     
 }
