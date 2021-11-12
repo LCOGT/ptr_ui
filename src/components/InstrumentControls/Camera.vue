@@ -44,7 +44,7 @@
         </div>
     </b-field>
 
-    <b-field horizontal label="Bin" v-if="camera_can_bin">
+    <!--b-field horizontal label="Bin" v-if="camera_can_bin">
       <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
         <option
           v-for="(bin_option, index) in camera_bin_options"
@@ -55,7 +55,14 @@
           {{ bin_option }}
         </option>
       </b-select>
-    </b-field>
+    </b-field-->
+    <CameraBinSelectField 
+      v-if="camera_can_bin"
+      v-model="camera_bin" 
+      :binModes="camera_bin_options" 
+      :default="camera_default_bin"
+      :horizontal="true"
+    />
 
     <b-field horizontal label="Area" v-if="camera_areas && camera_areas.length != 0">
         <b-select 
@@ -133,11 +140,9 @@
 
     <br>
 
-    <b-field horizontal style="height: auto;" label="Darkslide">
+    <b-field horizontal style="height: auto;" label="Darkslide" v-if="camera_has_darkslide">
 
-      <div class="status-val">
-        {{ camera_state && camera_state.darkslide || "no status" }}
-      </div>
+      <StatusVal :status-item="camera_darkslide" />
 
       <div class="buttons has-addons">
         <command-button :data="camera_darkslide_open_command" style="width: 50%;" class="is-small mb-0"/>
@@ -171,7 +176,9 @@ import { commands_mixin } from '../../mixins/commands_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
+import StatusVal from '@/components/status/StatusVal'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
+import CameraBinSelectField from './instrumentFields/CameraBinSelectField.vue'
 import { mapGetters } from 'vuex'
 export default {
   name: "Camera",
@@ -179,7 +186,9 @@ export default {
   components: {
     CommandButton, 
     StatusColumn,
+    StatusVal,
     SimpleDeviceStatus,
+    CameraBinSelectField,
   },
   data() {
     return {
@@ -202,8 +211,17 @@ export default {
       'site_is_online',
       'buildCameraTabStatus',
       'camera_state',
+      'camera_darkslide',
       'filter_wheel_state',
     ]),
+
+    ...mapGetters('site_config', [
+      'selected_camera_config',
+      'camera_has_darkslide',
+      'camera_can_bin',
+      'camera_default_bin'
+    ]),
+
     subframeIsActive: {
       get() { return this.$store.getters['command_params/subframeIsActive']},
       set(val) { this.$store.commit('command_params/subframeIsActive', val)},

@@ -12,7 +12,15 @@ const camera_status = (state, getters) => {
   return { name, val, is_stale, custom_styles }
 }
 
+const camera_darkslide = (state, getters) => {
+  let name = 'Darkslide'
+  let val = getters.camera_state.darkslide?.val ?? '-'
+  let is_stale = isItemStale(getters, 'camera_state', 'darkslide')
+  return { name, val, is_stale}
+}
+
 export default {
   camera_state,
   camera_status,
+  camera_darkslide,
 }

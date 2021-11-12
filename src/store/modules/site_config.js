@@ -143,10 +143,13 @@ const getters = {
     },
     // Does the camera bin or not? Returns string 'True' or 'False'.
     camera_can_bin: (state, getters) => {
-        return getters.selected_camera_config?.bin_modes?.length;
+        return getters.selected_camera_config.settings.bin_modes?.length;
+    },
+    camera_has_darkslide: (state, getters) => {
+        return getters.selected_camera_config.settings.has_darkslide ?? false
     },
     camera_default_bin: (state, getters) => {
-        return getters.selected_camera_config.settings?.default_bin ?? "";
+        return getters.selected_camera_config.settings?.default_bin ?? getters.camera_bin_options[0] ?? '';
     },
 
     // Available filters
