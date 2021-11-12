@@ -23,7 +23,7 @@ const state = {
     camera_exposure: '1',
     camera_count: 1, // numberinput form requires number, not string. converted to string in expose command.
     camera_area: null, 
-    camera_bin: '', 
+    camera_bin: [1,1], 
     camera_dither: 'off',
     camera_extract: 'on', // requested by Wayne for SEP related tests 20200413
     camera_image_type: 'light',
