@@ -52,7 +52,8 @@ export default {
     color: $logo-blue;
 }
 .at {
-    font-family: 'unica_oneregular';
+    //font-family: 'unica_oneregular';
+    font-family: 'Unica One';
     color: $logo-blue;
     font-size: 0.8em;
 }

@@ -37,7 +37,8 @@ export default {
 }
 
 .logo {
-    font-family: 'unica_oneregular';
+    //font-family: 'unica_oneregular';
+    font-family: 'Unica One';
     font-size: 1em;
 }
 .pt {
