@@ -1,7 +1,7 @@
 <template>
-    <span style="z-index: 1;">
+    <div style="z-index: 1;">
         <div class="google-map" :id="mapName"></div>
-    </span>
+    </div>
 </template>
 
 <script>
@@ -33,7 +33,7 @@ export default {
     const element = document.getElementById(this.mapName)
     const options = {
       scrollwheel: false,
-      zoom: 2,
+      zoom: 1,
       center: new google.maps.LatLng(sun_pos.lat, sun_pos.lng + 180),
       styles: [
         {
@@ -444,10 +444,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .google-map {
-    width: 100vw;
-    height: 50vh;
+    //width: 100vw;
+    //height: 50vh;
+    min-width: 50px;
+    min-height: 50px;
+    width: 100%;
+    height: 100%;
     background-color: grey;
     max-height: 90vh;
     z-index: 1;

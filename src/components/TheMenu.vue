@@ -3,25 +3,35 @@
 
         <template slot="brand">
             <b-navbar-item tag="router-link" class="menu-title" :to="{ path: '/' }">
-              <span v-if="selected_site==''" style="margin: 0;" class="title">photon ranch</span>
-              <span v-if="selected_site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp;</span>
-              <span v-if="selected_site!=''" class="is-hidden-tablet">&nbsp;&nbsp;<b-icon icon="home"/>&nbsp;</span>
-              <span v-if="selected_site!=''" style="margin: 0;" class="subtitle">>&nbsp;{{selected_site.toUpperCase()}}</span>
+              <!--span v-if="selected_site==''" style="margin: 0;" class="title">photon ranch</span-->
+              <!--span v-if="selected_site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp;</span-->
+              <!--span v-if="selected_site!=''" class="is-hidden-tablet">&nbsp;&nbsp;<b-icon icon="home"/>&nbsp;</span-->
               <!--span>&nbspv5</span-->
-                <!--img
-                    src="img/icons/logo-via-logohub.png"
-                    alt="photon ranch observatory"
-                -->
+                <PTR class="ml-1 mr-2 is-hidden-tablet" with-lambda font-size="40px" />
+                <PhotonRanch class="is-hidden-mobile" font-size="45px" :with-lambda="true" />
+                <span v-if="selected_site!=''" style="margin: 0;" class="subtitle site-hint">>&nbsp;{{selected_site.toUpperCase()}}</span>
             </b-navbar-item>
         </template>
 
         <template slot="start">
 
             <b-navbar-dropdown label="sites" :close-on-click="true" @click.native="updateSiteStatus"> 
-                <template v-for="(site, index) in available_sites">
+                <template v-for="(site, index) in real_sites">
                   <b-navbar-item tag="router-link" 
                     :to="{ path: '/site/' + site+ '/observe'}"
-                    v-bind:key="index"
+                    v-bind:key="'real'+index"
+                    v-if="global_config[site]">
+                    <div :class="siteOnlineClass(site)">&#9679;&nbsp;</div>
+                    <span style="font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</span>
+										<span style="color: silver;">{{global_config[site].name}}</span>
+                    <span></span>
+                  </b-navbar-item>
+                </template>
+                <hr class="navbar-divider">
+                <template v-for="(site, index) in simulated_sites">
+                  <b-navbar-item tag="router-link" 
+                    :to="{ path: '/site/' + site+ '/observe'}"
+                    v-bind:key="'sim'+index"
                     v-if="global_config[site]">
                     <div :class="siteOnlineClass(site)">&#9679;&nbsp;</div>
                     <span style="font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</span>
@@ -84,12 +94,15 @@
 </template>
 
 <script>
+import PhotonRanch from '@/components/logoText/PhotonRanch'
+import PTR from '@/components/logoText/PTR'
 import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "TheMenu",
-  data() {
-    return {}
+  components: {
+    PTR,
+    PhotonRanch,
   },
   computed: {
     ...mapState('site_config', [
@@ -97,8 +110,16 @@ export default {
       'global_config'
     ]),
     ...mapGetters('site_config', [
-      'available_sites', 
+      'all_sites_real',
+      'all_sites_simulated',
     ]),
+
+    real_sites() {
+      return this.all_sites_real.map(s => s.site)
+    },
+    simulated_sites() {
+      return this.all_sites_simulated.map(s => s.site)
+    },
 
     ...mapState('sitestatus', ['site_open_status']),
 
@@ -119,6 +140,7 @@ export default {
       }
       return siteName
     },
+
 
   },
   methods: {
@@ -162,13 +184,19 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "@/style/_variables.scss";
 .menu-title {
   display:flex;
   align-items:center;
-  font: 30px "Share Tech Mono", monospace;
+  //font: 30px "Share Tech Mono", monospace;
   margin-right: 2em;
   height: 75px;
+}
+.site-hint {
+  padding-left: 1em;
+  color: $grey-light;
+  font: 20px "Share Tech Mono", monospace;
 }
 nav {
   height: 75px;

@@ -15,11 +15,15 @@ $orange: #e67e22;
 $yellow: #f1b70e;
 $green: #2ecc71;
 $turquoise: #1abc9c;
-$blue: #3498db;
+//$blue: #3498db;
+$blue: #00adef; // used in the PTR logo
 $purple: #8e44ad;
 $red: #e74c3c;
 $white-ter: #ecf0f1;
 $yellow-invert: #fff;
+
+$logo-blue: $blue;
+$logo-red: #ef4123;
 
 
 $family-sans-serif: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "Helvetica", "Arial", sans-serif;

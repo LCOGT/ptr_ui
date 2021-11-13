@@ -22,13 +22,17 @@
 
     <!-- This is a temporary solution only. Does not scale. -->
     <!-- Add ClearDarkSky charts to site homepage -->
-    <div class="level" v-if="sitecode.toLowerCase()=='mrc'">
+    <div class="level" v-if="['mrc', 'mrc2'].indexOf(sitecode.toLowerCase()) != -1">
         <a href=https://www.cleardarksky.com/c/SaBarbCAkey.html>
         <img src="https://www.cleardarksky.com/c/SaBarbCAcsk.gif?c=1594801"></a>
     </div>
     <div class="level" v-if="sitecode.toLowerCase()=='saf'">
         <a href=https://www.cleardarksky.com/c/LmyRdgObNMkey.html>
         <img src="https://www.cleardarksky.com/c/LmyRdgObNMcsk.gif?c=1594801"></a>
+    </div>
+    <div class="level" v-if="sitecode.toLowerCase()=='fat'">
+        <a href=https://www.cleardarksky.com/c/SROCAkey.html>
+        <img src="https://www.cleardarksky.com/c/SROCAcsk.gif?c=1076447"></a>
     </div>
 
     <site-events-modal :sitecode="sitecode"/>
