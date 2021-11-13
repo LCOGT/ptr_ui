@@ -1,6 +1,7 @@
 <template>
+  <div>
   <div class="card-row">
-    <template v-for="s in sorted_sites">
+    <template v-for="s in all_sites_real">
       <div 
         :key="s.site" 
         :val="s.site"
@@ -24,6 +25,37 @@
 
       </div>
     </template>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="card-row">
+    <template v-for="s in all_sites_simulated">
+      <div 
+        :key="s.site" 
+        :val="s.site"
+        v-if="!site_blacklist.includes(s.site)"
+        class="card" 
+        :class="{
+          'online': isOnline(s.site)
+          }">
+
+        <div class="card-header subtitle">
+          <router-link :to="'/site/'+s.site+'/observe'">
+            <span style="color: white; height: 2em;">{{s.name}}</span>
+          </router-link>
+        </div>
+
+        <div class="card-image">
+          <router-link :to="'/site/'+s.site+'/observe'">
+            <figure class="image is-2by1"> <img :src="site_images[s.site]" /> </figure>
+          </router-link>
+        </div>
+
+      </div>
+    </template>
+    <div class="card-placeholder" />
+  </div>
   </div>
 </template>
 
@@ -95,7 +127,7 @@ export default {
       })
     },
     updateAllSiteImages() {
-      this.all_sites.forEach(s => {
+      [...this.all_sites_real, ...this.all_sites_simulated].forEach(s => {
         this.updateSiteImage(s.site)
       })
     },
@@ -103,11 +135,9 @@ export default {
   },
 
   computed: {
-    sorted_sites() {
-      return _.orderBy(this.sites, [s => s.site], ['asc'])
-    },
     ...mapGetters('site_config', [
-      'all_sites',
+      'all_sites_real',
+      'all_sites_simulated',
     ])
   }
 
@@ -123,12 +153,13 @@ export default {
   justify-content: space-between;
   @include tablet {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     grid-gap: 1rem;
   }
 }
 
 .subtitle {
+  font-size: 1rem;
 	padding: 0.25em;
 	line-height: 1.25;
 	height: 3em;
@@ -149,5 +180,9 @@ export default {
 }
 img {
   object-fit:cover;  // crop, don't distort
+}
+
+.divider {
+  border-bottom: 1px solid grey;
 }
 </style>

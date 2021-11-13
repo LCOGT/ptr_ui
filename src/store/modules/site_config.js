@@ -7,6 +7,9 @@ import _ from 'lodash'
 import axios from 'axios'
 
 const state = {
+
+    test_sites: ['tst', 'tst001', 'dht', 'sintezsim'],
+
     global_config: JSON.parse(window.localStorage.getItem('global_config') || '{}'),
     is_site_selected: false,
     did_config_load_yet: false,
@@ -42,6 +45,15 @@ const getters = {
         return Object.keys(state.global_config);
     },
 
+    // Array of sitecodes for real observatory sites 
+    available_sites_real: state => {
+        return Object.keys(state.global_config).filter(s => state.test_sites.indexOf(s.toLowerCase()) == -1)
+    },
+    // Array of sitecodes for simulated/test observatory sites 
+    available_sites_simulated: state => {
+        return Object.keys(state.global_config).filter(s => state.test_sites.indexOf(s.toLowerCase()) != -1)
+    },
+
     all_sites: state => {
       let sites = []
       Object.keys(state.global_config).forEach(site => {
@@ -56,6 +68,12 @@ const getters = {
       })
       sites = _.orderBy(sites, [s => s.site], ['asc'])
       return sites
+    },
+    all_sites_real: (state, getters) => {
+      return getters.all_sites.filter(s => !state.test_sites.includes(s.site.toLowerCase()))
+    },
+    all_sites_simulated: (state, getters) => {
+      return getters.all_sites.filter(s => state.test_sites.includes(s.site.toLowerCase()))
     },
 
     selected_enclosure_config: (state, getters) => {

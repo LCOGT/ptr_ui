@@ -1,16 +1,20 @@
 <template>  
   <div>
     <the-menu />
-    <div class="title has-text-centered" style=" margin: 1rem auto;">photon ranch</div>
-    <the-world-map name="google" />
-    <!--leaflet-map name="leafmap"></leaflet-map-->
-    <p>v0.1.3a</p>
+    <div class="page-content">
 
-    <sites-overview-cards :sites="all_sites" class="sites-overview-cards" />
+
+        <the-world-map name="google" class="map-display"/>
+        <!--leaflet-map name="leafmap"></leaflet-map-->
+
+      <sites-overview-cards :sites="all_sites" class="sites-overview-cards" />
+    </div>
   </div>
 </template>
 
 <script>
+import PTR from "@/components/logoText/PTR";
+import PhotonRanch from "@/components/logoText/PhotonRanch";
 import TheWorldMap from "@/components/TheWorldMap";
 import TheMenu from "@/components/TheMenu";
 import LeafletMap from "@/components/LeafletMap";
@@ -20,6 +24,8 @@ import { mapGetters } from 'vuex'
 export default {
   name: "Home",
   components: {
+    PTR,
+    PhotonRanch,
     TheWorldMap,
     LeafletMap,
     TheMenu,
@@ -41,8 +47,21 @@ export default {
 html {
   overflow: hidden;
 }
+.page-content {
+  position:absolute;
+  top: 75px;
+  height: calc(100vh - 75px);
+  overflow-y: auto;
+}
+
 .sites-overview-cards {
   margin: 1em auto;
   max-width: 90vw;
+}
+.map-display {
+  margin-top: 2rem;
+  height: 100%;
+  max-height: 450px;
+  width: 100vw;
 }
 </style>
