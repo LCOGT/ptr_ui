@@ -8,7 +8,7 @@
               <!--span v-if="selected_site!=''" class="is-hidden-tablet">&nbsp;&nbsp;<b-icon icon="home"/>&nbsp;</span-->
               <!--span>&nbspv5</span-->
                 <PTR class="ml-1 mr-2 is-hidden-tablet" with-lambda font-size="40px" />
-                <PhotonRanch class="is-hidden-mobile" font-size="45px" :with-lambda="true" />
+                <PhotonRanch class="is-hidden-mobile" :with-lambda="true" />
                 <span v-if="selected_site!=''" style="margin: 0;" class="subtitle site-hint">>&nbsp;{{selected_site.toUpperCase()}}</span>
             </b-navbar-item>
         </template>
