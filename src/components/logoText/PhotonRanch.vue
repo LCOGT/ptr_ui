@@ -1,11 +1,15 @@
 
 <template>
     <div :style="fontSizeStyle">
-        <span class="logo photon">PHOTON</span>
-        <span class="logo ranch">&nbsp;RANCH</span> 
-        <span v-if="atLco" class="at">&nbsp;@</span> 
-        <span v-if="atLco" class="logo lco">&nbsp;LCO</span>
-
+        <span v-if="text" style="margin-left: -5px;">
+            <span class="logo photon">PHOTON</span>
+            <span class="logo ranch">&nbsp;&nbsp;RANCH</span> 
+            <span v-if="atLco" class="at">&nbsp;@</span> 
+            <span v-if="atLco" class="logo lco">&nbsp;LCO</span>
+        </span>
+        <span v-else>
+            <img src="/img/logos/PTR-logo-photonranch.png" alt="photon ranch observatory" >
+        </span>
         <span v-if="withLambda" class="lambda">
             <img src="/img/logos/PTR-lambda.png" alt="photon ranch observatory" >
         </span>
@@ -18,7 +22,7 @@ export default {
     props: {
         fontSize: {
             type: String,
-            default: () => "50px"
+            default: () => "38px"
         },
         atLco: {
             type: Boolean,
@@ -26,6 +30,10 @@ export default {
         },
         withLambda: {
             type: Boolean,
+            default: false,
+        },
+        text: {
+            type: Boolean, 
             default: false,
         },
     },
@@ -39,11 +47,10 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/style/_variables.scss';
-//@import url('https://fonts.googleapis.com/css2?family=Unica+One&display=swap');
-@import '/img/logos/fonts/unica_oneregular.css';
+@import url('https://fonts.googleapis.com/css2?family=Unica+One&display=swap');
 .logo {
-    font-family: 'unica_oneregular';
-    letter-spacing: -3px;
+    font-family: 'Unica One';
+    letter-spacing: -2px;
 }
 .photon {
     color: $logo-red;
@@ -52,7 +59,6 @@ export default {
     color: $logo-blue;
 }
 .at {
-    //font-family: 'unica_oneregular';
     font-family: 'Unica One';
     color: $logo-blue;
     font-size: 0.8em;

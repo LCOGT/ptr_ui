@@ -16,8 +16,8 @@ export default {
         },
         fontSize: {
             type: String,
-            default: () => "80px"
-        }
+            default: () => "38px"
+        },
     },
     computed: {
         fontSizeStyle() {
@@ -29,15 +29,12 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/style/_variables.scss';
-//@import url('https://fonts.googleapis.com/css2?family=Unica+One&display=swap');
-@import '/img/logos/fonts/unica_oneregular.css';
+@import url('https://fonts.googleapis.com/css2?family=Unica+One&display=swap');
 
 .logo-container {
     line-height: 55px;
 }
-
 .logo {
-    //font-family: 'unica_oneregular';
     font-family: 'Unica One';
     font-size: 1em;
 }
