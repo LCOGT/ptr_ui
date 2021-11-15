@@ -1,22 +1,22 @@
 <template>
   <div class="site-home-wrapper">
 
-    <div class="level site-welcome-text mt-5">
+    <div class="level site-welcome-text mt-4 mb-0">
         <div class="level-item">
-        Welcome to {{sitecode.toUpperCase()}}
+            {{site_name}}
         </div>
     </div>
 
     <div class="spacer" style="height: 2em;" />
 
-    <div style="display: grid; grid-template-columns: auto 1fr;">
-        <!-- Dome camera -->
-        <the-dome-cam style="grid-column-start: 1;" v-if="sitecode=='wmd'"/>
-        <!--div style="grid-column-start: 2; min-width: 20px; height: 20px; background-color: red;"/-->
+    <div class="windy-and-site-events">
+
         <!-- Windy weather map -->
-        <div style="grid-column-start: 2; width: 100%; height: 500px; margin-bottom: 1em;">
-            <iframe style="width: 100%; height: 100%;" :src="`https://embed.windy.com/embed2.html?lat=${latitude}&lon=${longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${latitude}&detailLon=${longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`" frameborder="0"></iframe>
+        <div class="windy-container">
+            <iframe style="width: 100%; height: 100%;" :src="`https://embed.windy.com/embed2.html?lat=${site_latitude}&lon=${site_longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${latitude}&detailLon=${longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`" frameborder="0"></iframe>
         </div>
+
+        <site-events-modal class="site-events" :sitecode="sitecode"/>
 
     </div>
 
@@ -35,7 +35,6 @@
         <img src="https://www.cleardarksky.com/c/SROCAcsk.gif?c=1076447"></a>
     </div>
 
-    <site-events-modal :sitecode="sitecode"/>
 
 
     <div style="height: 2em;" />
@@ -65,56 +64,46 @@ export default {
         SiteEventsModal,
     },
     computed: {
-        ...mapGetters('site_config', {
-            latitude: 'site_latitude',
-            longitude: 'site_longitude', 
-        }),
+        ...mapGetters('site_config', [
+            'site_latitude',
+            'site_longitude', 
+            'site_name',
+        ]),
     }
 }
 
 </script>
 
-
-<style scoped>
+<style lang="scss" scoped>
+@import "@/style/_responsive.scss";
 .site-home-wrapper {
   margin: 0 auto;
   width: 90vw;
   max-width: 1150px;
 }
 .site-welcome-text {
-    font: 64px "Share Tech Mono", monospace;
-}
-.quick-status {
-    background-color: #232929;
-    height: 5em;
-    text-align: center;
-    vertical-align: middle;
-    padding-top: 1em;
+    font: 24px "Share Tech Mono";
+    @include tablet {
+        font: 34px "Share Tech Mono";
+    }
 }
 
-.line-divider {
-    width: 1px;
-    background: rgb(255,255,255,.0); 
-    padding-top: 2em;
+.windy-and-site-events {
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 4rem;
+  gap: 1rem;
+  @include tablet {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-gap: 1rem;
+  }
 }
 
-.preview-image {
-    width: 100%; 
-    background-color: grey; 
-    cursor: pointer; 
-    position: absolute; 
-    top:0; 
-    left:0;
+.windy-container {
+    height: 500px;
 }
-
-.quick-image-column {
-    margin: 2em;
+.site-events {
 }
-
-.resizable {
-    overflow:hidden;
-    border: 2px solid gold;
-    resize:vertical;
-}
-
 </style>

@@ -54,7 +54,10 @@
 
       </div>
     </template>
-    <div class="card-placeholder" />
+    <!-- add empty test sites so the cards are sized the same as the real sites -->
+    <template v-for="index in empty_test_sites_needed">
+      <div :key="index" class="card-placeholder" />
+    </template>
   </div>
   </div>
 </template>
@@ -138,7 +141,13 @@ export default {
     ...mapGetters('site_config', [
       'all_sites_real',
       'all_sites_simulated',
-    ])
+    ]),
+
+    // We want to add enough empty (invisible) test sites so that the cards are sized the same as real sites.
+    // Compute the difference in number. If there are more test sites than real sites, don't add any empty sites.
+    empty_test_sites_needed() {
+      return Math.max(0, Object.keys(this.all_sites_real).length - Object.keys(this.all_sites_simulated).length)
+    }
   }
 
 }
