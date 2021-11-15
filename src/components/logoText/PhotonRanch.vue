@@ -68,7 +68,7 @@ export default {
 }
 .lambda img {
     height: 0.8em;
-    margin-left: 0.3em;
+    margin-left: 0.45em;
 }
 </style>
 
