@@ -1,45 +1,19 @@
 <template>
-    
-  <!--b-modal :active="showSiteEvents"-->
-    <div class="card">
-      <div class="card-content">
-            <div style="display:flex; justify-content: space-between; padding-bottom: 1em;">
-                <p class="title" style="overflow-wrap: anywhere; margin-left: 10px;">{{sitecode}} events: </p>
-
-                <div style="display: flex;">
-                    <div>
-                        <p>Display Time</p>
-                        <b-select v-model="time_display_format">
-                            <option value="user">User</option>
-                            <option value="observatory">Observatory</option>
-                        </b-select>
-                    </div>
-
-                    <div style="padding-left: 10px;">
-                        <p>&nbsp;</p>
-                        <button class="button" @click="getSiteEvents('config')">refresh</button>
-                    </div>
-                </div>
-            </div>
-
-
-            <b-table
-                :mobile-cards="false" 
-                :narrowed="true"
-                :data="site_events"
-                :columns="columns"
-                :hoverable="true"
-                default-sort="unix"
-                style="width: auto; flex:0"
-                >
-            </b-table>
-            <div v-if="site_events.length == 0" class="empty-warning">
-                No events found in the site config.
-            </div>
-      
+    <div>
+        <b-table
+            height="500px"
+            :mobile-cards="false" 
+            :narrowed="true"
+            :data="site_events"
+            :columns="columns"
+            :hoverable="true"
+            sticky-header
+            default-sort="unix"
+            />
+        <div v-if="site_events.length == 0" class="empty-warning">
+            No events found in the site config.
         </div>
     </div>
-  <!--/b-modal-->
 </template>
 
 <script>
@@ -73,6 +47,7 @@ export default {
                     field: 'key',
                     label: 'key',
                     searchable:false,
+                    cellClass: 'site-events-table-key-cell'
                 },
                 {
                     field: 'time',
@@ -82,21 +57,27 @@ export default {
                     sortable: true,
                 },
                 {
-                    field: 'UTC',
-                    label: 'UTC',
+                    field: 'date',
+                    label: 'date',
                     searchable: false,
+                    sortable: true,
+                },
+                {
+                    field: 'observatory',
+                    label: 'site',
+                    visible: true,
                     sortable: true,
                 },
                 {
                     field: 'user',
                     label: 'user',
-                    visible: this.time_display_format == 'user',
+                    visible: true,
                     sortable: true,
                 },
                 {
-                    field: 'observatory',
-                    label: 'observatory',
-                    visible: this.time_display_format == 'observatory',
+                    field: 'UTC',
+                    label: 'UTC',
+                    searchable: false,
                     sortable: true,
                 },
                 {
@@ -126,6 +107,7 @@ export default {
                 site_events = {...this.config_site_events}
                 // convert dublin julian days to julian days to match the output of the photonranch-api results
                 Object.keys(site_events).forEach(key => site_events[key] += 2415020)  
+
             } else {
                 let url = `https://api.photonranch.org/api/events?site=${this.sitecode}`
                 site_events = await axios.get(url)
@@ -140,7 +122,7 @@ export default {
             let tableData = []
 
             // Configure the time display format
-            let formatString = 'YYYY/MM/DD HH:mm:ss'
+            let formatString = 'HH:mm:ss'
 
             for (const property in site_events) {
                 let time = moment(jd2unix(site_events[property]))
@@ -150,6 +132,7 @@ export default {
                         key: property.toLowerCase(),
                         time: time.format('HH:mm:ss'),
                         user: time.format(formatString),
+                        date: time.format('MM/DD'),
                         UTC: time.tz('utc').format(formatString),
                         observatory: this.timezone ? time.tz(this.timezone).format(formatString) : "unknown",
                         unix: time.unix(),
@@ -170,4 +153,13 @@ export default {
     text-align: center;
 }
 
+</style>
+<style lang="scss">
+
+.site-events-table-key-cell {
+    $table-border-color: rgb(85,95,97);
+    //font-weight: bold;
+    font-style:italic;
+    border-right: 4px solid $table-border-color !important;
+}
 </style>

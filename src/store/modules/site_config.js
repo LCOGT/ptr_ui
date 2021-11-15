@@ -137,6 +137,9 @@ const getters = {
 
 
     /* Site properties */
+    site_name: (state, getters) => {
+        return getters.site_config.name
+    },
     site_latitude: (state, getters) => {
         return parseFloat(getters.site_config?.latitude) ?? 0;
     },

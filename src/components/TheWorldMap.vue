@@ -29,12 +29,14 @@ export default {
   async mounted() {
 
     let sun_pos = { lat: nite.calculatePositionOfSun().lat(), lng: nite.calculatePositionOfSun().lng() }
+
+    const map_center_latitude = 15 // puts sites at a more visibly comfortable location
     
     const element = document.getElementById(this.mapName)
     const options = {
       scrollwheel: false,
-      zoom: 1,
-      center: new google.maps.LatLng(sun_pos.lat, sun_pos.lng + 180),
+      zoom: 2,
+      center: new google.maps.LatLng(map_center_latitude, sun_pos.lng + 180),
       styles: [
         {
           'featureType': 'poi',
