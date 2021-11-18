@@ -48,7 +48,7 @@ import TheDomeCam from '@/components/TheDomeCam'
 import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
-import LeafletMap from '@/components/LeafletMap'
+import LeafletMap from '@/components/maps/LeafletMap'
 import SiteEventsModal from '@/components/SiteEventsModal'
 import CommandButton from '@/components/CommandButton'
 

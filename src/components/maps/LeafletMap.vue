@@ -6,7 +6,7 @@
 
 <script>
 
-import nite from '@/utils/nite-overlay'
+import nite from './nite-overlay'
 export default {
   name: 'LeafletMap',
   props: ['name', 'latitude', 'longitude'],

@@ -27,6 +27,7 @@
     "@fullcalendar/timegrid": "^4.4.0",
     "@fullcalendar/timeline": "^4.4.0",
     "@fullcalendar/vue": "^4.4.0",
+    "@googlemaps/markerclusterer": "^1.0.12",
     "@mapbox/timespace": "^2.0.4",
     "@mdi/font": "^4.9.95",
     "@mdi/js": "^4.9.95",
