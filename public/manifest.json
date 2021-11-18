@@ -1,7 +1,7 @@
 {
-  "name": "photon ranch",
-  "short_name": "ptr",
-  "description": "this is the manifest description",
+  "name": "Photon Ranch",
+  "short_name": "PTR",
+  "description": "We keep you in the dark",
   "icons": [
     {
       "src": "./img/icons/android-chrome-192x192.png",
@@ -16,6 +16,6 @@
   ],
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#ffa"
+  "background_color": "#151718",
+  "theme_color": "#ef4123"
 }

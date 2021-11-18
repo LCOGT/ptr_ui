@@ -15,9 +15,9 @@
 <script>
 import PTR from "@/components/logoText/PTR";
 import PhotonRanch from "@/components/logoText/PhotonRanch";
-import TheWorldMap from "@/components/TheWorldMap";
+import TheWorldMap from "@/components/maps/TheWorldMap";
 import TheMenu from "@/components/TheMenu";
-import LeafletMap from "@/components/LeafletMap";
+import LeafletMap from "@/components/maps/LeafletMap";
 import SitesOverviewCards from '@/components/SitesOverviewCards'
 import { mapGetters } from 'vuex'
 
