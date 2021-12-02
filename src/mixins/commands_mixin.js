@@ -594,6 +594,15 @@ export const commands_mixin = {
     screen_off_command() {
       return this.base_command('screen', 'turn_off', 'off')
     },
+    screen_close_and_turn_on_command() {
+      return this.base_command('screen', 'close_and_turn_on', 'Close and turn on')
+    },
+    screen_turn_off_and_close_command() {
+      return this.base_command('screen', 'turn_off_and_close', 'Turn off and close')
+    },
+    screen_open_and_turn_off_command() {
+      return this.base_command('screen', 'open_and_turn_off', 'Open and turn off')
+    },
 
 
   }
