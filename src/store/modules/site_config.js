@@ -113,6 +113,11 @@ const getters = {
 
     /* Getters for specific device attributes (implemented here as needed) */
     // TODO: better process for setting default fallback values
+
+    enclosure_is_dome:(state, getters) => {
+        return getters.selected_enclosure_config.is_dome ?? false;
+    },
+
     focuser_reference: (state, getters) => {
         return parseFloat(getters.selected_focuser_config.reference); // ?? '';
     },

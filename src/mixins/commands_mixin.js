@@ -449,15 +449,20 @@ export const commands_mixin = {
         {},
         { username: this.username })
     },
-    enclosure_auto_command() {
-      return this.base_command('enclosure', 'setAuto', 'Set enclosure mode to auto',
+    enclosure_home_dome_command() {
+      return this.base_command('enclosure', 'home_dome', 'Home Dome',
         {},
-        { username: this.username })
+        {})
     },
-		enclosure_stayclosed_command() {
-      return this.base_command('enclosure', 'stayClosed', 'Set enclosure to stay closed',
+		enclosure_track_telescope_command() {
+      return this.base_command('enclosure', 'track_telescope', 'Track Telescope',
         {},
-        { username: this.username })
+        {})
+		},
+		enclosure_stop_tracking_telescope_command() {
+      return this.base_command('enclosure', 'stop_tracking_telescope', 'Stop Tracking Telescope',
+        {},
+        {})
 		},
     mount_slew_radec_command() {
       let ra = emptyString(this.mount_ra.toString())
