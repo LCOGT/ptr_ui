@@ -22,6 +22,32 @@
 			</p>
     </b-field>
 
+
+    <command-button 
+      v-if="enclosure_is_dome"
+      :data="enclosure_home_dome_command" 
+      style="margin-bottom: 1em;" 
+      class="is-small">
+      <div slot="title">Home Dome</div>
+    </command-button>
+
+    <b-field v-if="enclosure_is_dome">
+      <p class="control">
+        <command-button 
+          :data="enclosure_track_telescope_command" 
+          class="is-small">
+          <div slot="title">Track Telescope</div>
+        </command-button>
+      </p>
+      <p class="control">
+        <command-button 
+          :data="enclosure_stop_tracking_telescope_command" 
+          class="is-small">
+          <div slot="title">Stop Tracking Telescope</div>
+        </command-button>
+      </p>
+    </b-field>
+
     <b-field>
       <p class="control">
         <command-button 
@@ -98,6 +124,9 @@ export default {
     sitecode() {
       return this.$route.params.sitecode
     },
+    ...mapGetters('site_config', [
+      'enclosure_is_dome',
+    ]),
     ...mapGetters('sitestatus', [
       'site_is_online',
       'enclosure_message',
