@@ -24,6 +24,27 @@
       </b-field>
     </b-field>
 
+    <b-field>
+      <p class="control">
+        <command-button 
+          :data="screen_close_and_turn_on_command" 
+          class="is-small">
+        </command-button>
+      </p>
+      <p class="control">
+        <command-button 
+          :data="screen_turn_off_and_close_command" 
+          class="is-small">
+        </command-button>
+      </p>
+      <p class="control">
+        <command-button 
+          :data="screen_open_and_turn_off_command" 
+          class="is-small">
+        </command-button>
+      </p>
+    </b-field>
+
     <div class="status-toggle-bar" 
       @click="isExpandedStatusVisible= !isExpandedStatusVisible">
       {{ isExpandedStatusVisible ? 'collapse status' : 'expand status' }}
