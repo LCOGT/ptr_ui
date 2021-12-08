@@ -38,9 +38,6 @@ export default {
             default: () => []
         },
     },
-    mounted() {
-        console.log(this.value)
-    },
     filters: {
         bin_option_display(val) {
             if (val.length == 3) {
@@ -55,7 +52,6 @@ export default {
                 return this.value
             },
             set(val) {
-                console.log('setting ', val)
                 this.$emit('input', val)
             }
         }

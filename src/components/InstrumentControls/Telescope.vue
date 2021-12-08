@@ -11,6 +11,8 @@
       {{telescope_message}}
     </div>
 
+    <button class="button" style="width: 100%; margin-bottom: 1rem;" @click="move_telescope_and_expose">Move Telescope and Expose</button>
+
     <b-field>
       <b-radio-button v-model="telescope_selection"
         size="is-small"
@@ -39,20 +41,40 @@
         :statusList="buildTelescopeTabStatus2"/>
     </div>
 
+		<div style="border-bottom: 0.5px solid grey; margin: 1em 0;" />
+
     <b-field horizontal label="Ra/Ha/Az/Long">
       <b-field>
-        <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_ra" autocomplete="off"></b-input>
+        <b-input 
+          name="subject" 
+          type="search" 
+          icon-clickable 
+          size="is-small" 
+          v-model="mount_ra" 
+          autocomplete="off"></b-input>
         <!--p class="control"><span class="button is-static is-small">hrs</span></p-->
       </b-field>
     </b-field>
     <b-field horizontal label="Dec/Alt/Lat">
       <b-field>
-        <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_dec" autocomplete="off"></b-input>
+        <b-input 
+          name="subject" 
+          type="search" 
+          icon-clickable 
+          size="is-small"
+          v-model="mount_dec" 
+          autocomplete="off"></b-input>
         <!--p class="control"><span class="button is-static is-small">deg</span></p-->
       </b-field>
     </b-field>
     <b-field horizontal label="Object">
-      <b-input name="subject" type="search" icon-clickable size="is-small" v-model="mount_object" autocomplete="off"></b-input>
+      <b-input 
+        name="subject" 
+        type="search" 
+        icon-clickable 
+        size="is-small" 
+        v-model="mount_object" 
+        autocomplete="off"></b-input>
     </b-field>
 
     <b-field horizontal label="Frame">
@@ -137,6 +159,7 @@ import CommandButton from '@/components/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 import { mapGetters } from 'vuex'
+import { ToastProgrammatic as Toast } from 'buefy'
 export default {
   name: "Telescope",
   mixins: [commands_mixin, user_mixin],
@@ -148,6 +171,39 @@ export default {
   data() {
     return {
       isExpandedStatusVisible: false,
+    }
+  },
+
+  methods: {
+
+    move_telescope_and_expose() {
+      if (!this.mount_ra) {
+        this.$buefy.toast.open({
+          message: 'Please specify a right ascension to point the telescope',
+          type: 'is-danger'
+        })
+      }
+      if (!this.mount_dec) {
+        this.$buefy.toast.open({
+          message: 'Please specify a declination to point the telescope',
+          type: 'is-danger'
+        })
+      }
+
+      // If the coordinates are specified, send the command
+      if (this.mount_dec && this.mount_ra) {
+        const move_telescope_command_params = this.mount_slew_radec_command.form
+        const camera_expose_command_params = this.camera_expose_command.form
+
+        // First send the goto command, then send the expose command.
+        // Order of the commands is important. 
+        this.send_site_command(move_telescope_command_params).then((response) => {
+          this.send_site_command(camera_expose_command_params)
+        })
+      }
+
+
+
     }
   },
 
