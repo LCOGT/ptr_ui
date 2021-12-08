@@ -140,6 +140,10 @@ const getters = {
         return parseFloat(getters.selected_rotator_config.step_size) ?? 1;
     },
 
+    telescope_has_flip_flat: (state, getters) => {
+        return getters.selected_telescope_config.has_flip_flat ?? false;
+    },
+
 
     /* Site properties */
     site_name: (state, getters) => {

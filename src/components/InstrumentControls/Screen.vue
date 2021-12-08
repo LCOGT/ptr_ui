@@ -7,6 +7,8 @@
       :isOffline="!site_is_online"
     />
 
+		<div style="border-bottom: 0.5px solid grey; margin: 1em 0;" />
+
     <b-field label="Brightness">
       <b-field>
         <b-input 
@@ -24,7 +26,10 @@
       </b-field>
     </b-field>
 
-    <b-field>
+    <b-field 
+      label="Flip-Flat Telescope Cover" 
+      v-if="telescope_has_flip_flat"
+      style="margin: 1rem 0;">
       <p class="control">
         <command-button 
           :data="screen_close_and_turn_on_command" 
@@ -85,6 +90,9 @@ export default {
     sitecode() {
       return this.$route.params.sitecode
     },
+    ...mapGetters('site_config', [
+      'telescope_has_flip_flat',
+    ]),
     ...mapGetters('sitestatus', [
       'site_is_online',
       'buildScreenTabStatus',
