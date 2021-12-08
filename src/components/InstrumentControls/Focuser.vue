@@ -9,23 +9,13 @@
       :isOffline="!site_is_online"
     />
 
+		<div style="border-bottom: 0.5px solid grey; margin: 1em 0;" />
+
     <b-dropdown aria-role="list" style="width: 100%; margin-bottom: 1em;">
       <button class="button is-small" slot="trigger" style="width: 100%;">
           <span>Focus Action...</span>
           <b-icon icon="menu-down"></b-icon>
       </button>
-      <template v-for="(command, idx) in [
-            focus_home_command,
-            focus_gotoreference_command,
-            focus_gotocompensated_command,
-            focus_saveasreference_command,
-            focus_vcurve_command,
-          ]"
-        >
-        <b-dropdown-item :key="idx" aria-role="listitem">
-          <command-button :data="command" class="dropdown-button-command is-small"/>
-        </b-dropdown-item>
-      </template>
       <b-dropdown-item>
           <button class="button dropdown-button-command is-small" 
             @click="postCommand(focus_auto_command,[3])">
@@ -38,6 +28,18 @@
             Fine Autofocus (5 points) 
           </button>
       </b-dropdown-item>
+      <template v-for="(command, idx) in [
+            focus_home_command,
+            focus_gotoreference_command,
+            focus_gotocompensated_command,
+            focus_saveasreference_command,
+            focus_vcurve_command,
+          ]"
+        >
+        <b-dropdown-item :key="idx" aria-role="listitem">
+          <command-button :data="command" class="dropdown-button-command is-small"/>
+        </b-dropdown-item>
+      </template>
     </b-dropdown>
     <br>
 

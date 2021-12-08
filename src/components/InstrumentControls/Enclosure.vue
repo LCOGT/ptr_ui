@@ -22,6 +22,15 @@
 			</p>
     </b-field>
 
+    <b-field label="Admin Tests" v-if="userIsAdmin" class="is-small" style="margin-bottom: 2em;">
+      <command-button 
+        admin 
+        class="button admin is-small" 
+        :disabled="!userIsAuthenticated" 
+        :data="enclosure_simulate_weather_hold"> 
+        <div slot="title">toggle simulated weather hold</div>
+      </command-button>
+    </b-field>
 
     <command-button 
       v-if="enclosure_is_dome"
