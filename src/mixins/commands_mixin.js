@@ -449,8 +449,13 @@ export const commands_mixin = {
         {},
         { username: this.username })
     },
+    enclosure_simulate_weather_hold() {
+      return this.base_command('enclosure', 'simulate_weather_hold', 'Home Dome',
+        {},
+        {})
+    },
     enclosure_home_dome_command() {
-      return this.base_command('enclosure', 'home_dome', 'Home Dome',
+      return this.base_command('enclosure', 'home_dome', 'Simulate Weather Hold',
         {},
         {})
     },
