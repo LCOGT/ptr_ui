@@ -1,6 +1,23 @@
 <template>
   <div class="statusbar">
-    <div class="status-bar-1">
+    <div class="status-bar-1" 
+      @click="toggle_status_bar_height_1" 
+      @mouseover="mouseover_status_1 = true"
+      @mouseleave="collapse_status_bar_1">
+
+      <div 
+        v-if="status_bar_1_expanded" 
+        class="lock-button" 
+        @click="status_bar_1_lock = !status_bar_1_lock">
+        <b-icon
+          type="is-text"
+          :icon="status_bar_1_lock ? 'pin' : 'pin-off'"
+          class="pin-icon"
+        />
+      </div>
+
+      <div class="click-expand-hint" v-if="mouseover_status_1 && !status_bar_1_expanded"> click to expand </div>
+
       <!-- User status logs -->
       <div
         :class="{ expanded: status_bar_1_expanded }"
@@ -34,16 +51,26 @@
         </div>
       </div>
 
-      <a class="toggle" @click="toggle_status_bar_height_1">
-        <b-icon
-          type="is-text"
-          square
-          :icon="status_bar_1_expanded ? 'chevron-up' : 'chevron-left'"
-        />
-      </a>
     </div>
 
-    <div class="status-bar-2">
+    <div class="status-bar-2" 
+      @click="status_bar_2_expanded = true" 
+      @mouseover="mouseover_status_2 = true"
+      @mouseleave="collapse_status_bar_2">
+
+      <div 
+        v-if="status_bar_2_expanded" 
+        class="lock-button" 
+        @click="status_bar_2_lock = !status_bar_2_lock">
+        <b-icon
+          type="is-text"
+          :icon="status_bar_2_lock ? 'pin' : 'pin-off'"
+          class="pin-icon"
+        />
+      </div>
+
+      <div class="click-expand-hint" v-if="mouseover_status_2 && !status_bar_2_expanded"> click to expand </div>
+
       <div class="status-content">
         <div
           id="status-2-expanded"
@@ -51,7 +78,7 @@
           v-if="status_bar_2_expanded"
         >
 
-          <div class="status-container">
+          <div class="status-container container">
             <div class="status-container-header">
               Weather + Enclosure
               <div class="status-container-header-status-age">
@@ -70,7 +97,7 @@
             </div>
           </div>
 
-          <div class="status-container">
+          <div class="status-container container">
             <div class="status-container-header">
               Device Status
               <div class="status-container-header-status-age">
@@ -151,6 +178,7 @@
               </div>
             </div>
           </div>
+
           <div>
             <div
               style="
@@ -161,6 +189,7 @@
               "
             />
           </div>
+
           <div>
             <status-column
               style="padding: 0"
@@ -196,14 +225,9 @@
               :statusList="primary_status_group_5"
             />
           </div>
+
         </div>
       </div>
-      <a class="toggle" @click="toggle_status_bar_height_2">
-        <b-icon
-          type="is-text"
-          :icon="status_bar_2_expanded ? 'chevron-up' : 'chevron-left'"
-        />
-      </a>
     </div>
   </div>
 </template>
@@ -235,6 +259,11 @@ export default {
     return {
       status_bar_1_expanded: false,
       status_bar_2_expanded: false,
+      status_bar_1_lock: false,
+      status_bar_2_lock: false,
+
+      mouseover_status_1: false,
+      mouseover_status_2: false,
     };
   },
 
@@ -270,6 +299,7 @@ export default {
 
     toggle_status_bar_height_1() {
       if (this.status_bar_1_expanded) {
+        this.status_bar_1_lock = false;
         this.status_bar_1_expanded = false;
       } else {
         this.status_bar_1_expanded = true;
@@ -277,7 +307,16 @@ export default {
       }
     },
     toggle_status_bar_height_2() {
+      this.status_bar_2_lock = false;
       this.status_bar_2_expanded = !this.status_bar_2_expanded;
+    },
+    collapse_status_bar_1() {
+      this.status_bar_1_expanded = this.status_bar_1_lock || false;
+      this.mouseover_status_1 = false;
+    },
+    collapse_status_bar_2() {
+      this.status_bar_2_expanded = this.status_bar_2_lock || false;
+      this.mouseover_status_2 = false;
     },
 
     // Returns true if the element is scrolled to the bottom
@@ -488,13 +527,6 @@ export default {
 @import "@/style/_responsive.scss";
 @import "@/style/buefy-styles.scss";
 
-.online-users-list {
-  margin-bottom: 20px;
-}
-.online-users-list > * {
-  padding-left: 1em;
-}
-
 /**     
  *  Component styling
  */
@@ -505,9 +537,7 @@ export default {
   display: none;
 }
 
-$toggle-button-width: 60px;
-$status-col-width: 200px;
-
+$left-padding: 1em;
 $main-status-background: #0f1313;
 $user-status-background: darken($main-status-background, 3);
 $toggle-button-color: darken($main-status-background, 5);
@@ -523,9 +553,8 @@ $log-error: $danger;
 $log-critical: $danger;
 
 .status-bar-1 {
+  padding-left: $left-padding;
   position:relative;
-  display: grid;
-  grid-template-columns: 1fr 60px;
   background-color: $user-status-background;
 }
 .status-1-content {
@@ -536,8 +565,6 @@ $log-critical: $danger;
   display: flex;
   flex-direction: column;
   width: 100%;
-  // align with the .container margins:
-  padding-left: #{$toggle-button-width / 2};
   line-height: 2em;
 }
 .user-status.expanded {
@@ -558,7 +585,6 @@ $log-critical: $danger;
   color: #bbb;
   font-size: 11pt;
   font-family: "Courier New", Courier, monospace;
-  margin: 0 12px;
 }
 
 .log-line {
@@ -625,9 +651,8 @@ div.log-line:last-of-type * {
  */
 
 .status-bar-2 {
+  padding-left: $left-padding;
   position:relative;
-  display: grid;
-  grid-template-columns: 1fr 60px;
   background-color: $main-status-background;
   border-top: 1px grey solid;
   border-bottom: 1px $grey-dark solid;
@@ -636,16 +661,16 @@ div.log-line:last-of-type * {
 
 // This is the site status content that is always displayed
 #status-2-primary {
-  display: grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: 90px 50px repeat(4, $status-col-width);
-  grid-auto-rows: 0px;
-  grid-column-gap: 20px;
+  width: 100%;
+  display:flex;
+  flex-wrap: wrap;
+  height: 77px;
+  overflow: hidden;
+  gap: 20px;
+
   // align with the .container margins:
-  padding-left: #{$toggle-button-width / 2};
   margin-top: 10px;
   margin-bottom: 10px;
-  display:flex;
   gap: 20px;
 }
 
@@ -655,51 +680,35 @@ div.log-line:last-of-type * {
   padding-top: 1em;
   border-bottom: 1px solid grey;
   // align with the .container margins:
-  padding-left: #{$toggle-button-width / 2};
   display: flex;
   flex-wrap: wrap;
   gap: 40px;
 }
 
-@media screen and (min-width: 768px) and (max-width: 949px) {
-  #status-2-primary {
-    grid-template-columns: 70px 50px repeat(2, $status-col-width);
-  }
-  #status-2-primary > div:nth-child(n + 5) {
-    display: none;
-  }
+.status-column-list {
+  display:flex;
+  flex-wrap: wrap;
+  height: 77px;
+  overflow: hidden;
+  gap: 20px;
 }
-@media screen and (min-width: 950px) and (max-width: $desktop-min) {
-  #status-2-primary {
-    grid-template-columns: 70px 50px repeat(3, $status-col-width);
-  }
-  #status-2-primary > div:nth-child(n + 6) {
-    display: none;
-  }
+
+.lock-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  z-index: 5;
 }
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  #status-2-primary {
-    grid-template-columns: 215px 50px repeat(5, $status-col-width);
-  }
-  #status-2-primary > div:nth-child(n + 6) {
-    display: none;
-  }
+.pin-icon {
+  color: grey;
 }
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  #status-2-primary {
-    grid-template-columns: 215px 50px repeat(6, $status-col-width);
-  }
-  #status-2-primary > div:nth-child(n + 7) {
-    display: none;
-  }
-}
-@media screen and (min-width: 1408px) {
-  #status-2-primary {
-    grid-template-columns: 215px 50px repeat(7, $status-col-width);
-  }
-  #status-2-primary > div:nth-child(n + 9) {
-    display: none;
-  }
+.click-expand-hint {
+  position: absolute;
+  bottom: 5px;
+  right: 60px;
+  color: grey;
+  font-size: 10pt;
 }
 
 // Style the status container boxes in the expanded status panel
@@ -735,7 +744,6 @@ div.log-line:last-of-type * {
   justify-content: center;
   color: whitesmoke;
   background-color: $toggle-button-color;
-  width: $toggle-button-width;
   z-index: 10;
 }
 
@@ -757,21 +765,7 @@ div.log-line:last-of-type * {
   text-transform: uppercase;
   font-size: 10px;
 }
-// Blinking status colored dot indicators
-//@keyframes fade {
-//from { opacity: 1.0; }
-//50% { opacity: 0.1; }
-//to { opacity: 1.0; }
-//}
-//@-webkit-keyframes fade {
-//from { opacity: 1.0; }
-//50% { opacity: 0.1; }
-//to { opacity: 1.0; }
-//}
 .status-on {
-  //animation: fade 4000ms infinite;
-  //-webkit-animation: fade 4000ms infinite;
-
   /* Center the content */
   align-items: center;
   display: flex;
