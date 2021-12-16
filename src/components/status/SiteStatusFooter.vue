@@ -298,10 +298,7 @@ export default {
     },
 
     toggle_status_bar_height_1() {
-      if (this.status_bar_1_expanded) {
-        this.status_bar_1_lock = false;
-        this.status_bar_1_expanded = false;
-      } else {
+      if (!this.status_bar_1_expanded) {
         this.status_bar_1_expanded = true;
         this.$nextTick(this.scrollToBottom);
       }
