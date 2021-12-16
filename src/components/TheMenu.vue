@@ -146,7 +146,7 @@ export default {
   methods: {
     // Log the user in with Auth0
     login() {
-      this.$auth.loginWithRedirect();
+      this.$auth.loginWithPopup();
     },
 
     // Log the user out
