@@ -43,6 +43,13 @@
           <span>large fits</span>
         </a>
       </p>
+      <p class="control">
+        <a class="button has-text-white is-small" 
+          @click="download_jpg">
+          <b-icon icon="download" size="is-small" />
+          <span>jpg</span>
+        </a>
+      </p>
     </b-field>
   </div>
 </template>
@@ -101,6 +108,9 @@ export default {
       }
       const fits_url = await this.$store.dispatch('images/get_fits_url', params)
       window.location.assign(fits_url)
+    },
+    download_jpg() {
+      window.location.assign(this.current_image.jpg_url)
     },
     toggleJS9() {
       if (this.js9IsVisible) {
