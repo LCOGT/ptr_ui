@@ -1,13 +1,20 @@
 <template>
   <div class="statusbar">
     <div class="status-bar-1" 
-      @click="toggle_status_bar_height_1" 
       @mouseover="mouseover_status_1 = true"
       @mouseleave="collapse_status_bar_1">
+
+      <a class="toggle" @click="toggle_status_bar_height_1">
+        <b-icon
+          type="is-text"
+          :icon="status_bar_1_expanded ? 'chevron-up' : 'chevron-left'"
+        />
+      </a>
 
       <div 
         v-if="status_bar_1_expanded" 
         class="lock-button" 
+        title="keep expanded"
         @click="status_bar_1_lock = !status_bar_1_lock">
         <b-icon
           type="is-text"
@@ -15,8 +22,6 @@
           class="pin-icon"
         />
       </div>
-
-      <div class="click-expand-hint" v-if="mouseover_status_1 && !status_bar_1_expanded"> click to expand </div>
 
       <!-- User status logs -->
       <div
@@ -54,10 +59,15 @@
     </div>
 
     <div class="status-bar-2" 
-      @click="status_bar_2_expanded = true" 
       @mouseover="mouseover_status_2 = true"
       @mouseleave="collapse_status_bar_2">
 
+      <a class="toggle" @click="toggle_status_bar_height_2">
+        <b-icon
+          type="is-text"
+          :icon="status_bar_2_expanded ? 'chevron-up' : 'chevron-left'"
+        />
+      </a>
       <div 
         v-if="status_bar_2_expanded" 
         class="lock-button" 
@@ -68,8 +78,6 @@
           class="pin-icon"
         />
       </div>
-
-      <div class="click-expand-hint" v-if="mouseover_status_2 && !status_bar_2_expanded"> click to expand </div>
 
       <div class="status-content">
         <div
@@ -117,35 +125,22 @@
           </div>
 
         </div>
+
         <div id="status-2-primary" class="container">
-          <div>
+
+          <div class="clock-displays">
             <div style="display: flex; flex-direction: column">
-              <div
-                class="online-status"
-                :title="`status age: ${status_age_display.val}`"
-              >
-                <div
-                  :class="{ 'status-on': site_is_online, 'status-off': !site_is_online}"
-                ></div>
-                <p
-                  v-if="site_is_online"
-                  style="font-weight: bold; color: greenyellow"
-                >
-                  online
-                </p>
-                <p v-if="!site_is_online" style="font-weight: bold; color: orangered">
-                  offline
-                </p>
+              <div class="online-status" :title="`status age: ${status_age_display.val}`" >
+                <div :class="{ 'status-on': site_is_online, 'status-off': !site_is_online}" ></div>
+                <p v-if="site_is_online" style="font-weight: bold; color: greenyellow" > online </p>
+                <p v-if="!site_is_online" style="font-weight: bold; color: orangered"> offline </p>
               </div>
 
-              <div
-                style="
+              <div style="
                   display: flex;
                   flex-wrap: wrap;
                   height: 55px;
-                  overflow: hidden;
-                "
-              >
+                  overflow: hidden; ">
                 <div class="mr-5">
                   <site-sidereal-time
                     class="sidereal-time"
@@ -180,14 +175,7 @@
           </div>
 
           <div>
-            <div
-              style="
-                margin-left: 50%;
-                border-left: solid 1px grey;
-                height: 100%;
-                width: 1px;
-              "
-            />
+            <div class="clock-border"/>
           </div>
 
           <div>
@@ -301,6 +289,9 @@ export default {
       if (!this.status_bar_1_expanded) {
         this.status_bar_1_expanded = true;
         this.$nextTick(this.scrollToBottom);
+      } else {
+        this.status_bar_1_lock = false;
+        this.status_bar_1_expanded = false;
       }
     },
     toggle_status_bar_height_2() {
@@ -539,6 +530,10 @@ $main-status-background: #0f1313;
 $user-status-background: darken($main-status-background, 3);
 $toggle-button-color: darken($main-status-background, 5);
 
+$status-1-collapsed-height: 25px;
+$status-2-collapsed-height: 80px;
+$toggle-button-width: 50px;
+
 /**
  *  User status (log) styles (the top status bar)
  */
@@ -551,6 +546,7 @@ $log-critical: $danger;
 
 .status-bar-1 {
   padding-left: $left-padding;
+  padding-right: $toggle-button-width;
   position:relative;
   background-color: $user-status-background;
 }
@@ -649,6 +645,7 @@ div.log-line:last-of-type * {
 
 .status-bar-2 {
   padding-left: $left-padding;
+  padding-right: $toggle-button-width;
   position:relative;
   background-color: $main-status-background;
   border-top: 1px grey solid;
@@ -661,14 +658,13 @@ div.log-line:last-of-type * {
   width: 100%;
   display:flex;
   flex-wrap: wrap;
-  height: 77px;
+  height: $status-2-collapsed-height;
   overflow: hidden;
-  gap: 20px;
+  gap: 15px;
 
   // align with the .container margins:
   margin-top: 10px;
   margin-bottom: 10px;
-  gap: 20px;
 }
 
 // This is the site status for the expanded view
@@ -692,20 +688,13 @@ div.log-line:last-of-type * {
 
 .lock-button {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  bottom: 20px;
+  right: calc(20px + #{$toggle-button-width});
   cursor: pointer;
   z-index: 5;
 }
 .pin-icon {
-  color: grey;
-}
-.click-expand-hint {
-  position: absolute;
-  bottom: 5px;
-  right: 60px;
-  color: grey;
-  font-size: 10pt;
+  color: silver;
 }
 
 // Style the status container boxes in the expanded status panel
@@ -735,13 +724,18 @@ div.log-line:last-of-type * {
  * Toggle expand/collaps button style
  */
 .toggle {
+  position: absolute;
+  right: 0;
+  height: 100%;
+  width: $toggle-button-width;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: whitesmoke;
   background-color: $toggle-button-color;
-  z-index: 10;
+  z-index: 11;
 }
 
 /**
@@ -793,5 +787,12 @@ div.log-line:last-of-type * {
   border-radius: 9999px;
   height: 12px;
   width: 12px;
+}
+
+.clock-border {
+  margin-left: 50%;
+  border-left: solid 1px grey;
+  height: 100%;
+  width: 1px;
 }
 </style>
