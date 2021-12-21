@@ -124,8 +124,8 @@ export default {
     methods: {
         redraw_all() {
             this.clear_canvas()
-            this.draw_telescope_crosshairs()
             this.draw_user_crosshairs()
+            this.draw_telescope_crosshairs()
         },
 
         draw_user_crosshairs() {
