@@ -3,10 +3,6 @@
 
         <template slot="brand">
             <b-navbar-item tag="router-link" class="menu-title" :to="{ path: '/' }">
-              <!--span v-if="selected_site==''" style="margin: 0;" class="title">photon ranch</span-->
-              <!--span v-if="selected_site!=''" style="margin: 0;" class="is-hidden-mobile title">photon ranch&nbsp;</span-->
-              <!--span v-if="selected_site!=''" class="is-hidden-tablet">&nbsp;&nbsp;<b-icon icon="home"/>&nbsp;</span-->
-              <!--span>&nbspv5</span-->
                 <PTR class="ml-1 mr-2 is-hidden-tablet" with-lambda font-size="40px" />
                 <PhotonRanch class="is-hidden-mobile" :with-lambda="true" />
                 <span v-if="selected_site!=''" style="margin: 0;" class="subtitle site-hint">>&nbsp;{{selected_site.toUpperCase()}}</span>
@@ -45,20 +41,6 @@
                 </b-navbar-item>
             </b-navbar-dropdown>
 
-            <!--b-navbar-dropdown label="experimental">
-                <b-navbar-item tag="router-link" :to="{ path: '/skymap' }">
-                    chat
-                </b-navbar-item>
-                <b-navbar-item tag="router-link" :to="{ path: '/jobs' }">
-                    jobs
-                </b-navbar-item>
-                <b-navbar-item tag="router-link" :to="{ path: '/calendar' }">
-                    calendar
-                </b-navbar-item>
-                <b-navbar-item tag="router-link" :to="{ path: '/analysis' }">
-                    analysis
-                </b-navbar-item>
-            </b-navbar-dropdown-->
             <b-navbar-item tag="router-link" :to="{ path: '/plantargets' }">
                     find targets
             </b-navbar-item>
@@ -86,7 +68,6 @@
 
               <!-- show login when not authenticated -->
               <button class="button" v-if="!$auth.isAuthenticated" @click="login">Log in</button>
-
             </b-navbar-item>
         </template>
     </b-navbar> 
