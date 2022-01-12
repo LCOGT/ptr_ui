@@ -27,47 +27,6 @@
       </b-field>
     </b-field>
 
-    <!--b-button size="is-small" @click="isDownloadModalActive = true">download</b-button>
-    <b-modal :active.sync="isDownloadModalActive" >
-      <div class="modal-card">
-          <header class="modal-card-head">
-              <p class="modal-card-title">Login</p>
-              <button
-                  type="button"
-                  class="delete"
-                  @click="$emit('close')"/>
-          </header>
-          <section class="modal-card-body">
-
-              <input type="datetime-local"
-                name="start-time" :value="starttime">
-
-              <input type="datetime-local"
-                name="end-time" :value="endtime">
-
-              <b-field v-model="fits_size" label="Fits Size">
-                <b-radio v-model="fits_size"
-                    name="Fits Size"
-                    native-value="small">
-                    small
-                </b-radio>
-                <b-radio v-model="fits_size"
-                    name="Fits Size"
-                    native-value="large">
-                    large
-                </b-radio>
-                <b-radio v-model="fits_size"
-                    name="Fits Size"
-                    native-value="best">
-                    best
-                </b-radio>
-              </b-field>
-
-          </section>
-      </div>
-    </b-modal-->
-
-
     <b-field >
       <p class="control">
         <a class="button has-text-white is-small" 
