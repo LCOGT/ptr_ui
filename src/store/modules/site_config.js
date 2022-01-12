@@ -101,7 +101,7 @@ const getters = {
         return getters.site_config?.screen?.[state.selected_screen] ?? {}
     },
     selected_weather_config: (state, getters) => {
-        return getters.site_config?.weather?.[state.selected_weather] ?? {}
+        return getters.site_config?.observing_conditions?.[state.selected_weather] ?? {}
     },
     selected_sequencer_config: (state, getters) => {
         return getters.site_config?.sequencer?.[state.selected_sequencer] ?? {}
