@@ -123,7 +123,9 @@ export default {
       const url = this.$store.state.dev.active_api + `/${site}/latest_images/1` 
       axios.get(url).then(response => {
         if (response.data.length > 0) {
+          // Save the jpg url to our site_images object
           this.$set(this.site_images, site, response.data[0].jpg_url)
+        // Handle empty response
         } else {
           this.$set(this.site_images, site, '') 
         }
