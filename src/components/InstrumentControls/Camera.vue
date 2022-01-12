@@ -8,8 +8,6 @@
     </div>
     <br>
 
-		<!--div class="horizontal-border" /-->
-
     <b-field horizontal label="Expose">
         <b-field>
             <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
