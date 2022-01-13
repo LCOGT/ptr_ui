@@ -2,15 +2,11 @@
 <template>
   <div class="instrument-control-wrapper">
 
-    <div class="val" v-if="camera_state && camera_state.message">{{camera_state.message}}</div>
-
-    <status-column 
-      class="status-column"
-      :statusList="buildCameraTabStatus" 
-      :isOffline="!site_is_online"
-    />
-
-		<div style="border-bottom: 1px solid grey; margin: 1em 0;" />
+    <div class="buttons has-addons">
+      <command-button :data="camera_expose_command" style="width: 70%;" class=" is-outlined is-success"/>
+      <command-button :data="camera_cancel_command" style="width: 30%; border-left: 1px solid #00be65;" class=" is-outlined"/>
+    </div>
+    <br>
 
     <b-field horizontal label="Expose">
         <b-field>
@@ -133,24 +129,25 @@
     </b-field>
 
     <br>
-    <div class="buttons has-addons">
-      <command-button :data="camera_expose_command" style="width: 70%; z-index=50;" class="is-small is-success is-outlined"/>
-      <command-button :data="camera_cancel_command" style="width: 30%" class="is-small is-outlined"/>
-    </div>
-
-    <br>
 
     <b-field horizontal style="height: auto;" label="Darkslide" v-if="camera_has_darkslide">
-
       <StatusVal :status-item="camera_darkslide" />
-
       <div class="buttons has-addons">
         <command-button :data="camera_darkslide_open_command" style="width: 50%;" class="is-small mb-0"/>
         <command-button :data="camera_darkslide_close_command" style="width: 50%" class="is-small mb-0" />
       </div>
     </b-field>
 
-    <br>
+
+		<div class="horizontal-border" />
+
+    <div class="val" v-if="camera_state && camera_state.message">{{camera_state.message}}</div>
+
+    <status-column 
+      class="status-column"
+      :statusList="buildCameraTabStatus" 
+      :isOffline="!site_is_online"
+    />
 
     <div class="status-toggle-bar" 
       @click="isExpandedStatusVisible= !isExpandedStatusVisible">

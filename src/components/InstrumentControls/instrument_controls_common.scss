@@ -1,5 +1,11 @@
 @import "@/style/_variables.scss";
 
+/* Used for single div dividers between sections in command tabs */
+.horizontal-border {
+  border-bottom: 1px solid grey; 
+  margin: 1em 0;
+}
+
 .b-tabs{
   background-color: #1e2223;
   display:flex;

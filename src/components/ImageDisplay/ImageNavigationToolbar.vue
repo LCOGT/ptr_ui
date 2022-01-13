@@ -26,7 +26,8 @@
         </p>
       </b-field>
     </b-field>
-    <b-field>
+
+    <b-field >
       <p class="control">
         <a class="button has-text-white is-small" 
           :disabled="!small_fits_exists"
@@ -43,20 +44,55 @@
           <span>large fits</span>
         </a>
       </p>
+      <p class="control">
+        <a class="button has-text-white is-small" 
+          @click="download_jpg">
+          <b-icon icon="download" size="is-small" />
+          <span>jpg</span>
+        </a>
+      </p>
+      <p class="control">
+        <b-button :loading="zip_download_waiting" class="button has-text-white is-small" @click="download_fits_previous_24hrs">
+          <b-icon icon="download" size="is-small" />
+          <span>last 24hrs fits</span>
+        </b-button>
+      </p>
     </b-field>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 import {mapState, mapGetters} from 'vuex';
 export default {
   name: "ImageToolbar",
   data() {
     return {
+      isDownloadModalActive: false,
+      zip_download_waiting: false,
     }
   },
 
   methods: {
+    download_fits_previous_24hrs() {
+      const url = `${this.$store.state.dev.active_api}/downloadzip`
+      const args = {
+        site: this.$route.params.sitecode,
+        fits_size: 'small',
+        start_timestamp_s: Math.round(new Date().getTime() / 1000) - (24 * 3600),
+        end_timestamp_s: Math.round(new Date().getTime() / 1000),
+      }
+      function handleResponse(response) {
+        let download_url = response.data.message
+        console.log('zipped download url: ', download_url)
+        window.location.assign(download_url)
+      }
+      this.zip_download_waiting = true
+      axios.post(url, args)
+        .then(handleResponse)
+        .catch(console.log)
+        .finally(r => {this.zip_download_waiting = false})
+    },
     /**
      * Allows users to download a fits file (from the current image displayed).
      */
@@ -101,6 +137,9 @@ export default {
       }
       const fits_url = await this.$store.dispatch('images/get_fits_url', params)
       window.location.assign(fits_url)
+    },
+    download_jpg() {
+      window.location.assign(this.current_image.jpg_url)
     },
     toggleJS9() {
       if (this.js9IsVisible) {

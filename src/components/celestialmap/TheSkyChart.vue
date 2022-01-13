@@ -284,9 +284,10 @@ export default {
 
         // Update the telescope crosshair position
         update_telescope_crosshairs() {
-            let t_coords = [helpers.hour2degree(this.mount_pointing_ra), this.mount_pointing_dec]; // from status mixin
+            let t_coords = [helpers.hour2degree(this.mount_pointing_ra.val), this.mount_pointing_dec.val]; // from status mixin
+            let pixel_coords = Celestial.mapProjection(t_coords)
             if (Celestial.clip(t_coords)) {
-                this.telescope_crosshairs = this.pix_to_relative(Celestial.mapProjection(t_coords))
+                this.telescope_crosshairs = this.pix_to_relative(pixel_coords)
             } else {  // don't render if not in visible map
                 this.telescope_crosshairs = [-1, -1]
             }
