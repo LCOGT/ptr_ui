@@ -111,7 +111,7 @@ const mutations = {
 
     // Set the status for each device-type
     device_types.forEach(device_type => {
-      if (hasKey(status,device_type)) {
+      if (hasKey(status,device_type) && status[device_type] != null) {
       	state[device_type] = status[device_type]
 			}
     })

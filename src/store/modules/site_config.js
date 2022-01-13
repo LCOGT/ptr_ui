@@ -101,7 +101,7 @@ const getters = {
         return getters.site_config?.screen?.[state.selected_screen] ?? {}
     },
     selected_weather_config: (state, getters) => {
-        return getters.site_config?.weather?.[state.selected_weather] ?? {}
+        return getters.site_config?.observing_conditions?.[state.selected_weather] ?? {}
     },
     selected_sequencer_config: (state, getters) => {
         return getters.site_config?.sequencer?.[state.selected_sequencer] ?? {}
@@ -173,10 +173,10 @@ const getters = {
     },
     // Does the camera bin or not? Returns string 'True' or 'False'.
     camera_can_bin: (state, getters) => {
-        return getters.selected_camera_config.settings.bin_modes?.length;
+        return getters.selected_camera_config.settings?.bin_modes?.length;
     },
     camera_has_darkslide: (state, getters) => {
-        return getters.selected_camera_config.settings.has_darkslide ?? false
+        return getters.selected_camera_config.settings?.has_darkslide ?? false
     },
     camera_default_bin: (state, getters) => {
         return getters.selected_camera_config.settings?.default_bin ?? getters.camera_bin_options[0] ?? '';

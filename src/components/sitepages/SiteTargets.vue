@@ -434,6 +434,7 @@ export default {
         isLiveSkyDisplay() {
             if (this.isLiveSkyDisplay) {
                 this.skychart_location = [this.site_latitude, this.site_longitude]
+                this.skychart_date = new Date()
             }
         }
 
