@@ -119,21 +119,10 @@ export default {
       let a = site_status.status_age_s <= max_online_age && site_status.weather_ok && site_status.open_ok
       return a
     },
-    updateSiteImage(site) {
-      const url = this.$store.state.dev.active_api + `/${site}/latest_images/1` 
-      axios.get(url).then(response => {
-        if (response.data.length > 0) {
-          // Save the jpg url to our site_images object
-          this.$set(this.site_images, site, response.data[0].jpg_url)
-        // Handle empty response
-        } else {
-          this.$set(this.site_images, site, '') 
-        }
-      })
-    },
     updateAllSiteImages() {
-      [...this.all_sites_real, ...this.all_sites_simulated].forEach(s => {
-        this.updateSiteImage(s.site)
+      const url = this.$store.state.dev.active_api + `/latest_image_all_sites`
+      axios.get(url).then(response => {
+        this.site_images = response.data
       })
     },
 
