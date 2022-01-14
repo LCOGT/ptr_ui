@@ -82,15 +82,26 @@ export default {
         start_timestamp_s: Math.round(new Date().getTime() / 1000) - (24 * 3600),
         end_timestamp_s: Math.round(new Date().getTime() / 1000),
       }
-      function handleResponse(response) {
-        let download_url = response.data.message
-        console.log('zipped download url: ', download_url)
-        window.location.assign(download_url)
-      }
       this.zip_download_waiting = true
       axios.post(url, args)
-        .then(handleResponse)
-        .catch(console.log)
+        .then(response => {
+          let download_url = response.data.message
+          // quickly verify download url 
+          if (!download_url.includes('https://photonranch-001.s3.amazonaws.com')) {
+            console.warn('Bad url: ', download_url)
+            throw new Error('Bad url: ', download_url)
+          } else {
+            window.location.assign(download_url)
+          }
+        })
+        .catch(r => {
+          console.error('Zip download failed; ', r)
+          this.$buefy.toast.open({
+            message: "No images are available from the last 24 hours at this site.",
+            type: 'is-warning',
+            duration: 6000
+          })
+        })
         .finally(r => {this.zip_download_waiting = false})
     },
     /**
