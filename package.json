@@ -49,6 +49,7 @@
     "fabric": "^2.7.0",
     "isomorphic-ws": "^4.0.1",
     "jquery": "^3.5.1",
+    "json-vuer": "^0.1.2",
     "lodash": "^4.17.15",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
@@ -62,6 +63,7 @@
     "upgrade": "^1.1.0",
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.0",
+    "vue-json-viewer": "^2.2.21",
     "vue-loader": "^15.9.2",
     "vue-material-design-icons": "^4.6.0",
     "vue-router": "^3.2.0",
@@ -79,12 +81,13 @@
     "cypress": "^3.8.3",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.2.3",
-    "node-sass": "^4.14.1",
-    "sass-loader": "^7.1.0",
+    "sass": "^1.49.0",
+    "sass-loader": "^10.2.1",
     "style-loader": "^0.23.1",
     "vue-plugin-load-script": "^1.2.0",
     "vue-template-babel-compiler": "^1.0.5",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.46.0"
   },
   "eslintConfig": {
     "root": true,
