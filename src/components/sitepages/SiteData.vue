@@ -27,7 +27,6 @@
       <image-navigation-toolbar class="mt-3"/>
     </div>
 
-
     <!-- Collapsible panels on the right of the image --> 
     <div class="image-tools-area" >  
 
@@ -42,37 +41,28 @@
 
           <div class="shapes-toolbar" > <div>Draw a region: </div> <shapes-toolbar /> </div>
 
-          <!--div style="border-bottom: 1px solid #555; margin-bottom: 1em;" /-->
-          <!--div style="height: 20px" /-->
-
-          <div class="analysis-tools">
-            <div class="analysis-tools-tab-buttons">
+          <div class="flat-styled-tabs">
+            <div class="flat-styled-tabs-buttons">
               <div 
                 :class="{'active': activeAnalysisTab=='star inspector'}" 
-                @click="activeAnalysisTab='star inspector'"
-                class="analysis-tool-button">star inspector</div>
+                @click="activeAnalysisTab='star inspector'" >star inspector</div>
               <div 
                 :class="{'active': activeAnalysisTab=='statistics'}" 
-                @click="activeAnalysisTab='statistics'"
-                class="analysis-tool-button">statistics</div>
+                @click="activeAnalysisTab='statistics'" >statistics</div>
               <div 
                 :class="{'active': activeAnalysisTab=='histogram'}" 
-                @click="activeAnalysisTab='histogram'"
-                class="analysis-tool-button">histogram</div>
+                @click="activeAnalysisTab='histogram'" >histogram</div>
               <div 
                 :class="{'active': activeAnalysisTab=='line profile'}" 
-                @click="activeAnalysisTab='line profile'" 
-                class="analysis-tool-button">line profile</div>
+                @click="activeAnalysisTab='line profile'" >line profile</div>
               <div 
                 :class="{'active': activeAnalysisTab=='image info'}" 
-                @click="activeAnalysisTab='image info'"
-                class="analysis-tool-button">image info</div>
+                @click="activeAnalysisTab='image info'" >image info</div>
               <div 
                 :class="{'active': activeAnalysisTab=='misc'}" 
-                @click="activeAnalysisTab='misc'"
-                class="analysis-tool-button">misc</div>
+                @click="activeAnalysisTab='misc'" >misc</div>
             </div>
-            <div class="analysis-tools-content">
+            <div class="flat-styled-tabs-content">
 
               <star-profile v-if="activeAnalysisTab=='star inspector'" />
 
@@ -221,22 +211,41 @@
               <p class="is-italic has-text-weight-light">(stream the latest images as they arrive)</p>
             </b-field>
           </div>
-
           <div class="data-query-filters mb-4">
             <image-filter />
           </div>
-
           <div class="data-query-quick-buttons mb-4">
             <b-button class="is-small" @click="$store.dispatch('images/get_last_24hrs')"> all sites - last 24hrs </b-button>
           </div>
-
           <images-table :image_array="recent_images" class="mb-4"/>
 
         </b-tab-item>
 
+        <!-- Useful info for developers -->
+        <b-tab-item label="dev tools" class="dev-tab">
+          <div class="flat-styled-tabs" style="margin-top: 1em;">
+            <!-- Tab buttons --> 
+            <div class="flat-styled-tabs-buttons">
+              <div :class="{'active': activeDevTab=='recents3'}" 
+                   @click="activeDevTab='recents3'">recent s3 data</div>
+              <div :class="{'active': activeDevTab=='config'}" 
+                   @click="activeDevTab='config'">site config</div>
+            </div>
+            <!-- Tab content--> 
+            <div class="flat-styled-tabs-content">
+              <div v-if="activeDevTab=='recents3'">
+                <RecentS3UploadsTable :init_site="sitecode" />
+              </div>
+              <div v-if="activeDevTab=='config'">
+                <div class="subtitle">Config file for {{sitecode}}</div>
+                <SiteConfigViewer :init_site="sitecode" />
+              </div>
+            </div>
+          </div>
+
+        </b-tab-item>
       </b-tabs>
     </div>
-
 
   <!-- Modal popup window showing the full fits header. -->
   <b-modal :active.sync="showFitsHeaderModal" >
@@ -259,8 +268,7 @@
               </p>
             </b-field>
           </div>
-          </div>
-
+        </div>
         <b-table
             :mobile-cards="false" 
             :narrowed="true"
@@ -270,8 +278,6 @@
             :loading="headerIsLoading"
             >
         </b-table>
-
-      
       </div>
     </div>
   </b-modal>
@@ -280,9 +286,7 @@
 </div>
 </template>
 
-
 <script>
-
 import ImageView from '@/components/ImageView'
 import ImagesTable from '@/components/ImagesTable'
 import Js9Devtools from "@/components/Js9Devtools";
@@ -301,7 +305,8 @@ import InfoImageThumb from "@/components/ImageDisplay/InfoImageThumb"
 import ThumbnailRow from "@/components/ImageDisplay/ThumbnailRow"
 import ImageNavigationToolbar from "@/components/ImageDisplay/ImageNavigationToolbar"
 import ShapesToolbar from "@/components/ImageDisplay/ShapesToolbar"
-
+import RecentS3UploadsTable from '@/components/AdminTools/RecentS3UploadsTable'
+import SiteConfigViewer from '@/components/AdminTools/SiteConfigViewer'
 import StarProfile from '@/components/AnalysisTools/StarProfile'
 
 import moment from 'moment'
@@ -332,13 +337,16 @@ export default {
     ImageNavigationToolbar,
     ShapesToolbar,
     StarProfile,
+    RecentS3UploadsTable,
+    SiteConfigViewer,
   },
   data() {
     return {
       accordionIsOpen: 1,
 
-      activeAnalysisTab: 'star inspector',
-      activeImageToolsTab: 0,
+      activeImageToolsTab: 0, // default tab to set: controls / analysis / data / dev
+      activeAnalysisTab: 'star inspector',  // default tab in 'analysis'
+      activeDevTab: 'recents3',  // default tab in 'dev tools'
 
       fitsHeader: {},
       showFitsHeaderModal: false,
@@ -372,7 +380,6 @@ export default {
   methods: {
 
     getRegionStats(useSubregion=true) {
-
       const url = this.$store.state.dev.quickanalysis_endpoint + '/statistics'
 
       // Extract parts of the filename required by the analysis api
@@ -525,10 +532,10 @@ export default {
       this.$store.dispatch('images/load_latest_images')
     }
   },
-  computed: {
 
+  computed: {
     sitecode() {
-      return this.$route.params.site
+      return this.$route.params.sitecode
     },
 
     ...mapState("images", [
@@ -679,37 +686,34 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
   flex-grow: 1;
 }
 
-.analysis-tools {
+/* Tab styling for reusable tabs in this component only.
+   Almost worth refactoring into its own tab component */
+.flat-styled-tabs {
   background-color: $grey-darker;
-
 }
-.analysis-tools-tab-buttons {
+.flat-styled-tabs-buttons {
   background-color: $body-background-color;
   display: flex;
   flex-wrap: wrap;
   color: $grey-lighter;
   margin-bottom: 1em;
 }
-.analysis-tool-button {
+.flat-styled-tabs-buttons > div {
   padding: 5px 8px;
   border-right: 1px solid lighten($grey-dark, 4); 
   background-color: $body-background-color;
-
   &:hover {
     cursor: pointer;
   }
-
   &.active {
     background-color: $grey-darker;
     font-weight: bold;
   }
 }
-.analysis-tools-content {
+.flat-styled-tabs-content {
   padding: 1em;
   height: max-content;
 }
-
-
 
 .site-data-wrapper {
   margin: 1em auto;
@@ -722,7 +726,7 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
     margin-top: 0;
     display: grid;
     padding: $site-data-wrapper-padding;
-    grid-gap: 2em;
+    //grid-gap: 2em;
     grid-template-columns:  auto 1fr;
     grid-template-rows: 1fr;//$visible-content-height;
     grid-template-areas: 'image tools';
@@ -751,21 +755,19 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
   grid-area: tools;
   padding-left: 1em;
   width: 100%;
-
   @include desktop {
     width: 500px;
+    padding-left: 0;
   }
-
   @include widescreen {
     width: 600px;
+    padding-left: 0;
   }
-
   @include fullhd {
     width: 720px;
+    padding-left: 0;
   }
-
 }
-
 
 .command-tab-accordion {
   width: 100%;

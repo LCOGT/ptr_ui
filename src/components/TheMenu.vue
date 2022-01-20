@@ -11,7 +11,7 @@
 
         <template slot="start">
 
-            <b-navbar-dropdown label="sites" :close-on-click="true" @click.native="updateSiteStatus"> 
+            <b-navbar-dropdown label="observatories" :close-on-click="true" @click.native="updateSiteStatus"> 
                 <template v-for="(site, index) in real_sites">
                   <b-navbar-item tag="router-link" 
                     :to="{ path: '/site/' + site+ '/observe'}"
@@ -35,10 +35,6 @@
                     <span></span>
                   </b-navbar-item>
                 </template>
-                <hr class="navbar-divider">
-                <b-navbar-item tag="router-link" :to="{ path: '/about' }">
-                    About
-                </b-navbar-item>
             </b-navbar-dropdown>
 
             <b-navbar-item tag="router-link" :to="{ path: '/plantargets' }">
