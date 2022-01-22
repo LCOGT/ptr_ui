@@ -287,6 +287,7 @@ export default {
         datetime_picker_timezone_selection() {
             this.calculate_site_tz_offset()
         },
+
         // Save any custom lat/lng user inputs so that we can redisplay them if the user switches back to a custom site
         selected_latitude() {
             if (this.selected_observatory == "custom") { 
