@@ -214,11 +214,9 @@
           <div class="data-query-filters mb-4">
             <image-filter />
           </div>
-          <div class="data-query-quick-buttons mb-4">
-            <b-button class="is-small" @click="$store.dispatch('images/get_last_24hrs')"> all sites - last 24hrs </b-button>
-          </div>
+          <!--div class="data-query-quick-buttons mb-4"> <b-button class="is-small" @click="$store.dispatch('images/get_last_24hrs')"> all sites - last 24hrs </b-button> </div-->
           <images-table :image_array="recent_images" class="mb-4"/>
-
+          <DownloadInterface :site="sitecode" />
         </b-tab-item>
 
         <!-- Useful info for developers -->
@@ -308,6 +306,7 @@ import ShapesToolbar from "@/components/ImageDisplay/ShapesToolbar"
 import RecentS3UploadsTable from '@/components/AdminTools/RecentS3UploadsTable'
 import SiteConfigViewer from '@/components/AdminTools/SiteConfigViewer'
 import StarProfile from '@/components/AnalysisTools/StarProfile'
+import DownloadInterface from '@/components/DownloadInterface'
 
 import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
@@ -339,12 +338,13 @@ export default {
     StarProfile,
     RecentS3UploadsTable,
     SiteConfigViewer,
+    DownloadInterface,
   },
   data() {
     return {
       accordionIsOpen: 1,
 
-      activeImageToolsTab: 0, // default tab to set: controls / analysis / data / dev
+      activeImageToolsTab: 2, // default tab to set: controls / analysis / data / dev
       activeAnalysisTab: 'star inspector',  // default tab in 'analysis'
       activeDevTab: 'recents3',  // default tab in 'dev tools'
 

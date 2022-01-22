@@ -94,13 +94,27 @@ export default {
             window.location.assign(download_url)
           }
         })
-        .catch(r => {
-          console.error('Zip download failed; ', r)
-          this.$buefy.toast.open({
-            message: "No images are available from the last 24 hours at this site.",
-            type: 'is-warning',
-            duration: 6000
-          })
+        .catch(error => {
+          console.error('Zip download failed; ', error)
+
+          // Handle 404: no files are available
+          if (error.response.status == 404) {
+            this.$buefy.toast.open({
+              message: "No images are available from the last 24 hours at this site.",
+              type: 'is-warning',
+              duration: 6000
+            })
+          }
+
+          else if (error.response.status == 504) {
+            this.$buefy.toast.open({
+              message: "Too many files to zip, request timed out.",
+              type: 'is-warning',
+              duration: 6000
+            })
+          }
+
+
         })
         .finally(r => {this.zip_download_waiting = false})
     },
