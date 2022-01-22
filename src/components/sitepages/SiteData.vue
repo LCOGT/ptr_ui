@@ -344,7 +344,7 @@ export default {
     return {
       accordionIsOpen: 1,
 
-      activeImageToolsTab: 2, // default tab to set: controls / analysis / data / dev
+      activeImageToolsTab: 0, // default tab to set: controls / analysis / data / dev
       activeAnalysisTab: 'star inspector',  // default tab in 'analysis'
       activeDevTab: 'recents3',  // default tab in 'dev tools'
 
