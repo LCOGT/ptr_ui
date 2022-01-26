@@ -145,7 +145,7 @@ export default {
         let params = {
           base_filename: this.current_image.base_filename, 
           data_type: this.current_image.data_type,
-          reduction_level: '01',
+          reduction_level: '00',
         }
         fits_url = await this.$store.dispatch('images/get_fits_url', params)
       }
