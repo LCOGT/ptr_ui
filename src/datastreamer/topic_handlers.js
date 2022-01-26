@@ -12,6 +12,14 @@ const status_stream_handler = message => {
 
     let now = Date.now()
     store.commit('sitestatus/updateLocalClock', now)
+
+    // some sites don't have a dedicated WEMA (ie. Sierra Remote). 
+    // In those cases, the site config will say wema_is_active: false
+    // and we should update the wxEncStatus age to match the deviceStatus age
+    if ( Object.keys(store.getters['site_config/site_config']).includes('wema_is_active') 
+          && store.getters['site_config/site_config'].wema_is_active == false) {
+      store.commit('sitestatus/latest_weather_timestamp_ms', message.server_timestamp_ms)
+    }
   }
   if (statusType == "wxEncStatus") {
     store.commit('sitestatus/latest_status_timestamp_ms', message.server_timestamp_ms)

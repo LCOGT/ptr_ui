@@ -9,6 +9,8 @@ import LoadScript from 'vue-plugin-load-script';
 import Buefy from 'buefy'
 import './style/buefy-styles.scss'
 
+import JsonViewer from 'vue-json-viewer'
+
 // Import this (even if it's not used directly here) to register the local js9
 // crosshair plugin
 import JS9Helpers from '@/utils/js9Helpers'
@@ -18,6 +20,7 @@ import { domain, clientId, audience } from "../auth_config.json";
 import { Auth0Plugin } from "./auth";
 
  
+Vue.use(JsonViewer)
 Vue.use(LoadScript);
 Vue.use(Buefy)
 Vue.use(Auth0Plugin, {

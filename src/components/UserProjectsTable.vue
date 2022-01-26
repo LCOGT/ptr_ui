@@ -238,13 +238,7 @@ export default {
     justify-content: space-between;
 }
 
-// Fix buefy's default white detail background color
-.my-table {
-    /deep/ .table {
-        /deep/ tr.detail {
-            background-color: #1e2223;
-            box-shadow: none;
-        }
-    }
-}
+</style>
+
+<style lang="scss">
 </style>
