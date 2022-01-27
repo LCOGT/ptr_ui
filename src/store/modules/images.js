@@ -9,6 +9,9 @@ import axios from 'axios'
 import moment from 'moment'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
 
+const large_fits_reduction_level = '00'
+const small_fits_reduction_level = '10'
+
 function user_id() {
     if (getInstance().user) {
         return getInstance().user.sub
@@ -56,12 +59,12 @@ const getters = {
     small_fits_filename: (state, getters) => {
         if (!getters.small_fits_exists) return ''
         const image = getters.current_image
-        return `${image.base_filename}-${image.data_type}10.fits.bz2`
+        return `${image.base_filename}-${image.data_type}${small_fits_reduction_level}.fits.bz2`
     },
     large_fits_filename: (state, getters) => {
         if (!getters.large_fits_exists) return ''
         const image = getters.current_image
-        return `${image.base_filename}-${image.data_type}01.fits.bz2`
+        return `${image.base_filename}-${image.data_type}${large_fits_reduction_level}.fits.bz2`
     },
 
     info_image_is_active: state => state.current_image.s3_direcotry == 'info-images',
