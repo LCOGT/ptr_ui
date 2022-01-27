@@ -64,6 +64,10 @@
 <script>
 import axios from 'axios'
 import {mapState, mapGetters} from 'vuex';
+
+const large_fits_reduction_level = '00'
+const small_fits_reduction_level = '10'
+
 export default {
   name: "ImageToolbar",
   data() {
@@ -137,7 +141,7 @@ export default {
         let params = {
           base_filename: this.current_image.base_filename, 
           data_type: this.current_image.data_type,
-          reduction_level: '10',
+          reduction_level: small_fits_reduction_level,
         }
         fits_url = await this.$store.dispatch('images/get_fits_url', params)
       }
@@ -145,7 +149,7 @@ export default {
         let params = {
           base_filename: this.current_image.base_filename, 
           data_type: this.current_image.data_type,
-          reduction_level: '00',
+          reduction_level: large_fits_reduction_level,
         }
         fits_url = await this.$store.dispatch('images/get_fits_url', params)
       }
