@@ -22,7 +22,7 @@
         </button>
       </p>
     </b-field>
-    <p style="color: gold;">Note: reported values are suspicious. This component is due for an update.</p>
+    <p style="color: gold;">Note: this component doesn't work yet</p>
 
     <div style="display: flex; flex-wrap: wrap">
       <div>
