@@ -90,7 +90,7 @@
             <div class="status-container-header">
               Weather + Enclosure
               <div class="status-container-header-status-age">
-                <status-column :statusList="[wx_status_age_display]" />
+                <status-column :statusList="[weather_status_age_display]" />
               </div>
             </div>
             <div class="status-container-content">
@@ -130,7 +130,7 @@
 
           <div class="clock-displays">
             <div style="display: flex; flex-direction: column">
-              <div class="online-status" :title="`status age: ${status_age_display.val}`" >
+              <div class="online-status" :title="`status age: ${device_status_age_display.val}`" >
                 <div :class="{ 'status-on': site_is_online, 'status-off': !site_is_online}" ></div>
                 <p v-if="site_is_online" style="font-weight: bold; color: greenyellow" > online </p>
                 <p v-if="!site_is_online" style="font-weight: bold; color: orangered"> offline </p>
@@ -337,10 +337,9 @@ export default {
   computed: {
     ...mapGetters("site_config", ["site_longitude", "timezone"]),
     ...mapGetters("sitestatus", [
-        "status_age",
-        "status_age_display",
-        "wx_status_age_display",
-        "wx_status_age",
+        //"status_age_display",
+        "weather_status_age_display",
+        "weather_status_age",
         "device_status_age",
         "device_status_age_display",
         "site_is_online",
@@ -385,8 +384,8 @@ export default {
       ]),
 
     // Status ages for display
-    wx_status_age_display() {
-      return {name: "status age: ", ...this.$store.getters['sitestatus/wx_status_age_display']}
+    weather_status_age_display() {
+      return {name: "status age: ", ...this.$store.getters['sitestatus/weather_status_age_display']}
     },
     device_status_age_display() {
       return {name: "status age: ", ...this.$store.getters['sitestatus/device_status_age_display']}
@@ -753,6 +752,7 @@ div.log-line:last-of-type * {
   color: grey;
 }
 .sidereal-label {
+  color:rgb(160, 160, 160);
   text-transform: uppercase;
   font-size: 10px;
 }

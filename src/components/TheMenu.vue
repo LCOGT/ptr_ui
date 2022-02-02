@@ -138,24 +138,40 @@ export default {
     updateSiteStatus() {
       this.$store.dispatch('sitestatus/getSiteOpenStatus')
     },
+
+    /*
+      Strategy: 
+        if weather status is recent and wx_ok is true: green dot
+        if weather status is recent and wx_ok is false: red dot
+        otherwise: grey dot
+    */
     siteOnlineClass(site) {
       const status_age_online = 300 // max number of seconds to be considered online
-      let status
-      try { 
-        status = this.site_open_status[site]
-      } catch {
-        return 'no-status'
+
+      // Do nothing if the site doesn't have any status records
+      if (!Object.keys(this.site_open_status).includes(site)) {
+        return 'status-grey'
       }
 
-      if (status === undefined) {
-        return 'no-status'
-      }
+      // Extract the age of the latest status
+      const weather_age = this.site_open_status[site]?.weather?.status_age_s
+      const enclosure_age = this.site_open_status[site]?.enclosure?.status_age_s
+      const device_age = this.site_open_status[site]?.device?.status_age_s
 
-      if (parseFloat(status.status_age_s) > status_age_online) { return 'no-status' }
-      if (!status.hasWeatherStatus) { return 'status-blue'}
-      if (status.weather_ok && status.open_ok) {return 'status-green'}
-      if (status.weather_ok || status.open_ok) {return 'status-yellow'}
-      return 'status-yellow'
+      // online sites: weather is sending and ok. 
+      if (Object.keys(this.site_open_status[site]).includes('wx_ok')) {
+        let weather_ok = this.site_open_status[site].wx_ok 
+        let weather_status_age = this.site_open_status[site].weather.status_age_s
+        let weather_is_recent = weather_status_age < status_age_online
+        if (!weather_is_recent) {
+          return 'status-grey'
+        }
+        else {
+          return weather_ok ? 'status-green' : 'status-red'
+        }
+      }
+      return 'status-grey'
+
     }
   }
 };
@@ -201,6 +217,19 @@ nav {
   font-size: 10px;
   color: lightskyblue;
 }
+.status-red {
+  opacity: 0.8;
+  padding-right: 3px;
+  font-size: 10px;
+  color:red;
+}
+.status-grey {
+  opacity: 0.2;
+  padding-right: 3px;
+  font-size: 10px;
+  color:silver;
+}
+
 .no-status {
   padding-right: 3px;
   font-size: 10px;

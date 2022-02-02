@@ -13,6 +13,7 @@ const datastreamer = {
     websocket = new ReconnectingWebSocket(datastreamurl)
     websocket.onmessage = msg => {
         let payload = JSON.parse(msg.data)
+        console.log(payload.topic)
 
         if (payload.topic == "sitestatus") {
             topic_handlers.status_stream_handler(payload.data)

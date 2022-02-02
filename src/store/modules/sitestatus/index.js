@@ -3,7 +3,7 @@ import Axios from "axios"
 import { statusAgeDisplay, STALE_AGE_MS } from './getters/status_utils'
 
 import enclosure_getters from './getters/enclosure_getters'
-import observing_conditions_getters from './getters/observing_conditions_getters'
+import weather_getters from './getters/weather_getters'
 import mount_getters from './getters/mount_getters'
 import telescope_getters from "./getters/telescope_getters"
 import camera_getters from "./getters/camera_getters"
@@ -19,7 +19,7 @@ const hasKey = (obj, key) => { return Object.keys(obj).includes(key) }
 
 // Used to reset the status to an empty state
 const empty_status = {
-  observing_conditions: {},
+  weather: {},
   enclosure: {},
   screen: {},
   focuser: {},
@@ -38,8 +38,16 @@ const state = {
   now: Date.now(),
   site_open_status: {},
 
-  observing_conditions: {},
+  /* new status stuff */
+  weather_status_age: 1e8,
+  enclosure_status_age: 1e8,
+  device_status_age: 1e8,
+  
+  /* end new */
+
+  weather: {},
   enclosure: {},
+
   screen: {},
   focuser: {},
   camera: {},
@@ -56,18 +64,26 @@ const getters = {
   site: state => state.site,
   now: state => state.now,
 
-  wx_status_age: state => (state.now - state.weather_timestamp) / 1000,
-  wx_status_age_display: (state, getters) => statusAgeDisplay(getters.wx_status_age),
+  //wx_status_age: state => (state.now - state.weather_timestamp) / 1000,
+  //wx_status_age_display: (state, getters) => statusAgeDisplay(getters.wx_status_age),
 
+  //device_status_age: state => (state.now - state.device_timestamp) / 1000,
+  //device_status_age_display: (state, getters) => statusAgeDisplay(getters.device_status_age),
+
+  //status_age: (state, getters) => (Math.min(getters.wx_status_age, getters.device_status_age)),
+  //status_age_display: (state, getters) => statusAgeDisplay(getters.status_age), 
+
+  site_is_online: (state, getters) => (getters.device_status_age * 1000) < STALE_AGE_MS,
+
+  weather_status_age: state => (state.now - state.weather_timestamp) / 1000,
+  weather_status_age_display: (state, getters) => statusAgeDisplay(getters.weather_status_age),
+  enclosure_status_age: state => (state.now - state.enclosure_timestamp) / 1000,
+  enclosure_status_age_display: (state, getters) => statusAgeDisplay(getters.enclosure_status_age),
   device_status_age: state => (state.now - state.device_timestamp) / 1000,
   device_status_age_display: (state, getters) => statusAgeDisplay(getters.device_status_age),
 
-  status_age: (state, getters) => (Math.min(getters.wx_status_age, getters.device_status_age)),
-  status_age_display: (state, getters) => statusAgeDisplay(getters.status_age), 
 
-  site_is_online: (state, getters) => (getters.status_age * 1000) < STALE_AGE_MS,
-
-  ...observing_conditions_getters,
+  ...weather_getters,
   ...enclosure_getters,
   ...mount_getters,
   ...telescope_getters,
@@ -84,20 +100,47 @@ const getters = {
 const mutations = {
   site(state, val) { state.site = val },
 
-  latest_status_timestamp_ms(state, time) { state.timestamp = time },
+  //latest_status_timestamp_ms(state, time) { state.timestamp = time },
+
   latest_device_timestamp_ms(state, time) { state.device_timestamp = time },
   latest_weather_timestamp_ms(state, time) { state.weather_timestamp = time },
+  latest_enclosure_timestamp_ms(state, time) { state.enclosure_timestamp = time },
+
   updateLocalClock(state, time) { state.now = time },
 
   siteOpenStatus(state, val) { state.site_open_status = val },
 
-  status(state, status) {
-
-    state.status = status
-
+  new_weather_status(state, status) {
+    state.weather = status['observing_conditions']
+  },
+  new_enclosure_status(state, status) {
+    state.enclosure = status['enclosure']
+  },
+  new_device_status(state, status) {
     let device_types = [
-      'observing_conditions',
-      'enclosure',
+      'screen',
+      'focuser',
+      'camera',
+      'telescope',
+      'mount',
+      'rotator',
+      'filter_wheel',
+      'sequencer',
+			'selector',
+    ]
+    // Set the status for each device-type
+    device_types.forEach(device_type => {
+      if (hasKey(status,device_type) && status[device_type] != null) {
+      	state[device_type] = status[device_type]
+			}
+    })
+  },
+
+  status(state, status) {
+    state.status = status
+    let device_types = [
+      //'observing_conditions',
+      //'enclosure',
       'screen',
       'focuser',
       'camera',
@@ -119,7 +162,7 @@ const mutations = {
   
   resetStatus(state) {
     const device_types = [
-      'observing_conditions',
+      'weather',
       'enclosure',
       'screen',
       'focuser',
@@ -163,16 +206,16 @@ const actions = {
     if (Object.keys(response.data).includes('status')) {
       let status = response.data.status
 
-      // Set the global status age to the most recent timestamp
-      commit('latest_status_timestamp_ms', response.data.latest_status_timestamp_ms)
+      // Set the status ages
+      commit('latest_device_timestamp_ms', response.data.status_age_timestamps_ms.device)
+      commit('latest_weather_timestamp_ms', response.data.status_age_timestamps_ms.weather)
+      commit('latest_enclosure_timestamp_ms', response.data.status_age_timestamps_ms.enclosure)
 
-      // Set the device status age
-      commit('latest_device_timestamp_ms', response.data.status_age_timestamps_ms.deviceStatus)
+      // Set the status content
+      commit('new_device_status', status) 
+      commit('new_weather_status', status) 
+      commit('new_enclosure_status', status) 
 
-      // Set the weather status age
-      commit('latest_weather_timestamp_ms', response.data.status_age_timestamps_ms.wxEncStatus)
-
-      commit('status', status)
       commit('site', current_site)
     } else {
       console.warn(`Status not available for ${current_site}.`)
@@ -183,8 +226,8 @@ const actions = {
   clearStatus({commit}) {
     //commit('status',empty_status)
     commit('resetStatus')
-    commit('latest_status_timestamp_ms', 0)
     commit('latest_weather_timestamp_ms', 0)
+    commit('latest_enclosure_timestamp_ms', 0)
     commit('latest_device_timestamp_ms', 0)
   },
 
