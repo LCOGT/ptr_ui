@@ -8,12 +8,12 @@ export default class StatusItem {
 
     secondsBeforeStale = 300 // status is stale if not updated in the last 5 minutes
 
-    constructor(name, value, units, timestamp, wx_status_age) {
+    constructor(name, value, units, timestamp, weather_status_age) {
         this.name = name
         this.value = value
         this.units = units ?? ''
         this.timestamp = timestamp ?? 0
-        this.wx_status_age = wx_status_age
+        this.weather_status_age = weather_status_age
     }
 
 
@@ -31,7 +31,7 @@ export default class StatusItem {
 
     get isStale() {
         return true
-        return (this.wx_status_age > 3)
+        return (this.weather_status_age > 3)
     }
 
     styleClass() {

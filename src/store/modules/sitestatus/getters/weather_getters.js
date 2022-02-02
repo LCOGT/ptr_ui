@@ -7,7 +7,7 @@ function get_val(getters, key) {
 }
 
 const weather_state = (state, getters, rootState) => {
-  return state.observing_conditions[rootState.site_config.selected_weather] ?? {}
+  return state.weather[rootState.site_config.selected_weather] ?? {}
 }
 
 const weather_ok = (state, getters) => {
@@ -100,7 +100,7 @@ const wx_hold = (state, getters) => {
   let color = display_colors.default
   let is_stale = isItemStale(getters, 'weather_state', 'wx_hold')
   if (!Object.keys(getters.weather_state).includes('wx_hold')) {
-    val = 'missing'
+    val = 'missing key'
     color = 'grey'
   } else {
     let is_holding = getters.weather_state.wx_hold.val
@@ -121,7 +121,7 @@ const hold_duration = (state, getters) => {
   let is_stale = isItemStale(getters, 'weather_state', 'hold_duration')
   let color
   if (!Object.keys(getters.weather_state).includes('hold_duration')) {
-    val = "missing"
+    val = "missing key"
     color = "grey"
   } else {
     color = display_colors.default

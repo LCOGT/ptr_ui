@@ -21,6 +21,7 @@
       :slotLabelInterval="fc_slotLabelInterval"
       :slotLabelFormat="fc_slotLabelFormat"
       :eventTimeFormat="fc_eventTimeFormat"
+      :locale="fc_locale"
       :timeZone="fc_timeZone"
       :min-time="fc_minTime"
       :max-time="fc_maxTime"
@@ -273,6 +274,7 @@ export default {
       fc_slotLabelInterval: "01:00:00",
       fc_eventTimeFormat: { hour: "numeric", minute: "2-digit", hour12: false }, // 24hr times on events
       fc_slotLabelFormat: { hour: "numeric", minute: "2-digit", hour12: false }, // 24hr time on axis labels
+      fc_locale: 'en-GB',  // so we can use 0:00 instead of 24:00
       fc_minTime: "12:00:00", // start the day column at noon
       fc_maxTime: "36:00:00", // end the day column at noon for the following day
       fc_scrollTime: "16:00:00", // calendar default view starts at 4pm.
