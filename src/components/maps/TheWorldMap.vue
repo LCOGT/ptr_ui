@@ -157,6 +157,8 @@ export default {
 
     renderSiteContent(name, sitecode, openStatus) {
 
+      const weather_status_not_stale = openStatus?.weather?.status_age_s < 300
+
       let weather_status = ` 
         <div class="status-entry">
             <div class="col">
@@ -164,37 +166,31 @@ export default {
             </div>
             <div class="col">
               <div class="val">
-                <span style="color:${openStatus.status_age_s > 60 ? 'red' : 'greenyellow'}"> 
-                ${openStatus.status_age_s > 60 ? 'Offline' : 'Online'} 
+                <span style="color:${weather_status_not_stale ? 'greenyellow' : 'red'}"> 
+                ${weather_status_not_stale ? 'Online' : 'Offline'} 
                 </span>
               </div>
             </div>
         </div>
         `
 
-      if (openStatus.hasWeatherStatus && openStatus.status_age_s < 60) {
+      if (weather_status_not_stale) {
         weather_status = `
           <div class="status-entry">
               <div class="col">
                 <div class="key">Status</div>
                 <div class="key">Weather:</div>
-                <div class="key">Can open:</div>
               </div>
               <div class="col">
                 <div class="val">
-                  <span style="color:${openStatus.status_age_s > 60 ? 'red' : 'greenyellow'}">
-                  ${openStatus.status_age_s > 60 ? 'Offline' : 'Online'}
+                  <span style="color:${weather_status_not_stale ? 'greenyellow' : 'red'}">
+                  ${weather_status_not_stale ? 'Online' : 'Offline'}
                   </span>
                 </div>
                 <div class="val">
-                  <span style="color:${openStatus.weather_ok ? 'greenyellow' : 'red'}">
-                  ${openStatus.weather_ok ? "placeholder" : "placeholder"}
+                  <span style="color:${openStatus.wx_ok ? 'greenyellow' : 'red'}">
+                  ${openStatus.wx_ok ? "ok" : "poor"}
                   </span>
-                </div>
-                <div class="val">
-                  <span style="color:${openStatus.open_ok ? 'greenyellow' : 'red'}">
-                  ${openStatus.open_ok ? "placeholder" : "placeholder"}</div>
-                    </span>
                 </div>
             </div>
         `
@@ -262,18 +258,33 @@ export default {
         return contentString
     },
 
-    getSiteMapColor(siteOpenStatus) {
+    /*
+      Strategy: 
+        if weather status is recent and wx_ok is true: green dot
+        if weather status is recent and wx_ok is false: red dot
+        otherwise: grey dot
+    */
+    getSiteMapColor(site_open_status) {
       const colors = {
         yellow: {r: 221, g: 156, b: 0},
         red: {r: 205, g: 0, b: 0},
         green: {r: 53, g: 154, b: 34},
         grey: {r: 100, g: 100, b: 100},
       }
-      if (parseFloat(siteOpenStatus.status_age_s) > 300) { return colors['grey'] }
-      if (!siteOpenStatus.hasWeatherStatus) { return colors['green']}
-      if (siteOpenStatus.weather_ok && siteOpenStatus.open_ok) {return colors['green']}
-      if (siteOpenStatus.weather_ok || siteOpenStatus.open_ok) {return colors['green']}
-      return colors['green']
+      const status_age_online = 300 // max number of seconds to be considered online
+      // online sites: weather is sending and ok. 
+      if (Object.keys(site_open_status).includes('wx_ok')) {
+        let weather_ok = site_open_status.wx_ok 
+        let weather_status_age = site_open_status.weather.status_age_s
+        let weather_is_recent = weather_status_age < status_age_online
+        if (!weather_is_recent) {
+          return colors['grey']
+        }
+        else {
+          return weather_ok ? colors['green'] : colors['red']
+        }
+      }
+      return colors['grey']
     },
 
     async redrawMapSites() {
