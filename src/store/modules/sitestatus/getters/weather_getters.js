@@ -15,7 +15,7 @@ const weather_ok = (state, getters) => {
   let color = display_colors.red
   let val = get_val(getters, 'wx_ok')
   let is_stale = isItemStale(getters, 'weather_state', 'wx_ok')
-  if (val == "Yes") { color = display_colors.green }
+  if (val.toLowerCase() == "yes") { color = display_colors.green }
   return { name, val, is_stale, color }
 }
 
@@ -23,7 +23,7 @@ const open_ok = (state, getters) => {
   let name = 'Open OK'
   let val = get_val(getters, 'open_ok')
   let color = display_colors.red
-  if (val == "Yes") { color = display_colors.green }
+  if (val.toLowerCase() == "yes") { color = display_colors.green }
   let is_stale = isItemStale(getters, 'weather_state', 'open_ok')
   return { name, val, color, is_stale}
 }
@@ -104,12 +104,13 @@ const wx_hold = (state, getters) => {
     color = 'grey'
   } else {
     let is_holding = getters.weather_state.wx_hold.val
-    if (is_holding) { 
+    if (is_holding == "Holding") { 
       color = display_colors.red
-      val = "TRUE"
-    } else {
-      color = display_colors.green
+      val = is_holding 
+    } else if (is_holding == "No Hold") {
       val = 'No Hold'
+    } else {
+      val = is_holding
     }
   }
   return { name, val, is_stale, color }
@@ -126,7 +127,7 @@ const hold_duration = (state, getters) => {
   } else {
     color = display_colors.default
     val = get_val(getters, 'hold_duration')
-    if (getters.weather_state?.wx_hold?.val) { color = display_colors.red }
+    if (getters.weather_state?.wx_hold?.val == "Holding") { color = display_colors.red }
   }
   return { name, val, is_stale, color }
 }

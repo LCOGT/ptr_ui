@@ -50,9 +50,8 @@
             </b-tooltip>
           </div>
           <pre class="log-message" :class="get_log_level_classes(log)">
-                        {{ format_log_message_text(log) }}
-                    </pre
-          >
+            {{ format_log_message_text(log) }}
+          </pre>
         </div>
       </div>
 
@@ -130,12 +129,7 @@
 
           <div class="clock-displays">
             <div style="display: flex; flex-direction: column">
-              <div class="online-status" :title="`status age: ${device_status_age_display.val}`" >
-                <div :class="{ 'status-on': site_is_online, 'status-off': !site_is_online}" ></div>
-                <p v-if="site_is_online" style="font-weight: bold; color: greenyellow" > online </p>
-                <p v-if="!site_is_online" style="font-weight: bold; color: orangered"> offline </p>
-              </div>
-
+              <SiteOperationalStatus :site="site"/>
               <div style="
                   display: flex;
                   flex-wrap: wrap;
@@ -229,6 +223,7 @@ import SiteSiderealTime from "@/components/display/SiteSiderealTime";
 import SiteLocalTime from "@/components/display/SiteLocalTime";
 import UtcTime from "@/components/display/UtcTime";
 import SiteReservationStatus from "@/components/SiteReservationStatus";
+import SiteOperationalStatus from "@/components/status/SiteOperationalStatus";
 export default {
   name: "SiteStatusFooter",
   mixins: [ user_status_mixin],
@@ -238,6 +233,7 @@ export default {
     SiteLocalTime,
     UtcTime,
     SiteReservationStatus,
+    SiteOperationalStatus,
   },
   props: {
     site: String,
@@ -537,11 +533,13 @@ $toggle-button-width: 50px;
  *  User status (log) styles (the top status bar)
  */
 
+ $user-status-font-family: unset;
+
 $log-debug: #aaa;
-$log-info: #bbb;
-$log-warning: $warning;
-$log-error: $danger;
-$log-critical: $danger;
+$log-info: #eee;
+$log-warning: $ptr-yellow;
+$log-error: $ptr-blue;
+$log-critical: $ptr-red;
 
 .status-bar-1 {
   padding-left: $left-padding;
@@ -552,6 +550,8 @@ $log-critical: $danger;
 .status-1-content {
   height: 2em;
 }
+
+
 
 .user-status {
   display: flex;
@@ -576,7 +576,7 @@ $log-critical: $danger;
 .default-log-message {
   color: #bbb;
   font-size: 11pt;
-  font-family: "Courier New", Courier, monospace;
+  font-family: $user-status-font-family;
 }
 
 .log-line {
@@ -590,13 +590,13 @@ $log-critical: $danger;
   grid-column-start: 1;
   padding-top: 2pt;
   font-size: 9pt;
-  font-family: "Courier New", Courier, monospace;
+  font-family: $user-status-font-family;
   align-items: center;
 }
 pre.log-message {
   color: #bbb;
   font-size: 11pt;
-  font-family: "Courier New", Courier, monospace;
+  font-family: $user-status-font-family;
   width: 100%;
   background-color: $user-status-background;
   grid-column-start: 2;
@@ -740,10 +740,6 @@ div.log-line:last-of-type * {
 /**
  * Individual Status Items
  */
-.online-status {
-  display: flex;
-  align-items: center;
-}
 .sidereal-time {
   padding-top: 10px;
   font-size: 20px;
@@ -756,39 +752,6 @@ div.log-line:last-of-type * {
   text-transform: uppercase;
   font-size: 10px;
 }
-.status-on {
-  /* Center the content */
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  margin-right: 10px;
-
-  /* Colors */
-  background-color: greenyellow;
-  color: #fff;
-
-  /* Rounded border */
-  border-radius: 9999px;
-  height: 12px;
-  width: 12px;
-}
-.status-off {
-  /* Center the content */
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  margin-right: 10px;
-
-  /* Colors */
-  background-color: orangered;
-  color: #fff;
-
-  /* Rounded border */
-  border-radius: 9999px;
-  height: 12px;
-  width: 12px;
-}
-
 .clock-border {
   margin-left: 50%;
   border-left: solid 1px grey;

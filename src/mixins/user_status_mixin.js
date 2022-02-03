@@ -111,12 +111,7 @@ export const user_status_mixin = {
             let message = log.message
             let log_level = log.log_level || "info"
 
-            if (["debug", "info"].includes(log_level.toLowerCase())) {
-                return message
-            }
-            else {
-                return `[${log_level.toUpperCase()}]  ${message}`
-            }
+            return message
         },
 
 

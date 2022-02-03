@@ -17,7 +17,7 @@
                     :to="{ path: '/site/' + site+ '/observe'}"
                     v-bind:key="'real'+index"
                     v-if="global_config[site]">
-                    <div :class="siteOnlineClass(site)">&#9679;&nbsp;</div>
+                    <div class="status-dot" :class="siteOnlineClass(site)" />
                     <span style="font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</span>
 										<span style="color: silver;">{{global_config[site].name}}</span>
                     <span></span>
@@ -29,7 +29,7 @@
                     :to="{ path: '/site/' + site+ '/observe'}"
                     v-bind:key="'sim'+index"
                     v-if="global_config[site]">
-                    <div :class="siteOnlineClass(site)">&#9679;&nbsp;</div>
+                    <div class="status-dot" :class="siteOnlineClass(site)" />
                     <span style="font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</span>
 										<span style="color: silver;">{{global_config[site].name}}</span>
                     <span></span>
@@ -199,6 +199,7 @@ nav {
   z-index:31; /* so the navbar doesn't cover fullscreen modals */
 }
 
+/*
 .status-green {
   opacity: 0.8;
   padding-right: 3px;
@@ -229,10 +230,42 @@ nav {
   font-size: 10px;
   color:silver;
 }
+*/
 
 .no-status {
   padding-right: 3px;
   font-size: 10px;
   opacity: 0;
+}
+
+.status-dot {
+  /* Center the content */
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-right: 10px;
+
+  background-color: blue;
+
+  /* Rounded border */
+  border-radius: 9999px;
+  height: 8px;
+  width: 8px;
+}
+.status-green {
+    opacity: 0.8;
+    background-color: $ptr-green;
+}
+.status-yellow {
+    opacity: 0.8;
+    background-color: $ptr-yellow;
+}
+.status-red {
+    opacity: 0.8;
+    background-color: $ptr-red;
+}
+.status-grey {
+    opacity: 0.8;
+    background-color: $ptr-grey;
 }
 </style>

@@ -4,27 +4,27 @@ import store from '../store'
 const status_stream_handler = message => {
   let statusType = message.statusType
   let status = message.status
+  let now = Date.now()
+  console.log(message)
+
   if (statusType == 'device') {
     store.commit('sitestatus/latest_device_timestamp_ms', message.server_timestamp_ms)
     store.commit('sitestatus/new_device_status', status)
-
-    let now = Date.now()
     store.commit('sitestatus/updateLocalClock', now)
   }
   else if (statusType == "weather") {
     store.commit('sitestatus/latest_weather_timestamp_ms', message.server_timestamp_ms)
     store.commit('sitestatus/new_weather_status', status)
-
-    let now = Date.now()
     store.commit('sitestatus/updateLocalClock', now)
 
   }
   else if (statusType == "enclosure") {
     store.commit('sitestatus/latest_enclosure_timestamp_ms', message.server_timestamp_ms)
     store.commit('sitestatus/new_enclosure_status', status)
-
-    let now = Date.now()
     store.commit('sitestatus/updateLocalClock', now)
+  }
+  else {
+    console.warn(statusType)
   }
 
   //if (statusType == "deviceStatus") {
