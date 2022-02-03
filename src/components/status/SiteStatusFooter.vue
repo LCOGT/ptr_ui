@@ -138,7 +138,6 @@
                 <div class="mr-5">
                   <site-sidereal-time
                     class="sidereal-time"
-                    :class="{ offline: !site_is_online}"
                     v-if="site_longitude"
                     :longitude="site_longitude"
                   />
@@ -147,7 +146,6 @@
                 <div class="mr-5">
                   <site-local-time
                     class="sidereal-time"
-                    :class="{ offline: !site_is_online}"
                     v-if="timezone"
                     :timezone="timezone"
                   />
@@ -157,7 +155,6 @@
                 <div class="mr-1">
                   <utc-time
                     class="sidereal-time"
-                    :class="{ offline: !site_is_online}"
                     v-if="timezone"
                     :timezone="timezone"
                   />
@@ -175,35 +172,30 @@
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!site_is_online"
               :statusList="primary_status_group_1"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!site_is_online"
               :statusList="primary_status_group_2"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!site_is_online"
               :statusList="primary_status_group_3"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!site_is_online"
               :statusList="primary_status_group_4"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :isOffline="!site_is_online"
               :statusList="primary_status_group_5"
             />
           </div>
@@ -451,16 +443,16 @@ export default {
     // Status columns appearing in the always-visible status area
     primary_status_group_1() {
       return [
-        this.enclosure_open_status,
         this.weather_ok,
-        this.open_ok,
+        this.wx_hold,
+        this.hold_duration,
       ];
     },
     primary_status_group_2() {
       return [
         this.enclosure_mode,
-        this.wx_hold,
-        this.hold_duration,
+        this.enclosure_open_status,
+        this.dome_azimuth,
       ]
     },
     primary_status_group_3() {
