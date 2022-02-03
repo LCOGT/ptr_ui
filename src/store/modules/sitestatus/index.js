@@ -64,24 +64,52 @@ const getters = {
   site: state => state.site,
   now: state => state.now,
 
-  //wx_status_age: state => (state.now - state.weather_timestamp) / 1000,
-  //wx_status_age_display: (state, getters) => statusAgeDisplay(getters.wx_status_age),
+  /**
+   *  Site operational status:
+   *    operational: recieving all status (weather, enclosure device), none are stale
+   *    technical difficulty: recieving some but not all status
+   *    offline: all status is stale
+   */
+  site_is_online: (state, getters) => {
+    const stale_age_s = STALE_AGE_MS / 1000
+    if (
+      getters.weather_status_age < stale_age_s
+      && getters.enclosure_status_age < stale_age_s
+      && getters.device_status_age < stale_age_s
+    ) {
+      return true
+    }
+    //(getters.device_status_age * 1000) < STALE_AGE_MS
+  },
 
-  //device_status_age: state => (state.now - state.device_timestamp) / 1000,
-  //device_status_age_display: (state, getters) => statusAgeDisplay(getters.device_status_age),
+  /**
+   *  Site operational status:
+   *    operational: recieving all status (weather, enclosure device), none are stale
+   *    technical difficulty: recieving some but not all status
+   *    offline: all status is stale
+   */
+  site_operational_status(state, getters) {
+    const stale_age_s = STALE_AGE_MS / 1000
+    const weather_not_stale = getters.weather_status_age < stale_age_s
+    const device_not_stale = getters.device_status_age < stale_age_s
+    const enclosure_not_stale = getters.enclosure_status_age < stale_age_s
 
-  //status_age: (state, getters) => (Math.min(getters.wx_status_age, getters.device_status_age)),
-  //status_age_display: (state, getters) => statusAgeDisplay(getters.status_age), 
-
-  site_is_online: (state, getters) => (getters.device_status_age * 1000) < STALE_AGE_MS,
+    if ( weather_not_stale && device_not_stale && enclosure_not_stale) {
+      return 'operational'
+    } else if ( weather_not_stale || device_not_stale || enclosure_not_stale) {
+      return 'technical difficulty'
+    } else {
+      return 'offline'
+    }
+  },
 
   weather_status_age: state => (state.now - state.weather_timestamp) / 1000,
-  weather_status_age_display: (state, getters) => statusAgeDisplay(getters.weather_status_age),
   enclosure_status_age: state => (state.now - state.enclosure_timestamp) / 1000,
-  enclosure_status_age_display: (state, getters) => statusAgeDisplay(getters.enclosure_status_age),
   device_status_age: state => (state.now - state.device_timestamp) / 1000,
-  device_status_age_display: (state, getters) => statusAgeDisplay(getters.device_status_age),
 
+  weather_status_age_display: (state, getters) => statusAgeDisplay(getters.weather_status_age),
+  enclosure_status_age_display: (state, getters) => statusAgeDisplay(getters.enclosure_status_age),
+  device_status_age_display: (state, getters) => statusAgeDisplay(getters.device_status_age),
 
   ...weather_getters,
   ...enclosure_getters,
@@ -248,106 +276,3 @@ export default {
   mutations,
   actions
 }
-
-/* Example Status:
-{
-  "observing_conditions":{
-    "observing_conditions1":{
-      "solar_flux_w/m^2":"NA",
-      "meas_sky_mpsas":"-11.56",
-      "open_ok":"No",
-      "dewpoint_C":"3.0",
-      "wind_m/s":"2.86",
-      "temperature_C":"11.4",
-      "humidity_%":"56.0",
-      "calc_HSI_lux":"439.939",
-      "rain_rate":"0.0",
-      "calc_sky_mpsas":"-11.37",
-      "last_sky_update_s":"4.16",
-      "pressure_mbar":"784.0",
-      "sky_temp_C":"-29.5",
-      "wx_ok":"No"
-    }
-  },
-  "enclosure":{
-    "enclosure1":{
-      "enclosure_mode":"Manual",
-      "dome_azimuth":"316.0",
-      "dome_slewing":"False",
-      "enclosure_message":"Closed. Initialized class property value.",
-      "shutter_status":"Closed",
-      "enclosure_slaving":"False"
-    }
-  },
-  "screen":{
-    "screen1":{
-      "bright_setting":"0",
-      "dark_setting":"screen is off"
-    }
-  },
-  "focuser":{
-    "focuser1":{
-      "focus_temperature":"7.0",
-      "focus_moving":"false",
-      "focus_position":"9415.3"
-    }
-  },
-  "camera":{
-    "camera1":{
-      "busy_lock":"false",
-      "status":"not implemented yet"
-    }
-  },
-  "telescope":{
-    "telescope1":{
-      "altitude":"-0.002",
-      "right_ascension":"4.28786",
-      "sidereal_time":"4.29609",
-      "azimuth":"180.001",
-      "message":"-",
-      "pointing_instrument":"tel1",
-      "zenith_distance":"90.0",
-      "declination":"-54.4978",
-      "coordinate_system":"J.now",
-      "tracking_declination_rate":"0.0",
-      "tracking_right_ascension_rate":"0.0",
-      "airmass":" >> 5 ",
-      "equinox":"J2020.68",
-      "timestamp":"1617128709"
-    }
-  },
-  "mount":{
-    "mount1":{
-      "is_slewing":"false",
-      "message":"-",
-      "is_parked":"true",
-      "is_tracking":"false",
-      "pointing_telescope":"tel1",
-      "timestamp":"1617128709"
-    }
-  },
-  "rotator":{
-    "rotator1":{
-      "rotator_moving":"false",
-      "position_angle":"190.001"
-    }
-  },
-  "send_heartbeat":"false",
-  "filter_wheel":{
-    "filter_wheel1":{
-      "filter_number":"0",
-      "filter_name":"none",
-      "filter_offset":"0.0",
-      "wheel_is_moving":"false"
-    }
-  },
-  "sequencer":{
-    "sequencer1":{
-      "active_script":"none",
-      "sequencer_busy":"false"
-    }
-  },
-  "timestamp":"1617128709",
-  "server_timestamp_ms":1617129036000
-}
-*/
