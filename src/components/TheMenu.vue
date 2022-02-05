@@ -14,7 +14,7 @@
             <b-navbar-dropdown label="observatories" :close-on-click="true" @click.native="updateSiteStatus"> 
                 <template v-for="(site, index) in real_sites">
                   <b-navbar-item tag="router-link" 
-                    :to="{ path: '/site/' + site+ '/observe'}"
+                    :to="{ path: '/site/' + site+ '/home'}"
                     v-bind:key="'real'+index"
                     v-if="global_config[site]">
                     <div class="status-dot" :class="siteOnlineClass(site)" />
@@ -26,7 +26,7 @@
                 <hr class="navbar-divider">
                 <template v-for="(site, index) in simulated_sites">
                   <b-navbar-item tag="router-link" 
-                    :to="{ path: '/site/' + site+ '/observe'}"
+                    :to="{ path: '/site/' + site+ '/home'}"
                     v-bind:key="'sim'+index"
                     v-if="global_config[site]">
                     <div class="status-dot" :class="siteOnlineClass(site)" />
