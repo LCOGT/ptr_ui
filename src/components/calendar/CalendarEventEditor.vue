@@ -11,74 +11,115 @@
     </b-field>
     
     <b-field horizontal label="Event Name">
-        <b-input :default="eventDetails.title" v-model="title">{{title}}</b-input>
-    </b-field>
-
-    <hr>
-
-    <b-field horizontal label="Night of">
-        <p class="is-family-primary">{{nightOf}}</p>
-    </b-field>
-
-    <b-field horizontal label="Start Time">
-        <b-select v-model="startStr">
-            <option
-            v-for="t in startTimeOptions"
-            :value="t.iso"
-            :key="t.sort">
-            {{t.hhmm}}
-            </option>
-        </b-select>
-    </b-field>
-
-    <b-field horizontal label="End Time">
-        <b-select v-model="endStr">
-            <option
-            v-for="t in endTimeOptions"
-            :value="t.iso"
-            :key="t.sort">
-            {{t.hhmm}}
-            </option>
-        </b-select>
-    </b-field>
-
-
-    <b-field horizontal>
-        {{eventDuration}}
-    </b-field>
-
-    <hr>
-
-    <b-field horizontal label="Project">
-        <div style="display:flex">
-            <b-select v-model="project_name_and_created">
-                <option value="none">none</option>
-                <option
-                    v-for="(project, index) in displayedProjects" 
-                    :key="index"
-                    :value="`${project.project_name}#${project.created_at}`" 
-                    aria-role="listitem">
-                    <span>{{project.project_name}}</span>
-                </option>
-            </b-select>
-            <b-checkbox 
-                v-if="userIsAdmin" 
-                v-model="show_everyones_projects"
-                class="pl-3" 
-                style="color: #aaa; margin-left: auto;">
-                [admin] show everyone's projects
-            </b-checkbox>
-        </div>
-    </b-field>
-
-    <b-field label="Note" horizontal >
         <b-input 
-            v-model="reservation_note" 
-            :maxlength="max_fits_header_length"
-            > </b-input>
+            v-model="title"
+            placeholder="Add a name for your reservation"
+            required
+            validation-message="Please include a title"
+            ref="title_input"
+        >{{title}}</b-input>
     </b-field>
 
     <hr>
+
+    <b-tabs type="is-boxed" v-model="reservation_type_tabs">
+        <b-tab-item label="Real Time Session" value="realtime">
+            <b-field horizontal label="Night of">
+                <p class="is-family-primary">{{nightOf}}</p>
+            </b-field>
+            <b-field horizontal label="Start Time">
+                <b-select v-model="startStr">
+                    <option
+                    v-for="t in startTimeOptions"
+                    :value="t.iso"
+                    :key="t.sort">
+                    {{t.hhmm}}
+                    </option>
+                </b-select>
+            </b-field>
+            <b-field horizontal label="Duration">
+                <b-field>
+                <b-radio-button v-model="real_time_session_duration"
+                    type="is-primary is-outlined"
+                    :focused="false"
+                    :native-value="30">
+                    30 min
+                </b-radio-button>
+                <b-radio-button v-model="real_time_session_duration"
+                    type="is-primary is-outlined"
+                    :focused="false"
+                    :native-value="45">
+                    45 min
+                </b-radio-button>
+                </b-field>
+            </b-field>
+        </b-tab-item>
+        <b-tab-item label="Project Session" value="project">
+            <b-field horizontal label="Night of">
+                <p class="is-family-primary">{{nightOf}}</p>
+            </b-field>
+            <b-field horizontal label="Start Time">
+                <b-select v-model="startStr">
+                    <option
+                    v-for="t in startTimeOptions"
+                    :value="t.iso"
+                    :key="t.sort">
+                    {{t.hhmm}}
+                    </option>
+                </b-select>
+            </b-field>
+
+            <b-field horizontal label="End Time">
+                <b-select v-model="endStr">
+                    <option
+                    v-for="t in endTimeOptions"
+                    :value="t.iso"
+                    :key="t.sort">
+                    {{t.hhmm}}
+                    </option>
+                </b-select>
+            </b-field>
+
+
+            <b-field horizontal>
+                {{eventDuration}}
+            </b-field>
+
+            <hr>
+
+            <b-field horizontal label="Project">
+                <div style="display:flex">
+                    <b-select v-model="project_name_and_created">
+                        <option value="none">none</option>
+                        <option
+                            v-for="(project, index) in displayedProjects" 
+                            :key="index"
+                            :value="`${project.project_name}#${project.created_at}`" 
+                            aria-role="listitem">
+                            <span>{{project.project_name}}</span>
+                        </option>
+                    </b-select>
+                    <b-checkbox 
+                        v-if="userIsAdmin" 
+                        v-model="show_everyones_projects"
+                        class="pl-3" 
+                        style="color: #aaa; margin-left: auto;">
+                        [admin] show everyone's projects
+                    </b-checkbox>
+                </div>
+            </b-field>
+            <b-field label="Note" horizontal >
+                <b-input 
+                    v-model="reservation_note" 
+                    :maxlength="max_fits_header_length"
+                    > </b-input>
+            </b-field>
+        </b-tab-item>
+
+    </b-tabs>
+
+    <hr>
+
     <b-field horizontal>
         <b-field>
         <div class="level">
@@ -151,8 +192,12 @@ export default {
             // Pos 10 to 80, including two single quotes containing the value
             max_fits_header_length: 68, 
 
+            real_time_session_duration: 30,
+            reservation_type_tabs: 'realtime',
+
+            no_title_warning:true,
+
             show_everyones_projects: false,
-            istrue: true,
 
             submitIsLoading: false,
             modifyIsLoading: false,
@@ -172,8 +217,10 @@ export default {
         }
     },
     mounted() {
+        console.log(this.eventDetails)
         this.startStr = moment(this.eventDetails.startStr).tz(this.timezone).format()
         this.endStr = moment(this.eventDetails.endStr).tz(this.timezone).format()
+        this.reservation_type_tabs = this.eventDetails.reservation_type
 
         // If an admin opens an event they didn't create, we want them to be able to see the associated project.
         // So we set 'show_everyones_projects' = true
@@ -192,7 +239,8 @@ export default {
             else {
                 this.$store.dispatch('user_data/fetchUserProjects', this.$auth.user.sub)
             }
-        }
+        },
+
     },
     computed: {
         ...mapState('user_data', [
@@ -240,7 +288,8 @@ export default {
                     startTimes.push({
                         sort: i,
                         iso:startOption.format(),
-                        hhmm:startOption.format('HH:mm')
+                        hhmm:startOption.format('HH:mm'),
+                        moment: startOption
                     })
                 }
                 // Increment the time for the next loop.
@@ -265,13 +314,21 @@ export default {
                     endTimes.push({
                         sort: i,
                         iso: endOption.format(),
-                        hhmm: endOption.format('HH:mm')
+                        hhmm: endOption.format('HH:mm'),
+                        moment: endOption
                     })
                 }
                 // Increment the time for the next loop.
                 endOption.add(interval, 'm')
             }
             return endTimes
+        },
+        // Compute an end string from the start time and duration
+        realtime_end_string(){ 
+            return moment(this.startStr)
+                .add(this.real_time_session_duration, 'm')
+                .tz(this.timezone)
+                .format()
         },
         eventDuration() {
             let start = moment.tz(this.startStr, this.timezone)
@@ -280,11 +337,13 @@ export default {
             return `(${duration.hours()}h, ${duration.minutes()}m)`
         },
         modifiedEvent() {
+            const end_string = this.reservation_type_tabs == "realtime" ? this.realtime_end_string : this.endStr
             let m_event = {
                 id: this.id,
                 startStr: this.startStr,
-                endStr: this.endStr,
+                endStr: end_string,
                 title: this.title,
+                reservation_type: this.reservation_type_tabs,
                 creator: this.creator,
                 creator_id: this.creator_id,
                 site: this.site,
@@ -306,16 +365,22 @@ export default {
     },
     methods: {
         handleSubmit() {
-            this.submitIsLoading = true;
-            this.$emit('submit', this.modifiedEvent)
+            let valid_inputs = this.$refs.title_input.checkHtml5Validity()
+            if (valid_inputs) {
+                this.submitIsLoading = true;
+                this.$emit('submit', this.modifiedEvent)
+            }
         },
         handleModify() {
-            this.modifyIsLoading = true;
-            const body = {
-                modifiedEvent: this.modifiedEvent,
-                initialEvent: this.eventDetails,
+            let valid_inputs = this.$refs.title_input.checkHtml5Validity()
+            if (valid_inputs) {
+                this.modifyIsLoading = true;
+                const body = {
+                    modifiedEvent: this.modifiedEvent,
+                    initialEvent: this.eventDetails,
+                }
+                this.$emit('modify', body)
             }
-            this.$emit('modify', body)
         },
         handleDelete() {
             this.deleteIsLoading = true;
