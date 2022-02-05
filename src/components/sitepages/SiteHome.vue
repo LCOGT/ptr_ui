@@ -30,7 +30,7 @@
         <a href=https://www.cleardarksky.com/c/LmyRdgObNMkey.html>
         <img src="https://www.cleardarksky.com/c/LmyRdgObNMcsk.gif?c=1594801"></a>
     </div>
-    <div class="level" v-if="sitecode.toLowerCase()=='fat'">
+    <div class="level" v-if="sitecode.toLowerCase()=='sro'">
         <a href=https://www.cleardarksky.com/c/SROCAkey.html>
         <img src="https://www.cleardarksky.com/c/SROCAcsk.gif?c=1076447"></a>
     </div>
