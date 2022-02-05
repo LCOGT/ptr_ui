@@ -780,7 +780,8 @@ export default {
     newEventSelected(event) {
       this.activeEvent.startStr = moment(event.startStr).utc().format();
       this.activeEvent.endStr = moment(event.endStr).utc().format();
-      this.activeEvent.title = "new event";
+      this.activeEvent.title = "";
+      this.activeEvent.reservation_type = "realtime" // or "project"
       this.activeEvent.creator = this.$auth.user.name;
       this.activeEvent.id = this.makeUniqueID();
       this.activeEvent.site = this.calendarSite;
@@ -797,10 +798,13 @@ export default {
      */
     existingEventSelected(arg) {
       let event = arg.event;
+      console.log(event);
+      //console.log(event.reservation_type)
       (this.activeEvent.id = event.id),
         (this.activeEvent.startStr = moment(event.start).format());
       this.activeEvent.endStr = moment(event.end).format();
       this.activeEvent.title = event.title;
+      this.activeEvent.reservation_type = event.extendedProps?.reservation_type ?? 'project' // legacy events may not include this key
       this.activeEvent.creator = event.extendedProps.creator;
       this.activeEvent.site = event.extendedProps.site;
       this.activeEvent.resourceId = event.getResources()[0].id;
@@ -890,6 +894,7 @@ export default {
         creator_id: newEvent.creator_id,
         site: newEvent.site,
         title: newEvent.title,
+        reservation_type: newEvent.reservation_type,
         resourceId: newEvent.resourceId,
         project_id: newEvent.project_id,
         reservation_note: newEvent.reservation_note,
@@ -969,6 +974,7 @@ export default {
         creator_id: modifiedEvent.creator_id,
         site: modifiedEvent.site,
         title: modifiedEvent.title,
+        reservation_type: modifiedEvent.reservation_type,
         resourceId: modifiedEvent.resourceId,
         project_id: modifiedEvent.project_id,
         reservation_note: modifiedEvent.reservation_note,
@@ -982,6 +988,7 @@ export default {
         creator_id: initialEvent.creator_id,
         site: initialEvent.site,
         title: initialEvent.title,
+        reservation_type: initialEvent.reservation_type,
         resourceId: initialEvent.resourceId,
         project_id: initialEvent.project_id,
         reservation_note: initialEvent.reservation_note,
@@ -1008,10 +1015,6 @@ export default {
     Fetching Calendar Events
     /===================================================*/
 
-    /**
-     * The event color should reflect whether it is owned by the user.
-     */
-    eventColor() {},
 
     async fetchSiteEvents(fetchInfo) {
       let site = this.calendarSite;
@@ -1039,6 +1042,7 @@ export default {
           end: obj.end,
           id: obj.event_id,
           title: obj.title,
+          reservation_type: obj.reservation_type,
           creator: obj.creator,
           creator_id: obj.creator_id,
           site: obj.site,
@@ -1047,15 +1051,28 @@ export default {
           reservation_note: obj.reservation_note,
           rendering: obj.rendering,
         };
-        if (
-          this.$auth.isAuthenticated &&
-          fObj.creator_id == this.$auth.user.sub
-        ) {
-          fObj.backgroundColor = "#933bff";
-          //fObj.borderColor = '#4099ff'
+
+        // Event colors
+        const projects_color = "#9c27b0" //"#4e1199"
+        const user_projects_border = "gold" //"#a35ff7"
+        const realtime_color = "#2196f3" //"#006e64"
+        const user_realtime_border = "gold" //"#00e5d0"
+
+        let user_owns_event = ( this.$auth.isAuthenticated && fObj.creator_id == this.$auth.user.sub) 
+        if (obj.reservation_type == "realtime") {
+          fObj.backgroundColor = realtime_color
+          fObj.borderColor = user_owns_event ? user_realtime_border : realtime_color 
+        } else if (obj.reservation_type == "project") {
+          fObj.backgroundColor = projects_color
+          fObj.borderColor = user_owns_event ? user_projects_border : projects_color 
+        } else {
+          fObj.backgroundColor = projects_color
+          fObj.borderColor = user_owns_event ? user_projects_border : projects_color 
         }
+
         return fObj;
       });
+      console.log(formatted_events)
       return formatted_events;
     },
   },
