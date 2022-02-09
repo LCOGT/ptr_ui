@@ -220,10 +220,10 @@ export default {
       // Get the fullCalendar api
       let api = this.$refs.fullCalendar.getApi();
 
-      // If the week view is displayed, we want to center the 'today' column.
+      // If the week view is displayed, 'today' to be the second column.
       if (api.view.type == 'timeGridWeek') {
         let today_day_number = moment().tz(this.fc_timeZone).day()
-        let starting_day_number = (today_day_number - 3) % 6
+        let starting_day_number = (today_day_number - 1) % 6
         return starting_day_number
       }
       else {
