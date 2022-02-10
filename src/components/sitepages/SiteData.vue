@@ -653,7 +653,7 @@ $tabs-toggle-link-border-width: 10px;
 @import "@/style/_responsive.scss";
 
 $site-data-wrapper-padding: 1em;
-$infobar-height: 50px;
+$infobar-height: 70px;
 $thumbnails-height: 100px;
 $controls-height: 55px;
 
