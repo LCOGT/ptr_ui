@@ -14,6 +14,7 @@
     <div class="image-info-bar-item airmass">airmass:&nbsp;{{current_image.airmass}}</div>
     <div class="image-info-bar-item altitude">altitude:&nbsp;{{current_image.altitude}}°</div>
     <div class="image-info-bar-item obstime">{{current_image.capture_date | dateToReadable }}</div>
+    <div class="image-info-bar-item filename">{{current_image.base_filename}}</div>
   </div>
 </template>
 
@@ -61,10 +62,11 @@ export default {
   color: #aaa;
   background-color: #1e2223;
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   grid-template-columns:  1fr 2fr 0.5fr 1fr 1fr;
   grid-template-areas: 'site exptime . ra dec'
-                       'filter-used obstime . airmass altitude';
+                       'filter-used obstime . airmass altitude'
+                       '. filename filename filename .';
   grid-column-gap: 10px;
   padding: 1px 3px;
   font-size: 9pt;
@@ -80,6 +82,7 @@ export default {
   .airmass { grid-area: airmass; }
   .altitude { grid-area: altitude; }
   .obstime { grid-area: obstime; }
+  .filename { grid-area: filename; color: white;}
 }
 
 </style>
