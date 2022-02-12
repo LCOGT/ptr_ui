@@ -1,6 +1,6 @@
 <template>
   <div class="image-toolbar-wrapper">
-    <b-field grouped>
+    <b-field grouped style="margin-bottom: 0;">
       <b-field> 
         <button title="open the JS9 analysis tools"
           class="button is-small" @click="toggleJS9">JS9</button> </b-field>
@@ -27,37 +27,42 @@
       </b-field>
     </b-field>
 
-    <b-field >
-      <p class="control">
-        <a class="button has-text-white is-small" 
-          :disabled="!small_fits_exists"
-          @click="download_current_fits('small')">
-          <b-icon icon="download" size="is-small" />
-          <span>small fits</span>
-        </a>
-      </p>
-      <p class="control">
-        <a class="button has-text-white is-small" 
-          :disabled="!large_fits_exists"
-          @click="download_current_fits('large')">
-          <b-icon icon="download" size="is-small" />
-          <span>large fits</span>
-        </a>
-      </p>
-      <p class="control">
-        <a class="button has-text-white is-small" 
-          @click="download_jpg">
-          <b-icon icon="download" size="is-small" />
-          <span>jpg</span>
-        </a>
-      </p>
-      <p class="control">
-        <b-button :loading="zip_download_waiting" class="button has-text-white is-small" @click="download_fits_previous_24hrs">
-          <b-icon icon="download" size="is-small" />
-          <span>last 24hrs fits</span>
-        </b-button>
-      </p>
-    </b-field>
+      <b-dropdown aria-role="list" position="is-top-left" >
+        <template #trigger="{ active }">
+            <b-button
+                :loading="download_waiting"
+                type="is-small"
+                :icon-right="active ? 'menu-up' : 'menu-down'" >
+            <b-icon icon="download" size="is-small" />
+            <span>download</span>
+          </b-button>
+        </template>
+
+        <b-dropdown-item aria-role="listitem" @click="download_current_fits('small')" :disabled="!small_fits_exists">
+          small fits
+        </b-dropdown-item>
+        <b-dropdown-item aria-role="listitem" @click="download_current_fits('large')" :disabled="!large_fits_exists">
+          large fits
+        </b-dropdown-item>
+        <b-dropdown-item aria-role="listitem" @click="download_tif('small', 'linear')" :disabled="!small_fits_exists">
+          small tif (linear)
+        </b-dropdown-item>
+        <b-dropdown-item aria-role="listitem" @click="download_tif('large', 'linear')" :disabled="!large_fits_exists">
+          large tif (linear)
+        </b-dropdown-item>
+        <b-dropdown-item aria-role="listitem" @click="download_tif('small', 'arcsinh')" :disabled="!small_fits_exists">
+          small tif (arcsinh)
+        </b-dropdown-item>
+        <b-dropdown-item aria-role="listitem" @click="download_tif('large', 'arcsinh')" :disabled="!large_fits_exists">
+          large tif (arcsinh)
+        </b-dropdown-item>
+        <b-dropdown-item aria-role="listitem" @click="download_jpg">
+          jpg
+        </b-dropdown-item>
+        <b-dropdown-item aria-role="listitem" @click="download_fits_previous_24hrs">
+          last 24hrs fits
+        </b-dropdown-item>
+    </b-dropdown>
   </div>
 </template>
 
@@ -73,7 +78,7 @@ export default {
   data() {
     return {
       isDownloadModalActive: false,
-      zip_download_waiting: false,
+      download_waiting: false,
     }
   },
 
@@ -86,7 +91,7 @@ export default {
         start_timestamp_s: Math.round(new Date().getTime() / 1000) - (24 * 3600),
         end_timestamp_s: Math.round(new Date().getTime() / 1000),
       }
-      this.zip_download_waiting = true
+      this.download_waiting = true
       axios.post(url, args)
         .then(response => {
           let download_url = response.data.message
@@ -120,13 +125,14 @@ export default {
 
 
         })
-        .finally(r => {this.zip_download_waiting = false})
+        .finally(r => {this.download_waiting = false})
     },
     /**
      * Allows users to download a fits file (from the current image displayed).
      */
     async download_current_fits(size) {
       let fits_url = ""
+      this.download_waiting = true
 
       // First we need to get the url that points to the file we want to download
       // If the file is from an info image...
@@ -154,18 +160,51 @@ export default {
         fits_url = await this.$store.dispatch('images/get_fits_url', params)
       }
 
+      this.download_waiting = false
       // The following line downloads the file
       window.location.assign(fits_url)
 
     },
     async download_fits_file(base_filename, data_type, reduction_level) {
+      this.download_waiting = true
       const params = {
         base_filename: base_filename, 
         data_type: data_type,
         reduction_level: reduction_level,
       }
-      const fits_url = await this.$store.dispatch('images/get_fits_url', params)
+      let fits_url = await this.$store.dispatch('images/get_fits_url', params)
+      this.download_waiting = false
       window.location.assign(fits_url)
+    },
+
+    async download_tif(size, stretch) {
+      this.download_waiting = true
+      const url = `${this.$store.state.dev.active_api}/download`
+      let body = {}
+
+      if (size == "large") {
+        body = {
+          s3_directory: this.current_image.s3_directory,
+          object_name: this.large_fits_filename,
+          stretch: stretch,
+          image_type: 'tif',
+        }
+      }
+      else if (size == "small") {
+        body = {
+          s3_directory: this.current_image.s3_directory,
+          object_name: this.small_fits_filename,
+          stretch: stretch,
+          image_type: 'tif',
+        }
+      }
+      else {
+        // handle error
+      }
+      let tif_url = await axios.post(url, body)
+      console.log(tif_url.data)
+      window.location.assign(tif_url.data)
+      this.download_waiting = false
     },
     download_jpg() {
       window.location.assign(this.current_image.jpg_url)
@@ -216,6 +255,10 @@ export default {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+
+.image-toolbar-wrapper > * {
+  margin-bottom: 0;
 }
 
 </style>

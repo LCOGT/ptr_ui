@@ -5,7 +5,6 @@ const status_stream_handler = message => {
   let statusType = message.statusType
   let status = message.status
   let now = Date.now()
-  console.log(message)
 
   if (statusType == 'device') {
     store.commit('sitestatus/latest_device_timestamp_ms', message.server_timestamp_ms)
