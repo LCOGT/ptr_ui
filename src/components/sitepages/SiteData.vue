@@ -738,7 +738,7 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
   grid-area: image;
   width: 100%;
   display: grid;
-  grid-template-rows: $infobar-height auto auto 80px 1fr;
+  grid-template-rows: $infobar-height auto auto auto 1fr;
   grid-template-columns: auto;
   overflow: hidden;
 
