@@ -58,10 +58,10 @@ export default {
         duration: this.right_click_ttl,
         message:
           //"Center telescope here? <br>Note: <em>telescope will move to the location you clicked.</em>.",
-          "Click to center the telescope here.",
+          "Click to move the telescope pointing so it is centered on the red marker",
         type: "is-warning",
         position: "is-top",
-        actionText: "Center on pixels",
+        actionText: "Center Telescope",
         queue: false,
         onAction: () => {
           this.send_pixels_center_command(
