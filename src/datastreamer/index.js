@@ -17,14 +17,17 @@ const datastreamer = {
         if (payload.topic == "sitestatus") {
             topic_handlers.status_stream_handler(payload.data)
         }
-        if (payload.topic == "imagedata") {
+        else if (payload.topic == "imagedata") {
             topic_handlers.new_data_stream_handler(payload.data)
         }
-        if (payload.topic == "userstatus") {
+        else if (payload.topic == "userstatus") {
             topic_handlers.user_status_handler(payload.data)
         }
-        if (payload.topic == "jobs") {
+        else if (payload.topic == "jobs") {
             topic_handlers.jobs_handler(payload.data)
+        }
+        else {
+          console.log('Unrecognized datastream message: ', payload.topic, payload)
         }
     }
   },

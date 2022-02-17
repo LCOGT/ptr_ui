@@ -11,9 +11,8 @@
         />
       </a>
 
-      <div 
+      <div class="lock-button"
         v-if="status_bar_1_expanded" 
-        class="lock-button" 
         title="keep expanded"
         @click="status_bar_1_lock = !status_bar_1_lock">
         <b-icon
@@ -31,7 +30,7 @@
       >
         <div
           class="default-log-message"
-          v-if="status_bar_1_expanded || logs_to_display.length == 0"
+          v-if="logs_to_display.length == 0"
         >
           observatory logs will appear here
         </div>
@@ -40,13 +39,14 @@
           v-bind:key="idx"
           class="log-line"
         >
-          <div class="log-timestamp">
+          <div class="log-timestamp-group">
+            <span class="user-status-title">{{idx==logs_to_display.length - 1 ? 'User Status: ' : ''}}</span>
             <b-tooltip
               position="is-top"
               type="is-dark"
-              :label="timezone /*timestamp_to_date(log.timestamp)*/"
+              :label="''/*timezone timestamp_to_date(log.timestamp)*/"
             >
-              {{ timestamp_to_logdate(log.timestamp) }}
+              <span class="log-timestamp">{{ timestamp_to_logdate(log.timestamp) }}</span>
             </b-tooltip>
           </div>
           <pre class="log-message" :class="get_log_level_classes(log)">
@@ -54,6 +54,7 @@
           </pre>
         </div>
       </div>
+      <PhaseStatusBar class="phase-status-bar"/>
 
     </div>
 
@@ -67,9 +68,9 @@
           :icon="status_bar_2_expanded ? 'chevron-up' : 'chevron-left'"
         />
       </a>
-      <div 
+
+      <div class="lock-button"
         v-if="status_bar_2_expanded" 
-        class="lock-button" 
         @click="status_bar_2_lock = !status_bar_2_lock">
         <b-icon
           type="is-text"
@@ -79,8 +80,7 @@
       </div>
 
       <div class="status-content">
-        <div
-          id="status-2-expanded"
+        <div id="status-2-expanded"
           class="container"
           v-if="status_bar_2_expanded"
         >
@@ -207,6 +207,8 @@
 </template>
 
 <script>
+/*** TODO: Refactor out the user status into its own component, like the phase status ***/
+
 import { mapGetters } from "vuex";
 import moment from "moment";
 import { user_status_mixin } from "../../mixins/user_status_mixin";
@@ -216,6 +218,7 @@ import SiteLocalTime from "@/components/display/SiteLocalTime";
 import UtcTime from "@/components/display/UtcTime";
 import SiteReservationStatus from "@/components/SiteReservationStatus";
 import SiteOperationalStatus from "@/components/status/SiteOperationalStatus";
+import PhaseStatusBar from '@/components/status/PhaseStatusBar'
 export default {
   name: "SiteStatusFooter",
   mixins: [ user_status_mixin],
@@ -226,6 +229,7 @@ export default {
     UtcTime,
     SiteReservationStatus,
     SiteOperationalStatus,
+    PhaseStatusBar,
   },
   props: {
     site: String,
@@ -312,7 +316,7 @@ export default {
     //  in the log UI
     timestamp_to_logdate(timestamp) {
       const timestamp_ms = timestamp * 1000;
-      return moment(timestamp_ms).format("YYYY/MM/DD HH:mm:ss");
+      return moment(timestamp_ms).format("MM/DD HH:mm:ss");
     },
 
     // Used to format the time for the timestmap tooltip.
@@ -534,8 +538,8 @@ $log-error: $ptr-blue;
 $log-critical: $ptr-red;
 
 .status-bar-1 {
-  padding-left: $left-padding;
-  padding-right: $toggle-button-width;
+  //padding-left: $left-padding;
+  //padding-right: $toggle-button-width;
   position:relative;
   background-color: $user-status-background;
 }
@@ -548,7 +552,7 @@ $log-critical: $ptr-red;
 .user-status {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  //width: 100%;
   line-height: 2em;
 }
 .user-status.expanded {
@@ -564,6 +568,10 @@ $log-critical: $ptr-red;
   overflow-x: hidden;
   padding-top: 2px;
 }
+.user-status-title {
+    font-size: 12px;
+    text-transform: uppercase;
+}
 
 .default-log-message {
   color: #bbb;
@@ -573,17 +581,27 @@ $log-critical: $ptr-red;
 
 .log-line {
   display: grid;
-  grid-template-columns: 12em 1fr;
-  width: 100%;
+  grid-template-columns: 220px 1fr;
+  width: 90%;
+}
+.log-timestamp-group {
+  display: flex;
+  justify-content: space-between;
 }
 .log-timestamp {
   color: #bbb;
   animation: blinkonce 1s;
   grid-column-start: 1;
   padding-top: 2pt;
+  padding-right: 15px;
   font-size: 9pt;
   font-family: $user-status-font-family;
+  font-family: monospace;
   align-items: center;
+  text-align: right;
+}
+.user-status-title {
+  font-family: unset;
 }
 pre.log-message {
   color: #bbb;
@@ -597,6 +615,7 @@ pre.log-message {
   hyphens: auto;
   padding: 0;
   padding-top: 2pt;
+  margin-left: 15px;
 }
 // Style the log message based on its log level class.
 pre.log-message.debug {
@@ -628,6 +647,14 @@ div.log-line:last-of-type * {
 }
 .log-line:hover * {
   color: white;
+}
+
+.phase-status-bar {
+  position:relative;
+  background-color: $user-status-background;
+  border-top: 1px grey solid;
+  border-bottom: 1px $grey-dark solid;
+  line-height: 2em;
 }
 
 /**
@@ -727,6 +754,10 @@ div.log-line:last-of-type * {
   color: whitesmoke;
   background-color: $toggle-button-color;
   z-index: 11;
+}
+
+.clock-displays {
+  width: 220px;
 }
 
 /**
