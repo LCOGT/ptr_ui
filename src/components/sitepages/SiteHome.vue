@@ -13,7 +13,7 @@
 
         <!-- Windy weather map -->
         <div class="windy-container">
-            <iframe style="width: 100%; height: 100%;" :src="`https://embed.windy.com/embed2.html?lat=${site_latitude}&lon=${site_longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${latitude}&detailLon=${longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`" frameborder="0"></iframe>
+            <iframe style="width: 100%; height: 100%;" :src="`https://embed.windy.com/embed2.html?lat=${site_latitude}&lon=${site_longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${site_latitude}&detailLon=${site_longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`" frameborder="0"></iframe>
         </div>
 
         <site-events-modal class="site-events" :sitecode="sitecode"/>
