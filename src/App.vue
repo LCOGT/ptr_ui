@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <!--the-menu /-->
 
     <router-view class="router-view"></router-view>
 
@@ -18,7 +17,7 @@
 </template>
 
 <script>
-import TheMenu from '@/components/TheMenu.vue'
+import SiteNavbar from '@/components/SiteNavbar.vue'
 import JS9 from "@/components/JS9";
 import axios from 'axios'
 
@@ -26,7 +25,7 @@ import axios from 'axios'
 export default {
   name: 'App',
   components: {
-    TheMenu,
+    SiteNavbar,
     JS9,
   },
   async created() {

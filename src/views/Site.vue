@@ -2,7 +2,7 @@
   <div class="page">
 
     <div class="total-site-menu">
-      <the-menu />
+      <SiteNavbar />
 
       <div class="mobile-site-menu">
         <button class="menu-padding"></button>
@@ -51,14 +51,12 @@
 </template>
 
 <script>
-import CommandButton from "@/components/CommandButton";
+import CommandButton from "@/components/FormElements/CommandButton";
 import ChatModule from "@/components/ChatModule";
-import SideInfoPanel from "@/components/SideInfoPanel";
 import StatusPanelCollapsible from "@/components/status/StatusPanelCollapsible";
-import StatusRow from "@/components/status/StatusRow";
 import SiteStatusFooter from "@/components/status/SiteStatusFooter";
 import SiteStatusFooterMobile from "@/components/status/SiteStatusFooterMobile";
-import TheMenu from '@/components/TheMenu.vue'
+import SiteNavbar from '@/components/SiteNavbar.vue'
 
 import SiteHome from "@/components/sitepages/SiteHome";
 import SiteObserve from "@/components/sitepages/SiteObserve";
@@ -81,12 +79,10 @@ export default {
     SiteProjects,
     SiteData,
     ChatModule,
-    SideInfoPanel,
     StatusPanelCollapsible,
-    StatusRow,
     SiteStatusFooter,
     SiteStatusFooterMobile,
-    TheMenu,
+    SiteNavbar,
   },
   props: ["sitecode", "subpage"],
   mixins: [commands_mixin],

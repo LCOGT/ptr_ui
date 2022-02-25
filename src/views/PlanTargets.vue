@@ -1,6 +1,6 @@
 <template>
 <div>
-<the-menu />
+<SiteNavbar />
 <section class="the-page">
   <div class="the-form">
     <form id="targform" @submit.prevent>
@@ -84,7 +84,7 @@ import Vue from 'vue';
 import axios from 'axios';
 import moment from 'moment';
 import TargetCard from '@/components/TargetCard';
-import TheMenu from '@/components/TheMenu';
+import SiteNavbar from '@/components/SiteNavbar';
 import list from '../../public/data/easytargets.json';
 import helpers from '@/utils/helpers';
 
@@ -92,7 +92,7 @@ export default {
   name: 'PlanTargets',
   components: {
     TargetCard,
-    TheMenu,
+    SiteNavbar,
   },
   data() {
     return {

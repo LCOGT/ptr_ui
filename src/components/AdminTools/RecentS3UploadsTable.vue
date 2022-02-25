@@ -58,7 +58,7 @@
 
 <script>
 import axios from "axios";
-import SiteSelectField from "@/components/SiteSelectField";
+import SiteSelectField from "@/components/FormElements/SiteSelectField";
 
 export default {
   name: "RecentS3UploadsTable",

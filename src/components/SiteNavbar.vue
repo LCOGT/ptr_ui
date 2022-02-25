@@ -89,7 +89,7 @@ import PTR from '@/components/logoText/PTR'
 import { mapGetters, mapState } from "vuex";
 
 export default {
-  name: "TheMenu",
+  name: "SiteNavbar",
   components: {
     PTR,
     PhotonRanch,

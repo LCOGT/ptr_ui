@@ -24,7 +24,7 @@
           @thumbnailClicked="setActiveImage"/>
       </div>
 
-      <image-navigation-toolbar class="mt-3"/>
+      <ButtonRowBelowImage class="mt-3"/>
     </div>
 
     <!-- Collapsible panels on the right of the image --> 
@@ -39,7 +39,7 @@
 
         <b-tab-item label="analysis" class="analysis-tab-item">
 
-          <div class="shapes-toolbar" > <div>Draw a region: </div> <shapes-toolbar /> </div>
+          <div class="shapes-toolbar" > <div>Draw a region: </div> <DrawShapesToolbar /> </div>
 
           <div class="flat-styled-tabs">
             <div class="flat-styled-tabs-buttons">
@@ -288,11 +288,8 @@
 import ImageView from '@/components/ImageView'
 import ImagesTable from '@/components/ImagesTable'
 import Js9Devtools from "@/components/Js9Devtools";
-import ImageNavigationPanel from "@/components/ImageNavigationPanel";
-import ImageFilter from "@/components/ImageFilter";
-import ImageInfoPanel from "@/components/ImageInfoPanel";
-import SideInfoPanel from "@/components/SideInfoPanel";
-import LineProfileInspection from "@/components/LineProfileInspection";
+import LineProfileInspection from "@/components/AnalysisTools/LineProfileInspection";
+import ImageFilter from "@/components/ImageFilter"
 import RaDisplay from "@/components/display/RaDisplay"
 import DecDisplay from "@/components/display/DecDisplay"
 import HistogramViewer from "@/components/HistogramViewer"
@@ -301,8 +298,8 @@ import CommandTabsWide from "@/components/CommandTabsWide"
 import ImageInfoBar from "@/components/ImageDisplay/ImageInfoBar"
 import InfoImageThumb from "@/components/ImageDisplay/InfoImageThumb"
 import ThumbnailRow from "@/components/ImageDisplay/ThumbnailRow"
-import ImageNavigationToolbar from "@/components/ImageDisplay/ImageNavigationToolbar"
-import ShapesToolbar from "@/components/ImageDisplay/ShapesToolbar"
+import ButtonRowBelowImage from "@/components/ImageDisplay/ButtonRowBelowImage"
+import DrawShapesToolbar from "@/components/ImageDisplay/DrawShapesToolbar"
 import RecentS3UploadsTable from '@/components/AdminTools/RecentS3UploadsTable'
 import SiteConfigViewer from '@/components/AdminTools/SiteConfigViewer'
 import StarProfile from '@/components/AnalysisTools/StarProfile'
@@ -319,11 +316,7 @@ export default {
   components: {
     ImageView,
     ImagesTable,
-    ImageInfoPanel,
-    ImageNavigationPanel,
-    ImageFilter,
     Js9Devtools,
-    SideInfoPanel,
     LineProfileInspection,
     RaDisplay,
     DecDisplay,
@@ -331,10 +324,11 @@ export default {
     CommandTabsAccordion,
     CommandTabsWide,
     ImageInfoBar,
+    ImageFilter,
     InfoImageThumb,
     ThumbnailRow,
-    ImageNavigationToolbar,
-    ShapesToolbar,
+    ButtonRowBelowImage,
+    DrawShapesToolbar,
     StarProfile,
     RecentS3UploadsTable,
     SiteConfigViewer,

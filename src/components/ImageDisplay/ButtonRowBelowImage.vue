@@ -74,7 +74,7 @@ const large_fits_reduction_level = '00'
 const small_fits_reduction_level = '10'
 
 export default {
-  name: "ImageToolbar",
+  name: "ButtonRowBelowImage",
   data() {
     return {
       isDownloadModalActive: false,

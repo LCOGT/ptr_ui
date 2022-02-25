@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import DatetimeWithTimezonePicker from "@/components/DatetimeWithTimezonePicker";
+import DatetimeWithTimezonePicker from "@/components/FormElements/DatetimeWithTimezonePicker";
 import axios from 'axios'
 export default {
   name: "DownloadInterface",

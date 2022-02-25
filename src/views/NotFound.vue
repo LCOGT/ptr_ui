@@ -1,6 +1,6 @@
 <template>
 <div class="page">
-    <TheMenu />
+    <SiteNavbar />
     <div style="display: flex; align-items:start; justify-content:flex-end; margin-top: 50px;">
         <div>
             <div class="has-text title"> 404: we're lost in space </div>
@@ -11,10 +11,10 @@
 </template>
 
 <script>
-import TheMenu from '@/components/TheMenu'
+import SiteNavbar from '@/components/SiteNavbar'
 export default {
     name: "NotFound",
-    components: { TheMenu }
+    components: { SiteNavbar }
     
 }
 </script>
