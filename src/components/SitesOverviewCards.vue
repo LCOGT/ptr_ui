@@ -67,12 +67,8 @@ import axios from 'axios';
 import _ from 'lodash'
 import { mapGetters } from 'vuex'
 
-import SiteReservationStatus from '@/components/SiteReservationStatus'
 export default {
   name: 'SitesOverviewCards',
-  components: {
-    SiteReservationStatus,
-  },
   props: {
     sites: {
       type: Array,

@@ -40,7 +40,7 @@
           class="log-line"
         >
           <div class="log-timestamp-group">
-            <span class="user-status-title">{{idx==logs_to_display.length - 1 ? 'User Status: ' : ''}}</span>
+            <span class="user-status-title">{{idx==logs_to_display.length - 1 ? 'OBSY LOG: ' : ''}}</span>
             <b-tooltip
               position="is-top"
               type="is-dark"
@@ -216,7 +216,6 @@ import StatusColumn from "@/components/status/StatusColumn";
 import SiteSiderealTime from "@/components/display/SiteSiderealTime";
 import SiteLocalTime from "@/components/display/SiteLocalTime";
 import UtcTime from "@/components/display/UtcTime";
-import SiteReservationStatus from "@/components/SiteReservationStatus";
 import SiteOperationalStatus from "@/components/status/SiteOperationalStatus";
 import PhaseStatusBar from '@/components/status/PhaseStatusBar'
 export default {
@@ -227,7 +226,6 @@ export default {
     SiteSiderealTime,
     SiteLocalTime,
     UtcTime,
-    SiteReservationStatus,
     SiteOperationalStatus,
     PhaseStatusBar,
   },

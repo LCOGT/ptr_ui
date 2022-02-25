@@ -1,6 +1,6 @@
 <template>  
   <div>
-    <the-menu />
+    <SiteNavbar />
     <div class="page-content">
 
 
@@ -16,7 +16,7 @@
 import PTR from "@/components/logoText/PTR";
 import PhotonRanch from "@/components/logoText/PhotonRanch";
 import TheWorldMap from "@/components/maps/TheWorldMap";
-import TheMenu from "@/components/TheMenu";
+import SiteNavbar from "@/components/SiteNavbar";
 import LeafletMap from "@/components/maps/LeafletMap";
 import SitesOverviewCards from '@/components/SitesOverviewCards'
 import { mapGetters } from 'vuex'
@@ -28,7 +28,7 @@ export default {
     PhotonRanch,
     TheWorldMap,
     LeafletMap,
-    TheMenu,
+    SiteNavbar,
     SitesOverviewCards,
   },
 

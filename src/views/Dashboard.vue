@@ -1,6 +1,6 @@
 <template>
     <div>
-        <TheMenu />
+        <SiteNavbar />
         <div class="dashboard-page container" style="display:flex; flex-direction: column; gap: 1em;">
         
             <div class="title">Recent S3 Uploads</div>
@@ -16,12 +16,12 @@
 <script>
 import RecentS3UploadsTable from '@/components/AdminTools/RecentS3UploadsTable'
 import SiteConfigViewer from '@/components/AdminTools/SiteConfigViewer'
-import TheMenu from '@/components/TheMenu'
+import SiteNavbar from '@/components/SiteNavbar'
 import PrivatePageNotice from '@/components/AdminTools/PrivatePageNotice'
 
 export default {
   name: 'Dashboard',
-  components: { RecentS3UploadsTable, SiteConfigViewer, TheMenu, PrivatePageNotice },
+  components: { RecentS3UploadsTable, SiteConfigViewer, SiteNavbar, PrivatePageNotice },
   data() {
     return {
     }

@@ -190,7 +190,7 @@ import { mapGetters } from 'vuex'
 
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import DateTimeLocationPicker from '@/components/celestialmap/DateTimeLocationPicker'
-import CommandButton from '@/components/CommandButton'
+import CommandButton from '@/components/FormElements/CommandButton'
 import CommandTabsAccordion from "@/components/CommandTabsAccordion"
 //import Celestial from '@/components/celestialmap/celestial'
 import celestial from 'd3-celestial'

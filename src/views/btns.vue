@@ -62,7 +62,7 @@ import { mapGetters } from 'vuex'
 import axios from 'axios';
 import helpers from '@/utils/helpers'
 import create_commands from '@/utils/create_command'
-import CommandButton from '@/components/CommandButton'
+import CommandButton from '@/components/FormElements/CommandButton'
 import all_objects from '../assets/all_objects.json'
 
 import wcs from '@/utils/pix2wcs'

@@ -23,9 +23,9 @@
 </template>
 
 <script>
-import UserEventsTable from "@/components/UserEventsTable";
-import UserProjectsTable from "@/components/UserProjectsTable";
-import CreateProjectForm from "@/components/CreateProjectForm";
+import UserEventsTable from "@/components/calendar/UserEventsTable";
+import UserProjectsTable from "@/components/projects/UserProjectsTable";
+import CreateProjectForm from "@/components/projects/CreateProjectForm";
 import { mapGetters } from "vuex";
 import axios from "axios";
 import moment from "moment";

@@ -18,12 +18,10 @@ import { commands_mixin } from '../../mixins/commands_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 
 // Components
-import CommandButton from '@/components/CommandButton'
+import CommandButton from '@/components/FormElements/CommandButton'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 import ScriptSettings from '@/components/ScriptSettings/ScriptSettings'
-import TheDomeCam from '@/components/TheDomeCam'
-import SideInfoPanel from '@/components/SideInfoPanel'
 import SiteData from '@/components/sitepages/SiteData'
 import ImagesTable from '@/components/ImagesTable'
 import StatusColumn from '@/components/status/StatusColumn'
@@ -36,8 +34,6 @@ export default {
     TheSkyChart,
     SimpleDeviceStatus,
     ScriptSettings,
-    TheDomeCam,
-    SideInfoPanel,
     SiteData,
     ImagesTable,
     StatusColumn,

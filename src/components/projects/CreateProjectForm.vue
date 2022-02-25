@@ -407,16 +407,10 @@
 import {mapGetters, mapState} from 'vuex'
 import axios from 'axios'
 import moment from 'moment'
-import SideInfoPanel from '@/components/SideInfoPanel'
-import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 
 export default {
     name: "CreateProjectForm",
     props: ["sitecode", "project_to_load"],
-    components: { 
-        SideInfoPanel,
-        TheSkyChart,
-    },
 
     watch: {
         project_to_load({ project, is_existing_project }) {

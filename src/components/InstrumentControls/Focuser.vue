@@ -109,7 +109,7 @@
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 
-import CommandButton from '@/components/CommandButton'
+import CommandButton from '@/components/FormElements/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 

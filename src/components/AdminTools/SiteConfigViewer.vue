@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import SiteSelectField from "@/components/SiteSelectField";
+import SiteSelectField from "@/components/FormElements/SiteSelectField";
 
 export default {
   name: "SiteConfigViewer",

@@ -28,13 +28,11 @@ import helpers from '@/utils/helpers'
 import axios from 'axios'
 import * as d3 from 'd3'
 
-import SideInfoPanel from "@/components/SideInfoPanel";
 import D3Axis from '@/components/svg/D3Axis'
 export default {
   name: 'LineProfileInspection',
 
   components: {
-    SideInfoPanel,
     D3Axis,
   },
 

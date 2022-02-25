@@ -2,7 +2,7 @@
 <div>
     <div class="container phase-status-wrapper">
         <div class="phase-status-title">
-            <span>Obsy Log: </span>
+            <span>Next Events: </span>
             <span class="timestamp">{{phase_status_sorted[0].timestamp | readable_date}}</span>
         </div> 
         <template v-for="(s, index) in phase_status_sorted">
@@ -33,8 +33,8 @@ import moment from 'moment'
 import axios from 'axios'
 
 const default_phase_status = {
-    timestamp: (Date.now() / 1000) - 86400,
-    message: 'no phase status reported'
+    timestamp: (Date.now() / 1000) - 86400, // set age to a day ago so it looks like an older message
+    message: 'no reported phase'
 }
 export default {
     name: "PhaseStatusBar",

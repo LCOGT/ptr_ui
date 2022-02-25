@@ -52,7 +52,6 @@
       </b-collapse>
 
       <image-filter/>
-      <image-navigation-panel/>
 
     </div>
 
@@ -64,15 +63,11 @@
 <script>
 import { mapGetters, mapState } from "vuex";
 import Js9Devtools from "@/components/Js9Devtools";
-import ImageNavigationPanel from "@/components/ImageNavigationPanel";
-import ImageFilter from "@/components/ImageFilter";
 import JS9 from "@/components/JS9";
 
 export default {
   name: "analysis",
   components: {
-    ImageNavigationPanel,
-    ImageFilter,
     Js9Devtools,
     JS9,
   },
