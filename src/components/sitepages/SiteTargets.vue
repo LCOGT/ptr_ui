@@ -35,6 +35,15 @@
         </div>
     </div>
 
+    <div class="quick-results">
+    <p>hey is this working</p>
+        <div v-for="target in targlist" :target="target" :key="target.name">
+            <TargetCard :target="target" />
+        </div>
+    </div>
+
+    <div class="break-column"></div>
+
     <div class="sidebar-wrapper">
         <a class="sidebar-button" @click="toggle_expand_sidebar">
             <div style="display: flex;">
@@ -62,7 +71,10 @@
                         :class="{'active': activeSidebarTab=='telescope controls'}" 
                         @click="activeSidebarTab='telescope controls'"
                         class="sidebar-tab-button">telescope controls</div>
-                    <div class="sidebar-tab-button tab-spacer"/>
+                    <div 
+                        :class="{'active': activeSidebarTab=='quick targets'}" 
+                        @click="activeSidebarTab='quick targets'"
+                        class="sidebar-tab-button">quick targets</div>                    
                 </div>
 
                 <div class="sidebar-tab-content">
@@ -172,6 +184,30 @@
                             </b-field>
                         </div>
 
+
+                    </div>
+
+                    <div v-if="activeSidebarTab=='quick targets'"> 
+                        <form id="targform" @submit.prevent>
+                        <b-field label="Date/Time of Observation">
+                        <b-datetimepicker 
+                            id="dateobs" 
+                            v-model="dateobs"
+                            :timepicker="{ incrementMinutes:15, hourFormat:timeformat}"
+                            :datetime-parser="(d) => {new Date(d)}"
+                            required 
+                            inline 
+                            @input="changeDate"/>
+                        </b-field>
+                        <b-field grouped>
+                            <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat">My time</b-radio>
+                            <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat"> UTC</b-radio>
+                            <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat">Observatory time</b-radio>
+                        </b-field>
+                        <b-field class="buttons">
+                            <b-button @click="submitForm" type="submit">Find Easy Targets</b-button>
+                        </b-field>
+                        </form>
 
                     </div>
                 </div>
@@ -663,5 +699,11 @@ $toggle-button-height: 32px;
     margin-bottom: 1em;
     width: 100%;
 }
+.break-column {
+    flex-basis: 100%; 
+    width: 0;
+}
+.quick-results {
 
+}
 </style>
