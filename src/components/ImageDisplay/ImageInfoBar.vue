@@ -1,7 +1,6 @@
 <template>
   <div>
-    <div class="image-info-bar-item site" v-if="fits_header_loaded && fits_header.OBJECT != 'Unspecified' ">obj:&nbsp;{{fits_header.OBJECT}}</div>
-    <div class="image-info-bar-item site" v-if="!fits_header_loaded || fits_header.OBJECT == 'Unspecified'">site:&nbsp;{{current_image.site}}</div>
+    <div class="image-info-bar-item site" >site:&nbsp;{{current_image.site}}</div>
     <div class="image-info-bar-item exptime">exptime:&nbsp;{{current_image.exposure_time}}s</div>
     <div class="image-info-bar-item filter-used">filter:&nbsp;{{current_image.filter_used}}</div>
     <div/>
@@ -33,14 +32,6 @@ export default {
       type: Object,
       required: true,
     },
-    fits_header: {
-      type: Object,
-      required: true,
-    },
-    fits_header_loaded: {
-      type: Boolean,
-      default: false,
-    }
   },
 
   filters: {

@@ -10,88 +10,84 @@
         style="display: flex"
       >
         <p> search filters </p>
-        <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"> </b-icon> 
+        <b-icon :icon="props.open ? 'menu-down' : 'menu-left'"> </b-icon> 
       </div>
 
       <div class="notification">
         <div class="content">
-          <form class="review-form" @submit.prevent="onSubmit">
-            <b-field label="Filename">
-              <b-input v-model="filename" placeholder="(Optional)"></b-input>
+
+            <b-field>
+              <b-radio-button 
+                v-model="show_user_data_only"
+                :native-value="true"
+                :disabled="!$auth.isAuthenticated"
+                >
+                <span>only my data</span>
+              </b-radio-button>
+
+              <b-radio-button 
+                v-model="show_user_data_only"
+                :native-value="false">
+                <span>everyone's data</span>
+              </b-radio-button>
+            </b-field>
+
+            <DatetimeWithTimezonePicker 
+              label="Start"
+              @input="(t) => (start_date = t)"
+              :date="new Date(Date.now() - 86400000)"
+              :site="sitecode" />
+            <DatetimeWithTimezonePicker 
+              label="End"
+              @input="(t) => (end_date = t)"
+              :date="new Date(Date.now() + 86400000)"
+              :site="sitecode" />
+
+            <b-field label="Exposure time (seconds)">
+              <b-input
+                type="number"
+                step="any"
+                min="0"
+                v-model="exp_time_min"
+                placeholder="min"
+              />
+              <p class="control">
+                <b-input
+                  type="number"
+                  step="any"
+                  min="0"
+                  v-model="exp_time_max"
+                  placeholder="max (optional)"
+                />
+              </p>
             </b-field>
 
             <b-field label="Filter">
-              <b-select v-model="filter" placeholder="--">
-                <option v-for="filter_option in filter_options">
-                  {{ filter_option }}
+              <b-select v-model="filter" placeholder="any">
+                <option v-for="(filter_option, index) in filter_wheel_options" :key="index">
+                  {{ filter_option[0] }}
                 </option>
               </b-select>
             </b-field>
 
-            <div class="columns">
-              <div class="column">
-            <b-field label="Start date">
-              <b-datepicker
-                placeholder="Type or select a date..."
-                v-model="start_date"
-                icon="calendar-today"
-                editable
-              >
-              </b-datepicker>
+            <b-field label="Filename">
+              <b-input v-model="filename" placeholder="(optional)"></b-input>
             </b-field>
-            </div>
-            <div class="column">
-            <b-field label="End date">
-              <b-datepicker
-                placeholder="Type or select a date..."
-                v-model="end_date"
-                icon="calendar-today"
-                editable
-              >
-              </b-datepicker>
-            </b-field>
-            </div>
-            </div>
-
-            <div class="columns">
-              <div class="column">
-                <b-field label="Exposure time (s)">
-                  <b-input
-                    type="number"
-                    step="any"
-                    min="0"
-                    v-model="exp_time_min"
-                    placeholder="min"
-                  >
-                  </b-input>
-                </b-field>
-              </div>
-              <div class="column">
-                <b-field label="(range optional)">
-                  <b-input
-                    type="number"
-                    step="any"
-                    min="0"
-                    v-model="exp_time_max"
-                    placeholder="max"
-                  >
-                  </b-input>
-                </b-field>
-              </div>
-            </div>
 
             <div style="display: flex; justify-content:space-between;">
-              <button
+              <b-button
                 @click="reset_fields"
                 class="button"
                 style="float: left"
                 aria-controls="contentIdForA11y1"
-              >
-                <i style="font-size: 14px" class="fa">&#xf0e2;</i>
-              </button>
-              <input type="submit" class="button" value="Submit" />
+              >clear form</b-button>
+              <b-button 
+                class="button" 
+                @click="onSubmit" 
+                :loading="submit_button_loading"
+              >submit</b-button>
             </div>
-          </form>
+
         </div>
       </div>
     </b-collapse>
@@ -99,14 +95,20 @@
 </template>
 
 <script>
+import DatetimeWithTimezonePicker from '@/components/FormElements/DatetimeWithTimezonePicker'
+import { mapGetters } from 'vuex'
+import axios from 'axios'
 var moment = require("moment");
 moment().format();
 
 export default {
   name: "ImageFilter",
   props: ["sitecode"],
+  components: { DatetimeWithTimezonePicker },
   data() {
     return {
+      submit_button_loading: false,
+      show_user_data_only: false,
       filename: null,
       exp_time_min: null,
       exp_time_max: null,
@@ -114,31 +116,6 @@ export default {
       start_date: null,
       end_date: null,
       filter: null,
-      filter_options: [
-        "air",
-        "dif",
-        "w",
-        "ContR",
-        "N2",
-        "u",
-        "g",
-        "r",
-        "i",
-        "zs",
-        "PL",
-        "PR",
-        "PG",
-        "PB",
-        "O3",
-        "HA",
-        "S2",
-        "dif_u",
-        "dif_g",
-        "dif_r",
-        "dif_i",
-        "dif_zs",
-        "dark",
-      ],
     };
   },
 
@@ -152,6 +129,7 @@ export default {
       this.filename = null;
       this.exp_time_min = null;
       this.exp_time_max = null;
+      this.show_user_data_only = false;
 
       //Get all images
       this.$store.dispatch("images/load_latest_images");
@@ -159,6 +137,7 @@ export default {
     },
 
     onSubmit() {
+      this.submit_button_loading = true
       let startDate = null;
       let endDate = null;
 
@@ -178,10 +157,41 @@ export default {
         end_date: endDate,
         filter: this.filter,
       };
+      if (this.show_user_data_only) {
+        filterparams.user_id = this.$auth.user.sub
+      }
 
-      this.$store.dispatch("images/get_filtered_images", filterparams);
+      this.$store.dispatch('images/toggle_live_data', false)
+      let url = this.$store.state.dev.active_api + '/filtered_images';
+      let body = { 
+          method: "GET",
+          params: filterparams,
+          //baseURL: apiName,
+          url: url,
+      }
+      axios(body).then(response => {
+        response = response.data
+        console.log(response)
+        // Empty response:
+        if (response.length == 0) { 
+            this.$store.dispatch('images/display_placeholder_image') 
+            return; 
+        }
+        this.$store.commit('images/setRecentImages',response)
+      }).catch(error => {
+          console.warn(error)
+      }).finally(() => {
+        this.submit_button_loading = false
+      });
+
     },
   },
+
+  computed: {
+    ...mapGetters('site_config', [
+      'filter_wheel_options'
+    ])
+  }
 };
 </script>
 
