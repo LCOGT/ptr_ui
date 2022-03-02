@@ -27,6 +27,10 @@
       </b-field>
     </b-field>
 
+
+    <b-field>
+      <FitsHeaderModal :image="current_image" button_size="is-small" class="mr-3" />
+
       <b-dropdown aria-role="list" position="is-top-left" >
         <template #trigger="{ active }">
             <b-button
@@ -63,18 +67,20 @@
           last 24hrs fits
         </b-dropdown-item>
     </b-dropdown>
+    </b-field>
   </div>
 </template>
 
 <script>
+import FitsHeaderModal from '@/components/ImageDisplay/FitsHeaderModal.vue'
 import axios from 'axios'
 import {mapState, mapGetters} from 'vuex';
 
-const large_fits_reduction_level = '00'
-const small_fits_reduction_level = '10'
-
 export default {
   name: "ButtonRowBelowImage",
+  components: {
+    FitsHeaderModal,
+  },
   data() {
     return {
       isDownloadModalActive: false,
@@ -147,7 +153,7 @@ export default {
         let params = {
           base_filename: this.current_image.base_filename, 
           data_type: this.current_image.data_type,
-          reduction_level: small_fits_reduction_level,
+          reduction_level: this.small_fits_reduction_level,
         }
         fits_url = await this.$store.dispatch('images/get_fits_url', params)
       }
@@ -155,7 +161,7 @@ export default {
         let params = {
           base_filename: this.current_image.base_filename, 
           data_type: this.current_image.data_type,
-          reduction_level: large_fits_reduction_level,
+          reduction_level: this.large_fits_reduction_level,
         }
         fits_url = await this.$store.dispatch('images/get_fits_url', params)
       }
@@ -229,6 +235,10 @@ export default {
   },
   computed: {
 
+    ...mapState("images", [
+      'large_fits_reduction_level',
+      'small_fits_reduction_level',
+    ]),
     ...mapGetters("images", [
       "recent_images",
       "current_image",

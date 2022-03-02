@@ -7,7 +7,6 @@
         class="image-info-bar"
         v-if="Object.keys(current_image).length > 0"
         :current_image="current_image"
-        :fits_header="fitsHeader"
         />
       <image-view 
         class="image-view"
@@ -139,7 +138,6 @@
               </div>
 
               <div v-if="activeAnalysisTab=='image info'" >
-                <b-button class="button ml-1 mt-3" outlined  @click="showFitsHeader">show fits header</b-button>
 
                 <div style="margin: 1em; display:flex; flex-direction: column;">
                   <table class="info-panel-table">
@@ -194,7 +192,7 @@
                     <span>All Data</span>
                   </b-radio-button>
                 </b-field>
-                <image-filter :sitecode="sitecode"/>
+                <ImageFilter :sitecode="sitecode"/>
               </div>
 
             </div>
@@ -212,7 +210,7 @@
             </b-field>
           </div>
           <div class="data-query-filters mb-4">
-            <image-filter />
+            <ImageFilter :sitecode="sitecode" />
           </div>
           <!--div class="data-query-quick-buttons mb-4"> <b-button class="is-small" @click="$store.dispatch('images/get_last_24hrs')"> all sites - last 24hrs </b-button> </div-->
           <images-table :image_array="recent_images" class="mb-4"/>
@@ -245,41 +243,6 @@
       </b-tabs>
     </div>
 
-  <!-- Modal popup window showing the full fits header. -->
-  <b-modal :active.sync="showFitsHeaderModal" >
-    <div class="card" style="min-height: 100vh;">
-      <div class="card-content">
-        <div class="level">
-          <div class=" level-left"> 
-            <figure class="level-item image is-64x64">
-              <img :src="current_image.jpg_url">
-            </figure>
-            <p class="title" style="overflow-wrap: anywhere; margin-left: 10px;">{{current_image.base_filename}}</p>
-          </div>
-          <div class="level-right">
-            <b-field>
-              <p class="control">
-                <button class="button" @click="$store.dispatch('images/set_next_image')">prev</button>
-              </p>
-              <p class="control">
-                <button class="button" @click="$store.dispatch('images/set_previous_image')">next</button>
-              </p>
-            </b-field>
-          </div>
-        </div>
-        <b-table
-            :mobile-cards="false" 
-            :narrowed="true"
-            :data="fitsHeaderTable"
-            :columns="columns"
-            style="width: auto; flex:0"
-            :loading="headerIsLoading"
-            >
-        </b-table>
-      </div>
-    </div>
-  </b-modal>
-
 </div>
 </div>
 </template>
@@ -304,6 +267,7 @@ import RecentS3UploadsTable from '@/components/AdminTools/RecentS3UploadsTable'
 import SiteConfigViewer from '@/components/AdminTools/SiteConfigViewer'
 import StarProfile from '@/components/AnalysisTools/StarProfile'
 import DownloadInterface from '@/components/DownloadInterface'
+import FitsHeaderModal from '@/components/ImageDisplay/FitsHeaderModal'
 
 import moment from 'moment'
 import { mapGetters, mapState } from "vuex";
@@ -333,6 +297,7 @@ export default {
     RecentS3UploadsTable,
     SiteConfigViewer,
     DownloadInterface,
+    FitsHeaderModal
   },
   data() {
     return {
@@ -342,23 +307,6 @@ export default {
       activeAnalysisTab: 'star inspector',  // default tab in 'analysis'
       activeDevTab: 'recents3',  // default tab in 'dev tools'
 
-      fitsHeader: {},
-      showFitsHeaderModal: false,
-      headerIsLoading: false,
-      columns: [
-        {
-            field: 'key',
-            label: 'key',
-            width: '100',
-            searchable: true,
-        },
-        {
-            field: 'val',
-            label: 'value',
-            searchable: true,
-        },
-      ],
-
       region_stats_loading: false,
       image_stats_loading: false,
 
@@ -367,8 +315,6 @@ export default {
       
       hist_counts: [0],
       hist_edges: [0,1],
-
-
     }
   },
   methods: {
@@ -487,38 +433,15 @@ export default {
       this.hist_edges = [0,1]
     },
 
-    refreshFitsHeader() {
-      this.fitsHeader = {}
-
-      // First check if image is placeholder. If so, nothing to show.
-      if (this.current_image.base_filename == "placeholder image") {
-        this.fitsHeader = {}
-        return
-      }
-      this.headerIsLoading = true 
-      //let url = `https://api.photonranch.org/api/fitsheader/${this.current_image.base_filename}/`
-      let url = this.$store.state.dev.active_api + `/fitsheader/${this.current_image.base_filename}/`
-      let response = axios.get(url).then(response => {
-        this.fitsHeader = response.data
-      }).finally(() => {
-        this.headerIsLoading = false
-      })
-    },
-
     // Activated by clicking on an image thumbnail. Displays that image
     // in the main view.
     setActiveImage(image) {
       this.$store.dispatch("images/set_current_image", image);
     },
 
-    showFitsHeader() {
-      this.refreshFitsHeader()
-      this.showFitsHeaderModal = true
-    },
   },
   watch: {
     current_image() {
-      if (this.showFitsHeaderModal) this.refreshFitsHeader(); 
       this.resetRegionStats()
       this.resetHistogram()
     },
@@ -586,17 +509,6 @@ export default {
     show_user_data_only: {
       get() { return this.$store.getters['images/show_user_data_only']},
       set(val) { this.$store.commit('images/show_user_data_only', val)} 
-    },
-
-    fitsHeaderTable() {
-      let tableData = []
-      for (const property in this.fitsHeader) {
-        tableData.push({
-          key: property.toLowerCase(),
-          val: this.fitsHeader[property]
-        })
-      }
-      return tableData
     },
 
     captureDate() {
@@ -731,7 +643,7 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
   padding: 0 2em;
   grid-area: image;
   width: 100%;
-  display: grid;
+  //display: grid; // for some reason this breaks the layout when loading lots of images
   grid-template-rows: $infobar-height auto auto auto 1fr;
   grid-template-columns: auto;
   overflow: hidden;
