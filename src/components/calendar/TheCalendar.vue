@@ -798,8 +798,7 @@ export default {
      */
     existingEventSelected(arg) {
       let event = arg.event;
-      console.log(event);
-      //console.log(event.reservation_type)
+      //console.log(event);
       (this.activeEvent.id = event.id),
         (this.activeEvent.startStr = moment(event.start).format());
       this.activeEvent.endStr = moment(event.end).format();
@@ -1072,7 +1071,6 @@ export default {
 
         return fObj;
       });
-      console.log(formatted_events)
       return formatted_events;
     },
   },
