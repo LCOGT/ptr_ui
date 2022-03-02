@@ -33,8 +33,8 @@
       <b-dropdown-item value="observation" aria-role="listitem">
           <span>UTC Date</span>
       </b-dropdown-item>
-      <b-dropdown-item value="tif_download" aria-role="listitem">
-          <span>TIF Downloads</span>
+      <b-dropdown-item value="download" aria-role="listitem">
+          <span>Download</span>
       </b-dropdown-item>
     </b-dropdown>
 
@@ -102,27 +102,25 @@
       </b-table-column>
 
       <b-table-column 
-        field="tif_download" 
-        label="tif download" 
-        :visible="is_visible('tif_download')"
+        field="download" 
+        label="download" 
+        :visible="is_visible('download')"
         v-slot="props">
         <b-field>
         <p class="control">
           <b-button 
             size="is-small"
-            @click="download_tif(props.row, 'linear')" 
-            :loading="file_downloading==props.row.base_filename + 'tif_linear'">
-            linear
-            <!--b-icon icon="download" size="is-small" /-->
+            @click="download_fits(props.row)" 
+            :loading="check_download_in_progress(props.row.base_filename + 'fits')">
+            fits
           </b-button>
         </p>
         <p class="control">
           <b-button 
             size="is-small"
             @click="download_tif(props.row, 'arcsinh')" 
-            :loading="file_downloading==props.row.base_filename + 'tif_arcsinh'">
-            <!--b-icon icon="download" size="is-small" /-->
-            arcsinh
+            :loading="check_download_in_progress(props.row.base_filename + 'tif_arcsinh')">
+            tif
           </b-button>
         </p>
         </b-field>
@@ -178,9 +176,26 @@ export default {
       isSelectable: true,
 
       file_downloading: '',
+
+      download_in_progress: [],
     };
   },
   methods: {
+
+    add_download_progress(id) {
+      if (!this.download_in_progress.includes(id)) {
+        this.download_in_progress.push(id)
+      }
+    },
+    remove_download_in_progress(id) {
+      if (this.download_in_progress.includes(id)) {
+        this.download_in_progress = this.download_in_progress.filter(x => x != id)
+      }
+    },
+    check_download_in_progress(id) {
+      return this.download_in_progress.includes(id)
+    },
+
     is_visible(column) {
       return this.visibleColumns.includes(column)
     },
@@ -215,12 +230,32 @@ export default {
       }
       return "---";
     },
+
+    async download_fits(image) {
+      let current_download_id = image.base_filename + `fits`
+      this.add_download_progress(current_download_id)
+      //this.download_in_progress.push(current_download_id)
+
+      let large_fits_reduction_level = this.$store.state.images.large_fits_reduction_level
+      let object_name = `${image.base_filename}-${image.data_type}${large_fits_reduction_level}.fits.bz2`
+
+      const url = `${this.$store.state.dev.active_api}/download`
+      let body = {
+        s3_directory: image.s3_directory,
+        object_name: object_name,
+        image_type: 'fits',
+      }
+
+      let fits_url = await axios.post(url, body);
+      console.log(fits_url.data)
+      window.location.assign(fits_url.data)
+      //this.download_in_progress.delete(current_download_id)
+      this.remove_download_in_progress(current_download_id)
+    },
     async download_tif(image, stretch) {
-      this.file_downloading = image.base_filename + `tif_${stretch}`
-
-      let size = "large"
-
-      let s3_directory = image.s3_directory
+      let current_download_id = image.base_filename + `tif_${stretch}`
+      //this.download_in_progress.add(current_download_id)
+      this.add_download_progress(current_download_id)
 
       let large_fits_reduction_level = this.$store.state.images.large_fits_reduction_level
       let object_name = `${image.base_filename}-${image.data_type}${large_fits_reduction_level}.fits.bz2`
@@ -234,10 +269,11 @@ export default {
       }
 
       let tif_url = await axios.post(url, body)
-      console.log(tif_url.data)
       window.location.assign(tif_url.data)
-      this.file_downloading = ''
+      //this.download_in_progress.delete(current_download_id)
+      this.remove_download_in_progress(current_download_id)
     },
+
   },
 
   computed: {
@@ -251,6 +287,7 @@ export default {
         this.$store.dispatch("images/set_current_image", value);
       },
     },
+
   },
 };
 </script>

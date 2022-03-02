@@ -1,9 +1,11 @@
 
 <template>
   <div class="command-tab-accordion-wrapper">
-    <b-tabs  type="is-toggle" 
+    <b-tabs  
+    type="is-toggle" 
       size="is-small" 
       :animated="false"
+      v-model="active_tab"
       multiline>
       <template v-for="(instrument, index) of instruments">
         <b-tab-item 
@@ -46,6 +48,11 @@ export default {
     Sequencer,
     Settings,
   },
+  data() {
+    return {
+      active_tab: 5,
+    }
+  },
   methods: {
     selected_instrument(instrument) {
       let inst = instrument.toLowerCase()
@@ -71,12 +78,12 @@ export default {
         'Telescope',
         'Rotator',
         'Focuser',
+        'Camera', 
       ])
       if (this.selector_exists) {
         inst.push('InstrumentSelector')
       }
       inst.push(...[
-        'Camera', 
         'Sequencer',
         'Settings',
       ])
