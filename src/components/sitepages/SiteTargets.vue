@@ -1,7 +1,13 @@
 <template>
 <div id="site-targets-wrapper">
+    
+    <div class="easy-results" v-if="show_results">
+        <div v-for="target in targlist" :target="target" :key="target.name">
+            <TargetCard :target="target" />
+        </div>
+    </div>
 
-    <div  class="skychart-wrapper">
+    <div  class="skychart-wrapper" v-else>
         <div class="skychart-center">
             <the-sky-chart class="the-skychart" 
                 :showStars="showStars" 
@@ -35,13 +41,7 @@
         </div>
     </div>
 
-    <div class="easy-results">
-        <div v-for="target in targlist" :target="target" :key="target.name">
-            <TargetCard :target="target" />
-        </div>
-    </div>
-
-    <div class="break-column"></div>
+    <div class="break-column" v-if="show_results"></div>
 
     <div class="sidebar-wrapper">
         <a class="sidebar-button" @click="toggle_expand_sidebar">
@@ -195,30 +195,29 @@
                         </b-field>
                         <form id="targform" @submit.prevent>
                                 <b-field label="Photon Ranch Location" class= "control is-expanded">
-                                <b-select id="observatorytime" v-model="observatorytime" @input="setLatLong">
+                                <b-select id="selected_target_obs" v-model="selected_target_obs" @input="setLatLong" :disabled="isLiveEasyTargets">
                                     <option v-for="s in site_info"
                                     :key="s.name"
                                     :lat="s.latitude"
                                     :lon="s.longitude"
-                                    :value="s.siteoffset"
-                                    :disabled="isLiveEasyTargets"
+                                    :value="s.site"
                                     >{{s.name}}</option>
-                                    <option lat="" lon="" value="X" :disabled="isLiveEasyTargets">Custom Latitude and Longitude</option>
+                                    <option lat="" lon="" value="X">Custom Latitude and Longitude</option>
                                 </b-select>
                                 </b-field>
                                 <div class="field has-addons">
                                 <p class="control is-expanded">
                                     <b-field label="Latitude">
-                                    <b-input type="text" id="lat1" v-model="lat1" required :disabled="observatorytime!=='X'"/>
+                                    <b-input type="text" id="lat1" v-model="lat1" required :disabled="selected_target_obs!=='X'"/>
                                     </b-field>
                                 </p>
                                 <p class="control is-expanded">
                                     <b-field label="Longitude">
-                                    <b-input type="text" id="lon1" v-model="lon1" required :disabled="observatorytime!=='X'"/>
+                                    <b-input type="text" id="lon1" v-model="lon1" required :disabled="selected_target_obs!=='X'"/>
                                     </b-field>
                                 </p>
                                 </div>
-                                <div v-if="observatorytime =='X'" class="field">
+                                <div v-if="selected_target_obs =='X'" class="field">
                                 <p class="control is-expanded">
                                     <b-field label="Observatory UTC Offset (in hours)">
                                     <b-numberinput v-model="customobservatoryoffset" step=0.01 :controls="false" :required = "tzinfo == 'lcl'"></b-numberinput>
@@ -240,23 +239,28 @@
                                     </b-field>
                                 </p>
                                 </div>
-                                <div v-if="observatorytime !=='X' || customobservatoryoffset !== ''" class="field">
+                                <div v-if="selected_target_obs !=='X' || customobservatoryoffset !== ''" class="field">
                                     <b-field grouped>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat" :disabled="isLiveEasyTargets">My time</b-radio>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat" :disabled="isLiveEasyTargets"> UTC</b-radio>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat" :disabled="isLiveEasyTargets">Observatory time</b-radio>
+                                    <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat" >My time</b-radio>
+                                    <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat" > UTC</b-radio>
+                                    <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat" >Observatory time</b-radio>
                                     </b-field>
                                 </div>
                                 <div v-else class="field">
                                     <b-field grouped>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat" :disabled="isLiveEasyTargets">My time</b-radio>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat" :disabled="isLiveEasyTargets"> UTC</b-radio>
+                                    <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat" >My time</b-radio>
+                                    <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat" > UTC</b-radio>
                                     </b-field>
                                 </div>
                                     <div class="the-button">
                                     <b-field class="buttons">
                                         <b-button @click="submitForm" type="submit">Find Easy Targets</b-button>
+                                        <b-button @click="show_results = !show_results" v-if="show_toggle">
+                                            <div v-if="show_results"> Show Sky Map</div>
+                                            <div v-else> Show Targets </div>
+                                        </b-button>
                                     </b-field>
+                                    
                                 </div>
                             </form>
 
@@ -347,18 +351,23 @@ export default {
             skychart_date: new Date(),
             skychart_location: [0,0],
 
+            show_results: '',
+            show_toggle: '',
+
             // Directly copied from PlanTargets.vue
             site_info: {},
             easylist: list,
             target: {},
             targlist: '',
+            testvariable: 'test',
+            selected_target_obs: '',
             lat1: '',
             lon1: '',
             customobservatoryoffset: new Date().getTimezoneOffset()/-60,
             dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour
             dateobsreal: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour,
             tzinfo: 'my',
-            observatorytime: 'America/Los_Angeles',
+            observatorytime: '',
             timeformat: undefined,
         }
     },
@@ -417,17 +426,19 @@ export default {
     created: function() {
         const url = "https://api.photonranch.org/api/all/config"
         axios.get(url).then(response => {
-        for (let site in response.data) {
-            Vue.set(this.site_info, site, {
-            latitude: response.data[site].latitude,
-            longitude: response.data[site].longitude,
-            name: response.data[site].name,
-            siteoffset: response.data[site].TZ_database_name
+        for (let s in response.data) {
+            Vue.set(this.site_info, s, {
+            latitude: response.data[s].latitude,
+            longitude: response.data[s].longitude,
+            name: response.data[s].name,
+            site: response.data[s].site,
+            siteoffset: response.data[s].TZ_database_name
             })
         }
-        Vue.set(this, 'observatorytime', this.site_info.mrc.siteoffset)
-        Vue.set(this, 'lat1', this.site_info.mrc.latitude)
-        Vue.set(this, 'lon1', this.site_info.mrc.longitude)
+        Vue.set(this, 'selected_target_obs', this.sitecode)
+        Vue.set(this, 'observatorytime', this.timezone)
+        Vue.set(this, 'lat1', this.site_latitude)
+        Vue.set(this, 'lon1', this.site_longitude)
         })
         .catch(error => {
         console.warn(error)
@@ -525,7 +536,7 @@ export default {
 
             this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(5))
             this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
-            this.$store.commit('command_params/mount_object', ' ') // clear teh mount_object entry
+            this.$store.commit('command_params/mount_object', ' ') // clear the mount_object entry
         }, 
 
         handleMapClick(e) {
@@ -549,9 +560,10 @@ export default {
 
         // Easy Targets functions
         setLatLong() {
-        const selectedOption = document.getElementById('observatorytime').options[document.getElementById('observatorytime').selectedIndex];
+        const selectedOption = document.getElementById('selected_target_obs').options[document.getElementById('selected_target_obs').selectedIndex];
         this.lat1 = selectedOption.getAttribute('lat');
         this.lon1 = selectedOption.getAttribute('lon');
+        this.observatorytime = this.site_info[this.selected_target_obs].siteoffset;
 
         },
         changeDate() {
@@ -575,7 +587,10 @@ export default {
             this.dateobs = this.dateobsobs
         }
         },
+        
         submitForm() {
+        this.show_results = true;
+        this.show_toggle = true;
         var diclist = [];
 
         var endtime = moment(this.dateobsreal).add(30, 'm').toDate();
@@ -624,7 +639,15 @@ export default {
                 this.skychart_location = [this.site_latitude, this.site_longitude]
                 this.skychart_date = new Date()
             }
-        }
+        },
+
+        // If the live easy targets is activated, switch back to current date/time/location
+        isLiveEasyTargets() {
+            if (this.isLiveEasyTargets) {
+                testvariable = 'yep';
+
+            }
+        },
 
     },
     computed: {
@@ -652,7 +675,7 @@ export default {
             return new Date(this.dateobsreal).getTimezoneOffset()
         },
         observatoryoffset() {
-            if (this.observatorytime =='X') {
+            if (this.selected_target_obs =='X') {
                 return this.customobservatoryoffset*60
             } else {
                 return moment.utc(this.dateobs).tz(this.observatorytime).utcOffset()
@@ -669,7 +692,9 @@ export default {
 
         ...mapGetters('site_config', [
             'site_latitude',
-            'site_longitude'
+            'site_longitude',
+            'site_name',
+            'timezone',
         ])
     },
     
@@ -876,6 +901,8 @@ $toggle-button-height: 32px;
     width: 0;
 }
 .easy-results {
-
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:center;
 }
 </style>
