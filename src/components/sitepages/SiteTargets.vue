@@ -1,13 +1,13 @@
 <template>
 <div id="site-targets-wrapper">
-    
-    <div class="easy-results" v-if="show_results">
+
+    <div class="easy-results" v-show="show_results">
         <div v-for="target in targlist" :target="target" :key="target.name">
             <TargetCard :target="target" />
         </div>
     </div>
 
-    <div  class="skychart-wrapper" v-else>
+    <div  class="skychart-wrapper" v-show="!show_results">
         <div class="skychart-center">
             <the-sky-chart class="the-skychart" 
                 :showStars="showStars" 
@@ -351,7 +351,7 @@ export default {
             skychart_date: new Date(),
             skychart_location: [0,0],
 
-            show_results: '',
+            show_results: false,
             show_toggle: '',
 
             // Directly copied from PlanTargets.vue
@@ -359,7 +359,6 @@ export default {
             easylist: list,
             target: {},
             targlist: '',
-            testvariable: 'test',
             selected_target_obs: '',
             lat1: '',
             lon1: '',
