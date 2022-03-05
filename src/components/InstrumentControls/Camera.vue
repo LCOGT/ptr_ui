@@ -3,8 +3,9 @@
   <div class="instrument-control-wrapper">
 
     <div class="buttons has-addons">
-      <command-button :data="camera_expose_command" style="width: 70%;" class=" is-outlined is-success"/>
-      <command-button :data="camera_cancel_command" style="width: 30%; border-left: 1px solid #00be65;" class=" is-outlined"/>
+      <CommandButton :data="camera_expose_command" style="width: 70%;" class=" is-outlined is-success"/>
+      <CancelButton :site="sitecode" style="width: 30%; border-left: 1px solid #00be65" class="is-outlined"/>
+      <!--command-button :data="camera_cancel_command" style="width: 30%; border-left: 1px solid #00be65;" class=" is-outlined"/-->
     </div>
     <br>
 
@@ -172,6 +173,7 @@
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/FormElements/CommandButton'
+import CancelButton from '@/components/FormElements/CancelButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import StatusVal from '@/components/status/StatusVal'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
@@ -182,6 +184,7 @@ export default {
   mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton, 
+    CancelButton,
     StatusColumn,
     StatusVal,
     SimpleDeviceStatus,
