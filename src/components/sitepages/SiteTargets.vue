@@ -1,9 +1,10 @@
 <template>
 <div id="site-targets-wrapper">
+    <div>{{this.testvariable}}</div>
 
     <div class="easy-results" v-show="show_results">
-        <div v-for="target in targlist" :target="target" :key="target.name">
-            <TargetCard :target="target" />
+        <div class="target-cards" v-for="target in targlist" :target="target" :key="target.name">
+            <TargetCard :target="target" @selected-target="selectedTarget($event)"/>
         </div>
     </div>
 
@@ -64,7 +65,7 @@
                 <div class="sidebar-tabs">
                     <div 
                         :class="{'active': activeSidebarTab=='chart settings'}" 
-                        @click="activeSidebarTab='chart settings'"
+                        @click="activeSidebarTab='chart settings'; show_results=false"
                         class="sidebar-tab-button">chart settings</div>
                     <div 
                         :class="{'active': activeSidebarTab=='telescope controls'}" 
@@ -353,6 +354,7 @@ export default {
 
             show_results: false,
             show_toggle: '',
+            testvariable: '',
 
             // Directly copied from PlanTargets.vue
             site_info: {},
@@ -558,6 +560,14 @@ export default {
         },
 
         // Easy Targets functions
+        selectedTarget(targ) {
+            this.testvariable = targ;
+            this.activeSidebarTab ='telescope controls';
+            // this.mount_object = targ.name;
+            this.aladin.goToRaDec(parseFloat(targ.ra), targ.dec);
+            sendCoordinatesToSkychart();
+        },
+
         setLatLong() {
         const selectedOption = document.getElementById('selected_target_obs').options[document.getElementById('selected_target_obs').selectedIndex];
         this.lat1 = selectedOption.getAttribute('lat');
@@ -908,5 +918,11 @@ $toggle-button-height: 32px;
     display: flex;
     flex-wrap: wrap;
     justify-content:center;
+}
+.target-cards {
+        &:hover {
+        cursor: pointer;
+        filter: brightness(1.25);
+    }
 }
 </style>

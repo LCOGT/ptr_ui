@@ -1,5 +1,5 @@
 <template>
-  <div class="target-card">
+  <div class="target-card" @click="$emit('selected-target', target)">
     <div class="card">
       <img :src="`${target.image}`"/>
         <h2 class="target-name"><span class= "card-text">{{ target.name }}</span></h2>
@@ -24,11 +24,13 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  .card {
+  .target-card {
     position: relative;
     height: 250px;
     width: 250px;
     margin: 10px;
+
+
   }
   img {
     position: relative;
