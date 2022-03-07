@@ -643,8 +643,13 @@ export default {
         // If the live easy targets is activated, switch back to current date/time/location
         isLiveEasyTargets() {
             if (this.isLiveEasyTargets) {
-                testvariable = 'yep';
-
+                this.selected_target_obs = this.sitecode;
+                this.observatorytime = this.timezone;
+                this.lat1 = this.site_latitude;
+                this.lon1 = this.site_longitude;
+                this.customobservatoryoffset = new Date().getTimezoneOffset()/-60;
+                this.dateobs = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
+                this.dateobsreal = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
             }
         },
 
