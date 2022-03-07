@@ -1,6 +1,5 @@
 <template>
 <div id="site-targets-wrapper">
-    <div>{{this.testvariable}}</div>
 
     <div class="easy-results" v-show="show_results">
         <div class="target-cards" v-for="target in targlist" :target="target" :key="target.name">
@@ -354,7 +353,6 @@ export default {
 
             show_results: false,
             show_toggle: '',
-            testvariable: '',
 
             // Directly copied from PlanTargets.vue
             site_info: {},
@@ -561,70 +559,72 @@ export default {
 
         // Easy Targets functions
         selectedTarget(targ) {
-            this.testvariable = targ;
+            this.aladin.gotoRaDec(targ.ra, targ.dec);
+           
+            this.$store.commit('command_params/mount_ra', helpers.degree2hour(targ.ra).toFixed(5));
+            this.$store.commit('command_params/mount_dec', targ.dec.toFixed(4));
+            this.$store.commit('command_params/mount_object', targ.name);
+
             this.activeSidebarTab ='telescope controls';
-            // this.mount_object = targ.name;
-            this.aladin.goToRaDec(parseFloat(targ.ra), targ.dec);
-            sendCoordinatesToSkychart();
         },
 
         setLatLong() {
-        const selectedOption = document.getElementById('selected_target_obs').options[document.getElementById('selected_target_obs').selectedIndex];
-        this.lat1 = selectedOption.getAttribute('lat');
-        this.lon1 = selectedOption.getAttribute('lon');
-        this.observatorytime = this.site_info[this.selected_target_obs].siteoffset;
+            const selectedOption = document.getElementById('selected_target_obs').options[document.getElementById('selected_target_obs').selectedIndex];
+            this.lat1 = selectedOption.getAttribute('lat');
+            this.lon1 = selectedOption.getAttribute('lon');
+            this.observatorytime = this.site_info[this.selected_target_obs].siteoffset;
 
         },
         changeDate() {
-        if (this.tzinfo == 'my') {
-            this.dateobsreal = this.dateobs
-        } else if (this.tzinfo == 'utc') {
-            this.dateobsreal = moment(this.dateobs).subtract(this.offset, 'm').toDate()
-        } else if (this.tzinfo == 'lcl') {
-            this.dateobsreal = moment(this.dateobs).subtract(this.offset+this.observatoryoffset, 'm').toDate()
-        }
+            if (this.tzinfo == 'my') {
+                this.dateobsreal = this.dateobs
+            } else if (this.tzinfo == 'utc') {
+                this.dateobsreal = moment(this.dateobs).subtract(this.offset, 'm').toDate()
+            } else if (this.tzinfo == 'lcl') {
+                this.dateobsreal = moment(this.dateobs).subtract(this.offset+this.observatoryoffset, 'm').toDate()
+            }
         },
         changeTimeFormat() {
-        if (this.tzinfo == 'my') {
-            this.timeformat = undefined; //undefined defaults to user's prefered time display
-            this.dateobs = this.dateobsreal
-        } else if (this.tzinfo == 'utc') {
-            this.timeformat = '24';
-            this.dateobs = this.dateobsutc
-        } else if (this.tzinfo == 'lcl') {
-            this.timeformat = undefined; //undefined defaults to user's prefered time display
-            this.dateobs = this.dateobsobs
-        }
+            if (this.tzinfo == 'my') {
+                this.timeformat = undefined; //undefined defaults to user's prefered time display
+                this.dateobs = this.dateobsreal
+            } else if (this.tzinfo == 'utc') {
+                this.timeformat = '24';
+                this.dateobs = this.dateobsutc
+            } else if (this.tzinfo == 'lcl') {
+                this.timeformat = undefined; //undefined defaults to user's prefered time display
+                this.dateobs = this.dateobsobs
+            }
         },
         
         submitForm() {
-        this.show_results = true;
-        this.show_toggle = true;
-        var diclist = [];
+            this.show_results = true;
+            this.show_toggle = true;
+            var diclist = [];
 
-        var endtime = moment(this.dateobsreal).add(30, 'm').toDate();
-        for (var i = 0; i < this.easylist.length; ++i) {
-            var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, this.dateobsreal)[0]
-            var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, endtime)[0]
-            if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
-            diclist.push({
-                "name": this.easylist[i].name,
-                "nickname": this.easylist[i].alt, 
-                "type": this.easylist[i].group, 
-                "image": "/targs/DefaultTargetImages/"+this.easylist[i].name.replace(/ /g, "")+".jpg",
-                "ra": this.easylist[i].ra,
-                "dec": this.easylist[i].dec,
-                "starttime": this.dateobsreal,
-                "altstart": altstart,
-                "altend": altend
-                })
+            var endtime = moment(this.dateobsreal).add(30, 'm').toDate();
+            for (var i = 0; i < this.easylist.length; ++i) {
+                var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, this.dateobsreal)[0]
+                var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, endtime)[0]
+                if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
+                diclist.push({
+                    "name": this.easylist[i].name,
+                    "nickname": this.easylist[i].alt, 
+                    "type": this.easylist[i].group, 
+                    "image": "/targs/DefaultTargetImages/"+this.easylist[i].name.replace(/ /g, "")+".jpg",
+                    "ra": this.easylist[i].ra,
+                    "dec": this.easylist[i].dec,
+                    "starttime": this.dateobsreal,
+                    "altstart": altstart,
+                    "altend": altend
+                    })
+                }
             }
-        }
 
-        this.targlist=diclist;
+            this.targlist=diclist;
 
-        if (window.screen.availWidth<970) {
-            setTimeout(function(){ document.getElementById("results").scrollIntoView({behavior: 'smooth'}); }, 30);}
+            if (window.screen.availWidth<970) {
+                setTimeout(function(){ document.getElementById("results").scrollIntoView({behavior: 'smooth'}); }, 30);}
         },
         
     },
