@@ -918,6 +918,11 @@ $toggle-button-height: 32px;
     display: flex;
     flex-wrap: wrap;
     justify-content:center;
+    overflow-y: scroll;
+
+    @media(max-width:970px){
+        overflow-y: visible;
+    }
 }
 .target-cards {
         &:hover {
