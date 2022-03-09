@@ -11,16 +11,15 @@
 
         <template slot="start">
 
-            <b-navbar-dropdown label="observatories" :close-on-click="true" @click.native="updateSiteStatus"> 
+            <b-navbar-dropdown label="observatories"  @click.native="updateSiteStatus"> 
                 <template v-for="(site, index) in real_sites">
                   <b-navbar-item tag="router-link" 
                     :to="{ path: '/site/' + site+ '/home'}"
                     v-bind:key="'real'+index"
                     v-if="global_config[site]">
-                    <div class="status-dot" :class="siteOnlineClass(site)" />
-                    <span style="font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</span>
-										<span style="color: silver;">{{global_config[site].name}}</span>
-                    <span></span>
+                    <div style="pointer-events: none;" class="status-dot" :class="siteOnlineClass(site)" />
+                    <div style="pointer-events: none; font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</div> 
+                    <div style="pointer-events: none; color: silver;">{{global_config[site].name}}</div>
                   </b-navbar-item>
                 </template>
                 <hr class="navbar-divider">
@@ -29,10 +28,9 @@
                     :to="{ path: '/site/' + site+ '/home'}"
                     v-bind:key="'sim'+index"
                     v-if="global_config[site]">
-                    <div class="status-dot" :class="siteOnlineClass(site)" />
-                    <span style="font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</span>
-										<span style="color: silver;">{{global_config[site].name}}</span>
-                    <span></span>
+                    <div style="pointer-events: none;" class="status-dot" :class="siteOnlineClass(site)" />
+                    <div style="pointer-events: none; font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</div> 
+                    <div style="pointer-events: none; color: silver;">{{global_config[site].name}}</div>
                   </b-navbar-item>
                 </template>
             </b-navbar-dropdown>
