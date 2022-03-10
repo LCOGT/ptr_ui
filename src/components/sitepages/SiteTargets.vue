@@ -188,7 +188,7 @@
 
                     <div v-if="activeSidebarTab=='easy targets'"> 
                         <b-field>
-                            <b-checkbox v-model="isLiveEasyTargets" type="is-danger">
+                            <b-checkbox v-model="isLiveEasyTargets" type="is-danger" @input="submitForm()">
                                 LIVE easy targets for 
                                 <span style="text-transform:uppercase;">{{this.sitecode}}</span>
                             </b-checkbox>
@@ -598,6 +598,17 @@ export default {
         },
         
         submitForm() {
+            // This is here because the watched property doesn't change before the form gets submitted
+            if (this.isLiveEasyTargets) {
+                this.selected_target_obs = this.sitecode;
+                this.observatorytime = this.timezone;
+                this.lat1 = this.site_latitude;
+                this.lon1 = this.site_longitude;
+                this.customobservatoryoffset = new Date().getTimezoneOffset()/-60;
+                this.dateobs = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
+                this.dateobsreal = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
+            }
+
             this.show_results = true;
             this.show_toggle = true;
             var diclist = [];
@@ -647,19 +658,6 @@ export default {
             if (this.isLiveSkyDisplay) {
                 this.skychart_location = [this.site_latitude, this.site_longitude]
                 this.skychart_date = new Date()
-            }
-        },
-
-        // If the live easy targets is activated, switch back to current date/time/location
-        isLiveEasyTargets() {
-            if (this.isLiveEasyTargets) {
-                this.selected_target_obs = this.sitecode;
-                this.observatorytime = this.timezone;
-                this.lat1 = this.site_latitude;
-                this.lon1 = this.site_longitude;
-                this.customobservatoryoffset = new Date().getTimezoneOffset()/-60;
-                this.dateobs = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
-                this.dateobsreal = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
             }
         },
 
