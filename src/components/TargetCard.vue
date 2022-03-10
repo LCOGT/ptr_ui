@@ -1,7 +1,9 @@
 <template>
   <div class="target-card" @click="$emit('selected-target', target)">
     <div class="card">
-      <img :src="`${target.image}`"/>
+        <div class="target-img">
+          <img :src="`${target.image}`"/>
+        </div>
         <h2 class="target-name"><span class= "card-text">{{ target.name }}</span></h2>
         <h4 class="target-nickname"><span class= "card-text">{{ target.nickname }}</span></h4>
         <h3 class="target-type"><span class= "card-text">{{ target.type }}</span></h3>
@@ -32,8 +34,12 @@ export default {
 
 
   }
-  img {
-    position: relative;
+  .target-img {
+    justify-content:center;
+    width: 280px;
+    height: 250px;
+    margin-left: -15px;
+    margin-top: -15px;
     object-fit: fill;
   }
   .target-name {
