@@ -25,7 +25,6 @@ import calendarPage from './views/calendarPage.vue'
 import JobsMonitor from './views/JobsMonitor.vue'
 import UserData from './views/UserData.vue'
 import PlanTargets from './views/PlanTargets'
-import Dashboard from './views/Dashboard'
 import NotFound from './views/NotFound'
 import axios from 'axios'
 
@@ -51,13 +50,6 @@ const router = new VueRouter({
       component: devtools, 
       beforeEnter: authGuard, 
       meta: { requiresRole: 'admin'}
-    },
-    { 
-      path: '/dashboard', 
-      name: 'dashboard', 
-      component: Dashboard, 
-      //beforeEnter: authGuard,
-      //meta: { requiresRole: 'admin'}
     },
 
     { path: '/about', name: 'about', component: About },
