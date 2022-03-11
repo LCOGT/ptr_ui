@@ -187,82 +187,79 @@
                     </div>
 
                     <div v-if="activeSidebarTab=='easy targets'"> 
+                        <div class="the-button">
+                        <b-field class="buttons">
+                            <b-button expanded @click="show_results = !show_results" v-if="show_toggle">
+                                <div v-if="show_results"> Show Sky Map</div>
+                                <div v-else> Show Targets </div>
+                            </b-button>
+                        </b-field>
+                        </div>
+                        <br/>
                         <b-field>
                             <b-checkbox v-model="isLiveEasyTargets" type="is-danger" @input="submitForm()">
                                 LIVE easy targets for 
                                 <span style="text-transform:uppercase;">{{this.sitecode}}</span>
                             </b-checkbox>
+                        </b-field>                        
+                        <b-field label="Photon Ranch Location" class= "control is-expanded">
+                        <b-select id="selected_target_obs" v-model="selected_target_obs" @input="setLatLong(); submitForm();" :disabled="isLiveEasyTargets">
+                            <option v-for="s in site_info"
+                            :key="s.name"
+                            :lat="s.latitude"
+                            :lon="s.longitude"
+                            :value="s.site"
+                            >{{s.name}}</option>
+                            <option lat="" lon="" value="X">Custom Latitude and Longitude</option>
+                        </b-select>
                         </b-field>
-                        <form id="targform" @submit.prevent>
-                                <b-field label="Photon Ranch Location" class= "control is-expanded">
-                                <b-select id="selected_target_obs" v-model="selected_target_obs" @input="setLatLong" :disabled="isLiveEasyTargets">
-                                    <option v-for="s in site_info"
-                                    :key="s.name"
-                                    :lat="s.latitude"
-                                    :lon="s.longitude"
-                                    :value="s.site"
-                                    >{{s.name}}</option>
-                                    <option lat="" lon="" value="X">Custom Latitude and Longitude</option>
-                                </b-select>
-                                </b-field>
-                                <div class="field has-addons">
-                                <p class="control is-expanded">
-                                    <b-field label="Latitude">
-                                    <b-input type="text" id="lat1" v-model="lat1" required :disabled="selected_target_obs!=='X'"/>
-                                    </b-field>
-                                </p>
-                                <p class="control is-expanded">
-                                    <b-field label="Longitude">
-                                    <b-input type="text" id="lon1" v-model="lon1" required :disabled="selected_target_obs!=='X'"/>
-                                    </b-field>
-                                </p>
-                                </div>
-                                <div v-if="selected_target_obs =='X'" class="field">
-                                <p class="control is-expanded">
-                                    <b-field label="Observatory UTC Offset (in hours)">
-                                    <b-numberinput v-model="customobservatoryoffset" step=0.01 :controls="false" :required = "tzinfo == 'lcl'"></b-numberinput>
-                                    </b-field>
-                                </p>
-                                </div>
-                                <div class="field has-addons">
-                                <p class="control">
-                                    <b-field label="Date/Time">
-                                    <b-datetimepicker 
-                                        id="dateobs" 
-                                        v-model="dateobs"
-                                        :timepicker="{ incrementMinutes:15, hourFormat:timeformat}"
-                                        :datetime-parser="(d) => {new Date(d)}"
-                                        :disabled="isLiveEasyTargets"
-                                        required 
-                                        inline 
-                                        @input="changeDate"/>
-                                    </b-field>
-                                </p>
-                                </div>
-                                <div v-if="selected_target_obs !=='X' || customobservatoryoffset !== ''" class="field">
-                                    <b-field grouped>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat" >My time</b-radio>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat" > UTC</b-radio>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat" >Observatory time</b-radio>
-                                    </b-field>
-                                </div>
-                                <div v-else class="field">
-                                    <b-field grouped>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat" >My time</b-radio>
-                                    <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat" > UTC</b-radio>
-                                    </b-field>
-                                </div>
-                                    <div class="the-button">
-                                    <b-field class="buttons">
-                                        <b-button @click="submitForm" type="submit">Find Easy Targets</b-button>
-                                        <b-button @click="show_results = !show_results" v-if="show_toggle">
-                                            <div v-if="show_results"> Show Sky Map</div>
-                                            <div v-else> Show Targets </div>
-                                        </b-button>
-                                    </b-field>
-                                    
-                                </div>
-                            </form>
+                        <div class="field has-addons">
+                        <p class="control is-expanded">
+                            <b-field label="Latitude">
+                            <b-input type="text" id="lat1" v-model="lat1" required :disabled="selected_target_obs!=='X'" @input="submitForm()"/>
+                            </b-field>
+                        </p>
+                        <p class="control is-expanded">
+                            <b-field label="Longitude">
+                            <b-input type="text" id="lon1" v-model="lon1" required :disabled="selected_target_obs!=='X'" @input="submitForm()"/>
+                            </b-field>
+                        </p>
+                        </div>
+                        <div v-if="selected_target_obs =='X'" class="field">
+                        <p class="control is-expanded">
+                            <b-field label="Observatory UTC Offset (in hours)">
+                            <b-numberinput v-model="customobservatoryoffset" step=0.01 :controls="false" :required = "tzinfo == 'lcl'" @input="changeTimeFormat(); submitForm()"></b-numberinput>
+                            </b-field>
+                        </p>
+                        </div>
+                        <div class="field has-addons">
+                        <p class="control">
+                            <b-field label="Date/Time">
+                            <b-datetimepicker 
+                                id="dateobs" 
+                                v-model="dateobs"
+                                :timepicker="{ incrementMinutes:15, hourFormat:timeformat}"
+                                :datetime-parser="(d) => {new Date(d)}"
+                                :disabled="isLiveEasyTargets"
+                                required 
+                                inline 
+                                @input="changeDate(); submitForm();"/>
+                            </b-field>
+                        </p>
+                        </div>
+                        <div v-if="selected_target_obs !=='X' || customobservatoryoffset !== ''" class="field">
+                            <b-field grouped>
+                            <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat();" >My time</b-radio>
+                            <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat()" >UTC</b-radio>
+                            <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat()" >Observatory time</b-radio>
+                            </b-field>
+                        </div>
+                        <div v-else class="field">
+                            <b-field grouped>
+                            <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat()" >My time</b-radio>
+                            <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat()" >UTC</b-radio>
+                            </b-field>
+                        </div>
 
                     </div>
                 </div>
