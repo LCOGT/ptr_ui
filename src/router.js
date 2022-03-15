@@ -26,6 +26,7 @@ import JobsMonitor from './views/JobsMonitor.vue'
 import UserData from './views/UserData.vue'
 import PlanTargets from './views/PlanTargets'
 import NotFound from './views/NotFound'
+import Remotehq from './views/Remotehq'
 import axios from 'axios'
 
 
@@ -63,6 +64,7 @@ const router = new VueRouter({
     { path: '/analysis', name: 'analysis', component: analysis },
     { path: '/calendar', name: 'calendar', component: calendarPage },
     { path: '/jobs', name: 'jobs', component: JobsMonitor},
+    { path: '/remotehq', name: 'remotehq', component: Remotehq},
     { path: '/data/:user', name: 'data', component: UserData},
     {
       path: '/site/:sitecode/:subpage',

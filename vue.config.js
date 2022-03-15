@@ -8,7 +8,10 @@ module.exports = {
         // This produced 6mb(!!) of css! 
         //data: `@import "@/style/buefy-styles.scss";`
       }
-    }
+    },
+  },
+  devServer: {
+    host: 'localhost',
   },
 
   configureWebpack: {
