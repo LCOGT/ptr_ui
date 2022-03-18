@@ -17,7 +17,6 @@ async function getAuthRequestHeader() {
     let header = {
         'headers': {
         'Content-Type': 'application/json;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*',
         'Authorization': `Bearer ${token}`
         }
     }
@@ -91,7 +90,6 @@ const actions = {
         const header = {
             'headers': {
                 'Content-Type': 'application/json;charset=UTF-8',
-                'Access-Control-Allow-Origin': '*',
             }
         }
         let body = {
@@ -145,7 +143,6 @@ const actions = {
         const header = {
             'headers': {
                 'Content-Type': 'application/json;charset=UTF-8',
-                'Access-Control-Allow-Origin': '*',
             }
         }
         let project_id = (project_name=="none") ? "none" : `${project_name}#${created_at}`
