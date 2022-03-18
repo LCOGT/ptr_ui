@@ -1,7 +1,7 @@
 <template>
 <div id="site-targets-wrapper">
 
-    <div class="easy-results" v-show="show_results">
+    <div class="common-results" v-show="show_results">
         <div class="target-cards" v-for="target in targlist" :target="target" :key="target.name">
             <TargetCard :target="target" @selected-target="selectedTarget($event)"/>
         </div>
@@ -71,9 +71,9 @@
                         @click="activeSidebarTab='telescope controls'"
                         class="sidebar-tab-button">telescope controls</div>
                     <div 
-                        :class="{'active': activeSidebarTab=='easy targets'}" 
-                        @click="activeSidebarTab='easy targets'"
-                        class="sidebar-tab-button">easy targets</div>                    
+                        :class="{'active': activeSidebarTab=='common targets'}" 
+                        @click="activeSidebarTab='common targets'"
+                        class="sidebar-tab-button">common targets</div>                    
                 </div>
 
                 <div class="sidebar-tab-content">
@@ -186,7 +186,7 @@
 
                     </div>
 
-                    <div v-if="activeSidebarTab=='easy targets'"> 
+                    <div v-if="activeSidebarTab=='common targets'"> 
                         <div class="the-button">
                         <b-field class="buttons">
                             <b-button expanded @click="show_results = !show_results" v-if="show_toggle">
@@ -197,13 +197,13 @@
                         </div>
                         <br/>
                         <b-field>
-                            <b-checkbox v-model="isLiveEasyTargets" type="is-danger" @input="submitForm()">
-                                LIVE easy targets for 
+                            <b-checkbox v-model="isLiveCommonTargets" type="is-danger" @input="submitForm()">
+                                LIVE common targets for 
                                 <span style="text-transform:uppercase;">{{this.sitecode}}</span>
                             </b-checkbox>
                         </b-field>                        
                         <b-field label="Photon Ranch Location" class= "control is-expanded">
-                        <b-select id="selected_target_obs" v-model="selected_target_obs" @input="setLatLong(); submitForm();" :disabled="isLiveEasyTargets">
+                        <b-select id="selected_target_obs" v-model="selected_target_obs" @input="setLatLong(); submitForm();" :disabled="isLiveCommonTargets">
                             <option v-for="s in site_info"
                             :key="s.name"
                             :lat="s.latitude"
@@ -216,12 +216,12 @@
                         <div class="field has-addons">
                         <p class="control is-expanded">
                             <b-field label="Latitude">
-                            <b-input type="text" id="lat1" v-model="lat1" required :disabled="selected_target_obs!=='X'" @input="submitForm()"/>
+                            <b-input type="text" id="target_obs_latitude" v-model="target_obs_latitude" required :disabled="selected_target_obs!=='X'" @input="submitForm()"/>
                             </b-field>
                         </p>
                         <p class="control is-expanded">
                             <b-field label="Longitude">
-                            <b-input type="text" id="lon1" v-model="lon1" required :disabled="selected_target_obs!=='X'" @input="submitForm()"/>
+                            <b-input type="text" id="target_obs_longitude" v-model="target_obs_longitude" required :disabled="selected_target_obs!=='X'" @input="submitForm()"/>
                             </b-field>
                         </p>
                         </div>
@@ -240,7 +240,7 @@
                                 v-model="dateobs"
                                 :timepicker="{ incrementMinutes:15, hourFormat:timeformat}"
                                 :datetime-parser="(d) => {new Date(d)}"
-                                :disabled="isLiveEasyTargets"
+                                :disabled="isLiveCommonTargets"
                                 required 
                                 inline 
                                 @input="changeDate(); submitForm();"/>
@@ -288,7 +288,7 @@ import Vue from 'vue';
 import axios from 'axios';
 import moment from 'moment';
 import TargetCard from '@/components/TargetCard';
-import list from '../../../public/data/easytargets.json';
+import list from '../../../public/data/commontargets.json';
 import helpers from '@/utils/helpers';
 
 export default {
@@ -320,7 +320,7 @@ export default {
             chartDatetimeSource: 'live',
 
             isLiveSkyDisplay: true,
-            isLiveEasyTargets: true,
+            isLiveCommonTargets: true,
 
             showStars: true,
             showGalaxies: true,
@@ -353,12 +353,12 @@ export default {
 
             // Directly copied from PlanTargets.vue
             site_info: {},
-            easylist: list,
+            commonlist: list,
             target: {},
             targlist: '',
             selected_target_obs: '',
-            lat1: '',
-            lon1: '',
+            target_obs_latitude: '',
+            target_obs_longitude: '',
             customobservatoryoffset: new Date().getTimezoneOffset() / -60,
             dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour
             dateobsreal: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour,
@@ -417,7 +417,7 @@ export default {
     beforeDestroy() {
         this.stop_resize_observer()
     },
-    
+
     created: function() {
         const url = "https://api.photonranch.org/api/all/config"
         axios.get(url).then(response => {
@@ -432,8 +432,8 @@ export default {
         }
         Vue.set(this, 'selected_target_obs', this.sitecode)
         Vue.set(this, 'observatorytime', this.timezone)
-        Vue.set(this, 'lat1', this.site_latitude)
-        Vue.set(this, 'lon1', this.site_longitude)
+        Vue.set(this, 'target_obs_latitude', this.site_latitude)
+        Vue.set(this, 'target_obs_longitude', this.site_longitude)
         })
         .catch(error => {
         console.warn(error)
@@ -553,7 +553,7 @@ export default {
 
         },
 
-        // Easy Targets functions
+        // Common Targets functions
         selectedTarget(targ) {
             this.aladin.gotoRaDec(targ.ra, targ.dec);
            
@@ -566,8 +566,8 @@ export default {
 
         setLatLong() {
             const selectedOption = document.getElementById('selected_target_obs').options[document.getElementById('selected_target_obs').selectedIndex];
-            this.lat1 = selectedOption.getAttribute('lat');
-            this.lon1 = selectedOption.getAttribute('lon');
+            this.target_obs_latitude = selectedOption.getAttribute('lat');
+            this.target_obs_longitude = selectedOption.getAttribute('lon');
             this.observatorytime = this.site_info[this.selected_target_obs].siteoffset;
 
         },
@@ -595,11 +595,11 @@ export default {
         
         submitForm() {
             // This is here because the watched property doesn't change before the form gets submitted
-            if (this.isLiveEasyTargets) {
+            if (this.isLiveCommonTargets) {
                 this.selected_target_obs = this.sitecode;
                 this.observatorytime = this.timezone;
-                this.lat1 = this.site_latitude;
-                this.lon1 = this.site_longitude;
+                this.target_obs_latitude = this.site_latitude;
+                this.target_obs_longitude = this.site_longitude;
                 this.customobservatoryoffset = new Date().getTimezoneOffset()/-60;
                 this.dateobs = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
                 this.dateobsreal = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
@@ -610,17 +610,17 @@ export default {
             var diclist = [];
 
             var endtime = moment(this.dateobsreal).add(30, 'm').toDate();
-            for (var i = 0; i < this.easylist.length; ++i) {
-                var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, this.dateobsreal)[0]
-                var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, endtime)[0]
+            for (var i = 0; i < this.commonlist.length; ++i) {
+                var altstart = helpers.eq2altazWithDate(this.commonlist[i].ra, this.commonlist[i].dec, this.target_obs_latitude, this.target_obs_longitude, this.dateobsreal)[0]
+                var altend = helpers.eq2altazWithDate(this.commonlist[i].ra, this.commonlist[i].dec, this.target_obs_latitude, this.target_obs_longitude, endtime)[0]
                 if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
                 diclist.push({
-                    "name": this.easylist[i].name,
-                    "nickname": this.easylist[i].alt, 
-                    "type": this.easylist[i].group, 
-                    "image": "/targs/DefaultTargetImages/"+this.easylist[i].name.replace(/ /g, "")+".jpg",
-                    "ra": this.easylist[i].ra,
-                    "dec": this.easylist[i].dec,
+                    "name": this.commonlist[i].name,
+                    "nickname": this.commonlist[i].alt, 
+                    "type": this.commonlist[i].group, 
+                    "image": "/targs/DefaultTargetImages/"+this.commonlist[i].name.replace(/ /g, "")+".jpg",
+                    "ra": this.commonlist[i].ra,
+                    "dec": this.commonlist[i].dec,
                     "starttime": this.dateobsreal,
                     "altstart": altstart,
                     "altend": altend
@@ -678,7 +678,7 @@ export default {
             set(val) { this.$store.commit('command_params/mount_object', val)},
         },
 
-        // Easy Target computed
+        // Common Target computed
         offset() {
             return new Date(this.dateobsreal).getTimezoneOffset()
         },
@@ -908,7 +908,7 @@ $toggle-button-height: 32px;
     flex-basis: 100%; 
     width: 0;
 }
-.easy-results {
+.common-results {
     display: flex;
     flex-wrap: wrap;
     justify-content:center;
