@@ -15,14 +15,7 @@
  export default {
    props: [
      'target',
-   ],
-   computed: {
-     targetImage() {
-       return {
-         '--target-image': this.target.image,
-       };
-     },
-   },
+   ]
  };
  </script>
  <style lang="scss" scoped>
@@ -65,3 +58,4 @@
      color: white;
    }
  </style>
+ 

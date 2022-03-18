@@ -359,7 +359,7 @@ export default {
             selected_target_obs: '',
             lat1: '',
             lon1: '',
-            customobservatoryoffset: new Date().getTimezoneOffset()/-60,
+            customobservatoryoffset: new Date().getTimezoneOffset() / -60,
             dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour
             dateobsreal: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour,
             tzinfo: 'my',
@@ -417,8 +417,7 @@ export default {
     beforeDestroy() {
         this.stop_resize_observer()
     },
-
-    //  This was from the original SiteTargets to make mrc default, need to change this
+    
     created: function() {
         const url = "https://api.photonranch.org/api/all/config"
         axios.get(url).then(response => {
