@@ -2,8 +2,8 @@
 <div id="site-targets-wrapper">
 
     <div class="common-results" v-show="show_results">
-        <div class="target-cards" v-for="target in targlist" :target="target" :key="target.name">
-            <TargetCard :target="target" @selected-target="selectedTarget($event)" id="selected-target-card" />
+        <div class="target-cards" v-for="target in targlist" :target="target" :key="target.name" >
+            <TargetCard :target="target" @selected-target="selectedTarget($event)" :id="target.id" class="possible-selected"/>
         </div>
     </div>
 
@@ -560,7 +560,12 @@ export default {
             this.$store.commit('command_params/mount_dec', targ.dec.toFixed(4));
             this.$store.commit('command_params/mount_object', targ.name);
 
-            //document.getElementById("selected-target-card").style.border="1px solid white";
+            for (var i in document.getElementsByClassName("possible-selected")) {
+                //i.style.border="1px solid blue";};
+                document.getElementsByClassName("possible-selected")[i].style.border = "0px";
+                document.getElementById(targ.id).style.border="1px solid white";}
+            
+            
         },
 
         setLatLong() {
@@ -614,6 +619,7 @@ export default {
                 var altend = helpers.eq2altazWithDate(this.commonlist[i].ra, this.commonlist[i].dec, this.target_obs_latitude, this.target_obs_longitude, endtime)[0]
                 if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
                 diclist.push({
+                    "id": this.commonlist[i].name.replace(/\s/g, ''),
                     "name": this.commonlist[i].name,
                     "nickname": this.commonlist[i].alt, 
                     "type": this.commonlist[i].group, 
