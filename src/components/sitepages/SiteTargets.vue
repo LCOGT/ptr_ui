@@ -3,7 +3,7 @@
 
     <div class="common-results" v-show="show_results">
         <div class="target-cards" v-for="target in targlist" :target="target" :key="target.name">
-            <TargetCard :target="target" @selected-target="selectedTarget($event)"/>
+            <TargetCard :target="target" @selected-target="selectedTarget($event)" id="selected-target-card" />
         </div>
     </div>
 
@@ -72,7 +72,7 @@
                         class="sidebar-tab-button">telescope controls</div>
                     <div 
                         :class="{'active': activeSidebarTab=='common targets'}" 
-                        @click="activeSidebarTab='common targets'"
+                        @click="activeSidebarTab='common targets'; submitForm()"
                         class="sidebar-tab-button">common targets</div>                    
                 </div>
 
@@ -189,7 +189,7 @@
                     <div v-if="activeSidebarTab=='common targets'"> 
                         <div class="the-button">
                         <b-field class="buttons">
-                            <b-button expanded @click="show_results = !show_results" v-if="show_toggle">
+                            <b-button expanded @click="show_results = !show_results">
                                 <div v-if="show_results"> Show Sky Map</div>
                                 <div v-else> Show Targets </div>
                             </b-button>
@@ -349,7 +349,6 @@ export default {
             skychart_location: [0,0],
 
             show_results: false,
-            show_toggle: '',
 
             // Directly copied from PlanTargets.vue
             site_info: {},
@@ -561,7 +560,7 @@ export default {
             this.$store.commit('command_params/mount_dec', targ.dec.toFixed(4));
             this.$store.commit('command_params/mount_object', targ.name);
 
-            this.activeSidebarTab ='telescope controls';
+            //document.getElementById("selected-target-card").style.border="1px solid white";
         },
 
         setLatLong() {
@@ -569,8 +568,8 @@ export default {
             this.target_obs_latitude = selectedOption.getAttribute('lat');
             this.target_obs_longitude = selectedOption.getAttribute('lon');
             this.observatorytime = this.site_info[this.selected_target_obs].siteoffset;
-
         },
+
         changeDate() {
             if (this.tzinfo == 'my') {
                 this.dateobsreal = this.dateobs
@@ -580,6 +579,7 @@ export default {
                 this.dateobsreal = moment(this.dateobs).subtract(this.offset+this.observatoryoffset, 'm').toDate()
             }
         },
+        
         changeTimeFormat() {
             if (this.tzinfo == 'my') {
                 this.timeformat = undefined; //undefined defaults to user's prefered time display
@@ -606,7 +606,6 @@ export default {
             }
 
             this.show_results = true;
-            this.show_toggle = true;
             var diclist = [];
 
             var endtime = moment(this.dateobsreal).add(30, 'm').toDate();

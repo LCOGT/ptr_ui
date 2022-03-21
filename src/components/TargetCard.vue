@@ -24,15 +24,13 @@
      height: 250px;
      width: 250px;
      margin: 10px;
-
-
    }
    .target-img {
      justify-content:center;
-     width: 280px;
-     height: 250px;
+     height: 100%;
      margin-left: -15px;
      margin-top: -15px;
+     margin-bottom: -5px;
      object-fit: fill;
    }
    .target-name {
