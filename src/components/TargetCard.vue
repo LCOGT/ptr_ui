@@ -1,14 +1,12 @@
 <template>
    <div class="target-card" @click="$emit('selected-target', target)" :class="(is_clicked)?'selected':''">
-     <div class="card">
-         <div class="target-img">
-           <img :src="`${target.image}`"/>
-         </div>
-         <h2 class="target-name"><span class= "card-text">{{ target.name }}</span></h2>
-         <h4 class="target-nickname"><span class= "card-text">{{ target.nickname }}</span></h4>
-         <h3 class="target-type"><span class= "card-text">{{ target.type }}</span></h3>
+      <div class="target-img">
+        <img :src="`${target.image}`"/>
+      </div>
+      <h2 class="target-name"><span class= "card-text">{{ target.name }}</span></h2>
+      <h4 class="target-nickname"><span class= "card-text">{{ target.nickname }}</span></h4>
+      <h3 class="target-type"><span class= "card-text">{{ target.type }}</span></h3>
      </div>
-   </div>
  </template>
  <script>
 
@@ -28,14 +26,6 @@
      height: 250px;
      width: 250px;
      margin: 10px;
-   }
-   .target-img {
-     justify-content:center;
-     height: 100%;
-     margin-left: -15px;
-     margin-top: -15px;
-     margin-bottom: -5px;
-     object-fit: fill;
    }
    .target-name {
      font-size: x-large;
