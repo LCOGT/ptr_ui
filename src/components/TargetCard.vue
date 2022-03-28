@@ -1,5 +1,5 @@
 <template>
-   <div class="target-card" @click="$emit('selected-target', target)">
+   <div class="target-card" @click="$emit('selected-target', target)" :class="(is_clicked)?'selected':''">
      <div class="card">
          <div class="target-img">
            <img :src="`${target.image}`"/>
@@ -13,9 +13,13 @@
  <script>
 
  export default {
-   props: [
-     'target',
-   ]
+   props: {
+     target: Object,
+     is_clicked: {
+       type: Boolean,
+       default: false,
+     }
+   }
  };
  </script>
  <style lang="scss" scoped>
@@ -54,6 +58,9 @@
    .card-text {
      background-color: black;
      color: white;
+   }
+   .selected {
+     border: 3px solid white;
    }
  </style>
  

@@ -53,7 +53,6 @@ const router = new VueRouter({
     },
 
     { path: '/about', name: 'about', component: About },
-    // { path: '/plantargets', name: 'plan targets', component: PlanTargets},
     { path: '/info/reservations', name: 'reservations', component: ReservationInfo},
 
 

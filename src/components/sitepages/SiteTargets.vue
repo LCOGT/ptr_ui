@@ -3,7 +3,8 @@
 
     <div class="common-results" v-show="show_results">
         <div class="target-cards" v-for="target in targlist" :target="target" :key="target.name" >
-            <TargetCard :target="target" @selected-target="selectedTarget($event)" :id="target.id" class="possible-selected"/>
+            <TargetCard :target="target" @selected-target="targetClickHandler($event)" :id="target.id" :is_clicked="target.id==selected_target_id"/>
+           
         </div>
     </div>
 
@@ -349,6 +350,7 @@ export default {
             skychart_location: [0,0],
 
             show_results: false,
+            selected_target_id: '',
 
             // Directly copied from PlanTargets.vue
             site_info: {},
@@ -553,18 +555,15 @@ export default {
         },
 
         // Common Targets functions
-        selectedTarget(targ) {
+        targetClickHandler(targ) {
             this.aladin.gotoRaDec(targ.ra, targ.dec);
            
             this.$store.commit('command_params/mount_ra', helpers.degree2hour(targ.ra).toFixed(5));
             this.$store.commit('command_params/mount_dec', targ.dec.toFixed(4));
             this.$store.commit('command_params/mount_object', targ.name);
 
-            for (var i in document.getElementsByClassName("possible-selected")) {
-                //i.style.border="1px solid blue";};
-                document.getElementsByClassName("possible-selected")[i].style.border = "0px";
-                document.getElementById(targ.id).style.border="1px solid white";}
-            
+            //Update id of selected target
+            this.selected_target_id = targ.id;
             
         },
 
