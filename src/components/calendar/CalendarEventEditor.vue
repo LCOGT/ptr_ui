@@ -15,7 +15,7 @@
             v-model="title"
             placeholder="Add a name for your reservation"
             required
-            validation-message="Please include a title"
+            validation-message="Please include a name for your reservation"
             ref="title_input"
         >{{title}}</b-input>
     </b-field>
@@ -194,8 +194,6 @@ export default {
 
             real_time_session_duration: 30,
             reservation_type_tabs: 'realtime',
-
-            no_title_warning:true,
 
             show_everyones_projects: false,
 
