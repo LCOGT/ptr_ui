@@ -63,7 +63,7 @@
       </div>
         <div class="the-button">
           <b-field class="buttons">
-            <b-button @click="submitForm" type="submit">Find Easy Targets</b-button>
+            <b-button @click="submitForm" type="submit">Find Common Targets</b-button>
           </b-field>
         </div>
     </form>
@@ -85,7 +85,7 @@ import axios from 'axios';
 import moment from 'moment';
 import TargetCard from '@/components/TargetCard';
 import SiteNavbar from '@/components/SiteNavbar';
-import list from '../../public/data/easytargets.json';
+import list from '../../public/data/commontargets.json';
 import helpers from '@/utils/helpers';
 
 export default {
@@ -97,7 +97,7 @@ export default {
   data() {
     return {
       site_info: {},
-      easylist: list,
+      commonlist: list,
       target: {},
       targlist: '',
       lat1: '',
@@ -181,17 +181,17 @@ export default {
       var diclist = [];
 
       var endtime = moment(this.dateobsreal).add(30, 'm').toDate();
-      for (var i = 0; i < this.easylist.length; ++i) {
-        var altstart = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, this.dateobsreal)[0]
-        var altend = helpers.eq2altazWithDate(this.easylist[i].ra, this.easylist[i].dec, this.lat1, this.lon1, endtime)[0]
+      for (var i = 0; i < this.commonlist.length; ++i) {
+        var altstart = helpers.eq2altazWithDate(this.commonlist[i].ra, this.commonlist[i].dec, this.lat1, this.lon1, this.dateobsreal)[0]
+        var altend = helpers.eq2altazWithDate(this.commonlist[i].ra, this.commonlist[i].dec, this.lat1, this.lon1, endtime)[0]
         if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
           diclist.push({
-            "name": this.easylist[i].name,
-            "nickname": this.easylist[i].alt, 
-            "type": this.easylist[i].group, 
-            "image": "/targs/DefaultTargetImages/"+this.easylist[i].name.replace(/ /g, "")+".jpg",
-            "ra": this.easylist[i].ra,
-            "dec": this.easylist[i].dec,
+            "name": this.commonlist[i].name,
+            "nickname": this.commonlist[i].alt, 
+            "type": this.commonlist[i].group, 
+            "image": "/targs/DefaultTargetImages/"+this.commonlist[i].name.replace(/ /g, "")+".jpg",
+            "ra": this.commonlist[i].ra,
+            "dec": this.commonlist[i].dec,
             "starttime": this.dateobsreal,
             "altstart": altstart,
             "altend": altend
@@ -242,5 +242,4 @@ export default {
       align-items:center;
     }
   }
-
 </style>

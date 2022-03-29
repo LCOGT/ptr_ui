@@ -1,7 +1,14 @@
 <template>
 <div id="site-targets-wrapper">
 
-    <div  class="skychart-wrapper">
+    <div class="common-targets" v-show="show_common_targets">
+        <div class="target-cards" v-for="target in visible_target_list" :target="target" :key="target.name" >
+            <TargetCard :target="target" @selected-target="targetClickHandler($event)" :id="target.id" :is_clicked="target.id==selected_target_id"/>
+           
+        </div>
+    </div>
+
+    <div  class="skychart-wrapper" v-show="!show_common_targets">
         <div class="skychart-center">
             <the-sky-chart class="the-skychart" 
                 :showStars="showStars" 
@@ -35,6 +42,8 @@
         </div>
     </div>
 
+    <div class="break-column" v-if="show_common_targets"></div>
+
     <div class="sidebar-wrapper">
         <a class="sidebar-button" @click="toggle_expand_sidebar">
             <div style="display: flex;">
@@ -56,13 +65,16 @@
                 <div class="sidebar-tabs">
                     <div 
                         :class="{'active': activeSidebarTab=='chart settings'}" 
-                        @click="activeSidebarTab='chart settings'"
+                        @click="activeSidebarTab='chart settings'; show_common_targets=false"
                         class="sidebar-tab-button">chart settings</div>
                     <div 
                         :class="{'active': activeSidebarTab=='telescope controls'}" 
                         @click="activeSidebarTab='telescope controls'"
                         class="sidebar-tab-button">telescope controls</div>
-                    <div class="sidebar-tab-button tab-spacer"/>
+                    <div 
+                        :class="{'active': activeSidebarTab=='common targets'}" 
+                        @click="activeSidebarTab='common targets'; submitForm()"
+                        class="sidebar-tab-button">common targets</div>                    
                 </div>
 
                 <div class="sidebar-tab-content">
@@ -174,6 +186,83 @@
 
 
                     </div>
+
+                    <div v-if="activeSidebarTab=='common targets'"> 
+                        <div class="the-button">
+                        <b-field class="buttons">
+                            <b-button expanded @click="show_common_targets = !show_common_targets">
+                                <div v-if="show_common_targets"> Show Sky Map</div>
+                                <div v-else> Show Targets </div>
+                            </b-button>
+                        </b-field>
+                        </div>
+                        <br/>
+                        <b-field>
+                            <b-checkbox v-model="isLiveCommonTargets" type="is-danger" @input="submitForm()">
+                                LIVE common targets for 
+                                <span style="text-transform:uppercase;">{{this.sitecode}}</span>
+                            </b-checkbox>
+                        </b-field>                        
+                        <b-field label="Photon Ranch Location" class= "control is-expanded">
+                        <b-select id="selected_target_obs" v-model="selected_target_obs" @input="setLatLong(); submitForm();" :disabled="isLiveCommonTargets">
+                            <option v-for="s in site_info"
+                            :key="s.name"
+                            :lat="s.latitude"
+                            :lon="s.longitude"
+                            :value="s.site"
+                            >{{s.name}}</option>
+                            <option lat="" lon="" value="X">Custom Latitude and Longitude</option>
+                        </b-select>
+                        </b-field>
+                        <div class="field has-addons">
+                        <p class="control is-expanded">
+                            <b-field label="Latitude">
+                            <b-input type="text" id="target_obs_latitude" v-model="target_obs_latitude" required :disabled="selected_target_obs!=='X'" @input="submitForm()"/>
+                            </b-field>
+                        </p>
+                        <p class="control is-expanded">
+                            <b-field label="Longitude">
+                            <b-input type="text" id="target_obs_longitude" v-model="target_obs_longitude" required :disabled="selected_target_obs!=='X'" @input="submitForm()"/>
+                            </b-field>
+                        </p>
+                        </div>
+                        <div v-if="selected_target_obs =='X'" class="field">
+                        <p class="control is-expanded">
+                            <b-field label="Observatory UTC Offset (in hours)">
+                            <b-numberinput v-model="custom_observatory_offset" step=0.01 :controls="false" :required = "tz_info == 'lcl'" @input="changeTimeFormat(); submitForm()"></b-numberinput>
+                            </b-field>
+                        </p>
+                        </div>
+                        <div class="field has-addons">
+                        <p class="control">
+                            <b-field label="Date/Time">
+                            <b-datetimepicker 
+                                id="date_obs" 
+                                v-model="date_obs"
+                                :timepicker="{ incrementMinutes:15, hourFormat:time_format}"
+                                :datetime-parser="(d) => {new Date(d)}"
+                                :disabled="isLiveCommonTargets"
+                                required 
+                                inline 
+                                @input="changeDate(); submitForm();"/>
+                            </b-field>
+                        </p>
+                        </div>
+                        <div v-if="selected_target_obs !=='X' || custom_observatory_offset !== ''" class="field">
+                            <b-field grouped>
+                            <b-radio name="tz_info" id="tz_info" native-value="my" v-model="tz_info" required @input="changeTimeFormat();" >My time</b-radio>
+                            <b-radio name="tz_info" id="tz_info" native-value="utc" v-model="tz_info" required @input="changeTimeFormat()" >UTC</b-radio>
+                            <b-radio name="tz_info" id="tz_info" native-value="lcl" v-model="tz_info" @input="changeTimeFormat()" >Observatory time</b-radio>
+                            </b-field>
+                        </div>
+                        <div v-else class="field">
+                            <b-field grouped>
+                            <b-radio name="tz_info" id="tz_info" native-value="my" v-model="tz_info" required @input="changeTimeFormat()" >My time</b-radio>
+                            <b-radio name="tz_info" id="tz_info" native-value="utc" v-model="tz_info" required @input="changeTimeFormat()" >UTC</b-radio>
+                            </b-field>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -196,6 +285,13 @@ import CommandTabsAccordion from "@/components/CommandTabsAccordion"
 import celestial from 'd3-celestial'
 let Celestial = celestial.Celestial()
 
+import Vue from 'vue';
+import axios from 'axios';
+import moment from 'moment';
+import TargetCard from '@/components/TargetCard';
+import list from '../../../public/data/commontargets.json';
+import helpers from '@/utils/helpers';
+
 export default {
     name: "SiteTargets",
     props: [ "sitecode"],
@@ -205,6 +301,7 @@ export default {
         TheSkyChart,
         CommandTabsAccordion,
         DateTimeLocationPicker,
+        TargetCard,
     },
     data() {
         return {
@@ -224,6 +321,7 @@ export default {
             chartDatetimeSource: 'live',
 
             isLiveSkyDisplay: true,
+            isLiveCommonTargets: true,
 
             showStars: true,
             showGalaxies: true,
@@ -249,7 +347,25 @@ export default {
 
             use_custom_date_location: false,
             skychart_date: new Date(),
-            skychart_location: [0,0]
+            skychart_location: [0,0],
+
+            show_common_targets: false,
+            selected_target_id: '',
+
+            // Directly copied from PlanTargets.vue
+            site_info: {},
+            common_targets_list: list,
+            target: {},
+            visible_target_list: '',
+            selected_target_obs: '',
+            target_obs_latitude: '',
+            target_obs_longitude: '',
+            custom_observatory_offset: new Date().getTimezoneOffset() / -60,
+            date_obs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour
+            date_obs_real: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour,
+            tz_info: 'my',
+            observatory_time: '',
+            time_format: undefined,
         }
     },
 
@@ -301,6 +417,28 @@ export default {
 
     beforeDestroy() {
         this.stop_resize_observer()
+    },
+
+    created: function() {
+        const url = "https://api.photonranch.org/api/all/config"
+        axios.get(url).then(response => {
+        for (let s in response.data) {
+            Vue.set(this.site_info, s, {
+            latitude: response.data[s].latitude,
+            longitude: response.data[s].longitude,
+            name: response.data[s].name,
+            site: response.data[s].site,
+            siteoffset: response.data[s].TZ_database_name
+            })
+        }
+        Vue.set(this, 'selected_target_obs', this.sitecode)
+        Vue.set(this, 'observatory_time', this.timezone)
+        Vue.set(this, 'target_obs_latitude', this.site_latitude)
+        Vue.set(this, 'target_obs_longitude', this.site_longitude)
+        })
+        .catch(error => {
+        console.warn(error)
+        })
     },
 
     methods: {
@@ -394,7 +532,7 @@ export default {
 
             this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(5))
             this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
-            this.$store.commit('command_params/mount_object', ' ') // clear teh mount_object entry
+            this.$store.commit('command_params/mount_object', ' ') // clear the mount_object entry
         }, 
 
         handleMapClick(e) {
@@ -415,6 +553,91 @@ export default {
             }
 
         },
+
+        // Common Targets functions
+        targetClickHandler(targ) {
+            this.aladin.gotoRaDec(targ.ra, targ.dec);
+           
+            this.$store.commit('command_params/mount_ra', helpers.degree2hour(targ.ra).toFixed(5));
+            this.$store.commit('command_params/mount_dec', targ.dec.toFixed(4));
+            this.$store.commit('command_params/mount_object', targ.name);
+
+            //Update id of selected target
+            this.selected_target_id = targ.id;
+            
+        },
+
+        setLatLong() {
+            const selectedOption = document.getElementById('selected_target_obs').options[document.getElementById('selected_target_obs').selectedIndex];
+            this.target_obs_latitude = selectedOption.getAttribute('lat');
+            this.target_obs_longitude = selectedOption.getAttribute('lon');
+            this.observatory_time = this.site_info[this.selected_target_obs].siteoffset;
+        },
+
+        changeDate() {
+            if (this.tz_info == 'my') {
+                this.date_obs_real = this.date_obs
+            } else if (this.tz_info == 'utc') {
+                this.date_obs_real = moment(this.date_obs).subtract(this.offset, 'm').toDate()
+            } else if (this.tz_info == 'lcl') {
+                this.date_obs_real = moment(this.date_obs).subtract(this.offset+this.observatory_offset, 'm').toDate()
+            }
+        },
+        
+        changeTimeFormat() {
+            if (this.tz_info == 'my') {
+                this.time_format = undefined; //undefined defaults to user's prefered time display
+                this.date_obs = this.date_obs_real
+            } else if (this.tz_info == 'utc') {
+                this.time_format = '24';
+                this.date_obs = this.date_obs_utc
+            } else if (this.tz_info == 'lcl') {
+                this.time_format = undefined; //undefined defaults to user's prefered time display
+                this.date_obs = this.date_obs_obs
+            }
+        },
+        
+        submitForm() {
+            // This is here because the watched property doesn't change before the form gets submitted
+            if (this.isLiveCommonTargets) {
+                this.selected_target_obs = this.sitecode;
+                this.observatory_time = this.timezone;
+                this.target_obs_latitude = this.site_latitude;
+                this.target_obs_longitude = this.site_longitude;
+                this.custom_observatory_offset = new Date().getTimezoneOffset()/-60;
+                this.date_obs = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
+                this.date_obs_real = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
+            }
+
+            this.show_common_targets = true;
+            var diclist = [];
+
+            var endtime = moment(this.date_obs_real).add(30, 'm').toDate();
+            for (var i = 0; i < this.common_targets_list.length; ++i) {
+                var altstart = helpers.eq2altazWithDate(this.common_targets_list[i].ra, this.common_targets_list[i].dec, this.target_obs_latitude, this.target_obs_longitude, this.date_obs_real)[0]
+                var altend = helpers.eq2altazWithDate(this.common_targets_list[i].ra, this.common_targets_list[i].dec, this.target_obs_latitude, this.target_obs_longitude, endtime)[0]
+                if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
+                diclist.push({
+                    "id": this.common_targets_list[i].name.replace(/\s/g, ''),
+                    "name": this.common_targets_list[i].name,
+                    "nickname": this.common_targets_list[i].alt, 
+                    "type": this.common_targets_list[i].group, 
+                    "image": "/targs/DefaultTargetImages/"+this.common_targets_list[i].name.replace(/ /g, "")+".jpg",
+                    "ra": this.common_targets_list[i].ra,
+                    "dec": this.common_targets_list[i].dec,
+                    "starttime": this.date_obs_real,
+                    "altstart": altstart,
+                    "altend": altend
+                    })
+                }
+            }
+
+            this.visible_target_list=diclist;
+
+            if (window.screen.availWidth<970) {
+                setTimeout(function(){ document.getElementById("common-targets").scrollIntoView({behavior: 'smooth'}); }, 30);}
+        },
+        
     },
     watch: {
         // Update the aladin view if the coordinates change. 
@@ -436,7 +659,7 @@ export default {
                 this.skychart_location = [this.site_latitude, this.site_longitude]
                 this.skychart_date = new Date()
             }
-        }
+        },
 
     },
     computed: {
@@ -459,9 +682,31 @@ export default {
             set(val) { this.$store.commit('command_params/mount_object', val)},
         },
 
+        // Common Target computed
+        offset() {
+            return new Date(this.date_obs_real).getTimezoneOffset()
+        },
+        observatory_offset() {
+            if (this.selected_target_obs =='X') {
+                return this.custom_observatory_offset*60
+            } else {
+                return moment.utc(this.date_obs).tz(this.observatory_time).utcOffset()
+            }
+        },
+        date_obs_utc() {
+            return moment(this.date_obs_real).add(this.offset, 'm').toDate()
+            //Start time of observation date in "UTC" (ignore timezone info in moment obj)
+        },
+        date_obs_obs() {
+            return moment(this.date_obs_real).add(this.offset+this.observatory_offset, 'm').toDate()
+            //Start time of observation date in "observatory time" (ignore timezone info in moment obj)
+        },
+
         ...mapGetters('site_config', [
             'site_latitude',
-            'site_longitude'
+            'site_longitude',
+            'site_name',
+            'timezone',
         ])
     },
     
@@ -663,5 +908,24 @@ $toggle-button-height: 32px;
     margin-bottom: 1em;
     width: 100%;
 }
+.break-column {
+    flex-basis: 100%; 
+    width: 0;
+}
+.common-targets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:center;
+    overflow-y: scroll;
 
+    @media(max-width:970px){
+        overflow-y: visible;
+    }
+}
+.target-cards {
+        &:hover {
+        cursor: pointer;
+        filter: brightness(1.25);
+    }
+}
 </style>
