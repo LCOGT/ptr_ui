@@ -1,14 +1,14 @@
 <template>
 <div id="site-targets-wrapper">
 
-    <div class="common-results" v-show="show_results">
-        <div class="target-cards" v-for="target in targlist" :target="target" :key="target.name" >
+    <div class="common-targets" v-show="show_common_targets">
+        <div class="target-cards" v-for="target in visible_target_list" :target="target" :key="target.name" >
             <TargetCard :target="target" @selected-target="targetClickHandler($event)" :id="target.id" :is_clicked="target.id==selected_target_id"/>
            
         </div>
     </div>
 
-    <div  class="skychart-wrapper" v-show="!show_results">
+    <div  class="skychart-wrapper" v-show="!show_common_targets">
         <div class="skychart-center">
             <the-sky-chart class="the-skychart" 
                 :showStars="showStars" 
@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <div class="break-column" v-if="show_results"></div>
+    <div class="break-column" v-if="show_common_targets"></div>
 
     <div class="sidebar-wrapper">
         <a class="sidebar-button" @click="toggle_expand_sidebar">
@@ -65,7 +65,7 @@
                 <div class="sidebar-tabs">
                     <div 
                         :class="{'active': activeSidebarTab=='chart settings'}" 
-                        @click="activeSidebarTab='chart settings'; show_results=false"
+                        @click="activeSidebarTab='chart settings'; show_common_targets=false"
                         class="sidebar-tab-button">chart settings</div>
                     <div 
                         :class="{'active': activeSidebarTab=='telescope controls'}" 
@@ -190,8 +190,8 @@
                     <div v-if="activeSidebarTab=='common targets'"> 
                         <div class="the-button">
                         <b-field class="buttons">
-                            <b-button expanded @click="show_results = !show_results">
-                                <div v-if="show_results"> Show Sky Map</div>
+                            <b-button expanded @click="show_common_targets = !show_common_targets">
+                                <div v-if="show_common_targets"> Show Sky Map</div>
                                 <div v-else> Show Targets </div>
                             </b-button>
                         </b-field>
@@ -229,7 +229,7 @@
                         <div v-if="selected_target_obs =='X'" class="field">
                         <p class="control is-expanded">
                             <b-field label="Observatory UTC Offset (in hours)">
-                            <b-numberinput v-model="customobservatoryoffset" step=0.01 :controls="false" :required = "tzinfo == 'lcl'" @input="changeTimeFormat(); submitForm()"></b-numberinput>
+                            <b-numberinput v-model="custom_observatory_offset" step=0.01 :controls="false" :required = "tz_info == 'lcl'" @input="changeTimeFormat(); submitForm()"></b-numberinput>
                             </b-field>
                         </p>
                         </div>
@@ -237,9 +237,9 @@
                         <p class="control">
                             <b-field label="Date/Time">
                             <b-datetimepicker 
-                                id="dateobs" 
-                                v-model="dateobs"
-                                :timepicker="{ incrementMinutes:15, hourFormat:timeformat}"
+                                id="date_obs" 
+                                v-model="date_obs"
+                                :timepicker="{ incrementMinutes:15, hourFormat:time_format}"
                                 :datetime-parser="(d) => {new Date(d)}"
                                 :disabled="isLiveCommonTargets"
                                 required 
@@ -248,17 +248,17 @@
                             </b-field>
                         </p>
                         </div>
-                        <div v-if="selected_target_obs !=='X' || customobservatoryoffset !== ''" class="field">
+                        <div v-if="selected_target_obs !=='X' || custom_observatory_offset !== ''" class="field">
                             <b-field grouped>
-                            <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat();" >My time</b-radio>
-                            <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat()" >UTC</b-radio>
-                            <b-radio name="tzinfo" id="tzinfo" native-value="lcl" v-model="tzinfo" @input="changeTimeFormat()" >Observatory time</b-radio>
+                            <b-radio name="tz_info" id="tz_info" native-value="my" v-model="tz_info" required @input="changeTimeFormat();" >My time</b-radio>
+                            <b-radio name="tz_info" id="tz_info" native-value="utc" v-model="tz_info" required @input="changeTimeFormat()" >UTC</b-radio>
+                            <b-radio name="tz_info" id="tz_info" native-value="lcl" v-model="tz_info" @input="changeTimeFormat()" >Observatory time</b-radio>
                             </b-field>
                         </div>
                         <div v-else class="field">
                             <b-field grouped>
-                            <b-radio name="tzinfo" id="tzinfo" native-value="my" v-model="tzinfo" required @input="changeTimeFormat()" >My time</b-radio>
-                            <b-radio name="tzinfo" id="tzinfo" native-value="utc" v-model="tzinfo" required @input="changeTimeFormat()" >UTC</b-radio>
+                            <b-radio name="tz_info" id="tz_info" native-value="my" v-model="tz_info" required @input="changeTimeFormat()" >My time</b-radio>
+                            <b-radio name="tz_info" id="tz_info" native-value="utc" v-model="tz_info" required @input="changeTimeFormat()" >UTC</b-radio>
                             </b-field>
                         </div>
 
@@ -349,23 +349,23 @@ export default {
             skychart_date: new Date(),
             skychart_location: [0,0],
 
-            show_results: false,
+            show_common_targets: false,
             selected_target_id: '',
 
             // Directly copied from PlanTargets.vue
             site_info: {},
-            commonlist: list,
+            common_targets_list: list,
             target: {},
-            targlist: '',
+            visible_target_list: '',
             selected_target_obs: '',
             target_obs_latitude: '',
             target_obs_longitude: '',
-            customobservatoryoffset: new Date().getTimezoneOffset() / -60,
-            dateobs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour
-            dateobsreal: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour,
-            tzinfo: 'my',
-            observatorytime: '',
-            timeformat: undefined,
+            custom_observatory_offset: new Date().getTimezoneOffset() / -60,
+            date_obs: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour
+            date_obs_real: new Date(Math.round(new Date().getTime() / 1800000) * 1800000), //default to nearest half hour,
+            tz_info: 'my',
+            observatory_time: '',
+            time_format: undefined,
         }
     },
 
@@ -432,7 +432,7 @@ export default {
             })
         }
         Vue.set(this, 'selected_target_obs', this.sitecode)
-        Vue.set(this, 'observatorytime', this.timezone)
+        Vue.set(this, 'observatory_time', this.timezone)
         Vue.set(this, 'target_obs_latitude', this.site_latitude)
         Vue.set(this, 'target_obs_longitude', this.site_longitude)
         })
@@ -571,29 +571,29 @@ export default {
             const selectedOption = document.getElementById('selected_target_obs').options[document.getElementById('selected_target_obs').selectedIndex];
             this.target_obs_latitude = selectedOption.getAttribute('lat');
             this.target_obs_longitude = selectedOption.getAttribute('lon');
-            this.observatorytime = this.site_info[this.selected_target_obs].siteoffset;
+            this.observatory_time = this.site_info[this.selected_target_obs].siteoffset;
         },
 
         changeDate() {
-            if (this.tzinfo == 'my') {
-                this.dateobsreal = this.dateobs
-            } else if (this.tzinfo == 'utc') {
-                this.dateobsreal = moment(this.dateobs).subtract(this.offset, 'm').toDate()
-            } else if (this.tzinfo == 'lcl') {
-                this.dateobsreal = moment(this.dateobs).subtract(this.offset+this.observatoryoffset, 'm').toDate()
+            if (this.tz_info == 'my') {
+                this.date_obs_real = this.date_obs
+            } else if (this.tz_info == 'utc') {
+                this.date_obs_real = moment(this.date_obs).subtract(this.offset, 'm').toDate()
+            } else if (this.tz_info == 'lcl') {
+                this.date_obs_real = moment(this.date_obs).subtract(this.offset+this.observatory_offset, 'm').toDate()
             }
         },
         
         changeTimeFormat() {
-            if (this.tzinfo == 'my') {
-                this.timeformat = undefined; //undefined defaults to user's prefered time display
-                this.dateobs = this.dateobsreal
-            } else if (this.tzinfo == 'utc') {
-                this.timeformat = '24';
-                this.dateobs = this.dateobsutc
-            } else if (this.tzinfo == 'lcl') {
-                this.timeformat = undefined; //undefined defaults to user's prefered time display
-                this.dateobs = this.dateobsobs
+            if (this.tz_info == 'my') {
+                this.time_format = undefined; //undefined defaults to user's prefered time display
+                this.date_obs = this.date_obs_real
+            } else if (this.tz_info == 'utc') {
+                this.time_format = '24';
+                this.date_obs = this.date_obs_utc
+            } else if (this.tz_info == 'lcl') {
+                this.time_format = undefined; //undefined defaults to user's prefered time display
+                this.date_obs = this.date_obs_obs
             }
         },
         
@@ -601,41 +601,41 @@ export default {
             // This is here because the watched property doesn't change before the form gets submitted
             if (this.isLiveCommonTargets) {
                 this.selected_target_obs = this.sitecode;
-                this.observatorytime = this.timezone;
+                this.observatory_time = this.timezone;
                 this.target_obs_latitude = this.site_latitude;
                 this.target_obs_longitude = this.site_longitude;
-                this.customobservatoryoffset = new Date().getTimezoneOffset()/-60;
-                this.dateobs = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
-                this.dateobsreal = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
+                this.custom_observatory_offset = new Date().getTimezoneOffset()/-60;
+                this.date_obs = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
+                this.date_obs_real = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
             }
 
-            this.show_results = true;
+            this.show_common_targets = true;
             var diclist = [];
 
-            var endtime = moment(this.dateobsreal).add(30, 'm').toDate();
-            for (var i = 0; i < this.commonlist.length; ++i) {
-                var altstart = helpers.eq2altazWithDate(this.commonlist[i].ra, this.commonlist[i].dec, this.target_obs_latitude, this.target_obs_longitude, this.dateobsreal)[0]
-                var altend = helpers.eq2altazWithDate(this.commonlist[i].ra, this.commonlist[i].dec, this.target_obs_latitude, this.target_obs_longitude, endtime)[0]
+            var endtime = moment(this.date_obs_real).add(30, 'm').toDate();
+            for (var i = 0; i < this.common_targets_list.length; ++i) {
+                var altstart = helpers.eq2altazWithDate(this.common_targets_list[i].ra, this.common_targets_list[i].dec, this.target_obs_latitude, this.target_obs_longitude, this.date_obs_real)[0]
+                var altend = helpers.eq2altazWithDate(this.common_targets_list[i].ra, this.common_targets_list[i].dec, this.target_obs_latitude, this.target_obs_longitude, endtime)[0]
                 if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
                 diclist.push({
-                    "id": this.commonlist[i].name.replace(/\s/g, ''),
-                    "name": this.commonlist[i].name,
-                    "nickname": this.commonlist[i].alt, 
-                    "type": this.commonlist[i].group, 
-                    "image": "/targs/DefaultTargetImages/"+this.commonlist[i].name.replace(/ /g, "")+".jpg",
-                    "ra": this.commonlist[i].ra,
-                    "dec": this.commonlist[i].dec,
-                    "starttime": this.dateobsreal,
+                    "id": this.common_targets_list[i].name.replace(/\s/g, ''),
+                    "name": this.common_targets_list[i].name,
+                    "nickname": this.common_targets_list[i].alt, 
+                    "type": this.common_targets_list[i].group, 
+                    "image": "/targs/DefaultTargetImages/"+this.common_targets_list[i].name.replace(/ /g, "")+".jpg",
+                    "ra": this.common_targets_list[i].ra,
+                    "dec": this.common_targets_list[i].dec,
+                    "starttime": this.date_obs_real,
                     "altstart": altstart,
                     "altend": altend
                     })
                 }
             }
 
-            this.targlist=diclist;
+            this.visible_target_list=diclist;
 
             if (window.screen.availWidth<970) {
-                setTimeout(function(){ document.getElementById("results").scrollIntoView({behavior: 'smooth'}); }, 30);}
+                setTimeout(function(){ document.getElementById("common-targets").scrollIntoView({behavior: 'smooth'}); }, 30);}
         },
         
     },
@@ -684,21 +684,21 @@ export default {
 
         // Common Target computed
         offset() {
-            return new Date(this.dateobsreal).getTimezoneOffset()
+            return new Date(this.date_obs_real).getTimezoneOffset()
         },
-        observatoryoffset() {
+        observatory_offset() {
             if (this.selected_target_obs =='X') {
-                return this.customobservatoryoffset*60
+                return this.custom_observatory_offset*60
             } else {
-                return moment.utc(this.dateobs).tz(this.observatorytime).utcOffset()
+                return moment.utc(this.date_obs).tz(this.observatory_time).utcOffset()
             }
         },
-        dateobsutc() {
-            return moment(this.dateobsreal).add(this.offset, 'm').toDate()
+        date_obs_utc() {
+            return moment(this.date_obs_real).add(this.offset, 'm').toDate()
             //Start time of observation date in "UTC" (ignore timezone info in moment obj)
         },
-        dateobsobs() {
-            return moment(this.dateobsreal).add(this.offset+this.observatoryoffset, 'm').toDate()
+        date_obs_obs() {
+            return moment(this.date_obs_real).add(this.offset+this.observatory_offset, 'm').toDate()
             //Start time of observation date in "observatory time" (ignore timezone info in moment obj)
         },
 
@@ -912,7 +912,7 @@ $toggle-button-height: 32px;
     flex-basis: 100%; 
     width: 0;
 }
-.common-results {
+.common-targets {
     display: flex;
     flex-wrap: wrap;
     justify-content:center;
