@@ -1,5 +1,4 @@
 <template>
-  <div>
   <div class="card-row">
     <template v-for="s in all_sites_real">
       <div 
@@ -22,43 +21,8 @@
             <figure class="image is-2by1"> <img :src="site_images[s.site]" /> </figure>
           </router-link>
         </div>
-
       </div>
     </template>
-  </div>
-
-  <hr class="divider"/>
-
-  <div class="card-row">
-    <template v-for="s in all_sites_simulated">
-      <div 
-        :key="s.site" 
-        :val="s.site"
-        v-if="!site_blacklist.includes(s.site)"
-        class="card" 
-        :class="{
-          'online': isOnline(s.site)
-          }">
-
-        <div class="card-header subtitle">
-          <router-link :to="'/site/'+s.site+'/observe'">
-            <span style="color: white; height: 2em;">{{s.name}}</span>
-          </router-link>
-        </div>
-
-        <div class="card-image">
-          <router-link :to="'/site/'+s.site+'/observe'">
-            <figure class="image is-2by1"> <img :src="site_images[s.site]" /> </figure>
-          </router-link>
-        </div>
-
-      </div>
-    </template>
-    <!-- add empty test sites so the cards are sized the same as the real sites -->
-    <template v-for="index in empty_test_sites_needed">
-      <div :key="index" class="card-placeholder" />
-    </template>
-  </div>
   </div>
 </template>
 

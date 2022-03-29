@@ -70,10 +70,16 @@ const getters = {
       return sites
     },
     all_sites_real: (state, getters) => {
-      return getters.all_sites.filter(s => !state.test_sites.includes(s.site.toLowerCase()))
+        let sites = getters.all_sites.filter(s => !state.test_sites.includes(s.site.toLowerCase()))
+        // sort by longitude
+        sites = sites.sort((a, b) => a.longitude - b.longitude)
+        return sites
     },
     all_sites_simulated: (state, getters) => {
-      return getters.all_sites.filter(s => state.test_sites.includes(s.site.toLowerCase()))
+        let sites = getters.all_sites.filter(s => state.test_sites.includes(s.site.toLowerCase()))
+        // sort by longitude
+        sites = sites.sort((a, b) => a.longitude - b.longitude)
+        return sites
     },
 
     selected_enclosure_config: (state, getters) => {
