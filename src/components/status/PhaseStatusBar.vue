@@ -3,7 +3,7 @@
     <div class="container phase-status-wrapper">
         <div class="phase-status-title">
             <span>Next Events: </span>
-            <span class="timestamp">{{phase_status_sorted[0].timestamp | readable_date}}</span>
+            <span class="timestamp">{{phase_status_sorted[0]?.timestamp | readable_date}}</span>
         </div> 
         <template v-for="(s, index) in phase_status_sorted">
             <span :key="index + 'spacer'" class="spacer" v-if="index"> | </span>
@@ -48,7 +48,8 @@ export default {
     filters: {
         readable_date(timestamp) {
             // don't forget to convert back to ms for js date handling
-            return moment(timestamp * 1000).format("MM/DD HH:mm:ss");
+            let readable = moment(timestamp * 1000).format("MM/DD HH:mm:ss");
+            return readable
         }
     },
     created() {
@@ -92,7 +93,9 @@ export default {
                 + `/phase_status/${this.site}`
                 + `?max_age_seconds=${encodeURIComponent(max_age)}`
             let latest_phase_status = await axios.get(url)
-            this.phase_status = latest_phase_status.data
+            if (latest_phase_status.data.length) {
+                this.phase_status = latest_phase_status.data
+            }
         },
         text_opacity_style(timestamp) {
             const hour = 60 * 60

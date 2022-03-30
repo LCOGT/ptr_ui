@@ -290,7 +290,6 @@ const actions = {
          */
         axios.get(apiName+path).then(async response => {
             response = response.data
-            console.log(response)
 
             // Empty response:
             if (response.length == 0) { 

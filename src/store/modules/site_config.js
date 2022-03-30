@@ -10,7 +10,7 @@ const state = {
 
     test_sites: ['tst', 'tst001', 'dht', 'sintezsim'],
 
-    global_config: JSON.parse(window.localStorage.getItem('global_config') || '{}'),
+    global_config: {},
     is_site_selected: false,
     did_config_load_yet: false,
 
@@ -70,10 +70,16 @@ const getters = {
       return sites
     },
     all_sites_real: (state, getters) => {
-      return getters.all_sites.filter(s => !state.test_sites.includes(s.site.toLowerCase()))
+        let sites = getters.all_sites.filter(s => !state.test_sites.includes(s.site.toLowerCase()))
+        // sort by longitude
+        sites = sites.sort((a, b) => a.longitude - b.longitude)
+        return sites
     },
     all_sites_simulated: (state, getters) => {
-      return getters.all_sites.filter(s => state.test_sites.includes(s.site.toLowerCase()))
+        let sites = getters.all_sites.filter(s => state.test_sites.includes(s.site.toLowerCase()))
+        // sort by longitude
+        sites = sites.sort((a, b) => a.longitude - b.longitude)
+        return sites
     },
 
     selected_enclosure_config: (state, getters) => {
@@ -239,10 +245,8 @@ const actions = {
      * observatories in the network. 
      */
     update_config({ commit, dispatch, rootState }) {
-        let apiName = rootState.dev.active_api;
-        let path = '/all/config/';
-        return axios.get(apiName+path).then(response => {
-            window.localStorage.setItem('global_config', JSON.stringify(response.data))
+        const url = `${rootState.dev.active_api}/all/config`
+        axios.get(url).then(response => {
             commit('setGlobalConfig', response.data)
         }).catch(error => {
             console.warn(error)

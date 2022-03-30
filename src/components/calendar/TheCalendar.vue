@@ -779,7 +779,7 @@ export default {
     newEventSelected(event) {
       this.activeEvent.startStr = moment(event.startStr).utc().format();
       this.activeEvent.endStr = moment(event.endStr).utc().format();
-      this.activeEvent.title = "";
+      this.activeEvent.title = this.$auth.user.name;
       this.activeEvent.reservation_type = "realtime" // or "project"
       this.activeEvent.creator = this.$auth.user.name;
       this.activeEvent.id = this.makeUniqueID();
