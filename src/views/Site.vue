@@ -27,15 +27,10 @@
     </div>
 
     <div class="page-view">
-
         <!-- Primary content of the page. Selects from the various site subpages. -->
         <!-- Note: wait for parent (this component) to mount before loading child components. 
-      Otherwise, props may initially load as null. -->
-          <component
-            v-bind:is="`site-${subpage}`"
-            v-if="$store.state.site_config.did_config_load_yet"
-            :sitecode="sitecode"
-          />
+        Otherwise, props may initially load as null. -->
+        <component v-bind:is="`site-${subpage}`" :sitecode="sitecode" />
     </div>
 
     <site-status-footer
@@ -87,27 +82,12 @@ export default {
   props: ["sitecode", "subpage"],
   mixins: [commands_mixin],
 
-  beforeRouteEnter(to, from, next) {
-    const sitecode = to.params.sitecode.toLowerCase();
-    //console.log('IN BEFOREROUTEENTER, site: ', sitecode)
-    next((vm) => {
-      // Update the active devices
-      vm.$store.dispatch("site_config/set_default_active_devices", sitecode);
-
-      // Subscribe to datastream for the new site
-      datastreamer.open_connection(sitecode)
-
-      // get initial data/valuse for images, status, calendar
-      vm.$store.dispatch("images/display_placeholder_image");
-      vm.$store.dispatch("images/load_latest_images");
-      vm.$store.dispatch("images/load_latest_info_images");
-      vm.$store.dispatch("sitestatus/clearStatus")
-      vm.$store.dispatch("sitestatus/getLatestStatus")
-      vm.$store.dispatch("userstatus/fetch_recent_logs")
-      vm.$store.dispatch("calendar/fetchActiveReservations", sitecode);
-    });
+  // When the site page component loads for the first time, set the current site in vuex. 
+  created() {
+    this.site_changed_routine(this.$route.params.sitecode)
   },
 
+  // If the site changes while the component is still loaded, make sure to update the current site in vuex. 
   beforeRouteUpdate(to, from, next) {
     const new_site = to.params.sitecode.toLowerCase();
     //console.log('in BEFORE ROUTE UPDATE, site: ', new_site)
@@ -131,8 +111,6 @@ export default {
   },
 
   mounted() {
-    //this.setupImagesWebsocket();
-
     // Update timestamp every second (sent with command)
     setInterval(() => {
       this.timestamp = parseInt(Date.now() / 1000);
@@ -140,16 +118,14 @@ export default {
   },
 
   computed: {
-    active_subpage() {
-      return this.$route.params.subpage
-    }
+    active_subpage() { return this.$route.params.subpage }
   },
 
   methods: {
 
     // Do this whenever the selected site changes
+    // 'sitecode' argument is the new site being navigated to, not the old one.
     site_changed_routine(sitecode) {
-      // console.log('site changed to ', sitecode)
 
       // Update the active devices
       this.$store.dispatch("site_config/set_default_active_devices", sitecode);

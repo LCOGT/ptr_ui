@@ -109,8 +109,6 @@ export default {
       function iwClose() { iw.close(); }
       google.maps.event.addListener(this.map, 'click', iwClose);
 
-      console.log(sites.map(s => s.site))
-
       const markers = sites.filter(site => {
         // First, remove sites that don't have an available status 
         return Object.keys(this.site_open_status).includes(site.site)
