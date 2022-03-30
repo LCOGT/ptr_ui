@@ -41,6 +41,7 @@
 <script>
 import TheCalendar from "@/components/calendar/TheCalendar";
 import UserEventsTable from "@/components/calendar/UserEventsTable";
+import SiteReservationStatus from "@/components/calendar/SiteReservationStatus";
 import { mapState, mapGetters } from "vuex";
 import axios from "axios";
 import moment from "moment";
@@ -51,6 +52,7 @@ export default {
   components: {
     TheCalendar,
     UserEventsTable,
+    SiteReservationStatus,
   },
   data() {
     return {
