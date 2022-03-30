@@ -1,7 +1,6 @@
 <template>
   <div class="cal-page-wrapper">
 
-
     <the-calendar 
       class="the-calendar"
       v-if="timezone"
@@ -32,8 +31,6 @@
       </div>
 
     </div>
-    <!--button class="button" @click="getUserEvents">get user events</button-->
-
   </div>
 </template>
 
@@ -42,8 +39,7 @@
 import TheCalendar from "@/components/calendar/TheCalendar";
 import UserEventsTable from "@/components/calendar/UserEventsTable";
 import SiteReservationStatus from "@/components/calendar/SiteReservationStatus";
-import { mapState, mapGetters } from "vuex";
-import axios from "axios";
+import { mapGetters } from "vuex";
 import moment from "moment";
 
 export default {

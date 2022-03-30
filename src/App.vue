@@ -18,7 +18,7 @@ import JS9 from "@/components/JS9";
 export default {
   components: { JS9 },
   beforeCreate() {
-    // Initial load of the config. This is the only time it needs to happen unless the user relaods the site. 
+    // Initial load of the config. This is the only time it needs to happen unless the user reloads the site. 
     this.$store.dispatch('site_config/update_config')
   },
 }

@@ -27,9 +27,6 @@
     </div>
 
     <div class="page-view">
-        <!-- Primary content of the page. Selects from the various site subpages. -->
-        <!-- Note: wait for parent (this component) to mount before loading child components. 
-        Otherwise, props may initially load as null. -->
         <component v-bind:is="`site-${subpage}`" :sitecode="sitecode" />
     </div>
 
