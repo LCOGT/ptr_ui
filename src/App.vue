@@ -26,7 +26,7 @@ export default {
 
 <style scoped lang="scss">
 .router-view {
-  height: calc(100vh - 75px);
+  //height: calc(100vh - 75px);
   overflow-x: hidden;
 }
 </style>

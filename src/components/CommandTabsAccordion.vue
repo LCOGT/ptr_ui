@@ -95,12 +95,12 @@ export default {
         'Telescope',
         'Rotator',
         'Focuser',
+        'Camera', 
       ])
       if (this.selector_exists) {
         inst.push('InstrumentSelector')
       }
       inst.push(...[
-        'Camera', 
         'Sequencer',
         'Settings',
       ])
@@ -134,7 +134,7 @@ $accordion-header-background: $grey-darker;
   outline: none;
   padding-bottom: 0;
   border: 1px solid $grey-dark;
-  min-width: 340px;
+  width: 340px;
   overflow: hidden;
 }
 

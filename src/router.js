@@ -11,6 +11,7 @@ import devtools from './views/devtools.vue'
 
 import About from './views/info/About.vue'
 import ReservationInfo from './views/info/ReservationInfo.vue'
+import ControlRoom from './views/ControlRoom.vue'
 
 // Observatories
 import Site from './views/Site.vue'
@@ -18,7 +19,6 @@ import Site from './views/Site.vue'
 // Pages for testing
 import btns from './views/btns.vue'
 import skymap from './views/skymap.vue'
-import site from './views/Site.vue'
 import analysis from './views/analysis.vue'
 import { authGuard } from "./auth/authGuard";
 import calendarPage from './views/calendarPage.vue'
@@ -66,9 +66,19 @@ const router = new VueRouter({
     { path: '/remotehq', name: 'remotehq', component: Remotehq},
     { path: '/data/:user', name: 'data', component: UserData},
     {
+      path: '/cr/:sitecode',
+      name: 'control room',
+      component: ControlRoom,
+      props: route => {
+        return {
+          sitecode: route.params.sitecode.toLowerCase(),
+        }
+      },
+    },
+    {
       path: '/site/:sitecode/:subpage',
       name: 'site',
-      component: site,
+      component: Site,
       props: route => {
         return {
           sitecode: route.params.sitecode.toLowerCase(),
