@@ -41,10 +41,7 @@ export default {
     DatetimeWithTimezonePicker,
   },
   props: {
-    site: {
-      type: String,
-      required: true,
-    },
+    site: String
   },
   data() {
     return {

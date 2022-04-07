@@ -297,7 +297,10 @@ export default {
     RecentS3UploadsTable,
     SiteConfigViewer,
     DownloadInterface,
-    FitsHeaderModal
+    FitsHeaderModal,
+  },
+  props: {
+    sitecode: String
   },
   data() {
     return {
@@ -451,9 +454,6 @@ export default {
   },
 
   computed: {
-    sitecode() {
-      return this.$route.params.sitecode
-    },
 
     ...mapState("images", [
       'recent_images',

@@ -41,7 +41,7 @@
 import { utc_offset_from_coordinates } from '@/utils/timezones'
 import { mapState, mapGetters } from 'vuex'
 export default {
-    name: 'DownloadInterface',
+    name: 'DatetimeWithTimezonePicker',
     props: {
         size: {
             type: String,
@@ -51,13 +51,8 @@ export default {
             },
             default: () => ''
         },
-        site: {
-            type: String,
-            default: () => '',
-        },
-        label: {
-            type: String
-        },
+        site: String,
+        label: String,
         date: {
             type: Date,
             default: () => new Date()
