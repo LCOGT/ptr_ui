@@ -7,19 +7,19 @@
       <div class="mobile-site-menu">
         <button class="menu-padding"></button>
         <router-link :to="'/site/' + sitecode + '/home'">
-          <button class="button" :class="{'selected': active_subpage == 'home'}">Home</button>
+          <button class="button" :class="{'selected': subpage == 'home'}">Home</button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/targets'">
-          <button class="button" :class="{'selected': active_subpage == 'targets'}">Targets</button>
+          <button class="button" :class="{'selected': subpage == 'targets'}">Targets</button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/observe'">
-          <button class="button" :class="{'selected': active_subpage == 'observe'}">Observe</button>
+          <button class="button" :class="{'selected': subpage == 'observe'}">Observe</button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/calendar'">
-          <button class="button" :class="{'selected': active_subpage == 'calendar'}">Calendar</button>
+          <button class="button" :class="{'selected': subpage == 'calendar'}">Calendar</button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/projects'">
-          <button class="button" :class="{'selected': active_subpage == 'projects'}">Projects</button>
+          <button class="button" :class="{'selected': subpage == 'projects'}">Projects</button>
         </router-link>
         <button class="menu-padding" button></button>
       </div>
@@ -76,7 +76,16 @@ export default {
     SiteStatusFooterMobile,
     SiteNavbar,
   },
-  props: ["sitecode", "subpage"],
+  props: {
+    sitecode: {
+      type: String,
+      required: true,
+    },
+    subpage: {
+      type: String,
+      required: true,
+    }
+  },
   mixins: [commands_mixin],
 
   // When the site page component loads for the first time, set the current site in vuex. 
@@ -112,10 +121,6 @@ export default {
     setInterval(() => {
       this.timestamp = parseInt(Date.now() / 1000);
     }, 1000);
-  },
-
-  computed: {
-    active_subpage() { return this.$route.params.subpage }
   },
 
   methods: {

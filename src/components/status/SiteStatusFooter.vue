@@ -116,10 +116,12 @@
                 style="padding: 0"
                 :statusList="device_status_display_1"
               />
-              <status-column
-                style="padding: 0"
-                :statusList="device_status_display_2"
-              />
+              <div style="display:flex; flex-direction:column;">
+                <status-column
+                  style="padding: 0"
+                  :statusList="device_status_display_2"/>
+                <SiteRestartCommand :site="site" class="site-restart-button"/>
+              </div>
             </div>
           </div>
 
@@ -218,6 +220,7 @@ import SiteLocalTime from "@/components/display/SiteLocalTime";
 import UtcTime from "@/components/display/UtcTime";
 import SiteOperationalStatus from "@/components/status/SiteOperationalStatus";
 import PhaseStatusBar from '@/components/status/PhaseStatusBar'
+import SiteRestartCommand from '@/components/SiteRestartCommand'
 export default {
   name: "SiteStatusFooter",
   mixins: [ user_status_mixin],
@@ -228,9 +231,12 @@ export default {
     UtcTime,
     SiteOperationalStatus,
     PhaseStatusBar,
+    SiteRestartCommand,
   },
   props: {
-    site: String,
+    site: {
+      type: String,
+    }
   },
 
   data() {
@@ -508,7 +514,7 @@ export default {
  *  Component styling
  */
 .statusbar {
-  z-index: 10;
+  z-index: 40;
 }
 .hidden {
   display: none;
@@ -711,6 +717,17 @@ div.log-line:last-of-type * {
 }
 .pin-icon {
   color: silver;
+}
+
+.site-restart-button {
+  display:flex;
+  flex-direction: row-reverse;
+  border-top: 1px solid silver;
+  width: 100%;
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: 1em;
+  padding-top: 1em;
 }
 
 // Style the status container boxes in the expanded status panel
