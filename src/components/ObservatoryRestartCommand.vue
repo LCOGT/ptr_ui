@@ -1,12 +1,12 @@
 
 <template>
   <div>
-    <b-button :size="size" @click="restart_modal_is_active = true" >Restart Site</b-button >
+    <b-button :size="size" @click="restart_modal_is_active = true" >Restart Observatory</b-button >
     <b-modal :active.sync="restart_modal_is_active">
       <div class="card">
         <header class="modal-card-head">
           <p class="modal-card-title">
-            Restart Site:
+            Restart Observatory:
             <span class="modal-site-name">&nbsp;{{ site.toUpperCase() }}</span>
           </p>
           <button
@@ -50,7 +50,7 @@ import { commands_mixin } from "@/mixins/commands_mixin";
 import { getInstance } from "@/auth/index"; // get user object: getInstance().user
 
 export default {
-  name: "SiteRestartCommand",
+  name: "ObservatoryRestartCommand",
   mixins: [commands_mixin],
   props: {
     site: {
@@ -126,7 +126,7 @@ export default {
     restart_command_body() {
       return {
         site: this.site,
-        action: "site_restart",
+        action: "observatory_restart",
         device: "all",
         instance: "all",
         user_name: this.username,

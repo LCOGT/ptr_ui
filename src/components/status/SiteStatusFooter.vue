@@ -120,7 +120,7 @@
                 <status-column
                   style="padding: 0"
                   :statusList="device_status_display_2"/>
-                <SiteRestartCommand :site="site" class="site-restart-button"/>
+                <ObservatoryRestartCommand :site="site" class="site-restart-button"/>
               </div>
             </div>
           </div>
@@ -220,7 +220,7 @@ import SiteLocalTime from "@/components/display/SiteLocalTime";
 import UtcTime from "@/components/display/UtcTime";
 import SiteOperationalStatus from "@/components/status/SiteOperationalStatus";
 import PhaseStatusBar from '@/components/status/PhaseStatusBar'
-import SiteRestartCommand from '@/components/SiteRestartCommand'
+import ObservatoryRestartCommand from '@/components/ObservatoryRestartCommand'
 export default {
   name: "SiteStatusFooter",
   mixins: [ user_status_mixin],
@@ -231,7 +231,7 @@ export default {
     UtcTime,
     SiteOperationalStatus,
     PhaseStatusBar,
-    SiteRestartCommand,
+    ObservatoryRestartCommand,
   },
   props: {
     site: {
