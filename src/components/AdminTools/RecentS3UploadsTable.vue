@@ -38,14 +38,15 @@
       <template #top-left>
         <b-field>
           <SiteSelectField
+            :size="size"
             v-model="selected_site"
             all_display_value="Everything"
             include_all
           />
           <p class="control">
-            <button class="button" @click="get_recent_uploads">
+            <b-button :size="size" class="button" @click="get_recent_uploads">
               get recent uploads
-            </button>
+            </b-button>
           </p>
         </b-field>
       </template>
@@ -69,6 +70,10 @@ export default {
       type: String,
       default: () => "all",
     },
+    size: {
+      type: String,
+      default: "",
+    }
   },
   data() {
     return {

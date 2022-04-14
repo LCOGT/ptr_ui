@@ -1,6 +1,9 @@
 
 /**
  * @fileoverview This is the vuex store that maintains the state of images.
+ * 
+ * TODO: Make a class for images, gives more flexibility than a plain object
+ * for computing various attributes, etc. 
  */
 
 //import { API } from 'aws-amplify'

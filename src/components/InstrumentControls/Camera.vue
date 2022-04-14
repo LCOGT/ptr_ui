@@ -24,7 +24,8 @@
 
     <b-field horizontal label="Filter">
 
-        <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" size="is-small" style="width: 100%">
+      <b-field>
+        <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" size="is-small">
           <option 
             v-for="(filter, index) in filter_wheel_options"
             v-bind:value="filter[0]" 
@@ -34,10 +35,13 @@
             {{ filter[0] }}
           </option>
         </b-select>
+        <p class="control">
+          <command-button :data="filter_wheel_command" class="is-small"/>
+        </p>
+        <command-button :data="filter_wheel_home_command" style="margin-left: 2em;" class="is-small" />
+      </b-field>
 
         <div class="buttons has-addons">
-          <command-button :data="filter_wheel_command" style="width: 50%" class="is-small"/>
-          <command-button :data="filter_wheel_home_command" style="width: 50%" class="is-small" />
         </div>
     </b-field>
 

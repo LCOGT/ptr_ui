@@ -130,11 +130,15 @@ export default {
 
 $accordion-header-background: $grey-darker;
 
+.command-tab-accordion-wrapper {
+  //font-size: 11px;
+}
+
 .accordion {
   outline: none;
   padding-bottom: 0;
   border: 1px solid $grey-dark;
-  width: 340px;
+  max-width: 500px;
   overflow: hidden;
 }
 

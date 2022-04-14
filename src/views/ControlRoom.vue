@@ -28,24 +28,47 @@
 
     <!-- main page content: columns -->
     <div class="cr-columns">
-        <div class="command-tabs" style="display:flex;">
+        <div class="command-tabs" style="display:flex; flex-direction: column;">
             <!--div style="flex-shrink: 0; height: 100%; width: 25px; border: 1px solid red;"><</div-->
-            <CommandTabsAccordion :initInstrumentOpenView="5" />
+            <!--CommandTabsAccordion :initInstrumentOpenView="5" /-->
+            <CommandTabsWide style="width: 100%;" :initInstrumentOpenView="5" />
+            <div style="height: 5em; flex-shrink: 0;" />
         </div>
         <div class="image-view">
 
-            <ControlRoomImages :sitecode="sitecode" />
-            <!--ImageView /-->
-            <!--ThumbnailRow /-->
+            <Tabs class="control-room-main-tabs">
+                <TabItem title="images">
+                    <ControlRoomImages :sitecode="sitecode" />
+                    <Tabs class="analysis-tools-tabs">
+                        <TabItem title="statistics">
+                            <ImageStatisticsViewer />
+                        </TabItem>
+                        <TabItem title="histogram">
+                            <HistogramTool />
+                        </TabItem>
+                        <TabItem title="line profile">
+                            <LineProfileInspection />
+                        </TabItem>
+                        <TabItem title="image info">
+                            <ImageMetadataViewer />
+                        </TabItem>
+                    </Tabs>
+                </TabItem>
+                <TabItem title="sky chart">
+                    <TheSkyChart class="skychart-component" />
+                    <!--SiteTargets :sitecode="sitecode" /-->
+                </TabItem>
+            </Tabs>
+
         </div>
-        <div class="telescope-info">
+        <!--div class="telescope-info">
             <TelescopeLivestream class="telescope-livestream" />
             <div class="status-summary">
                 <div>Telescope: Parked</div>
                 <div>Roof: closed</div>
                 <div>weather: ok</div>
             </div>
-        </div>
+        </div-->
     </div>
 
     <!-- Status at bottom of page -->
@@ -55,12 +78,23 @@
 
 <script>
 import CommandTabsAccordion from '@/components/CommandTabsAccordion'
+import CommandTabsWide from '@/components/CommandTabsWide'
 import UserwayButton from '@/components/UserwayButton'
 import ControlRoomImages from '@/components/ImageDisplay/ControlRoomImages'
 import ImageView from '@/components/ImageView'
 import ThumbnailRow from '@/components/ImageDisplay/ThumbnailRow'
 import TelescopeLivestream from '../components/TelescopeLivestream'
 import SiteStatusFooter from '@/components/status/SiteStatusFooter'
+
+import HistogramTool from '@/components/AnalysisTools/HistogramTool'
+import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsViewer'
+import ImageMetadataViewer from '@/components/AnalysisTools/ImageMetadataViewer'
+import LineProfileInspection from '@/components/AnalysisTools/LineProfileInspection'
+import TheSkyChart from '@/components/celestialmap/TheSkyChart'
+import SiteTargets from '@/components/sitepages/SiteTargets'
+
+import Tabs from '@/components/Tabs'
+import TabItem from '@/components/TabItem'
 import datastreamer from "@/datastreamer";
 import { user_mixin } from '@/mixins/user_mixin'
 
@@ -68,12 +102,21 @@ export default {
     name: "ControlRoom",
     components: {
         CommandTabsAccordion,
+        CommandTabsWide,
         UserwayButton,
         ControlRoomImages,
         ImageView,
         ThumbnailRow,
         TelescopeLivestream,
         SiteStatusFooter,
+        HistogramTool,
+        ImageStatisticsViewer,
+        ImageMetadataViewer,
+        LineProfileInspection,
+        TheSkyChart,
+        SiteTargets,
+        Tabs,
+        TabItem,
     },
     mixins: [ user_mixin ],
     data() {
@@ -110,6 +153,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/style/buefy-styles.scss";
 
 .page-wrapper {
     height: 100vh;
@@ -127,10 +171,10 @@ export default {
     border-radius: 0;
 }
 .cr-columns {
-    margin: 0 3em;
+    margin-left: 3em;
     display: flex;
     height: 100%;
-    gap: 1em;
+    //gap: 1em;
     flex-shrink: 1;
     //overflow-y: auto;
     overflow-y: hidden;
@@ -139,18 +183,30 @@ export default {
     padding-top: 1em;
     overflow-y:auto;
 }
+
+.control-room-main-tabs {
+    background-color: $body-background-color;
+}
+.control-room-main-tabs > * {
+    padding: 1em 0;
+}
 .command-tabs {
-    padding-right: 5px;
+    padding-right: 10px;
     min-height: 100%;
     flex-shrink: 0;
     overflow-y: scroll;
+    width: 400px;
+}
+
+.analysis-tools-tabs {
+    margin: 3em 0;
 }
 .image-view {
     flex-shrink: 1;
     flex-basis: auto;
     height: 100%;
     resize:horizontal;
-    max-width: 80%;
+    max-width: 768px;
 }
 .telescope-info {
     flex-grow: 1;

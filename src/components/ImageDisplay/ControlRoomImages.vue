@@ -21,7 +21,9 @@
       </div>
 
       <ButtonRowBelowImage class="mt-3"/>
-      <DrawShapesToolbar />
+    <div class="horizontal-divider" />
+      <DrawShapesToolbar size="is-small" style="margin-top: 1em;" />
+    <div class="horizontal-divider" />
     </div>
 </template>
 
@@ -31,7 +33,7 @@ import ImageView from '@/components/ImageView'
 import InfoImageThumb from '@/components/ImageDisplay/InfoImageThumb'
 import ThumbnailRow from '@/components/ImageDisplay/ThumbnailRow'
 import ButtonRowBelowImage from '@/components/ImageDisplay/ButtonRowBelowImage'
-import DrawShapesToolbar from '@/components/ImageDisplay/DrawShapesToolbar'
+import DrawShapesToolbar from '@/components/AnalysisTools/DrawShapesToolbar'
 import { mapState, mapGetters, mapActions } from 'vuex'
 export default {
     name: "ControlRoomImages",
@@ -100,6 +102,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.horizontal-divider {
+    border-top: 1px solid grey;
+    width: 100%;
+    margin: 1em 0;
+}
 .image-display-area {
 
 }
