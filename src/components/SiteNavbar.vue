@@ -19,7 +19,9 @@
                     v-if="global_config[site]">
                     <div style="pointer-events: none;" class="status-dot" :class="siteOnlineClass(site)" />
                     <div style="pointer-events: none; font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</div> 
+                    <div style="width: 22ex"><b-button @click="open_control_room(site)" style="width: 21ex;" size="is-small">{{site}} control room</b-button></div>
                     <div style="pointer-events: none; color: silver;">{{global_config[site].name}}</div>
+
                   </b-navbar-item>
                 </template>
                 <hr class="navbar-divider">
@@ -30,6 +32,7 @@
                     v-if="global_config[site]">
                     <div style="pointer-events: none;" class="status-dot" :class="siteOnlineClass(site)" />
                     <div style="pointer-events: none; font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</div> 
+                    <div style="width: 22ex"><b-button @click="open_control_room(site)" style="width: 21ex;" size="is-small">{{site}} control room</b-button></div>
                     <div style="pointer-events: none; color: silver;">{{global_config[site].name}}</div>
                   </b-navbar-item>
                 </template>
@@ -128,6 +131,10 @@ export default {
 
   },
   methods: {
+    open_control_room(site) {
+      let url = `https://rooms.remotehq.com/photon-ranch/control-room-${site}`
+      window.open(url)
+    },
     // Log the user in with Auth0
     login() {
       this.$auth.loginWithPopup();
