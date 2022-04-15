@@ -10,33 +10,8 @@
         </template>
 
         <template slot="start">
+          <NavbarSiteDropdown />
 
-            <b-navbar-dropdown label="observatories"  @click.native="updateSiteStatus"> 
-                <template v-for="(site, index) in real_sites">
-                  <b-navbar-item tag="router-link" 
-                    :to="{ path: '/site/' + site+ '/home'}"
-                    v-bind:key="'real'+index"
-                    v-if="global_config[site]">
-                    <div style="pointer-events: none;" class="status-dot" :class="siteOnlineClass(site)" />
-                    <div style="pointer-events: none; font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</div> 
-                    <div style="width: 22ex"><b-button @click="open_control_room(site)" style="width: 21ex;" size="is-small">{{site}} control room</b-button></div>
-                    <div style="pointer-events: none; color: silver;">{{global_config[site].name}}</div>
-
-                  </b-navbar-item>
-                </template>
-                <hr class="navbar-divider">
-                <template v-for="(site, index) in simulated_sites">
-                  <b-navbar-item tag="router-link" 
-                    :to="{ path: '/site/' + site+ '/home'}"
-                    v-bind:key="'sim'+index"
-                    v-if="global_config[site]">
-                    <div style="pointer-events: none;" class="status-dot" :class="siteOnlineClass(site)" />
-                    <div style="pointer-events: none; font-weight: bold; width: 9ex">{{global_config[site].site}}&nbsp;</div> 
-                    <div style="width: 22ex"><b-button @click="open_control_room(site)" style="width: 21ex;" size="is-small">{{site}} control room</b-button></div>
-                    <div style="pointer-events: none; color: silver;">{{global_config[site].name}}</div>
-                  </b-navbar-item>
-                </template>
-            </b-navbar-dropdown>
 
         </template>
 
@@ -83,6 +58,7 @@
 <script>
 import PhotonRanch from '@/components/logoText/PhotonRanch'
 import PTR from '@/components/logoText/PTR'
+import NavbarSiteDropdown from '@/components/NavbarSiteDropdown'
 import { mapGetters, mapState } from "vuex";
 
 export default {
@@ -90,26 +66,13 @@ export default {
   components: {
     PTR,
     PhotonRanch,
+    NavbarSiteDropdown,
   },
   computed: {
+
     ...mapState('site_config', [
       'selected_site',
-      'global_config'
     ]),
-    ...mapGetters('site_config', [
-      'all_sites_real',
-      'all_sites_simulated',
-    ]),
-
-    real_sites() {
-      return this.all_sites_real.map(s => s.site)
-    },
-    simulated_sites() {
-      return this.all_sites_simulated.map(s => s.site)
-    },
-
-    ...mapState('sitestatus', ['site_open_status']),
-
     userIsAdmin() {
       try {
         let user = this.$auth.user 
@@ -119,22 +82,8 @@ export default {
         return false
       }
     },
-
-    menu_name() {
-      let siteName = ''
-      if (this.selected_site != '') { 
-         siteName += ' - ' + this.selected_site.toUpperCase()
-      }
-      return siteName
-    },
-
-
   },
   methods: {
-    open_control_room(site) {
-      let url = `https://rooms.remotehq.com/photon-ranch/control-room-${site}`
-      window.open(url)
-    },
     // Log the user in with Auth0
     login() {
       this.$auth.loginWithPopup();
@@ -148,45 +97,6 @@ export default {
         returnTo: window.location.origin
       }).then($router.go)
     },
-
-    updateSiteStatus() {
-      this.$store.dispatch('sitestatus/getSiteOpenStatus')
-    },
-
-    /*
-      Strategy: 
-        if weather status is recent and wx_ok is true: green dot
-        if weather status is recent and wx_ok is false: red dot
-        otherwise: grey dot
-    */
-    siteOnlineClass(site) {
-      const status_age_online = 300 // max number of seconds to be considered online
-
-      // Do nothing if the site doesn't have any status records
-      if (!Object.keys(this.site_open_status).includes(site)) {
-        return 'status-grey'
-      }
-
-      // Extract the age of the latest status
-      const weather_age = this.site_open_status[site]?.weather?.status_age_s
-      const enclosure_age = this.site_open_status[site]?.enclosure?.status_age_s
-      const device_age = this.site_open_status[site]?.device?.status_age_s
-
-      // online sites: weather is sending and ok. 
-      if (Object.keys(this.site_open_status[site]).includes('wx_ok')) {
-        let weather_ok = this.site_open_status[site].wx_ok 
-        let weather_status_age = this.site_open_status[site].weather.status_age_s
-        let weather_is_recent = weather_status_age < status_age_online
-        if (!weather_is_recent) {
-          return 'status-grey'
-        }
-        else {
-          return weather_ok ? 'status-green' : 'status-red'
-        }
-      }
-      return 'status-grey'
-
-    }
   }
 };
 </script>
@@ -213,73 +123,4 @@ nav {
   z-index:31; /* so the navbar doesn't cover fullscreen modals */
 }
 
-/*
-.status-green {
-  opacity: 0.8;
-  padding-right: 3px;
-  font-size: 10px;
-  color: lime;
-}
-.status-yellow {
-  opacity: 0.8;
-  padding-right: 3px;
-  font-size: 10px;
-  color: yellow;
-}
-.status-blue {
-  opacity: 0.8;
-  padding-right: 3px;
-  font-size: 10px;
-  color: lightskyblue;
-}
-.status-red {
-  opacity: 0.8;
-  padding-right: 3px;
-  font-size: 10px;
-  color:red;
-}
-.status-grey {
-  opacity: 0.2;
-  padding-right: 3px;
-  font-size: 10px;
-  color:silver;
-}
-*/
-
-.no-status {
-  padding-right: 3px;
-  font-size: 10px;
-  opacity: 0;
-}
-
-.status-dot {
-  /* Center the content */
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  margin-right: 10px;
-
-  background-color: blue;
-
-  /* Rounded border */
-  border-radius: 9999px;
-  height: 8px;
-  width: 8px;
-}
-.status-green {
-    opacity: 0.8;
-    background-color: $ptr-green;
-}
-.status-yellow {
-    opacity: 0.8;
-    background-color: $ptr-yellow;
-}
-.status-red {
-    opacity: 0.8;
-    background-color: $ptr-red;
-}
-.status-grey {
-    opacity: 0.8;
-    background-color: $ptr-grey;
-}
 </style>

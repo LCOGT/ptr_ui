@@ -1,7 +1,7 @@
 <template>
-    <div class="online-status-wrapper" :title="`status age: 3`" >
+    <div class="online-status-wrapper" >
         <div class="status-dot" :class="operational_status_color_class" ></div>
-        <p class="status-text" :class="operational_status_color_class">{{site_operational_status}}</p>
+        <p class="status-text" :class="operational_status_color_class"> {{operational_status}}</p>
     </div>
 </template>
 
@@ -12,7 +12,12 @@ export default {
     props: {
         site: {
             type: String,
-            required: true,
+            default: null,
+        },
+        // Optional: manually insert the operational status value instead of finding in vuex.
+        manual_status: {
+            type: String,
+            default: null,
         }
     },
 
@@ -21,25 +26,31 @@ export default {
             'site_operational_status',
         ]),
 
+        operational_status() {
+            let status;
+            // Prefer manual status if it is included
+            if (this.manual_status!== null) { 
+                status = this.manual_status
+            // Otherwise retrieve from the active site in vuex
+            } else {
+                status = this.site_operational_status
+            }
+            return status
+        },
+
         /**
          * operational: green
          * technical difficulty: yellow
          * offline: grey
          */
         operational_status_color_class() {
-            const status = this.site_operational_status
-            if (status == "operational") {
-                return "is-green"
+
+            const color_dict = {
+                'operational': 'is-green',
+                'technical difficulty': 'is-yellow',
+                'offline': 'is-grey'
             }
-            else if (status == "technical difficulty") {
-                return "is-yellow"
-            }
-            else if (status == "offline") {
-                return "is-grey"
-            }
-            else {
-                return "is-grey"
-            }
+            return color_dict?.[this.operational_status] ?? 'is-grey'
         }
     }
 }

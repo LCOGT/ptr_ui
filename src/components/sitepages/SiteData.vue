@@ -659,7 +659,7 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
 
 .image-tools-area {
   grid-area: tools;
-  padding-left: 1em;
+  //padding-left: 1em;
   width: 100%;
   @include desktop {
     width: 500px;
