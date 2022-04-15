@@ -1,5 +1,5 @@
 <template>
-  <b-navbar-dropdown ref="sites_dropdown" active label="observatories"  @active-change="dropdown_change">
+  <b-navbar-dropdown ref="sites_dropdown" label="observatories"  @active-change="dropdown_change">
     <div class="dropdown-wrapper">
         <h1 class="site-name">{{dropdown_active_site}}</h1>
         <div class="site-list">
