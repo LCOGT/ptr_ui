@@ -12,7 +12,7 @@
     <b-field horizontal label="Expose">
         <b-field>
             <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
-            <p class="control"> <span class="button is-static is-small">s</span> </p>
+            <p class="control"> <span class="button is-static is-small">seconds</span> </p>
         </b-field>
     </b-field>
 
@@ -24,7 +24,8 @@
 
     <b-field horizontal label="Filter">
 
-        <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" size="is-small" style="width: 100%">
+      <b-field>
+        <b-select placeholder="select filter..." v-model="filter_wheel_options_selection" size="is-small">
           <option 
             v-for="(filter, index) in filter_wheel_options"
             v-bind:value="filter[0]" 
@@ -34,10 +35,13 @@
             {{ filter[0] }}
           </option>
         </b-select>
+        <p class="control">
+          <command-button :data="filter_wheel_command" class="is-small"/>
+        </p>
+        <command-button :data="filter_wheel_home_command" style="margin-left: 2em;" class="is-small" />
+      </b-field>
 
         <div class="buttons has-addons">
-          <command-button :data="filter_wheel_command" style="width: 50%" class="is-small"/>
-          <command-button :data="filter_wheel_home_command" style="width: 50%" class="is-small" />
         </div>
     </b-field>
 
@@ -80,10 +84,15 @@
     </b-field>
 
     <b-field horizontal label="Subframe">
-      <p class="is-size-7">{{ subframeIsActive ? "Active" : "Not Active"}}</p>
-      <p class="is-size-7">({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
-      <button class="button is-small" v-if="subframeIsActive" @click="function(){subframeIsActive = false}"> deactivate </button>
-      <button class="button is-small" v-if="!subframeIsActive" @click="function(){subframeIsActive = true}"> activate </button>
+      <b-switch
+          size="is-small"
+          v-model="subframeIsActive"
+          type='is-info'>
+          {{ subframeIsActive ? "Subframe is active" : "Subframe not active" }}
+      </b-switch>
+    </b-field>
+    <b-field horizontal label="">
+      <p class="is-size-7">subframe: ({{subframe_x0.toFixed(2)}},{{subframe_y0.toFixed(2)}}), ({{subframe_x1.toFixed(2)}}, {{subframe_y1.toFixed(2)}})</p>
     </b-field>
 
     <b-field horizontal label="Image Type">
@@ -142,7 +151,7 @@
 
 		<div class="horizontal-border" />
 
-    <div class="val" v-if="camera_state && camera_state.message">{{camera_state.message}}</div>
+    <!--div class="val" v-if="camera_state && camera_state.message">{{camera_state.message}}</div-->
 
     <status-column 
       class="status-column"
@@ -156,10 +165,10 @@
     </div>
 
     <pre v-if="isExpandedStatusVisible">
-      <simple-device-status 
+      <!--simple-device-status 
         :device_name="active_camera" 
         device_type="Camera" 
-        :device_status="camera_state" />
+        :device_status="camera_state" /-->
       <simple-device-status 
         :device_name="active_filter_wheel" 
         device_type="Filter Wheel" 

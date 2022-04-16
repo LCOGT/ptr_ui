@@ -1,6 +1,9 @@
 
 /**
  * @fileoverview This is the vuex store that maintains the state of images.
+ * 
+ * TODO: Make a class for images, gives more flexibility than a plain object
+ * for computing various attributes, etc. 
  */
 
 //import { API } from 'aws-amplify'
@@ -350,6 +353,7 @@ const actions = {
      * Set this_image as the current displayed image 
      */
     set_current_image({ commit }, this_image) {
+        console.log('in set current image', this_image)
         commit('setCurrentImage', this_image)
 
     },

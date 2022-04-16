@@ -16,7 +16,25 @@ export const user_mixin = {
 		userIsAuthenticated() {
 			let user = this.$auth.user
 			return user !== undefined
-		}
+		},
+
+  },
+
+  methods: {
+
+    login() {
+      this.$auth.loginWithPopup();
+    },
+
+    logout() {
+      // make sure the logout happens before redirect.
+      // otherwise, the redirect check for authentication might log the user back in.
+      this.$auth.logout({
+        returnTo: window.location.origin
+      }).then($router.go)
+    },
+
+
 
   }
 

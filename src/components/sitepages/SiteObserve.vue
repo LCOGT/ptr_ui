@@ -5,7 +5,7 @@
 
   <!--div class="spacer" style="height: 2em;" /-->
 
-  <site-data />
+  <site-data :sitecode="sitecode" />
 
   <!--log-stream :site="sitecode" /-->
 
@@ -39,38 +39,13 @@ export default {
     StatusColumn,
     LogStream,
   },
-  mixins: [commands_mixin, user_mixin],
   props: ['sitecode'],
   data () {
     return {
-
-      self: this,
-
       // This is a setInterval object initialized in `created()`. 
       // Fetches status every few seconds.
       update_status_interval: 2000,
       local_timestamp: Date.now(),
-
-      // Controls the toggle for image preview modal.
-      isImageModalActive: false,
-
-      isCmdTabsExpanded: false,
-
-      // Toggles the script settings visiblity
-      isScriptSettingsActive: false,
-
-      testSubframeIsActive: false,
-
-      isDeviceSelectorActive: false,
-
-      isEnclosureStatusVisible: false,
-      isMountStatusVisible: false,
-      isCameraStatusVisible: false,
-      isFocuserStatusVisible: false,
-      isRotatorStatusVisible: false,
-      isScreenStatusVisible: false,
-      isSequencerStatusVisible: false,
-
     }
   },
 
@@ -83,8 +58,8 @@ export default {
     this.camera_bin = this.camera_default_bin
     this.camera_areas_selection = this.camera_default_area
     this.camera_bin = this.camera_default_bin
-
   },
+
   beforeDestroy() {
     clearInterval(this.update_time_interval)
   },
