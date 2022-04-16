@@ -2,7 +2,7 @@
   <div class="image-toolbar-wrapper">
     <b-field grouped>
 
-    <b-field label="draw shapes">
+    <b-field label="draw shapes" :horizontal="horizontal">
         <b-radio-button :size="size" v-model="activeDrawShape" native-value="none"> none </b-radio-button>
         <b-radio-button :size="size" v-model="activeDrawShape" native-value="point">
             <span class="iconify" data-icon="radix-icons:dot" data-inline="false"></span>
@@ -27,7 +27,7 @@
         icon-right="delete"
         @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
       </b-button-->
-      <b-field label="crosshairs" class="ml-5" >
+      <b-field label="crosshairs" class="ml-5" :horizontal="horizontal">
         <b-switch :size="size" type="is-info" v-model="crosshairsVisible"></b-switch>
       </b-field>
     </b-field>
@@ -43,6 +43,7 @@ export default {
       type: String,
       default: "",
     },
+    horizontal: Boolean,
   },
   data() {
     return {

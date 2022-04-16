@@ -36,9 +36,11 @@
         </div>
         <div class="image-view">
 
-            <Tabs class="control-room-main-tabs">
-                <TabItem title="images">
+            <!--Tabs class="control-room-main-tabs"-->
+                <!--TabItem title="images"-->
+                <div>
                     <ControlRoomImages :sitecode="sitecode" />
+                    <div class="analysis-tabs-wrapper">
                     <Tabs class="analysis-tools-tabs">
                         <TabItem title="statistics">
                             <ImageStatisticsViewer />
@@ -53,13 +55,17 @@
                             <ImageMetadataViewer />
                         </TabItem>
                     </Tabs>
-                </TabItem>
-                <TabItem title="sky chart">
-                    <TheSkyChart class="skychart-component" />
+                    </div>
+                </div>
+                <!--/TabItem-->
+                <!--TabItem title="sky chart"-->
                     <!--SiteTargets :sitecode="sitecode" /-->
-                </TabItem>
-            </Tabs>
+                <!--/TabItem-->
+            <!--/Tabs-->
 
+        </div>
+        <div class="skychart-section">
+            <TheSkyChart class="skychart-component" />
         </div>
         <!--div class="telescope-info">
             <TelescopeLivestream class="telescope-livestream" />
@@ -98,6 +104,9 @@ import TabItem from '@/components/TabItem'
 import datastreamer from "@/datastreamer";
 import { user_mixin } from '@/mixins/user_mixin'
 
+import celestial from 'd3-celestial'
+let Celestial = celestial.Celestial()
+
 export default {
     name: "ControlRoom",
     components: {
@@ -126,6 +135,9 @@ export default {
     },
     created() {
         this.site_changed_routine(this.$route.params.sitecode)
+    },
+    mounted() {
+        Celestial.resize({width: '400px', width: '400px'})
     },
     props: {
         sitecode: String,
@@ -157,16 +169,12 @@ export default {
 
 .page-wrapper {
     height: 100vh;
-    //display: grid;
-    //grid-template-rows: auto max-content;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 .navbar {
     padding-left: 3em;
-    //height: 50px;
-    //flex-shrink: 0;
     border-bottom: 1px solid grey;
     border-radius: 0;
 }
@@ -174,14 +182,13 @@ export default {
     margin-left: 3em;
     display: flex;
     height: 100%;
-    //gap: 1em;
     flex-shrink: 1;
-    //overflow-y: auto;
     overflow-y: hidden;
 }
 .cr-columns > * {
     padding-top: 1em;
     overflow-y:auto;
+    padding: 1em;
 }
 
 .control-room-main-tabs {
@@ -195,18 +202,26 @@ export default {
     min-height: 100%;
     flex-shrink: 0;
     overflow-y: scroll;
+    overflow-x: hidden;
     width: 400px;
 }
 
+.analysis-tabs-wrapper {
+    height: 500px;
+}
 .analysis-tools-tabs {
     margin: 3em 0;
 }
 .image-view {
     flex-shrink: 1;
-    flex-basis: auto;
     height: 100%;
-    resize:horizontal;
-    max-width: 768px;
+    resize: horizontal;
+    max-width: 750px;
+    flex-basis: 750px;
+}
+.skychart-section {
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 .telescope-info {
     flex-grow: 1;
