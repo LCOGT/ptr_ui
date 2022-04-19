@@ -16,6 +16,14 @@
             <b-navbar-item tag="a" href="https://ptredu.org/" target="_blank">
               <b-tooltip label="(opens a new tab)" position="is-bottom" type="is-black"> Courses </b-tooltip>
             </b-navbar-item>
+            <b-navbar-item tag="router-link" :to="{ path: '/resources' }">
+              Resources
+            </b-navbar-item>
+            <!-- Note: the affiliates page will be used to entice observatory owners to join PTR. 
+                 Keeping this here as a placeholder until we have content.
+            <b-navbar-item tag="router-link" :to="{ path: '/affiliates' }">
+              Affiliates
+            </b-navbar-item-->
             <NavbarSiteDropdown label="Observatories"/>
         </template>
 

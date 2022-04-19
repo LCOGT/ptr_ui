@@ -10,6 +10,7 @@ import AdminOnly from './views/AdminOnly.vue'
 import devtools from './views/devtools.vue'
 
 import About from './views/info/About.vue'
+import Resources from './views/info/Resources.vue'
 import ReservationInfo from './views/info/ReservationInfo.vue'
 import ControlRoom from './views/ControlRoom.vue'
 
@@ -54,6 +55,7 @@ const router = new VueRouter({
     },
 
     { path: '/about', name: 'about', component: About },
+    { path: '/resources', name: 'resources', component: Resources },
     { path: '/info/reservations', name: 'reservations', component: ReservationInfo},
 
 
