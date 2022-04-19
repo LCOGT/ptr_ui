@@ -1,5 +1,5 @@
 <template>
-  <b-navbar-dropdown ref="sites_dropdown" label="observatories"  @active-change="dropdown_change">
+  <b-navbar-dropdown ref="sites_dropdown" :label="label"  @active-change="dropdown_change">
     <div class="dropdown-wrapper">
         <h1 class="site-name">{{dropdown_active_site}}</h1>
         <div class="site-list">
@@ -47,6 +47,10 @@ import axios from 'axios'
 export default {
     components: {
         NavbarSitePreview,
+    },
+    props: {
+      label: String,
+      default: "Observatories"
     },
     data() {
         return {
@@ -97,7 +101,7 @@ export default {
     },
     site_operational_status(site) {
         if (!Object.keys(this.site_open_status).includes(site)) {
-            return false
+            return 'not available'
         }
         const stale_age_s = 300 // 5 minutes
         const site_status = this.site_open_status[site]

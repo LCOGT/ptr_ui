@@ -10,9 +10,13 @@
         </template>
 
         <template slot="start">
-          <NavbarSiteDropdown />
-
-
+            <b-navbar-item tag="router-link" :to="{ path: '/about' }">
+              About
+            </b-navbar-item>
+            <b-navbar-item tag="a" href="https://ptredu.org/" target="_blank">
+              <b-tooltip label="(opens a new tab)" position="is-bottom" type="is-black"> Courses </b-tooltip>
+            </b-navbar-item>
+            <NavbarSiteDropdown label="Observatories"/>
         </template>
 
         <template slot="end">
@@ -34,8 +38,13 @@
                   </div>
               </div>
 
-              <!-- show login when not authenticated -->
-              <button class="button" v-if="!$auth.isAuthenticated" @click="login">Log in</button>
+              <div v-else class="navbar-item not-authenticated">
+                <!-- show apply and login when not authenticated -->
+              <b-tooltip label="Under Development" position="is-bottom" type="is-black">
+                  <b-button class="button" disabled> apply </b-button>
+              </b-tooltip>
+                <b-button class="button" v-if="!$auth.isAuthenticated" @click="login">Log in</b-button>
+              </div>
 
               <!-- userway accessbility widget -->
               <a class="" id="userway-trigger" style="background: rgb(7, 8, 102); margin-left: 1em;"> 
@@ -121,6 +130,11 @@ nav {
 .navbar {
   border-radius: 0;
   z-index:31; /* so the navbar doesn't cover fullscreen modals */
+}
+
+.not-authenticated {
+  display: flex;
+  gap: 1em;
 }
 
 </style>

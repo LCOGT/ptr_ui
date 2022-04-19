@@ -1,7 +1,7 @@
 <template>  
   <div>
-    <SiteNavbar />
     <div class="page-content">
+    <SiteNavbar />
 
 
         <the-world-map name="google" class="map-display"/>
@@ -49,8 +49,9 @@ html {
 }
 .page-content {
   position:absolute;
-  top: 75px;
-  height: calc(100vh - 75px);
+  //top: 75px;
+  //height: calc(100vh - 75px);
+  height: 100vh;
   overflow-y: auto;
 }
 
