@@ -1,32 +1,32 @@
 
 <template>
   <div class="command-tab-accordion-wrapper">
-    <b-tabs  
+    <Tabs  
     type="is-toggle" 
       size="is-small" 
       :animated="false"
       v-model="active_tab"
       multiline>
       <template v-for="(instrument, index) of instruments">
-        <b-tab-item 
+        <TabItem
           class="tab-item"
           :key="index"
           :value="index.toString()"
-          :label="instrument">
-          <div class="accordion-header">
+          :title="instrument">
+          <!--div class="accordion-header">
             <div class="instrument-type-label" >
               {{instrument}}
             </div>
             <div style="flex-grow: 1;"/>
             <div class="instrument-instance-label">{{selected_instrument(instrument)}}</div>
-          </div>
+          </div-->
           <component class="accordion-content" v-bind:is="instrument"/>
           <!--div class="accordion-content p-3 mt-4 is-size-7 has-text-centered is-italic has-text-weight-light is-family-code">
             TODO: better status display here
           </div-->
-        </b-tab-item>
+        </TabItem>
       </template>
-    </b-tabs>
+    </Tabs>
   </div>
 </template>
 
@@ -34,6 +34,8 @@
 import { mapState } from 'vuex'
 import { Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
   Camera, Sequencer, Settings, } from '@/components/InstrumentControls'
+import Tabs from '@/components/Tabs'
+import TabItem from '@/components/TabItem'
 
 export default {
   name: "CommandTabAccordion",
@@ -47,6 +49,8 @@ export default {
     Camera,
     Sequencer,
     Settings,
+    Tabs,
+    TabItem,
   },
   data() {
     return {
@@ -104,6 +108,9 @@ export default {
 
 $accordion-header-background: $grey-darker;
 
+.tab-item {
+  width: 100%;
+}
 .accordion {
   outline: none;
   padding-bottom: 0;

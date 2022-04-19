@@ -3,6 +3,13 @@
     @import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic);
 }
 
+.field-label {
+  // formatting for the size of the field labels to make a clean column
+  // ie. the form for camera controls in CommandTabsAccordion
+ flex-grow: 2 !important; 
+}
+
+
 hr {
   height: $border-width;
 }

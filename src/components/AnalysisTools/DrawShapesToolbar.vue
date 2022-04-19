@@ -2,18 +2,18 @@
   <div class="image-toolbar-wrapper">
     <b-field grouped>
 
-    <b-field>
-        <b-radio-button v-model="activeDrawShape" native-value="none"> none </b-radio-button>
-        <b-radio-button v-model="activeDrawShape" native-value="point">
+    <b-field label="draw shapes" :horizontal="horizontal">
+        <b-radio-button :size="size" v-model="activeDrawShape" native-value="none"> none </b-radio-button>
+        <b-radio-button :size="size" v-model="activeDrawShape" native-value="point">
             <span class="iconify" data-icon="radix-icons:dot" data-inline="false"></span>
         </b-radio-button>
-        <b-radio-button v-model="activeDrawShape" native-value="line">
+        <b-radio-button :size="size" v-model="activeDrawShape" native-value="line">
             <span class="iconify" data-icon="mdi:vector-line" data-inline="false"></span>
         </b-radio-button>
-        <b-radio-button v-model="activeDrawShape" native-value="circle">
+        <b-radio-button :size="size" v-model="activeDrawShape" native-value="circle">
             <span class="iconify" data-icon="mdi:vector-circle-variant" data-inline="false"></span>
         </b-radio-button>
-        <b-radio-button v-model="activeDrawShape" native-value="rect">
+        <b-radio-button :size="size" v-model="activeDrawShape" native-value="rect">
             <span class="iconify" data-icon="mdi:vector-rectangle" data-inline="false"></span>
         </b-radio-button>
       </b-field>
@@ -27,8 +27,8 @@
         icon-right="delete"
         @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
       </b-button-->
-      <b-field label="crosshairs" horizontal class="ml-5" >
-        <b-switch type="is-info" v-model="crosshairsVisible"></b-switch>
+      <b-field label="crosshairs" class="ml-5" :horizontal="horizontal">
+        <b-switch :size="size" type="is-info" v-model="crosshairsVisible"></b-switch>
       </b-field>
     </b-field>
   </div>
@@ -38,6 +38,13 @@
 import {mapState, mapGetters} from 'vuex';
 export default {
   name: "DrawShapesToolbar",
+  props: {
+    size: {
+      type: String,
+      default: "",
+    },
+    horizontal: Boolean,
+  },
   data() {
     return {
       show_crosshairs: false,

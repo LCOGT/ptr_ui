@@ -1,11 +1,10 @@
 <template>
   <div>
-
     <b-field>
       <button 
+        :disabled="!large_fits_exists && !small_fits_exists" 
         title="first draw a line on the image to inspect"
         @click="getLineProfile"
-        :disabled="disabled"
         class="button" 
         :class="{'is-loading': analysisInProgress}">
         get line profile
@@ -31,21 +30,9 @@ import * as d3 from 'd3'
 import D3Axis from '@/components/svg/D3Axis'
 export default {
   name: 'LineProfileInspection',
-
-  components: {
-    D3Axis,
-  },
-
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-  },
-
+  components: { D3Axis, },
   data() {
     return {
-
       useLargeFits:false,
       analysisInProgress: false,
       lineProfileResults: [],
