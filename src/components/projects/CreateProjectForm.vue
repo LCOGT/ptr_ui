@@ -22,6 +22,15 @@
                     :maxlength="max_fits_header_length"
                     v-model="project_note" ></b-input>
             </b-field>
+            <b-field style="margin-left: 2em;">
+            <template #label>
+               Active
+                <b-tooltip type="is-dark" label="Projects that are not active can be saved but will not be scheduled to run automatically.">
+                    <b-icon size="is-small" icon="help-circle-outline"></b-icon>
+                </b-tooltip>
+            </template>
+            <b-checkbox v-model="project_constraints.project_is_active"></b-checkbox>
+        </b-field>
 
         </div>
 
@@ -473,8 +482,10 @@ export default {
             ],
 
             project_constraints: {
+                project_is_active: false,
+
                 site_tags: [],
-								generic_instrument: 'Main Camera',
+                generic_instrument: 'Main Camera',
 
                 meridian_flip: 'flip_ok', // can be ['flip_ok', 'no_flip', 'east_only', 'west_only']
                 ra_offset: 0.0,
@@ -637,8 +648,10 @@ export default {
             ]
             this.exposures_index = 1
             this.project_constraints = {
+                project_is_active: true,
+
                 site_tags: [],
-								generic_instrument: '',
+                generic_instrument: '',
 
                 ra_offset: 0.0,
                 ra_offset_units: 'deg',
