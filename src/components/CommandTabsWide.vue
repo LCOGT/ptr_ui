@@ -2,10 +2,11 @@
 <template>
   <div class="command-tab-accordion-wrapper">
     <Tabs  
-    type="is-toggle" 
+      type="is-toggle" 
       size="is-small" 
       :animated="false"
       v-model="active_tab"
+      :initial_tab_index="5"
       multiline>
       <template v-for="(instrument, index) of instruments">
         <TabItem

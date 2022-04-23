@@ -39,6 +39,12 @@
             instance_class: unique_class, // since refs don't play nice with $children, make component-specific class
       }
     },
+    props: {
+        initial_tab_index: {
+            type: Number,
+            default: 0,
+        }
+    },
     created () {
         //this.instance_class = uuidv4
 
@@ -46,7 +52,7 @@
     },
     mounted () {
       //this.set_lengths()
-      this.select_tab(0)
+      this.select_tab(this.initial_tab_index)
     },
     methods: {
       select_tab (i) {
