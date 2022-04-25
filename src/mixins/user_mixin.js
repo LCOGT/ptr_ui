@@ -18,6 +18,27 @@ export const user_mixin = {
 			return user !== undefined
 		},
 
+    userId() {
+      return this.userIsAuthenticated 
+        ? this.$auth.user.sub
+        : null
+    },
+    userName() {
+      return this.userIsAuthenticated 
+        ? this.$auth.user.name
+        : null
+    },
+    userNickname() {
+      return this.userIsAuthenticated 
+        ? this.$auth.user.nickname
+        : null
+    },
+    userEmail() {
+      return this.userIsAuthenticated 
+        ? this.$auth.user.email
+        : null
+    },
+
   },
 
   methods: {
