@@ -66,21 +66,10 @@
 
         set_lengths() {
             let choices = document.getElementsByClassName(this.instance_class)
-            //let choices = document.getElementsByClassName('testitem')
-            //let choices = this.$refs.tab_labels
             let max_width = 50;
-            console.log( 'labels: ', choices)
-            console.log('length: ', choices.length)
-            //console.log(this.$refs.tabs_container)
-            //for (let i = 0; i < choices.length; ++i) {
-                //choices[i].style.width = "max-content"
-            //}
             for (let i = 0; i < choices.length; ++i) {
                 max_width = Math.max(max_width, choices[i].offsetWidth)
-                console.log(choices[i].offsetWidth)
-                console.log(max_width)
             }
-            console.log(max_width)
             return max_width
         }
     },
@@ -93,20 +82,10 @@
         max_tab_width() {
             
             let choices = document.getElementsByClassName(this.instance_class)
-            //let choices = document.getElementsByClassName('testitem')
-            //let choices = this.$refs.tab_labels
             let max_width = 50;
-            console.log( 'labels: ', choices)
-            //console.log(this.$refs.tabs_container)
-            //for (let i = 0; i < choices.length; ++i) {
-                //choices[i].style.width = "max-content"
-            //}
             for (let i = 0; i < choices.length; ++i) {
                 max_width = Math.max(max_width, choices[i].offsetWidth)
-                console.log(choices[i].offsetWidth)
-                console.log(max_width)
             }
-            console.log(max_width)
             return max_width
         },
 
