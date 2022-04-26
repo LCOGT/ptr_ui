@@ -3,6 +3,7 @@
  *  for commands (eg. exposure time).
  *  
  */
+import helpers from '../../utils/helpers'
 
 const state = {
 
@@ -86,8 +87,36 @@ const getters = {
 
 const mutations = {
 
-    mount_ra(state, val) { state.mount_ra = val; },
-    mount_dec(state, val) { state.mount_dec = val; },
+    mount_ra(state, val) { 
+        // Clear the mount object name if the new coordinates have changed significantly
+        const large_anglular_difference_degrees = 3
+
+        let old_ra = helpers.hour2degree(state.mount_ra) // convert hours to degrees
+        let new_ra = helpers.hour2degree(val)
+        let dec = state.mount_dec // since dec doesn't change here, use it for both positions
+        let angle = helpers.angular_distance(old_ra, dec, new_ra, dec)
+        if (angle !== NaN & angle > large_anglular_difference_degrees) {
+            state.mount_object = ''
+        }
+
+        // finally, update the right ascension 
+        state.mount_ra = val; 
+    },
+    mount_dec(state, val) { 
+        // Clear the mount object name if the new coordinates have changed significantly
+        const large_anglular_difference_degrees = 3
+
+        let old_dec = state.mount_dec
+        let new_dec = val
+        let ra = state.mount_ra // since ra doesn't change here, use it for the both positions
+        let angle = helpers.angular_distance(ra, old_dec, ra, new_dec)
+        if (angle !== NaN & angle > large_anglular_difference_degrees) {
+            state.mount_object = ''
+        }
+
+        // finally, update the declination
+        state.mount_dec = val; 
+    },
     mount_object(state, val) { state.mount_object = val; },
 
     telescope_selection(state, val) { state.telescope_selection = val; },

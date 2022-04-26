@@ -59,7 +59,7 @@
             <div class="targets-page-content-wrapper">
 
                 <div class="ptr-aladin-parent-div">
-                    <div id="aladin-lite-div" @click="sendCoordinatesToSkychart"/>
+                    <div id="aladin-lite-div" @click="set_coordinates_from_aladin"/>
                 </div>
 
                 <div class="sidebar-tabs">
@@ -79,12 +79,7 @@
 
                 <div class="sidebar-tab-content">
                     <div v-if="activeSidebarTab=='telescope controls'"> 
-                        <b-field label="Search for objects...">
-                            <b-input v-model="simbad_query" @keyup.enter.native="submit_simbad_query"></b-input>
-                            <p class="control">
-                                <b-button @click="submit_simbad_query"><b-icon icon="magnify" /></b-button>
-                            </p>
-                        </b-field>
+                        <TargetSearchField v-model="mount_object" label="Search for objects..." @results="handle_object_name_search" />
                         <command-tabs-accordion 
                             :controls="['Telescope', 'Camera']" 
                             :initInstrumentOpenView="0"
@@ -280,6 +275,7 @@ import { mapGetters } from 'vuex'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import DateTimeLocationPicker from '@/components/celestialmap/DateTimeLocationPicker'
 import CommandButton from '@/components/FormElements/CommandButton'
+import TargetSearchField from '@/components/FormElements/TargetSearchField'
 import CommandTabsAccordion from "@/components/CommandTabsAccordion"
 //import Celestial from '@/components/celestialmap/celestial'
 import celestial from 'd3-celestial'
@@ -298,6 +294,7 @@ export default {
     mixins: [commands_mixin],
     components: {
         CommandButton,
+        TargetSearchField,
         TheSkyChart,
         CommandTabsAccordion,
         DateTimeLocationPicker,
@@ -307,8 +304,6 @@ export default {
         return {
             aladin: '',
             mapEl: '',
-
-            simbad_query: '',
 
             telescopeModal: false,
             isComponentModalActive: false,
@@ -369,11 +364,11 @@ export default {
         }
     },
 
-    mounted(){
+    async mounted(){
         this.start_resize_observer()
 
         this.$loadScript("https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js")
-            .then(() => {
+            .then(async () => {
 
                 // Default: load aladin on m33, but use coords in mount fields if possible.
                 let target = "M33"
@@ -392,7 +387,7 @@ export default {
                     showSimbadPointerControl: true
                 });
                 // cheap way to sync the skymap and mount coordinates to the aladin view.
-                setTimeout(this.sendCoordinatesToSkychart, 1000) 
+                setTimeout(this.set_coordinates_from_aladin, 1000) 
 
                 // The following code creates an overlay element that hides aladin from mouseevents.
                 // This is mainly to let the user scroll the sidebar without aladin zooming instead.
@@ -422,22 +417,22 @@ export default {
     created: function() {
         const url = "https://api.photonranch.org/api/all/config"
         axios.get(url).then(response => {
-        for (let s in response.data) {
-            Vue.set(this.site_info, s, {
-            latitude: response.data[s].latitude,
-            longitude: response.data[s].longitude,
-            name: response.data[s].name,
-            site: response.data[s].site,
-            siteoffset: response.data[s].TZ_database_name
-            })
-        }
-        Vue.set(this, 'selected_target_obs', this.sitecode)
-        Vue.set(this, 'observatory_time', this.timezone)
-        Vue.set(this, 'target_obs_latitude', this.site_latitude)
-        Vue.set(this, 'target_obs_longitude', this.site_longitude)
+            for (let s in response.data) {
+                Vue.set(this.site_info, s, {
+                    latitude: response.data[s].latitude,
+                    longitude: response.data[s].longitude,
+                    name: response.data[s].name,
+                    site: response.data[s].site,
+                    siteoffset: response.data[s].TZ_database_name
+                })
+            }
+            Vue.set(this, 'selected_target_obs', this.sitecode)
+            Vue.set(this, 'observatory_time', this.timezone)
+            Vue.set(this, 'target_obs_latitude', this.site_latitude)
+            Vue.set(this, 'target_obs_longitude', this.site_longitude)
         })
         .catch(error => {
-        console.warn(error)
+            console.warn(error)
         })
     },
 
@@ -518,21 +513,32 @@ export default {
             this.sidebar_is_expanded = !this.sidebar_is_expanded;
         },
 
-        submit_simbad_query() {
-            this.aladin.gotoObject(this.simbad_query, {success: () => {
-                this.sendCoordinatesToSkychart(); // update the sky chart 
-                this.mount_object = this.simbad_query; // save the searched object to mount_object to send with command.
+        
+        handle_object_name_search(search_results) {
+            if (!search_results.error) {
+                this.mount_ra = search_results.ra.toFixed(4)
+                this.mount_dec = search_results.dec.toFixed(4)
+                // make sure to change this after the coordinates, since the object name is cleared 
+                // after large changes in the coordinate positions. Details in vuex command_params.
+                this.mount_object = search_results.searched_name
+            } else {
+                this.mount_ra = ''
+                this.mount_dec = ''
+                this.$buefy.toast.open({
+                    message: `Could not resolve object with name ${search_results.searched_name}`,
+                    type: "is-warning",
+                    duration: 4000
+                })
             }
-            });
         },
 
-        sendCoordinatesToSkychart() {
+        set_coordinates_from_aladin() {
             var [aladin_ra, aladin_dec] = this.aladin.getRaDec();
             aladin_ra = aladin_ra / 15;
 
             this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(5))
             this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
-            this.$store.commit('command_params/mount_object', ' ') // clear the mount_object entry
+            //this.$store.commit('command_params/mount_object', ' ') // clear the mount_object entry
         }, 
 
         handleMapClick(e) {
@@ -556,11 +562,9 @@ export default {
 
         // Common Targets functions
         targetClickHandler(targ) {
-            this.aladin.gotoRaDec(targ.ra, targ.dec);
-           
-            this.$store.commit('command_params/mount_ra', helpers.degree2hour(targ.ra).toFixed(5));
-            this.$store.commit('command_params/mount_dec', targ.dec.toFixed(4));
-            this.$store.commit('command_params/mount_object', targ.name);
+            this.mount_ra = helpers.degree2hour(targ.ra).toFixed(5)
+            this.mount_dec = targ.dec.toFixed(4)
+            this.mount_object = targ.name
 
             //Update id of selected target
             this.selected_target_id = targ.id;

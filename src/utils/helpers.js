@@ -168,6 +168,12 @@ var helpers = {
     degree2hour: deg => {
         return deg > 0 ? deg / 15 : (deg + 360) / 15
     },
+    rad2deg: rad => { 
+        return rad * 360 / (2 * Math.PI) 
+    },
+    deg2rad: deg => { 
+        return deg * (2 * Math.PI) / 360 
+    },
     clamp: (val, min, max) => {
         return Math.max(Math.min(val, max), min)
     },
@@ -178,6 +184,37 @@ var helpers = {
         y1 = a[1];
         y2 = b[1];
         return Math.sqrt(Math.pow((x2-x1), 2) + Math.pow((y2-y1), 2));
+    },
+
+    /**
+     * Return the angular separation, in degrees, between two coordinates. 
+     * RA and Dec are inputs in decimal degrees because that is the most common unit we use for coordinates.
+     * 
+     * Formula obtained from https://www.gyes.eu/calculator/calculator_page1.htm
+     * @param {Number} ra1  RA of object 1, in decimal degrees
+     * @param {Number} dec1 Dec of object 1, in decimal degrees 
+     * @param {Number} ra2  RA of obejct 2, in decimal degrees 
+     * @param {Number} dec2 Dec of object 2, in decimal degrees 
+     */
+    angular_distance(ra1, dec1, ra2, dec2) {
+        // convert to radians to use with js trig functions
+        let ra1_r   = this.deg2rad(ra1)
+        let dec1_r  = this.deg2rad(dec1)
+        let ra2_r   = this.deg2rad(ra2)
+        let dec2_r  = this.deg2rad(dec2)
+        
+        // Equation for angular distance A:
+        // cos(A) = X + Y
+        // where    X = sin(dec1)sin(dec2) 
+        // and      Y = cos(dec1)cos(dec2)cos(ra1 - ra2) 
+        
+        let X = Math.sin(dec1_r) * Math.sin(dec2_r)
+        let Y = Math.cos(dec1_r) * Math.cos(dec2_r) * Math.cos(ra1_r - ra2_r)
+
+        let A = Math.acos( X + Y )
+
+        // convert A to degrees before returning
+        return this.rad2deg(A)
     },
 }
 
