@@ -49,7 +49,9 @@
                         class="project-input" 
                         v-model="targets[n-1].name"></b-input>
                     <p class="control">
-                        <b-button class="button" @click="getCoordinatesFromName(n-1)"><b-icon icon="magnify"/></b-button>
+                        <b-button class="button" :loading="object_name_search_in_progress" @click="getCoordinatesFromName(n-1)">
+                            <b-icon icon="magnify"/>
+                        </b-button>
                     </p>
                 </b-field>
             </b-field>
@@ -414,13 +416,14 @@
 
 <script>
 import {mapGetters, mapState} from 'vuex'
+import { target_names } from '@/mixins/target_names'
 import axios from 'axios'
 import moment from 'moment'
 
 export default {
     name: "CreateProjectForm",
     props: ["sitecode", "project_to_load"],
-
+    mixins: [ target_names ],
     watch: {
         project_to_load({ project, is_existing_project }) {
 
@@ -516,6 +519,8 @@ export default {
             /***********   End Project Parameters   **********/
             /*************************************************/
 
+            object_name_search_in_progress: false,
+
             modifying_existing_project: false,
             loaded_project_name: '',
             loaded_project_created_at: '',
@@ -576,6 +581,13 @@ export default {
             calendarBaseUrl: 'https://calendar.photonranch.org/dev',
 
         }
+    },
+    mounted() {
+        // initialize to the telescope command field ra/dec/name
+        this.targets[0].ra = this.mount_ra
+        this.targets[0].dec = this.mount_dec
+        this.targets[0].name = this.mount_object
+
     },
     methods: {
 
@@ -677,23 +689,23 @@ export default {
             }
         },
 
-        getCoordinatesFromName(target_index) {
-            let query_script = `query id ${this.targets[target_index].name}\\nhd 100`
-            let url = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame.jsonp?object=" + encodeURIComponent(this.targets[target_index].name);
-
-            axios.get(url).then( response => {
-                let result = JSON.parse(response.data.slice(10,-3))
-                if (!result.Target.Resolver || !result.Target.Resolver.jradeg || !result.Target.Resolver.jdedeg) {
-                    console.error('failed to fetch coordinates for ', target_index)
-                    this.$buefy.toast.open({
-                        message: "Could not resolve object with name "+this.targets[target_index].name,
-                        type: "is-danger"
-                    })
-                }
-                this.targets[target_index].ra = (result.Target.Resolver.jradeg / 15).toFixed(4) // degrees to decimal hours
-                this.targets[target_index].dec = result.Target.Resolver.jdedeg.toFixed(4)
-                this.targets[target_index].name= result.Target.Resolver.oname
-            })
+        async getCoordinatesFromName(target_index) {
+            this.object_name_search_in_progress = true
+            let name = this.targets[target_index].name
+            let search_results = await this.get_coordinates_from_object_name(name)
+            this.object_name_search_in_progress = false
+            if (!search_results.error) {
+                this.targets[target_index].ra = search_results.ra.toFixed(4)
+                this.targets[target_index].dec = search_results.dec.toFixed(4)
+                //this.targets[target_index].name= search_results.name
+            } else {
+                this.targets[target_index].ra = ''
+                this.targets[target_index].dec = ''
+                this.$buefy.toast.open({
+                    message: "Could not resolve object with name "+this.targets[target_index].name,
+                    type: "is-danger"
+                })
+            }
         },
 
         newExposureRow() {
@@ -921,6 +933,12 @@ export default {
             }
         },
 
+        ...mapGetters('command_params', [
+            'mount_ra',
+            'mount_dec', 
+            'mount_object',
+        ]),
+
         ...mapGetters('site_config', [
             'available_sites',
             'filter_wheel_options'
@@ -946,6 +964,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/style/buefy-styles.scss";
+@import "@/style/_responsive.scss";
 
 .project-form {
     background-color: $background;
@@ -967,17 +986,17 @@ export default {
     max-width: 959px;
     overflow-x:auto;
 }
-@media screen and (min-width: 768px) {
+@include tablet {
     .exposure-rows {
         max-width: 700px;
     }
 }
-@media screen and (min-width: 1024px) {
+@include widescreen {
     .exposure-rows {
         max-width: 750px;
     }
 }
-@media screen and (min-width: 1408px) {
+@include fullhd {
     .exposure-rows {
         max-width: 959px;
     }

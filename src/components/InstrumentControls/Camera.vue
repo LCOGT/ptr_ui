@@ -38,11 +38,9 @@
         <p class="control">
           <command-button :data="filter_wheel_command" class="is-small"/>
         </p>
-        <command-button :data="filter_wheel_home_command" style="margin-left: 2em;" class="is-small" />
+        <command-button :data="filter_wheel_home_command" style="margin-left: 1em;" class="is-small" />
       </b-field>
 
-        <div class="buttons has-addons">
-        </div>
     </b-field>
 
     <!--b-field horizontal label="Bin" v-if="camera_can_bin">

@@ -123,21 +123,24 @@ const mutations = {
         state[shape].splice(index, 1)
     },
 
+    removeAllShapesOfType(state, type) {
+        state[type].splice(0)
+    },
+
     crosshairsVisible( state, isVisibleBool) {
       state.crosshairsVisible = isVisibleBool
     },
 }
 
 const actions = {
-    deleteAllShapes({state, commit}) {
-      commit('selectedId', 'none')
-      commit('activeDrawShape', 'none')
-      // Remove each shape one at a time to work nicely with the svg rendering updates.
-      // There may be a cleaner solution but this is fast enough for any reasonable number of shapes. 
-      state.points.forEach(p => commit('removeElement', {shape: 'point', id: p.id}))
-      state.lines.forEach(p => commit('removeElement', {shape: 'lines', id: p.id}))
-      state.circles.forEach(p => commit('removeElement', {shape: 'circles', id: p.id}))
-      state.rects.forEach(p => commit('removeElement', {shape: 'rects', id: p.id}))
+    deleteAllShapes({state, getters, commit}) {
+        // deselect the selected shape so we don't have a selection pointing to nothing
+        commit('selectedId', 'none')
+        commit('activeDrawShape', 'none')
+
+        // remove the shape objects from their respective arrays
+        let shape_types = ['points', 'lines', 'rects', 'circles']
+        shape_types.forEach( shape_type => commit('removeAllShapesOfType', shape_type))
     },
     deleteShape({state, commit}, id) {
         const shape = idToShapelistName(id)

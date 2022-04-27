@@ -172,7 +172,15 @@ export default {
 @import "@/style/_responsive.scss";
 
 ::v-deep .navbar-dropdown {
-    left: -200px;
+  @include tablet {
+    left: -500px;
+  }
+  @include widescreen {
+    left: -300px;
+  }
+  @include fullhd {
+    left: -100px;
+  }
 }
 .dropdown-wrapper {
     display: flex;

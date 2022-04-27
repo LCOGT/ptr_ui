@@ -65,6 +65,9 @@
 
         </div>
         <div class="skychart-section">
+            <div class="ptr-aladin-parent-div">
+                <div id="aladin-lite-div" @click="set_coordinates_from_aladin"/>
+            </div>
             <TheSkyChart class="skychart-component" />
         </div>
         <!--div class="telescope-info">
@@ -83,6 +86,7 @@
 </template>
 
 <script>
+import AladinLite from '@/components/AladinLite'
 import CommandTabsAccordion from '@/components/CommandTabsAccordion'
 import CommandTabsWide from '@/components/CommandTabsWide'
 import UserwayButton from '@/components/UserwayButton'
@@ -97,7 +101,6 @@ import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsVie
 import ImageMetadataViewer from '@/components/AnalysisTools/ImageMetadataViewer'
 import LineProfileInspection from '@/components/AnalysisTools/LineProfileInspection'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
-import SiteTargets from '@/components/sitepages/SiteTargets'
 
 import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
@@ -110,6 +113,7 @@ let Celestial = celestial.Celestial()
 export default {
     name: "ControlRoom",
     components: {
+        AladinLite,
         CommandTabsAccordion,
         CommandTabsWide,
         UserwayButton,
@@ -123,13 +127,13 @@ export default {
         ImageMetadataViewer,
         LineProfileInspection,
         TheSkyChart,
-        SiteTargets,
         Tabs,
         TabItem,
     },
     mixins: [ user_mixin ],
     data() {
         return {
+            aladin: '',
             command_tabs_collapsed: false,
         }
     },
@@ -137,28 +141,85 @@ export default {
         this.site_changed_routine(this.$route.params.sitecode)
     },
     mounted() {
-        Celestial.resize({width: '400px', width: '400px'})
+        Celestial.resize({width: 550})
+        this.$loadScript("https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js")
+            .then(async () => {
+
+                // Default: load aladin on m33, but use coords in mount fields if possible.
+                let target = "M33"
+                if (parseFloat(this.mount_ra) && parseFloat(this.mount_dec)) {
+                    target = `${15*this.mount_ra} ${this.mount_dec}`
+                }
+
+                // Initialize Aladin
+                this.aladin = A.aladin('#aladin-lite-div', {
+                    survey: "P/DSS2/color", 
+                    fov:1, 
+                    target: target, 
+                    cooFrame: "ICRSd", 
+                    showFullscreenControl: false, 
+                    showGotoControl: false, 
+                    showSimbadPointerControl: true
+                });
+                // cheap way to sync the skymap and mount coordinates to the aladin view.
+                setTimeout(this.set_coordinates_from_aladin, 1000) 
+            })
+            .catch(error => {
+                console.warn('failed to load Aladin')
+                console.warn(error)
+            });
     },
     props: {
         sitecode: String,
     },
     methods: {
+
         site_changed_routine(sitecode) {
 
-        // Update the active devices
-        this.$store.dispatch("site_config/set_default_active_devices", sitecode);
+            // Update the active devices
+            this.$store.dispatch("site_config/set_default_active_devices", sitecode);
 
-        // Subscribe to datastream for the new site
-        datastreamer.update_site(sitecode)
+            // Subscribe to datastream for the new site
+            datastreamer.update_site(sitecode)
 
-        // get initial data/valuse for images, status, calendar
-        this.$store.dispatch("images/display_placeholder_image");
-        this.$store.dispatch("images/load_latest_images");
-        this.$store.dispatch("images/load_latest_info_images");
-        this.$store.dispatch("sitestatus/clearStatus")
-        this.$store.dispatch("sitestatus/getLatestStatus")
-        this.$store.dispatch("userstatus/fetch_recent_logs")
-        this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
+            // get initial data/valuse for images, status, calendar
+            this.$store.dispatch("images/display_placeholder_image");
+            this.$store.dispatch("images/load_latest_images");
+            this.$store.dispatch("images/load_latest_info_images");
+            this.$store.dispatch("sitestatus/clearStatus")
+            this.$store.dispatch("sitestatus/getLatestStatus")
+            this.$store.dispatch("userstatus/fetch_recent_logs")
+            this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
+        },
+        set_coordinates_from_aladin() {
+            var [aladin_ra, aladin_dec] = this.aladin.getRaDec();
+            aladin_ra = aladin_ra / 15;
+
+            this.$store.commit('command_params/mount_ra', aladin_ra.toFixed(5))
+            this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
+            //this.$store.commit('command_params/mount_object', ' ') // clear the mount_object entry
+        }, 
+    },
+    watch: {
+        mount_ra() {
+            let ra = parseFloat(this.mount_ra) * 15
+            let dec = parseFloat(this.mount_dec)
+            this.aladin.gotoRaDec(ra, dec)
+        },
+        mount_dec() {
+            let ra = parseFloat(this.mount_ra) * 15
+            let dec = parseFloat(this.mount_dec)
+            this.aladin.gotoRaDec(ra, dec)
+        },
+    },
+    computed: {
+        mount_ra: {
+            get() { return this.$store.getters['command_params/mount_ra']},
+            set(val) { this.$store.commit('command_params/mount_ra', val)},
+        },
+        mount_dec: {
+            get() { return this.$store.getters['command_params/mount_dec']},
+            set(val) { this.$store.commit('command_params/mount_dec', val)},
         },
     }
 }
@@ -186,7 +247,6 @@ export default {
     overflow-y: hidden;
 }
 .cr-columns > * {
-    padding-top: 1em;
     overflow-y:auto;
     padding: 1em;
 }
@@ -203,7 +263,8 @@ export default {
     flex-shrink: 0;
     overflow-y: scroll;
     overflow-x: hidden;
-    width: 400px;
+    width: 350px;
+    font-size: 13px;
 }
 
 .analysis-tabs-wrapper {
@@ -215,13 +276,18 @@ export default {
 .image-view {
     flex-shrink: 1;
     height: 100%;
-    resize: horizontal;
     max-width: 750px;
     flex-basis: 750px;
 }
 .skychart-section {
     overflow-x: hidden;
     overflow-y: scroll;
+}
+.ptr-aladin-parent-div {
+    width: 100%;
+    height: 200px;
+    background-color:grey;
+    margin-bottom: 3em;
 }
 .telescope-info {
     flex-grow: 1;
