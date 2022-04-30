@@ -30,6 +30,7 @@ import NotFound from './views/NotFound'
 import Remotehq from './views/Remotehq'
 import ChatTesting from './views/ChatTesting'
 import axios from 'axios'
+import { ResourceSplitter } from '@fullcalendar/resource-common'
 
 
 Vue.use(VueRouter)
@@ -71,7 +72,7 @@ const router = new VueRouter({
     { path: '/data/:user', name: 'data', component: UserData},
     {
       path: '/cr/:sitecode',
-      name: 'control room',
+      name: 'controlroom',
       component: ControlRoom,
       props: route => {
         return {
@@ -111,3 +112,14 @@ export default router
 
   //}
 //})
+
+router.beforeEach((to, from, next) => {
+  if (window._chatlio) {
+    // Chat should only be available in the control room. 
+    // The script is loaded globally, so hide the widget everywhere else. 
+    window._chatlio.hide()
+  } else {
+    //console.log('chatlio is not loaded')
+  }
+  next()
+})

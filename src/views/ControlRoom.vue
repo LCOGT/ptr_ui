@@ -31,6 +31,7 @@
         <div class="command-tabs" style="display:flex; flex-direction: column;">
             <!--div style="flex-shrink: 0; height: 100%; width: 25px; border: 1px solid red;"><</div-->
             <!--CommandTabsAccordion :initInstrumentOpenView="5" /-->
+            <Chatlio />
             <CommandTabsWide style="width: 100%;" :initInstrumentOpenView="5" />
             <div style="height: 5em; flex-shrink: 0;" />
         </div>
@@ -95,6 +96,7 @@ import ImageView from '@/components/ImageView'
 import ThumbnailRow from '@/components/ImageDisplay/ThumbnailRow'
 import TelescopeLivestream from '../components/TelescopeLivestream'
 import SiteStatusFooter from '@/components/status/SiteStatusFooter'
+import Chatlio from '@/components/Chatlio'
 
 import HistogramTool from '@/components/AnalysisTools/HistogramTool'
 import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsViewer'
@@ -129,6 +131,7 @@ export default {
         TheSkyChart,
         Tabs,
         TabItem,
+        Chatlio,
     },
     mixins: [ user_mixin ],
     data() {
@@ -168,6 +171,18 @@ export default {
                 console.warn('failed to load Aladin')
                 console.warn(error)
             });
+        
+        let control_room_id = `${this.sitecode}-control-room`
+        if (_chatlio) {
+            _chatlio.show({expanded: false}) 
+            _chatlio.identify(control_room_id )
+        } else {
+            document.addEventListener('chatlio.ready', function (e, data) {
+                _chatlio.show({expanded: false})
+                _chatlio.identify(control_room_id )
+            });
+        }
+
     },
     props: {
         sitecode: String,

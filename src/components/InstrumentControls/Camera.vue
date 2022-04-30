@@ -116,16 +116,6 @@
       </b-checkbox>
     </b-field>
 
-    <b-field horizontal label="Extract">
-      <b-checkbox
-        v-model="camera_extract"
-        true-value="on"
-        false-value="off"
-        >
-        {{ camera_extract }}
-      </b-checkbox>
-    </b-field>
-
     <b-field horizontal label="Note">
       <b-input placeholder="a camera note for the FITS header..."
         type="text"
