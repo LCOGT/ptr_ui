@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import helpers from '@/utils/helpers';
+
 export default {
   name: "RaDisplay",
   
@@ -27,7 +29,7 @@ export default {
     },
     decimal_precision: {
       type: Number,
-      default: 5,
+      default: 6,
     }
   },
 
@@ -36,7 +38,7 @@ export default {
 
       showCopyIcon: false,
 
-      displayFormatOptions: ["decimalHours", "sexagesimalWithUnits", "sexagesimalPlain"],
+      displayFormatOptions: ["decimalHours", "decimalDegrees", "sexagesimalWithUnits", "sexagesimalPlain"],
       displayFormatSelected: 0, // index of the list above
 
     }
@@ -81,6 +83,10 @@ export default {
       else {
         return hours + ' ' + minutes + ' ' + seconds 
       }
+    },
+
+    toDecimalDegrees(decimal_hours) {
+      return helpers.hour2degree(decimal_hours);
     }
 
   },
@@ -92,6 +98,9 @@ export default {
     rightAscension() {
       if (this.displayFormat == "decimalHours") {
         return this.ra_hours_decimal.toFixed(this.decimal_precision) + 'h'  
+      }
+      if (this.displayFormat == "decimalDegrees") {
+        return this.toDecimalDegrees(this.ra_hours_decimal).toFixed(this.decimal_precision) + '°'
       }
       if (this.displayFormat == "sexagesimalPlain") {
         return this.toSexagesimal(this.ra_hours_decimal, false)
