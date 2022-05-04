@@ -191,14 +191,25 @@ const draw_open_cluster = (Celestial, quadtree, styles, d) => {
     }
 }
 
-const draw_generic = (Celestial, styles, d) => {
+const draw_generic = (Celestial, quadtree, styles, d) => {
     let pt = Celestial.mapProjection(d.geometry.coordinates)
+    let s = 8;
+    let r = s / 1.5;
     Celestial.setStyle(styles.point);
     Celestial.map(d)
     Celestial.context.beginPath();
     Celestial.context.arc(pt[0], pt[1], 5, 0, 2 * Math.PI);
     Celestial.context.closePath();
     Celestial.context.stroke();
+
+    // Add object name if there is space
+    const nearest = quadtree.find(pt)
+    const no_overlap = !nearest || distance(nearest, pt) > PROXIMITY_LIMIT
+    if (no_overlap && d.properties.name != "null") {
+        quadtree.add(pt)
+        Celestial.setTextStyle(styles.point.nameStyle);
+        Celestial.context.fillText(d.properties.name, pt[0]+r, pt[1]-r); //KATIE FIX NULL 
+    }
 }
 
 
@@ -257,7 +268,7 @@ const add_custom_data = (Celestial, base_config, data_file) => {
                             base_config.stars.size, base_config.stars.exponent, d) 
                     }
                     else { 
-                        draw_generic(Celestial, styles, d) 
+                        draw_generic(Celestial, quadtree, styles, d) 
                     }
                 }
             });
