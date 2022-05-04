@@ -492,7 +492,7 @@ export default {
       // If user status bar is collapsed, just show the last log message
       if (!this.status_bar_1_expanded) {
         return this.user_status_logs.length
-          ? [this.user_status_logs.slice(-1)[0]]
+          ? this.user_status_logs.slice(-2)
           : [];
       }
       // Otherwise show all the logs
