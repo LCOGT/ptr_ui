@@ -27,10 +27,14 @@ export default {
       type: Boolean,
       default: false,
     },
-    decimal_precision: {
+    decimal_hours_precision: {
+      type: Number,
+      default: 5,
+    },
+    decimal_degrees_precision: {
       type: Number,
       default: 6,
-    }
+    },
   },
 
   data() {
@@ -97,10 +101,10 @@ export default {
     },
     rightAscension() {
       if (this.displayFormat == "decimalHours") {
-        return this.ra_hours_decimal.toFixed(this.decimal_precision) + 'h'  
+        return this.ra_hours_decimal.toFixed(this.decimal_hours_precision) + 'h'  
       }
       if (this.displayFormat == "decimalDegrees") {
-        return this.toDecimalDegrees(this.ra_hours_decimal).toFixed(this.decimal_precision) + '°'
+        return this.toDecimalDegrees(this.ra_hours_decimal).toFixed(this.decimal_degrees_precision) + '°'
       }
       if (this.displayFormat == "sexagesimalPlain") {
         return this.toSexagesimal(this.ra_hours_decimal, false)
