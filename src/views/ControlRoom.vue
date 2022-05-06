@@ -1,12 +1,11 @@
 <template>
 <div class="page-wrapper" >
-
+    <Chatlio />
     <!-- top navbar -->
     <b-navbar class="navbar is-dark">
         <template slot="start">
             <b-navbar-item class="nav-item">{{sitecode}}</b-navbar-item>
-        </template>
-        <template slot="end">
+            <b-navbar-item><div style="border-right: 1px solid grey; margin-left: 1em; height: 100%;"/></b-navbar-item>
             <b-navbar-item tag="div">
                 <div v-if="$auth.isAuthenticated" class="navbar-item has-dropdown is-hoverable is-dark">
                     <div class="navbar-link">
@@ -29,41 +28,29 @@
     <!-- main page content: columns -->
     <div class="cr-columns">
         <div class="command-tabs" style="display:flex; flex-direction: column;">
-            <!--div style="flex-shrink: 0; height: 100%; width: 25px; border: 1px solid red;"><</div-->
-            <!--CommandTabsAccordion :initInstrumentOpenView="5" /-->
-            <Chatlio />
             <CommandTabsWide style="width: 100%;" :initInstrumentOpenView="5" />
             <div style="height: 5em; flex-shrink: 0;" />
         </div>
         <div class="image-view">
-
-            <!--Tabs class="control-room-main-tabs"-->
-                <!--TabItem title="images"-->
-                <div>
-                    <ControlRoomImages :sitecode="sitecode" />
-                    <div class="analysis-tabs-wrapper">
-                    <Tabs class="analysis-tools-tabs">
-                        <TabItem title="statistics">
-                            <ImageStatisticsViewer />
-                        </TabItem>
-                        <TabItem title="histogram">
-                            <HistogramTool />
-                        </TabItem>
-                        <TabItem title="line profile">
-                            <LineProfileInspection />
-                        </TabItem>
-                        <TabItem title="image info">
-                            <ImageMetadataViewer />
-                        </TabItem>
-                    </Tabs>
-                    </div>
+            <div>
+                <ControlRoomImages :sitecode="sitecode" />
+                <div class="analysis-tabs-wrapper">
+                <Tabs class="analysis-tools-tabs">
+                    <TabItem title="statistics">
+                        <ImageStatisticsViewer />
+                    </TabItem>
+                    <TabItem title="histogram">
+                        <HistogramTool />
+                    </TabItem>
+                    <TabItem title="line profile">
+                        <LineProfileInspection />
+                    </TabItem>
+                    <TabItem title="image info">
+                        <ImageMetadataViewer />
+                    </TabItem>
+                </Tabs>
                 </div>
-                <!--/TabItem-->
-                <!--TabItem title="sky chart"-->
-                    <!--SiteTargets :sitecode="sitecode" /-->
-                <!--/TabItem-->
-            <!--/Tabs-->
-
+            </div>
         </div>
         <div class="skychart-section">
             <div class="ptr-aladin-parent-div">
@@ -71,14 +58,6 @@
             </div>
             <TheSkyChart class="skychart-component" />
         </div>
-        <!--div class="telescope-info">
-            <TelescopeLivestream class="telescope-livestream" />
-            <div class="status-summary">
-                <div>Telescope: Parked</div>
-                <div>Roof: closed</div>
-                <div>weather: ok</div>
-            </div>
-        </div-->
     </div>
 
     <!-- Status at bottom of page -->
