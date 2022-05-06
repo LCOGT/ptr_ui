@@ -42,8 +42,8 @@ export default {
 
       showCopyIcon: false,
 
-      displayFormatOptions: ["decimalHours", "decimalDegrees", "sexagesimalWithUnits", "sexagesimalPlain"],
-      displayFormatSelected: 0, // index of the list above
+      displayFormatOptions: ["decimalDegrees", "decimalHours", "sexagesimalWithUnits", "sexagesimalPlain"],
+      displayFormatSelected: window.localStorage.getItem('ra_display_format'), // index of the list above
 
     }
   },
@@ -51,6 +51,7 @@ export default {
   methods: {
     handleClick() {
       this.displayFormatSelected = (this.displayFormatSelected + 1 ) % this.displayFormatOptions.length
+      window.localStorage.setItem('ra_display_format', this.displayFormatSelected)
     },
 
     copy() {
@@ -97,7 +98,12 @@ export default {
 
   computed: {
     displayFormat() {
-      return this.displayFormatOptions[this.displayFormatSelected]
+      if (this.displayFormatSelected != null) {
+        return this.displayFormatOptions[this.displayFormatSelected]
+      } else {
+        return this.displayFormatOptions[0]
+      }
+      
     },
     rightAscension() {
       if (this.displayFormat == "decimalHours") {
