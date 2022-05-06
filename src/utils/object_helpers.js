@@ -5,7 +5,7 @@ var object_helpers = {
         */
 
         //List of potential alternate names in lowercase with corresponding proper Aladin names
-        const common_names = {"ngp": "North Galactic Pole", "sgp": "South Galactic Pole"}
+        const common_names = require('/public/data/common_names.json')
 
         if(common_names.hasOwnProperty(object_name.toLowerCase())) {
             return common_names[object_name.toLowerCase()];
