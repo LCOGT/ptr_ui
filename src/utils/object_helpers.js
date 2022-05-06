@@ -1,5 +1,5 @@
 /* Useful sky object related functions */
-var object_helpers = {
+const object_helpers = {
     common_name_parse: function(object_name) {
         /* Takes common names for objects and returns Aladin searchable object names
         */
