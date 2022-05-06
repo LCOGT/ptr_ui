@@ -1,44 +1,49 @@
 <template>
-  <div class="container">
-    <div style="height: 25px;"/>
-    <div class="top-section">
-      <div class="img-container" style="width: 200px;">
+  <div>
+    <SiteNavbar />
+    <div class="container">
+      <div style="height: 25px" />
+      <div class="top-section">
+        <div class="img-container" style="width: 200px">
           <b-image
             :src="$auth.user.picture"
             alt="alt text"
             ratio="1by1"
             :rounded="true"
-            :lazy="false" ></b-image>
-          </div>
+            :lazy="false"
+          ></b-image>
+        </div>
         <p class="title profile-name">{{ $auth.user.name }}</p>
       </div>
       <!--p>{{ $auth.user.email }}</p-->
-    <div>
-      <pre>{{ JSON.stringify($auth.user, null, 2) }}</pre>
-      <p>break</p>
-      <button @click="showAuth">auth</button>
-      <button @click="tokenWithPopup">getTokenWithPopup</button>
-      <button @click="tokenSilently">getTokenSilently</button>
+      <div>
+        <pre>{{ JSON.stringify($auth.user, null, 2) }}</pre>
+        <p>break</p>
+        <button @click="showAuth">auth</button>
+        <button @click="tokenWithPopup">getTokenWithPopup</button>
+        <button @click="tokenSilently">getTokenSilently</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import SiteNavbar from "@/components/SiteNavbar";
 export default {
   name: "Profile",
+  components: { SiteNavbar },
   methods: {
-
     async tokenWithPopup() {
-      console.log(await this.$auth.getTokenWithPopup())
+      console.log(await this.$auth.getTokenWithPopup());
     },
     async tokenSilently() {
-      return await this.$auth.getTokenSilently()
+      return await this.$auth.getTokenSilently();
     },
     showAuth() {
-      console.log(this.$auth)
+      console.log(this.$auth);
     },
     async getTokenClaims() {
-      return await this.$auth.getIdTokenClaims()
+      return await this.$auth.getIdTokenClaims();
     },
   },
 };

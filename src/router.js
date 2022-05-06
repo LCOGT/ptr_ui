@@ -4,6 +4,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from './store'
 
+import { user_mixin } from './mixins/user_mixin'
+
 import Home from './views/Home.vue'
 import Profile from './views/Profile.vue'
 import AdminOnly from './views/AdminOnly.vue'
@@ -92,6 +94,16 @@ const router = new VueRouter({
       },
     },
     { path: '/notfound', name: 'notfound', component: NotFound },
+
+    {
+      path: '/logout',
+      name: 'logout',
+      beforeEnter(to, from, next) {
+        // Get the route where the user clicked 'logout'. We want to redirect back to this page. 
+        let redirect_route = window.localStorage.getItem('ptr_logout_redirect_path') || '/'
+        return next(redirect_route)
+      }
+    },
 
     // handle page not found
     { path: '*', redirect: '/notfound' },

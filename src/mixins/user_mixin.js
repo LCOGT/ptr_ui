@@ -48,11 +48,11 @@ export const user_mixin = {
     },
 
     logout() {
-      // make sure the logout happens before redirect.
-      // otherwise, the redirect check for authentication might log the user back in.
+      // save the path we will redirect back to after logout is complete
+      window.localStorage.setItem('ptr_logout_redirect_path', this.$router.currentRoute.fullPath)
       this.$auth.logout({
-        returnTo: window.location.origin
-      }).then($router.go)
+        returnTo: `${window.location.origin}/logout`
+      })
     },
 
 
