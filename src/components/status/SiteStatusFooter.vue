@@ -587,6 +587,7 @@ $log-critical: $ptr-red;
   display: grid;
   grid-template-columns: 220px 1fr;
   width: 90%;
+  line-height: 25px;
 }
 .log-timestamp-group {
   display: flex;

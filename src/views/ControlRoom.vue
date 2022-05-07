@@ -56,6 +56,21 @@
             <div class="ptr-aladin-parent-div">
                 <div id="aladin-lite-div" @click="set_coordinates_from_aladin"/>
             </div>
+            <div class="slew-search-level">
+                <CommandButton
+                    :data="mount_slew_radec_command"
+                    style="margin-bottom: 1em"
+                    class="is-small is-success is-outlined">
+                    <div slot="title">Slew telescope here</div>
+                </CommandButton>
+                <TargetSearchField
+                    label="Object"
+                    v-model="mount_object"
+                    size="is-small"
+                    horizontal
+                    @results="handle_coordinate_search_results"
+                />
+            </div>
             <TheSkyChart class="skychart-component" />
         </div>
     </div>
@@ -76,6 +91,8 @@ import ThumbnailRow from '@/components/ImageDisplay/ThumbnailRow'
 import TelescopeLivestream from '../components/TelescopeLivestream'
 import SiteStatusFooter from '@/components/status/SiteStatusFooter'
 import Chatlio from '@/components/Chatlio'
+import TargetSearchField from '@/components/FormElements/TargetSearchField'
+import CommandButton from '@/components/FormElements/CommandButton'
 
 import HistogramTool from '@/components/AnalysisTools/HistogramTool'
 import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsViewer'
@@ -87,6 +104,7 @@ import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
 import datastreamer from "@/datastreamer";
 import { user_mixin } from '@/mixins/user_mixin'
+import { commands_mixin } from '@/mixins/commands_mixin'
 
 import celestial from 'd3-celestial'
 let Celestial = celestial.Celestial()
@@ -111,8 +129,10 @@ export default {
         Tabs,
         TabItem,
         Chatlio,
+        TargetSearchField,
+        CommandButton,
     },
-    mixins: [ user_mixin ],
+    mixins: [ commands_mixin, user_mixin ],
     data() {
         return {
             aladin: '',
@@ -193,6 +213,21 @@ export default {
             this.$store.commit('command_params/mount_dec', aladin_dec.toFixed(4))
             //this.$store.commit('command_params/mount_object', ' ') // clear the mount_object entry
         }, 
+        handle_coordinate_search_results(search_results) {
+            if (!search_results.error) {
+                this.mount_ra = search_results.ra.toFixed(5)
+                this.mount_dec = search_results.dec.toFixed(4)
+                // make sure to change this after the coordinates, since the object name is cleared 
+                // after large changes in the coordinate positions. Details in vuex command_params.
+                this.mount_object = search_results.searched_name;
+            } else {
+                this.$buefy.toast.open({
+                message: `Could not resolve object with name ${search_results.searched_name}`,
+                type: "is-warning",
+                duration: 4000,
+                });
+            }
+        },
     },
     watch: {
         mount_ra() {
@@ -214,6 +249,10 @@ export default {
         mount_dec: {
             get() { return this.$store.getters['command_params/mount_dec']},
             set(val) { this.$store.commit('command_params/mount_dec', val)},
+        },
+        mount_object: {
+            get() { return this.$store.getters['command_params/mount_object']},
+            set(val) { this.$store.commit('command_params/mount_object', val)},
         },
     }
 }
@@ -281,7 +320,12 @@ export default {
     width: 100%;
     height: 200px;
     background-color:grey;
-    margin-bottom: 3em;
+    margin-bottom: 1em;
+}
+.slew-search-level {
+    display:flex;
+    justify-content: space-between;
+    margin-bottom: 1em;
 }
 .telescope-info {
     flex-grow: 1;
