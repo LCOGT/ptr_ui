@@ -24,6 +24,9 @@
 
 <script>
 import { target_names } from "@/mixins/target_names";
+import object_helpers from '@/utils/object_helpers';
+
+
 export default {
   name: "TargetSearchField",
   mixins: [target_names],
@@ -68,7 +71,7 @@ export default {
       let error = true;
 
       let search_results = await this.get_coordinates_from_object_name(
-        this.object_name
+        object_helpers.common_name_parse(this.object_name)
       );
       this.search_is_loading = false;
       if (!search_results.error) {

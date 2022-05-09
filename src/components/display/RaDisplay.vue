@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import helpers from '@/utils/helpers';
+
 export default {
   name: "RaDisplay",
   
@@ -25,10 +27,14 @@ export default {
       type: Boolean,
       default: false,
     },
-    decimal_precision: {
+    decimal_hours_precision: {
       type: Number,
       default: 5,
-    }
+    },
+    decimal_degrees_precision: {
+      type: Number,
+      default: 6,
+    },
   },
 
   data() {
@@ -36,8 +42,8 @@ export default {
 
       showCopyIcon: false,
 
-      displayFormatOptions: ["decimalHours", "sexagesimalWithUnits", "sexagesimalPlain"],
-      displayFormatSelected: 0, // index of the list above
+      displayFormatOptions: ["decimalDegrees", "decimalHours", "sexagesimalWithUnits", "sexagesimalPlain"],
+      displayFormatSelected: window.localStorage.getItem('ra_display_format'), // index of the list above
 
     }
   },
@@ -45,6 +51,7 @@ export default {
   methods: {
     handleClick() {
       this.displayFormatSelected = (this.displayFormatSelected + 1 ) % this.displayFormatOptions.length
+      window.localStorage.setItem('ra_display_format', this.displayFormatSelected)
     },
 
     copy() {
@@ -81,17 +88,29 @@ export default {
       else {
         return hours + ' ' + minutes + ' ' + seconds 
       }
+    },
+
+    toDecimalDegrees(decimal_hours) {
+      return helpers.hour2degree(decimal_hours);
     }
 
   },
 
   computed: {
     displayFormat() {
-      return this.displayFormatOptions[this.displayFormatSelected]
+      if (this.displayFormatSelected != null) {
+        return this.displayFormatOptions[this.displayFormatSelected]
+      } else {
+        return this.displayFormatOptions[0]
+      }
+      
     },
     rightAscension() {
       if (this.displayFormat == "decimalHours") {
-        return this.ra_hours_decimal.toFixed(this.decimal_precision) + 'h'  
+        return this.ra_hours_decimal.toFixed(this.decimal_hours_precision) + 'h'  
+      }
+      if (this.displayFormat == "decimalDegrees") {
+        return this.toDecimalDegrees(this.ra_hours_decimal).toFixed(this.decimal_degrees_precision) + '°'
       }
       if (this.displayFormat == "sexagesimalPlain") {
         return this.toSexagesimal(this.ra_hours_decimal, false)
