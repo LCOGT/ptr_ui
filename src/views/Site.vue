@@ -6,19 +6,19 @@
 
       <div class="mobile-site-menu">
         <button class="menu-padding"></button>
-        <router-link :to="'/site/' + sitecode + '/home'">
+        <router-link :to="'/site/' + sitecode + '/home'" @click.native="setActiveSubpage">
           <button class="button" :class="{'selected': subpage == 'home'}">Home</button>
         </router-link>
-        <router-link :to="'/site/' + sitecode + '/targets'">
+        <router-link :to="'/site/' + sitecode + '/targets'" @click.native="setActiveSubpage">
           <button class="button" :class="{'selected': subpage == 'targets'}">Targets</button>
         </router-link>
-        <router-link :to="'/site/' + sitecode + '/observe'">
+        <router-link :to="'/site/' + sitecode + '/observe'" @click.native="setActiveSubpage">
           <button class="button" :class="{'selected': subpage == 'observe'}">Observe</button>
         </router-link>
-        <router-link :to="'/site/' + sitecode + '/calendar'">
+        <router-link :to="'/site/' + sitecode + '/calendar'" @click.native="setActiveSubpage">
           <button class="button" :class="{'selected': subpage == 'calendar'}">Calendar</button>
         </router-link>
-        <router-link :to="'/site/' + sitecode + '/projects'">
+        <router-link :to="'/site/' + sitecode + '/projects'" @click.native="setActiveSubpage">
           <button class="button" :class="{'selected': subpage == 'projects'}">Projects</button>
         </router-link>
         <button class="menu-padding" button></button>
@@ -100,10 +100,6 @@ export default {
 
     if (new_site != this.sitecode) {  // only if site changes
       this.site_changed_routine(new_site)
-      console.log(`site-${this.subpage}`)
-      this.$store.commit("site_config/setActiveTab", `site-${this.subpage}`)
-      console.log(this.active_tab)
-      // this.$store.dispatch("site_config/set_default_active_devices", sitecode);
     }
     next();
   },
@@ -147,6 +143,11 @@ export default {
       this.$store.dispatch("sitestatus/getLatestStatus")
       this.$store.dispatch("userstatus/fetch_recent_logs")
       this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
+    },
+
+    // change the active subpage in store
+    setActiveSubpage() {
+      this.$store.commit("site_config/setActiveSubpage", `${this.subpage}`)
     },
 
   },

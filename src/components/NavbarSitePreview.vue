@@ -5,7 +5,7 @@
         tag="button"
         title="view this site"
         class="button"
-        :to="{ path: '/site/' + site + '/home' }"
+        :to="{ path: '/site/' + site + '/' + active_subpage }"
         @click.native="$emit('view-site-clicked')"
         >view observatory</router-link
       >
@@ -48,7 +48,10 @@
 </template>
 
 <script>
+import { commands_mixin } from "../mixins/commands_mixin";
+
 export default {
+  mixins: [commands_mixin],
   props: {
     site: String,
     image_url: String,

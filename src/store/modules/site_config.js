@@ -15,7 +15,7 @@ const state = {
     did_config_load_yet: false,
 
     selected_site: '',
-    selected_tab: '',
+    selected_subpage: 'home',
     selected_enclosure: '',
     selected_mount: '',
     selected_telescope: '',
@@ -38,8 +38,8 @@ const getters = {
         return state.global_config[state.selected_site]; 
     },
 
-    selected_tab: state => {
-        return state.selected_tab;
+    selected_subpage: state => {
+        return state.selected_subpage;
     },
 
     available_devices: state => (deviceType, site) => {
@@ -217,8 +217,8 @@ const mutations = {
         state.selected_site = site; 
         state.is_site_selected = true 
     },
-    setActiveTab(state, tab) { 
-        state.selected_tab = tab; 
+    setActiveSubpage(state, subpage) { 
+        state.selected_subpage = subpage; 
     },
 		removeActiveSite(state) {
 			state.selected_site = ''
