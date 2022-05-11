@@ -315,7 +315,8 @@ export const commands_mixin = {
     },
 
     ...mapState('site_config', [
-      'selected_site', 
+      'selected_site',
+      'selected_tab', 
       'selected_enclosure',
       'selected_mount',
       'selected_telescope',
@@ -335,6 +336,10 @@ export const commands_mixin = {
     active_site: {
       get() { return this.selected_site },
       set(value) { this.$store.commit('site_config/setActiveSite', value) }
+    },
+    active_tab: {
+      get() { return this.selected_tab },
+      set(value) { this.$store.commit('site_config/setActiveTab', value) }
     },
     active_enclosure: {
       get() { return this.selected_enclosure },

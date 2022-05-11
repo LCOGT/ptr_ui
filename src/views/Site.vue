@@ -100,6 +100,10 @@ export default {
 
     if (new_site != this.sitecode) {  // only if site changes
       this.site_changed_routine(new_site)
+      console.log(`site-${this.subpage}`)
+      this.$store.commit("site_config/setActiveTab", `site-${this.subpage}`)
+      console.log(this.active_tab)
+      // this.$store.dispatch("site_config/set_default_active_devices", sitecode);
     }
     next();
   },

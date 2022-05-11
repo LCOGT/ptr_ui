@@ -15,6 +15,7 @@ const state = {
     did_config_load_yet: false,
 
     selected_site: '',
+    selected_tab: '',
     selected_enclosure: '',
     selected_mount: '',
     selected_telescope: '',
@@ -35,6 +36,10 @@ const getters = {
 
     site_config: state => {
         return state.global_config[state.selected_site]; 
+    },
+
+    selected_tab: state => {
+        return state.selected_tab;
     },
 
     available_devices: state => (deviceType, site) => {
@@ -211,6 +216,9 @@ const mutations = {
     setActiveSite(state, site) { 
         state.selected_site = site; 
         state.is_site_selected = true 
+    },
+    setActiveTab(state, tab) { 
+        state.selected_tab = tab; 
     },
 		removeActiveSite(state) {
 			state.selected_site = ''
