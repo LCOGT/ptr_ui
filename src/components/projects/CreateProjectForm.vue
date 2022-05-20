@@ -1,6 +1,36 @@
 <template>
 <div>
-    <h1 class="title">Create a project</h1>
+    <div class="project-form-header">
+        <h1 class="title">Create a project</h1>
+        <div>
+            <b-tooltip 
+                v-if="!this.modifying_existing_project"
+                :active="!$auth.isAuthenticated" 
+                label="You must be logged in to create a project." >
+                <button 
+                    class="button is-success mr-1"
+                    @click="saveNewProject"
+                    :disabled="!$auth.isAuthenticated"
+                    >Create Project</button>
+            </b-tooltip>
+
+            <b-tooltip 
+                v-if="this.modifying_existing_project"
+                :active="!$auth.isAuthenticated" 
+                label="You must be logged in to modify a project." >
+                <button 
+                    class="button is-info mr-1"
+                    @click="modifyProject"
+                    :disabled="!$auth.isAuthenticated"
+                    >Modify Project</button>
+            </b-tooltip>
+
+            <button 
+                class="button is-light is-outlined mr-1"
+                @click="clearProjectForm"
+                >Clear Form</button>
+        </div>
+    </div>
 
     <div class="project-form">
         <div class="target-row">
@@ -382,6 +412,9 @@
         </div>
         <hr>
 
+    </div>
+
+    <div class="project-form-footer">
         <b-tooltip 
             v-if="!this.modifying_existing_project"
             :active="!$auth.isAuthenticated" 
@@ -966,6 +999,15 @@ export default {
 @import "@/style/buefy-styles.scss";
 @import "@/style/_responsive.scss";
 
+.project-form-header {
+    display: flex;
+    justify-content: space-between;
+}
+.project-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1em;
+}
 .project-form {
     background-color: $background;
     padding: 1em;
