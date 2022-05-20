@@ -84,7 +84,14 @@ export const commands_mixin = {
     async postCommand(formCreatorFunction, args) {
 
       const options = await this.getAuthHeader()
-      let form = formCreatorFunction(...args).form
+      let form
+      if (args != null) {
+        console.log(args)
+        form = formCreatorFunction(...args).form
+      } else {
+        console.log('no args')
+        form = formCreatorFunction().form
+      }
       const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.active_site}`
 
       form.timestamp = parseInt(Date.now() / 1000)
@@ -214,7 +221,7 @@ export const commands_mixin = {
         'autofocus',
         '',
         {
-          num_focus_pts: num_focus_pts,
+          ...num_focus_pts && { num_focus_pts },
         },
         {}
       )

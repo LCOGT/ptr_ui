@@ -2,12 +2,16 @@
 <template>
   <div class="instrument-control-wrapper">
 
-    <div class="buttons has-addons">
+    <div class="buttons has-addons" style="margin-bottom: unset;">
       <CommandButton :data="camera_expose_command" style="width: 70%;" class=" is-outlined is-success"/>
       <CancelButton :site="sitecode" style="width: 30%; border-left: 1px solid #00be65" class="is-outlined"/>
-      <!--command-button :data="camera_cancel_command" style="width: 30%; border-left: 1px solid #00be65;" class=" is-outlined"/-->
     </div>
-    <br>
+
+    <b-button class="button is-success is-outlined" 
+      style="margin-bottom: 1em;"
+      @click="postCommand(focus_auto_command)">
+      autofocus
+    </b-button>
 
     <b-field horizontal label="Expose">
         <b-field>
@@ -38,7 +42,6 @@
         <p class="control">
           <command-button :data="filter_wheel_command" class="is-small"/>
         </p>
-        <command-button :data="filter_wheel_home_command" style="margin-left: 1em;" class="is-small" />
       </b-field>
 
     </b-field>
