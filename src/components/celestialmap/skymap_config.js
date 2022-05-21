@@ -169,6 +169,13 @@ const default_custom_object_styles = {
     point: {
         stroke: "rgba(243,156,18,1)",
         width: 1,
+        nameStyle: { 
+            fill: "rgba(243,156,18,1)", 
+            opacity: 1, 
+            font: "9px Helvetica, Arial, serif", 
+            align: "left", 
+            baseline: "top" 
+        },
     },
     galaxy: {
         fill: "rgba(231,76,60,0.8)",

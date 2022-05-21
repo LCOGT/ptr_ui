@@ -191,14 +191,25 @@ const draw_open_cluster = (Celestial, quadtree, styles, d) => {
     }
 }
 
-const draw_generic = (Celestial, styles, d) => {
+const draw_generic = (Celestial, quadtree, styles, d) => {
     let pt = Celestial.mapProjection(d.geometry.coordinates)
+    let s = 8;
+    let r = s / 1.5;
     Celestial.setStyle(styles.point);
     Celestial.map(d)
     Celestial.context.beginPath();
     Celestial.context.arc(pt[0], pt[1], 5, 0, 2 * Math.PI);
     Celestial.context.closePath();
     Celestial.context.stroke();
+
+    // Add object name if there is space
+    const nearest = quadtree.find(pt)
+    const no_overlap = !nearest || distance(nearest, pt) > PROXIMITY_LIMIT
+    if (no_overlap && d.properties.name != null) {
+        quadtree.add(pt)
+        Celestial.setTextStyle(styles.point.nameStyle);
+        Celestial.context.fillText(d.properties.name, pt[0]+r, pt[1]-r);
+    }
 }
 
 
@@ -212,57 +223,59 @@ const is_star = type => ['Ds', '**', 'star'].indexOf(type) !== -1;
  * Add custom data to the map from a json file. Currently, this is just a bunch of popular objects.
  * The method includes the callback function that Celestial uses to style and render the objects.
  */
-const add_custom_data = (Celestial, base_config, data_file) => {
+const add_custom_data = (Celestial, base_config, data_list) => {
 
     // Default to normal object symbols on sky chart
     const styles = default_custom_object_styles;
 
     // Add data and redraw the map
     Celestial.clear();
-    Celestial.add({
-        type: "json",
-        file: data_file,
-        callback: (error, json) => {
-            if (error) { return console.warn(error); }
-            let sky_objects = Celestial.getData(json, base_config.transform);
-            Celestial.container.selectAll(".custom_objects")
-                .data(sky_objects.features)
-                .enter().append("path")
-                .attr("class", "custom_obj");
-            Celestial.redraw();
-        },
-        redraw: () => {
+    for (const data_file of data_list) {
+        Celestial.add({
+            type: "json",
+            file: data_file,
+            callback: (error, json) => {
+                if (error) { return console.warn(error); }
+                let sky_objects = Celestial.getData(json, base_config.transform);
+                Celestial.container.selectAll(".custom_objects")
+                    .data(sky_objects.features)
+                    .enter().append("path")
+                    .attr("class", "custom_obj");
+                Celestial.redraw();
+            },
+            redraw: () => {
 
-            // The quadtree is used to avoid rendering object names that overlap
-            let m = Celestial.metrics()
-            let quadtree = d3.geom.quadtree().extent([[-1, -1], [m.width + 1, m.height + 1]])([]);
+                // The quadtree is used to avoid rendering object names that overlap
+                let m = Celestial.metrics()
+                let quadtree = d3.geom.quadtree().extent([[-1, -1], [m.width + 1, m.height + 1]])([]);
 
-            Celestial.container.selectAll(".custom_obj").each((d) => {
-                if (Celestial.clip(d.geometry.coordinates)) {
-                    const type = d.properties.type
-                    if (is_galaxy(type)) { 
-                        draw_galaxy(Celestial, quadtree, styles, d) 
+                Celestial.container.selectAll(".custom_obj").each((d) => {
+                    if (Celestial.clip(d.geometry.coordinates)) {
+                        const type = d.properties.type
+                        if (is_galaxy(type)) { 
+                            draw_galaxy(Celestial, quadtree, styles, d) 
+                        }
+                        else if (is_nebula(type)) { 
+                            draw_nebula(Celestial, quadtree, styles, d) 
+                        }
+                        else if (type == 'Gc') { 
+                            draw_globular_cluster(Celestial, quadtree, styles, d) 
+                        }
+                        else if (type == 'Oc') { 
+                            draw_open_cluster(Celestial, quadtree, styles, d) 
+                        }
+                        else if (is_star(type)) { 
+                            draw_star(Celestial, quadtree, styles, 
+                                base_config.stars.size, base_config.stars.exponent, d) 
+                        }
+                        else { 
+                            draw_generic(Celestial, quadtree, styles, d) 
+                        }
                     }
-                    else if (is_nebula(type)) { 
-                        draw_nebula(Celestial, quadtree, styles, d) 
-                    }
-                    else if (type == 'Gc') { 
-                        draw_globular_cluster(Celestial, quadtree, styles, d) 
-                    }
-                    else if (type == 'Oc') { 
-                        draw_open_cluster(Celestial, quadtree, styles, d) 
-                    }
-                    else if (is_star(type)) { 
-                        draw_star(Celestial, quadtree, styles, 
-                            base_config.stars.size, base_config.stars.exponent, d) 
-                    }
-                    else { 
-                        draw_generic(Celestial, styles, d) 
-                    }
-                }
-            });
-        }
-    });
+                });
+            }
+        });
+    };    
 }
 
 export default add_custom_data
