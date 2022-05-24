@@ -2,16 +2,34 @@
 <template>
   <div class="instrument-control-wrapper">
 
-    <div class="buttons has-addons" style="margin-bottom: unset;">
-      <CommandButton :data="camera_expose_command" style="width: 70%;" class=" is-outlined is-success"/>
-      <CancelButton :site="sitecode" style="width: 30%; border-left: 1px solid #00be65" class="is-outlined"/>
+    <div class="autofocus-and-selected-camera" >
+      <b-button class="button is-outlined" 
+        style="margin-bottom: 1em;"
+        @click="postCommand(focus_auto_command)">
+        Autofocus
+      </b-button>
+      <b-field 
+        horizontal
+        class="select-device" label="selected:">
+        <b-select 
+          placeholder="choose camera..."
+          v-model="active_camera" >
+          <option 
+            v-for="(val, index) in available_devices('camera', sitecode)" 
+            :value="val"
+            :key="index"
+          >
+            {{ val }}
+          </option>
+          <option v-if="number_of_cameras == 2" value="both">both</option>
+        </b-select>
+      </b-field>
     </div>
 
-    <b-button class="button is-success is-outlined" 
-      style="margin-bottom: 1em;"
-      @click="postCommand(focus_auto_command)">
-      autofocus
-    </b-button>
+    <div class="buttons has-addons expose-cancel-buttons">
+      <CommandButton :data="camera_expose_command" style="width: 70%;" class="is-outlined is-success"/>
+      <CancelButton :site="sitecode" style="width: 30%; border-left: 1px solid #00be65" class="is-outlined"/>
+    </div>
 
     <b-field horizontal label="Expose">
         <b-field>
@@ -87,9 +105,9 @@
     <b-field horizontal label="Subframe">
       <b-switch
           size="is-small"
-          v-model="subframeIsActive"
+          v-model="subframe_is_active"
           type='is-info'>
-          {{ subframeIsActive ? "Subframe is active" : "Subframe not active" }}
+          {{ subframe_is_active ? "Subframe is active" : "Subframe not active" }}
       </b-switch>
     </b-field>
     <b-field horizontal label="">
@@ -199,7 +217,7 @@ export default {
   watch: {
     // If the user changes the chip area parameter, deactivate the subframe.
     camera_areas_selection() {
-      this.subframeIsActive = false;
+      this.subframe_is_active = false;
     }
   },
 
@@ -216,13 +234,18 @@ export default {
     ]),
 
     ...mapGetters('site_config', [
+      'available_devices',
       'selected_camera_config',
       'camera_has_darkslide',
       'camera_can_bin',
       'camera_default_bin'
     ]),
 
-    subframeIsActive: {
+    number_of_cameras() {
+      return Object.keys(this.available_devices('camera', this.sitecode)).length
+    },
+
+    subframe_is_active: {
       get() { return this.$store.getters['command_params/subframeIsActive']},
       set(val) { this.$store.commit('command_params/subframeIsActive', val)},
     },
@@ -276,4 +299,11 @@ export default {
 
 <style scoped lang="scss">
 @import "./instrument_controls_common.scss";
+.autofocus-and-selected-camera {
+  display: flex;
+  justify-content: space-between;
+}
+.expose-cancel-buttons {
+  margin-bottom: 1em;
+}
 </style>

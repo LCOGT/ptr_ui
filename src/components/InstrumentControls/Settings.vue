@@ -1,4 +1,3 @@
-
 <template>
   <div class="instrument-control-wrapper">
 
@@ -28,7 +27,7 @@
                 <option 
                   v-for="(val, index) in available_devices(instrument, sitecode)" 
                   :value="val"
-                  :key="`ota-${index}`"
+                  :key="index"
                 >
                   {{ val }}
                 </option>
@@ -36,13 +35,11 @@
             </b-field>
             </template>
 
-
           <b-field horizontal class="select-device" label="">
             <button class="button is-success" @click="setDefaultDevices" >Defaults</button>
           </b-field>
       </div>
     </article>
-
 
   </div>
 </template>
