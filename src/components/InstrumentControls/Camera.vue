@@ -9,8 +9,8 @@
         Autofocus
       </b-button>
       <b-field 
-        horizontal
-        class="select-device" label="selected:">
+        label-position="on-border"
+        label="selected:">
         <b-select 
           placeholder="choose camera..."
           v-model="active_camera" >
