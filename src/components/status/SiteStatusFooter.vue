@@ -514,7 +514,8 @@ export default {
  *  Component styling
  */
 .statusbar {
-  z-index: 40;
+  // Bulma modal z-index is 40, and we don't want to cover modal windows. 
+  z-index: 39;
 }
 .hidden {
   display: none;
