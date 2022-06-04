@@ -21,6 +21,7 @@
                 <button class="button" v-if="!$auth.isAuthenticated" @click="login">Log in</button>
                 <!-- userway accessbility widget -->
                 <UserwayButton />
+                <OperatorMessage :site="sitecode" style="margin: 0 1em;"/>
             </b-navbar-item>
         </template>
     </b-navbar>
@@ -93,6 +94,7 @@ import SiteStatusFooter from '@/components/status/SiteStatusFooter'
 import Chatlio from '@/components/Chatlio'
 import TargetSearchField from '@/components/FormElements/TargetSearchField'
 import CommandButton from '@/components/FormElements/CommandButton'
+import OperatorMessage from '@/components/OperatorMessage'
 
 import HistogramTool from '@/components/AnalysisTools/HistogramTool'
 import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsViewer'
@@ -131,6 +133,7 @@ export default {
         Chatlio,
         TargetSearchField,
         CommandButton,
+        OperatorMessage,
     },
     mixins: [ commands_mixin, user_mixin ],
     data() {
