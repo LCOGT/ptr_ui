@@ -3,12 +3,12 @@
     <b-field style="margin: 0;">
       <p class="control">
         <b-button
-          :disabled="note == ''"
+          :disabled="!note_is_loaded"
           class="is-warning is-small"
           outlined
           @click="note_visible = true; editor_visible = false"
         >
-          operator message
+          night log
         </b-button>
       </p>
       <p
@@ -35,7 +35,12 @@
         type="is-warning"
         class="night-log-message"
         aria-close-label="Close message"
+        @close="message_close_handler"
       >
+        <div class="note-timestamp">
+          <div>{{ note_timestamp.utc_iso }}</div>
+          <div>{{ note_timestamp.ago }}</div>
+        </div>
         <p>{{ note?.note_data?.message }}</p>
       </b-message>
     </div>
@@ -80,18 +85,22 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
 import { mapGetters } from 'vuex'
 import { user_mixin } from '@/mixins/user_mixin'
+import { clock } from '@/mixins/clock'
 export default {
   props: {
     site: String
   },
-  mixins: [user_mixin],
+  mixins: [user_mixin, clock],
   data () {
     return {
       note_visible: false,
       editor_visible: false,
       note_editor_message: '',
+
+      note_is_loaded: false,
       note: ''
     }
   },
@@ -105,8 +114,16 @@ export default {
       const url = this.$store.state.api_endpoints.active_api + '/nightlog/' + this.site
       axios.get(url).then(response => {
         console.log(response)
+
+        // Save the note we just loaded
         this.note = response.data
-        if (this.note !== '') {
+        this.note_is_loaded = true
+
+        // Check if the user has already seen this note
+        const note_id = this.note.site + this.note.created_timestamp
+        const last_read_note = window.localStorage.getItem('ptr_nightlog_last_read')
+        if (note_id !== last_read_note) {
+          // Hide the editor / show the note
           this.note_visible = true
           this.editor_visible = false
         }
@@ -126,11 +143,25 @@ export default {
         console.log(response)
         this.get_note()
       })
+    },
+    message_close_handler () {
+      // mark the message as read
+      const note_id = this.note.site + this.note.created_timestamp
+      window.localStorage.setItem('ptr_nightlog_last_read', note_id)
     }
   },
   computed: {
     note_title () {
       return this.site.toUpperCase() + ' - Message from ' + this.note?.note_data?.username
+    },
+    note_timestamp () {
+      if (!this.note_is_loaded) { return false }
+      const date_obj = moment(this.note.created_timestamp * 1000)
+      return {
+        utc_iso: date_obj.utc().format('MM/DD HH:mm UTC'),
+        ago: date_obj.fromNow(),
+        timestamp_now: this.timestamp_now // included so this computed property updates each second
+      }
     },
     ...mapGetters('images', [
       'current_image'
@@ -142,14 +173,22 @@ export default {
 <style lang="scss" scoped>
 .note-container {
     position: absolute;
-    width: 100%;
+    width: 350px;
     margin-top: 1.5em;
 
     // shadow
     -webkit-box-shadow: 4px 4px 25px 0px rgba(0,0,0,0.67);
     -moz-box-shadow: 4px 4px 25px 0px rgba(0,0,0,0.67);
     box-shadow: 4px 4px 25px 0px rgba(0,0,0,0.67);
+}
 
+.note-timestamp {
+    color: silver;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 0.5em;
+    margin-bottom: 1em;
+    border-bottom: 1px solid silver;
 }
 </style>
 
