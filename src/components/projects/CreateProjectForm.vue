@@ -188,8 +188,8 @@
                                 v-bind:key="filter">
                             {{ filter }}
                         </option>
-                        <option disabled value="------"> ------ </option>
-                        <option v-for="(filter, index) in project_filter_list"
+                        <option disabled v-if="project_sites.length > 0" value="------"> ------ </option>
+                        <option v-if="project_sites.length > 0" v-for="(filter, index) in project_filter_list"
                                 v-bind:value="filter"
                                 v-bind:selected="index === 0"
                                 v-bind:key="filter">
