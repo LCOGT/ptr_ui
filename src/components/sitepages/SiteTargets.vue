@@ -65,15 +65,15 @@
                 <div class="sidebar-tabs">
                     <div 
                         :class="{'active': activeSidebarTab=='chart settings'}" 
-                        @click="activeSidebarTab='chart settings'; show_common_targets=false"
+                        @click="activeSidebarTab='chart settings'; show_common_targets=false; saveTab()"
                         class="sidebar-tab-button">chart settings</div>
                     <div 
                         :class="{'active': activeSidebarTab=='telescope controls'}" 
-                        @click="activeSidebarTab='telescope controls'"
+                        @click="activeSidebarTab='telescope controls'; saveTab()"
                         class="sidebar-tab-button">telescope controls</div>
                     <div 
                         :class="{'active': activeSidebarTab=='common targets'}" 
-                        @click="activeSidebarTab='common targets'; submitForm(); show_common_targets=true"
+                        @click="activeSidebarTab='common targets'; submitForm(); show_common_targets=true; saveTab()"
                         class="sidebar-tab-button">common targets</div>                    
                 </div>
 
@@ -434,6 +434,9 @@ export default {
     },
 
     methods: {
+        saveTab() {
+            this.$store.commit('site_config/setActiveTargetTab', `${this.activeSidebarTab}`); 
+        },
 
         start_resize_observer() {
 
@@ -672,7 +675,7 @@ export default {
         },
 
         sitecode() {
-            console.log("please")
+            // update common targets with new site's location
             this.submitForm()
          }
 

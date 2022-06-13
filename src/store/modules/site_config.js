@@ -16,6 +16,7 @@ const state = {
 
     selected_site: '',
     selected_subpage: 'home',
+    selected_target_tab: 'telescope controls', 
     selected_enclosure: '',
     selected_mount: '',
     selected_telescope: '',
@@ -40,6 +41,10 @@ const getters = {
 
     selected_subpage: state => {
         return state.selected_subpage;
+    },
+
+    selected_target_tab: state => {
+        return state.selected_target_tab;
     },
 
     available_devices: state => (deviceType, site) => {
@@ -219,6 +224,9 @@ const mutations = {
     },
     setActiveSubpage(state, subpage) { 
         state.selected_subpage = subpage; 
+    },
+    setActiveTargetTab(state, target_tab) {
+        state.selected_target_tab = target_tab;
     },
 		removeActiveSite(state) {
 			state.selected_site = ''
