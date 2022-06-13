@@ -89,7 +89,7 @@
                     <div v-if="activeSidebarTab=='chart settings'">
 
                         <div>
-
+                            {{use_custom_date_location}}
                             <b-field>
                                 <b-checkbox v-model="isLiveSkyDisplay" type="is-danger">
                                     LIVE sky display for 
@@ -178,8 +178,6 @@
                                 <b-switch style="margin-bottom: 0.75rem;" v-model="showPlanets"></b-switch> 
                             </b-field>
                         </div>
-
-
                     </div>
 
                     <div v-if="activeSidebarTab=='common targets'"> 
@@ -662,7 +660,16 @@ export default {
             if (this.isLiveSkyDisplay) {
                 this.skychart_location = [this.site_latitude, this.site_longitude]
                 this.skychart_date = new Date()
+                this.use_custom_date_location = false
             }
+        },
+
+        $route (to, from) {
+            // update the skychart with new site's location
+            this.use_custom_date_location = true
+            this.skychart_location = [this.site_latitude, this.site_longitude]
+            this.skychart_date = new Date()
+            this.use_custom_date_location = false
         },
 
     },

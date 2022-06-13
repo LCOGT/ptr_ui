@@ -6,19 +6,19 @@
 
       <div class="mobile-site-menu">
         <button class="menu-padding"></button>
-        <router-link :to="'/site/' + sitecode + '/home'" @click.native="setActiveSubpage">
+        <router-link :to="'/site/' + sitecode + '/home'" >
           <button class="button" :class="{'selected': subpage == 'home'}">Home</button>
         </router-link>
-        <router-link :to="'/site/' + sitecode + '/targets'" @click.native="setActiveSubpage">
+        <router-link :to="'/site/' + sitecode + '/targets'">
           <button class="button" :class="{'selected': subpage == 'targets'}">Targets</button>
         </router-link>
-        <router-link :to="'/site/' + sitecode + '/observe'" @click.native="setActiveSubpage">
+        <router-link :to="'/site/' + sitecode + '/observe'">
           <button class="button" :class="{'selected': subpage == 'observe'}">Observe</button>
         </router-link>
-        <router-link :to="'/site/' + sitecode + '/calendar'" @click.native="setActiveSubpage">
+        <router-link :to="'/site/' + sitecode + '/calendar'">
           <button class="button" :class="{'selected': subpage == 'calendar'}">Calendar</button>
         </router-link>
-        <router-link :to="'/site/' + sitecode + '/projects'" @click.native="setActiveSubpage">
+        <router-link :to="'/site/' + sitecode + '/projects'">
           <button class="button" :class="{'selected': subpage == 'projects'}">Projects</button>
         </router-link>
         <button class="menu-padding" button></button>
@@ -123,6 +123,13 @@ export default {
     }, 1000);
   },
 
+  watch: {
+    subpage() {
+      this.$store.commit("site_config/setActiveSubpage", `${this.subpage}`)
+    }
+    
+  },
+
   methods: {
 
     // Do this whenever the selected site changes
@@ -143,10 +150,6 @@ export default {
       this.$store.dispatch("sitestatus/getLatestStatus")
       this.$store.dispatch("userstatus/fetch_recent_logs")
       this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
-    },
-
-    // change the active subpage in store
-    setActiveSubpage() {
       this.$store.commit("site_config/setActiveSubpage", `${this.subpage}`)
     },
 
