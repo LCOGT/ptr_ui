@@ -73,7 +73,7 @@
                         class="sidebar-tab-button">telescope controls</div>
                     <div 
                         :class="{'active': activeSidebarTab=='common targets'}" 
-                        @click="activeSidebarTab='common targets'; submitForm()"
+                        @click="activeSidebarTab='common targets'; submitForm(); show_common_targets=true"
                         class="sidebar-tab-button">common targets</div>                    
                 </div>
 
@@ -89,7 +89,6 @@
                     <div v-if="activeSidebarTab=='chart settings'">
 
                         <div>
-                            {{use_custom_date_location}}
                             <b-field>
                                 <b-checkbox v-model="isLiveSkyDisplay" type="is-danger">
                                     LIVE sky display for 
@@ -288,7 +287,7 @@ import helpers from '@/utils/helpers';
 
 export default {
     name: "SiteTargets",
-    props: [ "sitecode"],
+    props: ["sitecode"],
     mixins: [commands_mixin],
     components: {
         CommandButton,
@@ -611,7 +610,7 @@ export default {
                 this.date_obs_real = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
             }
 
-            this.show_common_targets = true;
+            // this.show_common_targets = true;
             var diclist = [];
 
             var endtime = moment(this.date_obs_real).add(30, 'm').toDate();
@@ -671,6 +670,11 @@ export default {
             this.skychart_date = new Date()
             this.use_custom_date_location = false
         },
+
+        sitecode() {
+            console.log("please")
+            this.submitForm()
+         }
 
     },
     computed: {
