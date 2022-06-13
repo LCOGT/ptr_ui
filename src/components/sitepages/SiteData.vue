@@ -215,6 +215,10 @@ export default {
       this.$store.dispatch("images/set_current_image", image);
     },
 
+    saveTab() {
+        this.$store.commit('site_config/setActiveImageToolsTab', `${this.activeImageToolsTab}`); 
+    },
+
   },
   watch: {
     show_user_data_only() {

@@ -17,6 +17,7 @@ const state = {
     selected_site: '',
     selected_subpage: 'home',
     selected_target_tab: 'telescope controls', 
+    selected_image_tools_tab: '1', 
     selected_enclosure: '',
     selected_mount: '',
     selected_telescope: '',
@@ -45,6 +46,10 @@ const getters = {
 
     selected_target_tab: state => {
         return state.selected_target_tab;
+    },
+
+    selected_image_tools_tab: state => {
+        return state.selected_image_tools_tab;
     },
 
     available_devices: state => (deviceType, site) => {
@@ -227,6 +232,9 @@ const mutations = {
     },
     setActiveTargetTab(state, target_tab) {
         state.selected_target_tab = target_tab;
+    },
+    setActiveImageToolsTab(state, image_tools_tab) {
+        state.selected_image_toos_tab = image_tools_tab;
     },
 		removeActiveSite(state) {
 			state.selected_site = ''
