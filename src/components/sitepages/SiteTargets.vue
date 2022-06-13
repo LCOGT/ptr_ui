@@ -65,15 +65,15 @@
                 <div class="sidebar-tabs">
                     <div 
                         :class="{'active': activeSidebarTab=='chart settings'}" 
-                        @click="activeSidebarTab='chart settings'; show_common_targets=false; saveTab()"
+                        @click="activeSidebarTab='chart settings'; show_common_targets=false"
                         class="sidebar-tab-button">chart settings</div>
                     <div 
                         :class="{'active': activeSidebarTab=='telescope controls'}" 
-                        @click="activeSidebarTab='telescope controls'; saveTab()"
+                        @click="activeSidebarTab='telescope controls'"
                         class="sidebar-tab-button">telescope controls</div>
                     <div 
                         :class="{'active': activeSidebarTab=='common targets'}" 
-                        @click="activeSidebarTab='common targets'; submitForm(); show_common_targets=true; saveTab()"
+                        @click="activeSidebarTab='common targets'; submitForm(); show_common_targets=true"
                         class="sidebar-tab-button">common targets</div>                    
                 </div>
 
@@ -306,7 +306,7 @@ export default {
             isComponentModalActive: false,
 
             sidebar_is_expanded: true,
-            activeSidebarTab: 'telescope controls',
+            activeSidebarTab: '',
 
             // Whether to show the live sky at site or a chart based on manual date/location settings.
             // Options are 'live' or 'manual'.
@@ -362,6 +362,8 @@ export default {
     },
 
     async mounted(){
+        this.activeSidebarTab = this.selected_target_tab;
+
         this.start_resize_observer()
 
         this.$loadScript("https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js")
@@ -434,9 +436,6 @@ export default {
     },
 
     methods: {
-        saveTab() {
-            this.$store.commit('site_config/setActiveTargetTab', `${this.activeSidebarTab}`); 
-        },
 
         start_resize_observer() {
 
@@ -644,6 +643,10 @@ export default {
         
     },
     watch: {
+        activeSidebarTab() {
+            this.$store.commit('site_config/setActiveTargetTab', `${this.activeSidebarTab}`); 
+        },
+
         // Update the aladin view if the coordinates change. 
         mount_ra() {
             let ra = parseFloat(this.mount_ra) * 15

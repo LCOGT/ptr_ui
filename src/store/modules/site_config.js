@@ -17,7 +17,7 @@ const state = {
     selected_site: '',
     selected_subpage: 'home',
     selected_target_tab: 'telescope controls', 
-    selected_image_tools_tab: '1', 
+    selected_image_tools_tab: 0, 
     selected_enclosure: '',
     selected_mount: '',
     selected_telescope: '',
@@ -234,7 +234,7 @@ const mutations = {
         state.selected_target_tab = target_tab;
     },
     setActiveImageToolsTab(state, image_tools_tab) {
-        state.selected_image_toos_tab = image_tools_tab;
+        state.selected_image_tools_tab = image_tools_tab;
     },
 		removeActiveSite(state) {
 			state.selected_site = ''

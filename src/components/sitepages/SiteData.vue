@@ -136,6 +136,8 @@
 </template>
 
 <script>
+import { commands_mixin } from '../../mixins/commands_mixin'
+
 import ImageView from '@/components/ImageView'
 import ImagesTable from '@/components/ImagesTable'
 import Js9Devtools from "@/components/Js9Devtools";
@@ -168,6 +170,7 @@ import helpers from "@/utils/helpers"
 
 export default {
   name: "SubpageData",
+  mixins: [commands_mixin],
   components: {
     ImageView,
     ImagesTable,
@@ -199,7 +202,7 @@ export default {
     return {
       accordionIsOpen: 1,
 
-      activeImageToolsTab: 1, // default tab to set: controls / analysis / data / dev
+      activeImageToolsTab: '', 
       activeAnalysisTab: 'star inspector',  // default tab in 'analysis'
       activeDevTab: 'recents3',  // default tab in 'dev tools'
 
@@ -207,23 +210,32 @@ export default {
       image_stats_loading: false,
     }
   },
-  methods: {
 
+  mounted() {
+    this.activeImageToolsTab = this.selected_image_tools_tab;
+    console.log(this.selected_image_tools_tab)
+    console.log(this.activeImageToolsTab)
+  },
+
+  methods: {
     // Activated by clicking on an image thumbnail. Displays that image
     // in the main view.
     setActiveImage(image) {
       this.$store.dispatch("images/set_current_image", image);
     },
 
-    saveTab() {
-        this.$store.commit('site_config/setActiveImageToolsTab', `${this.activeImageToolsTab}`); 
-    },
-
   },
   watch: {
     show_user_data_only() {
       this.$store.dispatch('images/load_latest_images')
-    }
+    },
+
+    activeImageToolsTab() {
+      console.log(this.selected_image_tools_tab)
+      console.log(this.activeImageToolsTab)
+      this.$store.commit('site_config/setActiveImageToolsTab', `${this.activeImageToolsTab}`); 
+      console.log(this.selected_image_tools_tab)
+    },
   },
 
   computed: {
