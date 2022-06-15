@@ -31,12 +31,12 @@
 
       <b-tabs v-model="activeImageToolsTab">
 
-        <b-tab-item label="controls">
+        <b-tab-item label="controls" :value="'controls'">
           <command-tabs-accordion class="command-tab-accordion is-hidden-desktop"/>
           <command-tabs-wide class="command-tabs-wide is-hidden-touch" />
         </b-tab-item>
 
-        <b-tab-item label="analysis" class="analysis-tab-item">
+        <b-tab-item label="analysis" class="analysis-tab-item" :value="'analysis'">
 
           <div class="shapes-toolbar" > <div>Draw a region: </div> <DrawShapesToolbar /> </div>
 
@@ -79,7 +79,7 @@
 
         </b-tab-item>
 
-        <b-tab-item label="data" class="data-tab">
+        <b-tab-item label="data" class="data-tab" :value="'data'">
           
           <!-- TODO: 'disable' the other image filter tools if this is turned on. -->
           <div class="live-data-toggle-pane">
@@ -97,7 +97,7 @@
         </b-tab-item>
 
         <!-- Useful info for developers -->
-        <b-tab-item label="dev tools" class="dev-tab">
+        <b-tab-item label="dev tools" class="dev-tab" :value="'dev'">
           <Tabs class="dev-tools-tabs">
             <TabItem title="recent s3 data">
                 <RecentS3UploadsTable :init_site="sitecode" size="is-small" />
@@ -212,10 +212,7 @@ export default {
   },
 
   mounted() {
-    console.log("this is the mounted bit")
     this.activeImageToolsTab = this.selected_image_tools_tab;
-    console.log("store " + this.selected_image_tools_tab)
-    console.log("local " + this.activeImageToolsTab)
   },
 
   methods: {
@@ -232,17 +229,11 @@ export default {
     },
 
     activeImageToolsTab() {
-      console.log("pre commiting to the store")
-      console.log("store " + this.selected_image_tools_tab)
-      console.log("local " + this.activeImageToolsTab)
       if (typeof this.activeImageToolsTab !== 'undefined') {
         this.$store.commit('site_config/setActiveImageToolsTab', `${this.activeImageToolsTab}`);
       } else {
         this.activeImageToolsTab = this.selected_image_tools_tab;
       }
-      console.log("post commiting to the store")
-      console.log("store " + this.selected_image_tools_tab)
-      console.log("local " + this.activeImageToolsTab)
     },
   },
 

@@ -17,7 +17,7 @@ const state = {
     selected_site: '',
     selected_subpage: 'home',
     selected_target_tab: 'telescope controls', 
-    selected_image_tools_tab: 0, 
+    selected_image_tools_tab: 'analysis', 
     selected_enclosure: '',
     selected_mount: '',
     selected_telescope: '',
