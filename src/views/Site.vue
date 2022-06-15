@@ -6,7 +6,7 @@
 
       <div class="mobile-site-menu">
         <button class="menu-padding"></button>
-        <router-link :to="'/site/' + sitecode + '/home'" >
+        <router-link :to="'/site/' + sitecode + '/home'">
           <button class="button" :class="{'selected': subpage == 'home'}">Home</button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/targets'">

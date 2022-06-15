@@ -212,7 +212,8 @@ export default {
   },
 
   mounted() {
-    this.activeImageToolsTab = this.selected_image_tools_tab;
+    //default image tools tab, set to analysis in site_config.js
+    this.activeImageToolsTab = this.selected_image_tools_tab; 
   },
 
   methods: {
@@ -229,11 +230,7 @@ export default {
     },
 
     activeImageToolsTab() {
-      if (typeof this.activeImageToolsTab !== 'undefined') {
-        this.$store.commit('site_config/setActiveImageToolsTab', `${this.activeImageToolsTab}`);
-      } else {
-        this.activeImageToolsTab = this.selected_image_tools_tab;
-      }
+      this.$store.commit('site_config/setActiveImageToolsTab', `${this.activeImageToolsTab}`)
     },
   },
 

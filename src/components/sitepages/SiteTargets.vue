@@ -362,6 +362,7 @@ export default {
     },
 
     async mounted(){
+        //default sidebar tab, set to telescope controls in site_config.js
         this.activeSidebarTab = this.selected_target_tab;
 
         this.start_resize_observer()
@@ -612,7 +613,6 @@ export default {
                 this.date_obs_real = new Date(Math.round(new Date().getTime() / 1800000) * 1800000); //default to nearest half hour
             }
 
-            // this.show_common_targets = true;
             var diclist = [];
 
             var endtime = moment(this.date_obs_real).add(30, 'm').toDate();
