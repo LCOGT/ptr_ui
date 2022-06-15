@@ -212,9 +212,10 @@ export default {
   },
 
   mounted() {
+    console.log("this is the mounted bit")
     this.activeImageToolsTab = this.selected_image_tools_tab;
-    console.log(this.selected_image_tools_tab)
-    console.log(this.activeImageToolsTab)
+    console.log("store " + this.selected_image_tools_tab)
+    console.log("local " + this.activeImageToolsTab)
   },
 
   methods: {
@@ -231,10 +232,17 @@ export default {
     },
 
     activeImageToolsTab() {
-      console.log(this.selected_image_tools_tab)
-      console.log(this.activeImageToolsTab)
-      this.$store.commit('site_config/setActiveImageToolsTab', `${this.activeImageToolsTab}`); 
-      console.log(this.selected_image_tools_tab)
+      console.log("pre commiting to the store")
+      console.log("store " + this.selected_image_tools_tab)
+      console.log("local " + this.activeImageToolsTab)
+      if (typeof this.activeImageToolsTab !== 'undefined') {
+        this.$store.commit('site_config/setActiveImageToolsTab', `${this.activeImageToolsTab}`);
+      } else {
+        this.activeImageToolsTab = this.selected_image_tools_tab;
+      }
+      console.log("post commiting to the store")
+      console.log("store " + this.selected_image_tools_tab)
+      console.log("local " + this.activeImageToolsTab)
     },
   },
 
