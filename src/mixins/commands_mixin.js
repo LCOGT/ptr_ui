@@ -319,6 +319,7 @@ export const commands_mixin = {
       'selected_subpage', 
       'selected_target_tab',
       'selected_image_tools_tab',
+      'selected_controls_tab',
       'selected_enclosure',
       'selected_mount',
       'selected_telescope',
@@ -350,6 +351,10 @@ export const commands_mixin = {
     active_image_tools_tab: {
       get() { return this.selected_image_tools_tab },
       set(value) {this.$store.commit('site_config/setActiveImageToolsTab', value) }
+    },
+    active_controls_tab: {
+      get() { return this.selected_controls_tab },
+      set(value) { this.$store.commit('site_config/setActiveControlsTab', value) }
     },
     active_enclosure: {
       get() { return this.selected_enclosure },

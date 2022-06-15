@@ -4,7 +4,7 @@
       <li
         v-for="(tab, index) in tabs"
         :key="tab.title"
-        @click="select_tab(index)"
+        @click="select_tab(index); $emit('selected-index', index)"
         :class='[{"tab__selected": (index == selectedIndex)}, instance_class] '
         ref="tab_labels"
       >
