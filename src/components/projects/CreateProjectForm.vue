@@ -64,9 +64,6 @@
         <div v-for="n in targets_index" v-bind:key="n" class="target-row">
 
             <!-- we decided to only allow one target per project -->
-            <!--b-field :label="' '">
-                 <b-checkbox v-model="targets[n-1].active"></b-checkbox>
-            </b-field-->
 
             <b-field :label="n==1 ? 'Name' : ''" style="width: 130px;">
                 <b-field>
@@ -466,7 +463,6 @@ export default {
 
             this.project_name = project.project_name
             this.project_events = project.scheduled_with_events
-
             this.project_sites = project.project_sites
 
             this.targets = project.project_targets.map(target => ({...target, active: true}))
@@ -740,9 +736,9 @@ export default {
                     message: "Please avoid '#' in the project name",
                     type: "is-danger"
                 })
-            // If user selects no sites, reset selection to current site
+            // If user selects no sites, consider the selection to be the current site
             if (this.project_sites.length === 0) {
-                this.project_sites = [site]
+                this.project_sites = site
                 }     
             }
         },
@@ -793,7 +789,7 @@ export default {
                         .map(({ active, ...stuff_to_keep }) => stuff_to_keep),
 
                 // List of observatory sites selected
-                project_sites: [this.project_sites],
+                project_sites: this.project_sites,
 
                 // List of objects (exposures to complete for each target).
                 exposures: this.exposures
@@ -836,7 +832,7 @@ export default {
         },
 
         modifyProject() {
-            let url = this.projects_api_url+'/modify-project'
+            let url = this.projects_api_url + '/modify-project'
             let project = {
                 project_name: this.project_name,
                 created_at: moment().utc().format(),
@@ -850,7 +846,7 @@ export default {
                         .map(({active, ...stuff_to_keep}) => stuff_to_keep),
 
                 // List of observatory sites selected
-                project_sites: [this.project_sites],
+                project_sites: this.project_sites,
 
                 // List of objects (exposures to complete for each target).
                 exposures: this.exposures
@@ -918,28 +914,33 @@ export default {
             this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
         },
        
-
         // Function to get filters at any site to populate filter dropdown
         get_default_filter_options(site) {
-            let site_config = this.global_config[site]
-            let default_filter_wheel_name = site_config.defaults.filter_wheel
-            let filter_wheel_options = site_config.filter_wheel[default_filter_wheel_name].settings.filter_data
+            let site_cfg = this.global_config[site]
+            let default_filter_wheel_name = site_cfg.defaults.filter_wheel
+            let filter_wheel_options = site_cfg.filter_wheel[default_filter_wheel_name].settings.filter_data
             return filter_wheel_options
         },
     },
 
+
     computed: {
+
+        // Reliably access the global config
+        global_config() {
+            return this.$store.state.site_config.global_config
+        },
 
         // Filter dropdown choices update based on which sites are selected.
         project_filter_list() {
             let generics = this.generic_filter_list
-            let selected_sites = this.project_sites
+            let selected_sites = this.project_sites.flat(Infinity)
 
             if (selected_sites.length != 0) {
                 let fwo = []
                 for (let site of selected_sites) {
-                    let new_site_filters = this.get_default_filter_options(site).map(x => x[0])
-                    fwo = [...fwo, ...new_site_filters]
+                    let filter_list = this.get_default_filter_options(site).map(x => x[0])
+                    fwo = [...fwo, ...filter_list]
                 }
                 // Remove duplicates between site filter lists
                 let all_site_filters = [...new Set(fwo)]
@@ -947,7 +948,7 @@ export default {
                 all_site_filters = all_site_filters.filter(item => generics.indexOf(item) < 0)
                 return all_site_filters
 
-            // Default filter set is the generic filter list.
+                // Default filter set is the generic filter list.
             } else {
                 return generics
             }
@@ -976,9 +977,6 @@ export default {
             'available_sites_real',
             'available_sites_simulated',
             'filter_wheel_options',
-        ]),
-        ...mapState('site_config', [
-            'global_config',
         ]),
         ...mapState('user_data', [
             'user_events',
