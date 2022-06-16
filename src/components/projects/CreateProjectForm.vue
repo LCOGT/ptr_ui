@@ -583,7 +583,7 @@ export default {
                 lunar_phase_max: false,
             },
 
-            calendarBaseUrl: 'https://calendar.photonranch.org/dev',
+            calendarBaseUrl: this.$store.state.dev.calendar_api,
 
         }
     },
