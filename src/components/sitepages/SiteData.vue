@@ -29,7 +29,7 @@
     <!-- Collapsible panels on the right of the image --> 
     <div class="image-tools-area" >  
 
-      <b-tabs v-model="activeImageToolsTab">
+      <b-tabs v-model="active_image_tools_tab">
 
         <b-tab-item label="controls" :value="'controls'">
           <command-tabs-accordion class="command-tab-accordion is-hidden-desktop"/>
@@ -201,19 +201,12 @@ export default {
   data() {
     return {
       accordionIsOpen: 1,
-
-      activeImageToolsTab: '', 
       activeAnalysisTab: 'star inspector',  // default tab in 'analysis'
       activeDevTab: 'recents3',  // default tab in 'dev tools'
 
       region_stats_loading: false,
       image_stats_loading: false,
     }
-  },
-
-  mounted() {
-    //default image tools tab, set to analysis in site_config.js
-    this.activeImageToolsTab = this.selected_image_tools_tab; 
   },
 
   methods: {
@@ -229,9 +222,6 @@ export default {
       this.$store.dispatch('images/load_latest_images')
     },
 
-    activeImageToolsTab() {
-      this.$store.commit('site_config/setActiveImageToolsTab', `${this.activeImageToolsTab}`)
-    },
   },
 
   computed: {
@@ -260,6 +250,12 @@ export default {
       'selectionExists',
       'selectedShapeType',
     ]),
+
+    active_image_tools_tab: {
+      get() { return this.$store.state.user_interface.selected_image_tools_tab },
+      set(value) {this.$store.commit('user_interface/setActiveImageToolsTab', value) }
+      // image tools tab set to analysis by default in user_interface
+    },
 
     activeDrawShape: {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},

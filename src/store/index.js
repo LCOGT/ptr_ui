@@ -13,6 +13,7 @@ import drawshapes from './modules/drawshapes'
 import sitestatus from './modules/sitestatus'
 import starprofile from './modules/analysistools/starprofile'
 import userstatus from './modules/userstatus'
+import user_interface from './modules/user_interface'
 
 Vue.use(Vuex)
 
@@ -39,7 +40,8 @@ const store = new Vuex.Store({
         drawshapes,
         sitestatus,
         starprofile,
-        userstatus
+        userstatus,
+        user_interface,
     },
 })
 

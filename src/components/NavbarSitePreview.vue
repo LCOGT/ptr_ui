@@ -48,16 +48,20 @@
 </template>
 
 <script>
-import { commands_mixin } from "../mixins/commands_mixin";
-
 export default {
-  mixins: [commands_mixin],
   props: {
     site: String,
     image_url: String,
     weather: String,
     operation: String,
   },
+  computed: {
+    active_subpage: {
+      get() { return this.$store.state.user_interface.selected_subpage },
+      set(value) { this.$store.commit('user_interface/setActiveSubpage', value) }
+    },
+  },
+
   methods: {
     open_control_room(site) {
       let url = `https://rooms.remotehq.com/photon-ranch/control-room-${site}`;

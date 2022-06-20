@@ -64,21 +64,21 @@
 
                 <div class="sidebar-tabs">
                     <div 
-                        :class="{'active': activeSidebarTab=='chart settings'}" 
-                        @click="activeSidebarTab='chart settings'; show_common_targets=false"
+                        :class="{'active': active_target_tab=='chart settings'}" 
+                        @click="handleSidebarClick('chart settings')"
                         class="sidebar-tab-button">chart settings</div>
                     <div 
-                        :class="{'active': activeSidebarTab=='telescope controls'}" 
-                        @click="activeSidebarTab='telescope controls'"
+                        :class="{'active': active_target_tab=='telescope controls'}" 
+                        @click="handleSidebarClick('telescope controls')"
                         class="sidebar-tab-button">telescope controls</div>
                     <div 
-                        :class="{'active': activeSidebarTab=='common targets'}" 
-                        @click="activeSidebarTab='common targets'; submitForm(); show_common_targets=true"
+                        :class="{'active': active_target_tab=='common targets'}" 
+                        @click="handleSidebarClick('common targets'); submitForm();"
                         class="sidebar-tab-button">common targets</div>                    
                 </div>
 
                 <div class="sidebar-tab-content">
-                    <div v-if="activeSidebarTab=='telescope controls'"> 
+                    <div v-if="active_target_tab=='telescope controls'"> 
                         <TargetSearchField v-model="mount_object" label="Search for objects..." @results="handle_object_name_search" />
                         <command-tabs-accordion 
                             :controls="['Telescope', 'Camera']" 
@@ -86,7 +86,7 @@
                             class="command-tab-accordion"/>
                     </div>
 
-                    <div v-if="activeSidebarTab=='chart settings'">
+                    <div v-if="active_target_tab=='chart settings'">
 
                         <div>
                             <b-field>
@@ -179,7 +179,7 @@
                         </div>
                     </div>
 
-                    <div v-if="activeSidebarTab=='common targets'"> 
+                    <div v-if="active_target_tab=='common targets'"> 
                         <div class="the-button">
                         <b-field class="buttons">
                             <b-button expanded @click="show_common_targets = !show_common_targets">
@@ -306,7 +306,6 @@ export default {
             isComponentModalActive: false,
 
             sidebar_is_expanded: true,
-            activeSidebarTab: '',
 
             // Whether to show the live sky at site or a chart based on manual date/location settings.
             // Options are 'live' or 'manual'.
@@ -362,8 +361,6 @@ export default {
     },
 
     async mounted(){
-        //default sidebar tab, set to telescope controls in site_config.js
-        this.activeSidebarTab = this.selected_target_tab;
 
         this.start_resize_observer()
 
@@ -415,7 +412,7 @@ export default {
     },
 
     created: function() {
-        const url = "https://api.photonranch.org/api/all/config"
+        const url = this.$store.state.dev.active_api + '/all/config' 
         axios.get(url).then(response => {
             for (let s in response.data) {
                 Vue.set(this.site_info, s, {
@@ -560,6 +557,15 @@ export default {
 
         },
 
+        handleSidebarClick(tab) {
+            this.active_target_tab=tab
+            if (tab == 'chart settings') {
+                this.show_common_targets=false;
+            } else if (tab == 'common targets') {
+                this.show_common_targets=true;
+            }
+        },
+
         // Common Targets functions
         targetClickHandler(targ) {
             this.mount_ra = helpers.degree2hour(targ.ra).toFixed(5)
@@ -643,9 +649,6 @@ export default {
         
     },
     watch: {
-        activeSidebarTab() {
-            this.$store.commit('site_config/setActiveTargetTab', `${this.activeSidebarTab}`); 
-        },
 
         // Update the aladin view if the coordinates change. 
         mount_ra() {
@@ -669,17 +672,16 @@ export default {
             }
         },
 
-        $route (to, from) {
-            // update the skychart with new site's location
-            this.use_custom_date_location = true
+        sitecode() {
+            // update common targets and skychart with new site's location
+            this.submitForm();
+
             this.skychart_location = [this.site_latitude, this.site_longitude]
             this.skychart_date = new Date()
+            
+            // reset skychart to live display for new site
+            this.isLiveSkyDisplay = true
             this.use_custom_date_location = false
-        },
-
-        sitecode() {
-            // update common targets with new site's location
-            this.submitForm()
          }
 
     },
@@ -721,6 +723,12 @@ export default {
         date_obs_obs() {
             return moment(this.date_obs_real).add(this.offset+this.observatory_offset, 'm').toDate()
             //Start time of observation date in "observatory time" (ignore timezone info in moment obj)
+        },
+
+        active_target_tab: {
+            get() { return this.$store.state.user_interface.selected_target_tab },
+            set(value) {this.$store.commit('user_interface/setActiveTargetTab', value) }
+            // targets sidebar tab set to telescope controls by default in user_interface
         },
 
         ...mapGetters('site_config', [

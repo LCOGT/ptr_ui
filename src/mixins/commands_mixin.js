@@ -316,10 +316,6 @@ export const commands_mixin = {
 
     ...mapState('site_config', [
       'selected_site',
-      'selected_subpage', 
-      'selected_target_tab',
-      'selected_image_tools_tab',
-      'selected_controls_tab',
       'selected_enclosure',
       'selected_mount',
       'selected_telescope',
@@ -339,22 +335,6 @@ export const commands_mixin = {
     active_site: {
       get() { return this.selected_site },
       set(value) { this.$store.commit('site_config/setActiveSite', value) }
-    },
-    active_subpage: {
-      get() { return this.selected_subpage },
-      set(value) { this.$store.commit('site_config/setActiveSubpage', value) }
-    },
-    active_target_tab: {
-      get() { return this.selected_target_tab },
-      set(value) {this.$store.commit('site_config/setActiveTargetTab', value) }
-    },
-    active_image_tools_tab: {
-      get() { return this.selected_image_tools_tab },
-      set(value) {this.$store.commit('site_config/setActiveImageToolsTab', value) }
-    },
-    active_controls_tab: {
-      get() { return this.selected_controls_tab },
-      set(value) { this.$store.commit('site_config/setActiveControlsTab', value) }
     },
     active_enclosure: {
       get() { return this.selected_enclosure },

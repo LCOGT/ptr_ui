@@ -123,9 +123,17 @@ export default {
     }, 1000);
   },
 
+  computed: {
+    active_subpage: {
+      get() { return this.$store.state.user_interface.selected_subpage },
+      set(value) { this.$store.commit('user_interface/setActiveSubpage', value) }
+      // subpage set to home by default in user_interface
+    },
+  },
+
   watch: {
     subpage() {
-      this.$store.commit("site_config/setActiveSubpage", `${this.subpage}`)
+      this.active_subpage = this.subpage
     }
     
   },
@@ -150,7 +158,7 @@ export default {
       this.$store.dispatch("sitestatus/getLatestStatus")
       this.$store.dispatch("userstatus/fetch_recent_logs")
       this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
-      this.$store.commit("site_config/setActiveSubpage", `${this.subpage}`)
+      this.active_subpage = this.subpage
     },
 
   },

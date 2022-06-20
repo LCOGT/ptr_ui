@@ -5,9 +5,9 @@
       type="is-toggle" 
       size="is-small" 
       :animated="false"
-      :initial_tab_index="selected_controls_tab"
+      :initial_tab_index="active_controls_tab"
       multiline
-      @selected-index="selectedTab($event)">
+      @selected-index="active_controls_tab =$event">
       <template v-for="(instrument, index) of instruments">
         <TabItem
           class="tab-item"
@@ -40,7 +40,7 @@ import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
 
 export default {
-  name: "CommandTabAccordion",
+  name: "CommandTabsWide",
   mixins: [commands_mixin],
   components: {
     Enclosure,
@@ -57,10 +57,6 @@ export default {
   },
 
   methods: {
-    selectedTab(tab) {
-      this.$store.commit('site_config/setActiveControlsTab', tab);
-    },
-    
     selected_instrument(instrument) {
       let inst = instrument.toLowerCase()
       if (['enclosure', 'screen', 'telescope', 'mount', 'rotator', 'focuser', 'camera', 'sequencer'].includes(inst)) {
@@ -73,6 +69,12 @@ export default {
   },
 
   computed: {
+    active_controls_tab: {
+      get() { return this.$store.state.user_interface.selected_controls_tab },
+      set(value) { this.$store.commit('user_interface/setActiveControlsTab', value) }
+      // controls tab set to camera by default in user_interface
+    },
+
     ...mapState('site_config', [
       'selector_exists',
     ]),

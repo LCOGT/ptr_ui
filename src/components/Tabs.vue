@@ -4,7 +4,7 @@
       <li
         v-for="(tab, index) in tabs"
         :key="tab.title"
-        @click="select_tab(index); $emit('selected-index', index)"
+        @click="select_tab(index)"
         :class='[{"tab__selected": (index == selectedIndex)}, instance_class] '
         ref="tab_labels"
       >
@@ -56,6 +56,9 @@
     },
     methods: {
       select_tab (i) {
+        // provide parent component with selected tab index
+        this.$emit('selected-index', i)
+
         this.selectedIndex = i
 
         // loop over all the tabs
