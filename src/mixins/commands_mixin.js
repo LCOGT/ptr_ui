@@ -322,7 +322,7 @@ export const commands_mixin = {
     },
 
     ...mapState('site_config', [
-      'selected_site', 
+      'selected_site',
       'selected_enclosure',
       'selected_mount',
       'selected_telescope',

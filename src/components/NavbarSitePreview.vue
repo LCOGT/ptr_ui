@@ -5,7 +5,7 @@
         tag="button"
         title="view this site"
         class="button"
-        :to="{ path: '/site/' + site + '/home' }"
+        :to="{ path: '/site/' + site + '/' + active_subpage }"
         @click.native="$emit('view-site-clicked')"
         >view observatory</router-link
       >
@@ -55,6 +55,13 @@ export default {
     weather: String,
     operation: String,
   },
+  computed: {
+    active_subpage: {
+      get() { return this.$store.state.user_interface.selected_subpage },
+      set(value) { this.$store.commit('user_interface/setActiveSubpage', value) }
+    },
+  },
+
   methods: {
     open_control_room(site) {
       let url = `https://rooms.remotehq.com/photon-ranch/control-room-${site}`;

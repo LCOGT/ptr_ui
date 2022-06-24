@@ -29,14 +29,14 @@
     <!-- Collapsible panels on the right of the image --> 
     <div class="image-tools-area" >  
 
-      <b-tabs v-model="activeImageToolsTab">
+      <b-tabs v-model="active_image_tools_tab">
 
-        <b-tab-item label="controls">
+        <b-tab-item label="controls" :value="'controls'">
           <command-tabs-accordion class="command-tab-accordion is-hidden-desktop"/>
           <command-tabs-wide class="command-tabs-wide is-hidden-touch" />
         </b-tab-item>
 
-        <b-tab-item label="analysis" class="analysis-tab-item">
+        <b-tab-item label="analysis" class="analysis-tab-item" :value="'analysis'">
 
           <div class="shapes-toolbar" > <div>Draw a region: </div> <DrawShapesToolbar /> </div>
 
@@ -79,7 +79,7 @@
 
         </b-tab-item>
 
-        <b-tab-item label="data" class="data-tab">
+        <b-tab-item label="data" class="data-tab" :value="'data'">
           
           <!-- TODO: 'disable' the other image filter tools if this is turned on. -->
           <div class="live-data-toggle-pane">
@@ -97,7 +97,7 @@
         </b-tab-item>
 
         <!-- Useful info for developers -->
-        <b-tab-item label="dev tools" class="dev-tab">
+        <b-tab-item label="dev tools" class="dev-tab" :value="'dev'">
           <Tabs class="dev-tools-tabs">
             <TabItem title="recent s3 data">
                 <RecentS3UploadsTable :init_site="sitecode" size="is-small" />
@@ -136,6 +136,8 @@
 </template>
 
 <script>
+import { commands_mixin } from '../../mixins/commands_mixin'
+
 import ImageView from '@/components/ImageView'
 import ImagesTable from '@/components/ImagesTable'
 import Js9Devtools from "@/components/Js9Devtools";
@@ -168,6 +170,7 @@ import helpers from "@/utils/helpers"
 
 export default {
   name: "SubpageData",
+  mixins: [commands_mixin],
   components: {
     ImageView,
     ImagesTable,
@@ -198,8 +201,6 @@ export default {
   data() {
     return {
       accordionIsOpen: 1,
-
-      activeImageToolsTab: 1, // default tab to set: controls / analysis / data / dev
       activeAnalysisTab: 'star inspector',  // default tab in 'analysis'
       activeDevTab: 'recents3',  // default tab in 'dev tools'
 
@@ -207,8 +208,8 @@ export default {
       image_stats_loading: false,
     }
   },
-  methods: {
 
+  methods: {
     // Activated by clicking on an image thumbnail. Displays that image
     // in the main view.
     setActiveImage(image) {
@@ -219,7 +220,8 @@ export default {
   watch: {
     show_user_data_only() {
       this.$store.dispatch('images/load_latest_images')
-    }
+    },
+
   },
 
   computed: {
@@ -248,6 +250,12 @@ export default {
       'selectionExists',
       'selectedShapeType',
     ]),
+
+    active_image_tools_tab: {
+      get() { return this.$store.state.user_interface.selected_image_tools_tab },
+      set(value) {this.$store.commit('user_interface/setActiveImageToolsTab', value) }
+      // image tools tab set to analysis by default in user_interface
+    },
 
     activeDrawShape: {
       get() { return this.$store.getters['drawshapes/activeDrawShape']},

@@ -55,12 +55,15 @@
       this.select_tab(this.initial_tab_index)
     },
     methods: {
-      select_tab (i) {
-        this.selectedIndex = i
+      select_tab (clicked_tab_index) {
+        // provide parent component with selected tab index
+        this.$emit('selected-index', clicked_tab_index)
+
+        this.selectedIndex = clicked_tab_index
 
         // loop over all the tabs
         this.tabs.forEach((tab, index) => {
-          tab.isActive = (index === i)
+          tab.isActive = (index === clicked_tab_index)
         })
       },
 

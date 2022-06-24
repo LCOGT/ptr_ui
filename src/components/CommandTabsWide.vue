@@ -5,9 +5,9 @@
       type="is-toggle" 
       size="is-small" 
       :animated="false"
-      v-model="active_tab"
-      :initial_tab_index="5"
-      multiline>
+      :initial_tab_index="active_controls_tab"
+      multiline
+      @selected-index="active_controls_tab =$event">
       <template v-for="(instrument, index) of instruments">
         <TabItem
           class="tab-item"
@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { commands_mixin } from '@/mixins/commands_mixin'
 import { mapState } from 'vuex'
 import { Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
   Camera, Sequencer, Settings, } from '@/components/InstrumentControls'
@@ -39,7 +40,8 @@ import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
 
 export default {
-  name: "CommandTabAccordion",
+  name: "CommandTabsWide",
+  mixins: [commands_mixin],
   components: {
     Enclosure,
     Screen,
@@ -53,11 +55,7 @@ export default {
     Tabs,
     TabItem,
   },
-  data() {
-    return {
-      active_tab: 5,
-    }
-  },
+
   methods: {
     selected_instrument(instrument) {
       let inst = instrument.toLowerCase()
@@ -71,6 +69,12 @@ export default {
   },
 
   computed: {
+    active_controls_tab: {
+      get() { return this.$store.state.user_interface.selected_controls_tab },
+      set(value) { this.$store.commit('user_interface/setActiveControlsTab', value) }
+      // controls tab set to camera by default in user_interface
+    },
+
     ...mapState('site_config', [
       'selector_exists',
     ]),

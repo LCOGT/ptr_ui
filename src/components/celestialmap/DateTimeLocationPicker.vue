@@ -284,6 +284,10 @@ export default {
     },
 
     watch: {
+        default_observatory() {
+            this.selected_observatory = this.default_observatory;
+        },
+
         datetime_picker_timezone_selection() {
             this.calculate_site_tz_offset()
         },

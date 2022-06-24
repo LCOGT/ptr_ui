@@ -330,7 +330,6 @@ export default {
             this.update_date_location()
         },
         location() {
-            if (!this.use_custom_date_location) return;
             this.update_date_location()
         },
 
