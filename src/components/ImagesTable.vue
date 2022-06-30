@@ -239,7 +239,7 @@ export default {
       let large_fits_reduction_level = this.$store.state.images.large_fits_reduction_level
       let object_name = `${image.base_filename}-${image.data_type}${large_fits_reduction_level}.fits.bz2`
 
-      const url = `${this.$store.state.dev.active_api}/download`
+      const url = `${this.$store.state.api_endpoints.active_api}/download`
       let body = {
         s3_directory: image.s3_directory,
         object_name: object_name,
@@ -260,7 +260,7 @@ export default {
       let large_fits_reduction_level = this.$store.state.images.large_fits_reduction_level
       let object_name = `${image.base_filename}-${image.data_type}${large_fits_reduction_level}.fits.bz2`
 
-      const url = `${this.$store.state.dev.active_api}/download`
+      const url = `${this.$store.state.api_endpoints.active_api}/download`
       let body = {
         s3_directory: image.s3_directory,
         object_name: object_name,

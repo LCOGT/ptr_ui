@@ -32,7 +32,7 @@ export default {
   },
   methods: {
       async get_remote_browser() {
-        const url = this.$store.state.dev.active_api + '/new_remotehq_browser'
+        const url = this.$store.state.api_endpoints.active_api + '/new_remotehq_browser'
         let token = await this.$auth.getTokenSilently();
         let headers = {
             'headers': {
@@ -48,7 +48,7 @@ export default {
 
       },
       async requires_auth_test() {
-        const url = this.$store.state.dev.active_api + '/dummy-requires-auth'
+        const url = this.$store.state.api_endpoints.active_api + '/dummy-requires-auth'
         let token = await this.$auth.getTokenSilently();
         let headers = {
             'headers': {

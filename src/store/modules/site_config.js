@@ -245,7 +245,7 @@ const actions = {
      * observatories in the network. 
      */
     update_config({ commit, dispatch, rootState }) {
-        const url = `${rootState.dev.active_api}/all/config`
+        const url = `${rootState.api_endpoints.active_api}/all/config`
         axios.get(url).then(response => {
             commit('setGlobalConfig', response.data)
         }).catch(error => {

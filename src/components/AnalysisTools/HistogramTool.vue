@@ -54,7 +54,7 @@ export default {
     methods: {
 
         getHistogram(useSubregion=true) {
-        const url = this.$store.state.dev.quickanalysis_endpoint + '/histogram-clipped'
+        const url = this.$store.state.api_endpoints.quickanalysis_endpoint + '/histogram-clipped'
         let body = {
             "full_filename": this.best_available_full_filename,
             "s3_directory": this.current_image.s3_directory || "data",

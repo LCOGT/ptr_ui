@@ -552,7 +552,7 @@ export default {
             loaded_project_name: '',
             loaded_project_created_at: '',
 
-            projects_api_url: this.$store.state.dev.projects_endpoint,
+            projects_api_url: this.$store.state.api_endpoints.projects_endpoint,
             showAdvancedInputs: false,
 
             // Max length for a fits header string value. 
@@ -583,7 +583,7 @@ export default {
                 lunar_phase_max: false,
             },
 
-            calendarBaseUrl: this.$store.state.dev.calendar_api,
+            calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
 
         }
     },
@@ -898,7 +898,7 @@ export default {
                 project_name: project_name,
                 created_at: created_at,
             }
-            let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
+            let project_endpoint = this.$store.state.api_endpoints.projects_endpoint + '/get-project'
             axios.post(project_endpoint, request_params).then(response => {
                 console.log(response)
             }).catch(err => {

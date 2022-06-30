@@ -162,7 +162,7 @@ export default {
       }
 
       this.$store.dispatch('images/toggle_live_data', false)
-      let url = this.$store.state.dev.active_api + '/filtered_images';
+      let url = this.$store.state.api_endpoints.active_api + '/filtered_images';
       let body = { 
           method: "GET",
           params: filterparams,

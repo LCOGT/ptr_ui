@@ -160,7 +160,7 @@ export const user_status_mixin = {
     },
 
     computed: {
-        ...mapState('dev', [
+        ...mapState('api_endpoints', [
             'logs_ws_endpoint',
             'logs_endpoint',
         ]),

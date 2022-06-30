@@ -68,7 +68,7 @@ const actions = {
         }
 
         // Prepare the api call get reservations
-        const url = "https://calendar.photonranch.org/dev/get-event-at-time"
+        const url = this.$store.state.api_endpoints.calendar_api + "/get-event-at-time"
         const iso_datestring = moment.utc().format()
         const request_body = {
             site: site,

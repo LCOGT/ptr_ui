@@ -35,7 +35,7 @@ npm run serve
 
 ## Configuration
 
-Api endpoint urls used by the frontend are configured in the vuex module in `src/store/modules/dev.js`.
+Api endpoint urls used by the frontend are configured in the vuex module in `src/store/modules/api_endpoints.js`.
 This provides a mechanism for dynamically toggling between different urls.
 
 The backend services defined here and used for the main deployment (and set by default) are:

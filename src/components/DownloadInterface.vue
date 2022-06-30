@@ -65,7 +65,7 @@ export default {
         fits_size: this.fits_size,
         site: this.site,
       };
-      const url = `${this.$store.state.dev.active_api}/downloadzip`
+      const url = `${this.$store.state.api_endpoints.active_api}/downloadzip`
       this.zip_download_waiting = true;
       axios.post(url, request_body).then((response) => {
           let download_url = response.data.message;

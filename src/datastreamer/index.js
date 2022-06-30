@@ -8,7 +8,7 @@ const datastreamer = {
 
   open_connection(sitecode) {
     this.close()
-    let datastreamurl = `wss://datastream.photonranch.org/dev` 
+    let datastreamurl = this.$store.state.api_endpoints.datastream 
                       + `?site=${encodeURIComponent(sitecode)}`
     websocket = new ReconnectingWebSocket(datastreamurl)
     websocket.onmessage = msg => {

@@ -117,8 +117,7 @@ export default {
                 return
             }
             this.headerIsLoading = true 
-            //let url = `https://api.photonranch.org/api/fitsheader/${this.image.base_filename}/`
-            let url = this.$store.state.dev.active_api + `/fitsheader/${this.image.base_filename}/`
+            let url = this.$store.state.api_endpoints.active_api + `/fitsheader/${this.image.base_filename}/`
             let response = axios.get(url).then(response => {
                 this.fitsHeader = response.data
             }).finally(() => {

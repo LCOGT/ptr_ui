@@ -412,7 +412,7 @@ export default {
     },
 
     created: function() {
-        const url = this.$store.state.dev.active_api + '/all/config' 
+        const url = this.$store.state.api_endpoints.active_api + '/all/config' 
         axios.get(url).then(response => {
             for (let s in response.data) {
                 Vue.set(this.site_info, s, {

@@ -48,7 +48,7 @@ export default {
             this.data.form.mount=this.data.mount
             this.data.form.timestamp = parseInt(Date.now() / 1000)
 
-            const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.data.site}`
+            const url = `${this.$store.state.api_endpoints.jobs_api}/newjob?site=${this.data.site}`
             const options = await this.getAuthHeader()
             axios.post(url, this.data.form, options).then(response => {
                 this.isLoading = false

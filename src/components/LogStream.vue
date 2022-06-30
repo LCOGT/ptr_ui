@@ -1,7 +1,7 @@
 <template>
     <div>
         
-    <-- enable these buttons for easier manual testing>
+    <!-- enable these buttons for easier manual testing>
     <button @click="send_fake_log_ws" class="button ">send ws log</button>
     <button @click="send_fake_log_http" class="button ">send http log</button>
     <button @click="get_recent_logs" class="button">get recent logs</button>
@@ -238,7 +238,7 @@ export default {
     },
 
     computed: {
-        ...mapState('dev', [
+        ...mapState('api_endpoints', [
             'logs_ws_endpoint',
             'logs_endpoint',
         ])

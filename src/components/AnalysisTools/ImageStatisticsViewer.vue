@@ -67,7 +67,7 @@ export default {
     methods: {
 
     getRegionStats(useSubregion=true) {
-      const url = this.$store.state.dev.quickanalysis_endpoint + '/statistics'
+      const url = this.$store.state.api_endpoints.quickanalysis_endpoint + '/statistics'
 
       let body = {
         "site": this.sitecode,

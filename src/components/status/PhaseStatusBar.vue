@@ -62,7 +62,7 @@ export default {
     mounted() {
         this.get_recent_phase_status()
 
-        let datastreamurl = `wss://datastream.photonranch.org/dev` 
+        let datastreamurl = this.$store.state.api_endpoints.datastream 
                         + `?site=${encodeURIComponent(this.site)}`
         this.websocket = new ReconnectingWebSocket(datastreamurl)
         this.websocket.onmessage = msg => {
@@ -89,7 +89,7 @@ export default {
     methods: {
         async get_recent_phase_status() {
             const max_age = 3600  // one hour
-            let url = this.$store.state.dev.status_endpoint 
+            let url = this.$store.state.api_endpoints.status_endpoint 
                 + `/phase_status/${this.site}`
                 + `?max_age_seconds=${encodeURIComponent(max_age)}`
             let latest_phase_status = await axios.get(url)

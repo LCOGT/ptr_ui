@@ -109,7 +109,7 @@ export default {
                 Object.keys(site_events).forEach(key => site_events[key] += 2415020)  
 
             } else {
-                let url = `https://api.photonranch.org/api/events?site=${this.sitecode}`
+                let url = `${this.$store.state.api_endpoints.active_api}/events?site=${this.sitecode}`
                 site_events = await axios.get(url)
                 site_events = site_events.data
             }

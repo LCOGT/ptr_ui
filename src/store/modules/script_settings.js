@@ -358,7 +358,7 @@ const actions = {
      */
     async script_run_command({ getters, rootState }) {
 
-        const url = `${rootState.dev.jobs_api}/newjob?site=${rootState.site_config.selected_site}`
+        const url = `${rootState.api_endpoints.jobs_api}/newjob?site=${rootState.site_config.selected_site}`
         const header = await getAuthHeader()
 
         // Command to send
@@ -415,7 +415,7 @@ const actions = {
     async script_stop_command({ rootState }) {
 
         // API parameters
-        const url = `${rootState.dev.jobs_api}/newjob`//?site=${rootState.site_config.selected_site}`
+        const url = `${rootState.api_endpoints.jobs_api}/newjob`//?site=${rootState.site_config.selected_site}`
         const header = await getAuthHeader()
         let site = rootState.site_config.selected_site;
         let mount = rootState.site_config.selected_mount;

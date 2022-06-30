@@ -42,7 +42,7 @@ export default {
 
             this.is_loading = true
 
-            const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.site}`
+            const url = `${this.$store.state.api_endpoints.jobs_api}/newjob?site=${this.site}`
             const options = await this.getAuthHeader()
             axios.post(url, this.cancel_request_body, options).then(response => {
                 this.is_loading = false

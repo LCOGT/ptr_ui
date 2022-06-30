@@ -90,7 +90,7 @@ export default {
 
   methods: {
     download_fits_previous_24hrs() {
-      const url = `${this.$store.state.dev.active_api}/downloadzip`
+      const url = `${this.$store.state.api_endpoints.active_api}/downloadzip`
       const args = {
         site: this.$route.params.sitecode,
         fits_size: 'small',
@@ -185,7 +185,7 @@ export default {
 
     async download_tif(size, stretch) {
       this.download_waiting = true
-      const url = `${this.$store.state.dev.active_api}/download`
+      const url = `${this.$store.state.api_endpoints.active_api}/download`
       let body = {}
 
       if (size == "large") {
