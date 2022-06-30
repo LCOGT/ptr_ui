@@ -315,10 +315,6 @@ export default {
         illumination: '',
       },
 
-      // URL for the calendar backend api
-      //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
-      backendUrl: "https://calendar.photonranch.org",
-
       // this informs what buttons appear in the modal event editor
       isNewEvent: false,
 
@@ -863,7 +859,7 @@ export default {
       // Make request headers and include token.
       // Requires user to be logged in.
       let header = await this.getConfigWithAuth();
-      let url = `${this.backendUrl}/dev/is-user-scheduled`;
+      let url = `${this.$store.state.dev.calendar_api}/is-user-scheduled`;
       let user_id = this.$auth.user.sub;
       let body = {
         user_id: user_id,
@@ -883,7 +879,7 @@ export default {
       // Requires user to be logged in.
       let config = await this.getConfigWithAuth();
 
-      let url = `${this.backendUrl}/dev/newevent`;
+      let url = `${this.$store.state.dev.calendar_api}/newevent`;
       let eventToPost = {
         event_id: newEvent.id,
         start: moment(newEvent.startStr).utc().format(),
@@ -933,7 +929,7 @@ export default {
      */
     async deleteButtonClicked(eventToDelete) {
       let config = await this.getConfigWithAuth();
-      let url = `${this.backendUrl}/dev/delete`;
+      let url = `${this.$store.state.dev.calendar_api}/delete`;
       let body = {
         event_id: eventToDelete.id,
         start: moment(eventToDelete.startStr).utc().format(),
@@ -963,7 +959,7 @@ export default {
       // Make request headers and include token.
       // Requires user to be logged in.
       let config = await this.getConfigWithAuth();
-      let url = `${this.backendUrl}/dev/modifyevent`;
+      let url = `${this.$store.state.dev.calendar_api}/modifyevent`;
       let theModifiedEvent = {
         event_id: modifiedEvent.id,
         start: moment(modifiedEvent.startStr).utc().format(),
@@ -1016,7 +1012,7 @@ export default {
 
     async fetchSiteEvents(fetchInfo) {
       let site = this.calendarSite;
-      const url = `${this.backendUrl}/dev/siteevents`;
+      const url = `${this.$store.state.dev.calendar_api}/siteevents`;
       const options = {
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
