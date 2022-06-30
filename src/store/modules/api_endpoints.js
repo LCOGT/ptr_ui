@@ -25,8 +25,6 @@ const state = {
 
     status_endpoint: 'https://status.photonranch.org/status',
     //status_endpoint: 'https://status.photonranch.org/test',
-
-    datastream: "wss://datastream.photonranch.org/dev",
 }
 
 // getters

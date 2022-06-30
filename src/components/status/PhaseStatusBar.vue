@@ -62,7 +62,7 @@ export default {
     mounted() {
         this.get_recent_phase_status()
 
-        let datastreamurl = this.$store.state.api_endpoints.datastream 
+        let datastreamurl = `wss://datastream.photonranch.org/dev` 
                         + `?site=${encodeURIComponent(this.site)}`
         this.websocket = new ReconnectingWebSocket(datastreamurl)
         this.websocket.onmessage = msg => {
