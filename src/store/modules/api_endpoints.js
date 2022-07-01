@@ -5,25 +5,31 @@
 
 // initial state
 const state = {
-    active_api: "https://api.photonranch.org/api", 
+    active_api: "https://api.photonranch.org/api", //current dev stage endpoint
+    //active_api: "https://api.photonranch.org/dev", //nonexistent currently 
     //active_api: "https://api.photonranch.org/test", 
 
-    jobs_api: "https://jobs.photonranch.org/jobs",
+    jobs_api: "https://jobs.photonranch.org/jobs", //current dev stage endpoint
+    //jobs_api: "https://jobs.photonranch.org/dev", //nonexistent currently
     //jobs_api: "https://jobs.photonranch.org/test",
 
-    calendar_api: "https://calendar.photonranch.org/dev",
+    //calendar_api: "https://calendar.photonranch.org/calendar",
+    calendar_api: "https://calendar.photonranch.org/dev", //in use for dev and prod
     //calendar_api: "https://calendar.photonranch.org/test",
 
-    projects_endpoint: "https://projects.photonranch.org/dev", // prod endpoint
+    //projects_endpoint: "https://projects.photonranch.org/prod",
+    projects_endpoint: "https://projects.photonranch.org/dev", //in use for dev and prod
     //projects_endpoint: "https://projects.photonranch.org/test",
 
     logs_endpoint: "https://logs.photonranch.org/logs",  // prod
     //logs_endpoint: "https://logs.photonranch.org/dev",  // dev
+    //logs_endpoint: "https://logs.photonranch.org/test", //nonexistent currently
 
     quickanalysis_endpoint: "https://quickanalysis.photonranch.org",
     //quickanalysis_endpoint: "http://localhost:5000",
 
-    status_endpoint: 'https://status.photonranch.org/status',
+    //status_endpoint: 'https://status.photonranch.org/status', //nonexistent currently
+    status_endpoint: 'https://status.photonranch.org/status', //in use for dev and prod
     //status_endpoint: 'https://status.photonranch.org/test',
 }
 
