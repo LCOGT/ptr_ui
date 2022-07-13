@@ -5,6 +5,16 @@
 
 // initial state
 const state = {
+    /* Prod API urls are used by default by both the prod and dev branches currently, 
+    except in cases (calendar, projects, status) where the dev endpoint is in use.
+    
+    Eventual switch to prod site using prod endpoints, dev site using dev endpoints, 
+    and all other testing on test endpoints to come. 
+
+    Endpoints listed as "nonexistent currently" have not yet been defined in their 
+    respective backend repositories.
+    */
+
     active_api: "https://api.photonranch.org/api", //current dev stage endpoint
     //active_api: "https://api.photonranch.org/dev", //nonexistent currently 
     //active_api: "https://api.photonranch.org/test", 
@@ -13,11 +23,11 @@ const state = {
     //jobs_api: "https://jobs.photonranch.org/dev", //nonexistent currently
     //jobs_api: "https://jobs.photonranch.org/test",
 
-    //calendar_api: "https://calendar.photonranch.org/calendar",
+    //calendar_api: "https://calendar.photonranch.org/calendar", //not currently in use
     calendar_api: "https://calendar.photonranch.org/dev", //in use for dev and prod
     //calendar_api: "https://calendar.photonranch.org/test",
 
-    //projects_endpoint: "https://projects.photonranch.org/prod",
+    //projects_endpoint: "https://projects.photonranch.org/prod", //not currently in use
     projects_endpoint: "https://projects.photonranch.org/dev", //in use for dev and prod
     //projects_endpoint: "https://projects.photonranch.org/test",
 
