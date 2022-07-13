@@ -57,10 +57,6 @@ export default {
       utcTime: "-",
 
       showMoonEvents: true,
-
-      // URL for the calendar backend api
-      //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
-      backendUrl: "https://calendar.photonranch.org",
     };
   },
   created() {

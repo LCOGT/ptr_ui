@@ -81,7 +81,7 @@ export default {
     async send_command() {
       this.is_loading = true;
 
-      const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.site}`;
+      const url = `${this.$store.state.api_endpoints.jobs_api}/newjob?site=${this.site}`;
       const options = await this.getAuthHeader();
       axios
         .post(url, this.restart_command_body, options)

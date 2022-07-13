@@ -231,7 +231,7 @@ export default {
       isLoggedIn: 'isLoggedIn',
       token: 'getToken',
     }),
-    ...mapGetters('dev', [
+    ...mapGetters('api_endpoints', [
       'api',
     ])
   },

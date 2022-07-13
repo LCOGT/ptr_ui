@@ -69,7 +69,7 @@ export const commands_mixin = {
       command.mount = this.active_mount
       command.timestamp = parseInt(Date.now() / 1000)
 
-      const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.active_site}`
+      const url = `${this.$store.state.api_endpoints.jobs_api}/newjob?site=${this.active_site}`
       const options = await this.getAuthHeader()
       axios.post(url, command, options).then(response => {
         this.command_is_sending = false
@@ -92,7 +92,7 @@ export const commands_mixin = {
         console.log('no args')
         form = formCreatorFunction().form
       }
-      const url = `${this.$store.state.dev.jobs_api}/newjob?site=${this.active_site}`
+      const url = `${this.$store.state.api_endpoints.jobs_api}/newjob?site=${this.active_site}`
 
       form.timestamp = parseInt(Date.now() / 1000)
       form.site = this.active_site

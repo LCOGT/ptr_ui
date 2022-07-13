@@ -166,7 +166,7 @@ export default {
                 project_name: project_name,
                 created_at: created_at,
             }
-            let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
+            let project_endpoint = this.$store.state.api_endpoints.projects_endpoint + '/get-project'
             axios.post(project_endpoint, request_params).then(response => {
                 let project = response.data
                 project.created_at = moment().utc().format()
@@ -184,7 +184,7 @@ export default {
                 project_name: project_name,
                 created_at: created_at,
             }
-            let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
+            let project_endpoint = this.$store.state.api_endpoints.projects_endpoint + '/get-project'
             axios.post(project_endpoint, request_params).then(response => {
                 let project_loader = {
                     project: response.data,

@@ -65,7 +65,7 @@ export default {
   },
   methods: {
     getSiteOpenStatus() {
-      const url = this.$store.state.dev.status_endpoint + '/allopenstatus'
+      const url = this.$store.state.api_endpoints.status_endpoint + '/allopenstatus'
       axios.get(url).then(resp => {
         this.site_online_status = _.orderBy(resp.data, [s => s.site], ['asc'])
       })
@@ -80,7 +80,7 @@ export default {
       return a
     },
     updateAllSiteImages() {
-      const url = this.$store.state.dev.active_api + `/latest_image_all_sites`
+      const url = this.$store.state.api_endpoints.active_api + `/latest_image_all_sites`
       axios.get(url).then(response => {
         this.site_images = response.data
       })

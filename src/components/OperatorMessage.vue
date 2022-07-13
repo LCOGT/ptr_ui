@@ -76,7 +76,7 @@ export default {
     },
     methods: {
         get_note() {
-            const url = this.$store.state.dev.active_api + '/nightlog/' + this.site
+            const url = this.$store.state.api_endpoints.active_api + '/nightlog/' + this.site
             axios.get(url).then(response => {
                 console.log(response)
                 this.note = response.data
@@ -87,7 +87,7 @@ export default {
             })
         },
         new_note() {
-            const url = this.$store.state.dev.active_api + '/nightlog/' + this.site
+            const url = this.$store.state.api_endpoints.active_api + '/nightlog/' + this.site
             let note_data = {
                 site: this.$route.params.sitecode,
                 username: this.userName,

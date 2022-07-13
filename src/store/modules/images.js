@@ -132,7 +132,7 @@ const actions = {
         }
 
         // Fetch the incoming image
-        let apiName = rootState.dev.active_api;  // Get the base api url
+        let apiName = rootState.api_endpoints.active_api;  // Get the base api url
         let path = `/image/${new_base_filename}`;  
 
         // Make the api call.
@@ -199,7 +199,7 @@ const actions = {
      */
     get_filtered_images({ commit, dispatch, rootState }, filter_params) {
         dispatch('toggle_live_data', false)
-        let apiName = rootState.dev.active_api;
+        let apiName = rootState.api_endpoints.active_api;
         let url = apiName + '/filtered_images';
         let body = { 
             method: "GET",
@@ -224,7 +224,7 @@ const actions = {
 
     get_last_24hrs({ commit, dispatch, rootState}) {
       dispatch('toggle_live_data', false)
-      let apiName = rootState.dev.active_api;
+      let apiName = rootState.api_endpoints.active_api;
       let url = apiName + '/filtered_images';
       let body = { 
           method: "GET",
@@ -258,7 +258,7 @@ const actions = {
     async load_latest_images({ dispatch, commit, state, rootState }, num_images ) {
 
         let site = rootState.site_config.selected_site;
-        let apiName = rootState.dev.active_api;
+        let apiName = rootState.api_endpoints.active_api;
         let querySize = num_images || 25; // How many images to get
         let path = `/${site}/latest_images/${querySize}`;
 
@@ -312,7 +312,7 @@ const actions = {
 
     load_latest_info_images({ state, commit, rootState}) {
       const site = rootState.site_config.selected_site;
-      const base_url = rootState.dev.active_api
+      const base_url = rootState.api_endpoints.active_api
 
       // query each of the three channels
       for (let channel = 0; channel < 3; channel ++) {
@@ -390,7 +390,7 @@ const actions = {
     async get_fits_url({rootState}, {base_filename, data_type, reduction_level}) {
 
         // Get the global configuration for all sites from an api call.
-        const apiName = rootState.dev.active_api
+        const apiName = rootState.api_endpoints.active_api
 
         const path = '/download';
         let body = {

@@ -131,7 +131,7 @@ export default {
     },
   },
   created: function() {
-    const url = "https://api.photonranch.org/api/all/config"
+    const url = this.$store.state.api_endpoints.active_api + "/all/config"
     axios.get(url).then(response => {
       for (let site in response.data) {
         Vue.set(this.site_info, site, {

@@ -161,7 +161,7 @@ export default {
       'subframeFromShape',
     ]),
 
-    ...mapState('dev', ['quickanalysis_endpoint']),
+    ...mapState('api_endpoints', ['quickanalysis_endpoint']),
 
     xScale() {
       let margin = this.chartMargin

@@ -213,7 +213,7 @@ const actions = {
 
   // Get and update the 'open' status of all sites. Used for the global map site indicators. 
   async getSiteOpenStatus({commit, rootState }) {
-    const url = rootState.dev.status_endpoint + '/allopenstatus'
+    const url = rootState.api_endpoints.status_endpoint + '/allopenstatus'
     const response = await Axios.get(url)
     commit('siteOpenStatus', response.data)
   },
@@ -227,7 +227,7 @@ const actions = {
       dispatch('clearStatus')
     }
 
-    let url = rootState.dev.status_endpoint + `/${current_site}/complete_status`
+    let url = rootState.api_endpoints.status_endpoint + `/${current_site}/complete_status`
     let response = await Axios.get(url)
 
     // If the site has no status available, commit a default empty status to the store

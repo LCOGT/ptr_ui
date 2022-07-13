@@ -211,7 +211,7 @@ export default {
 
   computed: {
 
-    ...mapState('dev', ['quickanalysis_endpoint']),
+    ...mapState('api_endpoints', ['quickanalysis_endpoint']),
 
     inner_width() {
       return this.chart_width - this.mleft - this.mright

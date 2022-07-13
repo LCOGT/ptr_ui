@@ -33,7 +33,7 @@ const actions = {
         if (site_param == "") { return }
 
         // Form the url with query params
-        let url = rootState.dev.logs_endpoint + '/recent-logs'
+        let url = rootState.api_endpoints.logs_endpoint + '/recent-logs'
         url += '?after_time=' + encodeURIComponent(after_time_param)
         url += '&site=' + encodeURIComponent(site_param)
 

@@ -59,8 +59,7 @@ const actions = {
      * The idea is to keep the list as up-to-date as possible without polling
      * every single second. 
      */
-    fetchActiveReservations({ commit, dispatch }, site) {
-        
+    fetchActiveReservations({ commit, dispatch, rootState }, site) {
         site == site || false
         if (!site) {
             console.error("Bad sitecode while trying to fetch active reservations.")
@@ -68,7 +67,7 @@ const actions = {
         }
 
         // Prepare the api call get reservations
-        const url = "https://calendar.photonranch.org/dev/get-event-at-time"
+        const url = rootState.api_endpoints.calendar_api + "/get-event-at-time"
         const iso_datestring = moment.utc().format()
         const request_body = {
             site: site,

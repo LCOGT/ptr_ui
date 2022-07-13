@@ -457,7 +457,7 @@ export default {
 
     // Call the photonranch api to get moon times. 
     async getMoonTimesFromAPI(start, end) {
-      let url = "https://api.photonranch.org/api/events/moon/rise-set-illum";
+      let url = `${this.$store.state.api_endpoints.active_api}/events/moon/rise-set-illum`;
       let payload = {
         params: {
           start: start,
@@ -859,7 +859,7 @@ export default {
       // Make request headers and include token.
       // Requires user to be logged in.
       let header = await this.getConfigWithAuth();
-      let url = `${this.$store.state.dev.calendar_api}/is-user-scheduled`;
+      let url = `${this.$store.state.api_endpoints.calendar_api}/is-user-scheduled`;
       let user_id = this.$auth.user.sub;
       let body = {
         user_id: user_id,
@@ -879,7 +879,7 @@ export default {
       // Requires user to be logged in.
       let config = await this.getConfigWithAuth();
 
-      let url = `${this.$store.state.dev.calendar_api}/newevent`;
+      let url = `${this.$store.state.api_endpoints.calendar_api}/newevent`;
       let eventToPost = {
         event_id: newEvent.id,
         start: moment(newEvent.startStr).utc().format(),
@@ -929,7 +929,7 @@ export default {
      */
     async deleteButtonClicked(eventToDelete) {
       let config = await this.getConfigWithAuth();
-      let url = `${this.$store.state.dev.calendar_api}/delete`;
+      let url = `${this.$store.state.api_endpoints.calendar_api}/delete`;
       let body = {
         event_id: eventToDelete.id,
         start: moment(eventToDelete.startStr).utc().format(),
@@ -959,7 +959,7 @@ export default {
       // Make request headers and include token.
       // Requires user to be logged in.
       let config = await this.getConfigWithAuth();
-      let url = `${this.$store.state.dev.calendar_api}/modifyevent`;
+      let url = `${this.$store.state.api_endpoints.calendar_api}/modifyevent`;
       let theModifiedEvent = {
         event_id: modifiedEvent.id,
         start: moment(modifiedEvent.startStr).utc().format(),
@@ -1012,7 +1012,7 @@ export default {
 
     async fetchSiteEvents(fetchInfo) {
       let site = this.calendarSite;
-      const url = `${this.$store.state.dev.calendar_api}/siteevents`;
+      const url = `${this.$store.state.api_endpoints.calendar_api}/siteevents`;
       const options = {
         headers: {
           "Content-Type": "application/json;charset=UTF-8",

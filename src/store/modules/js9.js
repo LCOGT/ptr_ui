@@ -77,7 +77,7 @@ const actions = {
             }
 
             // Get the url based on the image filename
-            let apiName = rootState.dev.active_api;
+            let apiName = rootState.api_endpoints.active_api;
             let path = '/download';
             let body = {
                 object_name: rootGetters['images/small_fits_filename']

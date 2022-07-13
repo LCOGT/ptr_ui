@@ -52,7 +52,7 @@ const actions = {
 
         commit('user_projects_is_loading', true)
 
-        const url = rootState.dev.projects_endpoint + '/get-user-projects'
+        const url = rootState.api_endpoints.projects_endpoint + '/get-user-projects'
         const body = {user_id: user_id}
         let header = await getAuthRequestHeader()
 
@@ -70,7 +70,7 @@ const actions = {
         
         commit('all_projects_is_loading', true)
 
-        const url = rootState.dev.projects_endpoint + '/get-all-projects'
+        const url = rootState.api_endpoints.projects_endpoint + '/get-all-projects'
         const body = {}
         let header = await getAuthRequestHeader()
 
@@ -86,7 +86,7 @@ const actions = {
     fetchUserEvents({ commit, rootState }, user_id) {
         commit('user_events_is_loading', true)
 
-        const url = rootState.dev.calendar_api + '/user-events-ending-after-time'
+        const url = rootState.api_endpoints.calendar_api + '/user-events-ending-after-time'
         const header = {
             'headers': {
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -107,7 +107,7 @@ const actions = {
     },
 
     async deleteProject({ dispatch, rootState }, {project_name,created_at}) {
-        const url = rootState.dev.projects_endpoint + '/delete-project'
+        const url = rootState.api_endpoints.projects_endpoint + '/delete-project'
         let header = await getAuthRequestHeader()
         let body = {
             project_name:project_name,
@@ -138,7 +138,7 @@ const actions = {
     updateProjectInEvent({ dispatch, rootState }, {event, project_name,created_at}) {
         /* arg 'event' is the event object we want to update. Must include 'event_id' and 'start' */
 
-        const url = rootState.dev.calendar_api + '/add-projects-to-events'
+        const url = rootState.api_endpoints.calendar_api + '/add-projects-to-events'
 
         const header = {
             'headers': {

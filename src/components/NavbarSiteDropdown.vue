@@ -91,7 +91,7 @@ export default {
       window.open(url);
     },
     update_all_site_images() {
-      const url = this.$store.state.dev.active_api + `/latest_image_all_sites`
+      const url = this.$store.state.api_endpoints.active_api + `/latest_image_all_sites`
       axios.get(url).then(response => {
         this.site_images = response.data
       })
