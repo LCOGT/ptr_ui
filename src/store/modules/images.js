@@ -386,6 +386,10 @@ const actions = {
             commit('setCurrentImage', prev_image)
         }
     },
+    set_first_image({ commit, state }) {
+        let first_image = state.recent_images[state.recent_images.length - 1]
+        commit('setCurrentImage', first_image)
+    },
 
     async get_fits_url({rootState}, {base_filename, data_type, reduction_level}) {
 

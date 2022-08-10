@@ -24,6 +24,13 @@
             <b-icon icon="chevron-right" />
           </button>
         </p>
+        <p class="control">
+         <button 
+            class="button level-item is-small" title="go to tonight's first image" 
+            @click="$store.dispatch('images/set_first_image')">
+            <b-icon icon="chevron-double-right"/>
+          </button>
+        </p>
       </b-field>
     </b-field>
 
