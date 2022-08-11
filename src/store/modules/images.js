@@ -256,21 +256,80 @@ const actions = {
      *     taken the active user or not. 
      */
     async load_latest_images({ dispatch, commit, state, rootState }, num_images ) {
-
-        let site = rootState.site_config.selected_site;
-        let apiName = rootState.api_endpoints.active_api;
-        let querySize = num_images || 25; // How many images to get
-        let path = `/${site}/latest_images/${querySize}`;
-
-        // Get the current user's id
-        let userid = user_id()
         
-        // If a user is logged in and they want to see only their data, 
-        // add their id as a query string param for the api call. 
-        if (state.show_user_data_only && userid) {
-            const query_data = { userid: userid, };
-            const query_params = new URLSearchParams(query_data);
-            path += '?' + query_params
+        // Get site and user_id
+        let url = null
+        let site = rootState.site_config.selected_site;
+        let userid = user_id()
+        let filterparams = {}
+
+
+        if (!num_images) {
+            //If no number of images is specified, query for site's local noon to noon
+            url =rootState.api_endpoints.active_api + '/filtered_images'
+
+            let queryStart = null
+            let queryEnd = null
+
+            let noonDate = new Date
+            noonDate.setHours (12, 0, 0, 0)
+            //need to make this site timezone
+
+            let siteDate = new Date
+            //need to make this site timezone
+            
+            //siteDate.setHours(13,0,0,0)
+            //console.log(siteDate)
+
+
+            if (siteDate>noonDate) {
+                console.log("date is later than noon")
+                // If it's later than noon, set the start to noon today
+                queryStart = noonDate
+
+                // and the end to noon tomorrow
+                queryEnd = new Date
+                queryEnd.setHours (12, 0, 0, 0)
+                queryEnd.setDate(noonDate.getDate() + 1);
+
+            } else { 
+                console.log("date is earlier than noon")
+                // If it's earlier than noon, set the start to noon yesterday
+                queryStart = new Date
+                queryStart.setHours (12, 0, 0, 0)
+                queryStart.setDate(noonDate.getDate() - 1);
+
+                // and the end to noon today
+                queryEnd = noonDate
+
+            }
+            
+
+            // Set the parameters for this query
+            filterparams.site = site;
+            filterparams.start_date = moment(queryStart).format("YYYY-MM-DD hh:mm:ss");
+            filterparams.end_date = moment(queryEnd).format("YYYY-MM-DD hh:mm:ss");
+
+            // If a user is logged in and they want to see only their data,
+            // add their id as a parameter for the api call
+
+            if (state.show_user_data_only && userid) {
+                filterparams.user_id = user_id
+            }
+
+        } else {
+            // If a query size is specified, use the old method of retrieving X images
+            let querySize = num_images || 25 // || 25 (original default);
+            url = rootState.api_endpoints.active_api + `/${site}/latest_images/${querySize}`;
+
+            
+            // If a user is logged in and they want to see only their data, 
+            // add their id as a query string param for the api call. 
+            if (state.show_user_data_only && userid) {
+                const query_data = { userid: userid, };
+                const query_params = new URLSearchParams(query_data);
+                url += '?' + query_params
+            }
         }
 
         /**
@@ -290,8 +349,15 @@ const actions = {
          *      "user_id": str,
          *      "username": str,
          *  }
-         */
-        axios.get(apiName+path).then(async response => {
+        */
+
+        let body = { 
+            method: "GET",
+            params: filterparams,
+            url: url,
+        }
+    
+        axios(body).then(async response => {
             response = response.data
 
             // Empty response:
