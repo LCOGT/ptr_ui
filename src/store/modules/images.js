@@ -260,6 +260,7 @@ const actions = {
         // Get site and user_id
         let url = null
         let site = rootState.site_config.selected_site;
+        
         let userid = user_id()
         let filterparams = {}
 
@@ -272,18 +273,24 @@ const actions = {
             let queryEnd = null
 
             let noonDate = new Date
-            noonDate.setHours (12, 0, 0, 0)
-            //need to make this site timezone
 
-            let siteDate = new Date
-            //need to make this site timezone
+            // Timezone and Offset for site and user to convert to site local time
+            let siteTimezone = rootState.site_config.global_config[site].TZ_database_name
+            let siteOffset = moment.utc(new Date()).tz(siteTimezone).utcOffset()/60
+            let userOffset = - noonDate.getTimezoneOffset()/60
             
-            //siteDate.setHours(13,0,0,0)
-            //console.log(siteDate)
+            // How many hours difference is between the site and user timezones
+            let siteUserDifference = siteOffset-userOffset
+
+            // Noon local site time in user's timezone
+            noonDate.setHours (12-siteUserDifference, 0, 0, 0)
+
+            // Current time in user's timezone
+            let siteDate = new Date
+            siteDate.setHours (10, 0,0,0)
 
 
             if (siteDate>noonDate) {
-                console.log("date is later than noon")
                 // If it's later than noon, set the start to noon today
                 queryStart = noonDate
 
@@ -293,7 +300,6 @@ const actions = {
                 queryEnd.setDate(noonDate.getDate() + 1);
 
             } else { 
-                console.log("date is earlier than noon")
                 // If it's earlier than noon, set the start to noon yesterday
                 queryStart = new Date
                 queryStart.setHours (12, 0, 0, 0)
@@ -319,7 +325,7 @@ const actions = {
 
         } else {
             // If a query size is specified, use the old method of retrieving X images
-            let querySize = num_images || 25 // || 25 (original default);
+            let querySize = num_images // || 25 (original default);
             url = rootState.api_endpoints.active_api + `/${site}/latest_images/${querySize}`;
 
             
