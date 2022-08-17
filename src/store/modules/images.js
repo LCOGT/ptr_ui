@@ -255,22 +255,136 @@ const actions = {
      *  @param {boolean} user_data_only: whether or not to filter by images 
      *     taken the active user or not. 
      */
-    async load_latest_images({ dispatch, commit, state, rootState }, num_images ) {
-
+    
+    async load_latest_x_images({ dispatch, commit, state, rootState }, num_images ) {
+        // Old method of loading only a certain amount of images
+        let url = null
         let site = rootState.site_config.selected_site;
-        let apiName = rootState.api_endpoints.active_api;
-        let querySize = num_images || 25; // How many images to get
-        let path = `/${site}/latest_images/${querySize}`;
-
-        // Get the current user's id
+        
         let userid = user_id()
+
+        // If a query size is specified, use the old method of retrieving X images
+        let querySize = num_images // || 25 (original default);
+        url = rootState.api_endpoints.active_api + `/${site}/latest_images/${querySize}`;
+
         
         // If a user is logged in and they want to see only their data, 
         // add their id as a query string param for the api call. 
         if (state.show_user_data_only && userid) {
             const query_data = { userid: userid, };
             const query_params = new URLSearchParams(query_data);
-            path += '?' + query_params
+            url += '?' + query_params
+        }
+
+        let body = { 
+            method: "GET",
+            url: url,
+        }
+    
+        axios(body).then(async response => {
+            response = response.data
+
+            // Empty response:
+            if (response.length == 0) { 
+                dispatch('display_placeholder_image') 
+                return; 
+            }
+
+            commit('setCurrentImage', response[0])
+            commit('setRecentImages', response)
+
+        }).catch(error => {
+            console.error(error)
+        });
+
+        dispatch('load_latest_info_images')
+        
+    },
+    
+    async load_latest_images({ dispatch, commit, state, rootState }) {
+        
+        // Get site and user_id
+        let url = null
+        let site = rootState.site_config.selected_site;
+        let filterparams = {}
+        
+        let userid = user_id()
+        
+        let siteDate = new Date()
+        let noonDate = new Date()
+
+        // Timezone and Offset for site and user to convert to site local time
+        let siteTimezone = rootState.site_config.global_config[site].TZ_database_name
+        let siteOffset = moment.utc(new Date()).tz(siteTimezone).utcOffset()/60
+        let userOffset = - noonDate.getTimezoneOffset()/60
+        
+        // How many hours difference is between the site and user timezones
+        let siteUserDifference = siteOffset-userOffset
+
+        //Query for site's local noon to noon
+        url = rootState.api_endpoints.active_api + '/filtered_images'
+
+        let queryStart = null
+        let queryEnd = null
+
+        // If this query is going to return nothing (i.e. site hasn't been used in a while)
+        // then check for the most recent image and use that as the "current time".
+        let firstbody = { 
+            method: "GET",
+            url: rootState.api_endpoints.active_api + '/' + site + '/latest_images/1',
+        }
+        
+        await axios(firstbody).then(async response => {
+            response = response.data
+
+            // Empty response:
+            if (response.length == 0) { 
+                dispatch('display_placeholder_image') 
+                return; 
+            }
+
+            // Time of most recent image in user's timezone
+            siteDate = new Date(response[0].capture_date)
+
+            // Noon local site time in user's timezone
+            noonDate = new Date(response[0].capture_date)
+            noonDate.setHours(12-siteUserDifference, 0, 0, 0)
+
+
+        }).catch(error => {
+            console.error(error)
+        });
+
+        if (siteDate>noonDate) {
+            // If it's later than noon, set the start to noon today
+            queryStart = noonDate
+
+            // and the end to noon tomorrow
+            queryEnd = siteDate
+            queryEnd.setHours (12, 0, 0, 0)
+            queryEnd.setDate(siteDate.getDate() + 1);
+
+        } else { 
+            // If it's earlier than noon, set the start to noon yesterday
+            queryStart = siteDate
+            queryStart.setHours (12, 0, 0, 0)
+            queryStart.setDate(siteDate.getDate() - 1);
+
+            // and the end to noon today
+            queryEnd = noonDate
+
+        }
+
+        // Set the parameters for this query
+        filterparams.site = site;
+        filterparams.start_date = moment(queryStart).format("YYYY-MM-DD hh:mm:ss");
+        filterparams.end_date = moment(queryEnd).format("YYYY-MM-DD hh:mm:ss");
+
+        // If a user is logged in and they want to see only their data,
+        // add their id as a parameter for the api call
+
+        if (state.show_user_data_only && userid) {
+            filterparams.user_id = user_id
         }
 
         /**
@@ -290,8 +404,15 @@ const actions = {
          *      "user_id": str,
          *      "username": str,
          *  }
-         */
-        axios.get(apiName+path).then(async response => {
+        */
+
+        let body = { 
+            method: "GET",
+            params: filterparams,
+            url: url,
+        }
+    
+        await axios(body).then(async response => {
             response = response.data
 
             // Empty response:
@@ -385,6 +506,10 @@ const actions = {
             prev_image = state.recent_images[index - 1]
             commit('setCurrentImage', prev_image)
         }
+    },
+    set_first_image({ commit, state }) {
+        let first_image = state.recent_images[state.recent_images.length - 1]
+        commit('setCurrentImage', first_image)
     },
 
     async get_fits_url({rootState}, {base_filename, data_type, reduction_level}) {
