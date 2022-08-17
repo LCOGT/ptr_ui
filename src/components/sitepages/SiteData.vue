@@ -56,31 +56,12 @@
             <TabItem title="image info">
               <ImageMetadataViewer />
             </TabItem>
-            <TabItem title="misc">
-                <!-- Toggle display of all site images or just the user's images. -->
-                <b-field>
-                  <b-radio-button expanded 
-                    v-model="show_user_data_only"
-                    :native-value="true"
-                    :disabled="!$auth.isAuthenticated"
-                    >
-                    <span>My Data</span>
-                  </b-radio-button>
-
-                  <b-radio-button expanded 
-                    v-model="show_user_data_only"
-                    :native-value="false">
-                    <span>All Data</span>
-                  </b-radio-button>
-                </b-field>
-                <ImageFilter :sitecode="sitecode"/>
-            </TabItem>
           </Tabs>
 
         </b-tab-item>
 
         <b-tab-item label="data" class="data-tab" :value="'data'">
-          
+
           <!-- TODO: 'disable' the other image filter tools if this is turned on. -->
           <div class="live-data-toggle-pane">
             <b-field label="live data" horizontal>
@@ -91,6 +72,22 @@
           <div class="data-query-filters mb-4">
             <ImageFilter :sitecode="sitecode" />
           </div>
+          <!-- Toggle display of all site images or just the user's images. -->
+          <b-field>
+            <b-radio-button expanded 
+              v-model="show_user_data_only"
+              :native-value="true"
+              :disabled="!$auth.isAuthenticated"
+              >
+              <span>My Data</span>
+            </b-radio-button>
+
+            <b-radio-button expanded 
+              v-model="show_user_data_only"
+              :native-value="false">
+              <span>All Data</span>
+            </b-radio-button>
+          </b-field>
           <!--div class="data-query-quick-buttons mb-4"> <b-button class="is-small" @click="$store.dispatch('images/get_last_24hrs')"> all sites - last 24hrs </b-button> </div-->
           <images-table :image_array="recent_images" class="mb-4"/>
           <DownloadInterface :site="sitecode" />
