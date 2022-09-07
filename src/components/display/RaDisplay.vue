@@ -91,7 +91,8 @@ export default {
     },
 
     toDecimalDegrees(decimal_hours) {
-      return helpers.hour2degree(decimal_hours);
+      let tempRA = helpers.hour2degree(decimal_hours)
+      return tempRA < 0? tempRA + 360 : tempRA;
     }
 
   },
