@@ -196,7 +196,7 @@
                 </b-field>
                 <b-field :label="n==1 ? 'Bin' : ''">
                     <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].bin">
-                        <option value="default"> 0, 0 </option>
+                        <option value="0, 0"> default </option>
                         <option value="1, 1"> 1, 1 </option>
                         <option value="2, 2"> 2, 2 </option>
                         <option value="3, 3"> 3, 3 </option>
@@ -496,7 +496,7 @@ export default {
                     exposure: 1,
                     filter: 'Lum',
                     area: 'FULL',
-                    bin: 'default',
+                    bin: '0, 0',
                     dither: 'no',
                     photometry: '-',
                     defocus: 0,
@@ -649,7 +649,7 @@ export default {
                     exposure: 1,
                     filter: 'Lum',
                     area: 'FULL',
-                    bin: 'default',
+                    bin: '0, 0',
                     dither: 'no',
                     photometry: '-',
                     defocus: 0,
