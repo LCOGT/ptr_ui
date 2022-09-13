@@ -76,6 +76,7 @@ const hour_angle = (state, getters) => {
     val = '-' // if sidereal_time or right_ascension is not provided, can't calculate hour_angle.
   } else {
     if (ha < -12) { ha += 24 } // hours, since we're in decimal 
+    if (ha > 12) { ha -= 24 } // hours, since we're in decimal 
     ha = ha.toFixed(3)
     if (ha > 0) { ha = '+' + ha }
     val = ha
