@@ -406,6 +406,8 @@ export const commands_mixin = {
         image_type: this.camera_image_type,
       }
       let opt_params = {
+        #object: this.object_name,
+        object: 'test object',
         count: this.camera_count.toString(),
         bin: JSON.stringify(this.camera_bin),
         filter: this.filter_wheel_options_selection,
