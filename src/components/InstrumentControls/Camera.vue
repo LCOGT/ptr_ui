@@ -31,6 +31,16 @@
       <CancelButton :site="sitecode" style="width: 30%; border-left: 1px solid #00be65" class="is-outlined"/>
     </div>
 
+    <b-field horizontal label="Object Name">
+      <b-input placeholder="Enter your object Name here"
+        type="text"
+        min="0"
+        max="64"
+        size="is-small"
+        v-model="object_name">
+      </b-input>
+    </b-field>
+
     <b-field horizontal label="Expose">
         <b-field>
             <b-input name="subject" size="is-small" v-model="camera_exposure" autocomplete="off"></b-input>
@@ -257,6 +267,11 @@ export default {
     camera_note: {
       get() { return this.$store.getters['command_params/camera_note']},
       set(val) { this.$store.commit('command_params/camera_note', val)},
+    },
+    
+    object_name: {
+      get() { return this.$store.getters['command_params/object_name']},
+      set(val) { this.$store.commit('command_params/object_name', val)},
     },
     camera_exposure: {
       get() { return this.$store.getters['command_params/camera_exposure'] },

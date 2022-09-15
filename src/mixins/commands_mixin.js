@@ -275,6 +275,7 @@ export const commands_mixin = {
 
       'camera_areas_selection',
       'camera_note',
+      'object_name',
       'camera_exposure',
       'camera_count',
       'camera_bin',
@@ -405,20 +406,26 @@ export const commands_mixin = {
         time: this.camera_exposure,
         image_type: this.camera_image_type,
       }
-      let opt_params = {
+      let opt_params = {        
         count: this.camera_count.toString(),
         bin: JSON.stringify(this.camera_bin),
         filter: this.filter_wheel_options_selection,
         area: this.camera_areas_selection,
         dither: this.camera_dither,
         extract: this.camera_extract,
+        object_name: this.object_name,
+        //object_name: 'test test test',
         username: this.username, // from auth0
       }
 
       // Avoid empty strings (thanks, dynamodb)
-      if (this.camear_note != '') {
+      if (this.camera_note != '') {
         opt_params["hint"] = this.camera_note
       }
+      //if (this.object_name != '') {
+      //  opt_params["hint"] = this.object_name
+      //}
+
 
       // If active, add subframe parameters.
       // Also ignore if active but subframe params specify the whole image [(0,0),(1,1)] (the sum should == 2). 
