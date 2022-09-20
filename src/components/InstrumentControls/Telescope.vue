@@ -52,7 +52,22 @@
 
     <div style="border-bottom: 0.5px solid grey; margin: 1em 0" />
 
-    <b-field horizontal label="Ra/Ha/Az/Long">
+    <TargetSearchField
+      label="Object"
+      v-model="mount_object"
+      size="is-small"
+      horizontal
+      @results="handle_coordinate_search_results"
+    />
+
+    <p><small>The default values for RA and Dec
+      are in RA decimal hours and Dec decimal degrees. To use RA decimal degrees, include the letter d at the end of your RA (e.g. 34.54d). Sexagesimal will be converted as normal. 
+    </small></p>
+    <div style="border-bottom: 0.5px solid grey; margin: 1em 0" />
+    
+    
+
+    <b-field horizontal label="Right Asc.">
       <b-field>
         <b-input
           name="subject"
@@ -64,7 +79,8 @@
         <!--p class="control"><span class="button is-static is-small">hrs</span></p-->
       </b-field>
     </b-field>
-    <b-field horizontal label="Dec/Alt/Lat">
+
+    <b-field horizontal label="Declination">
       <b-field>
         <b-input
           name="subject"
@@ -76,13 +92,8 @@
         <!--p class="control"><span class="button is-static is-small">deg</span></p-->
       </b-field>
     </b-field>
-    <TargetSearchField
-      label="Object"
-      v-model="mount_object"
-      size="is-small"
-      horizontal
-      @results="handle_coordinate_search_results"
-    />
+    
+    
     <b-field horizontal label="Frame">
       <b-select
         placeholder="Select bin"
@@ -98,9 +109,7 @@
           {{ frame_option }}
         </option>
       </b-select>
-    </b-field>
 
-    <b-field>
       <p class="control">
         <command-button
           :data="mount_slew_radec_command"
@@ -108,6 +117,22 @@
           class="is-small is-success is-outlined"
         />
       </p>
+
+    </b-field>
+
+
+
+    <b-field horizontal label="Hour Angle">
+      <b-field>
+        <b-input
+          name="subject"
+          type="search"
+          size="is-small"
+          v-model="mount_ha"
+          autocomplete="off"
+        ></b-input>
+        <!--p class="control"><span class="button is-static is-small">deg</span></p-->
+      </b-field>
       <p class="control">
         <command-button
           :data="mount_slew_hadec_command"
@@ -115,6 +140,32 @@
           class="is-small"
         />
       </p>
+    </b-field>
+
+    <b-field horizontal label="Azimuth">
+      <b-field>
+        <b-input
+          name="subject"
+          type="search"
+          size="is-small"
+          v-model="mount_az"
+          autocomplete="off"
+        ></b-input>
+        <!--p class="control"><span class="button is-static is-small">hrs</span></p-->
+      </b-field>
+    </b-field>
+
+    <b-field horizontal label="Altitude">
+      <b-field>
+        <b-input
+          name="subject"
+          type="search"
+          size="is-small"
+          v-model="mount_alt"
+          autocomplete="off"
+        ></b-input>
+        <!--p class="control"><span class="button is-static is-small">deg</span></p-->
+      </b-field>
       <p class="control">
         <command-button
           :data="mount_slew_azalt_command"
@@ -218,6 +269,16 @@ export default {
 
       // If the coordinates are specified, send the command
       if (this.mount_dec && this.mount_ra) {
+        // First parse the entry
+        // Is it degrees?
+        console.log(this.mount_ra)
+        if (this.mount_ra.includes("d") ) {
+          this.mount_ra.replace("d","")
+          this.mount_ra = this.mount_ra / 15
+          console.log(this.mount_ra)
+        }
+
+      
         const move_telescope_command_params = this.mount_slew_radec_command.form;
         const camera_expose_command_params = this.camera_expose_command.form;
 
@@ -287,6 +348,30 @@ export default {
       },
       set(val) {
         this.$store.commit("command_params/mount_object", val);
+      },
+    },
+    mount_ha: {
+      get() {
+        return this.$store.getters["command_params/mount_ha"];
+      },
+      set(val) {
+        this.$store.commit("command_params/mount_ha", val);
+      },
+    },
+    mount_az: {
+      get() {
+        return this.$store.getters["command_params/mount_az"];
+      },
+      set(val) {
+        this.$store.commit("command_params/mount_az", val);
+      },
+    },
+    mount_alt: {
+      get() {
+        return this.$store.getters["command_params/mount_alt"];
+      },
+      set(val) {
+        this.$store.commit("command_params/mount_alt", val);
       },
     },
 

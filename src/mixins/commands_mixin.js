@@ -484,15 +484,44 @@ export const commands_mixin = {
 		},
     mount_slew_radec_command() {
       let ra = emptyString(this.mount_ra.toString())
+      
       let dec = emptyString(this.mount_dec.toString())
       let obj = emptyString(this.mount_object.toString())
+      //console.log(ra)
+
+      // Convert if RA Decimal Degrees
+      if (ra.includes("d") ) {
+        ra=ra.replace("d","")
+        ra = parseFloat(Number(ra) / 15).toFixed(4)
+      }
+      // Convert if sexagesimal
+      if (ra.includes(":") || ra.includes(" ") ) {    
+      let raarray = ra.replace(":", " ").replace(":", " ").replace(".", " ").split(" ")
+      ra = Number(raarray[0]) + Number(raarray[1]/60) + Number(raarray[2]/3600)
+      let decarray = dec.replace(":", " ").replace(":", " ").replace(".", " ").split(" ")
+      if (Math.sign(Number(decarray[[0]])) == -1) {            
+        dec=Number(decarray[0]) - Number(decarray[1]/60) - Number(decarray[2]/3600)
+        } 
+      else {
+            dec =Number(decarray[0]) + Number(decarray[1]/60) + Number(decarray[2]/3600)
+        }
+      ra = ra.toFixed(4)
+      dec = dec.toFixed(4)
+      }
+
+
+        // if (ra.includes("d") ) {
+        //  ra.replace("d","")
+        //  ra = Number(ra) / 15
+        //  console.log(ra)
+        //}
       return this.base_command('mount', 'go', 'slew to RA/Dec',
         { ra: ra, dec: dec, frame: this.telescope_coordinate_frame },
         { object: obj }
       )
     },
     mount_slew_hadec_command() {
-      let ha = emptyString(this.mount_ra.toString())
+      let ha = emptyString(this.mount_ha.toString())      
       let dec = emptyString(this.mount_dec.toString())
       let obj = emptyString(this.mount_object.toString())
       return this.base_command('mount', 'go', 'slew to HA/Dec',
@@ -501,8 +530,8 @@ export const commands_mixin = {
       )
     },
     mount_slew_azalt_command() {
-      let az = emptyString(this.mount_ra.toString())
-      let alt = emptyString(this.mount_dec.toString())
+      let az = emptyString(this.mount_az.toString())
+      let alt = emptyString(this.mount_alt.toString())
       let obj = emptyString(this.mount_object.toString())
       return this.base_command('mount', 'go', 'slew to az/alt',
         { az: az, alt: alt, frame: this.telescope_coordinate_frame },

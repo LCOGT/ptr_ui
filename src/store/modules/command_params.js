@@ -11,6 +11,9 @@ const state = {
     mount_ra: '',
     mount_dec: '',
     mount_object: '',
+    mount_ha: '0',
+    mount_az: '0',
+    mount_alt: '45',
 
     telescope_selection: 1, // 1: main telescope, 2: auxiliary telescope
     telescope_coordinate_frame: 'ICRS',
@@ -52,6 +55,9 @@ const getters = {
     mount_ra: state => state.mount_ra,
     mount_dec: state => state.mount_dec,
     mount_object: state => state.mount_object,
+    mount_ha: state => state.mount_ha,
+    mount_az: state => state.mount_az,
+    mount_alt: state => state.mount_alt,
 
     telescope_selection: state => state.telescope_selection,
     telescope_coordinate_frame: state => state.telescope_coordinate_frame,
@@ -118,6 +124,15 @@ const mutations = {
 
         // finally, update the declination
         state.mount_dec = val; 
+    },
+    mount_ha(state, val) { 
+        let mount_ha = 0
+    },
+    mount_az(state, val) { 
+        let mount_az = 0
+    },
+    mount_alt(state, val) { 
+        let mount_alt = 30
     },
     mount_object(state, val) { state.mount_object = val; },
 
