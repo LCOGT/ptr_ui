@@ -361,17 +361,23 @@ const actions = {
 
             // and the end to noon tomorrow
             queryEnd = siteDate
-            queryEnd.setHours (12, 0, 0, 0)
+            queryEnd.setHours (12-siteUserDifference, 0, 0, 0)
             queryEnd.setDate(siteDate.getDate() + 1);
+            //console.log("later than noon")        
+            //console.log(queryStart)
+            //console.log(queryEnd)
 
         } else { 
             // If it's earlier than noon, set the start to noon yesterday
             queryStart = siteDate
-            queryStart.setHours (12, 0, 0, 0)
+            queryStart.setHours (12-siteUserDifference, 0, 0, 0)
             queryStart.setDate(siteDate.getDate() - 1);
 
             // and the end to noon today
             queryEnd = noonDate
+            //console.log("earlier than noon")
+            //console.log(queryStart)
+            //console.log(queryEnd)
 
         }
 
@@ -379,6 +385,8 @@ const actions = {
         filterparams.site = site;
         filterparams.start_date = moment(queryStart).format("YYYY-MM-DD hh:mm:ss");
         filterparams.end_date = moment(queryEnd).format("YYYY-MM-DD hh:mm:ss");
+        //console.log(filterparams.start_date)
+        //console.log(filterparams.end_date)
 
         // If a user is logged in and they want to see only their data,
         // add their id as a parameter for the api call
