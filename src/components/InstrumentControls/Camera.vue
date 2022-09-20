@@ -137,16 +137,6 @@
       </b-checkbox>
     </b-field>
 
-    <b-field horizontal label="Object">
-      <b-input placeholder="object name"
-        type="text"
-        min="0"
-        max="64"
-        size="is-small"
-        v-model="mount_object">
-      </b-input>
-    </b-field>
-
     <b-field horizontal label="Note">
       <b-input placeholder="a camera note for the FITS header..."
         type="text"
@@ -250,10 +240,6 @@ export default {
       'camera_can_bin',
       'camera_default_bin'
     ]),
-
-    ...mapGetters('command_params', [
-            'mount_object',
-        ]),
 
     number_of_cameras() {
       return Object.keys(this.available_devices('camera', this.sitecode)).length
