@@ -363,6 +363,7 @@ const actions = {
             queryEnd = siteDate
             queryEnd.setHours (12-siteUserDifference, 0, 0, 0)
             queryEnd.setDate(siteDate.getDate() + 1);
+            // below and in the else, comments for testing correct postage query boundaries
             //console.log("later than noon")        
             //console.log(queryStart)
             //console.log(queryEnd)
