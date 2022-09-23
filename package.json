@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
+    "lint": "eslint",
     "cypress:open": "cypress open"
   },
   "dependencies": {
@@ -79,8 +79,12 @@
     "@vue/eslint-config-standard": "^4.0.0",
     "babel-eslint": "^10.1.0",
     "cypress": "^3.8.3",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.2.3",
+    "eslint": "^8.23.1",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.5",
+    "eslint-plugin-promise": "^6.0.1",
+    "eslint-plugin-vue": "^9.5.1",
     "sass": "^1.49.0",
     "sass-loader": "^10.2.1",
     "style-loader": "^0.23.1",
@@ -88,19 +92,6 @@
     "vue-template-babel-compiler": "^1.0.5",
     "vue-template-compiler": "^2.6.11",
     "webpack": "^4.46.0"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "@vue/standard"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
   },
   "postcss": {
     "plugins": {
