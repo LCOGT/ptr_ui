@@ -1,47 +1,52 @@
 
 <template>
-    <div class="command-tab-accordion-wrapper">
-      <b-collapse
-        class="accordion"
-        animation="no animation"
-        v-for="(instrument, index) of instruments"
-        :key="index"
-        :class="{'active': instrumentOpenView == index }"
-        :open="instrumentOpenView == index"
-        @open="instrumentOpenView = index"
-        @close="instrumentOpenView = -1"
-        >
-
+  <div class="command-tab-accordion-wrapper">
+    <b-collapse
+      v-for="(instrument, index) of instruments"
+      :key="index"
+      class="accordion"
+      animation="no animation"
+      :class="{'active': instrumentOpenView == index }"
+      :open="instrumentOpenView == index"
+      @open="instrumentOpenView = index"
+      @close="instrumentOpenView = -1"
+    >
+      <div
+        slot="trigger"
+        slot-scope="props"
+        class="accordion-header"
+        :class="{'active': props.open}"
+        role="button"
+      >
         <div
-          slot="trigger"
-          slot-scope="props"
-          class="accordion-header"
-          :class="{'active': props.open}"
-          role="button">
-
-          <div 
-            class="instrument-type-label"
-            :class="{'subtitle, m-0': props.open}">
-            {{instrument}}
-          </div>
-          <div style="flex-grow: 1;"/>
-          <div class="instrument-instance-label">{{selected_instrument(instrument)}}</div>
-
+          class="instrument-type-label"
+          :class="{'subtitle, m-0': props.open}"
+        >
+          {{ instrument }}
         </div>
+        <div style="flex-grow: 1;" />
+        <div class="instrument-instance-label">
+          {{ selected_instrument(instrument) }}
+        </div>
+      </div>
 
-            <component class="accordion-content" v-bind:is="instrument"/>
-
+      <component
+        :is="instrument"
+        class="accordion-content"
+      />
     </b-collapse>
-    </div>
+  </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import { Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
-  Camera, Sequencer, Settings, } from '@/components/InstrumentControls'
+import {
+  Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
+  Camera, Sequencer, Settings
+} from '@/components/InstrumentControls'
 
 export default {
-  name: "CommandTabAccordion",
+  name: 'CommandTabAccordion',
   components: {
     Enclosure,
     Screen,
@@ -51,76 +56,68 @@ export default {
     InstrumentSelector,
     Camera,
     Sequencer,
-    Settings,
+    Settings
   },
   props: {
     controls: {
       Type: Array,
-      default: null,
+      default: null
     },
     initInstrumentOpenView: {
       Type: Number,
-      default: -1, // init with all collapsed
+      default: -1 // init with all collapsed
     }
   },
-  data() {
+  data () {
     return {
       instrumentOpenView: this.initInstrumentOpenView
     }
   },
   methods: {
-    selected_instrument(instrument) {
-      let inst = instrument.toLowerCase()
+    selected_instrument (instrument) {
+      const inst = instrument.toLowerCase()
       if (['enclosure', 'screen', 'telescope', 'mount', 'rotator', 'focuser', 'camera', 'sequencer'].includes(inst)) {
-        return this.$store.getters['site_config/'+inst]
-      }
-      else {
+        return this.$store.getters['site_config/' + inst]
+      } else {
         return ''
       }
-    },
+    }
   },
 
   computed: {
     ...mapState('site_config', [
-      'selector_exists',
+      'selector_exists'
     ]),
 
-    instruments() {
-
+    instruments () {
       // Default display
-      let inst = []
+      const inst = []
       inst.push(...[
         'Enclosure',
-        'Screen', 
+        'Screen',
         'Telescope',
         'Rotator',
         'Focuser',
-        'Camera', 
+        'Camera'
       ])
       if (this.selector_exists) {
         inst.push('InstrumentSelector')
       }
       inst.push(...[
         'Sequencer',
-        'Settings',
+        'Settings'
       ])
 
       if (this.controls == null) {
         return inst
-      }
-      // If a custom controls list was provided via props, use as many of those as possible
-      else {
+      } else { // If a custom controls list was provided via props, use as many of those as possible
         return inst.filter(value => this.controls.includes(value))
       }
-
     }
   }
 
-  
 }
 </script>
-
-
 
 <style lang="scss" scoped>
 @import "@/style/buefy-styles.scss";

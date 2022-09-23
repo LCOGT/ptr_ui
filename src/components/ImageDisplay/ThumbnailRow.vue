@@ -1,16 +1,18 @@
 <template>
   <div class="images">
     <template
-      v-for="(item, index) in images" >
-      <img 
-        :key="index" 
+      v-for="(item, index) in images"
+    >
+      <img
+        :key="index"
         :src="thumbnailWithFallback(item)"
         onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
         :title="item.base_filename"
         :class="{'selected_thumbnail' : item.image_id == selected_image}"
         loading="lazy"
-        class="recent-image" 
-        @click="setActiveImage(item)" >
+        class="recent-image"
+        @click="setActiveImage(item)"
+      >
     </template>
   </div>
 </template>
@@ -21,23 +23,23 @@ export default {
   props: {
     images: {
       type: Array,
-      default: () => {[]}
+      default: () => []
     },
     selected_image: {
       type: Number,
-      required: false,
+      required: false
     }
   },
 
   methods: {
-    setActiveImage(item) {
+    setActiveImage (item) {
       this.$emit('thumbnailClicked', item)
     },
 
-		thumbnailWithFallback(item) {
-			return item.jpg_thumbnail_url || item.jpg_url
-		}
-  },
+    thumbnailWithFallback (item) {
+      return item.jpg_thumbnail_url || item.jpg_url
+    }
+  }
 }
 </script>
 

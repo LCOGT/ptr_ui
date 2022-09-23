@@ -8,8 +8,8 @@ import Camera from './Camera'
 import Sequencer from './Sequencer'
 import Settings from './Settings'
 
-export { 
-  Enclosure, 
+export {
+  Enclosure,
   Screen,
   Telescope,
   Rotator,
@@ -17,5 +17,5 @@ export {
   InstrumentSelector,
   Camera,
   Sequencer,
-  Settings,
+  Settings
 }

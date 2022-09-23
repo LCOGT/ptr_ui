@@ -1,91 +1,91 @@
 <template>
   <div class="image-view-wrapper">
+    <!-- The main image view -->
+    <div
+      ref="image_div"
+      class="image-div"
+    >
+      <svg
+        v-show="!js9IsVisible"
+        id="image_svg"
+        ref="svgElement"
+        :class="{'cursor-is-crosshair': activeDrawShape!='none'}"
+      >
+        <image-crosshairs
+          :width="imageWidth"
+          :height="imageHeight"
+          :is-visible="crosshairsVisible"
+          color="yellow"
+        />
+        <background-element
+          id="svg-background"
+          :width="imageWidth"
+          :height="imageHeight"
+        />
+      </svg>
 
-      <!-- The main image view -->
-      <div class="image-div" ref="image_div">
+      <svg-context-menu svg-id="image_svg" />
 
-        <svg 
-          id='image_svg' 
-          ref="svgElement" 
-          :class="{'cursor-is-crosshair': activeDrawShape!='none'}" 
-          v-show="!js9IsVisible">
-          <image-crosshairs 
-            :width="imageWidth"
-            :height="imageHeight"
-            :isVisible="crosshairsVisible"
-            color="yellow"/>
-          <background-element id="svg-background" :width="imageWidth" :height="imageHeight" />
-        </svg>
+      <img
+        v-show="!js9IsVisible"
+        id="main-image"
+        ref="image"
+        rel="preload"
+        alt="no jpg available"
+        onerror1="this.onerror=null;this.src='https://via.placeholder.com/768?text=no+jpg+preview+available'"
+        onerror="this.onerror=null;this.src='@/assets/README_screenshot.png'"
+        :src="current_image.jpg_url"
+      >
 
-        <svg-context-menu svgId="image_svg" />
-
-        <img
-          id="main-image"
-          ref="image" 
-          rel="preload"
-          alt="no jpg available"
-          onerror1="this.onerror=null;this.src='https://via.placeholder.com/768?text=no+jpg+preview+available'"
-          onerror="this.onerror=null;this.src='@/assets/README_screenshot.png'"
-          v-show="!js9IsVisible"
-          :src="current_image.jpg_url" />
-
-        <div id="js9-window" v-if="js9IsVisible" >
-          <JS9 ref="js9" :include-menu="true" :initial-width="js9width" :initial-height="js9height" />
-        </div>
-
+      <div
+        v-if="js9IsVisible"
+        id="js9-window"
+      >
+        <JS9
+          ref="js9"
+          :include-menu="true"
+          :initial-width="js9width"
+          :initial-height="js9height"
+        />
       </div>
-
     </div>
+  </div>
 </template>
 
 <script>
-//import { API, Auth } from "aws-amplify";
-import axios from 'axios';
-import wcs from "@/utils/pix2wcs";
-import { mapGetters, mapState } from "vuex";
-import { commands_mixin } from "../mixins/commands_mixin";
-import * as d3 from "d3";
+// import { API, Auth } from "aws-amplify";
+import { mapGetters, mapState } from 'vuex'
+import { commands_mixin } from '../mixins/commands_mixin'
+import * as d3 from 'd3'
 
-import JS9 from "@/components/JS9";
-import ImageCrosshairs from "@/components/svg/ImageCrosshairs"
-import BackgroundElement from "@/components/svg/BackgroundElement"
-import SvgContextMenu from "@/components/svg/SvgContextMenu"
-import RectSelection from "@/components/svg/RectSelection"
+import JS9 from '@/components/JS9'
+import ImageCrosshairs from '@/components/svg/ImageCrosshairs'
+import BackgroundElement from '@/components/svg/BackgroundElement'
+import SvgContextMenu from '@/components/svg/SvgContextMenu'
 
-import ImageInfoBar from "@/components/ImageDisplay/ImageInfoBar"
-import ThumbnailRow from "@/components/ImageDisplay/ThumbnailRow"
-import RaDisplay from "@/components/display/RaDisplay"
-import DecDisplay from "@/components/display/DecDisplay"
-
-import { Point, Line, Rect, Circle, Starmarker }from "@/utils/drawshapes"
+import { Point, Line, Rect, Circle, Starmarker } from '@/utils/drawshapes'
 
 export default {
-  name: "ImageView",
+  name: 'ImageView',
 
   components: {
     JS9,
     SvgContextMenu,
     ImageCrosshairs,
-    BackgroundElement,
-    RectSelection,
-    ImageInfoBar,
-    ThumbnailRow,
-    RaDisplay,
-    DecDisplay,
+    BackgroundElement
   },
 
   mixins: [commands_mixin],
 
   props: {
     site: String,
-    markedStars: Array,
+    markedStars: Array
   },
 
-
-  data() {
+  data () {
     return {
       // The image that is selected and visible in the main viewer.
-      active_image: "",
+      active_image: '',
 
       // Width of image in UI
       imageWidth: 0,
@@ -93,89 +93,84 @@ export default {
 
       // This is modified by the crosshairs switch and controls whether the crosshairs are visible.
       show_crosshairs: false,
-      crosshair_color: "#32cd32",
+      crosshair_color: '#32cd32',
 
-      //Image ID of the currently highlighted image (focused)
+      // Image ID of the currently highlighted image (focused)
       highlighted_image: 0,
 
       js9width: 200,
-      js9height: 500,
+      js9height: 500
 
-
-    };
+    }
   },
 
-  mounted() {
+  mounted () {
     this.init()
 
     // Updates whenever the rendered image size changes
     this.ro = new ResizeObserver(entries => {
-      for (let entry of entries) {
-        const cr = entry.contentRect;
+      for (const entry of entries) {
+        const cr = entry.contentRect
         this.onImageResize(cr.width, cr.height)
         this.updateAll()
       }
-    });
-    let imageEl = document.getElementById('main-image')
+    })
+    const imageEl = document.getElementById('main-image')
     // Observe one or multiple elements
-    this.ro.observe(imageEl);
-
+    this.ro.observe(imageEl)
   },
 
   watch: {
-    site: function(newVal, oldVal) {
-      this.$store.dispatch("images/load_latest_images");
+    site: function (newVal, oldVal) {
+      this.$store.dispatch('images/load_latest_images')
     },
 
-    current_image: function(newVal, oldVal) {
-      // If we're in the js9 window mode, keep the image updated with the 
+    current_image: function (newVal, oldVal) {
+      // If we're in the js9 window mode, keep the image updated with the
       // selected thumbnail.
       if (this.js9IsVisible) {
         this.js9LoadImage(newVal)
       }
-
     },
 
     lines: {
-      handler: function() {
+      handler: function () {
         this.drawLines.draw()
       },
-      deep: true,
+      deep: true
     },
-    
+
     points: {
-      handler: function() {
+      handler: function () {
         this.drawPoints.draw()
       },
-      deep: true,
+      deep: true
     },
     rects: {
-      handler: function() {
+      handler: function () {
         this.drawRects.draw()
       },
-      deep: true,
+      deep: true
     },
     circles: {
-      handler: function() {
+      handler: function () {
         this.drawCircles.draw()
       },
-      deep: true,
+      deep: true
     },
-    selectedId() {
+    selectedId () {
       this.updateAll()
       this.subframeDefinedWithFile = this.current_image.base_filename
     },
-    markedStars() {
+    markedStars () {
       this.drawStarmarkers.updateData(this.markedStars)
       this.drawStarmarkers.draw()
     }
   },
 
-
   methods: {
 
-    init() {
-
+    init () {
       this.svg = d3.select('#image_svg')
 
       this.drawPoints = new Point(this.svg, this.points, this.imageWidth, this.imageHeight)
@@ -186,14 +181,14 @@ export default {
 
       // Event actions to perform on the image window element
       this.svg
-        .on("mousedown", this.handleMouseDown) 
-        .on("mouseup", this.handleMouseUp)
-        //.on('keyup', e => console.log(e.key))
+        .on('mousedown', this.handleMouseDown)
+        .on('mouseup', this.handleMouseUp)
+        // .on('keyup', e => console.log(e.key))
 
       this.updateAll()
     },
 
-    updateAll() {
+    updateAll () {
       this.drawPoints.draw()
       this.drawLines.draw()
       this.drawRects.draw()
@@ -201,11 +196,9 @@ export default {
       this.drawStarmarkers.draw()
     },
 
-
-    onImageResize(width, height) {
-
-      // This happens when we load js9, since the jpg display goes away. 
-      if (width == 0 && height == 0) return;
+    onImageResize (width, height) {
+      // This happens when we load js9, since the jpg display goes away.
+      if (width == 0 && height == 0) return
 
       this.imageWidth = parseInt(width)
       this.imageHeight = parseInt(height)
@@ -221,32 +214,30 @@ export default {
       this.drawCircles.imageDimensions = [width, height]
       this.drawStarmarkers.imageDimensions = [width, height]
 
-
-      // This is fed to js9 just before displaying to set the matching size. 
-      this.js9width=parseInt(width)
-      this.js9height=parseInt(height)
+      // This is fed to js9 just before displaying to set the matching size.
+      this.js9width = parseInt(width)
+      this.js9height = parseInt(height)
       this.$store.commit('js9/js9Width', parseInt(width))
       this.$store.commit('js9/js9Height', parseInt(height))
       // Update the js9 size
       if (this.js9IsVisible) {
-        let resize_opts = {
-          id: "myJS9",
-          width: width, 
-          height: height,
+        const resize_opts = {
+          id: 'myJS9',
+          width,
+          height
         }
         this.$store.dispatch('js9/resizeDisplay', resize_opts)
       }
-
     },
 
-    handleMouseDown() {
-      d3.event.preventDefault();
-      let mouse = d3.mouse(this.svg.node())
+    handleMouseDown () {
+      d3.event.preventDefault()
+      const mouse = d3.mouse(this.svg.node())
 
       // Calculate image dimensions
-      let bounds = this.svg.node().getBoundingClientRect()
-      let imageWidth = bounds.width
-      let imageHeight = bounds.height
+      const bounds = this.svg.node().getBoundingClientRect()
+      const imageWidth = bounds.width
+      const imageHeight = bounds.height
 
       // Drawing a new line
       if (this.activeDrawShape == 'line') {
@@ -256,11 +247,11 @@ export default {
           x2: mouse[0] / imageWidth,
           y2: mouse[1] / imageHeight,
           color: 'gold',
-          show: true,
+          show: true
         })
-        this.svg.on("mousemove", () => {
-          let mouse = d3.mouse(this.svg.node())
-          let newLine = this.lines[this.lines.length - 1]
+        this.svg.on('mousemove', () => {
+          const mouse = d3.mouse(this.svg.node())
+          const newLine = this.lines[this.lines.length - 1]
           this.selectedId = newLine.id
           newLine.x2 = mouse[0] / this.imageWidth
           newLine.y2 = mouse[1] / this.imageHeight
@@ -273,26 +264,26 @@ export default {
           x2: mouse[0] / imageWidth,
           y2: mouse[1] / imageHeight,
           color: 'gold',
-          show: true,
+          show: true
         })
-        this.svg.on("mousemove", () => {
-          let mouse = d3.mouse(this.svg.node())
-          let newRect = this.rects[this.rects.length - 1]
+        this.svg.on('mousemove', () => {
+          const mouse = d3.mouse(this.svg.node())
+          const newRect = this.rects[this.rects.length - 1]
           this.selectedId = newRect.id
           newRect.x2 = mouse[0] / this.imageWidth
           newRect.y2 = mouse[1] / this.imageHeight
         })
       // Drawing a new point
-      } else if ( this.activeDrawShape == 'point') {
+      } else if (this.activeDrawShape == 'point') {
         this.$store.commit('drawshapes/addPoint', {
           x: mouse[0] / imageWidth,
           y: mouse[1] / imageHeight,
-          color: 'gold', 
-          show: true,
+          color: 'gold',
+          show: true
         })
-        this.svg.on("mousemove", () => {
-          let mouse = d3.mouse(this.svg.node())
-          let theNewPoint = this.points[this.points.length - 1]
+        this.svg.on('mousemove', () => {
+          const mouse = d3.mouse(this.svg.node())
+          const theNewPoint = this.points[this.points.length - 1]
           this.selectedId = theNewPoint.id
           theNewPoint.x = mouse[0] / this.imageWidth
           theNewPoint.y = mouse[1] / this.imageHeight
@@ -304,12 +295,12 @@ export default {
           y: mouse[1] / imageHeight,
           rx: 0,
           ry: 0,
-          color: 'gold', 
-          show: true,
+          color: 'gold',
+          show: true
         })
-        this.svg.on("mousemove", () => {
-          let mouse = d3.mouse(this.svg.node())
-          let newCircle = this.circles[this.circles.length - 1]
+        this.svg.on('mousemove', () => {
+          const mouse = d3.mouse(this.svg.node())
+          const newCircle = this.circles[this.circles.length - 1]
           this.selectedId = newCircle.id
           newCircle.rx = (mouse[0] / this.imageWidth) - newCircle.x
           newCircle.ry = (mouse[1] / this.imageHeight) - newCircle.y
@@ -317,86 +308,85 @@ export default {
       }
     },
 
-    handleMouseUp(context) {
+    handleMouseUp (context) {
       // We don't want every click to draw a shape. Users need to select what
-      // they want drawn each time. 
+      // they want drawn each time.
       this.activeDrawShape = 'none'
 
       // Remove the mousemove method
-      this.svg.on("mousemove", null)
+      this.svg.on('mousemove', null)
 
-      this.mouseIsDown = false;
+      this.mouseIsDown = false
     },
 
-    js9LoadImage(image) {
-      let the_load_options = {
+    js9LoadImage (image) {
+      const the_load_options = {
         site: image.site,
-        base_filename: image.base_filename,
+        base_filename: image.base_filename
       }
       this.$store.dispatch('js9/loadImage', the_load_options)
     },
 
-    toggleAnalysis() {
+    toggleAnalysis () {
       if (this.js9IsVisible) {
-        this.js9IsVisible = false;
+        this.js9IsVisible = false
         this.init()
       } else {
         this.js9LoadImage(this.current_image)
-        this.js9IsVisible = true;
+        this.js9IsVisible = true
       }
-    },
+    }
 
   },
   computed: {
 
-    ...mapGetters("images", [
-      "recent_images",
-      "current_image",
+    ...mapGetters('images', [
+      'recent_images',
+      'current_image'
     ]),
 
-
     js9IsVisible: {
-      get() { return this.$store.getters['js9/instanceIsVisible']},
-      set(val) { this.$store.commit('js9/instanceIsVisible', val)},
+      get () { return this.$store.getters['js9/instanceIsVisible'] },
+      set (val) { this.$store.commit('js9/instanceIsVisible', val) }
     },
 
     subframeIsActive: {
-        get() { return this.$store.getters['command_params/subframeIsActive']},
-        set(val) { this.$store.commit('command_params/subframeIsActive', val)},
+      get () { return this.$store.getters['command_params/subframeIsActive'] },
+      set (val) { this.$store.commit('command_params/subframeIsActive', val) }
     },
 
     subframeDefinedWithFile: {
-        get() { return this.$store.getters['command_params/subframeDefinedWithFile']},
-        set(val) { this.$store.commit('command_params/subframeDefinedWithFile', val)},
+      get () { return this.$store.getters['command_params/subframeDefinedWithFile'] },
+      set (val) { this.$store.commit('command_params/subframeDefinedWithFile', val) }
     },
 
     ...mapState('drawshapes', [
-      'shapes', 
-      'lines', 
-      'rects', 
-      'circles', 
-      'points', 
+      'shapes',
+      'lines',
+      'rects',
+      'circles',
+      'points',
       'starmarkers'
     ]),
 
     selectedId: {
-      get() { return this.$store.getters['drawshapes/selectedId']},
-      set(val) { this.$store.commit('drawshapes/selectedId', val)}
+      get () { return this.$store.getters['drawshapes/selectedId'] },
+      set (val) { this.$store.commit('drawshapes/selectedId', val) }
     },
 
     // User selection for which shape they want to draw
     activeDrawShape: {
-      get() { return this.$store.getters['drawshapes/activeDrawShape']},
-      set(val) { this.$store.commit('drawshapes/activeDrawShape', val)}
+      get () { return this.$store.getters['drawshapes/activeDrawShape'] },
+      set (val) { this.$store.commit('drawshapes/activeDrawShape', val) }
     },
 
     crosshairsVisible: {
-      get() { return this.$store.getters['drawshapes/crosshairsVisible']},
-      set(val) { this.$store.commit('drawshapes/crosshairsVisible', val)}
-    },
+      get () { return this.$store.getters['drawshapes/crosshairsVisible'] },
+      set (val) { this.$store.commit('drawshapes/crosshairsVisible', val) }
+    }
 
   }
-};
+}
 </script>
 
 <style scoped lang="scss">
@@ -408,10 +398,10 @@ $controls-height: 55px;
 
 $square-image-height: calc(
   100vh - #{
-    $top-bottom-height 
-    + $infobar-height 
-    + $thumbnails-height 
-    + $controls-height} 
+    $top-bottom-height
+    + $infobar-height
+    + $thumbnails-height
+    + $controls-height}
   - 4em);
 $max-div-width: $square-image-height;
 
