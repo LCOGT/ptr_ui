@@ -3,59 +3,57 @@ export const user_mixin = {
 
   computed: {
 
-    userIsAdmin() {
+    userIsAdmin () {
       try {
-        let user = this.$auth.user 
-        let roles = user['https://photonranch.org/user_metadata'].roles
+        const user = this.$auth.user
+        const roles = user['https://photonranch.org/user_metadata'].roles
         return roles.includes('admin')
       } catch {
         return false
       }
     },
 
-		userIsAuthenticated() {
-			let user = this.$auth.user
-			return user !== undefined
-		},
+    userIsAuthenticated () {
+      const user = this.$auth.user
+      return user !== undefined
+    },
 
-    userId() {
-      return this.userIsAuthenticated 
+    userId () {
+      return this.userIsAuthenticated
         ? this.$auth.user.sub
         : null
     },
-    userName() {
-      return this.userIsAuthenticated 
+    userName () {
+      return this.userIsAuthenticated
         ? this.$auth.user.name
         : null
     },
-    userNickname() {
-      return this.userIsAuthenticated 
+    userNickname () {
+      return this.userIsAuthenticated
         ? this.$auth.user.nickname
         : null
     },
-    userEmail() {
-      return this.userIsAuthenticated 
+    userEmail () {
+      return this.userIsAuthenticated
         ? this.$auth.user.email
         : null
-    },
+    }
 
   },
 
   methods: {
 
-    login() {
-      this.$auth.loginWithPopup();
+    login () {
+      this.$auth.loginWithPopup()
     },
 
-    logout() {
+    logout () {
       // save the path we will redirect back to after logout is complete
       window.localStorage.setItem('ptr_logout_redirect_path', this.$router.currentRoute.fullPath)
       this.$auth.logout({
         returnTo: `${window.location.origin}/logout`
       })
-    },
-
-
+    }
 
   }
 
