@@ -1,7 +1,10 @@
 <template>
-    <div style="z-index: 1;">
-        <div class="google-map" :id="mapName"></div>
-    </div>
+  <div style="z-index: 1;">
+    <div
+      :id="mapName"
+      class="google-map"
+    />
+  </div>
 </template>
 
 <script>
@@ -12,7 +15,7 @@ import { makeIcon } from './mapHelpers'
 
 export default {
   name: 'TheWorldMap',
-  props: ['name', ],
+  props: ['name'],
   data: function () {
     return {
 
@@ -26,55 +29,47 @@ export default {
       oms: '', // OverlappingMarkerSpiderfier
 
       // The marker depicting the sun's position
-      sunMapMarker: '',
+      sunMapMarker: ''
     }
   },
-  async mounted() {
+  async mounted () {
     this.initMap()
   },
-  beforeDestroy() {
+  beforeDestroy () {
     // Remove the looping intervals that update the sun and daylight regions on the map.
     clearInterval(this.updateTwilightInterval)
     clearInterval(this.updateSunInterval)
   },
-  
+
   methods: {
 
-    addMarkerWithData(markerData) {
-      const white = { r: 255, g: 255, b: 255};
+    addMarkerWithData (markerData) {
+      const white = { r: 255, g: 255, b: 255 }
       const marker = new google.maps.Marker({
-          position: markerData,
-          draggable: true,
-      });
+        position: markerData,
+        draggable: true
+      })
 
-      function darkenColor(rgb) {
-        return {
-            r: rgb.r - 50,
-            g: rgb.g - 50,
-            b: rgb.b - 50,
-        }
-      }
       google.maps.event.addListener(marker, 'spider_format', function (status) {
-          const markerStatus = OverlappingMarkerSpiderfier.markerStatus
-          const showName = status == markerStatus.UNSPIDERFIABLE || status == markerStatus.SPIDERFIED
-          const showPlus = status == markerStatus.SPIDERFIABLE
-          const sizeCoefficient = showName ? 1.5 : 1.5
+        const markerStatus = OverlappingMarkerSpiderfier.markerStatus
+        const showName = status == markerStatus.UNSPIDERFIABLE || status == markerStatus.SPIDERFIED
+        const showPlus = status == markerStatus.SPIDERFIABLE
+        const sizeCoefficient = showName ? 1.5 : 1.5
 
-          marker.setIcon({
-              url: makeIcon(markerData.rgb, white,
-                  showPlus ? white : false,
-                  showName ? markerData.name : false),
-              scaledSize: new google.maps.Size(23*sizeCoefficient, 32*sizeCoefficient)  // makes SVG icons work in IE
-          });
-      });
+        marker.setIcon({
+          url: makeIcon(markerData.rgb, white,
+            showPlus ? white : false,
+            showName ? markerData.name : false),
+          scaledSize: new google.maps.Size(23 * sizeCoefficient, 32 * sizeCoefficient) // makes SVG icons work in IE
+        })
+      })
       this.oms.addMarker(marker, e => {
-          this.iw.setContent(markerData.content);
-          this.iw.open(this.map, marker);
-      });
+        this.iw.setContent(markerData.content)
+        this.iw.open(this.map, marker)
+      })
     },
 
-
-    async initMap() {
+    async initMap () {
       await this.$store.dispatch('sitestatus/getSiteOpenStatus')
       const sun_pos = { lat: nite.calculatePositionOfSun().lat(), lng: nite.calculatePositionOfSun().lng() }
       const map_center_latitude = 15 // puts sites at a more visibly comfortable location
@@ -82,7 +77,7 @@ export default {
         zoom: 2,
         center: new google.maps.LatLng(map_center_latitude, sun_pos.lng + 180),
         styles: google_map_styles
-      });
+      })
 
       // Draw the daylight regions, and update every few seconds.
       nite.init(this.map)
@@ -92,44 +87,42 @@ export default {
       this.drawSunMarker()
       this.updateSunInterval = setInterval(this.updateSunPosition, 10000)
 
-      let sites = this.all_sites
-       
+      const sites = this.all_sites
+
       const oms = new OverlappingMarkerSpiderfier(this.map, {
         markersWontMove: true,
         markersWontHide: true,
         keepSpiderfied: true,
         circleFootSeparation: 35,
-        nearbyDistance: 35,
-      });
+        nearbyDistance: 35
+      })
       this.oms = oms
 
-      const iw = new google.maps.InfoWindow();
+      const iw = new google.maps.InfoWindow()
       this.iw = iw
 
-      function iwClose() { iw.close(); }
-      google.maps.event.addListener(this.map, 'click', iwClose);
+      function iwClose () { iw.close() }
+      google.maps.event.addListener(this.map, 'click', iwClose)
 
-      const markers = sites.filter(site => {
-        // First, remove sites that don't have an available status 
+      sites.filter(site => {
+        // First, remove sites that don't have an available status
         return Object.keys(this.site_open_status).includes(site.site)
-      }).map(site => {
-
+      }).forEach(site => {
         const markerData = {
           lat: site.latitude,
-          lng: site.longitude, 
+          lng: site.longitude,
           rgb: this.getSiteMapColor(this.site_open_status[site.site]),
           content: this.renderSiteContent(site.name, site.site, this.site_open_status[site.site]),
-          name: site.site.toUpperCase(),
+          name: site.site.toUpperCase()
         }
 
         this.addMarkerWithData(markerData)
       })
-
     },
 
     // Draw the sun for the first time
-    drawSunMarker() {
-      let sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
+    drawSunMarker () {
+      const sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
       this.sunMapMarker = new google.maps.Marker({
         position: sun_pos,
         icon: {
@@ -147,14 +140,12 @@ export default {
     },
 
     // Reposition the sun to its current position
-    updateSunPosition() {
-
-      var sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
+    updateSunPosition () {
+      const sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
       this.sunMapMarker.setPosition(sun_pos)
     },
 
-    renderSiteContent(name, sitecode, openStatus) {
-
+    renderSiteContent (name, sitecode, openStatus) {
       const weather_status_not_stale = openStatus?.weather?.status_age_s < 300
 
       let weather_status = ` 
@@ -187,14 +178,14 @@ export default {
                 </div>
                 <div class="val">
                   <span style="color:${openStatus.wx_ok ? 'greenyellow' : 'red'}">
-                  ${openStatus.wx_ok ? "ok" : "poor"}
+                  ${openStatus.wx_ok ? 'ok' : 'poor'}
                   </span>
                 </div>
             </div>
         `
-        }
+      }
 
-        let style = `
+      const style = `
         <style>
           .status-entry {
             font-weight: normal;
@@ -233,7 +224,7 @@ export default {
         </style>
         `
 
-        let contentString = `
+      const contentString = `
 
           ${style}
 
@@ -253,60 +244,59 @@ export default {
               </div>
             </div>
           </div>`
-        return contentString
+      return contentString
     },
 
     /*
-      Strategy: 
+      Strategy:
         if weather status is recent and wx_ok is true: green dot
         if weather status is recent and wx_ok is false: red dot
         otherwise: grey dot
     */
-    getSiteMapColor(site_open_status) {
+    getSiteMapColor (site_open_status) {
       const colors = {
-        yellow: {r: 221, g: 156, b: 0},
-        red: {r: 205, g: 0, b: 0},
-        green: {r: 53, g: 154, b: 34},
-        grey: {r: 100, g: 100, b: 100},
+        yellow: { r: 221, g: 156, b: 0 },
+        red: { r: 205, g: 0, b: 0 },
+        green: { r: 53, g: 154, b: 34 },
+        grey: { r: 100, g: 100, b: 100 }
       }
       const status_age_online = 300 // max number of seconds to be considered online
-      // online sites: weather is sending and ok. 
+      // online sites: weather is sending and ok.
       if (Object.keys(site_open_status).includes('wx_ok')) {
-        let weather_ok = site_open_status.wx_ok 
-        let weather_status_age = site_open_status.weather.status_age_s
-        let weather_is_recent = weather_status_age < status_age_online
+        const weather_ok = site_open_status.wx_ok
+        const weather_status_age = site_open_status.weather.status_age_s
+        const weather_is_recent = weather_status_age < status_age_online
         if (!weather_is_recent) {
-          return colors['grey']
+          return colors.grey
         }
         else {
-          return weather_ok ? colors['green'] : colors['red']
+          return weather_ok ? colors.green : colors.red
         }
       }
-      return colors['grey']
+      return colors.grey
     },
 
-    async redrawMapSites() {
+    async redrawMapSites () {
       // Fetch the list of sites to display on the map
       await this.$store.dispatch('sitestatus/getSiteOpenStatus')
-      let sites = this.all_sites.reverse()
+      const sites = this.all_sites.reverse()
 
       // For each site, draw a marker with a popup (on click) to visit the site.
       sites.forEach(site => {
-
         // Skip if the site doesn't have any status available
         if (!Object.keys(this.site_open_status).includes(site.site)) { return }
 
-        let icon_color = this.getSiteMapColor(this.site_open_status[site.site])
+        const icon_color = this.getSiteMapColor(this.site_open_status[site.site])
 
-        var marker = new google.maps.Marker({
+        const marker = new google.maps.Marker({
           position: { lat: site.latitude, lng: site.longitude },
           map: this.map,
           icon: {
             url: `http://maps.google.com/mapfiles/ms/icons/${icon_color}-dot.png`
           },
-          title: site.name,
+          title: site.name
         })
-        let siteInfoWindow = new google.maps.InfoWindow({
+        const siteInfoWindow = new google.maps.InfoWindow({
           content: this.renderSiteContent(site.name, site.site, this.site_open_status[site.site])
         })
         this.infoWindows.push(siteInfoWindow)
@@ -315,25 +305,24 @@ export default {
           siteInfoWindow.open(this.map, marker)
         })
       })
-      
-    },
+    }
 
   },
 
   watch: {
-    all_sites() {
-      //this.redrawMapSites()
+    all_sites () {
+      // this.redrawMapSites()
     },
-    site_open_status() {
-      //this.initMap()
-    },
+    site_open_status () {
+      // this.initMap()
+    }
   },
-  
+
   computed: {
     ...mapGetters('site_config', ['all_sites']),
     ...mapState('sitestatus', ['site_open_status']),
-    ...mapActions('sitestatus', ['getSiteOpenStatus']),
-  },
+    ...mapActions('sitestatus', ['getSiteOpenStatus'])
+  }
 }
 </script>
 
