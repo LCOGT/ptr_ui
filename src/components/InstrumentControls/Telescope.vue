@@ -136,7 +136,7 @@
       <p class="control">
         <command-button
           :data="mount_slew_hadec_command"
-          style="margin-bottom: 1em; border-left-color: #48c774"
+          style="margin-bottom: 1em"
           class="is-small"
         />
       </p>
