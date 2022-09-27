@@ -11,6 +11,9 @@ const state = {
     mount_ra: '',
     mount_dec: '',
     mount_object: '',
+    mount_ha: '0',
+    mount_az: '0',
+    mount_alt: '45',
 
     telescope_selection: 1, // 1: main telescope, 2: auxiliary telescope
     telescope_coordinate_frame: 'ICRS',
@@ -52,6 +55,9 @@ const getters = {
     mount_ra: state => state.mount_ra,
     mount_dec: state => state.mount_dec,
     mount_object: state => state.mount_object,
+    mount_ha: state => state.mount_ha,
+    mount_az: state => state.mount_az,
+    mount_alt: state => state.mount_alt,
 
     telescope_selection: state => state.telescope_selection,
     telescope_coordinate_frame: state => state.telescope_coordinate_frame,

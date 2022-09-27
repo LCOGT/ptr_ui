@@ -93,6 +93,26 @@
                          v-model="targets[n-1].dec" />
             </b-field>
 
+            <b-field style="margin-left: 2em;">
+                <template #label>
+                    Hours / Degrees
+                    <b-tooltip type="is-dark" label="When this is turned on, PTR expects units in RA hours. When off, PTR expects units in RA degrees.">
+                        <b-icon size="is-small" icon="help-circle-outline"></b-icon>
+                    </b-tooltip>
+                </template>
+                <b-checkbox v-model="targets.RAhours"></b-checkbox>
+            </b-field>
+
+            <b-field style="margin-left: 2em;">
+                <template #label>
+                    Sexagesimal?
+                    <b-tooltip type="is-dark" label="When this is turned on, PTR expects units in Hours Minutes Seconds. When off, PTR expects units in Decimals.">
+                        <b-icon size="is-small" icon="help-circle-outline"></b-icon>
+                    </b-tooltip>
+                </template>
+                <b-checkbox v-model="targets.hrsminssecs"></b-checkbox>
+            </b-field>
+
         </div>
 
         <!-- Multi-select dropdown, choose which sites a project can be scheduled at -->
@@ -468,6 +488,8 @@ export default {
 
             this.targets = project.project_targets.map(target => ({...target, active: true}))
             this.targets_index = this.targets.length
+            this.targets.RAhours = true
+            this.targets.hrsminssecs = false
             this.project_note = project.project_note
             this.exposures = project.exposures.map(exposure => ({...exposure, active: true}))
             this.exposures_index = this.exposures.length
@@ -486,6 +508,7 @@ export default {
             project_note: '',
 
             project_sites: [this.sitecode],
+            
 
             exposures_index: 1,
             exposures: [
@@ -502,6 +525,9 @@ export default {
                     defocus: 0,
                 },
             ],
+            
+
+            
 
             targets_index: 1,
             targets: [
@@ -510,8 +536,12 @@ export default {
                     name: '',
                     ra: '',
                     dec: '',
+                    RAhours: true,
+                    hrsminssecs: false,
                 },
+                
             ],
+            
 
             project_constraints: {
                 project_is_active: true,
@@ -593,6 +623,8 @@ export default {
         this.targets[0].ra = this.mount_ra
         this.targets[0].dec = this.mount_dec
         this.targets[0].name = this.mount_object
+        this.targets.RAhours = true
+        this.targets.hrsminssecs = false
 
     },
     methods: {
@@ -622,6 +654,32 @@ export default {
             }
         },
 
+        RAfromSexagesimal(rasexag) {
+
+          let raarray = rasexag.replace(":", " ").replace(":", " ").replace(".", " ").split(" ")
+
+          let rahrs = Number(raarray[0]) + Number(raarray[1]/60) + Number(raarray[2]/3600)
+          console.log(rahrs)
+       
+          return rahrs 
+        
+        },
+
+        DECfromSexagesimal(decsexag) {
+          
+          let decarray = decsexag.replace(":", " ").replace(":", " ").replace(".", " ").split(" ")
+
+          if (Math.sign(Number(decarray[[0]])) == -1) {            
+             return  Number(decarray[0]) - Number(decarray[1]/60) - Number(decarray[2]/3600)
+          } 
+          else {
+             return Number(decarray[0]) + Number(decarray[1]/60) + Number(decarray[2]/3600)
+          }
+
+        },
+        
+
+
         clearProjectForm() {
             this.modifying_existing_project = false
             this.loaded_project_name = ''
@@ -629,14 +687,20 @@ export default {
 
             this.project_name = '' 
             this.project_events = []
+            
             this.targets = [
                 {
                     active: true,
                     name: '',
                     ra: '',
                     dec: '',
+                    RAhours: true,
+                    hrsminssecs: false,
                 },
             ]
+            this.targets.RAhours = true,
+            this.targets.hrsminssecs = false,
+
             this.targets_index = 1
             this.project_note = ""
             this.project_sites = [this.sitecode]
@@ -723,6 +787,8 @@ export default {
                 name: '',
                 ra: '', 
                 dec: '',
+                RAhours: true,
+                hrsminssecs: false,
             })
 
             // Show one additional row
@@ -775,6 +841,20 @@ export default {
                 let key = `bin${e.bin}#exposure${e.exposure}#filter${e.filter}`
                 remaining[key] = e.count
             })
+
+            // Make sure that correct format of RA and dec is sent to the site-code
+
+            // Convert Sexagesimal 
+            if (this.targets.hrsminssecs == true) {
+              this.targets[0].ra=this.RAfromSexagesimal(this.targets[0].ra)
+              this.targets[0].dec=this.DECfromSexagesimal(this.targets[0].dec)              
+              this.targets.RAhours = true
+              this.targets.hrsminssecs = false
+            }
+
+            // Decimal RA degrees to Decimal RA hours
+            if ( this.targets.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15}
+            this.targets.RAhours = true
 
             let project = {
                 project_name: this.project_name,
@@ -833,6 +913,11 @@ export default {
 
         modifyProject() {
             let url = this.projects_api_url + '/modify-project'
+
+            // Make sure that correct format of RA is sent to the site-code
+            if ( this.targets.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15}
+            this.targets.RAhours = true
+
             let project = {
                 project_name: this.project_name,
                 created_at: moment().utc().format(),
