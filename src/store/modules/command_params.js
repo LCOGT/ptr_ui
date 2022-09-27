@@ -125,15 +125,6 @@ const mutations = {
         // finally, update the declination
         state.mount_dec = val; 
     },
-    mount_ha(state, val) { 
-        let mount_ha = 0
-    },
-    mount_az(state, val) { 
-        let mount_az = 0
-    },
-    mount_alt(state, val) { 
-        let mount_alt = 30
-    },
     mount_object(state, val) { state.mount_object = val; },
 
     telescope_selection(state, val) { state.telescope_selection = val; },
