@@ -125,6 +125,9 @@ const mutations = {
         // finally, update the declination
         state.mount_dec = val; 
     },
+    mount_ha(state, val) { state.mount_ha = val; },
+    mount_az(state, val) { state.mount_az = val; },
+    mount_alt(state, val) { state.mount_alt = val; },
     mount_object(state, val) { state.mount_object = val; },
 
     telescope_selection(state, val) { state.telescope_selection = val; },
