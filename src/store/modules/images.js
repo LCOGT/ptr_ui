@@ -519,7 +519,7 @@ const actions = {
 
         const path = '/download';
         let body = {
-            object_name: `${base_filename}-${data_type}${reduction_level}.fits.bz2`
+            object_name: `${base_filename}-${data_type}${reduction_level}.fits.fz`
         }
         const fits_url = await axios.post(apiName+path, body);
 

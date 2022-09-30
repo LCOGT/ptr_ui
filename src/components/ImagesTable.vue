@@ -237,7 +237,7 @@ export default {
       //this.download_in_progress.push(current_download_id)
 
       let large_fits_reduction_level = this.$store.state.images.large_fits_reduction_level
-      let object_name = `${image.base_filename}-${image.data_type}${large_fits_reduction_level}.fits.bz2`
+      let object_name = `${image.base_filename}-${image.data_type}${large_fits_reduction_level}.fits.fz`
 
       const url = `${this.$store.state.api_endpoints.active_api}/download`
       let body = {
@@ -258,7 +258,7 @@ export default {
       this.add_download_progress(current_download_id)
 
       let large_fits_reduction_level = this.$store.state.images.large_fits_reduction_level
-      let object_name = `${image.base_filename}-${image.data_type}${large_fits_reduction_level}.fits.bz2`
+      let object_name = `${image.base_filename}-${image.data_type}${large_fits_reduction_level}.fits.fz`
 
       const url = `${this.$store.state.api_endpoints.active_api}/download`
       let body = {
