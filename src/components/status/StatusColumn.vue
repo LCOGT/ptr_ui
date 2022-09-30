@@ -1,39 +1,40 @@
 <template>
-    <div class="status-grid" >
-        <div 
-            v-for="(item,key) in statusList"
-            v-bind:key="`k-${key}`"
-            class="key"
-            :class="{'spacer': item.val=='spacer'}"
-            >{{item.name}}</div>
-
-        <div 
-            v-for="(item,key) in statusList"
-            v-bind:key="`v-${key}`"
-            :class="{'spacer': item.val=='spacer'}"
-            >
-                <StatusVal :status-item="item" />
-            </div>
-
+  <div class="status-grid">
+    <div
+      v-for="(item,key) in statusList"
+      :key="`k-${key}`"
+      class="key"
+      :class="{'spacer': item.val=='spacer'}"
+    >
+      {{ item.name }}
     </div>
+
+    <div
+      v-for="(item,key) in statusList"
+      :key="`v-${key}`"
+      :class="{'spacer': item.val=='spacer'}"
+    >
+      <StatusVal :status-item="item" />
+    </div>
+  </div>
 </template>
 
 <script>
-import StatusVal from "@/components/status/StatusVal"
+import StatusVal from '@/components/status/StatusVal'
 export default {
-    components: {
-        StatusVal,
+  components: {
+    StatusVal
+  },
+  props: {
+    statusList: {
+      type: Array,
+      default: () => []
     },
-    props: {
-        'statusList': {
-            type: Array,
-            default: () => [],
-        },
-        'isOffline': {
-            type: Boolean,
-            default: false,
-        }
-    },
+    isOffline: {
+      type: Boolean,
+      default: false
+    }
+  }
 }
 </script>
 
@@ -59,7 +60,7 @@ export default {
 }
 .spacer {
     display: inline-block;
-    height: 1em; 
+    height: 1em;
     visibility: hidden;
 }
 .is-stale {

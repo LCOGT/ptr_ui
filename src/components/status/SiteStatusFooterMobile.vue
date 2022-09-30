@@ -1,247 +1,275 @@
 
 <template>
-    <div class="site-status-footer-mobile-wrapper">
-
-        <div class="status-tabs">
-            <div class="button main-status-button" @click="toggle_main_status">
-                status
-            </div>
-            <div class="button user-status-button" @click="toggle_user_status">
-                logs
-            </div>
-        </div>
-
-        <div class="overlay" v-if="status_visible">
-
-            <!-- Backdrop -->
-            <div class="backdrop" @click="hide_status"/>
-
-            <!-- Content -->
-            <div class="status-content">
-
-                <!-- Main Status Display -->
-                <div class="main-status-mobile" v-if="main_status_visible">
-
-                    <div class="main-status-header">
-                        <div class="online-status">
-                            <div style="display:flex; align-items:center;">
-                                <div :class="{'status-on':site_is_online, 'status-off':!site_is_online}" ></div>
-                                <p v-if="site_is_online" style="font-weight: bold; color: greenyellow;">online</p>
-                                <p v-if="!site_is_online" style="font-weight: bold; color: orangered;">offline</p>
-                            </div>
-                        </div>
-                        <div style="display:flex; flex-direction:column; align-items:center;">
-                            <div class="sidereal-time" :class="{'offline': !site_is_online}">
-                                <site-sidereal-time :longitude="site_longitude"/> 
-                            </div>
-                            <div class="sidereal-label">
-                                sidereal time
-                            </div>
-                        </div>
-                    </div>
-                    <div class="main-status-items">
-
-                        <status-column 
-                            style="padding: 0;"
-                            :isOffline="!site_is_online"
-                            :statusList="status_display_left"/>
-
-                        <status-column 
-                            style="padding: 0;"
-                            :isOffline="!site_is_online"
-                            :statusList="status_display_right"/>
-                    </div>
-                </div>
-
-                <!-- User Status Display -->
-                <div class="user-status-mobile" v-if="user_status_visible">
-                    <div class="user-status expanded" ref="loglist">
-
-                        <div class="default-log-message">
-                            observatory logs will appear below
-                        </div>
-
-                        <div 
-                            v-for="(log, idx) in user_status_logs"
-                            v-bind:key="idx"
-                            class="log-line"
-                            >
-                            <div class="log-timestamp">
-                                <b-tooltip 
-                                    position="is-right" 
-                                    type="is-dark" 
-                                    :label="timestamp_to_date(log.timestamp)">
-                                    {{timestamp_to_logdate(log.timestamp)}}
-                                </b-tooltip>
-                            </div>
-                            <pre 
-                                class="log-message"
-                                :class="get_log_level_classes(log)"
-                                >
-                                {{format_log_message_text(log)}}
-                            </pre>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
+  <div class="site-status-footer-mobile-wrapper">
+    <div class="status-tabs">
+      <div
+        class="button main-status-button"
+        @click="toggle_main_status"
+      >
+        status
+      </div>
+      <div
+        class="button user-status-button"
+        @click="toggle_user_status"
+      >
+        logs
+      </div>
     </div>
+
+    <div
+      v-if="status_visible"
+      class="overlay"
+    >
+      <!-- Backdrop -->
+      <div
+        class="backdrop"
+        @click="hide_status"
+      />
+
+      <!-- Content -->
+      <div class="status-content">
+        <!-- Main Status Display -->
+        <div
+          v-if="main_status_visible"
+          class="main-status-mobile"
+        >
+          <div class="main-status-header">
+            <div class="online-status">
+              <div style="display:flex; align-items:center;">
+                <div :class="{'status-on':site_is_online, 'status-off':!site_is_online}" />
+                <p
+                  v-if="site_is_online"
+                  style="font-weight: bold; color: greenyellow;"
+                >
+                  online
+                </p>
+                <p
+                  v-if="!site_is_online"
+                  style="font-weight: bold; color: orangered;"
+                >
+                  offline
+                </p>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <div
+                class="sidereal-time"
+                :class="{'offline': !site_is_online}"
+              >
+                <site-sidereal-time :longitude="site_longitude" />
+              </div>
+              <div class="sidereal-label">
+                sidereal time
+              </div>
+            </div>
+          </div>
+          <div class="main-status-items">
+            <status-column
+              style="padding: 0;"
+              :is-offline="!site_is_online"
+              :status-list="status_display_left"
+            />
+
+            <status-column
+              style="padding: 0;"
+              :is-offline="!site_is_online"
+              :status-list="status_display_right"
+            />
+          </div>
+        </div>
+
+        <!-- User Status Display -->
+        <div
+          v-if="user_status_visible"
+          class="user-status-mobile"
+        >
+          <div
+            ref="loglist"
+            class="user-status expanded"
+          >
+            <div class="default-log-message">
+              observatory logs will appear below
+            </div>
+
+            <div
+              v-for="(log, idx) in user_status_logs"
+              :key="idx"
+              class="log-line"
+            >
+              <div class="log-timestamp">
+                <b-tooltip
+                  position="is-right"
+                  type="is-dark"
+                  :label="timestamp_to_date(log.timestamp)"
+                >
+                  {{ timestamp_to_logdate(log.timestamp) }}
+                </b-tooltip>
+              </div>
+              <pre
+                class="log-message"
+                :class="get_log_level_classes(log)"
+              >
+                                {{ format_log_message_text(log) }}
+                            </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import moment from 'moment';
+import moment from 'moment'
 import { user_status_mixin } from '@/mixins/user_status_mixin'
 import StatusColumn from '@/components/status/StatusColumn'
 import SiteSiderealTime from '@/components/display/SiteSiderealTime'
 export default {
-    name: 'SiteStatusFooterMobile',
-    mixins: [ user_status_mixin],
-    components: {
-        StatusColumn,
-        SiteSiderealTime
-    },
-    props: {
-        site: String,
-    },
+  name: 'SiteStatusFooterMobile',
+  mixins: [user_status_mixin],
+  components: {
+    StatusColumn,
+    SiteSiderealTime
+  },
+  props: {
+    site: String
+  },
 
-    data() {
-        return {
-            status_visible: false,
-            main_status_visible: false,
-            user_status_visible: false,
-        }
-    },
+  data () {
+    return {
+      status_visible: false,
+      main_status_visible: false,
+      user_status_visible: false
+    }
+  },
 
-    created() {
-        this.set_user_status_active_site(this.site)
-    },
+  created () {
+    this.set_user_status_active_site(this.site)
+  },
 
-    watch: {
+  watch: {
 
-        site() {
-            this.set_user_status_active_site(this.site)
-        },
-
-        user_status_logs() {
-            const div = this.$refs.loglist;
-            if (this.user_status_visible && this.isScrolledToBottom(div)) {
-                this.$nextTick(this.scrollToBottom)
-            }
-        },
+    site () {
+      this.set_user_status_active_site(this.site)
     },
 
-    methods: {
+    user_status_logs () {
+      const div = this.$refs.loglist
+      if (this.user_status_visible && this.isScrolledToBottom(div)) {
+        this.$nextTick(this.scrollToBottom)
+      }
+    }
+  },
 
-        hide_status() {
-            this.status_visible = false;
-            this.main_status_visible = false;
-            this.user_status_visible = false;
-        },
-        toggle_main_status() {
-            if (this.main_status_visible) {
-                this.hide_status()
-                return
-            } else {
-                this.main_status_visible = true;
-                this.user_status_visible = false;
-                this.status_visible = true;
-            }
-        },
-        toggle_user_status() {
-            if (this.user_status_visible) {
-                this.hide_status()
-            } else {
-                this.user_status_visible = true;
-                this.main_status_visible = false;
-                this.status_visible = true;
-                this.$nextTick(this.scrollToBottom)
-            }
-        },
+  methods: {
 
-        // Returns true if the element is scrolled to the bottom
-        isScrolledToBottom(el) {
-            var $el = $(el);
-            return el.scrollHeight - $el.scrollTop() - $el.outerHeight() < 1;
-        },
-            
-        // This method will scroll the log window to the bottom (to the latest 
-        // message)
-        scrollToBottom() {
-            const div = this.$refs.loglist;
-            div.scrollTop = div.scrollHeight - div.clientHeight;
-        },
-        // Method for converting timestamp(seconds) to a date that reads easily
-        // in the log UI
-        timestamp_to_logdate(timestamp) {
-            const timestamp_ms = timestamp * 1000
-            return moment(timestamp_ms).format('HH:mm:ss UTC')
-        },            
-
-        // Used to format the time for the timestmap tooltip.
-        // (reveals the yyyy/mm/dd, not included in the default view)
-        timestamp_to_date(timestamp) {
-            const timestamp_ms = timestamp * 1000
-            return moment(timestamp_ms).format('YYYY/MM/DD')
-        },
-
+    hide_status () {
+      this.status_visible = false
+      this.main_status_visible = false
+      this.user_status_visible = false
     },
-    computed: {
-
-        ...mapGetters('site_config', ['site_longitude']),
-        ...mapGetters('sitestatus', [
-            'site_is_online',
-
-            'weather_ok',
-            'open_ok',
-            'enclosure_open_status',
-            'enclosure_mode',
-            'dome_azimuth',
-            'dome_slewing',
-            'enclosure_synchronized',
-
-            'sky_temp',
-            'air_temp',
-            'humidity',
-            'dewpoint',
-            'wind',
-            'surface',
-            'ambient',
-            'meas_sky_mpsas',
-            'calc_sky_mpsas',
-        ]),
-
-        status_display_left() {
-            const spacer = {name: 'spacer', val: 'spacer'}
-            let status = [
-                this.weather_ok,
-                this.open_ok,
-                spacer,
-                this.enclosure_open_status,
-                this.enclosure_mode,
-                spacer,
-                this.dome_azimuth,
-                this.dome_slewing,
-                this.enclosure_synchronized
-            ]
-            return status
-        },
-        status_display_right() {
-            let status = [
-                this.sky_temp,
-                this.air_temp,
-                this.humidity,
-                this.dewpoint,
-                this.wind,
-                this.surface,
-                this.meas_sky_mpsas,
-                this.calc_sky_mpsas,
-            ]
-            return status
-        },
+    toggle_main_status () {
+      if (this.main_status_visible) {
+        this.hide_status()
+      } else {
+        this.main_status_visible = true
+        this.user_status_visible = false
+        this.status_visible = true
+      }
     },
+    toggle_user_status () {
+      if (this.user_status_visible) {
+        this.hide_status()
+      } else {
+        this.user_status_visible = true
+        this.main_status_visible = false
+        this.status_visible = true
+        this.$nextTick(this.scrollToBottom)
+      }
+    },
+
+    // Returns true if the element is scrolled to the bottom
+    isScrolledToBottom (el) {
+      const $el = $(el)
+      return el.scrollHeight - $el.scrollTop() - $el.outerHeight() < 1
+    },
+
+    // This method will scroll the log window to the bottom (to the latest
+    // message)
+    scrollToBottom () {
+      const div = this.$refs.loglist
+      div.scrollTop = div.scrollHeight - div.clientHeight
+    },
+    // Method for converting timestamp(seconds) to a date that reads easily
+    // in the log UI
+    timestamp_to_logdate (timestamp) {
+      const timestamp_ms = timestamp * 1000
+      return moment(timestamp_ms).format('HH:mm:ss UTC')
+    },
+
+    // Used to format the time for the timestmap tooltip.
+    // (reveals the yyyy/mm/dd, not included in the default view)
+    timestamp_to_date (timestamp) {
+      const timestamp_ms = timestamp * 1000
+      return moment(timestamp_ms).format('YYYY/MM/DD')
+    }
+
+  },
+  computed: {
+
+    ...mapGetters('site_config', ['site_longitude']),
+    ...mapGetters('sitestatus', [
+      'site_is_online',
+
+      'weather_ok',
+      'open_ok',
+      'enclosure_open_status',
+      'enclosure_mode',
+      'dome_azimuth',
+      'dome_slewing',
+      'enclosure_synchronized',
+
+      'sky_temp',
+      'air_temp',
+      'humidity',
+      'dewpoint',
+      'wind',
+      'surface',
+      'ambient',
+      'meas_sky_mpsas',
+      'calc_sky_mpsas'
+    ]),
+
+    status_display_left () {
+      const spacer = { name: 'spacer', val: 'spacer' }
+      const status = [
+        this.weather_ok,
+        this.open_ok,
+        spacer,
+        this.enclosure_open_status,
+        this.enclosure_mode,
+        spacer,
+        this.dome_azimuth,
+        this.dome_slewing,
+        this.enclosure_synchronized
+      ]
+      return status
+    },
+    status_display_right () {
+      const status = [
+        this.sky_temp,
+        this.air_temp,
+        this.humidity,
+        this.dewpoint,
+        this.wind,
+        this.surface,
+        this.meas_sky_mpsas,
+        this.calc_sky_mpsas
+      ]
+      return status
+    }
+  }
 
 }
 </script>
@@ -274,7 +302,6 @@ $status-tab-color: darken($main-status-background, 3);
     //border: solid 3px black;
     border-radius: 0;
     background-color: $status-tab-color;
-
 
     display: flex;
     align-items: center;
@@ -344,7 +371,7 @@ $status-tab-color: darken($main-status-background, 3);
 }
 
 /**
- *  User status (log) styles 
+ *  User status (log) styles
  */
 $log-debug: #aaa;
 $log-info: #bbb;
@@ -419,7 +446,7 @@ pre.log-message.critical {
     font-weight: bold;
 }
 
-// New messages enter yellow to grab attention, then fade to their 
+// New messages enter yellow to grab attention, then fade to their
 // destination color (based on the log level, see above)
 @keyframes blinkonce {
     0% {
@@ -430,7 +457,7 @@ div.log-line:last-of-type * {
     animation: blinkonce 1s;
 }
 
-// highlight the timestamp of the line that is hovered over. 
+// highlight the timestamp of the line that is hovered over.
 .log-line:hover * {
     color:white;
 }
@@ -467,7 +494,7 @@ div.log-line:last-of-type * {
 .status-on {
     animation: fade 4000ms infinite;
     -webkit-animation: fade 4000ms infinite;
-    
+
     /* Center the content */
     align-items: center;
     display: flex;

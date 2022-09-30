@@ -1,20 +1,26 @@
 <template>
   <div class="statusbar">
-    <div class="status-bar-1" 
+    <div
+      class="status-bar-1"
       @mouseover="mouseover_status_1 = true"
-      @mouseleave="collapse_status_bar_1">
-
-      <a class="toggle" @click="toggle_status_bar_height_1">
+      @mouseleave="collapse_status_bar_1"
+    >
+      <a
+        class="toggle"
+        @click="toggle_status_bar_height_1"
+      >
         <b-icon
           type="is-text"
           :icon="status_bar_1_expanded ? 'chevron-up' : 'chevron-left'"
         />
       </a>
 
-      <div class="lock-button"
-        v-if="status_bar_1_expanded" 
+      <div
+        v-if="status_bar_1_expanded"
+        class="lock-button"
         title="keep expanded"
-        @click="status_bar_1_lock = !status_bar_1_lock">
+        @click="status_bar_1_lock = !status_bar_1_lock"
+      >
         <b-icon
           type="is-text"
           :icon="status_bar_1_lock ? 'pin' : 'pin-off'"
@@ -24,23 +30,23 @@
 
       <!-- User status logs -->
       <div
+        ref="loglist"
         :class="{ expanded: status_bar_1_expanded }"
         class="user-status container"
-        ref="loglist"
       >
         <div
-          class="default-log-message"
           v-if="logs_to_display.length == 0"
+          class="default-log-message"
         >
           observatory logs will appear here
         </div>
         <div
           v-for="(log, idx) in logs_to_display"
-          v-bind:key="idx"
+          :key="idx"
           class="log-line"
         >
           <div class="log-timestamp-group">
-            <span class="user-status-title">{{idx==logs_to_display.length - 1 ? 'OBSY LOG: ' : ''}}</span>
+            <span class="user-status-title">{{ idx==logs_to_display.length - 1 ? 'OBSY LOG: ' : '' }}</span>
             <b-tooltip
               position="is-top"
               type="is-dark"
@@ -49,29 +55,37 @@
               <span class="log-timestamp">{{ timestamp_to_logdate(log.timestamp) }}</span>
             </b-tooltip>
           </div>
-          <pre class="log-message" :class="get_log_level_classes(log)">
+          <pre
+            class="log-message"
+            :class="get_log_level_classes(log)"
+          >
             {{ format_log_message_text(log) }}
           </pre>
         </div>
       </div>
-      <PhaseStatusBar class="phase-status-bar"/>
-
+      <PhaseStatusBar class="phase-status-bar" />
     </div>
 
-    <div class="status-bar-2" 
+    <div
+      class="status-bar-2"
       @mouseover="mouseover_status_2 = true"
-      @mouseleave="collapse_status_bar_2">
-
-      <a class="toggle" @click="toggle_status_bar_height_2">
+      @mouseleave="collapse_status_bar_2"
+    >
+      <a
+        class="toggle"
+        @click="toggle_status_bar_height_2"
+      >
         <b-icon
           type="is-text"
           :icon="status_bar_2_expanded ? 'chevron-up' : 'chevron-left'"
         />
       </a>
 
-      <div class="lock-button"
-        v-if="status_bar_2_expanded" 
-        @click="status_bar_2_lock = !status_bar_2_lock">
+      <div
+        v-if="status_bar_2_expanded"
+        class="lock-button"
+        @click="status_bar_2_lock = !status_bar_2_lock"
+      >
         <b-icon
           type="is-text"
           :icon="status_bar_2_lock ? 'pin' : 'pin-off'"
@@ -80,26 +94,26 @@
       </div>
 
       <div class="status-content">
-        <div id="status-2-expanded"
-          class="container"
+        <div
           v-if="status_bar_2_expanded"
+          id="status-2-expanded"
+          class="container"
         >
-
           <div class="status-container container">
             <div class="status-container-header">
               Weather + Enclosure
               <div class="status-container-header-status-age">
-                <status-column :statusList="[weather_status_age_display]" />
+                <status-column :status-list="[weather_status_age_display]" />
               </div>
             </div>
             <div class="status-container-content">
               <status-column
                 style="padding: 0"
-                :statusList="weather_status_display_1"
+                :status-list="weather_status_display_1"
               />
               <status-column
                 style="padding: 0"
-                :statusList="weather_status_display_2"
+                :status-list="weather_status_display_2"
               />
             </div>
           </div>
@@ -108,100 +122,122 @@
             <div class="status-container-header">
               Device Status
               <div class="status-container-header-status-age">
-                <status-column :statusList="[device_status_age_display]" />
+                <status-column :status-list="[device_status_age_display]" />
               </div>
             </div>
             <div class="status-container-content">
               <status-column
                 style="padding: 0"
-                :statusList="device_status_display_1"
+                :status-list="device_status_display_1"
               />
               <div style="display:flex; flex-direction:column;">
                 <status-column
                   style="padding: 0"
-                  :statusList="device_status_display_2"/>
-                <ObservatoryRestartCommand :site="site" class="site-restart-button"/>
+                  :status-list="device_status_display_2"
+                />
+                <ObservatoryRestartCommand
+                  :site="site"
+                  class="site-restart-button"
+                />
               </div>
             </div>
           </div>
-
         </div>
 
-        <div id="status-2-primary" class="container">
-
+        <div
+          id="status-2-primary"
+          class="container"
+        >
           <div class="clock-displays">
             <div style="display: flex; flex-direction: column">
-              <SiteOperationalStatus :site="site"/>
-              <div style="
+              <SiteOperationalStatus :site="site" />
+              <div
+                style="
                   display: flex;
                   flex-wrap: wrap;
                   height: 55px;
-                  overflow: hidden; ">
+                  overflow: hidden; "
+              >
                 <div class="mr-5">
                   <site-sidereal-time
-                    class="sidereal-time"
                     v-if="site_longitude"
+                    class="sidereal-time"
                     :longitude="site_longitude"
                   />
-                  <div class="sidereal-label">LMST</div>
+                  <div class="sidereal-label">
+                    LMST
+                  </div>
                 </div>
                 <div class="mr-5">
                   <site-local-time
-                    class="sidereal-time"
                     v-if="timezone"
+                    class="sidereal-time"
                     :timezone="timezone"
                   />
-									<div v-else class="sidereal-time"> -- </div>
-                  <div class="sidereal-label">Obs Time</div>
+                  <div
+                    v-else
+                    class="sidereal-time"
+                  >
+                    --
+                  </div>
+                  <div class="sidereal-label">
+                    Obs Time
+                  </div>
                 </div>
                 <div class="mr-1">
                   <utc-time
-                    class="sidereal-time"
                     v-if="timezone"
+                    class="sidereal-time"
                     :timezone="timezone"
                   />
-									<div v-else class="sidereal-time"> -- </div>
-                  <div class="sidereal-label">UTC Time</div>
+                  <div
+                    v-else
+                    class="sidereal-time"
+                  >
+                    --
+                  </div>
+                  <div class="sidereal-label">
+                    UTC Time
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div>
-            <div class="clock-border"/>
+            <div class="clock-border" />
           </div>
 
           <div>
             <status-column
               style="padding: 0"
-              :statusList="primary_status_group_1"
+              :status-list="primary_status_group_1"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :statusList="primary_status_group_2"
+              :status-list="primary_status_group_2"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :statusList="primary_status_group_3"
+              :status-list="primary_status_group_3"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :statusList="primary_status_group_4"
+              :status-list="primary_status_group_4"
             />
           </div>
           <div>
             <status-column
               style="padding: 0"
-              :statusList="primary_status_group_5"
+              :status-list="primary_status_group_5"
             />
           </div>
-
         </div>
       </div>
     </div>
@@ -209,21 +245,21 @@
 </template>
 
 <script>
-/*** TODO: Refactor out the user status into its own component, like the phase status ***/
+/** * TODO: Refactor out the user status into its own component, like the phase status ***/
 
-import { mapGetters } from "vuex";
-import moment from "moment";
-import { user_status_mixin } from "../../mixins/user_status_mixin";
-import StatusColumn from "@/components/status/StatusColumn";
-import SiteSiderealTime from "@/components/display/SiteSiderealTime";
-import SiteLocalTime from "@/components/display/SiteLocalTime";
-import UtcTime from "@/components/display/UtcTime";
-import SiteOperationalStatus from "@/components/status/SiteOperationalStatus";
+import { mapGetters } from 'vuex'
+import moment from 'moment'
+import { user_status_mixin } from '../../mixins/user_status_mixin'
+import StatusColumn from '@/components/status/StatusColumn'
+import SiteSiderealTime from '@/components/display/SiteSiderealTime'
+import SiteLocalTime from '@/components/display/SiteLocalTime'
+import UtcTime from '@/components/display/UtcTime'
+import SiteOperationalStatus from '@/components/status/SiteOperationalStatus'
 import PhaseStatusBar from '@/components/status/PhaseStatusBar'
 import ObservatoryRestartCommand from '@/components/ObservatoryRestartCommand'
 export default {
-  name: "SiteStatusFooter",
-  mixins: [ user_status_mixin],
+  name: 'SiteStatusFooter',
+  mixins: [user_status_mixin],
   components: {
     StatusColumn,
     SiteSiderealTime,
@@ -231,15 +267,15 @@ export default {
     UtcTime,
     SiteOperationalStatus,
     PhaseStatusBar,
-    ObservatoryRestartCommand,
+    ObservatoryRestartCommand
   },
   props: {
     site: {
-      type: String,
+      type: String
     }
   },
 
-  data() {
+  data () {
     return {
       status_bar_1_expanded: false,
       status_bar_2_expanded: false,
@@ -247,150 +283,150 @@ export default {
       status_bar_2_lock: false,
 
       mouseover_status_1: false,
-      mouseover_status_2: false,
-    };
+      mouseover_status_2: false
+    }
   },
 
-  created() {
-    this.set_user_status_active_site(this.site);
+  created () {
+    this.set_user_status_active_site(this.site)
   },
 
   watch: {
-    site() {
-      this.set_user_status_active_site(this.site);
+    site () {
+      this.set_user_status_active_site(this.site)
     },
 
-    status_bar_1_expanded() {
-      this.scrollToBottom();
+    status_bar_1_expanded () {
+      this.scrollToBottom()
     },
 
-    user_status_logs() {
-      const div = this.$refs.loglist;
+    user_status_logs () {
+      const div = this.$refs.loglist
       if (this.status_bar_1_expanded && this.isScrolledToBottom(div)) {
-        this.$nextTick(this.scrollToBottom);
+        this.$nextTick(this.scrollToBottom)
       }
-    },
+    }
   },
 
   methods: {
     // Get the username from Auth0
-    username() {
+    username () {
       if (this.$auth.isAuthenticated) {
-        return this.$auth.user.name;
+        return this.$auth.user.name
       }
-      return "anonymous";
+      return 'anonymous'
     },
 
-    toggle_status_bar_height_1() {
+    toggle_status_bar_height_1 () {
       if (!this.status_bar_1_expanded) {
-        this.status_bar_1_expanded = true;
-        this.$nextTick(this.scrollToBottom);
+        this.status_bar_1_expanded = true
+        this.$nextTick(this.scrollToBottom)
       } else {
-        this.status_bar_1_lock = false;
-        this.status_bar_1_expanded = false;
+        this.status_bar_1_lock = false
+        this.status_bar_1_expanded = false
       }
     },
-    toggle_status_bar_height_2() {
-      this.status_bar_2_lock = false;
-      this.status_bar_2_expanded = !this.status_bar_2_expanded;
+    toggle_status_bar_height_2 () {
+      this.status_bar_2_lock = false
+      this.status_bar_2_expanded = !this.status_bar_2_expanded
     },
-    collapse_status_bar_1() {
-      this.status_bar_1_expanded = this.status_bar_1_lock || false;
-      this.mouseover_status_1 = false;
+    collapse_status_bar_1 () {
+      this.status_bar_1_expanded = this.status_bar_1_lock || false
+      this.mouseover_status_1 = false
     },
-    collapse_status_bar_2() {
-      this.status_bar_2_expanded = this.status_bar_2_lock || false;
-      this.mouseover_status_2 = false;
+    collapse_status_bar_2 () {
+      this.status_bar_2_expanded = this.status_bar_2_lock || false
+      this.mouseover_status_2 = false
     },
 
     // Returns true if the element is scrolled to the bottom
-    isScrolledToBottom(el) {
-      var $el = $(el);
-      return el.scrollHeight - $el.scrollTop() - $el.outerHeight() < 1;
+    isScrolledToBottom (el) {
+      const $el = $(el)
+      return el.scrollHeight - $el.scrollTop() - $el.outerHeight() < 1
     },
 
     // This method will scroll the log window to the bottom (to the latest
     // message)
-    scrollToBottom() {
-      const div = this.$refs.loglist;
-      div.scrollTop = div.scrollHeight - div.clientHeight;
+    scrollToBottom () {
+      const div = this.$refs.loglist
+      div.scrollTop = div.scrollHeight - div.clientHeight
     },
 
     // Method for converting timestamp(seconds) to a date that reads easily
     //  in the log UI
-    timestamp_to_logdate(timestamp) {
-      const timestamp_ms = timestamp * 1000;
-      return moment(timestamp_ms).format("MM/DD HH:mm:ss");
+    timestamp_to_logdate (timestamp) {
+      const timestamp_ms = timestamp * 1000
+      return moment(timestamp_ms).format('MM/DD HH:mm:ss')
     },
 
     // Used to format the time for the timestmap tooltip.
     // (reveals the yyyy/mm/dd, not included in the default view)
-    timestamp_to_date(timestamp) {
-      const timestamp_ms = timestamp * 1000;
-      return moment(timestamp_ms).format("YYYY/MM/DD");
-    },
+    timestamp_to_date (timestamp) {
+      const timestamp_ms = timestamp * 1000
+      return moment(timestamp_ms).format('YYYY/MM/DD')
+    }
   },
   computed: {
-    ...mapGetters("site_config", ["site_longitude", "timezone"]),
-    ...mapGetters("sitestatus", [
-        //"status_age_display",
-        "weather_status_age_display",
-        "weather_status_age",
-        "device_status_age",
-        "device_status_age_display",
-        "site_is_online",
-        "buildRotatorTabStatus",
+    ...mapGetters('site_config', ['site_longitude', 'timezone']),
+    ...mapGetters('sitestatus', [
+      // "status_age_display",
+      'weather_status_age_display',
+      'weather_status_age',
+      'device_status_age',
+      'device_status_age_display',
+      'site_is_online',
+      'buildRotatorTabStatus',
 
-        "ra",
-        "dec",
-        "hour_angle",
-        "azimuth",
-        "altitude",
-        "airmass",
-        "refraction",
-        "zenith_distance",
+      'ra',
+      'dec',
+      'hour_angle',
+      'azimuth',
+      'altitude',
+      'airmass',
+      'refraction',
+      'zenith_distance',
 
-        "filter_name",
-        "filter_wheel_moving",
-        "focus_position",
-        "focus_moving",
-        "rotator_position",
-        "rotator_moving",
-        "camera_status",
+      'filter_name',
+      'filter_wheel_moving',
+      'focus_position',
+      'focus_moving',
+      'rotator_position',
+      'rotator_moving',
+      'camera_status',
 
-        "weather_ok",
-        "open_ok",
-        "sky_temp",
-        "air_temp",
-        "humidity",
-        "dewpoint",
-        "wind",
-        "surface",
-        "ambient",
-        "meas_sky_mpsas",
-        "calc_sky_mpsas",
-        "wx_hold", 
-        "hold_duration",
+      'weather_ok',
+      'open_ok',
+      'sky_temp',
+      'air_temp',
+      'humidity',
+      'dewpoint',
+      'wind',
+      'surface',
+      'ambient',
+      'meas_sky_mpsas',
+      'calc_sky_mpsas',
+      'wx_hold',
+      'hold_duration',
 
-        "enclosure_open_status",
-        "enclosure_mode",
-        "dome_azimuth",
-        "dome_slewing",
-        "enclosure_synchronized",
-      ]),
+      'enclosure_open_status',
+      'enclosure_mode',
+      'dome_azimuth',
+      'dome_slewing',
+      'enclosure_synchronized'
+    ]),
 
     // Status ages for display
-    weather_status_age_display() {
-      return {name: "status age: ", ...this.$store.getters['sitestatus/weather_status_age_display']}
+    weather_status_age_display () {
+      return { name: 'status age: ', ...this.$store.getters['sitestatus/weather_status_age_display'] }
     },
-    device_status_age_display() {
-      return {name: "status age: ", ...this.$store.getters['sitestatus/device_status_age_display']}
+    device_status_age_display () {
+      return { name: 'status age: ', ...this.$store.getters['sitestatus/device_status_age_display'] }
     },
 
     // Status columns visible in the expanded status view
-    weather_status_display_1() {
-      const spacer = {name: 'spacer', val: 'spacer'}
-      let status = [
+    weather_status_display_1 () {
+      const spacer = { name: 'spacer', val: 'spacer' }
+      const status = [
         this.weather_ok,
         this.open_ok,
         spacer,
@@ -403,8 +439,8 @@ export default {
       ]
       return status
     },
-    weather_status_display_2() {
-      let status = [
+    weather_status_display_2 () {
+      const status = [
         this.sky_temp,
         this.air_temp,
         this.humidity,
@@ -413,13 +449,13 @@ export default {
         this.surface,
         this.ambient,
         this.meas_sky_mpsas,
-        this.calc_sky_mpsas,
+        this.calc_sky_mpsas
       ]
       return status
     },
-    device_status_display_1() {
-      const spacer = {name: 'spacer', val: 'spacer'}
-      let status = [
+    device_status_display_1 () {
+      const spacer = { name: 'spacer', val: 'spacer' }
+      const status = [
         this.ra,
         this.dec,
         spacer,
@@ -429,13 +465,13 @@ export default {
         this.hour_angle,
         this.airmass,
         this.zenith_distance,
-        this.refraction,
+        this.refraction
       ]
       return status
     },
-    device_status_display_2() {
-      const spacer = {name: 'spacer', val: 'spacer'}
-      let status = [
+    device_status_display_2 () {
+      const spacer = { name: 'spacer', val: 'spacer' }
+      const status = [
         this.filter_name,
         this.filter_wheel_moving,
         spacer,
@@ -443,44 +479,44 @@ export default {
         this.focus_moving,
         spacer,
         this.rotator_position,
-        this.rotator_moving,
+        this.rotator_moving
       ]
       return status
     },
 
     // Status columns appearing in the always-visible status area
-    primary_status_group_1() {
+    primary_status_group_1 () {
       return [
         this.weather_ok,
         this.wx_hold,
-        this.hold_duration,
-      ];
+        this.hold_duration
+      ]
     },
-    primary_status_group_2() {
+    primary_status_group_2 () {
       return [
         this.enclosure_mode,
         this.enclosure_open_status,
-        this.dome_azimuth,
+        this.dome_azimuth
       ]
     },
-    primary_status_group_3() {
-      return [ 
-        this.ra, 
-        this.dec, 
-        this.hour_angle 
+    primary_status_group_3 () {
+      return [
+        this.ra,
+        this.dec,
+        this.hour_angle
       ]
     },
-    primary_status_group_4() {
-      return [ 
-        this.azimuth, 
-        this.altitude, 
-        this.airmass 
+    primary_status_group_4 () {
+      return [
+        this.azimuth,
+        this.altitude,
+        this.airmass
       ]
     },
-    primary_status_group_5() {
-      return [ 
+    primary_status_group_5 () {
+      return [
         this.camera_status,
-        this.filter_name,
+        this.filter_name
       ]
     },
 
@@ -488,33 +524,32 @@ export default {
      *  This will return either the single latest log message, or the full
      *  list of logs, depending on whether the view is expanded or not.
      */
-    logs_to_display() {
+    logs_to_display () {
       // If user status bar is collapsed, just show the last log message
       if (!this.status_bar_1_expanded) {
         return this.user_status_logs.length
           ? this.user_status_logs.slice(-2)
-          : [];
+          : []
       }
       // Otherwise show all the logs
       else {
-        return this.user_status_logs;
+        return this.user_status_logs
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
-
 
 <style lang="scss" scoped>
 @import "@/style/_variables.scss";
 @import "@/style/_responsive.scss";
 @import "@/style/buefy-styles.scss";
 
-/**     
+/**
  *  Component styling
  */
 .statusbar {
-  // Bulma modal z-index is 40, and we don't want to cover modal windows. 
+  // Bulma modal z-index is 40, and we don't want to cover modal windows.
   z-index: 39;
 }
 .hidden {
@@ -551,8 +586,6 @@ $log-critical: $ptr-red;
 .status-1-content {
   height: 2em;
 }
-
-
 
 .user-status {
   display: flex;
@@ -755,7 +788,7 @@ div.log-line:last-of-type * {
   align-items: flex-start;
 }
 
-/** 
+/**
  * Toggle expand/collaps button style
  */
 .toggle {

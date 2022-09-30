@@ -1,142 +1,140 @@
 <template>
   <div class="cal-page-wrapper">
-
-    <the-calendar 
-      class="the-calendar"
+    <the-calendar
       v-if="timezone"
-      :fc_timeZone="timezone"
-      :calendarSite="sitecode" 
-      :fc_resources="listOfObservatories" 
-      :showMoonEvents="showMoonEvents"
-      />
+      class="the-calendar"
+      :fc-time-zone="timezone"
+      :calendar-site="sitecode"
+      :fc_resources="listOfObservatories"
+      :show-moon-events="showMoonEvents"
+    />
 
     <div class="calendar-adjacent">
-
-      <site-reservation-status :sitecode="sitecode" class=""/>
+      <site-reservation-status
+        :sitecode="sitecode"
+        class=""
+      />
 
       <div class="projects-section">
         <p>Projects will be shown here.</p>
-        <p>You will be able to drag them onto the calendar to schedule them.</p>   
+        <p>You will be able to drag them onto the calendar to schedule them.</p>
       </div>
 
       <div class="fc-settings-box">
         <div>
-          <p class="menu-label">Settings</p>
+          <p class="menu-label">
+            Settings
+          </p>
           <div class="field">
-              <b-switch v-model="showMoonEvents">
-                  Show moon events
-              </b-switch>
+            <b-switch v-model="showMoonEvents">
+              Show moon events
+            </b-switch>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
-
 <script>
-import TheCalendar from "@/components/calendar/TheCalendar";
-import UserEventsTable from "@/components/calendar/UserEventsTable";
-import SiteReservationStatus from "@/components/calendar/SiteReservationStatus";
-import { mapGetters } from "vuex";
-import moment from "moment";
+import TheCalendar from '@/components/calendar/TheCalendar'
+import SiteReservationStatus from '@/components/calendar/SiteReservationStatus'
+import { mapGetters } from 'vuex'
+import moment from 'moment'
 
 export default {
-  name: "SiteCalendar",
-  props: ["sitecode"],
+  name: 'SiteCalendar',
+  props: ['sitecode'],
   components: {
     TheCalendar,
-    UserEventsTable,
-    SiteReservationStatus,
+    SiteReservationStatus
   },
-  data() {
+  data () {
     return {
-      localTime: "-",
-      siteTime: "-",
-      utcTime: "-",
+      localTime: '-',
+      siteTime: '-',
+      utcTime: '-',
 
-      showMoonEvents: true,
-    };
+      showMoonEvents: true
+    }
   },
-  created() {
-    this.timeInterval = setInterval(this.updateTime, 1000);
-    window.moment = moment; // use moment lib in browser devtools
+  created () {
+    this.timeInterval = setInterval(this.updateTime, 1000)
+    window.moment = moment // use moment lib in browser devtools
   },
-  mounted() {
-    // Load the users projects so they can add them to calendar events. 
+  mounted () {
+    // Load the users projects so they can add them to calendar events.
     if (this.$auth.isAuthenticated) {
       this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
     }
   },
-  destroyed() {
-    clearInterval(this.timeInterval);
+  destroyed () {
+    clearInterval(this.timeInterval)
   },
   watch: {
-    // Update the user's schedulable projects if the user changes. 
-    user() {
+    // Update the user's schedulable projects if the user changes.
+    user () {
       this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
     }
   },
   methods: {
-    displayUtcTime(time) {
-      return moment(time).utc().format("MMM D, kk:mm");
+    displayUtcTime (time) {
+      return moment(time).utc().format('MMM D, kk:mm')
     },
-    updateTime() {
-      this.localTime = moment().format("MMM D, kk:mm");
+    updateTime () {
+      this.localTime = moment().format('MMM D, kk:mm')
 
       if (this.timezone) {
-        this.siteTime = moment().tz(this.timezone).format("MMM D, kk:mm");
+        this.siteTime = moment().tz(this.timezone).format('MMM D, kk:mm')
       }
       else {
         this.siteTime = '---'
       }
-      this.utcTime = moment().utc().format("MMM D, kk:mm");
-    },
+      this.utcTime = moment().utc().format('MMM D, kk:mm')
+    }
   },
   computed: {
-    ...mapGetters("site_config", [
-      "all_sites",
-      "timezone"
+    ...mapGetters('site_config', [
+      'all_sites',
+      'timezone'
     ]),
 
-    user() {
-      return this.$auth.user;
+    user () {
+      return this.$auth.user
     },
-    username() {
+    username () {
       if (this.$auth.isAuthenticated) {
-        return this.$auth.user.name;
+        return this.$auth.user.name
       }
-      return "-";
+      return '-'
     },
 
     // Calendar Resources (Observatories) to feed into the calendar component
-    listOfObservatories() {
-      let all_obs = [];
+    listOfObservatories () {
+      const all_obs = []
       this.all_sites.forEach(o => {
         all_obs.push({
           id: o.site,
           title: o.name,
-          eventColor: "#4e1199",
-          eventBorderColor: "#200589",
-          eventTextColor: "#fbf8fd",
-          eventClassNames: "",
+          eventColor: '#4e1199',
+          eventBorderColor: '#200589',
+          eventTextColor: '#fbf8fd',
+          eventClassNames: '',
           eventOverlap: false, // defines whether events are allowed to overlap
-          eventConstraint: "",
-          eventAllow: "",
-          businessHours: "",
-          children: "",
-          parentId: "",
+          eventConstraint: '',
+          eventAllow: '',
+          businessHours: '',
+          children: '',
+          parentId: '',
           anyOtherPropsHere:
-            "call from key extendedProps of this resource object",
-        });
+            'call from key extendedProps of this resource object'
+        })
       })
-      return all_obs;
-    },
-  },
-};
+      return all_obs
+    }
+  }
+}
 </script>
-
 
 <style scoped lang="scss">
 @import "@/style/_responsive.scss";
