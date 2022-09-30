@@ -241,7 +241,7 @@
           v-for="project_site in project_sites"
           :key="project_site"
         >
-          <span v-if="project_sites.indexOf(site) > 0">, </span>
+          <span v-if="project_sites.indexOf(project_site) > 0">, </span>
           {{ project_site }}
         </span>
       </div>
