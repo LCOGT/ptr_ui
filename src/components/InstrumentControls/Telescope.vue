@@ -209,7 +209,7 @@
         <span>Slew to...</span>
         <b-icon icon="menu-down" />
       </button>
-      <template
+      <b-dropdown-item
         v-for="(command, idx) in [
           mount_screenflat_command,
           mount_skyflat_command,
@@ -222,17 +222,14 @@
           mount_tracking_on_command,
           mount_tracking_off_command,
         ]"
+        :key="idx"
+        aria-role="listitem"
       >
-        <b-dropdown-item
-          :key="idx"
-          aria-role="listitem"
-        >
-          <command-button
-            :data="command"
-            class="dropdown-button-command is-small"
-          />
-        </b-dropdown-item>
-      </template>
+        <command-button
+          :data="command"
+          class="dropdown-button-command is-small"
+        />
+      </b-dropdown-item>
     </b-dropdown>
 
     <div style="height: 1em" />
