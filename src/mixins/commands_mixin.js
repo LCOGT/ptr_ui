@@ -124,7 +124,7 @@ export const commands_mixin = {
       return {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         }
       }
     },

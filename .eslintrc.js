@@ -30,6 +30,7 @@ module.exports = {
     'camelcase': 'off',
     'eqeqeq': 'off',
     'brace-style': 'off',
+    'quote-props': ['error', 'consistent'],
     'vue/require-prop-type-constructor': 'off',
     'vue/prop-name-casing': 'off',
     'vue/require-default-prop': 'off',
