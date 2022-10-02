@@ -5,7 +5,12 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "eslint",
+    "lint:check": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "lint-strict:check": "eslint -c .eslintrc_strict.js src",
+    "lint-strict:fix": "eslint -c .eslintrc_strict.js src --fix",
+    "lint-changes:check": "eslint -c .eslintrc_strict.js $(git diff --name-only --diff-filter=ACMRTUXB dev | grep  -E \"(.js$|.vue$)\")",
+    "lint-changes:fix": "eslint -c .eslintrc_strict.js $(git diff --name-only --diff-filter=ACMRTUXB dev | grep  -E \"(.js$|.vue$)\") --fix",
     "cypress:open": "cypress open"
   },
   "dependencies": {
