@@ -10,10 +10,25 @@ jobs:
     name: Lint Code Base
     runs-on: ubuntu-latest
     steps:
+
     - uses: actions/checkout@v3 
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 14
+
     - name: Install modules
       run: npm ci
+
     - name: Lint all files
       run: npm run lint:check
-    - name: Strict lint for changes
-      run: npm run lint-changes:check
+
+    - name: Run eslint on changed files
+      uses: tj-actions/eslint-changed-files@v14
+      with:
+        config_path: ".eslintrc_strict.js"
+        ignore_path: ".eslintignore"
+        extra_args: "--max-warnings=0"
+        file_extensions: |
+          **/*.js
+          **/*.vue

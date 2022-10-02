@@ -5,12 +5,12 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint:check": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "lint-strict:check": "eslint -c .eslintrc_strict.js src",
-    "lint-strict:fix": "eslint -c .eslintrc_strict.js src --fix",
-    "lint-changes:check": "eslint -c .eslintrc_strict.js $(git diff --name-only --diff-filter=ACMRTUXB dev | grep  -E \"(.js$|.vue$)\")",
-    "lint-changes:fix": "eslint -c .eslintrc_strict.js $(git diff --name-only --diff-filter=ACMRTUXB dev | grep  -E \"(.js$|.vue$)\") --fix",
+    "lint:check": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint-strict:check": "eslint -c .eslintrc_strict.js .",
+    "lint-strict:fix": "eslint -c .eslintrc_strict.js . --fix",
+    "lint-changes:check": "eslint -c .eslintrc_strict.js $(git diff --name-only --diff-filter=ACMRTUXB origin/dev | grep  -E \"(.js$|.vue$)\")",
+    "lint-changes:fix": "eslint -c .eslintrc_strict.js $(git diff --name-only --diff-filter=ACMRTUXB origin/dev | grep  -E \"(.js$|.vue$)\") --fix",
     "cypress:open": "cypress open"
   },
   "dependencies": {
