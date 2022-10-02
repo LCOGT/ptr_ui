@@ -145,28 +145,27 @@ export default {
   },
   props: {
     // The active site (resource) disaplyed in the calendar
-    'calendarSite': {
+    calendarSite: {
       required: true
     },
 
     // Resources for fullcalendar (in our case they are observatories)
-    'fc_resources': {
+    fc_resources: {
       required: true
     },
 
     // Timezone of the site
-    'fc_timeZone': {
+    fc_timeZone: {
       required: true
     },
 
-    'showMoonEvents': {
+    showMoonEvents: {
       required: true
     }
 
   },
 
   mounted () {
-
     this.fullCalendarApi = this.$refs.fullCalendar.getApi()
 
     // Once we've mounted, we're able to access the fullCalendar $ref.

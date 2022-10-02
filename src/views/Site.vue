@@ -1,33 +1,62 @@
 <template>
   <div class="page">
-
     <div class="total-site-menu">
       <SiteNavbar />
 
       <div class="mobile-site-menu">
-        <button class="menu-padding"></button>
+        <button class="menu-padding" />
         <router-link :to="'/site/' + sitecode + '/home'">
-          <button class="button" :class="{'selected': subpage == 'home'}">Home</button>
+          <button
+            class="button"
+            :class="{'selected': subpage == 'home'}"
+          >
+            Home
+          </button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/targets'">
-          <button class="button" :class="{'selected': subpage == 'targets'}">Targets</button>
+          <button
+            class="button"
+            :class="{'selected': subpage == 'targets'}"
+          >
+            Targets
+          </button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/observe'">
-          <button class="button" :class="{'selected': subpage == 'observe'}">Observe</button>
+          <button
+            class="button"
+            :class="{'selected': subpage == 'observe'}"
+          >
+            Observe
+          </button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/calendar'">
-          <button class="button" :class="{'selected': subpage == 'calendar'}">Calendar</button>
+          <button
+            class="button"
+            :class="{'selected': subpage == 'calendar'}"
+          >
+            Calendar
+          </button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/projects'">
-          <button class="button" :class="{'selected': subpage == 'projects'}">Projects</button>
+          <button
+            class="button"
+            :class="{'selected': subpage == 'projects'}"
+          >
+            Projects
+          </button>
         </router-link>
-        <button class="menu-padding" button></button>
+        <button
+          class="menu-padding"
+          button
+        />
       </div>
-
     </div>
 
     <div class="page-view">
-        <component v-bind:is="`site-${subpage}`" :sitecode="sitecode" />
+      <component
+        :is="`site-${subpage}`"
+        :sitecode="sitecode"
+      />
     </div>
 
     <site-status-footer
@@ -43,25 +72,25 @@
 </template>
 
 <script>
-import CommandButton from "@/components/FormElements/CommandButton";
-import ChatModule from "@/components/ChatModule";
-import StatusPanelCollapsible from "@/components/status/StatusPanelCollapsible";
-import SiteStatusFooter from "@/components/status/SiteStatusFooter";
-import SiteStatusFooterMobile from "@/components/status/SiteStatusFooterMobile";
+import CommandButton from '@/components/FormElements/CommandButton'
+import ChatModule from '@/components/ChatModule'
+import StatusPanelCollapsible from '@/components/status/StatusPanelCollapsible'
+import SiteStatusFooter from '@/components/status/SiteStatusFooter'
+import SiteStatusFooterMobile from '@/components/status/SiteStatusFooterMobile'
 import SiteNavbar from '@/components/SiteNavbar.vue'
 
-import SiteHome from "@/components/sitepages/SiteHome";
-import SiteObserve from "@/components/sitepages/SiteObserve";
-import SiteTargets from "@/components/sitepages/SiteTargets";
-import SiteCalendar from "@/components/sitepages/SiteCalendar";
-import SiteProjects from "@/components/sitepages/SiteProjects";
-import SiteData from "@/components/sitepages/SiteData";
+import SiteHome from '@/components/sitepages/SiteHome'
+import SiteObserve from '@/components/sitepages/SiteObserve'
+import SiteTargets from '@/components/sitepages/SiteTargets'
+import SiteCalendar from '@/components/sitepages/SiteCalendar'
+import SiteProjects from '@/components/sitepages/SiteProjects'
+import SiteData from '@/components/sitepages/SiteData'
 
-import { commands_mixin } from "../mixins/commands_mixin";
-import datastreamer from "@/datastreamer";
+import { commands_mixin } from '../mixins/commands_mixin'
+import datastreamer from '@/datastreamer'
 
 export default {
-  name: "Site",
+  name: 'Site',
   components: {
     CommandButton,
     SiteHome,
@@ -74,95 +103,94 @@ export default {
     StatusPanelCollapsible,
     SiteStatusFooter,
     SiteStatusFooterMobile,
-    SiteNavbar,
+    SiteNavbar
   },
   props: {
     sitecode: {
       type: String,
-      required: true,
+      required: true
     },
     subpage: {
       type: String,
-      required: true,
+      required: true
     }
   },
   mixins: [commands_mixin],
 
-  // When the site page component loads for the first time, set the current site in vuex. 
-  created() {
+  // When the site page component loads for the first time, set the current site in vuex.
+  created () {
     this.site_changed_routine(this.$route.params.sitecode)
   },
 
-  // If the site changes while the component is still loaded, make sure to update the current site in vuex. 
-  beforeRouteUpdate(to, from, next) {
-    const new_site = to.params.sitecode.toLowerCase();
-    //console.log('in BEFORE ROUTE UPDATE, site: ', new_site)
+  // If the site changes while the component is still loaded, make sure to update the current site in vuex.
+  beforeRouteUpdate (to, from, next) {
+    const new_site = to.params.sitecode.toLowerCase()
+    // console.log('in BEFORE ROUTE UPDATE, site: ', new_site)
 
-    if (new_site != this.sitecode) {  // only if site changes
+    if (new_site != this.sitecode) { // only if site changes
       this.site_changed_routine(new_site)
     }
-    next();
+    next()
   },
 
-  beforeRouteLeave(to, from, next) {
-    //console.log('in BEFORE ROUTE LEAVE')
+  beforeRouteLeave (to, from, next) {
+    // console.log('in BEFORE ROUTE LEAVE')
     datastreamer.close()
     next()
   },
 
-  beforeDestroy() {
-    this.$store.commit("site_config/removeActiveSite");
-    this.$store.dispatch("images/display_placeholder_image");
+  beforeDestroy () {
+    this.$store.commit('site_config/removeActiveSite')
+    this.$store.dispatch('images/display_placeholder_image')
     datastreamer.close()
   },
 
-  mounted() {
+  mounted () {
     // Update timestamp every second (sent with command)
     setInterval(() => {
-      this.timestamp = parseInt(Date.now() / 1000);
-    }, 1000);
+      this.timestamp = parseInt(Date.now() / 1000)
+    }, 1000)
   },
 
   computed: {
     active_subpage: {
-      get() { return this.$store.state.user_interface.selected_subpage },
-      set(value) { this.$store.commit('user_interface/setActiveSubpage', value) }
+      get () { return this.$store.state.user_interface.selected_subpage },
+      set (value) { this.$store.commit('user_interface/setActiveSubpage', value) }
       // subpage set to home by default in user_interface
-    },
+    }
   },
 
   watch: {
-    subpage() {
+    subpage () {
       this.active_subpage = this.subpage
     }
-    
+
   },
 
   methods: {
 
     // Do this whenever the selected site changes
     // 'sitecode' argument is the new site being navigated to, not the old one.
-    site_changed_routine(sitecode) {
-
+    site_changed_routine (sitecode) {
       // Update the active devices
-      this.$store.dispatch("site_config/set_default_active_devices", sitecode);
+      this.$store.dispatch('site_config/set_default_active_devices', sitecode)
 
       // Subscribe to datastream for the new site
       datastreamer.update_site(sitecode)
 
       // get initial data/valuse for images, status, calendar
-      this.$store.dispatch("images/display_placeholder_image");
-      this.$store.dispatch("images/load_latest_images");
-      this.$store.dispatch("images/load_latest_info_images");
-      this.$store.dispatch("sitestatus/clearStatus")
-      this.$store.dispatch("sitestatus/getLatestStatus")
-      this.$store.dispatch("userstatus/fetch_recent_logs")
-      this.$store.dispatch("calendar/fetchActiveReservations", sitecode);
+      this.$store.dispatch('images/display_placeholder_image')
+      this.$store.dispatch('images/load_latest_images')
+      this.$store.dispatch('images/load_latest_info_images')
+      this.$store.dispatch('sitestatus/clearStatus')
+      this.$store.dispatch('sitestatus/getLatestStatus')
+      this.$store.dispatch('userstatus/fetch_recent_logs')
+      this.$store.dispatch('calendar/fetchActiveReservations', sitecode)
       this.active_subpage = this.subpage
-    },
+    }
 
-  },
-};
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -181,7 +209,7 @@ export default {
   right: 0;
 }
 .total-site-menu {
-  grid-row: 1; 
+  grid-row: 1;
 }
 .page-view {
   grid-row: 2;

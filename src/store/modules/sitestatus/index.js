@@ -17,20 +17,6 @@ import accumulated_getters from './getters/accumulated_getters'
 
 const hasKey = (obj, key) => { return Object.keys(obj).includes(key) }
 
-// Used to reset the status to an empty state
-// const empty_status = {
-  // weather: {},
-  // enclosure: {},
-  // screen: {},
-  // focuser: {},
-  // camera: {},
-  // telescope: {},
-  // mount: {},
-  // rotator: {},
-  // filter_wheel: {},
-  // sequencer: {}
-// }
-
 const state = {
   site: 'no site',
   status: {},

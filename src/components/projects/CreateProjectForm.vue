@@ -1255,7 +1255,7 @@ export default {
         // Remove duplicates that appear in generic filters
         all_site_filters = all_site_filters.filter(item => generics.indexOf(item) < 0)
         return all_site_filters
-        
+
       // Default behavior (if no specific sites selected) returns the filters for the current site only
       } else {
         const filter_list = this.get_default_filter_options(this.sitecode).map(x => x[0])

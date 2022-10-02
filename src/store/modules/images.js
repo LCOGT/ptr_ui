@@ -62,12 +62,12 @@ const getters = {
   small_fits_filename: (state, getters) => {
     if (!getters.small_fits_exists) return ''
     const image = getters.current_image
-    return `${image.base_filename}-${image.data_type}${state.small_fits_reduction_level}.fits.bz2`
+    return `${image.base_filename}-${image.data_type}${state.small_fits_reduction_level}.fits.fz`
   },
   large_fits_filename: (state, getters) => {
     if (!getters.large_fits_exists) return ''
     const image = getters.current_image
-    return `${image.base_filename}-${image.data_type}${state.large_fits_reduction_level}.fits.bz2`
+    return `${image.base_filename}-${image.data_type}${state.large_fits_reduction_level}.fits.fz`
   },
 
   info_image_is_active: state => state.current_image.s3_direcotry == 'info-images',
