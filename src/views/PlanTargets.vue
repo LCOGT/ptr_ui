@@ -182,8 +182,8 @@ export default {
 
       var endtime = moment(this.dateobsreal).add(30, 'm').toDate();
       for (var i = 0; i < this.commonlist.length; ++i) {
-        var altstart = helpers.eq2altazWithDate(this.commonlist[i].ra, this.commonlist[i].dec, this.lat1, this.lon1, this.dateobsreal)[0]
-        var altend = helpers.eq2altazWithDate(this.commonlist[i].ra, this.commonlist[i].dec, this.lat1, this.lon1, endtime)[0]
+        var altstart = helpers.eq2altaz(this.commonlist[i].ra, this.commonlist[i].dec, this.lat1, this.lon1, this.dateobsreal)[0]
+        var altend = helpers.eq2altaz(this.commonlist[i].ra, this.commonlist[i].dec, this.lat1, this.lon1, endtime)[0]
         if (altstart>45 && altend>45) { //45 degree altitude for targets <1.6 airmass
           diclist.push({
             "name": this.commonlist[i].name,

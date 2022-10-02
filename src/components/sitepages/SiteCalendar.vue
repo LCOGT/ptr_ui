@@ -3,7 +3,7 @@
     <the-calendar
       v-if="timezone"
       class="the-calendar"
-      :fc-time-zone="timezone"
+      :fc_time-zone="timezone"
       :calendar-site="sitecode"
       :fc_resources="listOfObservatories"
       :show-moon-events="showMoonEvents"

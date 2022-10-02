@@ -905,8 +905,8 @@ export default {
 
       const endtime = moment(this.date_obs_real).add(30, 'm').toDate()
       for (let i = 0; i < this.common_targets_list.length; ++i) {
-        const altstart = helpers.eq2altazWithDate(this.common_targets_list[i].ra, this.common_targets_list[i].dec, this.target_obs_latitude, this.target_obs_longitude, this.date_obs_real)[0]
-        const altend = helpers.eq2altazWithDate(this.common_targets_list[i].ra, this.common_targets_list[i].dec, this.target_obs_latitude, this.target_obs_longitude, endtime)[0]
+        const altstart = helpers.eq2altaz(this.common_targets_list[i].ra, this.common_targets_list[i].dec, this.target_obs_latitude, this.target_obs_longitude, this.date_obs_real)[0]
+        const altend = helpers.eq2altaz(this.common_targets_list[i].ra, this.common_targets_list[i].dec, this.target_obs_latitude, this.target_obs_longitude, endtime)[0]
         if (altstart > 45 && altend > 45) { // 45 degree altitude for targets <1.6 airmass
           diclist.push({
             id: this.common_targets_list[i].name.replace(/\s/g, ''),
