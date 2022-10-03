@@ -159,8 +159,6 @@ export default {
   display: flex;
   align-items: center;
 }
-.detailed-status-label {
-}
 .status-text {
   font-weight: bold;
   background-color: unset;
