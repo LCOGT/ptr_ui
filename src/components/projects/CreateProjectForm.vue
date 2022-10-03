@@ -935,7 +935,7 @@ export default {
       return {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         }
       }
     },

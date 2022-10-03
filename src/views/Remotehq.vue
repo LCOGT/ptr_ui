@@ -43,7 +43,7 @@ export default {
       const headers = {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         }
       }
       const response = await axios.post(url, {}, headers)

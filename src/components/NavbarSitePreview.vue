@@ -93,10 +93,10 @@ export default {
     },
     status_color_class (status) {
       const color_dict = {
-        operational: 'is-green',
-        ok: 'is-green',
+        'operational': 'is-green',
+        'ok': 'is-green',
         'technical difficulty': 'is-yellow',
-        offline: 'is-grey'
+        'offline': 'is-grey'
       }
       return color_dict?.[status] ?? 'is-grey'
     }
