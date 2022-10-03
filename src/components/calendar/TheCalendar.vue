@@ -3,7 +3,6 @@
     <!-- for development -->
     <!--button class="level-item button is-danger" @click="refreshCalendarView">refresh</button-->
     <!--button class="level-item button is-danger" @click="refreshIfUserIsScheduled">refresh current user is scheduled</button-->
-    <!--button class="level-item button is-danger" @click="ping">ping</button-->
     <!--button class="level-item button is-danger" @click="updateNowIndicator">refresh</button-->
     <!--div>{{currentUserScheduled}}</div-->
     <!--button @click="resize">resize</button-->

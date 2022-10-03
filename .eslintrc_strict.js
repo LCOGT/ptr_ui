@@ -28,7 +28,7 @@ module.exports = {
   ],
   rules: {
     "camelcase": "off",
-    "eqeqeq": "off",
+    //"eqeqeq": "off",
     "brace-style": "off",
     "vue/require-prop-type-constructor": "off",
     "vue/prop-name-casing": "off",
