@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import auth from './modules/auth'
 import site_config from './modules/site_config'
 import images from './modules/images'
 import script_settings from './modules/script_settings'
@@ -18,31 +17,30 @@ import user_interface from './modules/user_interface'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
-    plugins: [
-        // Vuex normally doesn't save between page reloads.
-        // Use this plugin to save state for the duration of a browser session.
-        //createPersistedState({
-        //    paths: [
-        //        'script_settings'
-        //    ]
-        //})
-    ],
-    modules: {
-        site_config,
-        command_params,
-        script_settings,
-        images,
-        user_data,
-        api_endpoints,
-        js9,
-        auth,
-        calendar,
-        drawshapes,
-        sitestatus,
-        starprofile,
-        userstatus,
-        user_interface,
-    },
+  plugins: [
+    // Vuex normally doesn't save between page reloads.
+    // Use this plugin to save state for the duration of a browser session.
+    // createPersistedState({
+    //    paths: [
+    //        'script_settings'
+    //    ]
+    // })
+  ],
+  modules: {
+    site_config,
+    command_params,
+    script_settings,
+    images,
+    user_data,
+    api_endpoints,
+    js9,
+    calendar,
+    drawshapes,
+    sitestatus,
+    starprofile,
+    userstatus,
+    user_interface
+  }
 })
 
 store.dispatch('sitestatus/startClock')

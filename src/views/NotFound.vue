@@ -1,21 +1,27 @@
 <template>
-<div class="page">
+  <div class="page">
     <SiteNavbar />
     <div style="display: flex; align-items:start; justify-content:flex-end; margin-top: 50px;">
-        <div>
-            <div class="has-text title"> 404: we're lost in space </div>
-            <div class="has-text subtitle"><router-link to="/">home page</router-link></div>
+      <div>
+        <div class="has-text title">
+          404: we're lost in space
         </div>
+        <div class="has-text subtitle">
+          <router-link to="/">
+            home page
+          </router-link>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 </template>
 
 <script>
 import SiteNavbar from '@/components/SiteNavbar'
 export default {
-    name: "NotFound",
-    components: { SiteNavbar }
-    
+  name: 'NotFound',
+  components: { SiteNavbar }
+
 }
 </script>
 <style lang="scss" scoped>

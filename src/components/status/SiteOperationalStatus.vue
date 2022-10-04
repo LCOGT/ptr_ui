@@ -1,58 +1,65 @@
 <template>
-    <div class="online-status-wrapper" >
-        <div class="status-dot" :class="operational_status_color_class" ></div>
-        <p class="status-text" :class="operational_status_color_class"> {{operational_status}}</p>
-    </div>
+  <div class="online-status-wrapper">
+    <div
+      class="status-dot"
+      :class="operational_status_color_class"
+    />
+    <p
+      class="status-text"
+      :class="operational_status_color_class"
+    >
+      {{ operational_status }}
+    </p>
+  </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 export default {
-    name: "SiteOperationalStatus", 
-    props: {
-        site: {
-            type: String,
-            default: null,
-        },
-        // Optional: manually insert the operational status value instead of finding in vuex.
-        manual_status: {
-            type: String,
-            default: null,
-        }
+  name: 'SiteOperationalStatus',
+  props: {
+    site: {
+      type: String,
+      default: null
+    },
+    // Optional: manually insert the operational status value instead of finding in vuex.
+    manual_status: {
+      type: String,
+      default: null
+    }
+  },
+
+  computed: {
+    ...mapGetters('sitestatus', [
+      'site_operational_status'
+    ]),
+
+    operational_status () {
+      let status
+      // Prefer manual status if it is included
+      if (this.manual_status !== null) {
+        status = this.manual_status
+        // Otherwise retrieve from the active site in vuex
+      } else {
+        status = this.site_operational_status
+      }
+      return status
     },
 
-    computed: {
-        ...mapGetters('sitestatus', [
-            'site_operational_status',
-        ]),
-
-        operational_status() {
-            let status;
-            // Prefer manual status if it is included
-            if (this.manual_status!== null) { 
-                status = this.manual_status
-            // Otherwise retrieve from the active site in vuex
-            } else {
-                status = this.site_operational_status
-            }
-            return status
-        },
-
-        /**
+    /**
          * operational: green
          * technical difficulty: yellow
          * offline: grey
          */
-        operational_status_color_class() {
-
-            const color_dict = {
-                'operational': 'is-green',
-                'technical difficulty': 'is-yellow',
-                'offline': 'is-grey'
-            }
-            return color_dict?.[this.operational_status] ?? 'is-grey'
-        }
+    operational_status_color_class () {
+      const color_dict = {
+        'operational': 'is-green',
+        'technical difficulty': 'is-yellow',
+        'offline': 'is-grey'
+      }
+      return color_dict?.[this.operational_status] ?? 'is-grey'
     }
+  }
 }
 </script>
 

@@ -7,38 +7,62 @@
         class="button"
         :to="{ path: '/site/' + site + '/' + active_subpage }"
         @click.native="$emit('view-site-clicked')"
-        >view observatory</router-link
       >
+        view observatory
+      </router-link>
       <b-button
-        @click="open_control_room(site)"
         class="is-success is-outlined"
         icon-right="launch"
         title="enter control room"
+        @click="open_control_room(site)"
       >
-        enter control room &nbsp;</b-button
-      >
+        enter control room &nbsp;
+      </b-button>
     </div>
     <div class="latest-site-image">
-      <img class="the-image" :src="image_url" title="latest-site-image" />
+      <img
+        class="the-image"
+        :src="image_url"
+        title="latest-site-image"
+      >
     </div>
     <div class="status-row">
       <div style="display: flex; flex-direction: column">
-        <div class="detailed-status-label">Weather Status:</div>
-        <div class="detailed-status-wrapper" :title="`weather is ${weather}`">
-          <div class="status-dot" :class="status_color_class(weather)"></div>
-          <p class="status-text" :class="status_color_class(weather)">
+        <div class="detailed-status-label">
+          Weather Status:
+        </div>
+        <div
+          class="detailed-status-wrapper"
+          :title="`weather is ${weather}`"
+        >
+          <div
+            class="status-dot"
+            :class="status_color_class(weather)"
+          />
+          <p
+            class="status-text"
+            :class="status_color_class(weather)"
+          >
             {{ weather }}
           </p>
         </div>
       </div>
       <div style="display: flex; flex-direction: column">
-        <div class="detailed-status-label">Site Operation:</div>
+        <div class="detailed-status-label">
+          Site Operation:
+        </div>
         <div
           class="detailed-status-wrapper"
           :title="`site operation status: ${operation}`"
         >
-          <div class="status-dot" :class="status_color_class(operation)"></div>
-          <p class="status-text" :class="status_color_class(operation)">
+          <div
+            class="status-dot"
+            :class="status_color_class(operation)"
+          />
+          <p
+            class="status-text"
+            :class="status_color_class(operation)"
+          >
             {{ operation }}
           </p>
         </div>
@@ -53,31 +77,31 @@ export default {
     site: String,
     image_url: String,
     weather: String,
-    operation: String,
+    operation: String
   },
   computed: {
     active_subpage: {
-      get() { return this.$store.state.user_interface.selected_subpage },
-      set(value) { this.$store.commit('user_interface/setActiveSubpage', value) }
-    },
+      get () { return this.$store.state.user_interface.selected_subpage },
+      set (value) { this.$store.commit('user_interface/setActiveSubpage', value) }
+    }
   },
 
   methods: {
-    open_control_room(site) {
-      let url = `https://rooms.remotehq.com/photon-ranch/control-room-${site}`;
-      window.open(url);
+    open_control_room (site) {
+      const url = `https://rooms.remotehq.com/photon-ranch/control-room-${site}`
+      window.open(url)
     },
-    status_color_class(status) {
+    status_color_class (status) {
       const color_dict = {
-        operational: "is-green",
-        ok: "is-green",
-        "technical difficulty": "is-yellow",
-        offline: "is-grey",
-      };
-      return color_dict?.[status] ?? "is-grey";
-    },
-  },
-};
+        'operational': 'is-green',
+        'ok': 'is-green',
+        'technical difficulty': 'is-yellow',
+        'offline': 'is-grey'
+      }
+      return color_dict?.[status] ?? 'is-grey'
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -134,8 +158,6 @@ export default {
 .detailed-status-wrapper {
   display: flex;
   align-items: center;
-}
-.detailed-status-label {
 }
 .status-text {
   font-weight: bold;

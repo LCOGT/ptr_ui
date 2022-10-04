@@ -1,71 +1,80 @@
 <template>
   <div class="site-home-wrapper">
-
     <div class="level site-welcome-text mt-4 mb-0">
-        <div class="level-item">
-            {{site_name}}
-        </div>
+      <div class="level-item">
+        {{ site_name }}
+      </div>
     </div>
 
-    <div class="spacer" style="height: 2em;" />
+    <div
+      class="spacer"
+      style="height: 2em;"
+    />
 
     <div class="windy-and-site-events">
+      <!-- Windy weather map -->
+      <div class="windy-container">
+        <iframe
+          style="width: 100%; height: 100%;"
+          :src="`https://embed.windy.com/embed2.html?lat=${site_latitude}&lon=${site_longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${site_latitude}&detailLon=${site_longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`"
+          frameborder="0"
+        />
+      </div>
 
-        <!-- Windy weather map -->
-        <div class="windy-container">
-            <iframe style="width: 100%; height: 100%;" :src="`https://embed.windy.com/embed2.html?lat=${site_latitude}&lon=${site_longitude}&zoom=7&level=surface&overlay=clouds&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${site_latitude}&detailLon=${site_longitude}&metricWind=m%2Fs&metricTemp=%C2%B0C&radarRange=-1`" frameborder="0"></iframe>
-        </div>
-
-        <site-events-modal class="site-events" :sitecode="sitecode"/>
-
+      <site-events-modal
+        class="site-events"
+        :sitecode="sitecode"
+      />
     </div>
 
     <!-- This is a temporary solution only. Does not scale. -->
     <!-- Add ClearDarkSky charts to site homepage -->
-    <div class="level" v-if="['mrc', 'mrc2'].indexOf(sitecode.toLowerCase()) != -1">
-        <a href=https://www.cleardarksky.com/c/SaBarbCAkey.html>
+    <div
+      v-if="['mrc', 'mrc2'].indexOf(sitecode.toLowerCase()) != -1"
+      class="level"
+    >
+      <a href="https://www.cleardarksky.com/c/SaBarbCAkey.html">
         <img src="https://www.cleardarksky.com/c/SaBarbCAcsk.gif?c=1594801"></a>
     </div>
-    <div class="level" v-if="sitecode.toLowerCase()=='saf'">
-        <a href=https://www.cleardarksky.com/c/LmyRdgObNMkey.html>
+    <div
+      v-if="sitecode.toLowerCase()=='saf'"
+      class="level"
+    >
+      <a href="https://www.cleardarksky.com/c/LmyRdgObNMkey.html">
         <img src="https://www.cleardarksky.com/c/LmyRdgObNMcsk.gif?c=1594801"></a>
     </div>
-    <div class="level" v-if="sitecode.toLowerCase()=='sro'">
-        <a href=https://www.cleardarksky.com/c/SROCAkey.html>
+    <div
+      v-if="sitecode.toLowerCase()=='sro'"
+      class="level"
+    >
+      <a href="https://www.cleardarksky.com/c/SROCAkey.html">
         <img src="https://www.cleardarksky.com/c/SROCAcsk.gif?c=1076447"></a>
     </div>
-
-
 
     <div style="height: 2em;" />
   </div>
 </template>
 
-
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
-import LeafletMap from '@/components/maps/LeafletMap'
 import SiteEventsModal from '@/components/SiteEventsModal'
-import CommandButton from '@/components/FormElements/CommandButton'
 
 export default {
-    name: "SiteHome",
-    props: ["sitecode"],
-    mixins: [commands_mixin, user_mixin],
-    components: {
-        CommandButton, 
-        LeafletMap,
-        SiteEventsModal,
-    },
-    computed: {
-        ...mapGetters('site_config', [
-            'site_latitude',
-            'site_longitude', 
-            'site_name',
-        ]),
-    }
+  name: 'SiteHome',
+  props: ['sitecode'],
+  mixins: [commands_mixin, user_mixin],
+  components: {
+    SiteEventsModal
+  },
+  computed: {
+    ...mapGetters('site_config', [
+      'site_latitude',
+      'site_longitude',
+      'site_name'
+    ])
+  }
 }
 
 </script>

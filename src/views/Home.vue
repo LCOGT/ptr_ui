@@ -1,41 +1,40 @@
-<template>  
+<template>
   <div>
     <div class="page-content">
-    <SiteNavbar />
+      <SiteNavbar />
 
+      <the-world-map
+        name="google"
+        class="map-display"
+      />
+      <!--leaflet-map name="leafmap"></leaflet-map-->
 
-        <the-world-map name="google" class="map-display"/>
-        <!--leaflet-map name="leafmap"></leaflet-map-->
-
-      <sites-overview-cards :sites="all_sites" class="sites-overview-cards" />
+      <sites-overview-cards
+        :sites="all_sites"
+        class="sites-overview-cards"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import PTR from "@/components/logoText/PTR";
-import PhotonRanch from "@/components/logoText/PhotonRanch";
-import TheWorldMap from "@/components/maps/TheWorldMap";
-import SiteNavbar from "@/components/SiteNavbar";
-import LeafletMap from "@/components/maps/LeafletMap";
+import TheWorldMap from '@/components/maps/TheWorldMap'
+import SiteNavbar from '@/components/SiteNavbar'
 import SitesOverviewCards from '@/components/SitesOverviewCards'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: "Home",
+  name: 'Home',
   components: {
-    PTR,
-    PhotonRanch,
     TheWorldMap,
-    LeafletMap,
     SiteNavbar,
-    SitesOverviewCards,
+    SitesOverviewCards
   },
 
   computed: {
     ...mapGetters('site_config', ['all_sites'])
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

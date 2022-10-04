@@ -1,19 +1,25 @@
 <template>
   <div>
     <b-field>
-      <button 
-        :disabled="!large_fits_exists && !small_fits_exists" 
+      <button
+        :disabled="!large_fits_exists && !small_fits_exists"
         title="first draw a line on the image to inspect"
+        class="button"
+        :class="{'is-loading': analysisInProgress}"
         @click="getLineProfile"
-        class="button" 
-        :class="{'is-loading': analysisInProgress}">
+      >
         get line profile
       </button>
     </b-field>
 
     <div id="line-inspection-chart">
       <svg :viewbox="`0 0 100 ${height}`">
-        <path :d="linePath" fill="none" stroke="steelblue" stroke-width="1.5" ></path>
+        <path
+          :d="linePath"
+          fill="none"
+          stroke="steelblue"
+          stroke-width="1.5"
+        />
         <g id="line-y-axis" />
         <g id="line-x-axis" />
       </svg>
@@ -23,17 +29,14 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import helpers from '@/utils/helpers'
 import axios from 'axios'
 import * as d3 from 'd3'
 
-import D3Axis from '@/components/svg/D3Axis'
 export default {
   name: 'LineProfileInspection',
-  components: { D3Axis, },
-  data() {
+  data () {
     return {
-      useLargeFits:false,
+      useLargeFits: false,
       analysisInProgress: false,
       lineProfileResults: [],
 
@@ -41,58 +44,57 @@ export default {
         top: 20,
         right: 30,
         bottom: 30,
-        left: 40,
+        left: 40
       },
       width: 100,
-      height: 200,
+      height: 200
 
     }
   },
-  
-  mounted() {
+
+  mounted () {
     this.resizeObserver()
   },
 
   methods: {
 
-    drawYAxis() {
+    drawYAxis () {
       d3.select('#line-y-axis')
-        .attr("transform", `translate(${this.chartMargin.left},0)`)
-        .call(d3.axisLeft(this.yScale).ticks(6, d3.format(",.0f")))
+        .attr('transform', `translate(${this.chartMargin.left},0)`)
+        .call(d3.axisLeft(this.yScale).ticks(6, d3.format(',.0f')))
     },
-    drawXAxis() {
+    drawXAxis () {
       d3.select('#line-x-axis')
-        .attr("transform", `translate(0,${this.height - this.chartMargin.bottom})`)
+        .attr('transform', `translate(0,${this.height - this.chartMargin.bottom})`)
         .call(d3.axisBottom(this.xScale).ticks(this.width / 80).tickSizeOuter(0))
     },
 
     // Responsive sizing
-    resizeObserver() {
-      const updateSize = (w,h) => {
+    resizeObserver () {
+      const updateSize = (w, h) => {
         this.width = w
         this.height = h
         this.drawYAxis()
         this.drawXAxis()
       }
-      let ro = new ResizeObserver(entries => {
-        for (let entry of entries) {
-          const cr = entry.contentRect;
+      const ro = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          const cr = entry.contentRect
           updateSize(cr.width, cr.height)
         }
-      });
-      let imageEl = document.getElementById('line-inspection-chart')
+      })
+      const imageEl = document.getElementById('line-inspection-chart')
       // Set observers on the element(s)
-      ro.observe(imageEl);
+      ro.observe(imageEl)
     },
 
-    getLineProfile() {
-
+    getLineProfile () {
       if (this.selectedShapeType != 'lines') {
         this.$buefy.toast.open({
-          type: "is-warning",
-          message: "Please select a line for this analysis"
+          type: 'is-warning',
+          message: 'Please select a line for this analysis'
         })
-        return;
+        return
       }
 
       this.analysisInProgress = true
@@ -106,10 +108,10 @@ export default {
         if (lineSelection[coord] < 0 || lineSelection[coord] > 1) {
           this.analysisInProgress = false
           this.$buefy.toast.open({
-            type: "is-warning",
-            message: "Please select a line within the image boundary"
+            type: 'is-warning',
+            message: 'Please select a line within the image boundary'
           })
-          return;
+          return
         }
       }
 
@@ -117,18 +119,18 @@ export default {
       const x0IsLeft = lineSelection.x0 < lineSelection.x1
       const startingPoint = {
         x: x0IsLeft ? lineSelection.x0 : lineSelection.x1,
-        y: x0IsLeft ? lineSelection.y0 : lineSelection.y1,
+        y: x0IsLeft ? lineSelection.y0 : lineSelection.y1
       }
       const endingPoint = {
         x: x0IsLeft ? lineSelection.x1 : lineSelection.x0,
-        y: x0IsLeft ? lineSelection.y1 : lineSelection.y0,
+        y: x0IsLeft ? lineSelection.y1 : lineSelection.y0
       }
-      
+
       const payload = {
         full_filename: this.useLargeFits ? this.large_fits_filename : this.small_fits_filename,
-        s3_directory: this.current_image.s3_directory || "data",
+        s3_directory: this.current_image.s3_directory || 'data',
         start: startingPoint,
-        end: endingPoint,
+        end: endingPoint
       }
 
       axios.post(url, payload).then(response => {
@@ -137,13 +139,13 @@ export default {
         this.lineProfileResults = profile
       }).catch(e => {
         this.$buefy.toast.open({
-          type: "is-danger",
-          message: "There was a problem computing the line profile."
+          type: 'is-danger',
+          message: 'There was a problem computing the line profile.'
         })
         this.analysisInProgress = false
         console.warn(e)
       })
-    },
+    }
 
   },
 
@@ -153,26 +155,26 @@ export default {
       'large_fits_exists',
       'small_fits_exists',
       'large_fits_filename',
-      'small_fits_filename',
+      'small_fits_filename'
     ]),
 
     ...mapGetters('drawshapes', [
       'selectedShapeType',
-      'subframeFromShape',
+      'subframeFromShape'
     ]),
 
     ...mapState('api_endpoints', ['quickanalysis_endpoint']),
 
-    xScale() {
-      let margin = this.chartMargin
+    xScale () {
+      const margin = this.chartMargin
       return (
         d3.scaleLinear()
           .domain([0, this.lineProfileResults.length])
           .range([margin.left, this.width - margin.right])
       )
     },
-    yScale() {
-      let margin = this.chartMargin
+    yScale () {
+      const margin = this.chartMargin
       return (
         d3.scaleSymlog()
           .domain([d3.min(this.lineProfileResults), d3.max(this.lineProfileResults)])
@@ -180,15 +182,15 @@ export default {
       )
     },
 
-    linePath() {
+    linePath () {
       this.drawYAxis()
       this.drawXAxis()
       const line = d3
-          .line()
-          .x((d,i) => this.xScale(i))
-          .y((d,i) => this.yScale(d))(this.lineProfileResults)
+        .line()
+        .x((d, i) => this.xScale(i))
+        .y((d, i) => this.yScale(d))(this.lineProfileResults)
       return line
-    },
+    }
   }
 
 }

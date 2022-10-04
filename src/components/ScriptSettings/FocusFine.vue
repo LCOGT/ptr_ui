@@ -1,70 +1,103 @@
 <template>
-<section>
-    <b-field horizontal label="target">
-        <b-field>
-            <b-radio-button size="is-small" v-model="target"
-                native-value="near_tycho_star">
-                Near Tycho Star
-            </b-radio-button>
-            <b-radio-button size="is-small" v-model="target"
-                native-value="use_field">
-                Use Field
-            </b-radio-button>
-        </b-field>
+  <section>
+    <b-field
+      horizontal
+      label="target"
+    >
+      <b-field>
+        <b-radio-button
+          v-model="target"
+          size="is-small"
+          native-value="near_tycho_star"
+        >
+          Near Tycho Star
+        </b-radio-button>
+        <b-radio-button
+          v-model="target"
+          size="is-small"
+          native-value="use_field"
+        >
+          Use Field
+        </b-radio-button>
+      </b-field>
     </b-field>
-    <b-field horizontal label="bin">
-        <b-field>
-            <b-radio-button size="is-small"  v-model="bin"
-                :native-value="1">
-                1
-            </b-radio-button>
-            <b-radio-button size="is-small" v-model="bin"
-                :native-value="2">
-                2
-            </b-radio-button>
-            <b-radio-button size="is-small" v-model="bin"
-                :native-value="4">
-                4
-            </b-radio-button>
-        </b-field>
+    <b-field
+      horizontal
+      label="bin"
+    >
+      <b-field>
+        <b-radio-button
+          v-model="bin"
+          size="is-small"
+          :native-value="1"
+        >
+          1
+        </b-radio-button>
+        <b-radio-button
+          v-model="bin"
+          size="is-small"
+          :native-value="2"
+        >
+          2
+        </b-radio-button>
+        <b-radio-button
+          v-model="bin"
+          size="is-small"
+          :native-value="4"
+        >
+          4
+        </b-radio-button>
+      </b-field>
     </b-field>
-    <b-field horizontal label="area">
-        <b-field>
-            <b-radio-button size="is-small" v-model="area"
-                native-value="100%">
-                100%
-            </b-radio-button>
+    <b-field
+      horizontal
+      label="area"
+    >
+      <b-field>
+        <b-radio-button
+          v-model="area"
+          size="is-small"
+          native-value="100%"
+        >
+          100%
+        </b-radio-button>
 
-            <b-radio-button size="is-small" v-model="area"
-                native-value="71%">
-                71%
-            </b-radio-button>
-            <b-radio-button size="is-small" v-model="area"
-                native-value="50%">
-                50% 
-            </b-radio-button>
-        </b-field>
+        <b-radio-button
+          v-model="area"
+          size="is-small"
+          native-value="71%"
+        >
+          71%
+        </b-radio-button>
+        <b-radio-button
+          v-model="area"
+          size="is-small"
+          native-value="50%"
+        >
+          50%
+        </b-radio-button>
+      </b-field>
     </b-field>
-    <div style="height: 1em;"/>
-</section>
+    <div style="height: 1em;" />
+  </section>
 </template>
 
 <script>
 export default {
-    computed: {
-        target: {
-            get() { return this.$store.getters['focusFine_target'] },
-            set(val) { this.$store.commit('focusFine_target', val) }
-        },
-        bin: {
-            get() { return this.$store.getters['focusFine_bin'] },
-            set(val) { this.$store.commit('focusFine_bin', val) }
-        },
-        area: {
-            get() { return this.$store.getters['focusFine_area'] },
-            set(val) { this.$store.commit('focusFine_area', val) }
-        },
+  computed: {
+    target: {
+      get () { return this.$store.getters.focusFine_target },
+      set (val) { this.$store.commit('focusFine_target', val) }
+    },
+    bin: {
+      get () { return this.$store.getters.focusFine_bin },
+      set (val) { this.$store.commit('focusFine_bin', val) }
+    },
+    area: {
+      get () { return this.$store.getters.focusFine_area },
+      set (val) { this.$store.commit('focusFine_area', val) }
     }
+  }
 }
 </script>
 

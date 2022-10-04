@@ -1,47 +1,65 @@
 
 <template>
-    <div :style="fontSizeStyle">
-        <span v-if="text" style="margin-left: -5px;">
-            <span class="logo photon">PHOTON</span>
-            <span class="logo ranch">&nbsp;&nbsp;RANCH</span> 
-            <span v-if="atLco" class="at">&nbsp;@</span> 
-            <span v-if="atLco" class="logo lco">&nbsp;LCO</span>
-        </span>
-        <span v-else>
-            <img src="/img/logos/PTR-logo-photonranch.png" alt="photon ranch observatory" >
-        </span>
-        <span v-if="withLambda" class="lambda">
-            <img src="/img/logos/PTR-lambda.png" alt="photon ranch observatory" >
-        </span>
-    </div>
+  <div :style="fontSizeStyle">
+    <span
+      v-if="text"
+      style="margin-left: -5px;"
+    >
+      <span class="logo photon">PHOTON</span>
+      <span class="logo ranch">&nbsp;&nbsp;RANCH</span>
+      <span
+        v-if="atLco"
+        class="at"
+      >&nbsp;@</span>
+      <span
+        v-if="atLco"
+        class="logo lco"
+      >&nbsp;LCO</span>
+    </span>
+    <span v-else>
+      <img
+        src="/img/logos/PTR-logo-photonranch.png"
+        alt="photon ranch observatory"
+      >
+    </span>
+    <span
+      v-if="withLambda"
+      class="lambda"
+    >
+      <img
+        src="/img/logos/PTR-lambda.png"
+        alt="photon ranch observatory"
+      >
+    </span>
+  </div>
 </template>
 
 <script>
 export default {
-    name: "PhotonRanch",
-    props: {
-        fontSize: {
-            type: String,
-            default: () => "38px"
-        },
-        atLco: {
-            type: Boolean,
-            default: false
-        },
-        withLambda: {
-            type: Boolean,
-            default: false,
-        },
-        text: {
-            type: Boolean, 
-            default: false,
-        },
+  name: 'PhotonRanch',
+  props: {
+    fontSize: {
+      type: String,
+      default: () => '38px'
     },
-    computed: {
-        fontSizeStyle() {
-            return `font-size: ${this.fontSize};`
-        }
+    atLco: {
+      type: Boolean,
+      default: false
     },
+    withLambda: {
+      type: Boolean,
+      default: false
+    },
+    text: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    fontSizeStyle () {
+      return `font-size: ${this.fontSize};`
+    }
+  }
 }
 </script>
 
@@ -71,4 +89,3 @@ export default {
     margin-left: 0.45em;
 }
 </style>
-

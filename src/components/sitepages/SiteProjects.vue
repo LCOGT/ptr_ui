@@ -8,77 +8,77 @@
     <div style="height: 50px" />
 
     <div class="projects-events-tables">
-      <user-projects-table 
+      <user-projects-table
         class="user-projects-table"
-        :user="user" 
-        @load_project_form="load_project_form" />
+        :user="user"
+        @load_project_form="load_project_form"
+      />
 
       <div class="user-events-table">
-        <h1 class="subtitle">Reservations</h1>
+        <h1 class="subtitle">
+          Reservations
+        </h1>
         <user-events-table :user="user" />
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
-import UserEventsTable from "@/components/calendar/UserEventsTable";
-import UserProjectsTable from "@/components/projects/UserProjectsTable";
-import CreateProjectForm from "@/components/projects/CreateProjectForm";
-import { mapGetters } from "vuex";
-import axios from "axios";
-import moment from "moment";
+import UserEventsTable from '@/components/calendar/UserEventsTable'
+import UserProjectsTable from '@/components/projects/UserProjectsTable'
+import CreateProjectForm from '@/components/projects/CreateProjectForm'
+import { mapGetters } from 'vuex'
+import moment from 'moment'
 
 export default {
-  name: "SiteProjects",
-  props: ["sitecode"],
+  name: 'SiteProjects',
+  props: ['sitecode'],
   components: {
     UserEventsTable,
     UserProjectsTable,
-    CreateProjectForm,
+    CreateProjectForm
   },
-  data() {
+  data () {
     return {
-      localTime: "-",
-      siteTime: "-",
-      utcTime: "-",
+      localTime: '-',
+      siteTime: '-',
+      utcTime: '-',
 
-      project_to_load: "",
-    };
+      project_to_load: ''
+    }
   },
-  created() {
-    this.timeInterval = setInterval(this.updateTime, 1000);
-    window.moment = moment; // use moment lib in browser devtools
+  created () {
+    this.timeInterval = setInterval(this.updateTime, 1000)
+    window.moment = moment // use moment lib in browser devtools
   },
-  destroyed() {
-    clearInterval(this.timeInterval);
+  destroyed () {
+    clearInterval(this.timeInterval)
   },
   methods: {
-    displayUtcTime(time) {
-      return moment(time).utc().format("MMM D, kk:mm");
+    displayUtcTime (time) {
+      return moment(time).utc().format('MMM D, kk:mm')
     },
 
-    updateTime() {
-      this.localTime = moment().format("MMM D, kk:mm");
-      this.siteTime = moment().tz(this.timezone).format("MMM D, kk:mm");
-      this.utcTime = moment().utc().format("MMM D, kk:mm");
+    updateTime () {
+      this.localTime = moment().format('MMM D, kk:mm')
+      this.siteTime = moment().tz(this.timezone).format('MMM D, kk:mm')
+      this.utcTime = moment().utc().format('MMM D, kk:mm')
     },
 
-    load_project_form(project) {
-      this.project_to_load = project;
-    },
+    load_project_form (project) {
+      this.project_to_load = project
+    }
   },
   computed: {
-    ...mapGetters("site_config", [ "timezone" ]),
+    ...mapGetters('site_config', ['timezone']),
 
-    user() {
-      return this.$auth.user;
-    },
-  },
-};
+    user () {
+      return this.$auth.user
+    }
+  }
+}
 </script>
-
 
 <style scoped lang="scss">
 @import "@/style/_responsive.scss";
@@ -117,8 +117,6 @@ export default {
     margin-top: 4em;
   }
 }
-
-
 
 .time-display {
   font-size: 1.3em;

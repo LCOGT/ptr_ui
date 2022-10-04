@@ -3,7 +3,6 @@
 import { register } from 'register-service-worker'
 import { SnackbarProgrammatic as Snackbar } from 'buefy'
 
-
 if (process.env.NODE_ENV === 'production') {
   register(`${process.env.BASE_URL}service-worker.js`, {
     ready () {
@@ -25,14 +24,14 @@ if (process.env.NODE_ENV === 'production') {
         message: 'New content is available. Please shift-reload to update.',
         type: 'is-success',
         position: 'is-bottom-right',
-        queue: false,
+        queue: false
       })
     },
     updated () {
       console.log('New content is available; please refresh.')
       caches.keys().then(function (names) {
-        for (let name of names) caches.delete(name);
-      });
+        for (const name of names) caches.delete(name)
+      })
     },
     offline () {
       console.log('No internet connection found. App is running in offline mode.')

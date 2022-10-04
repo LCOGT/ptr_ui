@@ -3,71 +3,75 @@
   <div>
     <SiteNavbar />
     <div class="container">
-        <iframe :src="iframe_src"/>
-        <button @click="get_remote_browser">get remotehq</button>
-        <button @click="requires_auth_test">requires auth</button>
+      <iframe :src="iframe_src" />
+      <button @click="get_remote_browser">
+        get remotehq
+      </button>
+      <button @click="requires_auth_test">
+        requires auth
+      </button>
 
-        <iframe :src="extra_iframe_src"/>
-        <input type="text" v-model.lazy="extra_iframe_src"/>
-
+      <iframe :src="extra_iframe_src" />
+      <input
+        v-model.lazy="extra_iframe_src"
+        type="text"
+      >
     </div>
   </div>
 </template>
 
 <script>
-import SiteNavbar from "@/components/SiteNavbar";
+import SiteNavbar from '@/components/SiteNavbar'
 import { mapGetters } from 'vuex'
 import { getInstance } from '@/auth/index' // get user object: getInstance().user
 import axios from 'axios'
 export default {
-  name: "Remotehq",
+  name: 'Remotehq',
   components: { SiteNavbar },
-  data() {
-      return {
-          iframe_src: "",
-          extra_iframe_src: "",
-      }
+  data () {
+    return {
+      iframe_src: '',
+      extra_iframe_src: ''
+    }
   },
-  mounted() {
+  mounted () {
   },
   methods: {
-      async get_remote_browser() {
-        const url = this.$store.state.api_endpoints.active_api + '/new_remotehq_browser'
-        let token = await this.$auth.getTokenSilently();
-        let headers = {
-            'headers': {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+    async get_remote_browser () {
+      const url = this.$store.state.api_endpoints.active_api + '/new_remotehq_browser'
+      const token = await this.$auth.getTokenSilently()
+      const headers = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
-        let response = await axios.post(url, {}, headers)
-        console.log(response)
-        let remoteBrowserURL = response.data.data.embedURL + '?iframeSource=photonranch'
-        this.iframe_src = remoteBrowserURL
-        //window.open(remoteBrowserURL, '_blank');
-
-      },
-      async requires_auth_test() {
-        const url = this.$store.state.api_endpoints.active_api + '/dummy-requires-auth'
-        let token = await this.$auth.getTokenSilently();
-        let headers = {
-            'headers': {
-                'Authorization': `Bearer ${token}`
-            }
-        }
-        let response = await axios.post(url, {}, headers)
-        console.log(response)
-
       }
+      const response = await axios.post(url, {}, headers)
+      console.log(response)
+      const remoteBrowserURL = response.data.data.embedURL + '?iframeSource=photonranch'
+      this.iframe_src = remoteBrowserURL
+      // window.open(remoteBrowserURL, '_blank');
+    },
+    async requires_auth_test () {
+      const url = this.$store.state.api_endpoints.active_api + '/dummy-requires-auth'
+      const token = await this.$auth.getTokenSilently()
+      const headers = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+      const response = await axios.post(url, {}, headers)
+      console.log(response)
+    }
 
   },
   computed: {
-        ...mapGetters('auth', {
-            token: 'getToken'
-        }),
-        user_id() { return getInstance().user?.sub ?? 'anonymous' },
+    ...mapGetters('auth', {
+      token: 'getToken'
+    }),
+    user_id () { return getInstance().user?.sub ?? 'anonymous' }
   }
-};
+}
 </script>
 
 <style scoped>

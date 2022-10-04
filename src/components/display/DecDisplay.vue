@@ -1,78 +1,86 @@
 
 <template>
-  <div class="wrapper" v-if="dec_deg_decimal" >
-    <div @click="handleClick" title="click to change format" class="dec-display" >
-      {{declinationDisplayVal}} 
+  <div
+    v-if="dec_deg_decimal"
+    class="wrapper"
+  >
+    <div
+      title="click to change format"
+      class="dec-display"
+      @click="handleClick"
+    >
+      {{ declinationDisplayVal }}
     </div>
-    <b-icon 
-      @click.native="copy"
+    <b-icon
+      v-if="can_copy"
       title="copy"
-      class="copy-icon" 
-      v-if="can_copy" 
-      icon="content-copy" 
-      custom-size="mdi-30px" />
-  </div> 
+      class="copy-icon"
+      icon="content-copy"
+      custom-size="mdi-30px"
+      @click.native="copy"
+    />
+  </div>
 </template>
 
 <script>
 export default {
-  name: "DecDisplay",
-  
+  name: 'DecDisplay',
+
   props: {
 
     // declination (degrees) as a decimal value
     dec_deg_decimal: {
-      type: Number,
+      type: Number
     },
     can_copy: {
       type: Boolean,
-      default: false,
+      default: false
     },
     decimal_precision: {
       type: Number,
-      default: 4,
+      default: 4
     }
   },
 
-  data() {
+  data () {
     return {
 
       showCopyIcon: false,
 
-      displayFormatOptions: ["decimalDegrees", "sexagesimalWithUnits", "sexagesimalPlain"],
-      displayFormatSelected: window.localStorage.getItem('dec_display_format'), // index of the list above
+      displayFormatOptions: ['decimalDegrees', 'sexagesimalWithUnits', 'sexagesimalPlain'],
+      displayFormatSelected: window.localStorage.getItem('dec_display_format') // index of the list above
 
     }
   },
 
   methods: {
-    handleClick() {
-      this.displayFormatSelected = (this.displayFormatSelected + 1 ) % this.displayFormatOptions.length
+    handleClick () {
+      this.displayFormatSelected = (this.displayFormatSelected + 1) % this.displayFormatOptions.length
       window.localStorage.setItem('dec_display_format', this.displayFormatSelected)
     },
 
-    copy() {
+    copy () {
       navigator.clipboard.writeText(this.declinationDisplayVal)
       this.$buefy.toast.open({
-        message: "Coppied " + this.declinationDisplayVal + " to clipboard",
-        type: "is-success"
+        message: 'Coppied ' + this.declinationDisplayVal + ' to clipboard',
+        type: 'is-success'
       })
     },
 
-    toSexagesimal(decimalDegrees, includeUnits) {
+    toSexagesimal (decimalDegrees, includeUnits) {
       let degrees = parseInt(decimalDegrees)
       let remainder = Math.abs(decimalDegrees - degrees)
-      let decimalMinutes = remainder * 60
-      let minutes = parseInt(decimalMinutes) 
+      const decimalMinutes = remainder * 60
+      let minutes = parseInt(decimalMinutes)
       remainder = decimalMinutes - minutes
-      let decimalSeconds = remainder * 60 
+      const decimalSeconds = remainder * 60
       let seconds = parseInt(decimalSeconds)
 
       // Zero padding if single digit
-      if (degrees < 10 && degrees > -10) {  // dec can be negative
-        if (degrees < 0) { degrees = '-0' + Math.abs(degrees)} // add the minus sign before the zero
-        else { degrees = '0' + degrees}
-      } 
+      if (degrees < 10 && degrees > -10) { // dec can be negative
+        if (degrees < 0) { degrees = '-0' + Math.abs(degrees) } // add the minus sign before the zero
+        else { degrees = '0' + degrees }
+      }
       if (minutes < 10) {
         minutes = '0' + minutes
       }
@@ -81,33 +89,36 @@ export default {
       }
 
       if (includeUnits) {
-        return `${degrees}º ${minutes}\' ${seconds}\"`
-      }
-      else {
-        return degrees + ' ' + minutes + ' ' + seconds 
+        return `${degrees}º ${minutes}' ${seconds}"`
+      } else {
+        return degrees + ' ' + minutes + ' ' + seconds
       }
     }
 
   },
 
   computed: {
-    displayFormat() {
+    displayFormat () {
       if (this.displayFormatSelected != null) {
         return this.displayFormatOptions[this.displayFormatSelected]
       } else {
         return this.displayFormatOptions[0]
       }
     },
-    declinationDisplayVal() {
-      if (this.displayFormat == "decimalDegrees") {
+    declinationDisplayVal () {
+      if (this.displayFormat == 'decimalDegrees') {
         return this.dec_deg_decimal.toFixed(this.decimal_precision) + '°'
       }
-      if (this.displayFormat == "sexagesimalPlain") {
+      if (this.displayFormat == 'sexagesimalPlain') {
         return this.toSexagesimal(this.dec_deg_decimal, false)
       }
-      if (this.displayFormat == "sexagesimalWithUnits") {
+      if (this.displayFormat == 'sexagesimalWithUnits') {
         return this.toSexagesimal(this.dec_deg_decimal, true)
       }
+
+      // fallback with error msg
+      console.error('DecDisplay component failed to display because the displayFormat was unrecognized')
+      return 'unrecognized units'
     }
   }
 }
