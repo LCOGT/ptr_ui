@@ -104,6 +104,11 @@ export default {
       set (val) { this.$store.commit('command_params/telescope_coordinate_frame', val) }
     },
 
+    smartstackIsActive: {
+      get () { return this.$store.getters['command_params/smartstackIsActive'] },
+      set (val) { this.$store.commit('command_params/smartstackIsActive', val) }
+    },
+
     subframeIsActive: {
       get () { return this.$store.getters['command_params/subframeIsActive'] },
       set (val) { this.$store.commit('command_params/subframeIsActive', val) }

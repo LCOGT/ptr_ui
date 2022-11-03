@@ -167,6 +167,19 @@
 
     <b-field
       horizontal
+      label="Smart Stack"
+    >
+      <b-switch
+        v-model="smartstackIsActive"
+        size="is-small"
+        type="is-info"
+      >
+        {{ smartstackIsActive ? "Smart stack is active" : "Smart stack not active" }}
+      </b-switch>
+    </b-field>
+
+    <b-field
+      horizontal
       label="Subframe"
     >
       <b-switch
@@ -343,6 +356,11 @@ export default {
 
     number_of_cameras () {
       return Object.keys(this.available_devices('camera', this.sitecode)).length
+    },
+
+    smartstackIsActive: {
+      get () { return this.$store.getters['command_params/smartstackIsActive'] },
+      set (val) { this.$store.commit('command_params/smartstackIsActive', val) }
     },
 
     subframe_is_active: {

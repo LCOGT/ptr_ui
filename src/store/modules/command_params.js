@@ -18,6 +18,9 @@ const state = {
   telescope_selection: 1, // 1: main telescope, 2: auxiliary telescope
   telescope_coordinate_frame: 'ICRS',
 
+  // Stack parameters
+  smartstackIsActive: true,
+
   // Subframe parameters
   subframeIsActive: false,
   subframeDefinedWithFile: '',
@@ -61,6 +64,8 @@ const getters = {
 
   telescope_selection: state => state.telescope_selection,
   telescope_coordinate_frame: state => state.telescope_coordinate_frame,
+
+  smartstackIsActive: state => state.smartstackIsActive,
 
   subframeIsActive: state => state.subframeIsActive,
   subframeDefinedWithFile: state => state.subframeDefinedWithFile,
@@ -132,6 +137,8 @@ const mutations = {
 
   telescope_selection (state, val) { state.telescope_selection = val },
   telescope_coordinate_frame (state, val) { state.telescope_coordinate_frame = val },
+
+  smartstackIsActive (state, val) { state.smartstackIsActive = val },
 
   subframeIsActive (state, val) { state.subframeIsActive = val },
   subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },

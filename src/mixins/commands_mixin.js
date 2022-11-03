@@ -266,6 +266,8 @@ export const commands_mixin = {
       'telescope_selection',
       'telescope_coordinate_frame',
 
+      'smartstackIsActive',
+
       'subframeIsActive',
       'subframeDefinedWithFile',
 
