@@ -20,6 +20,7 @@ const state = {
 
   // Stack parameters
   smartstackIsActive: true,
+  longstackIsActive: false,
 
   // Subframe parameters
   subframeIsActive: false,
@@ -66,6 +67,7 @@ const getters = {
   telescope_coordinate_frame: state => state.telescope_coordinate_frame,
 
   smartstackIsActive: state => state.smartstackIsActive,
+  longstackIsActive: state => state.longstackIsActive,
 
   subframeIsActive: state => state.subframeIsActive,
   subframeDefinedWithFile: state => state.subframeDefinedWithFile,
@@ -139,6 +141,7 @@ const mutations = {
   telescope_coordinate_frame (state, val) { state.telescope_coordinate_frame = val },
 
   smartstackIsActive (state, val) { state.smartstackIsActive = val },
+  longstackIsActive (state, val) { state.longstackIsActive = val },
 
   subframeIsActive (state, val) { state.subframeIsActive = val },
   subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },

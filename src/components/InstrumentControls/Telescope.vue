@@ -316,7 +316,6 @@ export default {
         this.send_site_command(move_telescope_command_params).then(
           (response) => {
             this.send_site_command(camera_expose_command_params)
-            console.log(camera_expose_command_params)
           }
         )
       }

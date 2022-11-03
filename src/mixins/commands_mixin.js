@@ -267,6 +267,7 @@ export const commands_mixin = {
       'telescope_coordinate_frame',
 
       'smartstackIsActive',
+      'longstackIsActive',
 
       'subframeIsActive',
       'subframeDefinedWithFile',
@@ -401,7 +402,9 @@ export const commands_mixin = {
     camera_expose_command () {
       const req_params = {
         time: this.camera_exposure,
-        image_type: this.camera_image_type
+        image_type: this.camera_image_type,
+        smartstack: this.smartstackIsActive,
+        longstack: this.longstackIsActive,
       }
       const opt_params = {
         count: this.camera_count.toString(),

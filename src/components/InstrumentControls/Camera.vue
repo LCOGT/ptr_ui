@@ -180,23 +180,15 @@
 
     <b-field
       horizontal
-      label="Subframe"
+      label="Long Stack"
     >
       <b-switch
-        v-model="subframe_is_active"
+        v-model="longstackIsActive"
         size="is-small"
         type="is-info"
       >
-        {{ subframe_is_active ? "Subframe is active" : "Subframe not active" }}
+        {{ longstackIsActive ? "Long stack is active" : "Long stack not active" }}
       </b-switch>
-    </b-field>
-    <b-field
-      horizontal
-      label=""
-    >
-      <p class="is-size-7">
-        subframe: ({{ subframe_x0.toFixed(2) }},{{ subframe_y0.toFixed(2) }}), ({{ subframe_x1.toFixed(2) }}, {{ subframe_y1.toFixed(2) }})
-      </p>
     </b-field>
 
     <b-field
@@ -361,6 +353,11 @@ export default {
     smartstackIsActive: {
       get () { return this.$store.getters['command_params/smartstackIsActive'] },
       set (val) { this.$store.commit('command_params/smartstackIsActive', val) }
+    },
+
+    longstackIsActive: {
+      get () { return this.$store.getters['command_params/longstackIsActive'] },
+      set (val) { this.$store.commit('command_params/longstackIsActive', val) }
     },
 
     subframe_is_active: {
