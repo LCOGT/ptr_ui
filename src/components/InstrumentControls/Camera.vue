@@ -9,6 +9,20 @@
       >
         Autofocus
       </b-button>
+      <b-button
+        class="button is-outlined"
+        style="margin-bottom: 1em;"
+        @click="postCommand(focus_adjust_command)"
+      >
+        Focus Adjust
+      </b-button>
+      <b-button
+        class="button is-outlined"
+        style="margin-bottom: 1em;"
+        @click="postCommand(zcompress_command)"
+      >
+        Z-Compress
+      </b-button>
       <b-field
         label-position="on-border"
         label="selected:"

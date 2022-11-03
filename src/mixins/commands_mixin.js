@@ -218,7 +218,29 @@ export const commands_mixin = {
         {
           ...num_focus_pts && { num_focus_pts }
         },
-        {}
+        {
+          filter: this.filter_wheel_options_selection,
+          bin: this.camera_bin,
+        },
+      )
+    },
+    focus_adjust_command () {
+      return this.base_command(
+        'focuser',
+        'focusadjust',
+        '',
+        {},
+        {
+          filter: this.filter_wheel_options_selection,
+          bin: this.camera_bin,
+        },
+      )
+    },
+    zcompress_command () {
+      return this.base_command(
+        'focuser',
+        'zcompress',
+        '',
       )
     },
     mount_slew_clickposition_command (x, y, filename) {
@@ -607,7 +629,7 @@ export const commands_mixin = {
     },
 
     filter_wheel_command () {
-      return this.base_command('filter_wheel', 'set_name', 'apply',
+      return this.base_command('filter_wheel', 'set_name', 'Apply',
         { filter_name: this.filter_wheel_options_selection }
       )
     },
