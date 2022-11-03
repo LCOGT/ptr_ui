@@ -23,18 +23,17 @@ export const commands_mixin = {
       // Camera Fields
       camera_image_type_options: [
         'light',
+        'simulation',
         'experimental',
         'bias',
         'dark',
-        'autofocus probe',
         'screen flat',
         'sky flat',
         'lamp flat',
         'arc flat',
         'NeAr flat',
         'ThAr flat',
-        'solar flat',
-        'simulation'
+        'solar flat'
       ],
       telescope_coordinate_frame_options: [
         'ICRS',
