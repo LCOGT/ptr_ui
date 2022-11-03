@@ -7,10 +7,13 @@
       v-model="localSelection"
       size="is-small"
     >
-      <option value="optimal" selected>
+      <option
+        value="optimal"
+        selected
+      >
         Optimal
       </option>
-       <option value="maximum">
+      <option value="maximum">
         Maximum
       </option>
     </b-select>
@@ -24,18 +27,18 @@ export default {
     horizontal: {
       type: Boolean,
       default: false
-    },
+    }
   },
 
   computed: {
     localSelection: {
       get () {
         // If no default gets set, make sure default is optimal
-          if (this.value) {
-            return this.value
-          } else {
-            return "optimal"
-          }
+        if (this.value) {
+          return this.value
+        } else {
+          return 'optimal'
+        }
       },
       set (val) {
         this.$emit('input', val)

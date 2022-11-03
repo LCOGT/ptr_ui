@@ -220,8 +220,8 @@ export const commands_mixin = {
         },
         {
           filter: this.filter_wheel_options_selection,
-          bin: this.camera_bin,
-        },
+          bin: this.camera_bin
+        }
       )
     },
     focus_adjust_command () {
@@ -232,15 +232,15 @@ export const commands_mixin = {
         {},
         {
           filter: this.filter_wheel_options_selection,
-          bin: this.camera_bin,
-        },
+          bin: this.camera_bin
+        }
       )
     },
     zcompress_command () {
       return this.base_command(
         'focuser',
         'zcompress',
-        '',
+        ''
       )
     },
     mount_slew_clickposition_command (x, y, filename) {
@@ -425,7 +425,7 @@ export const commands_mixin = {
         time: this.camera_exposure,
         image_type: this.camera_image_type,
         smartstack: this.smartstackIsActive,
-        longstack: this.longstackIsActive,
+        longstack: this.longstackIsActive
       }
       const opt_params = {
         count: this.camera_count.toString(),

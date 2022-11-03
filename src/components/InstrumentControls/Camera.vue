@@ -353,7 +353,7 @@ export default {
       'available_devices',
       'selected_camera_config',
       'camera_has_darkslide',
-      'camera_can_bin',
+      'camera_can_bin'
     ]),
 
     number_of_cameras () {

@@ -176,11 +176,17 @@
           <b-checkbox v-model="targets.hrsminssecs" />
         </b-field>
 
-        <b-field style="margin-left: 2em;" label = "Smart Stack">
+        <b-field
+          style="margin-left: 2em;"
+          label="Smart Stack"
+        >
           <b-checkbox v-model="smartstackIsActive" />
         </b-field>
 
-        <b-field style="margin-left: 2em;" label = "Long Stack">
+        <b-field
+          style="margin-left: 2em;"
+          label="Long Stack"
+        >
           <b-checkbox v-model="longstackIsActive" />
         </b-field>
       </div>

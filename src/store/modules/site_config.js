@@ -27,7 +27,7 @@ const state = {
   selected_sequencer: '',
 
   selector_exists: false,
-  selected_selector: '',
+  selected_selector: ''
 }
 
 const getters = {
