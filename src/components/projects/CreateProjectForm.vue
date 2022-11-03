@@ -175,6 +175,14 @@
           </template>
           <b-checkbox v-model="targets.hrsminssecs" />
         </b-field>
+
+        <b-field style="margin-left: 2em;" label = "Smart Stack">
+          <b-checkbox v-model="smartstackIsActive" />
+        </b-field>
+
+        <b-field style="margin-left: 2em;" label = "Long Stack">
+          <b-checkbox v-model="longstackIsActive" />
+        </b-field>
       </div>
 
       <!-- Multi-select dropdown, choose which sites a project can be scheduled at -->
@@ -1128,7 +1136,10 @@ export default {
         // Empty nested arrays such that
         // project_data[exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
-        scheduled_with_events: this.project_events
+        scheduled_with_events: this.project_events,
+        // Stacking options
+        smartstack: this.smartstackIsActive,
+        longstack: this.longstackIsActive
       }
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
@@ -1180,7 +1191,10 @@ export default {
         // Empty nested arrays such that
         // project_data[target_index][exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
-        scheduled_with_events: this.project_events
+        scheduled_with_events: this.project_events,
+        // Stacking options
+        smartstack: this.smartstackIsActive,
+        longstack: this.longstackIsActive
       }
       const request_body = {
         project_name: this.loaded_project_name,
@@ -1289,6 +1303,17 @@ export default {
       'user_events',
       'user_projects'
     ]),
+
+    smartstackIsActive: {
+      get () { return this.$store.getters['command_params/smartstackIsActive'] },
+      set (val) { this.$store.commit('command_params/smartstackIsActive', val) }
+    },
+
+    longstackIsActive: {
+      get () { return this.$store.getters['command_params/longstackIsActive'] },
+      set (val) { this.$store.commit('command_params/longstackIsActive', val) }
+    },
+
     user_events_with_projects () {
       return this.user_events
         .filter(event => event.project_id == 'none')
