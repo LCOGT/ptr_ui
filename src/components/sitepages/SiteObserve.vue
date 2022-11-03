@@ -35,9 +35,7 @@ export default {
 
     // set default values from config
     // TODO: this should go in a better place
-    this.camera_bin = this.camera_default_bin
     this.camera_areas_selection = this.camera_default_area
-    this.camera_bin = this.camera_default_bin
   },
 
   beforeDestroy () {
@@ -62,7 +60,6 @@ export default {
   },
 
   computed: {
-
     ...mapGetters('images', [
       'current_image'
     ]),
@@ -71,7 +68,6 @@ export default {
     ]),
 
     ...mapGetters('site_config', [
-      'camera_default_bin',
       'camera_default_area'
     ]),
 

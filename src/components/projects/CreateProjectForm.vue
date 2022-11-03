@@ -351,26 +351,17 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Bin' : ''">
+          <b-field :label="n==1 ? 'Resolution' : ''">
             <b-select
               v-model="exposures[n-1].bin"
               size="is-small"
               :disabled="!exposures[n-1].active"
             >
-              <option value="0, 0">
-                default
+              <option value="optimal">
+                Optimal
               </option>
-              <option value="1, 1">
-                1, 1
-              </option>
-              <option value="2, 2">
-                2, 2
-              </option>
-              <option value="3, 3">
-                3, 3
-              </option>
-              <option value="4, 4">
-                4, 4
+              <option value="maximum">
+                Maximum
               </option>
             </b-select>
           </b-field>
@@ -837,7 +828,7 @@ export default {
           exposure: 1,
           filter: 'Lum',
           area: 'FULL',
-          bin: '0, 0',
+          bin: 'optimal',
           dither: 'no',
           photometry: '-',
           defocus: 0
@@ -994,7 +985,7 @@ export default {
           exposure: 1,
           filter: 'Lum',
           area: 'FULL',
-          bin: '0, 0',
+          bin: 'optimal',
           dither: 'no',
           photometry: '-',
           defocus: 0

@@ -138,11 +138,8 @@
     <CameraBinSelectField
       v-if="camera_can_bin"
       v-model="camera_bin"
-      :bin-modes="camera_bin_options"
-      :default="camera_default_bin"
       :horizontal="true"
     />
-
     <b-field
       v-if="camera_areas && camera_areas.length != 0"
       horizontal
@@ -343,7 +340,6 @@ export default {
       'selected_camera_config',
       'camera_has_darkslide',
       'camera_can_bin',
-      'camera_default_bin'
     ]),
 
     number_of_cameras () {
