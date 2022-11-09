@@ -9,6 +9,20 @@
       >
         Autofocus
       </b-button>
+      <b-button
+        class="button is-outlined"
+        style="margin-bottom: 1em;"
+        @click="postCommand(focus_adjust_command)"
+      >
+        Focus Adjust
+      </b-button>
+      <b-button
+        class="button is-outlined"
+        style="margin-bottom: 1em;"
+        @click="postCommand(zcompress_command)"
+      >
+        Z-Compress
+      </b-button>
       <b-field
         label-position="on-border"
         label="selected:"
@@ -138,11 +152,8 @@
     <CameraBinSelectField
       v-if="camera_can_bin"
       v-model="camera_bin"
-      :bin-modes="camera_bin_options"
-      :default="camera_default_bin"
       :horizontal="true"
     />
-
     <b-field
       v-if="camera_areas && camera_areas.length != 0"
       horizontal
@@ -167,23 +178,28 @@
 
     <b-field
       horizontal
-      label="Subframe"
+      label="Smart Stack"
     >
       <b-switch
-        v-model="subframe_is_active"
+        v-model="smartstackIsActive"
         size="is-small"
         type="is-info"
       >
-        {{ subframe_is_active ? "Subframe is active" : "Subframe not active" }}
+        {{ smartstackIsActive ? "Smart stack is active" : "Smart stack not active" }}
       </b-switch>
     </b-field>
+
     <b-field
       horizontal
-      label=""
+      label="Long Stack"
     >
-      <p class="is-size-7">
-        subframe: ({{ subframe_x0.toFixed(2) }},{{ subframe_y0.toFixed(2) }}), ({{ subframe_x1.toFixed(2) }}, {{ subframe_y1.toFixed(2) }})
-      </p>
+      <b-switch
+        v-model="longstackIsActive"
+        size="is-small"
+        type="is-info"
+      >
+        {{ longstackIsActive ? "Long stack is active" : "Long stack not active" }}
+      </b-switch>
     </b-field>
 
     <b-field
@@ -337,12 +353,21 @@ export default {
       'available_devices',
       'selected_camera_config',
       'camera_has_darkslide',
-      'camera_can_bin',
-      'camera_default_bin'
+      'camera_can_bin'
     ]),
 
     number_of_cameras () {
       return Object.keys(this.available_devices('camera', this.sitecode)).length
+    },
+
+    smartstackIsActive: {
+      get () { return this.$store.getters['command_params/smartstackIsActive'] },
+      set (val) { this.$store.commit('command_params/smartstackIsActive', val) }
+    },
+
+    longstackIsActive: {
+      get () { return this.$store.getters['command_params/longstackIsActive'] },
+      set (val) { this.$store.commit('command_params/longstackIsActive', val) }
     },
 
     subframe_is_active: {

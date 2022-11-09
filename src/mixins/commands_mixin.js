@@ -23,18 +23,17 @@ export const commands_mixin = {
       // Camera Fields
       camera_image_type_options: [
         'light',
+        'simulation',
         'experimental',
         'bias',
         'dark',
-        'autofocus probe',
         'screen flat',
         'sky flat',
         'lamp flat',
         'arc flat',
         'NeAr flat',
         'ThAr flat',
-        'solar flat',
-        'simulation'
+        'solar flat'
       ],
       telescope_coordinate_frame_options: [
         'ICRS',
@@ -219,7 +218,29 @@ export const commands_mixin = {
         {
           ...num_focus_pts && { num_focus_pts }
         },
-        {}
+        {
+          filter: this.filter_wheel_options_selection,
+          bin: this.camera_bin
+        }
+      )
+    },
+    focus_adjust_command () {
+      return this.base_command(
+        'focuser',
+        'focusadjust',
+        '',
+        {},
+        {
+          filter: this.filter_wheel_options_selection,
+          bin: this.camera_bin
+        }
+      )
+    },
+    zcompress_command () {
+      return this.base_command(
+        'focuser',
+        'zcompress',
+        ''
       )
     },
     mount_slew_clickposition_command (x, y, filename) {
@@ -265,6 +286,9 @@ export const commands_mixin = {
     ...mapGetters('command_params', [
       'telescope_selection',
       'telescope_coordinate_frame',
+
+      'smartstackIsActive',
+      'longstackIsActive',
 
       'subframeIsActive',
       'subframeDefinedWithFile',
@@ -399,7 +423,9 @@ export const commands_mixin = {
     camera_expose_command () {
       const req_params = {
         time: this.camera_exposure,
-        image_type: this.camera_image_type
+        image_type: this.camera_image_type,
+        smartstack: this.smartstackIsActive,
+        longstack: this.longstackIsActive
       }
       const opt_params = {
         count: this.camera_count.toString(),
@@ -603,7 +629,7 @@ export const commands_mixin = {
     },
 
     filter_wheel_command () {
-      return this.base_command('filter_wheel', 'set_name', 'apply',
+      return this.base_command('filter_wheel', 'set_name', 'Apply',
         { filter_name: this.filter_wheel_options_selection }
       )
     },

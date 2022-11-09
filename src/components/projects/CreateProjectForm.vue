@@ -175,6 +175,20 @@
           </template>
           <b-checkbox v-model="targets.hrsminssecs" />
         </b-field>
+
+        <b-field
+          style="margin-left: 2em;"
+          label="Smart Stack"
+        >
+          <b-checkbox v-model="smartstackIsActive" />
+        </b-field>
+
+        <b-field
+          style="margin-left: 2em;"
+          label="Long Stack"
+        >
+          <b-checkbox v-model="longstackIsActive" />
+        </b-field>
       </div>
 
       <!-- Multi-select dropdown, choose which sites a project can be scheduled at -->
@@ -343,26 +357,17 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Bin' : ''">
+          <b-field :label="n==1 ? 'Resolution' : ''">
             <b-select
               v-model="exposures[n-1].bin"
               size="is-small"
               :disabled="!exposures[n-1].active"
             >
-              <option value="0, 0">
-                default
+              <option value="optimal">
+                Optimal
               </option>
-              <option value="1, 1">
-                1, 1
-              </option>
-              <option value="2, 2">
-                2, 2
-              </option>
-              <option value="3, 3">
-                3, 3
-              </option>
-              <option value="4, 4">
-                4, 4
+              <option value="maximum">
+                Maximum
               </option>
             </b-select>
           </b-field>
@@ -829,7 +834,7 @@ export default {
           exposure: 1,
           filter: 'Lum',
           area: 'FULL',
-          bin: '0, 0',
+          bin: 'optimal',
           dither: 'no',
           photometry: '-',
           defocus: 0
@@ -986,7 +991,7 @@ export default {
           exposure: 1,
           filter: 'Lum',
           area: 'FULL',
-          bin: '0, 0',
+          bin: 'optimal',
           dither: 'no',
           photometry: '-',
           defocus: 0
@@ -1128,7 +1133,10 @@ export default {
         // Empty nested arrays such that
         // project_data[exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
-        scheduled_with_events: this.project_events
+        scheduled_with_events: this.project_events,
+        // Stacking options
+        smartstack: this.smartstackIsActive,
+        longstack: this.longstackIsActive
       }
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
@@ -1180,7 +1188,10 @@ export default {
         // Empty nested arrays such that
         // project_data[target_index][exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
-        scheduled_with_events: this.project_events
+        scheduled_with_events: this.project_events,
+        // Stacking options
+        smartstack: this.smartstackIsActive,
+        longstack: this.longstackIsActive
       }
       const request_body = {
         project_name: this.loaded_project_name,
@@ -1289,6 +1300,17 @@ export default {
       'user_events',
       'user_projects'
     ]),
+
+    smartstackIsActive: {
+      get () { return this.$store.getters['command_params/smartstackIsActive'] },
+      set (val) { this.$store.commit('command_params/smartstackIsActive', val) }
+    },
+
+    longstackIsActive: {
+      get () { return this.$store.getters['command_params/longstackIsActive'] },
+      set (val) { this.$store.commit('command_params/longstackIsActive', val) }
+    },
+
     user_events_with_projects () {
       return this.user_events
         .filter(event => event.project_id == 'none')

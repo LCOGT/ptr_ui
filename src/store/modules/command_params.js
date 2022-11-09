@@ -18,6 +18,10 @@ const state = {
   telescope_selection: 1, // 1: main telescope, 2: auxiliary telescope
   telescope_coordinate_frame: 'ICRS',
 
+  // Stack parameters
+  smartstackIsActive: true,
+  longstackIsActive: false,
+
   // Subframe parameters
   subframeIsActive: false,
   subframeDefinedWithFile: '',
@@ -28,7 +32,7 @@ const state = {
   camera_exposure: '1',
   camera_count: 1, // numberinput form requires number, not string. converted to string in expose command.
   camera_area: null,
-  camera_bin: [1, 1],
+  camera_bin: 'optimal',
   camera_dither: 'off',
   camera_extract: 'on', // requested by Wayne for SEP related tests 20200413
   camera_image_type: 'light',
@@ -61,6 +65,9 @@ const getters = {
 
   telescope_selection: state => state.telescope_selection,
   telescope_coordinate_frame: state => state.telescope_coordinate_frame,
+
+  smartstackIsActive: state => state.smartstackIsActive,
+  longstackIsActive: state => state.longstackIsActive,
 
   subframeIsActive: state => state.subframeIsActive,
   subframeDefinedWithFile: state => state.subframeDefinedWithFile,
@@ -132,6 +139,9 @@ const mutations = {
 
   telescope_selection (state, val) { state.telescope_selection = val },
   telescope_coordinate_frame (state, val) { state.telescope_coordinate_frame = val },
+
+  smartstackIsActive (state, val) { state.smartstackIsActive = val },
+  longstackIsActive (state, val) { state.longstackIsActive = val },
 
   subframeIsActive (state, val) { state.subframeIsActive = val },
   subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },

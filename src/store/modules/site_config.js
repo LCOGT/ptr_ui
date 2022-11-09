@@ -180,9 +180,6 @@ const getters = {
   camera_has_darkslide: (state, getters) => {
     return getters.selected_camera_config.settings?.has_darkslide ?? false
   },
-  camera_default_bin: (state, getters) => {
-    return getters.selected_camera_config.settings?.default_bin ?? getters.camera_bin_options[0] ?? ''
-  },
 
   // Available filters
   filter_wheel_options: (state, getters) => {
