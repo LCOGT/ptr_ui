@@ -212,7 +212,7 @@ export const commands_mixin = {
     },
     focus_auto_command (num_focus_pts) {
       return this.base_command(
-        'focuser',
+        'sequencer',
         'autofocus',
         '',
         {
@@ -226,7 +226,7 @@ export const commands_mixin = {
     },
     focus_adjust_command () {
       return this.base_command(
-        'focuser',
+        'sequencer',
         'focusadjust',
         '',
         {},
@@ -238,7 +238,7 @@ export const commands_mixin = {
     },
     zcompress_command () {
       return this.base_command(
-        'focuser',
+        'sequencer',
         'zcompress',
         ''
       )
