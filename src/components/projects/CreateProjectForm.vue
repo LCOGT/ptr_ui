@@ -925,7 +925,7 @@ export default {
         lunar_phase_max: false
       },
       calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
-      
+
       cycleIsActive: true,
       depleteIsActive: true
     }
