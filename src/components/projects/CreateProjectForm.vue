@@ -143,8 +143,9 @@
             :disabled="!targets[n-1].active"
           />
         </b-field>
-
-        <b-field style="margin-left: 2em;">
+      </div>
+      <div class="target-row">
+        <b-field>
           <template #label>
             Hours / Degrees
             <b-tooltip
@@ -188,6 +189,20 @@
           label="Long Stack"
         >
           <b-checkbox v-model="longstackIsActive" />
+        </b-field>
+
+        <b-field
+          style="margin-left: 2em;"
+          label="Deplete"
+        >
+          <b-checkbox v-model="depleteIsActive" />
+        </b-field>
+
+        <b-field
+          style="margin-left: 2em;"
+          label="Cycle"
+        >
+          <b-checkbox v-model="cycleIsActive" />
         </b-field>
       </div>
 
@@ -909,7 +924,10 @@ export default {
         lunar_dist_min: false,
         lunar_phase_max: false
       },
-      calendarBaseUrl: this.$store.state.api_endpoints.calendar_api
+      calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
+      
+      cycleIsActive: true,
+      depleteIsActive: true
     }
   },
   mounted () {
@@ -947,7 +965,6 @@ export default {
     RAfromSexagesimal (rasexag) {
       const raarray = rasexag.replace(':', ' ').replace(':', ' ').replace('.', ' ').split(' ')
       const rahrs = Number(raarray[0]) + Number(raarray[1] / 60) + Number(raarray[2] / 3600)
-      console.log(rahrs)
 
       return rahrs
     },
@@ -1136,7 +1153,9 @@ export default {
         scheduled_with_events: this.project_events,
         // Stacking options
         smartstack: this.smartstackIsActive,
-        longstack: this.longstackIsActive
+        longstack: this.longstackIsActive,
+        deplete: this.depleteIsActive,
+        cycle: this.cycleIsActive
       }
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
@@ -1191,7 +1210,9 @@ export default {
         scheduled_with_events: this.project_events,
         // Stacking options
         smartstack: this.smartstackIsActive,
-        longstack: this.longstackIsActive
+        longstack: this.longstackIsActive,
+        deplete: this.depleteIsActive,
+        cycle: this.cycleIsActive
       }
       const request_body = {
         project_name: this.loaded_project_name,
