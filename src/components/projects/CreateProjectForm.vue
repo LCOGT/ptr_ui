@@ -75,7 +75,7 @@
             :maxlength="max_fits_header_length"
           />
         </b-field>
-        <b-field style="margin-left: 2em;">
+        <b-field>
           <template #label>
             Active
             <b-tooltip
@@ -144,7 +144,7 @@
           />
         </b-field>
       </div>
-      <div class="target-row">
+      <div class="button-row">
         <b-field>
           <template #label>
             Hours / Degrees
@@ -161,7 +161,7 @@
           <b-checkbox v-model="RAhours" />
         </b-field>
 
-        <b-field style="margin-left: 2em;">
+        <b-field>
           <template #label>
             Sexagesimal?
             <b-tooltip
@@ -178,28 +178,24 @@
         </b-field>
 
         <b-field
-          style="margin-left: 2em;"
           label="Smart Stack"
         >
           <b-checkbox v-model="smartstackIsActive" />
         </b-field>
 
         <b-field
-          style="margin-left: 2em;"
           label="Long Stack"
         >
           <b-checkbox v-model="longstackIsActive" />
         </b-field>
 
         <b-field
-          style="margin-left: 2em;"
           label="Deplete"
         >
           <b-checkbox v-model="depleteIsActive" />
         </b-field>
 
         <b-field
-          style="margin-left: 2em;"
           label="Cycle"
         >
           <b-checkbox v-model="cycleIsActive" />
@@ -1426,5 +1422,12 @@ export default {
 }
 .target-row > * {
     margin-right: 8px;
+}
+.button-row {
+    display: flex;
+    flex-direction: row;
+}
+.button-row > * {
+    margin-right: 16px;
 }
 </style>
