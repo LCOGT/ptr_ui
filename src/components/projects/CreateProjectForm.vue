@@ -232,9 +232,30 @@
                   class="button"
                   icon-right="menu-down"
                 >
-                  Select sites ({{ project_sites.length }})
+                  <span v-if="project_sites.length === 0">default (common pool)</span>
+                  <span
+                    v-for="project_site in project_sites"
+                    :key="project_site"
+                  >
+                    <span v-if="project_sites.indexOf(project_site) > 0">, </span>
+                    {{ project_site }}
+                  </span>
                 </b-button>
               </template>
+              <b-dropdown-item
+                key="common pool"
+                class="item"
+                value="common pool"
+              >
+                common pool
+              </b-dropdown-item>
+
+              <div class="separator">
+                <div class="line" />
+                <p>SITES</p>
+                <div class="line" />
+              </div>
+
               <b-dropdown-item
                 v-for="site_real in available_sites_real"
                 :key="site_real"
@@ -246,7 +267,7 @@
 
               <div class="separator">
                 <div class="line" />
-                <p>SIMULATED</p>
+                <p>SIMULATED SITES</p>
                 <div class="line" />
               </div>
 
@@ -261,14 +282,6 @@
             </b-dropdown>
           </div>
         </b-field>
-        <span v-if="project_sites.length === 0">default ({{ sitecode }})</span>
-        <span
-          v-for="project_site in project_sites"
-          :key="project_site"
-        >
-          <span v-if="project_sites.indexOf(project_site) > 0">, </span>
-          {{ project_site }}
-        </span>
       </div>
 
       <!-- we decided to only allow one target per project -->
@@ -353,6 +366,7 @@
                 {{ filter }}
               </option>
               <option
+                v-if="project_filter_list && project_filter_list.length>0"
                 disabled
                 value="------"
               >
@@ -832,7 +846,7 @@ export default {
       project_name: '',
       project_events: [],
       project_note: '',
-      project_sites: [this.sitecode],
+      project_sites: ['common pool'],
 
       exposures_index: 1,
       exposures: [
@@ -989,7 +1003,7 @@ export default {
       this.hrsminssecs = false
       this.targets_index = 1
       this.project_note = ''
-      this.project_sites = [this.sitecode]
+      this.project_sites = ["common pool"]
       this.exposures = [
         {
           active: true,
@@ -1075,7 +1089,7 @@ export default {
         })
         // If user selects no sites, consider the selection to be the current site
         if (this.project_sites.length === 0) {
-          this.project_sites = this.site
+          this.project_sites = ["common pool"]
         }
       }
     },
@@ -1248,6 +1262,9 @@ export default {
 
     // Function to get filters at any site to populate filter dropdown
     get_default_filter_options (site) {
+      if (site == "common pool") {
+        return
+      }
       const site_cfg = this.global_config[site]
       const default_filter_wheel_name = site_cfg.defaults.filter_wheel
       const filter_wheel_options = site_cfg.filter_wheel[default_filter_wheel_name].settings.filter_data
@@ -1267,8 +1284,10 @@ export default {
       if (selected_sites.length != 0) {
         let fwo = []
         for (const site of selected_sites) {
-          const filter_list = this.get_default_filter_options(site).map(x => x[0])
-          fwo = [...fwo, ...filter_list]
+          if (site != 'common pool') {
+            const filter_list = this.get_default_filter_options(site).map(x => x[0])
+            fwo = [...fwo, ...filter_list]
+          }
         }
         // Remove duplicates between site filter lists
         let all_site_filters = [...new Set(fwo)]
@@ -1276,11 +1295,8 @@ export default {
         all_site_filters = all_site_filters.filter(item => generics.indexOf(item) < 0)
         return all_site_filters
 
-      // Default behavior (if no specific sites selected) returns the filters for the current site only
-      } else {
-        const filter_list = this.get_default_filter_options(this.sitecode).map(x => x[0])
-        return filter_list
       }
+      // Default behavior (if no specific sites selected) returns the "site filters" for common pool, which are none
     },
 
     // True if we're modifying a project and the name is changed.
@@ -1355,7 +1371,7 @@ export default {
     background-color: $body-background-color;
 }
 .site-dropdown .button {
-    width: 130px;
+    display: inline-block;
     background-color: $body-background-color;
 }
 .site-dropdown .item {
