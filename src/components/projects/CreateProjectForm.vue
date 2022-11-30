@@ -158,7 +158,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="targets.RAhours" />
+          <b-checkbox v-model="RAhours" />
         </b-field>
 
         <b-field style="margin-left: 2em;">
@@ -174,7 +174,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="targets.hrsminssecs" />
+          <b-checkbox v-model="hrsminssecs" />
         </b-field>
 
         <b-field
@@ -822,8 +822,6 @@ export default {
       this.project_sites = project.project_sites
       this.targets = project.project_targets.map(target => ({ ...target, active: true }))
       this.targets_index = this.targets.length
-      this.targets.RAhours = true
-      this.targets.hrsminssecs = false
       this.project_note = project.project_note
       this.exposures = project.exposures.map(exposure => ({ ...exposure, active: true }))
       this.exposures_index = this.exposures.length
@@ -863,8 +861,6 @@ export default {
           name: '',
           ra: '',
           dec: '',
-          RAhours: true,
-          hrsminssecs: false
         }
 
       ],
@@ -926,6 +922,9 @@ export default {
       },
       calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
 
+
+      RAhours: true,
+      hrsminssecs: false,
       cycleIsActive: true,
       depleteIsActive: true
     }
@@ -935,8 +934,6 @@ export default {
     this.targets[0].ra = this.mount_ra
     this.targets[0].dec = this.mount_dec
     this.targets[0].name = this.mount_object
-    this.targets.RAhours = true
-    this.targets.hrsminssecs = false
   },
   methods: {
     async getAuthRequestHeader () {
@@ -990,13 +987,11 @@ export default {
           active: true,
           name: '',
           ra: '',
-          dec: '',
-          RAhours: true,
-          hrsminssecs: false
+          dec: ''
         }
       ]
-      this.targets.RAhours = true
-      this.targets.hrsminssecs = false
+      this.RAhours = true
+      this.hrsminssecs = false
       this.targets_index = 1
       this.project_note = ''
       this.project_sites = [this.sitecode]
@@ -1071,8 +1066,6 @@ export default {
         name: '',
         ra: '',
         dec: '',
-        RAhours: true,
-        hrsminssecs: false
       })
       // Show one additional row
       this.targets_index += 1
@@ -1118,15 +1111,15 @@ export default {
       })
       // Make sure that correct format of RA and dec is sent to the site-code
       // Convert Sexagesimal
-      if (this.targets.hrsminssecs == true) {
+      if (this.hrsminssecs == true) {
         this.targets[0].ra = this.RAfromSexagesimal(this.targets[0].ra)
         this.targets[0].dec = this.DECfromSexagesimal(this.targets[0].dec)
-        this.targets.RAhours = true
-        this.targets.hrsminssecs = false
+        this.RAhours = true
+        this.hrsminssecs = false
       }
       // Decimal RA degrees to Decimal RA hours
-      if (this.targets.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
-      this.targets.RAhours = true
+      if (this.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
+      this.RAhours = true
       const project = {
         project_name: this.project_name,
         created_at: moment().utc().format(),
@@ -1182,8 +1175,8 @@ export default {
     modifyProject () {
       const url = this.projects_api_url + '/modify-project'
       // Make sure that correct format of RA is sent to the site-code
-      if (this.targets.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
-      this.targets.RAhours = true
+      if (this.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
+      this.RAhours = true
       const project = {
         project_name: this.project_name,
         created_at: moment().utc().format(),
