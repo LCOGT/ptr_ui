@@ -75,21 +75,6 @@
             :maxlength="max_fits_header_length"
           />
         </b-field>
-        <b-field>
-          <template #label>
-            Active
-            <b-tooltip
-              type="is-dark"
-              label="Projects that are not active can be saved but will not be scheduled to run automatically."
-            >
-              <b-icon
-                size="is-small"
-                icon="help-circle-outline"
-              />
-            </b-tooltip>
-          </template>
-          <b-checkbox v-model="project_constraints.project_is_active" />
-        </b-field>
       </div>
 
       <div
@@ -205,7 +190,7 @@
       <!-- Multi-select dropdown, choose which sites a project can be scheduled at -->
       <!-- Default selection is current site. Currently, there is no "generic site" option -->
       <div class="site-select">
-        <b-field style="margin-top: 1em;">
+        <b-field >
           <template #label>
             Sites
             <b-tooltip
@@ -281,6 +266,46 @@
               </b-dropdown-item>
             </b-dropdown>
           </div>
+        </b-field>
+        <b-field>
+          <template #label>
+            Expiry Date
+            <b-tooltip
+              type="is-dark"
+              position="is-right"
+              label="Choose the last day this project can be scheduled in the common pool."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-datepicker
+              ref="datepicker"
+              expanded
+              placeholder="Select a date"
+              v-model="expiry">
+          </b-datepicker>
+          <b-button
+              @click="$refs.datepicker.toggle()"
+              icon-left="calendar-today"
+              type="is-primary" />
+        </b-field>
+        <b-field>
+          <template #label>
+            Active
+            <b-tooltip
+              type="is-dark"
+              label="Projects that are not active can be saved but will not be scheduled to run automatically."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="project_constraints.project_is_active" />
         </b-field>
       </div>
 
@@ -932,6 +957,8 @@ export default {
       },
       calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
 
+      expiry: new Date(),
+
       RAhours: true,
       hrsminssecs: false,
       cycleIsActive: true,
@@ -943,6 +970,11 @@ export default {
     this.targets[0].ra = this.mount_ra
     this.targets[0].dec = this.mount_dec
     this.targets[0].name = this.mount_object
+  },
+  created () {
+    //initialize expiry date to one lunar month from now
+    var today = new Date()
+    this.expiry.setDate(today.getDate()+28)
   },
   methods: {
     async getAuthRequestHeader () {
@@ -1157,7 +1189,8 @@ export default {
         smartstack: this.smartstackIsActive,
         longstack: this.longstackIsActive,
         deplete: this.depleteIsActive,
-        cycle: this.cycleIsActive
+        cycle: this.cycleIsActive,
+        expiry: this.exypiry
       }
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
@@ -1214,7 +1247,8 @@ export default {
         smartstack: this.smartstackIsActive,
         longstack: this.longstackIsActive,
         deplete: this.depleteIsActive,
-        cycle: this.cycleIsActive
+        cycle: this.cycleIsActive,
+        expiry: this.expiry
       }
       const request_body = {
         project_name: this.loaded_project_name,
@@ -1445,5 +1479,14 @@ export default {
 }
 .button-row > * {
     margin-right: 16px;
+}
+.site-select {
+  display: flex;
+  flex-direction: row;
+  align-items: bottom;
+  margin-top: 1em;
+}
+.site-select > * {
+  margin-right:16px;
 }
 </style>
