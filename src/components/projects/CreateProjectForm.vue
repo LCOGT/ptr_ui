@@ -2,7 +2,7 @@
   <div>
     <div class="project-form-header">
       <h1 class="title">
-        Create a project
+        Create a project 
       </h1>
       <div>
         <b-tooltip
@@ -128,6 +128,22 @@
             :disabled="!targets[n-1].active"
           />
         </b-field>
+        <b-field>
+          <template #label>
+            TCO
+            <b-tooltip
+              type="is-dark"
+              label="Time critical observation (e.g. exoplanet, variable star)"
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="tco" />
+        </b-field>
+
       </div>
       <div class="button-row">
         <b-field>
@@ -148,7 +164,7 @@
 
         <b-field>
           <template #label>
-            Sexagesimal?
+            Sexagesimal
             <b-tooltip
               type="is-dark"
               label="When this is turned on, PTR expects units in Hours Minutes Seconds. When off, PTR expects units in Decimals."
@@ -162,27 +178,67 @@
           <b-checkbox v-model="hrsminssecs" />
         </b-field>
 
-        <b-field
-          label="Smart Stack"
-        >
+        <b-field>
+          <template #label>
+            Smart Stack
+            <b-tooltip
+              type="is-dark"
+              label="Automatically stack shorter exposures over long exposure time."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
           <b-checkbox v-model="smartstackIsActive" />
         </b-field>
 
-        <b-field
-          label="Long Stack"
-        >
+        <b-field>
+          <template #label>
+            Long Stack
+            <b-tooltip
+              type="is-dark"
+              label="Stacking multiple longer exposure times."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
           <b-checkbox v-model="longstackIsActive" />
         </b-field>
 
-        <b-field
-          label="Deplete"
-        >
+        <b-field>
+          <template #label>
+            Deplete
+            <b-tooltip
+              type="is-dark"
+              label="Decrement count."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
           <b-checkbox v-model="depleteIsActive" />
         </b-field>
 
-        <b-field
-          label="Cycle"
-        >
+        <b-field>
+          <template #label>
+            Cycle
+            <b-tooltip
+              type="is-dark"
+              label="Do each line first."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
           <b-checkbox v-model="cycleIsActive" />
         </b-field>
       </div>
@@ -217,14 +273,7 @@
                   class="button"
                   icon-right="menu-down"
                 >
-                  <span v-if="project_sites.length === 0">default (common pool)</span>
-                  <span
-                    v-for="project_site in project_sites"
-                    :key="project_site"
-                  >
-                    <span v-if="project_sites.indexOf(project_site) > 0">, </span>
-                    {{ project_site }}
-                  </span>
+                  Select sites ({{project_sites.length}})
                 </b-button>
               </template>
               <b-dropdown-item
@@ -269,11 +318,11 @@
         </b-field>
         <b-field>
           <template #label>
-            Expiry Date
+            Start Date (UTC)
             <b-tooltip
               type="is-dark"
               position="is-right"
-              label="Choose the last day this project can be scheduled in the common pool."
+              label="Choose the first day this project can be scheduled in the common pool, in UTC."
             >
               <b-icon
                 size="is-small"
@@ -281,14 +330,39 @@
               />
             </b-tooltip>
           </template>
-          <b-datepicker
-              ref="datepicker"
+          <b-datetimepicker
+              ref="stdatetimepicker"
               expanded
               placeholder="Select a date"
-              v-model="expiry">
-          </b-datepicker>
+              v-model="start_date">
+          </b-datetimepicker>
           <b-button
-              @click="$refs.datepicker.toggle()"
+              @click="$refs.stdatetimepicker.toggle()"
+              icon-left="calendar-today"
+              type="is-primary" />
+        </b-field>
+        <b-field>
+          <template #label>
+            Expiry Date (UTC)
+            <b-tooltip
+              type="is-dark"
+              position="is-right"
+              label="Choose the last day this project can be scheduled in the common pool, in UTC."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-datetimepicker
+              ref="expdatetimepicker"
+              expanded
+              placeholder="Select a date"
+              v-model="expiry_date">
+          </b-datetimepicker>
+          <b-button
+              @click="$refs.expdatetimepicker.toggle()"
               icon-left="calendar-today"
               type="is-primary" />
         </b-field>
@@ -307,6 +381,17 @@
           </template>
           <b-checkbox v-model="project_constraints.project_is_active" />
         </b-field>
+      </div>
+
+      <div class="sites-text">
+        <span v-if="project_sites.length === 0 || project_sites == ['common pool']"> default (common pool)</span>
+        <span
+          v-for="project_site in project_sites"
+          :key="project_site"
+        >
+          <span v-if="project_sites.indexOf(project_site) > 0">, </span>
+          {{ project_site }}
+        </span>
       </div>
 
       <!-- we decided to only allow one target per project -->
@@ -474,11 +559,11 @@
               size="is-small"
               :disabled="!exposures[n-1].active"
             >
-              <option value="yes">
-                yes
-              </option>
               <option value="no">
                 no
+              </option>
+              <option value="yes">
+                yes
               </option>
               <option
                 v-for="i in 25"
@@ -861,6 +946,17 @@ export default {
       this.exposures = project.exposures.map(exposure => ({ ...exposure, active: true }))
       this.exposures_index = this.exposures.length
       this.project_constraints = project.project_constraints
+      
+      //ADD THE REST
+
+      // moment() automatically assumes user's TZ for creating a moment, so this displays correctly in datetimepicker
+      console.log(project.expiry_date)
+      console.log(moment(project.expiry_date))
+      console.log(moment(project.expiry_date).toDate())
+      
+      this.start_date = moment(project.start_date).toDate()
+      this.expiry_date = moment(project.expiry_date).toDate()
+
     }
   },
   data () {
@@ -941,7 +1037,8 @@ export default {
         'Blue',
         'HA',
         'O3',
-        'S2'
+        'S2',
+        'EXO'
       ],
       site: this.sitecode,
       warn: {
@@ -957,12 +1054,15 @@ export default {
       },
       calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
 
-      expiry: new Date(),
+      expiry_date: new Date(),
+      start_date: new Date(),
 
       RAhours: true,
       hrsminssecs: false,
       cycleIsActive: true,
-      depleteIsActive: true
+      depleteIsActive: true,
+
+      tco: false
     }
   },
   mounted () {
@@ -972,9 +1072,17 @@ export default {
     this.targets[0].name = this.mount_object
   },
   created () {
-    //initialize expiry date to one lunar month from now
+    // initialize expiry date to one lunar month from now, and start date to today
     var today = new Date()
-    this.expiry.setDate(today.getDate()+28)
+
+    this.expiry_date.setDate(today.getDate()+28)
+    this.start_date.setDate(today.getDate())
+
+    // converting from user's timezone to UTC
+    this.expiry_date.setMinutes(this.expiry_date.getMinutes() + today.getTimezoneOffset())
+    this.start_date.setMinutes(this.start_date.getMinutes() + today.getTimezoneOffset())
+
+    //GET OFFSET CHANGE TIME KT
   },
   methods: {
     async getAuthRequestHeader () {
@@ -1190,8 +1298,14 @@ export default {
         longstack: this.longstackIsActive,
         deplete: this.depleteIsActive,
         cycle: this.cycleIsActive,
-        expiry: this.exypiry
+        tco: this.tco,
+
+        // This ignores the TZ info and acts as if the input to the datetime picker is in UTC
+        // no matter the user's timezone
+        expiry_date: moment(this.expiry_date).format('YYYY-MM-DDTHH:mm:ss'),
+        start_date: moment(this.start_date).format('YYYY-MM-DDTHH:mm:ss')
       }
+      console.log(project)
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
         axios.post(url, project).then(response => {
@@ -1248,7 +1362,11 @@ export default {
         longstack: this.longstackIsActive,
         deplete: this.depleteIsActive,
         cycle: this.cycleIsActive,
-        expiry: this.expiry
+        tco: this.tco,
+
+        // no matter the user's timezone
+        expiry_date: moment(this.expiry_date).format('YYYY-MM-DDTHH:mm:ss'),
+        start_date: moment(this.start_date).format('YYYY-MM-DDTHH:mm:ss')
       }
       const request_body = {
         project_name: this.loaded_project_name,
@@ -1471,7 +1589,7 @@ export default {
     align-items: bottom;
 }
 .target-row > * {
-    margin-right: 8px;
+    margin-right: 16px;
 }
 .button-row {
     display: flex;
@@ -1479,6 +1597,7 @@ export default {
 }
 .button-row > * {
     margin-right: 16px;
+    margin-top: 1em;
 }
 .site-select {
   display: flex;
@@ -1488,5 +1607,8 @@ export default {
 }
 .site-select > * {
   margin-right:16px;
+}
+.sites-text {
+  margin-top: 1em;
 }
 </style>
