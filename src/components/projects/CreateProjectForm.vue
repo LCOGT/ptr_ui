@@ -922,7 +922,6 @@ export default {
       },
       calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
 
-
       RAhours: true,
       hrsminssecs: false,
       cycleIsActive: true,
