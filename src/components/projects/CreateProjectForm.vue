@@ -265,7 +265,7 @@
           </template>
           <b-datetimepicker
             ref="stdatetimepicker"
-            v-model="start_date"
+            v-model="project_constraints.start_date"
             expanded
             placeholder="Select a date"
           />
@@ -291,7 +291,7 @@
           </template>
           <b-datetimepicker
             ref="expdatetimepicker"
-            v-model="expiry_date"
+            v-model="project_constraints.expiry_date"
             expanded
             placeholder="Select a date"
           />
@@ -948,12 +948,8 @@ export default {
       this.project_constraints = project.project_constraints
 
       // moment() automatically assumes user's TZ for creating a moment, so this displays correctly in datetimepicker
-      console.log(project.expiry_date)
-      console.log(moment(project.expiry_date))
-      console.log(moment(project.expiry_date).toDate())
-
-      this.start_date = moment(project.start_date).toDate()
-      this.expiry_date = moment(project.expiry_date).toDate()
+      this.project_constraints.start_date = moment(project.project_constraints.start_date).toDate()
+      this.project_constraints.expiry_date = moment(project.project_constraints.expiry_date).toDate()
     }
   },
   data () {
@@ -1020,7 +1016,10 @@ export default {
         cycle: true,
         tco: false,
         RAhours: true,
-        hrsminssecs: false
+        hrsminssecs: false,
+        expiry_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
+        start_date: new Date() // Date obj here for datetimepicker, but gets converted to moment str in UTC
+
       },
       /*************************************************/
       /** *********   End Project Parameters   **********/
@@ -1056,10 +1055,7 @@ export default {
         lunar_dist_min: false,
         lunar_phase_max: false
       },
-      calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
-
-      expiry_date: new Date(),
-      start_date: new Date()
+      calendarBaseUrl: this.$store.state.api_endpoints.calendar_api
     }
   },
   mounted () {
@@ -1076,14 +1072,12 @@ export default {
     // initialize expiry date to one lunar month from now, and start date to today
     const today = new Date()
 
-    this.expiry_date.setDate(today.getDate() + 28)
-    this.start_date.setDate(today.getDate())
+    this.project_constraints.expiry_date.setDate(today.getDate() + 28)
+    this.project_constraints.start_date.setDate(today.getDate())
 
     // converting from user's timezone to UTC
-    this.expiry_date.setMinutes(this.expiry_date.getMinutes() + today.getTimezoneOffset())
-    this.start_date.setMinutes(this.start_date.getMinutes() + today.getTimezoneOffset())
-
-    // GET OFFSET CHANGE TIME KT
+    this.project_constraints.expiry_date.setMinutes(this.project_constraints.expiry_date.getMinutes() + today.getTimezoneOffset())
+    this.project_constraints.start_date.setMinutes(this.project_constraints.start_date.getMinutes() + today.getTimezoneOffset())
   },
   methods: {
     async getAuthRequestHeader () {
@@ -1184,8 +1178,18 @@ export default {
         cycle: true,
         tco: false,
         RAhours: true,
-        hrsminssecs: false
+        hrsminssecs: false,
+        start_date: new Date(),
+        expiry_date: new Date()
       }
+      // Reset start/expiry date, like in created()
+      const today = new Date()
+
+      this.project_constraints.expiry_date.setDate(today.getDate() + 28)
+      this.project_constraints.start_date.setDate(today.getDate())
+
+      this.project_constraints.expiry_date.setMinutes(this.project_constraints.expiry_date.getMinutes() + today.getTimezoneOffset())
+      this.project_constraints.start_date.setMinutes(this.project_constraints.start_date.getMinutes() + today.getTimezoneOffset())
     },
     async getCoordinatesFromName (target_index) {
       this.object_name_search_in_progress = true
@@ -1298,14 +1302,12 @@ export default {
         // Empty nested arrays such that
         // project_data[exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
-        scheduled_with_events: this.project_events,
-
-        // This ignores the TZ info and acts as if the input to the datetime picker is in UTC
-        // no matter the user's timezone
-        expiry_date: moment(this.expiry_date).format('YYYY-MM-DDTHH:mm:ss'),
-        start_date: moment(this.start_date).format('YYYY-MM-DDTHH:mm:ss')
+        scheduled_with_events: this.project_events
       }
-      console.log(project)
+      // This ignores the TZ info and acts as if the input to the datetime picker is in UTC
+      // no matter the user's timezone
+      project.project_constraints.expiry_date = moment(this.project_constraints.expiry_date).format('YYYY-MM-DDTHH:mm:ss')
+      project.project_constraints.start_date = moment(this.project_constraints.start_date).format('YYYY-MM-DDTHH:mm:ss')
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
         axios.post(url, project).then(response => {
@@ -1356,18 +1358,17 @@ export default {
         // Empty nested arrays such that
         // project_data[target_index][exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
-        scheduled_with_events: this.project_events,
-
-        // no matter the user's timezone
-        expiry_date: moment(this.expiry_date).format('YYYY-MM-DDTHH:mm:ss'),
-        start_date: moment(this.start_date).format('YYYY-MM-DDTHH:mm:ss')
+        scheduled_with_events: this.project_events
       }
+      // This ignores the TZ info and acts as if the input to the datetime picker is in UTC
+      // no matter the user's timezone
+      project.project_constraints.expiry_date = moment(this.project_constraints.expiry_date).format('YYYY-MM-DDTHH:mm:ss')
+      project.project_constraints.start_date = moment(this.project_constraints.start_date).format('YYYY-MM-DDTHH:mm:ss')
       const request_body = {
         project_name: this.loaded_project_name,
         created_at: this.loaded_project_created_at,
         project_changes: project
       }
-      console.log(project)
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
         axios.post(url, request_body).then(response => {
