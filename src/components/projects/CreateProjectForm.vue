@@ -141,7 +141,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="tco" />
+          <b-checkbox v-model="project_constraints.tco" />
         </b-field>
 
       </div>
@@ -159,7 +159,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="RAhours" />
+          <b-checkbox v-model="project_constraints.RAhours" />
         </b-field>
 
         <b-field>
@@ -175,7 +175,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="hrsminssecs" />
+          <b-checkbox v-model="project_constraints.hrsminssecs" />
         </b-field>
 
         <b-field>
@@ -191,7 +191,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="smartstackIsActive" />
+          <b-checkbox v-model="project_constraints.smartstack" />
         </b-field>
 
         <b-field>
@@ -207,7 +207,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="longstackIsActive" />
+          <b-checkbox v-model="project_constraints.longstack" />
         </b-field>
 
         <b-field>
@@ -223,7 +223,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="depleteIsActive" />
+          <b-checkbox v-model="project_constraints.deplete" />
         </b-field>
 
         <b-field>
@@ -239,7 +239,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="cycleIsActive" />
+          <b-checkbox v-model="project_constraints.cycle" />
         </b-field>
       </div>
 
@@ -1016,7 +1016,14 @@ export default {
         enhance_photometry: false,
         close_on_block_completion: false,
         add_center_to_mosaic: false,
-        dark_sky_setting: false
+        dark_sky_setting: false,
+        longstack: false,
+        smartstack: true,
+        deplete: true,
+        cycle: true,
+        tco: false,
+        RAhours: true,
+        hrsminssecs: false
       },
       /*************************************************/
       /** *********   End Project Parameters   **********/
@@ -1056,13 +1063,6 @@ export default {
 
       expiry_date: new Date(),
       start_date: new Date(),
-
-      RAhours: true,
-      hrsminssecs: false,
-      cycleIsActive: true,
-      depleteIsActive: true,
-
-      tco: false
     }
   },
   mounted () {
@@ -1070,6 +1070,10 @@ export default {
     this.targets[0].ra = this.mount_ra
     this.targets[0].dec = this.mount_dec
     this.targets[0].name = this.mount_object
+
+    // initialize smart stack and long stack to camera tab values
+    this.project_constraints.longstack=this.longstackIsActive
+    this.project_constraints.smartstack=this.smartstackIsActive
   },
   created () {
     // initialize expiry date to one lunar month from now, and start date to today
@@ -1139,8 +1143,6 @@ export default {
           dec: ''
         }
       ]
-      this.RAhours = true
-      this.hrsminssecs = false
       this.targets_index = 1
       this.project_note = ''
       this.project_sites = ["common pool"]
@@ -1178,7 +1180,14 @@ export default {
         close_on_block_completion: false,
         add_center_to_mosaic: false,
         dark_sky_setting: false,
-        generic_instrument: 'Main Camera'
+        generic_instrument: 'Main Camera',
+        longstack: false,
+        smartstack: true,
+        deplete: true,
+        cycle: true,
+        tco: false,
+        RAhours: true,
+        hrsminssecs: false
       }
     },
     async getCoordinatesFromName (target_index) {
@@ -1260,15 +1269,15 @@ export default {
       })
       // Make sure that correct format of RA and dec is sent to the site-code
       // Convert Sexagesimal
-      if (this.hrsminssecs == true) {
+      if (this.project_constraints.hrsminssecs == true) {
         this.targets[0].ra = this.RAfromSexagesimal(this.targets[0].ra)
         this.targets[0].dec = this.DECfromSexagesimal(this.targets[0].dec)
-        this.RAhours = true
-        this.hrsminssecs = false
+        this.project_constraints.RAhours = true
+        this.project_constraints.hrsminssecs = false
       }
       // Decimal RA degrees to Decimal RA hours
-      if (this.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
-      this.RAhours = true
+      if (this.project_constraints.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
+      this.project_constraints.RAhours = true
       const project = {
         project_name: this.project_name,
         created_at: moment().utc().format(),
@@ -1293,12 +1302,6 @@ export default {
         // project_data[exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
         scheduled_with_events: this.project_events,
-        // Stacking options
-        smartstack: this.smartstackIsActive,
-        longstack: this.longstackIsActive,
-        deplete: this.depleteIsActive,
-        cycle: this.cycleIsActive,
-        tco: this.tco,
 
         // This ignores the TZ info and acts as if the input to the datetime picker is in UTC
         // no matter the user's timezone
@@ -1331,8 +1334,8 @@ export default {
     modifyProject () {
       const url = this.projects_api_url + '/modify-project'
       // Make sure that correct format of RA is sent to the site-code
-      if (this.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
-      this.RAhours = true
+      if (this.project_constraints.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
+      this.project_constraints.RAhours = true
       const project = {
         project_name: this.project_name,
         created_at: moment().utc().format(),
@@ -1357,12 +1360,6 @@ export default {
         // project_data[target_index][exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
         scheduled_with_events: this.project_events,
-        // Stacking options
-        smartstack: this.smartstackIsActive,
-        longstack: this.longstackIsActive,
-        deplete: this.depleteIsActive,
-        cycle: this.cycleIsActive,
-        tco: this.tco,
 
         // no matter the user's timezone
         expiry_date: moment(this.expiry_date).format('YYYY-MM-DDTHH:mm:ss'),
@@ -1373,6 +1370,7 @@ export default {
         created_at: this.loaded_project_created_at,
         project_changes: project
       }
+      console.log(project)
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
         axios.post(url, request_body).then(response => {
