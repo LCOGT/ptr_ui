@@ -130,23 +130,6 @@
         </b-field>
         <b-field>
           <template #label>
-            TCO
-            <b-tooltip
-              type="is-dark"
-              label="Time critical observation (e.g. exoplanet, variable star)"
-            >
-              <b-icon
-                size="is-small"
-                icon="help-circle-outline"
-              />
-            </b-tooltip>
-          </template>
-          <b-checkbox v-model="project_constraints.tco" />
-        </b-field>
-      </div>
-      <div class="button-row">
-        <b-field>
-          <template #label>
             Hours / Degrees
             <b-tooltip
               type="is-dark"
@@ -176,13 +159,12 @@
           </template>
           <b-checkbox v-model="project_constraints.hrsminssecs" />
         </b-field>
-
         <b-field>
           <template #label>
-            Smart Stack
+            TCO
             <b-tooltip
               type="is-dark"
-              label="Automatically stack shorter exposures over long exposure time."
+              label="Time critical observation (e.g. exoplanet, variable star)"
             >
               <b-icon
                 size="is-small"
@@ -190,55 +172,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="project_constraints.smartstack" />
-        </b-field>
-
-        <b-field>
-          <template #label>
-            Long Stack
-            <b-tooltip
-              type="is-dark"
-              label="Stacking multiple longer exposure times."
-            >
-              <b-icon
-                size="is-small"
-                icon="help-circle-outline"
-              />
-            </b-tooltip>
-          </template>
-          <b-checkbox v-model="project_constraints.longstack" />
-        </b-field>
-
-        <b-field>
-          <template #label>
-            Deplete
-            <b-tooltip
-              type="is-dark"
-              label="Decrement count."
-            >
-              <b-icon
-                size="is-small"
-                icon="help-circle-outline"
-              />
-            </b-tooltip>
-          </template>
-          <b-checkbox v-model="project_constraints.deplete" />
-        </b-field>
-
-        <b-field>
-          <template #label>
-            Cycle
-            <b-tooltip
-              type="is-dark"
-              label="Do each line first."
-            >
-              <b-icon
-                size="is-small"
-                icon="help-circle-outline"
-              />
-            </b-tooltip>
-          </template>
-          <b-checkbox v-model="project_constraints.cycle" />
+          <b-checkbox v-model="project_constraints.tco" />
         </b-field>
       </div>
 
@@ -382,6 +316,38 @@
           </template>
           <b-checkbox v-model="project_constraints.project_is_active" />
         </b-field>
+
+        <b-field>
+          <template #label>
+            Deplete
+            <b-tooltip
+              type="is-dark"
+              label="Decrement count."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="project_constraints.deplete" />
+        </b-field>
+
+        <b-field>
+          <template #label>
+            Cycle
+            <b-tooltip
+              type="is-dark"
+              label="Do each line first."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="project_constraints.cycle" />
+        </b-field>
       </div>
 
       <div class="sites-text">
@@ -395,6 +361,39 @@
         </span>
       </div>
 
+      <div class="button-row">
+        <b-field>
+          <template #label>
+            Smart Stack
+            <b-tooltip
+              type="is-dark"
+              label="Automatically stack shorter exposures over long exposure time."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="project_constraints.smartstack" />
+        </b-field>
+
+        <b-field>
+          <template #label>
+            Long Stack
+            <b-tooltip
+              type="is-dark"
+              label="Stacking multiple longer exposure times."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="project_constraints.longstack" />
+        </b-field>
+      </div>
       <!-- we decided to only allow one target per project -->
       <!--button class="button" @click="newTargetRow">add another target</button-->
       <hr>
@@ -948,8 +947,6 @@ export default {
       this.exposures_index = this.exposures.length
       this.project_constraints = project.project_constraints
 
-      // ADD THE REST
-
       // moment() automatically assumes user's TZ for creating a moment, so this displays correctly in datetimepicker
       console.log(project.expiry_date)
       console.log(moment(project.expiry_date))
@@ -1446,6 +1443,7 @@ export default {
         return all_site_filters
       }
       // Default behavior (if no specific sites selected) returns the "site filters" for common pool, which are none
+      return ''
     },
 
     // True if we're modifying a project and the name is changed.
