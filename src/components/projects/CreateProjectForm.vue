@@ -2,7 +2,7 @@
   <div>
     <div class="project-form-header">
       <h1 class="title">
-        Create a project 
+        Create a project
       </h1>
       <div>
         <b-tooltip
@@ -143,7 +143,6 @@
           </template>
           <b-checkbox v-model="project_constraints.tco" />
         </b-field>
-
       </div>
       <div class="button-row">
         <b-field>
@@ -246,7 +245,7 @@
       <!-- Multi-select dropdown, choose which sites a project can be scheduled at -->
       <!-- Default selection is current site. Currently, there is no "generic site" option -->
       <div class="site-select">
-        <b-field >
+        <b-field>
           <template #label>
             Sites
             <b-tooltip
@@ -273,7 +272,7 @@
                   class="button"
                   icon-right="menu-down"
                 >
-                  Select sites ({{project_sites.length}})
+                  Select sites ({{ project_sites.length }})
                 </b-button>
               </template>
               <b-dropdown-item
@@ -331,15 +330,16 @@
             </b-tooltip>
           </template>
           <b-datetimepicker
-              ref="stdatetimepicker"
-              expanded
-              placeholder="Select a date"
-              v-model="start_date">
-          </b-datetimepicker>
+            ref="stdatetimepicker"
+            v-model="start_date"
+            expanded
+            placeholder="Select a date"
+          />
           <b-button
-              @click="$refs.stdatetimepicker.toggle()"
-              icon-left="calendar-today"
-              type="is-primary" />
+            icon-left="calendar-today"
+            type="is-primary"
+            @click="$refs.stdatetimepicker.toggle()"
+          />
         </b-field>
         <b-field>
           <template #label>
@@ -356,15 +356,16 @@
             </b-tooltip>
           </template>
           <b-datetimepicker
-              ref="expdatetimepicker"
-              expanded
-              placeholder="Select a date"
-              v-model="expiry_date">
-          </b-datetimepicker>
+            ref="expdatetimepicker"
+            v-model="expiry_date"
+            expanded
+            placeholder="Select a date"
+          />
           <b-button
-              @click="$refs.expdatetimepicker.toggle()"
-              icon-left="calendar-today"
-              type="is-primary" />
+            icon-left="calendar-today"
+            type="is-primary"
+            @click="$refs.expdatetimepicker.toggle()"
+          />
         </b-field>
         <b-field>
           <template #label>
@@ -946,17 +947,16 @@ export default {
       this.exposures = project.exposures.map(exposure => ({ ...exposure, active: true }))
       this.exposures_index = this.exposures.length
       this.project_constraints = project.project_constraints
-      
-      //ADD THE REST
+
+      // ADD THE REST
 
       // moment() automatically assumes user's TZ for creating a moment, so this displays correctly in datetimepicker
       console.log(project.expiry_date)
       console.log(moment(project.expiry_date))
       console.log(moment(project.expiry_date).toDate())
-      
+
       this.start_date = moment(project.start_date).toDate()
       this.expiry_date = moment(project.expiry_date).toDate()
-
     }
   },
   data () {
@@ -991,7 +991,7 @@ export default {
           active: true,
           name: '',
           ra: '',
-          dec: '',
+          dec: ''
         }
 
       ],
@@ -1062,7 +1062,7 @@ export default {
       calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
 
       expiry_date: new Date(),
-      start_date: new Date(),
+      start_date: new Date()
     }
   },
   mounted () {
@@ -1072,21 +1072,21 @@ export default {
     this.targets[0].name = this.mount_object
 
     // initialize smart stack and long stack to camera tab values
-    this.project_constraints.longstack=this.longstackIsActive
-    this.project_constraints.smartstack=this.smartstackIsActive
+    this.project_constraints.longstack = this.longstackIsActive
+    this.project_constraints.smartstack = this.smartstackIsActive
   },
   created () {
     // initialize expiry date to one lunar month from now, and start date to today
-    var today = new Date()
+    const today = new Date()
 
-    this.expiry_date.setDate(today.getDate()+28)
+    this.expiry_date.setDate(today.getDate() + 28)
     this.start_date.setDate(today.getDate())
 
     // converting from user's timezone to UTC
     this.expiry_date.setMinutes(this.expiry_date.getMinutes() + today.getTimezoneOffset())
     this.start_date.setMinutes(this.start_date.getMinutes() + today.getTimezoneOffset())
 
-    //GET OFFSET CHANGE TIME KT
+    // GET OFFSET CHANGE TIME KT
   },
   methods: {
     async getAuthRequestHeader () {
@@ -1145,7 +1145,7 @@ export default {
       ]
       this.targets_index = 1
       this.project_note = ''
-      this.project_sites = ["common pool"]
+      this.project_sites = ['common pool']
       this.exposures = [
         {
           active: true,
@@ -1223,7 +1223,7 @@ export default {
         active: true,
         name: '',
         ra: '',
-        dec: '',
+        dec: ''
       })
       // Show one additional row
       this.targets_index += 1
@@ -1238,7 +1238,7 @@ export default {
         })
         // If user selects no sites, consider the selection to be the current site
         if (this.project_sites.length === 0) {
-          this.project_sites = ["common pool"]
+          this.project_sites = ['common pool']
         }
       }
     },
@@ -1412,7 +1412,7 @@ export default {
 
     // Function to get filters at any site to populate filter dropdown
     get_default_filter_options (site) {
-      if (site == "common pool") {
+      if (site == 'common pool') {
         return
       }
       const site_cfg = this.global_config[site]
@@ -1444,7 +1444,6 @@ export default {
         // Remove duplicates that appear in generic filters
         all_site_filters = all_site_filters.filter(item => generics.indexOf(item) < 0)
         return all_site_filters
-
       }
       // Default behavior (if no specific sites selected) returns the "site filters" for common pool, which are none
     },
