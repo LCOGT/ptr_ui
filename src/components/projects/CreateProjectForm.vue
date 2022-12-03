@@ -255,7 +255,7 @@
             <b-tooltip
               type="is-dark"
               position="is-right"
-              label="Choose the first day this project can be scheduled in the common pool, in UTC."
+              label="Choose the first day this project can be scheduled automatically, in UTC."
             >
               <b-icon
                 size="is-small"
@@ -283,7 +283,7 @@
             <b-tooltip
               type="is-dark"
               position="is-right"
-              label="Choose the last day this project can be scheduled in the common pool, in UTC."
+              label="Choose the last day this project can be scheduled automatically, in UTC."
             >
               <b-icon
                 size="is-small"
@@ -371,6 +371,7 @@
             Smart Stack All
             <b-tooltip
               type="is-dark"
+              position="is-right"
               label="Automatically stack shorter exposures over long exposure time for all exposures."
             >
               <b-icon
@@ -387,6 +388,7 @@
             Long Stack All
             <b-tooltip
               type="is-dark"
+              position="is-right"
               label="Stacking multiple longer exposure times for all exposures."
             >
               <b-icon
