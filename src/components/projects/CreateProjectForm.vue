@@ -379,7 +379,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="project_constraints.smartstackall" />
+          <b-checkbox v-model="smartstackall" />
         </b-field>
 
         <b-field>
@@ -395,7 +395,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="project_constraints.longstackall" />
+          <b-checkbox v-model="longstackall" />
         </b-field>
       </div>
       <!-- we decided to only allow one target per project -->
@@ -1008,16 +1008,16 @@ export default {
       this.project_constraints.start_date = moment(project.project_constraints.start_date).toDate()
       this.project_constraints.expiry_date = moment(project.project_constraints.expiry_date).toDate()
     },
-    smart_stack_changed () {
+    smartstackall () {
       // Any time the smartstackall checkbox is clicked, change all the individual exposure options
       this.exposures.forEach(e => {
-        e.smartstack = this.project_constraints.smartstackall
+        e.smartstack = this.smartstackall
       })
     },
-    long_stack_changed () {
+    longstackall () {
       // Any time the longstackall checkbox is clicked, change all the individual exposure options
       this.exposures.forEach(e => {
-        e.longstack = this.project_constraints.longstackall
+        e.longstack = this.longstackall
       })
     }
   },
@@ -1082,8 +1082,6 @@ export default {
         close_on_block_completion: false,
         add_center_to_mosaic: false,
         dark_sky_setting: false,
-        longstackall: false,
-        smartstackall: true,
         deplete: true,
         cycle: true,
         tco: false,
@@ -1127,6 +1125,10 @@ export default {
         lunar_dist_min: false,
         lunar_phase_max: false
       },
+
+      longstackall: false,
+      smartstackall: true,
+
       calendarBaseUrl: this.$store.state.api_endpoints.calendar_api
     }
   },
@@ -1137,8 +1139,8 @@ export default {
     this.targets[0].name = this.mount_object
 
     // initialize smart stack and long stack to camera tab values
-    this.project_constraints.longstackall = this.longstackIsActive
-    this.project_constraints.smartstackall = this.smartstackIsActive
+    this.longstackall = this.longstackIsActive
+    this.smartstackall = this.smartstackIsActive
   },
   created () {
     // initialize expiry date to one lunar month from now, and start date to today
@@ -1198,6 +1200,9 @@ export default {
       this.project_name = ''
       this.project_events = []
 
+      this.longstackall = false
+      this.smartstackall = true
+
       this.targets = [
         {
           active: true,
@@ -1246,8 +1251,6 @@ export default {
         add_center_to_mosaic: false,
         dark_sky_setting: false,
         generic_instrument: 'Main Camera',
-        longstackall: false,
-        smartstackall: true,
         deplete: true,
         cycle: true,
         tco: false,
@@ -1256,6 +1259,7 @@ export default {
         start_date: new Date(),
         expiry_date: new Date()
       }
+
       // Reset start/expiry date, like in created()
       const today = new Date()
 
@@ -1566,12 +1570,6 @@ export default {
     },
     user () {
       return this.$auth.user
-    },
-    smart_stack_changed () {
-      return this.project_constraints.smartstackall
-    },
-    long_stack_changed () {
-      return this.project_constraints.longstackall
     }
   }
 }
