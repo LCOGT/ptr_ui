@@ -75,21 +75,6 @@
             :maxlength="max_fits_header_length"
           />
         </b-field>
-        <b-field style="margin-left: 2em;">
-          <template #label>
-            Active
-            <b-tooltip
-              type="is-dark"
-              label="Projects that are not active can be saved but will not be scheduled to run automatically."
-            >
-              <b-icon
-                size="is-small"
-                icon="help-circle-outline"
-              />
-            </b-tooltip>
-          </template>
-          <b-checkbox v-model="project_constraints.project_is_active" />
-        </b-field>
       </div>
 
       <div
@@ -143,8 +128,7 @@
             :disabled="!targets[n-1].active"
           />
         </b-field>
-
-        <b-field style="margin-left: 2em;">
+        <b-field>
           <template #label>
             Hours / Degrees
             <b-tooltip
@@ -157,12 +141,12 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="targets.RAhours" />
+          <b-checkbox v-model="project_constraints.RAhours" />
         </b-field>
 
-        <b-field style="margin-left: 2em;">
+        <b-field>
           <template #label>
-            Sexagesimal?
+            Sexagesimal
             <b-tooltip
               type="is-dark"
               label="When this is turned on, PTR expects units in Hours Minutes Seconds. When off, PTR expects units in Decimals."
@@ -173,28 +157,29 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="targets.hrsminssecs" />
+          <b-checkbox v-model="project_constraints.hrsminssecs" />
         </b-field>
-
-        <b-field
-          style="margin-left: 2em;"
-          label="Smart Stack"
-        >
-          <b-checkbox v-model="smartstackIsActive" />
-        </b-field>
-
-        <b-field
-          style="margin-left: 2em;"
-          label="Long Stack"
-        >
-          <b-checkbox v-model="longstackIsActive" />
+        <b-field>
+          <template #label>
+            TCO
+            <b-tooltip
+              type="is-dark"
+              label="Time critical observation (e.g. exoplanet, variable star)"
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="project_constraints.tco" />
         </b-field>
       </div>
 
       <!-- Multi-select dropdown, choose which sites a project can be scheduled at -->
       <!-- Default selection is current site. Currently, there is no "generic site" option -->
       <div class="site-select">
-        <b-field style="margin-top: 1em;">
+        <b-field>
           <template #label>
             Sites
             <b-tooltip
@@ -225,6 +210,20 @@
                 </b-button>
               </template>
               <b-dropdown-item
+                key="common pool"
+                class="item"
+                value="common pool"
+              >
+                common pool
+              </b-dropdown-item>
+
+              <div class="separator">
+                <div class="line" />
+                <p>SITES</p>
+                <div class="line" />
+              </div>
+
+              <b-dropdown-item
                 v-for="site_real in available_sites_real"
                 :key="site_real"
                 class="item"
@@ -235,7 +234,7 @@
 
               <div class="separator">
                 <div class="line" />
-                <p>SIMULATED</p>
+                <p>SIMULATED SITES</p>
                 <div class="line" />
               </div>
 
@@ -250,7 +249,113 @@
             </b-dropdown>
           </div>
         </b-field>
-        <span v-if="project_sites.length === 0">default ({{ sitecode }})</span>
+        <b-field>
+          <template #label>
+            Start Date (UTC)
+            <b-tooltip
+              type="is-dark"
+              position="is-right"
+              label="Choose the first day this project can be scheduled automatically, in UTC."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-datetimepicker
+            ref="stdatetimepicker"
+            v-model="project_constraints.start_date"
+            expanded
+            placeholder="Select a date"
+          />
+          <p class="control">
+            <b-button
+              icon-left="calendar-today"
+              type="is-primary"
+              @click="$refs.stdatetimepicker.toggle()"
+            />
+          </p>
+        </b-field>
+        <b-field>
+          <template #label>
+            Expiry Date (UTC)
+            <b-tooltip
+              type="is-dark"
+              position="is-right"
+              label="Choose the last day this project can be scheduled automatically, in UTC."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-datetimepicker
+            ref="expdatetimepicker"
+            v-model="project_constraints.expiry_date"
+            expanded
+            placeholder="Select a date"
+          />
+          <p class="control">
+            <b-button
+              icon-left="calendar-today"
+              type="is-primary"
+              @click="$refs.expdatetimepicker.toggle()"
+            />
+          </p>
+        </b-field>
+        <b-field>
+          <template #label>
+            Active
+            <b-tooltip
+              type="is-dark"
+              label="Projects that are not active can be saved but will not be scheduled to run automatically."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="project_constraints.project_is_active" />
+        </b-field>
+
+        <b-field>
+          <template #label>
+            Deplete
+            <b-tooltip
+              type="is-dark"
+              label="Decrement count."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="project_constraints.deplete" />
+        </b-field>
+
+        <b-field>
+          <template #label>
+            Cycle
+            <b-tooltip
+              type="is-dark"
+              label="Do each line first."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="project_constraints.cycle" />
+        </b-field>
+      </div>
+
+      <div class="sites-text">
+        <span v-if="project_sites.length === 0 || project_sites == ['common pool']"> default (common pool)</span>
         <span
           v-for="project_site in project_sites"
           :key="project_site"
@@ -260,6 +365,41 @@
         </span>
       </div>
 
+      <div class="button-row">
+        <b-field>
+          <template #label>
+            Smart Stack All
+            <b-tooltip
+              type="is-dark"
+              position="is-right"
+              label="Automatically stack shorter exposures over long exposure time for all exposures."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="smartstackall" />
+        </b-field>
+
+        <b-field>
+          <template #label>
+            Long Stack All
+            <b-tooltip
+              type="is-dark"
+              position="is-right"
+              label="Stacking multiple longer exposure times for all exposures."
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="longstackall" />
+        </b-field>
+      </div>
       <!-- we decided to only allow one target per project -->
       <!--button class="button" @click="newTargetRow">add another target</button-->
       <hr>
@@ -273,7 +413,9 @@
           :key="n"
           class="exposure-row"
         >
-          <b-field :label="n==1 ? '  ' : ' '">
+          <b-field
+            :label="n==1 ? '  ' : ' '"
+          >
             <b-checkbox v-model="exposures[n-1].active" />
           </b-field>
           <b-field
@@ -307,7 +449,7 @@
           </b-field>
           <b-field
             :label="n==1 ? 'Count' : ''"
-            style="width: 100px;"
+            style="width: 50px;"
           >
             <b-input
               v-model="exposures[n-1].count"
@@ -317,8 +459,8 @@
             />
           </b-field>
           <b-field
-            :label="n==1 ? 'Exposure [s]' : ''"
-            style="max-width: 100px;"
+            :label="n==1 ? 'Exp [s]' : ''"
+            style="max-width: 50px;"
           >
             <b-input
               v-model="exposures[n-1].exposure"
@@ -327,7 +469,9 @@
               min="0"
             />
           </b-field>
-          <b-field :label="n==1 ? 'Filter' : ''">
+          <b-field
+            :label="n==1 ? 'Filter' : ''"
+          >
             <b-select
               v-model="exposures[n-1].filter"
               size="is-small"
@@ -342,6 +486,7 @@
                 {{ filter }}
               </option>
               <option
+                v-if="project_filter_list && project_filter_list.length>0"
                 disabled
                 value="------"
               >
@@ -357,7 +502,9 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Resolution' : ''">
+          <b-field
+            :label="n==1 ? 'Resolution' : ''"
+          >
             <b-select
               v-model="exposures[n-1].bin"
               size="is-small"
@@ -371,7 +518,9 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Area' : ''">
+          <b-field
+            :label="n==1 ? 'Area' : ''"
+          >
             <b-select
               v-model="exposures[n-1].area"
               size="is-small"
@@ -396,10 +545,10 @@
                 133%
               </option>
               <option value="FULL">
-                FULL
+                Full
               </option>
               <option value="SQUARE">
-                SQUARE
+                Square
               </option>
               <option value="71%">
                 71%
@@ -418,17 +567,19 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Dither' : ''">
+          <b-field
+            :label="n==1 ? 'Dither' : ''"
+          >
             <b-select
               v-model="exposures[n-1].dither"
               size="is-small"
               :disabled="!exposures[n-1].active"
             >
-              <option value="yes">
-                yes
-              </option>
               <option value="no">
                 no
+              </option>
+              <option value="yes">
+                yes
               </option>
               <option
                 v-for="i in 25"
@@ -439,7 +590,10 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Photometry' : ''">
+          <b-field
+            :label="n==1 ? 'Photometry' : ''"
+            :style="n==1 ? '' : 'margin-right:13px;'"
+          >
             <b-select
               v-model="exposures[n-1].photometry"
               size="is-small"
@@ -452,10 +606,10 @@
                 target
               </option>
               <option value="comparison1">
-                Comparison 1
+                Comp 1
               </option>
               <option value="comparison2">
-                Comparison 2
+                Comp 2
               </option>
               <option value="check1">
                 Check 1
@@ -483,7 +637,44 @@
               </option>
             </b-select>
           </b-field>
-
+          <b-field :label="n==1 ? 'Smart' : ''">
+            <b-select
+              v-model="exposures[n-1].smartstack"
+              size="is-small"
+              :disabled="!exposures[n-1].active"
+            >
+              <option :value="true">
+                on
+              </option>
+              <option :value="false">
+                off
+              </option>
+            </b-select>
+            <!--<b-checkbox
+              v-model="exposures[n-1].smartstack"
+              size="is-small"
+              :disabled="!exposures[n-1].active"
+              />-->
+          </b-field>
+          <b-field :label="n==1 ? 'Long' : ''">
+            <b-select
+              v-model="exposures[n-1].longstack"
+              size="is-small"
+              :disabled="!exposures[n-1].active"
+            >
+              <option :value="true">
+                on
+              </option>
+              <option :value="false">
+                off
+              </option>
+            </b-select>
+            <!--<b-checkbox
+              v-model="exposures[n-1].longstack"
+              size="is-small"
+              :disabled="!exposures[n-1].active"
+              />-->
+          </b-field>
           <div />
         </div>
         <div />
@@ -796,6 +987,7 @@ export default {
   mixins: [target_names],
   watch: {
     project_to_load ({ project, is_existing_project }) {
+      // This runs any time an existing project is passed into the component. It transforms the project data into a format that works nicely with the form elements and user interaction.
       if (project == '') {
         this.clearProjectForm()
       }
@@ -807,12 +999,28 @@ export default {
       this.project_sites = project.project_sites
       this.targets = project.project_targets.map(target => ({ ...target, active: true }))
       this.targets_index = this.targets.length
-      this.targets.RAhours = true
-      this.targets.hrsminssecs = false
       this.project_note = project.project_note
       this.exposures = project.exposures.map(exposure => ({ ...exposure, active: true }))
       this.exposures_index = this.exposures.length
       this.project_constraints = project.project_constraints
+
+      // start_date and expiry_date are stored in projects table as strings of the format 'YYYY-MM-DDTHH:mm:ss', assumed to be in UTC
+      // To display correctly in the datetimepicker, the values should be a Date object in the user's timezone
+      // moment.js automatically assumes user's timezone for creating a moment, so no conversion is needed
+      this.project_constraints.start_date = moment(project.project_constraints.start_date).toDate()
+      this.project_constraints.expiry_date = moment(project.project_constraints.expiry_date).toDate()
+    },
+    smartstackall () {
+      // Any time the smartstackall checkbox is clicked, change all the individual exposure options
+      this.exposures.forEach(e => {
+        e.smartstack = this.smartstackall
+      })
+    },
+    longstackall () {
+      // Any time the longstackall checkbox is clicked, change all the individual exposure options
+      this.exposures.forEach(e => {
+        e.longstack = this.longstackall
+      })
     }
   },
   data () {
@@ -823,7 +1031,8 @@ export default {
       project_name: '',
       project_events: [],
       project_note: '',
-      project_sites: [this.sitecode],
+      project_sites: ['common pool'],
+      project_window: 28, // in days, how long the project has a chance to be scheduled
 
       exposures_index: 1,
       exposures: [
@@ -837,7 +1046,9 @@ export default {
           bin: 'optimal',
           dither: 'no',
           photometry: '-',
-          defocus: 0
+          defocus: 0,
+          smartstack: true,
+          longstack: false
         }
       ],
 
@@ -847,9 +1058,7 @@ export default {
           active: true,
           name: '',
           ra: '',
-          dec: '',
-          RAhours: true,
-          hrsminssecs: false
+          dec: ''
         }
 
       ],
@@ -874,7 +1083,15 @@ export default {
         enhance_photometry: false,
         close_on_block_completion: false,
         add_center_to_mosaic: false,
-        dark_sky_setting: false
+        dark_sky_setting: false,
+        deplete: true,
+        cycle: true,
+        tco: false,
+        RAhours: true,
+        hrsminssecs: false,
+        expiry_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
+        start_date: new Date() // Date obj here for datetimepicker, but gets converted to moment str in UTC
+
       },
       /*************************************************/
       /** *********   End Project Parameters   **********/
@@ -895,7 +1112,8 @@ export default {
         'Blue',
         'HA',
         'O3',
-        'S2'
+        'S2',
+        'EXO'
       ],
       site: this.sitecode,
       warn: {
@@ -909,6 +1127,10 @@ export default {
         lunar_dist_min: false,
         lunar_phase_max: false
       },
+
+      longstackall: false,
+      smartstackall: true,
+
       calendarBaseUrl: this.$store.state.api_endpoints.calendar_api
     }
   },
@@ -917,8 +1139,21 @@ export default {
     this.targets[0].ra = this.mount_ra
     this.targets[0].dec = this.mount_dec
     this.targets[0].name = this.mount_object
-    this.targets.RAhours = true
-    this.targets.hrsminssecs = false
+
+    // initialize smart stack and long stack to camera tab values
+    this.longstackall = this.longstackIsActive
+    this.smartstackall = this.smartstackIsActive
+  },
+  created () {
+    // initialize expiry date to one lunar month from now, and start date to today
+    const today = new Date()
+
+    this.project_constraints.expiry_date.setDate(today.getDate() + this.project_window)
+    this.project_constraints.start_date.setDate(today.getDate())
+
+    // converting from user's timezone to UTC
+    this.project_constraints.expiry_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
+    this.project_constraints.start_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
   },
   methods: {
     async getAuthRequestHeader () {
@@ -947,7 +1182,6 @@ export default {
     RAfromSexagesimal (rasexag) {
       const raarray = rasexag.replace(':', ' ').replace(':', ' ').replace('.', ' ').split(' ')
       const rahrs = Number(raarray[0]) + Number(raarray[1] / 60) + Number(raarray[2] / 3600)
-      console.log(rahrs)
 
       return rahrs
     },
@@ -968,21 +1202,20 @@ export default {
       this.project_name = ''
       this.project_events = []
 
+      this.longstackall = false
+      this.smartstackall = true
+
       this.targets = [
         {
           active: true,
           name: '',
           ra: '',
-          dec: '',
-          RAhours: true,
-          hrsminssecs: false
+          dec: ''
         }
       ]
-      this.targets.RAhours = true
-      this.targets.hrsminssecs = false
       this.targets_index = 1
       this.project_note = ''
-      this.project_sites = [this.sitecode]
+      this.project_sites = ['common pool']
       this.exposures = [
         {
           active: true,
@@ -994,7 +1227,9 @@ export default {
           bin: 'optimal',
           dither: 'no',
           photometry: '-',
-          defocus: 0
+          defocus: 0,
+          smartstack: true,
+          longstack: false
         }
       ]
       this.exposures_index = 1
@@ -1017,8 +1252,24 @@ export default {
         close_on_block_completion: false,
         add_center_to_mosaic: false,
         dark_sky_setting: false,
-        generic_instrument: 'Main Camera'
+        generic_instrument: 'Main Camera',
+        deplete: true,
+        cycle: true,
+        tco: false,
+        RAhours: true,
+        hrsminssecs: false,
+        start_date: new Date(),
+        expiry_date: new Date()
       }
+
+      // Reset start/expiry date, like in created()
+      const today = new Date()
+
+      this.project_constraints.expiry_date.setDate(today.getDate() + this.project_window)
+      this.project_constraints.start_date.setDate(today.getDate())
+
+      this.project_constraints.expiry_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
+      this.project_constraints.start_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
     },
     async getCoordinatesFromName (target_index) {
       this.object_name_search_in_progress = true
@@ -1053,9 +1304,7 @@ export default {
         active: true,
         name: '',
         ra: '',
-        dec: '',
-        RAhours: true,
-        hrsminssecs: false
+        dec: ''
       })
       // Show one additional row
       this.targets_index += 1
@@ -1070,7 +1319,7 @@ export default {
         })
         // If user selects no sites, consider the selection to be the current site
         if (this.project_sites.length === 0) {
-          this.project_sites = this.site
+          this.project_sites = ['common pool']
         }
       }
     },
@@ -1101,15 +1350,15 @@ export default {
       })
       // Make sure that correct format of RA and dec is sent to the site-code
       // Convert Sexagesimal
-      if (this.targets.hrsminssecs == true) {
+      if (this.project_constraints.hrsminssecs == true) {
         this.targets[0].ra = this.RAfromSexagesimal(this.targets[0].ra)
         this.targets[0].dec = this.DECfromSexagesimal(this.targets[0].dec)
-        this.targets.RAhours = true
-        this.targets.hrsminssecs = false
+        this.project_constraints.RAhours = true
+        this.project_constraints.hrsminssecs = false
       }
       // Decimal RA degrees to Decimal RA hours
-      if (this.targets.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
-      this.targets.RAhours = true
+      if (this.project_constraints.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
+      this.project_constraints.RAhours = true
       const project = {
         project_name: this.project_name,
         created_at: moment().utc().format(),
@@ -1133,11 +1382,12 @@ export default {
         // Empty nested arrays such that
         // project_data[exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
-        scheduled_with_events: this.project_events,
-        // Stacking options
-        smartstack: this.smartstackIsActive,
-        longstack: this.longstackIsActive
+        scheduled_with_events: this.project_events
       }
+      // This ignores the TZ info and acts as if the input to the datetime picker is in UTC
+      // no matter the user's timezone
+      project.project_constraints.expiry_date = moment(this.project_constraints.expiry_date).format('YYYY-MM-DDTHH:mm:ss')
+      project.project_constraints.start_date = moment(this.project_constraints.start_date).format('YYYY-MM-DDTHH:mm:ss')
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
         axios.post(url, project).then(response => {
@@ -1163,8 +1413,8 @@ export default {
     modifyProject () {
       const url = this.projects_api_url + '/modify-project'
       // Make sure that correct format of RA is sent to the site-code
-      if (this.targets.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
-      this.targets.RAhours = true
+      if (this.project_constraints.RAhours == false) { this.targets[0].ra = this.targets[0].ra / 15 }
+      this.project_constraints.RAhours = true
       const project = {
         project_name: this.project_name,
         created_at: moment().utc().format(),
@@ -1188,11 +1438,12 @@ export default {
         // Empty nested arrays such that
         // project_data[target_index][exposure_index] = [array of filenames]
         project_data: this.exposures.map(e => []),
-        scheduled_with_events: this.project_events,
-        // Stacking options
-        smartstack: this.smartstackIsActive,
-        longstack: this.longstackIsActive
+        scheduled_with_events: this.project_events
       }
+      // This ignores the TZ info and acts as if the input to the datetime picker is in UTC
+      // no matter the user's timezone
+      project.project_constraints.expiry_date = moment(this.project_constraints.expiry_date).format('YYYY-MM-DDTHH:mm:ss')
+      project.project_constraints.start_date = moment(this.project_constraints.start_date).format('YYYY-MM-DDTHH:mm:ss')
       const request_body = {
         project_name: this.loaded_project_name,
         created_at: this.loaded_project_created_at,
@@ -1239,6 +1490,9 @@ export default {
 
     // Function to get filters at any site to populate filter dropdown
     get_default_filter_options (site) {
+      if (site == 'common pool') {
+        return
+      }
       const site_cfg = this.global_config[site]
       const default_filter_wheel_name = site_cfg.defaults.filter_wheel
       const filter_wheel_options = site_cfg.filter_wheel[default_filter_wheel_name].settings.filter_data
@@ -1258,20 +1512,19 @@ export default {
       if (selected_sites.length != 0) {
         let fwo = []
         for (const site of selected_sites) {
-          const filter_list = this.get_default_filter_options(site).map(x => x[0])
-          fwo = [...fwo, ...filter_list]
+          if (site != 'common pool') {
+            const filter_list = this.get_default_filter_options(site).map(x => x[0])
+            fwo = [...fwo, ...filter_list]
+          }
         }
         // Remove duplicates between site filter lists
         let all_site_filters = [...new Set(fwo)]
         // Remove duplicates that appear in generic filters
         all_site_filters = all_site_filters.filter(item => generics.indexOf(item) < 0)
         return all_site_filters
-
-      // Default behavior (if no specific sites selected) returns the filters for the current site only
-      } else {
-        const filter_list = this.get_default_filter_options(this.sitecode).map(x => x[0])
-        return filter_list
       }
+      // Default behavior (if no specific sites selected) returns the "site filters" for common pool, which are none
+      return ''
     },
 
     // True if we're modifying a project and the name is changed.
@@ -1302,13 +1555,11 @@ export default {
     ]),
 
     smartstackIsActive: {
-      get () { return this.$store.getters['command_params/smartstackIsActive'] },
-      set (val) { this.$store.commit('command_params/smartstackIsActive', val) }
+      get () { return this.$store.getters['command_params/smartstackIsActive'] }
     },
 
     longstackIsActive: {
-      get () { return this.$store.getters['command_params/longstackIsActive'] },
-      set (val) { this.$store.commit('command_params/longstackIsActive', val) }
+      get () { return this.$store.getters['command_params/longstackIsActive'] }
     },
 
     user_events_with_projects () {
@@ -1346,7 +1597,7 @@ export default {
     background-color: $body-background-color;
 }
 .site-dropdown .button {
-    width: 130px;
+    display: inline-block;
     background-color: $body-background-color;
 }
 .site-dropdown .item {
@@ -1412,6 +1663,26 @@ export default {
     align-items: bottom;
 }
 .target-row > * {
-    margin-right: 8px;
+    margin-right: 16px;
+}
+.button-row {
+    display: flex;
+    flex-direction: row;
+}
+.button-row > * {
+    margin-right: 16px;
+    margin-top: 1em;
+}
+.site-select {
+  display: flex;
+  flex-direction: row;
+  align-items: bottom;
+  margin-top: 1em;
+}
+.site-select > * {
+  margin-right:16px;
+}
+.sites-text {
+  margin-top: 1em;
 }
 </style>
