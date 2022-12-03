@@ -269,11 +269,13 @@
             expanded
             placeholder="Select a date"
           />
-          <b-button
-            icon-left="calendar-today"
-            type="is-primary"
-            @click="$refs.stdatetimepicker.toggle()"
-          />
+          <p class="control">
+            <b-button
+              icon-left="calendar-today"
+              type="is-primary"
+              @click="$refs.stdatetimepicker.toggle()"
+            />
+          </p>
         </b-field>
         <b-field>
           <template #label>
@@ -295,11 +297,13 @@
             expanded
             placeholder="Select a date"
           />
-          <b-button
-            icon-left="calendar-today"
-            type="is-primary"
-            @click="$refs.expdatetimepicker.toggle()"
-          />
+          <p class="control">
+            <b-button
+              icon-left="calendar-today"
+              type="is-primary"
+              @click="$refs.expdatetimepicker.toggle()"
+            />
+          </p>
         </b-field>
         <b-field>
           <template #label>
@@ -364,10 +368,10 @@
       <div class="button-row">
         <b-field>
           <template #label>
-            Smart Stack
+            Smart Stack All
             <b-tooltip
               type="is-dark"
-              label="Automatically stack shorter exposures over long exposure time."
+              label="Automatically stack shorter exposures over long exposure time for all exposures."
             >
               <b-icon
                 size="is-small"
@@ -375,15 +379,15 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="project_constraints.smartstack" />
+          <b-checkbox v-model="project_constraints.smartstackall" />
         </b-field>
 
         <b-field>
           <template #label>
-            Long Stack
+            Long Stack All
             <b-tooltip
               type="is-dark"
-              label="Stacking multiple longer exposure times."
+              label="Stacking multiple longer exposure times for all exposures."
             >
               <b-icon
                 size="is-small"
@@ -391,7 +395,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="project_constraints.longstack" />
+          <b-checkbox v-model="project_constraints.longstackall" />
         </b-field>
       </div>
       <!-- we decided to only allow one target per project -->
@@ -407,7 +411,9 @@
           :key="n"
           class="exposure-row"
         >
-          <b-field :label="n==1 ? '  ' : ' '">
+          <b-field
+            :label="n==1 ? '  ' : ' '"
+          >
             <b-checkbox v-model="exposures[n-1].active" />
           </b-field>
           <b-field
@@ -441,7 +447,7 @@
           </b-field>
           <b-field
             :label="n==1 ? 'Count' : ''"
-            style="width: 100px;"
+            style="width: 50px;"
           >
             <b-input
               v-model="exposures[n-1].count"
@@ -451,8 +457,8 @@
             />
           </b-field>
           <b-field
-            :label="n==1 ? 'Exposure [s]' : ''"
-            style="max-width: 100px;"
+            :label="n==1 ? 'Exp [s]' : ''"
+            style="max-width: 50px;"
           >
             <b-input
               v-model="exposures[n-1].exposure"
@@ -461,7 +467,9 @@
               min="0"
             />
           </b-field>
-          <b-field :label="n==1 ? 'Filter' : ''">
+          <b-field
+            :label="n==1 ? 'Filter' : ''"
+          >
             <b-select
               v-model="exposures[n-1].filter"
               size="is-small"
@@ -492,7 +500,9 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Resolution' : ''">
+          <b-field
+            :label="n==1 ? 'Resolution' : ''"
+          >
             <b-select
               v-model="exposures[n-1].bin"
               size="is-small"
@@ -506,7 +516,9 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Area' : ''">
+          <b-field
+            :label="n==1 ? 'Area' : ''"
+          >
             <b-select
               v-model="exposures[n-1].area"
               size="is-small"
@@ -531,10 +543,10 @@
                 133%
               </option>
               <option value="FULL">
-                FULL
+                Full
               </option>
               <option value="SQUARE">
-                SQUARE
+                Square
               </option>
               <option value="71%">
                 71%
@@ -553,7 +565,9 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Dither' : ''">
+          <b-field
+            :label="n==1 ? 'Dither' : ''"
+          >
             <b-select
               v-model="exposures[n-1].dither"
               size="is-small"
@@ -574,7 +588,10 @@
               </option>
             </b-select>
           </b-field>
-          <b-field :label="n==1 ? 'Photometry' : ''">
+          <b-field
+            :label="n==1 ? 'Photometry' : ''"
+            :style="n==1 ? '' : 'margin-right:13px;'"
+          >
             <b-select
               v-model="exposures[n-1].photometry"
               size="is-small"
@@ -587,10 +604,10 @@
                 target
               </option>
               <option value="comparison1">
-                Comparison 1
+                Comp 1
               </option>
               <option value="comparison2">
-                Comparison 2
+                Comp 2
               </option>
               <option value="check1">
                 Check 1
@@ -618,7 +635,44 @@
               </option>
             </b-select>
           </b-field>
-
+          <b-field :label="n==1 ? 'Smart' : ''">
+            <b-select
+              v-model="exposures[n-1].smartstack"
+              size="is-small"
+              :disabled="!exposures[n-1].active"
+            >
+              <option :value="true">
+                on
+              </option>
+              <option :value="false">
+                off
+              </option>
+            </b-select>
+            <!--<b-checkbox
+              v-model="exposures[n-1].smartstack"
+              size="is-small"
+              :disabled="!exposures[n-1].active"
+              />-->
+          </b-field>
+          <b-field :label="n==1 ? 'Long' : ''">
+            <b-select
+              v-model="exposures[n-1].longstack"
+              size="is-small"
+              :disabled="!exposures[n-1].active"
+            >
+              <option :value="true">
+                on
+              </option>
+              <option :value="false">
+                off
+              </option>
+            </b-select>
+            <!--<b-checkbox
+              v-model="exposures[n-1].longstack"
+              size="is-small"
+              :disabled="!exposures[n-1].active"
+              />-->
+          </b-field>
           <div />
         </div>
         <div />
@@ -931,6 +985,7 @@ export default {
   mixins: [target_names],
   watch: {
     project_to_load ({ project, is_existing_project }) {
+      // This runs any time an existing project is passed into the component. It transforms the project data into a format that works nicely with the form elements and user interaction.
       if (project == '') {
         this.clearProjectForm()
       }
@@ -947,9 +1002,23 @@ export default {
       this.exposures_index = this.exposures.length
       this.project_constraints = project.project_constraints
 
-      // moment() automatically assumes user's TZ for creating a moment, so this displays correctly in datetimepicker
+      // start_date and expiry_date are stored in projects table as strings of the format 'YYYY-MM-DDTHH:mm:ss', assumed to be in UTC
+      // To display correctly in the datetimepicker, the values should be a Date object in the user's timezone
+      // moment.js automatically assumes user's timezone for creating a moment, so no conversion is needed
       this.project_constraints.start_date = moment(project.project_constraints.start_date).toDate()
       this.project_constraints.expiry_date = moment(project.project_constraints.expiry_date).toDate()
+    },
+    smart_stack_changed () {
+      // Any time the smartstackall checkbox is clicked, change all the individual exposure options
+      this.exposures.forEach(e => {
+        e.smartstack = this.project_constraints.smartstackall
+      })
+    },
+    long_stack_changed () {
+      // Any time the longstackall checkbox is clicked, change all the individual exposure options
+      this.exposures.forEach(e => {
+        e.longstack = this.project_constraints.longstackall
+      })
     }
   },
   data () {
@@ -961,6 +1030,7 @@ export default {
       project_events: [],
       project_note: '',
       project_sites: ['common pool'],
+      project_window: 28, // in days, how long the project has a chance to be scheduled
 
       exposures_index: 1,
       exposures: [
@@ -974,7 +1044,9 @@ export default {
           bin: 'optimal',
           dither: 'no',
           photometry: '-',
-          defocus: 0
+          defocus: 0,
+          smartstack: true,
+          longstack: false
         }
       ],
 
@@ -1010,8 +1082,8 @@ export default {
         close_on_block_completion: false,
         add_center_to_mosaic: false,
         dark_sky_setting: false,
-        longstack: false,
-        smartstack: true,
+        longstackall: false,
+        smartstackall: true,
         deplete: true,
         cycle: true,
         tco: false,
@@ -1065,19 +1137,19 @@ export default {
     this.targets[0].name = this.mount_object
 
     // initialize smart stack and long stack to camera tab values
-    this.project_constraints.longstack = this.longstackIsActive
-    this.project_constraints.smartstack = this.smartstackIsActive
+    this.project_constraints.longstackall = this.longstackIsActive
+    this.project_constraints.smartstackall = this.smartstackIsActive
   },
   created () {
     // initialize expiry date to one lunar month from now, and start date to today
     const today = new Date()
 
-    this.project_constraints.expiry_date.setDate(today.getDate() + 28)
+    this.project_constraints.expiry_date.setDate(today.getDate() + this.project_window)
     this.project_constraints.start_date.setDate(today.getDate())
 
     // converting from user's timezone to UTC
-    this.project_constraints.expiry_date.setMinutes(this.project_constraints.expiry_date.getMinutes() + today.getTimezoneOffset())
-    this.project_constraints.start_date.setMinutes(this.project_constraints.start_date.getMinutes() + today.getTimezoneOffset())
+    this.project_constraints.expiry_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
+    this.project_constraints.start_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
   },
   methods: {
     async getAuthRequestHeader () {
@@ -1148,7 +1220,9 @@ export default {
           bin: 'optimal',
           dither: 'no',
           photometry: '-',
-          defocus: 0
+          defocus: 0,
+          smartstack: true,
+          longstack: false
         }
       ]
       this.exposures_index = 1
@@ -1172,8 +1246,8 @@ export default {
         add_center_to_mosaic: false,
         dark_sky_setting: false,
         generic_instrument: 'Main Camera',
-        longstack: false,
-        smartstack: true,
+        longstackall: false,
+        smartstackall: true,
         deplete: true,
         cycle: true,
         tco: false,
@@ -1185,11 +1259,11 @@ export default {
       // Reset start/expiry date, like in created()
       const today = new Date()
 
-      this.project_constraints.expiry_date.setDate(today.getDate() + 28)
+      this.project_constraints.expiry_date.setDate(today.getDate() + this.project_window)
       this.project_constraints.start_date.setDate(today.getDate())
 
-      this.project_constraints.expiry_date.setMinutes(this.project_constraints.expiry_date.getMinutes() + today.getTimezoneOffset())
-      this.project_constraints.start_date.setMinutes(this.project_constraints.start_date.getMinutes() + today.getTimezoneOffset())
+      this.project_constraints.expiry_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
+      this.project_constraints.start_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
     },
     async getCoordinatesFromName (target_index) {
       this.object_name_search_in_progress = true
@@ -1475,13 +1549,11 @@ export default {
     ]),
 
     smartstackIsActive: {
-      get () { return this.$store.getters['command_params/smartstackIsActive'] },
-      set (val) { this.$store.commit('command_params/smartstackIsActive', val) }
+      get () { return this.$store.getters['command_params/smartstackIsActive'] }
     },
 
     longstackIsActive: {
-      get () { return this.$store.getters['command_params/longstackIsActive'] },
-      set (val) { this.$store.commit('command_params/longstackIsActive', val) }
+      get () { return this.$store.getters['command_params/longstackIsActive'] }
     },
 
     user_events_with_projects () {
@@ -1494,6 +1566,12 @@ export default {
     },
     user () {
       return this.$auth.user
+    },
+    smart_stack_changed () {
+      return this.project_constraints.smartstackall
+    },
+    long_stack_changed () {
+      return this.project_constraints.longstackall
     }
   }
 }
