@@ -590,6 +590,29 @@
               </option>
             </b-select>
           </b-field>
+          <b-field :label="n==1 ? 'Drizzle' : ''">
+            <b-select
+              v-model="exposures[n-1].drizzle"
+              size="is-small"
+              :disabled="!exposures[n-1].active"
+            >
+              <option value="1">
+                1x
+              </option>
+              <option value="1.5">
+                1.5x
+              </option>
+              <option value="2">
+                2x
+              </option>
+              <option value="2.5">
+                2.5x
+              </option>
+              <option value="3">
+                3x
+              </option>
+            </b-select>
+          </b-field>
           <b-field
             :label="n==1 ? 'Photometry' : ''"
             :style="n==1 ? '' : 'margin-right:13px;'"
@@ -1045,6 +1068,7 @@ export default {
           area: 'FULL',
           bin: 'optimal',
           dither: 'no',
+          drizzle: '1',
           photometry: '-',
           defocus: 0,
           smartstack: true,
@@ -1226,6 +1250,7 @@ export default {
           area: 'FULL',
           bin: 'optimal',
           dither: 'no',
+          drizzle: '1',
           photometry: '-',
           defocus: 0,
           smartstack: true,
