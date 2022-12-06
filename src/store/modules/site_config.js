@@ -185,8 +185,7 @@ const getters = {
   filter_wheel_options: (state, getters) => {
     const fwo = getters.selected_filter_wheel_config.settings?.filter_data
     if (fwo == undefined) return [[]]
-    const num_filters = fwo.length
-    return fwo.slice(1, num_filters)
+    return fwo
   },
 
   // Get the site events from the selected config (things like nautical dark start, etc)
