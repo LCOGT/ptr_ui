@@ -40,6 +40,12 @@
     <div class="image-info-bar-item filename">
       {{ current_image.base_filename }}
     </div>
+    <div class="image-info-bar-item fwhm">
+      fwhm: {{ fwhm }}"
+    </div>
+    <div class="image-info-bar-item sepsky">
+      sky: {{ sepsky }} adu
+    </div>
   </div>
 </template>
 
@@ -47,6 +53,7 @@
 import moment from 'moment'
 import RaDisplay from '@/components/display/RaDisplay'
 import DecDisplay from '@/components/display/DecDisplay'
+import axios from 'axios'
 export default {
   name: 'ImageInfoBar',
   components: {
@@ -59,6 +66,12 @@ export default {
       required: true
     }
   },
+  data () {
+    return {
+      fwhm: '',
+      sepsky: ''
+    }
+  },
 
   filters: {
     dateToUnix (date) {
@@ -66,6 +79,18 @@ export default {
     },
     dateToReadable (date) {
       return moment.utc(date).format('YYYY-MM-DD HH:mm UTC')
+    }
+  },
+
+  watch: {
+    current_image () {
+      // Get header for extra infobar values
+      const url = this.$store.state.api_endpoints.active_api + `/fitsheader/${this.current_image.base_filename}/`
+      axios.get(url).then(response => {
+        // Round appropriately
+        this.fwhm = Number(response.data.FWHMASEC).toFixed(2)
+        this.sepsky = parseInt(response.data.SEPSKY)
+      })
     }
   }
 
@@ -83,7 +108,7 @@ export default {
   grid-template-columns:  1fr 2fr 0.5fr 1fr 1fr;
   grid-template-areas: 'site exptime . ra dec'
                        'filter-used obstime . airmass altitude'
-                       '. filename filename filename .';
+                       '. filename filename fwhm sepsky';
   grid-column-gap: 10px;
   padding: 1px 3px;
   font-size: 9pt;
@@ -100,6 +125,8 @@ export default {
   .altitude { grid-area: altitude; }
   .obstime { grid-area: obstime; }
   .filename { grid-area: filename; color: white;}
+  .fwhm {grid-area: fwhm;}
+  .sepsky {grid-area: sepsky;}
 }
 
 </style>
