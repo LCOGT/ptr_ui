@@ -294,6 +294,15 @@ const actions = {
   },
 
   async load_latest_images ({ dispatch, commit, state, rootState }) {
+    /** This function is for the postage stamp images in the observe display.
+     * It first queries S3 for the most recent image at a given site, then uses that
+     * image's capture date to determine the most recent site local noon to noon "day"
+     * of observing, then returns all images from that site during that noon-noon day.
+     *
+     * Datetime for this function is done in the local timezone of the observatory, then
+     * converted to UTC for the API call to query S3 for all images.
+     * **/
+
     // Get site and user_id
     let url = null
     const site = rootState.site_config.selected_site
@@ -301,16 +310,13 @@ const actions = {
 
     const userid = user_id()
 
-    let siteDate = new Date()
-    let noonDate = new Date()
+    let siteDate = moment()
+    let noonDate = moment()
+    let endDate = moment()
 
-    // Timezone and Offset for site and user to convert to site local time
+    // Timezone and Offset for site
     const siteTimezone = rootState.site_config.global_config[site].TZ_database_name
-    const siteOffset = moment.utc(new Date()).tz(siteTimezone).utcOffset() / 60
-    const userOffset = -noonDate.getTimezoneOffset() / 60
-
-    // How many hours difference is between the site and user timezones
-    const siteUserDifference = siteOffset - userOffset
+    const siteOffset = -moment.utc(new Date()).tz(siteTimezone).utcOffset() / 60
 
     // Query for site's local noon to noon
     url = rootState.api_endpoints.active_api + '/filtered_images'
@@ -318,8 +324,7 @@ const actions = {
     let queryStart = null
     let queryEnd = null
 
-    // If this query is going to return nothing (i.e. site hasn't been used in a while)
-    // then check for the most recent image and use that as the "current time".
+    // Check for the most recent image and use that as the "current time".
     const firstbody = {
       method: 'GET',
       url: rootState.api_endpoints.active_api + '/' + site + '/latest_images/1'
@@ -334,47 +339,38 @@ const actions = {
         return
       }
 
-      // Time of most recent image in user's timezone
-      siteDate = new Date(response[0].capture_date)
+      // Datetime (in site timezone) of most recent image
+      siteDate = moment(response[0].capture_date).tz(siteTimezone)
 
-      // Noon local site time in user's timezone
-      noonDate = new Date(response[0].capture_date)
-      noonDate.setHours(12 - siteUserDifference, 0, 0, 0)
+      // Site noon (in site timezone) on the day the most recent image was taken
+      noonDate = moment(response[0].capture_date).tz(siteTimezone).hours(12).minutes(0).seconds(0).milliseconds(0)
+
+      // Extra variable (in site timezone) for the end date noon, initialized same as noonDate
+      endDate = moment(response[0].capture_date).tz(siteTimezone).hours(12).minutes(0).seconds(0).milliseconds(0)
     }).catch(error => {
       console.error(error)
     })
 
-    if (siteDate > noonDate) {
-      // If it's later than noon, set the start to noon today
+    if (siteDate.format('HH') > 12) {
+      // If the image was taken later than noon, set the start of query to noon today
       queryStart = noonDate
 
       // and the end to noon tomorrow
-      queryEnd = siteDate
-      queryEnd.setHours(12 - siteUserDifference, 0, 0, 0)
-      queryEnd.setDate(siteDate.getDate() + 1)
-      // below and in the else, comments for testing correct postage query boundaries
-      // console.log("later than noon")
-      // console.log(queryStart)
-      // console.log(queryEnd)
+      queryEnd = endDate.add(1, 'days')
     } else {
-      // If it's earlier than noon, set the start to noon yesterday
-      queryStart = siteDate
-      queryStart.setHours(12 - siteUserDifference, 0, 0, 0)
-      queryStart.setDate(siteDate.getDate() - 1)
+      // If the image was taken earlier than noon, set the start of query to noon yesterday
+      queryStart = noonDate.add(-1, 'days')
 
       // and the end to noon today
-      queryEnd = noonDate
-      // console.log("earlier than noon")
-      // console.log(queryStart)
-      // console.log(queryEnd)
+      queryEnd = endDate
     }
 
     // Set the parameters for this query
     filterparams.site = site
-    filterparams.start_date = moment(queryStart).format('YYYY-MM-DD hh:mm:ss')
-    filterparams.end_date = moment(queryEnd).format('YYYY-MM-DD hh:mm:ss')
-    // console.log(filterparams.start_date)
-    // console.log(filterparams.end_date)
+
+    // API endpoint expects the start/end dates in UTC, so convert using the site offset
+    filterparams.start_date = queryStart.add(siteOffset, 'hours').format('YYYY-MM-DD HH:mm:ss')
+    filterparams.end_date = queryEnd.add(siteOffset, 'hours').format('YYYY-MM-DD HH:mm:ss')
 
     // If a user is logged in and they want to see only their data,
     // add their id as a parameter for the api call
