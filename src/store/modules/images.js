@@ -294,6 +294,15 @@ const actions = {
   },
 
   async load_latest_images ({ dispatch, commit, state, rootState }) {
+    /** This function is for the postage stamp images in the observe display.
+     * It first queries S3 for the most recent image at a given site, then uses that
+     * image's capture date to determine the most recent site local noon to noon "day"
+     * of observing, then returns all images from that site during that noon-noon day.
+     * 
+     * Datetime for this function is done in the local timezone of the observatory, then
+     * converted to UTC for the API call to query S3 for all images.
+     * **/
+
     // Get site and user_id
     let url = null
     const site = rootState.site_config.selected_site
