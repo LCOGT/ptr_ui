@@ -513,8 +513,11 @@
               <option value="optimal">
                 Optimal
               </option>
-              <option value="maximum">
-                Maximum
+              <option value="coarse">
+                Coarse
+              </option>
+              <option value="fine">
+                Fine
               </option>
             </b-select>
           </b-field>
