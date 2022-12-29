@@ -1,4 +1,4 @@
-import Axios from 'axios'
+import axios from 'axios'
 
 import { statusAgeDisplay, STALE_AGE_MS } from './getters/status_utils'
 
@@ -200,8 +200,11 @@ const actions = {
   // Get and update the 'open' status of all sites. Used for the global map site indicators.
   async getSiteOpenStatus ({ commit, rootState }) {
     const url = rootState.api_endpoints.status_endpoint + '/allopenstatus'
-    const response = await Axios.get(url)
-    commit('siteOpenStatus', response.data)
+    axios.get(url).then(response => {
+      commit('siteOpenStatus', response.data)
+    }).catch(error => {
+      console.warn('Failure getting data from ' + url, error)
+    })
   },
 
   // Get a single status object for a site. Used to initialize values when loading a new site.
@@ -214,7 +217,7 @@ const actions = {
     }
 
     const url = rootState.api_endpoints.status_endpoint + `/${current_site}/complete_status`
-    const response = await Axios.get(url)
+    const response = await axios.get(url)
 
     // If the site has no status available, commit a default empty status to the store
     if (Object.keys(response.data).includes('status')) {
