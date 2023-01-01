@@ -9,6 +9,7 @@
 
 <script>
 import nite from './nite-overlay'
+import axios from 'axios'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import google_map_styles from './google-styles'
 import { makeIcon } from './mapHelpers'
@@ -18,6 +19,8 @@ export default {
   props: ['name'],
   data: function () {
     return {
+
+      global_config: {},
 
       // The google map object
       map: '',
@@ -33,6 +36,7 @@ export default {
     }
   },
   async mounted () {
+    this.global_config = await this.get_global_config()
     this.initMap()
   },
   beforeDestroy () {
@@ -41,7 +45,29 @@ export default {
     clearInterval(this.updateSunInterval)
   },
 
+  watch: {
+    all_sites () {
+      this.redrawMapSites()
+    },
+    site_open_status () {
+      // this.initMap()
+    }
+  },
+
   methods: {
+
+    async get_global_config () {
+      const url = `${this.$store.state.api_endpoints.active_api}/all/config`
+      return new Promise((resolve, reject) => {
+        axios.get(url)
+          .then(response => {
+            resolve(response.data)
+          })
+          .catch(error => {
+            reject(error)
+          })
+      })
+    },
 
     addMarkerWithData (markerData) {
       const white = { r: 255, g: 255, b: 255 }
@@ -87,8 +113,6 @@ export default {
       this.drawSunMarker()
       this.updateSunInterval = setInterval(this.updateSunPosition, 10000)
 
-      const sites = this.all_sites
-
       const oms = new OverlappingMarkerSpiderfier(this.map, {
         markersWontMove: true,
         markersWontHide: true,
@@ -104,10 +128,12 @@ export default {
       function iwClose () { iw.close() }
       google.maps.event.addListener(this.map, 'click', iwClose)
 
-      sites.filter(site => {
+      let sites = this.all_sites
+      sites = sites.filter(site => {
         // First, remove sites that don't have an available status
         return Object.keys(this.site_open_status).includes(site.site)
-      }).forEach(site => {
+      })
+      sites.forEach(site => {
         const markerData = {
           lat: site.latitude,
           lng: site.longitude,
@@ -278,7 +304,6 @@ export default {
 
     async redrawMapSites () {
       // Fetch the list of sites to display on the map
-      await this.$store.dispatch('sitestatus/getSiteOpenStatus')
       const sites = this.all_sites.reverse()
 
       // For each site, draw a marker with a popup (on click) to visit the site.
@@ -307,15 +332,6 @@ export default {
       })
     }
 
-  },
-
-  watch: {
-    all_sites () {
-      // this.redrawMapSites()
-    },
-    site_open_status () {
-      // this.initMap()
-    }
   },
 
   computed: {
