@@ -43,7 +43,7 @@
             <command-tabs-accordion class="command-tab-accordion is-hidden-desktop" />
             <command-tabs-wide class="command-tabs-wide is-hidden-touch" />
           </b-tab-item>
-
+          <!--
           <b-tab-item
             label="analysis"
             class="analysis-tab-item"
@@ -70,6 +70,17 @@
                 <ImageMetadataViewer />
               </TabItem>
             </Tabs>
+          </b-tab-item>
+          -->
+          <b-tab-item
+            label="inspect"
+            class="inspect-tab-item"
+            :value="'inspect'"
+          >
+            <div class="shapes-toolbar">
+              <div>Draw a region: </div> <DrawShapesToolbar />
+            </div>
+            <Inspect />
           </b-tab-item>
 
           <b-tab-item
@@ -199,6 +210,7 @@ import InfoImageThumb from '@/components/ImageDisplay/InfoImageThumb'
 import ThumbnailRow from '@/components/ImageDisplay/ThumbnailRow'
 import ButtonRowBelowImage from '@/components/ImageDisplay/ButtonRowBelowImage'
 import DrawShapesToolbar from '@/components/AnalysisTools/DrawShapesToolbar'
+import Inspect from '@/components/AnalysisTools/Inspect'
 import RecentS3UploadsTable from '@/components/AdminTools/RecentS3UploadsTable'
 import SiteConfigViewer from '@/components/AdminTools/SiteConfigViewer'
 import StarProfile from '@/components/AnalysisTools/StarProfile'
@@ -228,6 +240,7 @@ export default {
     ThumbnailRow,
     ButtonRowBelowImage,
     DrawShapesToolbar,
+    Inspect,
     StarProfile,
     RecentS3UploadsTable,
     SiteConfigViewer,

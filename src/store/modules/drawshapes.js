@@ -68,10 +68,17 @@ const getters = {
       // get the square that encloses the circle
       const rad_length = Math.sqrt((shape.rx ** 2) + (shape.ry ** 2))
       return {
-        x0: shape.cx - rad_length,
-        y0: shape.cy - rad_length,
-        x1: shape.cx + rad_length,
-        y1: shape.xy + rad_length
+        x0: shape.x - rad_length,
+        y0: shape.y - rad_length,
+        x1: shape.x + rad_length,
+        y1: shape.y + rad_length
+      }
+    } else if (type == 'points') {
+      return {
+        x0: shape.x,
+        y0: shape.y,
+        x1: null,
+        y1: null
       }
     } else {
       // Default case

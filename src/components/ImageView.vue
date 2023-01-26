@@ -280,7 +280,10 @@ export default {
           y: mouse[1] / imageHeight,
           color: 'gold',
           show: true
-        })
+        }
+        )
+        const currentPoint = this.points[this.points.length - 1]
+        this.selectedId = currentPoint.id
         this.svg.on('mousemove', () => {
           const mouse = d3.mouse(this.svg.node())
           const theNewPoint = this.points[this.points.length - 1]
