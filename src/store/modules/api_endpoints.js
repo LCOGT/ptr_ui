@@ -10,36 +10,30 @@ const state = {
     Eventual switch to prod site using prod endpoints, dev site using dev endpoints,
     and all other testing on test endpoints to come.
 
-    Endpoints listed as "nonexistent currently" have not yet been defined in their
+    Endpoints listed as 'nonexistent currently' have not yet been defined in their
     respective backend repositories.
     */
 
-  active_api: 'https://api.photonranch.org/api', // current dev stage endpoint
-  // active_api: "https://api.photonranch.org/dev", //nonexistent currently
-  // active_api: "https://api.photonranch.org/test",
+  active_api: 'https://api.photonranch.org/api', // prod
+  // active_api: 'https://api.photonranch.org/dev', // dev
 
-  jobs_api: 'https://jobs.photonranch.org/jobs', // current dev stage endpoint
-  // jobs_api: "https://jobs.photonranch.org/dev", //nonexistent currently
-  // jobs_api: "https://jobs.photonranch.org/test",
+  jobs_api: 'https://jobs.photonranch.org/jobs', // prod
+  // jobs_api: 'https://jobs.photonranch.org/dev', // dev
 
-  // calendar_api: "https://calendar.photonranch.org/calendar", //not currently in use
-  calendar_api: 'https://calendar.photonranch.org/dev', // in use for dev and prod
-  // calendar_api: "https://calendar.photonranch.org/test",
+  calendar_api: 'https://calendar.photonranch.org/calendar', // prod
+  // calendar_api: 'https://calendar.photonranch.org/dev', // dev
 
-  // projects_endpoint: "https://projects.photonranch.org/prod", //not currently in use
-  projects_endpoint: 'https://projects.photonranch.org/dev', // in use for dev and prod
-  // projects_endpoint: "https://projects.photonranch.org/test",
+  projects_endpoint: 'https://projects.photonranch.org/projects', // prod
+  // projects_endpoint: 'https://projects.photonranch.org/dev', // dev
 
   logs_endpoint: 'https://logs.photonranch.org/logs', // prod
-  // logs_endpoint: "https://logs.photonranch.org/dev",  // dev
-  // logs_endpoint: "https://logs.photonranch.org/test", //nonexistent currently
+  // logs_endpoint: 'https://logs.photonranch.org/dev',  // dev
 
   quickanalysis_endpoint: 'https://quickanalysis.photonranch.org',
-  // quickanalysis_endpoint: "http://localhost:5000",
+  // quickanalysis_endpoint: 'http://localhost:5000',
 
-  // status_endpoint: 'https://status.photonranch.org/status', //nonexistent currently
-  status_endpoint: 'https://status.photonranch.org/status' // in use for dev and prod
-  // status_endpoint: 'https://status.photonranch.org/test',
+  status_endpoint: 'https://status.photonranch.org/status' // prod
+  // status_endpoint: 'https://status.photonranch.org/dev' // dev
 }
 
 // getters
