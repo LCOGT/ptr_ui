@@ -17,7 +17,7 @@
       <take-sky-flats v-if="script=='takeSkyFlats'" />
       <pointing-run v-if="script=='pointingRun'" />
       <focus-auto v-if="script=='focusAuto'" />
-      <focus-auto v-if="script=='focusExtensive'" />
+      <focus-extensive v-if="script=='focusExtensive'" />
       <focus-fine v-if="script=='focusFine'" />
       <focus-vcurve v-if="script=='focusVcurve'" />
     </section>
