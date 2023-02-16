@@ -17,6 +17,7 @@
       <take-sky-flats v-if="script=='takeSkyFlats'" />
       <pointing-run v-if="script=='pointingRun'" />
       <focus-auto v-if="script=='focusAuto'" />
+      <focus-auto v-if="script=='focusExtensive'" />
       <focus-fine v-if="script=='focusFine'" />
       <focus-vcurve v-if="script=='focusVcurve'" />
     </section>
@@ -41,6 +42,7 @@ import TakeLunarStack from '@/components/ScriptSettings/TakeLunarStack'
 import TakeSkyFlats from '@/components/ScriptSettings/TakeSkyFlats'
 import PointingRun from '@/components/ScriptSettings/PointingRun'
 import FocusAuto from '@/components/ScriptSettings/FocusAuto'
+import FocusExtensive from '@/components/ScriptSettings/FocusExtensive'
 import FocusFine from '@/components/ScriptSettings/FocusFine'
 import FocusVcurve from '@/components/ScriptSettings/FocusVcurve'
 export default {
@@ -56,6 +58,7 @@ export default {
     TakeSkyFlats,
     PointingRun,
     FocusAuto,
+    FocusExtensive,
     FocusFine,
     FocusVcurve
   },

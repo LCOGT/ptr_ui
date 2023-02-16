@@ -128,6 +128,13 @@ const defaults = {
       area: '100%' // percent, from 0 to 1
     }
   },
+  focusExtensive () {
+    return {
+      target: 'near_tycho_star', // alternative: 'use_field'
+      bin: 1, // integer: 1, 2, or 4
+      area: '100%' // percent, from 0 to 1
+    }
+  },
   focusFine () {
     return {
       target: 'near_tycho_star', // alternative: 'use_field'
@@ -160,6 +167,7 @@ const state = {
   takeSkyFlats: defaults.takeSkyFlats(),
   pointingRun: defaults.pointingRun(),
   focusAuto: defaults.focusAuto(),
+  focusExtensive: defaults.focusExtensive(),
   focusFine: defaults.focusFine(),
   focusVcurve: defaults.focusVcurve(),
 
@@ -175,6 +183,7 @@ const state = {
     'takeSkyFlats',
     'pointingRun',
     'focusAuto',
+    'focusExtensive',
     'focusFine',
     'focusVcurve'
   ],
@@ -191,6 +200,7 @@ const state = {
     takeSkyFlats: 'Take Sky-Flats',
     pointingRun: 'Pointing Run',
     focusAuto: 'Focus Auto',
+    focusExtensive: 'Focus Extensive',
     focusFine: 'Focus Fine',
     focusVcurve: 'Focus V-Curve'
   }
@@ -270,6 +280,10 @@ const getters = {
   focusAuto_bin: state => state.focusAuto.bin,
   focusAuto_area: state => state.focusAuto.area,
 
+  focusExtensive_target: state => state.focusExtensive.target,
+  focusExtensive_bin: state => state.focusExtensive.bin,
+  focusExtensive_area: state => state.focusExtensive.area,
+
   focusFine_target: state => state.focusFine.target,
   focusFine_bin: state => state.focusFine.bin,
   focusFine_area: state => state.focusFine.area,
@@ -339,6 +353,10 @@ const mutations = {
   focusAuto_target (state, val) { state.focusAuto.target = val },
   focusAuto_bin (state, val) { state.focusAuto.bin = val },
   focusAuto_area (state, val) { state.focusAuto.area = val },
+
+  focusExtensive_target (state, val) { state.focusExtensive.target = val },
+  focusExtensive_bin (state, val) { state.focusExtensive.bin = val },
+  focusExtensive_area (state, val) { state.focusExtensive.area = val },
 
   focusFine_target (state, val) { state.focusFine.target = val },
   focusFine_bin (state, val) { state.focusFine.bin = val },

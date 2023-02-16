@@ -33,6 +33,9 @@
           <option value="focusAuto">
             Focus Auto
           </option>
+          <option value="focusExtensive">
+            Focus Extensive  
+          </option>
           <option value="focusFine">
             Focus Fine
           </option>
