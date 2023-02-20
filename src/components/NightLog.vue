@@ -175,6 +175,7 @@ export default {
     position: absolute;
     width: 350px;
     margin-top: 1.5em;
+    margin-left: -280px; // right side should align with right of "night log" button (which is 70px wide)
 
     // shadow
     -webkit-box-shadow: 4px 4px 25px 0px rgba(0,0,0,0.67);
