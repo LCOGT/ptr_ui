@@ -32,8 +32,10 @@ const state = {
   quickanalysis_endpoint: 'https://quickanalysis.photonranch.org',
   // quickanalysis_endpoint: 'http://localhost:5000',
 
-  status_endpoint: 'https://status.photonranch.org/status' // prod
-  // status_endpoint: 'https://status.photonranch.org/dev' // dev
+  status_endpoint: 'https://status.photonranch.org/status', // prod
+  // status_endpoint: 'https://status.photonranch.org/dev', // dev
+
+  archive_api: 'https://archiveapi.photonranch.org/frames' // archiveapi endpoint, no stages
 }
 
 // getters

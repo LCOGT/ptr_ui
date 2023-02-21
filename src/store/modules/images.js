@@ -190,62 +190,6 @@ const actions = {
   },
 
   /**
-     *  This action will retrieve a list of images filtered by the parameters in filter_params
-     */
-  get_filtered_images ({ commit, dispatch, rootState }, filter_params) {
-    dispatch('toggle_live_data', false)
-    const apiName = rootState.api_endpoints.active_api
-    const url = apiName + '/filtered_images'
-    const body = {
-      method: 'GET',
-      params: filter_params,
-      baseURL: apiName,
-      url
-    }
-    axios(body).then(response => {
-      response = response.data
-
-      // Empty response:
-      if (response.length == 0) {
-        dispatch('display_placeholder_image')
-        return
-      }
-
-      commit('setRecentImages', response)
-    }).catch(error => {
-      console.warn(error)
-    })
-  },
-
-  get_last_24hrs ({ commit, dispatch, rootState }) {
-    dispatch('toggle_live_data', false)
-    const apiName = rootState.api_endpoints.active_api
-    const url = apiName + '/filtered_images'
-    const body = {
-      method: 'GET',
-      params: {
-        start_date: moment().add(-1, 'days').format('YYYY-MM-DD hh:mm:ss'),
-        end_date: moment().format('YYYY-MM-DD hh:mm:ss')
-      },
-      baseURL: apiName,
-      url
-    }
-    axios(body).then(response => {
-      response = response.data
-
-      // Empty response:
-      if (response.length == 0) {
-        dispatch('display_placeholder_image')
-        return
-      }
-
-      commit('setRecentImages', response)
-    }).catch(error => {
-      console.warn(error)
-    })
-  },
-
-  /**
      *  LOAD the latest images, replacing the current list of latest_images.
      *  @param {boolean} user_data_only: whether or not to filter by images
      *     taken the active user or not.
@@ -412,9 +356,26 @@ const actions = {
         dispatch('display_placeholder_image')
         return
       }
-
       commit('setCurrentImage', response[0])
       commit('setRecentImages', response)
+
+      // Fetch the url from archiveapi.photonranch.org for each file, if it exists
+      const images_with_archive_fits_url = await Promise.all(response.map(async frame => {
+        const archiveApi = rootState.api_endpoints.archive_api
+        const path = `/?basename=${frame.base_filename}`
+        const archiveapi_response = await axios.get(archiveApi + path)
+
+        // Save the url of each fits file (denoted by reduction_level)
+        const modified_frame = frame
+        archiveapi_response.data.results.forEach(record => {
+          const url_key = `fits_${record.reduction_level}_url`
+          modified_frame[url_key] = record.url
+        })
+        return modified_frame
+      }))
+
+      commit('setCurrentImage', images_with_archive_fits_url[0])
+      commit('setRecentImages', images_with_archive_fits_url)
     }).catch(error => {
       console.error(error)
     })

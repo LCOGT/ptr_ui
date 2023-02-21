@@ -114,7 +114,6 @@
                 <span>All Data</span>
               </b-radio-button>
             </b-field>
-            <!--div class="data-query-quick-buttons mb-4"> <b-button class="is-small" @click="$store.dispatch('images/get_last_24hrs')"> all sites - last 24hrs </b-button> </div-->
             <images-table
               :image_array="recent_images"
               class="mb-4"
