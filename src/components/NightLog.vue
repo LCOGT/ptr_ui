@@ -3,10 +3,11 @@
     <b-field style="margin: 0;">
       <p class="control">
         <b-button
-          :disabled="!note_is_loaded"
+          :disabled="!noteIsLoaded && !noteIsExpired"
           class="is-warning is-small"
-          outlined
-          @click="note_visible = true; editor_visible = false"
+          :class="buttonAnimating ? 'note-is-animating' : ''"
+          :size="noteButtonSize"
+          @click="$event => { noteVisible = true; editorVisible = false }"
         >
           night log
         </b-button>
@@ -19,37 +20,61 @@
           class="is-warning is-small"
           outlined
           icon-left="plus"
-          @click="editor_visible = true; note_visible = false"
+          @click="$event => { editorVisible = true; noteVisible = false }"
         >
           new
         </b-button>
       </p>
     </b-field>
+
+    <!-- Note display -->
     <div
       id="night-log-draggable-note"
       class="note-container"
     >
       <b-message
-        v-model="note_visible"
-        :title="note_title"
+        v-model="noteVisible"
+        :title="noteTitle"
         type="is-warning"
         class="night-log-message"
         aria-close-label="Close message"
-        @close="message_close_handler"
+        @close="messageCloseHandler"
       >
         <div class="note-timestamp">
-          <div>{{ note_timestamp.utc_iso }}</div>
-          <div>{{ note_timestamp.ago }}</div>
+          <div>{{ noteTimestamp.utcIso }}</div>
+          <div>{{ noteTimestamp.ago }}</div>
         </div>
         <p>{{ note?.note_data?.message }}</p>
+        <div
+          class="note-delete"
+        >
+          <div
+            v-if="noteExpiresSoon"
+            class="note-expires-soon-warning"
+          >
+            {{ readableTimeToExpiry }}
+          </div>
+          <b-button
+            v-show="userIsAdmin"
+            type="is-danger"
+            outlined
+            size="is-small"
+            :loading="deleteInProgress"
+            @click="deleteNote"
+          >
+            delete
+          </b-button>
+        </div>
       </b-message>
     </div>
+
+    <!-- Note Editor -->
     <div
       id="night-log-draggable-editor"
       class="note-container"
     >
       <b-message
-        v-model="editor_visible"
+        v-model="editorVisible"
         title="New Message"
         type="is-warning"
         class="night-log-message"
@@ -66,17 +91,39 @@
           horizontal
         >
           <b-input
-            v-model="note_editor_message"
+            v-model="noteEditorMessage"
             type="textarea"
           />
         </b-field>
+        <b-field
+          horizontal
+          label="Expires after"
+        >
+          <b-field>
+            <p class="control">
+              <b-input
+                v-model="noteEditorTtlHours"
+                type="number"
+              />
+            </p>
+            <p class="control">
+              <b-button disabled>
+                hours
+              </b-button>
+            </p>
+          </b-field>
+        </b-field>
         <b-field horizontal>
-          <b-button @click="new_note">
+          <b-button
+            :loading="createNoteInProgress"
+            @click="newNote"
+          >
             submit new message
           </b-button>
         </b-field>
+        <br>
         <b-field>
-          <p>Note: messages are visible for 48 hours or until another note is created.</p>
+          <p>Your message will be visible to all users until it expires or another note is created.</p>
         </b-field>
       </b-message>
     </div>
@@ -89,79 +136,147 @@ import moment from 'moment'
 import { mapGetters } from 'vuex'
 import { user_mixin } from '@/mixins/user_mixin'
 import { clock } from '@/mixins/clock'
+import { commands_mixin } from '@/mixins/commands_mixin' // for getAuthHeader
 export default {
   props: {
     site: String
   },
-  mixins: [user_mixin, clock],
+  mixins: [user_mixin, clock, commands_mixin],
   data () {
     return {
-      note_visible: false,
-      editor_visible: false,
-      note_editor_message: '',
+      noteVisible: false,
+      editorVisible: false,
 
-      note_is_loaded: false,
-      note: ''
+      noteEditorMessage: '',
+      noteEditorTtlHours: 48, // default: 48hr expiry
+
+      noteIsLoaded: false,
+      note: '',
+
+      buttonFlash: false,
+      buttonAnimating: false,
+      noteButtonSize: 'is-small',
+
+      deleteInProgress: false,
+      createNoteInProgress: false
+      // TODO: loading bar for button that creates new note
+      // TODO: gracefully handle 404 error when no note exists
     }
   },
   mounted () {
-    this.get_note()
+    this.getNote()
     $('#night-log-draggable-note').draggable({ cancel: 'article section.message-body' })
     $('#night-log-draggable-editor').draggable({ cancel: 'article section.message-body' })
   },
   methods: {
-    get_note () {
+    getNote () {
       const url = this.$store.state.api_endpoints.active_api + '/nightlog/' + this.site
       axios.get(url).then(response => {
-        console.log(response)
+        // Do nothing if there's no note to load
+        if (response.status == 204) { return }
 
         // Save the note we just loaded
         this.note = response.data
-        this.note_is_loaded = true
+        this.noteIsLoaded = true
 
         // Check if the user has already seen this note
-        const note_id = this.note.site + this.note.created_timestamp
-        const last_read_note = window.localStorage.getItem('ptr_nightlog_last_read')
-        if (note_id !== last_read_note) {
+        const lastReadNote = window.localStorage.getItem(this.nightlogReadId)
+        if (this.noteId !== lastReadNote) {
           // Hide the editor / show the note
-          this.note_visible = true
-          this.editor_visible = false
+          this.noteVisible = true
+          this.editorVisible = false
+        }
+      }).catch(error => {
+        if (error.response.status == 404) {
+          console.error('problem fetching night log for site ', this.site)
         }
       })
     },
-    new_note () {
+    async newNote () {
+      this.createNoteInProgress = true
       const url = this.$store.state.api_endpoints.active_api + '/nightlog/' + this.site
+      const options = await this.getAuthHeader()
       const note_data = {
         site: this.$route.params.sitecode,
         username: this.userName,
         userid: this.userId,
-        message: this.note_editor_message,
+        message: this.noteEditorMessage,
+        ttl_hours: this.noteEditorTtlHours,
         selected_image: this.current_image
       }
       const body = { note_data }
-      axios.post(url, body).then(response => {
-        console.log(response)
-        this.get_note()
+      axios.post(url, body, options).then(response => {
+        this.createNoteInProgress = false
+        this.getNote()
+      }).catch(error => {
+        console.error('Error creating note', error)
+        this.createNoteInProgress = false
       })
     },
-    message_close_handler () {
+    async deleteNote () {
+      this.deleteInProgress = true
+      const url = this.$store.state.api_endpoints.active_api + '/nightlog/' + this.site
+      const options = await this.getAuthHeader()
+      axios.delete(url, options).then(response => {
+        this.deleteInProgress = false
+        window.localStorage.removeItem(this.nightlogReadId)
+        this.noteVisible = false
+        this.noteIsLoaded = false
+        this.note = ''
+      })
+    },
+    pulseNightlogButton () {
+      // Quick animation to show where the user can reopen the night log
+      this.buttonAnimating = true
+      this.noteButtonSize = 'is-medium'
+      setTimeout(() => { this.noteButtonSize = 'is-small' }, 200)
+      setTimeout(() => { this.buttonAnimating = false }, 1600)
+    },
+    messageCloseHandler () {
       // mark the message as read
-      const note_id = this.note.site + this.note.created_timestamp
-      window.localStorage.setItem('ptr_nightlog_last_read', note_id)
+      window.localStorage.setItem(this.nightlogReadId, this.noteId)
+
+      // animate the button users need to reopen
+      this.pulseNightlogButton()
     }
   },
   computed: {
-    note_title () {
+    nightlogReadId () {
+      const id = 'ptrNightlogLastRead+'
+      return id
+    },
+    noteId () {
+      return this.note.site + '|' + this.note.created_timestamp
+    },
+    noteTitle () {
       return this.site.toUpperCase() + ' - Message from ' + this.note?.note_data?.username
     },
-    note_timestamp () {
-      if (!this.note_is_loaded) { return false }
-      const date_obj = moment(this.note.created_timestamp * 1000)
+    noteTimestamp () {
+      if (!this.noteIsLoaded) { return false }
+      const dateObj = moment(this.note.created_timestamp * 1000)
       return {
-        utc_iso: date_obj.utc().format('MM/DD HH:mm UTC'),
-        ago: date_obj.fromNow(),
-        timestamp_now: this.timestamp_now // included so this computed property updates each second
+        utcIso: dateObj.utc().format('MM/DD HH:mm UTC'),
+        ago: dateObj.fromNow(),
+        timestampNow: this.timestampNow // included so this computed property updates each second
       }
+    },
+    millisecondsUntilExpiry () {
+      // Calculate the timestamp when the note should expire
+      const msUntilExpiry = (this.note.ttl_timestamp_seconds * 1000) - this.timestampNow
+      return msUntilExpiry
+    },
+    noteExpiresSoon () {
+      const soonIntervalMilliseconds = 1800 * 1000 * 3 // define "soon" as 30 minutes
+      return this.millisecondsUntilExpiry < soonIntervalMilliseconds
+    },
+    readableTimeToExpiry () {
+      const expirationTime = this.millisecondsUntilExpiry + this.timestampNow
+      return 'This note will expire ' + moment(expirationTime).fromNow()
+    },
+    noteIsExpired () {
+      // Note expirations in the backend are handled by a dynamodb ttl attribute and isn't super precise.
+      // This check exists so that we can simply hide the note if it is overdue to expire.
+      return this.millisecondsUntilExpiry <= 0
     },
     ...mapGetters('images', [
       'current_image'
@@ -191,6 +306,23 @@ export default {
     margin-bottom: 1em;
     border-bottom: 1px solid silver;
 }
+.note-delete {
+    color: silver;
+    display:flex;
+    justify-content: space-between;
+    //flex-direction: row-reverse;
+    padding-top: 1em;
+    margin-top: 1em;
+    //border-top: 1px solid grey;
+}
+
+.note-expires-soon-warning {
+  color: grey;
+}
+.note-is-animating {
+  transition: 0.2s;
+}
+
 </style>
 
 <style>

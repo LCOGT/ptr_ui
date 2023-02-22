@@ -3,14 +3,14 @@ export const clock = {
 
   data () {
     return {
-      timestamp_now: new Date().getTime(),
-      update_routine: ''
+      timestampNow: new Date().getTime(),
+      updateRoutine: ''
     }
   },
 
   created () {
-    this.update_routine = setInterval(() => {
-      this.timestamp_now = new Date().getTime()
+    this.updateRoutine = setInterval(() => {
+      this.timestampNow = new Date().getTime()
     }, 1000)
   },
 

@@ -430,14 +430,19 @@ const actions = {
     for (let channel = 0; channel < 3; channel++) {
       const url = base_url + `/infoimage/${site}/${channel + 1}`
       axios.get(url).then(response => {
+        // Handle case if no info image exists
+        if (response.status == 204) {
+          commit('setInfoImage', { info_image: { jpg_url: '' }, channel }) // reset to default empty value
+          return
+        }
         // Only update the current image if currently set to the old info image
         // Don't want to yank the focus from the user
         if (state.current_image.s3_directory == 'info-images') {
           commit('setCurrentImage', response.data)
         }
         commit('setInfoImage', { info_image: response.data, channel })
-      }).catch(() => {
-        commit('setInfoImage', { info_image: { jpg_url: '' }, channel }) // reset to default empty value
+      }).catch(error => {
+        console.error('Error fetching info images', error)
       })
     }
   },
