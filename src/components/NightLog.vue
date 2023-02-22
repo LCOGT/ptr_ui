@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-field style="margin: 0;">
+    <b-field custom-class="night-log-buttons">
       <p class="control">
         <b-button
           :disabled="!noteIsLoaded && !noteIsExpired"
@@ -159,8 +159,6 @@ export default {
 
       deleteInProgress: false,
       createNoteInProgress: false
-      // TODO: loading bar for button that creates new note
-      // TODO: gracefully handle 404 error when no note exists
     }
   },
   mounted () {
@@ -286,11 +284,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.night-log-buttons {
+  margin: 0;
+  z-index: 19; // beneath buefy dropdowns (e.g. profile dropdown in navbar)
+}
 .note-container {
     position: absolute;
     width: 350px;
     margin-top: 1.5em;
     margin-left: -280px; // right side should align with right of "night log" button (which is 70px wide)
+
+    z-index: 40; // same as buefy modal windows
 
     // shadow
     -webkit-box-shadow: 4px 4px 25px 0px rgba(0,0,0,0.67);

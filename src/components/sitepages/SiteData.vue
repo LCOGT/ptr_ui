@@ -489,7 +489,6 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
 .night-log-container {
   position: absolute;
   right: 0;
-  z-index: 40;  // match buefy modal z-index
 }
 
 .command-tab-accordion {
