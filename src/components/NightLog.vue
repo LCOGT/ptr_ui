@@ -264,7 +264,7 @@ export default {
       return msUntilExpiry
     },
     noteExpiresSoon () {
-      const soonIntervalMilliseconds = 1800 * 1000 * 3 // define "soon" as 30 minutes
+      const soonIntervalMilliseconds = 90 * 60 * 1000 // define "soon" as 90 minutes
       return this.millisecondsUntilExpiry < soonIntervalMilliseconds
     },
     readableTimeToExpiry () {
