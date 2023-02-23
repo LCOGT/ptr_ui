@@ -35,6 +35,12 @@
 
       <!-- Collapsible panels on the right of the image -->
       <div class="image-tools-area">
+        <div class="night-log-container">
+          <NightLog
+            :site="sitecode"
+            style="margin: 0 1em;"
+          />
+        </div>
         <b-tabs v-model="active_image_tools_tab">
           <b-tab-item
             label="controls"
@@ -205,6 +211,7 @@ import StarProfile from '@/components/AnalysisTools/StarProfile'
 import DownloadInterface from '@/components/DownloadInterface'
 import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsViewer'
 import ImageMetadataViewer from '@/components/AnalysisTools/ImageMetadataViewer'
+import NightLog from '@/components/NightLog'
 
 import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
@@ -234,6 +241,7 @@ export default {
     DownloadInterface,
     ImageStatisticsViewer,
     ImageMetadataViewer,
+    NightLog,
     Tabs,
     TabItem
   },
@@ -456,21 +464,31 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
 }
 
 .image-tools-area {
+  position: relative;
   grid-area: tools;
+  margin-top: 2em;
   //padding-left: 1em;
   width: 100%;
   @include desktop {
     width: 500px;
     padding-left: 0;
+    margin-top: 0;
   }
   @include widescreen {
     width: 600px;
     padding-left: 0;
+    margin-top: 0;
   }
   @include fullhd {
     width: 720px;
     padding-left: 0;
+    margin-top: 0;
   }
+}
+
+.night-log-container {
+  position: absolute;
+  right: 0;
 }
 
 .command-tab-accordion {

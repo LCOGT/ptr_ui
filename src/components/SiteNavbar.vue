@@ -72,6 +72,7 @@
               width="25"
               height="25"
               style="border-radius: 50%;"
+              referrerpolicy="no-referrer"
             >
             <div style="width:5px" />
             <p> {{ $auth.user.name }} </p>
