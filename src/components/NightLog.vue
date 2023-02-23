@@ -166,7 +166,22 @@ export default {
     $('#night-log-draggable-note').draggable({ cancel: 'article section.message-body' })
     $('#night-log-draggable-editor').draggable({ cancel: 'article section.message-body' })
   },
+  watch: {
+    $route (to, from) {
+      console.log('route changed')
+      this.resetNightLogState()
+    }
+  },
   methods: {
+    resetNightLogState () {
+      this.noteVisible = false
+      this.editorVisible = false
+      this.noteIsLoaded = false
+      this.deleteInProgress = false
+      this.createNoteInProgress = false
+      this.note = ''
+      this.getNote()
+    },
     getNote () {
       const url = this.$store.state.api_endpoints.active_api + '/nightlog/' + this.site
       axios.get(url).then(response => {
