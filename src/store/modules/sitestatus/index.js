@@ -200,11 +200,9 @@ const actions = {
   // Get and update the 'open' status of all sites. Used for the global map site indicators.
   async getSiteOpenStatus ({ commit, rootState }) {
     const url = rootState.api_endpoints.status_endpoint + '/allopenstatus'
-    axios.get(url).then(response => {
-      commit('siteOpenStatus', response.data)
-    }).catch(error => {
-      console.warn('Failure getting data from ' + url, error)
-    })
+    const response = await axios.get(url)
+    commit('siteOpenStatus', response.data)
+    return response.data
   },
 
   // Get a single status object for a site. Used to initialize values when loading a new site.

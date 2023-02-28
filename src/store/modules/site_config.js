@@ -7,8 +7,7 @@ import _ from 'lodash'
 import axios from 'axios'
 
 const state = {
-
-  test_sites: ['tst', 'tst001', 'dht', 'sintezsim'],
+  test_sites: ['tst', 'tst001', 'dht'],
 
   global_config: {},
   is_site_selected: false,
@@ -236,13 +235,11 @@ const actions = {
      * This action gets the most recent config from AWS, which applies to all
      * observatories in the network.
      */
-  update_config ({ commit, dispatch, rootState }) {
+  async update_config ({ commit, rootState }) {
     const url = `${rootState.api_endpoints.active_api}/all/config`
-    axios.get(url).then(response => {
-      commit('setGlobalConfig', response.data)
-    }).catch(error => {
-      console.warn(error)
-    })
+    const response = await axios.get(url)
+    commit('setGlobalConfig', response.data)
+    return response.data
   },
 
   set_default_filter_option ({ commit, getters }) {

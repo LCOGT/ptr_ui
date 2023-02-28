@@ -10,7 +10,7 @@
       <!--leaflet-map name="leafmap"></leaflet-map-->
 
       <sites-overview-cards
-        :sites="all_sites"
+        :sites="all_sites_real"
         class="sites-overview-cards"
       />
     </div>
@@ -32,7 +32,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('site_config', ['all_sites'])
+    ...mapGetters('site_config', ['all_sites_real'])
   }
 }
 </script>
