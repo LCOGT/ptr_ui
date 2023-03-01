@@ -84,6 +84,19 @@
               @click="set_coordinates_from_aladin"
             />
           </div>
+          <div class="search-slew-container">
+            <command-button
+              :data="mount_slew_radec_command"
+              style="margin-bottom: 1em"
+              class="command-slew-button is-small is-success is-outlined"
+            />
+            <TargetSearchField
+              v-model="mount_object"
+              label="Search for objects..."
+              size="is-small"
+              @results="handle_object_name_search"
+            />
+          </div>
 
           <div class="sidebar-tabs">
             <div
@@ -111,11 +124,6 @@
 
           <div class="sidebar-tab-content">
             <div v-if="active_target_tab=='telescope controls'">
-              <TargetSearchField
-                v-model="mount_object"
-                label="Search for objects..."
-                @results="handle_object_name_search"
-              />
               <command-tabs-accordion
                 :controls="['Telescope', 'Camera']"
                 :init-instrument-open-view="0"
@@ -567,6 +575,7 @@ import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import DateTimeLocationPicker from '@/components/celestialmap/DateTimeLocationPicker'
 import TargetSearchField from '@/components/FormElements/TargetSearchField'
 import CommandTabsAccordion from '@/components/CommandTabsAccordion'
+import CommandButton from '@/components/FormElements/CommandButton'
 // import Celestial from '@/components/celestialmap/celestial'
 import celestial from 'd3-celestial'
 
@@ -586,6 +595,7 @@ export default {
     TargetSearchField,
     TheSkyChart,
     CommandTabsAccordion,
+    CommandButton,
     DateTimeLocationPicker,
     TargetCard
   },
@@ -1208,7 +1218,19 @@ $toggle-button-height: 32px;
     width: 100%;
     height: 300px;
     background-color:grey;
-    margin-bottom: 3em;
+}
+
+.search-slew-container {
+  position: relative;
+  height: 6em;
+  margin-top: 10px;
+  display:flex;
+  flex-direction: row-reverse;
+  gap: 1em;
+  padding-right: 1em;
+}
+.command-slew-button {
+  margin-top: 30px;
 }
 
 .command-tab-accordion {

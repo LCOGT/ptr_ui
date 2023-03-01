@@ -36,7 +36,7 @@ export default {
     }
   },
   async mounted () {
-    this.global_config = await this.get_global_config()
+    this.global_config = this.$store.state.site_config.global_config
     this.initMap()
   },
   beforeDestroy () {
@@ -46,7 +46,7 @@ export default {
   },
 
   watch: {
-    all_sites () {
+    all_sites_real () {
       this.redrawMapSites()
     },
     site_open_status () {
@@ -96,7 +96,7 @@ export default {
     },
 
     async initMap () {
-      await this.$store.dispatch('sitestatus/getSiteOpenStatus')
+      await this.getSiteOpenStatus
       const sun_pos = { lat: nite.calculatePositionOfSun().lat(), lng: nite.calculatePositionOfSun().lng() }
       const map_center_latitude = 15 // puts sites at a more visibly comfortable location
       this.map = new google.maps.Map(document.getElementById(this.mapName), {
@@ -128,11 +128,14 @@ export default {
       function iwClose () { iw.close() }
       google.maps.event.addListener(this.map, 'click', iwClose)
 
-      let sites = this.all_sites
+      let sites = this.all_sites_real
+
+      // First, remove sites that don't have an available status
       sites = sites.filter(site => {
-        // First, remove sites that don't have an available status
         return Object.keys(this.site_open_status).includes(site.site)
       })
+
+      // Consolidate additional data used to render sites to the map
       sites.forEach(site => {
         const markerData = {
           lat: site.latitude,
@@ -304,7 +307,7 @@ export default {
 
     async redrawMapSites () {
       // Fetch the list of sites to display on the map
-      const sites = this.all_sites.reverse()
+      const sites = this.all_sites_real.reverse()
 
       // For each site, draw a marker with a popup (on click) to visit the site.
       sites.forEach(site => {
@@ -335,7 +338,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters('site_config', ['all_sites']),
+    ...mapState('site_config', ['test_sites']),
+    ...mapGetters('site_config', ['all_sites_real']),
     ...mapState('sitestatus', ['site_open_status']),
     ...mapActions('sitestatus', ['getSiteOpenStatus'])
   }
@@ -344,8 +348,6 @@ export default {
 
 <style lang="scss" scoped>
 .google-map {
-    //width: 100vw;
-    //height: 50vh;
     min-width: 50px;
     min-height: 50px;
     width: 100%;

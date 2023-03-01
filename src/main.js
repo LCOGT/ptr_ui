@@ -38,9 +38,12 @@ Vue.use(Auth0Plugin, {
 // Hide the 'you are running in development mode!' warning in the console.
 Vue.config.productionTip = false
 
-new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app')
+// Load the config for all sites
+store.dispatch('site_config/update_config').then(() => {
+  new Vue({
+    el: '#app',
+    router,
+    store,
+    render: h => h(App)
+  }).$mount('#app')
+})

@@ -1,8 +1,7 @@
 <template>
   <div class="card-row">
-    <template v-for="s in all_sites_real">
+    <template v-for="s in sites">
       <div
-        v-if="!site_blacklist.includes(s.site)"
         :key="s.site"
         :val="s.site"
         class="card"
@@ -86,20 +85,10 @@ export default {
         this.site_images = response.data
       })
     }
-
   },
 
   computed: {
-    ...mapGetters('site_config', [
-      'all_sites_real',
-      'all_sites_simulated'
-    ]),
-
-    // We want to add enough empty (invisible) test sites so that the cards are sized the same as real sites.
-    // Compute the difference in number. If there are more test sites than real sites, don't add any empty sites.
-    empty_test_sites_needed () {
-      return Math.max(0, Object.keys(this.all_sites_real).length - Object.keys(this.all_sites_simulated).length)
-    }
+    ...mapGetters('site_config', ['all_sites_real'])
   }
 
 }

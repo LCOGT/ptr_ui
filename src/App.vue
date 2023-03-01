@@ -1,9 +1,6 @@
 <template>
   <div id="app">
-    <router-view
-      v-if="$store.state.site_config.did_config_load_yet"
-      class="router-view"
-    />
+    <router-view class="router-view" />
 
     <!-- This is the home for the JS9 DOM elements. They are hidden here and only
     visible when moved into the js9 component. This avoid js9-reloading issues.-->
@@ -30,18 +27,8 @@
   </div>
 </template>
 
-<script>
-export default {
-  beforeCreate () {
-    // Initial load of the config. This is the only time it needs to happen unless the user reloads the site.
-    this.$store.dispatch('site_config/update_config')
-  }
-}
-</script>
-
 <style scoped lang="scss">
 .router-view {
-  //height: calc(100vh - 75px);
   overflow-x: hidden;
 }
 </style>
