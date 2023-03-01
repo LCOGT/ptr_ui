@@ -1218,7 +1218,6 @@ $toggle-button-height: 32px;
     width: 100%;
     height: 300px;
     background-color:grey;
-    //margin-bottom: 3em;
 }
 
 .search-slew-container {
@@ -1229,7 +1228,6 @@ $toggle-button-height: 32px;
   flex-direction: row-reverse;
   gap: 1em;
   padding-right: 1em;
-  //justify-content: space-between;
 }
 .command-slew-button {
   margin-top: 30px;
