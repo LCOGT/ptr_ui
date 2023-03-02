@@ -147,7 +147,6 @@ export default {
   font-size: 1rem;
   padding: 0.25em;
   line-height: 1.25;
-  //height: 3em;
   width: 100%;
   margin-bottom: 0 !important;
 }
