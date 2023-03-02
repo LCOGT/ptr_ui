@@ -224,10 +224,10 @@ export const commands_mixin = {
         }
       )
     },
-    focus_adjust_command () {
+    fix_pointing_command () {
       return this.base_command(
         'sequencer',
-        'focusadjust',
+        'fixpointingscript',
         '',
         {},
         {

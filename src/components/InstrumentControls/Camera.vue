@@ -12,9 +12,9 @@
       <b-button
         class="button is-outlined"
         style="margin-bottom: 1em;"
-        @click="postCommand(focus_adjust_command)"
+        @click="postCommand(fix_pointing_command)"
       >
-        Focus Adjust
+        Fix Pointing
       </b-button>
       <b-button
         class="button is-outlined"
