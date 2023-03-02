@@ -9,7 +9,6 @@
 
 <script>
 import nite from './nite-overlay'
-import axios from 'axios'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import google_map_styles from './google-styles'
 import { makeIcon } from './mapHelpers'

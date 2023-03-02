@@ -99,11 +99,6 @@ export default {
 
   computed: {
     orderedSites () {
-      if (!this.siteImages) {
-        console.warn('no site images')
-        return this.sites
-      }
-
       const getImgDate = (site) => {
         const sitecode = site.site
         if (this.siteImages !== 'undefined' && sitecode in this.siteImages) {
@@ -122,7 +117,6 @@ export default {
       sitesCopy.sort((a, b) => {
         return getImgDate(b) - getImgDate(a)
       })
-      console.log(sitesCopy.map(s => getImgDate(s)))
       return sitesCopy
     }
   }
