@@ -9,7 +9,6 @@
 
 <script>
 import nite from './nite-overlay'
-import axios from 'axios'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import google_map_styles from './google-styles'
 import { makeIcon } from './mapHelpers'
@@ -56,19 +55,6 @@ export default {
 
   methods: {
 
-    async get_global_config () {
-      const url = `${this.$store.state.api_endpoints.active_api}/all/config`
-      return new Promise((resolve, reject) => {
-        axios.get(url)
-          .then(response => {
-            resolve(response.data)
-          })
-          .catch(error => {
-            reject(error)
-          })
-      })
-    },
-
     addMarkerWithData (markerData) {
       const white = { r: 255, g: 255, b: 255 }
       const marker = new google.maps.Marker({
@@ -88,6 +74,9 @@ export default {
             showName ? markerData.name : false),
           scaledSize: new google.maps.Size(23 * sizeCoefficient, 32 * sizeCoefficient) // makes SVG icons work in IE
         })
+
+        // Prevent users from repositioning markers
+        marker.setDraggable(false)
       })
       this.oms.addMarker(marker, e => {
         this.iw.setContent(markerData.content)
