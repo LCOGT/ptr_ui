@@ -22,7 +22,7 @@
             <span style="color: white; height: 2em;">{{ s.name }}</span>
           </router-link>
         </div>
-        <div class="site-code">
+        <div class="sitecode-overlay">
           {{ s.site }}
         </div>
       </div>
@@ -142,7 +142,7 @@ export default {
 .subtitle {
   position:absolute;
   top: 0em;
-  opacity: 80%;
+  opacity: 0.8;
   pointer-events: none;
   font-size: 1rem;
   padding: 0.25em;
@@ -152,7 +152,7 @@ export default {
   margin-bottom: 0 !important;
 }
 
-.site-code {
+.sitecode-overlay {
   position:absolute;
   height: 0;
   right: 1rem;
@@ -160,7 +160,7 @@ export default {
   text-transform:uppercase;
   font-weight: 900;
   font-size:xx-large;
-  opacity: 30%;
+  opacity: 0.3;
 
 }
 
