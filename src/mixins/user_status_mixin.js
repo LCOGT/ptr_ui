@@ -77,22 +77,40 @@ export const user_status_mixin = {
       return moment(timestamp_ms).format('YYYY/MM/DD')
     },
 
+    readable_time_ago (timestamp) {
+      const timestamp_ms = timestamp * 1000
+      return moment(timestamp_ms).fromNow()
+    },
+
+    log_is_stale (timestamp_s) {
+      const stale_age_s = 60 * 30 // Stale logs are older than 30 minutes
+      return (Date.now() / 1000) - parseInt(timestamp_s) > stale_age_s
+    },
+
     // Returns class names used to style a log message based on the
     // supplied log level.
     get_log_level_classes (log) {
+      let classes = ''
       // Default level of info if none supplied
       if (!('log_level' in log)) {
-        return 'info'
+        classes += ' info'
       }
 
       const log_level = log.log_level
       if (this.supported_log_levels.includes(log_level.toLowerCase())) {
-        return log_level.toLowerCase()
+        classes += ` ${log_level.toLowerCase()}`
       }
       else {
         console.warn('Unrecognized log level in log: ', log_level)
-        return 'info'
+        classes += ' info'
       }
+
+      // Check if log is stale (old).
+      if (this.log_is_stale(log.timestamp)) {
+        classes += ' log-is-stale'
+      }
+
+      return classes
     },
 
     // Add the log level in front of the message if it is a warning, error,
@@ -102,7 +120,12 @@ export const user_status_mixin = {
       if (!('message' in log)) {
         return ''
       }
-      const message = log.message
+      let message = log.message
+
+      // Mark stale messages by prefixing (stale) in front of the message
+      if (this.log_is_stale(log.timestamp)) {
+        message = `(stale) ${message}`
+      }
       return message
     },
 

@@ -50,7 +50,7 @@
             <b-tooltip
               position="is-top"
               type="is-dark"
-              :label="''/*timezone timestamp_to_date(log.timestamp)*/"
+              :label="readable_time_ago(log.timestamp)"
             >
               <span class="log-timestamp">{{ timestamp_to_logdate(log.timestamp) }}</span>
             </b-tooltip>
@@ -533,7 +533,9 @@ export default {
       }
       // Otherwise show all the logs
       else {
-        return this.user_status_logs
+        // Only show the latest 100 so the rendering doesn't cause lags.
+        const logs_list = this.user_status_logs.slice(-100)
+        return logs_list
       }
     }
   }
@@ -576,6 +578,7 @@ $log-info: #eee;
 $log-warning: $ptr-yellow;
 $log-error: $ptr-blue;
 $log-critical: $ptr-red;
+$log-stale: grey;
 
 .status-bar-1 {
   //padding-left: $left-padding;
@@ -672,6 +675,9 @@ pre.log-message.error {
 pre.log-message.critical {
   color: $log-critical;
   font-weight: bold;
+}
+pre.log-message.log-is-stale {
+  color: $log-stale;
 }
 
 // New messages enter yellow to grab attention, then fade to their
