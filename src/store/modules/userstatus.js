@@ -18,13 +18,13 @@ const mutations = {
 
 const actions = {
 
-  // Fetch logs from the last day to display them in the log window
+  // Fetch logs from the previous hour to display them in the log window
   // in chronological order (newest at bottom)
   fetch_recent_logs ({ rootState, commit }) {
-    // Fetch any logs that are under a day old
-    const seconds_per_day = 86400
-    const timestamp_seconds = Math.floor(Date.now() / 1000)
-    const after_time_param = timestamp_seconds - seconds_per_day
+    // Fetch any logs that are under an hour old
+    const max_age_s = 3600
+    const timestamp_s = Math.floor(Date.now() / 1000)
+    const after_time_param = timestamp_s - max_age_s
 
     // Only fetch logs from the current site
     const site_param = rootState.site_config.selected_site
