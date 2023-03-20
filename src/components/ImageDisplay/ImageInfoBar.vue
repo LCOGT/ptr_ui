@@ -92,7 +92,7 @@ export default {
   },
 
   methods: {
-    dateToUnix(date) {
+    dateToUnix (date) {
       return (new Date(date).getTime() / 1000).toFixed(0)
     }
   },
