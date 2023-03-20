@@ -137,6 +137,29 @@
       </b-field>
     </b-field>
 
+    <b-field
+      horizontal
+      label="Auto-Color"
+      v-if="auto_color_options.length > 1"
+    >
+      <b-field>
+        <b-select
+          v-model="auto_color_options_selection"
+          placeholder="auto-color..."
+          size="is-small"
+        >
+          <option
+            v-for="(color_opt, index) in auto_color_options"
+            :key="index"
+            :value="color_opt"
+            :selected="index === 0"
+          >
+            {{ color_opt }}
+          </option>
+        </b-select>
+      </b-field>
+    </b-field>
+
     <!--b-field horizontal label="Bin" v-if="camera_can_bin">
       <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
         <option
@@ -416,6 +439,11 @@ export default {
     filter_wheel_options_selection: {
       get () { return this.$store.getters['command_params/filter_wheel_options_selection'] },
       set (val) { this.$store.commit('command_params/filter_wheel_options_selection', val) }
+    },
+
+    auto_color_options_selection: {
+      get () { return this.$store.getters['command_params/auto_color_options_selection'] },
+      set (val) { this.$store.commit('command_params/auto_color_options_selection', val) }
     },
 
     selector_position: {

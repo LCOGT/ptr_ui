@@ -42,6 +42,7 @@ const state = {
   camera_de_ice_cooling: false,
 
   filter_wheel_options_selection: '',
+  auto_color_options_selection: 'manual',
 
   selector_position: 0, // the chosen inst. selector position.
 
@@ -87,6 +88,7 @@ const getters = {
   camera_de_ice_cooling: state => state.camera_de_ice_cooling,
 
   filter_wheel_options_selection: state => state.filter_wheel_options_selection,
+  auto_color_options_selection: state => state.auto_color_options_selection,
 
   selector_position: state => state.selector_position,
 
@@ -161,6 +163,7 @@ const mutations = {
   camera_de_ice_cooling (state, val) { state.camera_de_ice_cooling = val },
 
   filter_wheel_options_selection (state, val) { state.filter_wheel_options_selection = val },
+  auto_color_options_selection (state, val) { state.auto_color_options_selection = val },
 
   selector_position (state, val) { state.selector_position = val },
 
