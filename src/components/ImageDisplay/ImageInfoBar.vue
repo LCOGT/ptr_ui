@@ -15,7 +15,7 @@
       style="display:flex"
     >
       ra:&nbsp;<ra-display
-        :ra_hours_decimal="current_image.right_ascension"
+        :ra_hours_decimal="ra_hours"
         :decimal_precision="3"
       />
     </div>
@@ -91,6 +91,13 @@ export default {
         this.fwhm = Number(response.data.FWHMASEC).toFixed(2)
         this.sepsky = parseInt(response.data.SEPSKY)
       })
+    }
+  },
+
+  computed: {
+    ra_hours () {
+      // default is degrees, but we need hours
+      return this.current_image.right_ascension / 15
     }
   }
 
