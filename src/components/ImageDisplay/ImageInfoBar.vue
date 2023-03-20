@@ -15,7 +15,7 @@
       style="display:flex"
     >
       ra:&nbsp;<ra-display
-        :ra_hours_decimal="current_image.right_ascension"
+        :ra_hours_decimal="raHours"
         :decimal_precision="3"
       />
     </div>
@@ -74,9 +74,6 @@ export default {
   },
 
   filters: {
-    dateToUnix (date) {
-      return (new Date(date).getTime() / 1000).toFixed(0)
-    },
     dateToReadable (date) {
       return moment.utc(date).format('YYYY-MM-DD HH:mm UTC')
     }
@@ -91,6 +88,28 @@ export default {
         this.fwhm = Number(response.data.FWHMASEC).toFixed(2)
         this.sepsky = parseInt(response.data.SEPSKY)
       })
+    }
+  },
+
+  methods: {
+    dateToUnix (date) {
+      return (new Date(date).getTime() / 1000).toFixed(0)
+    }
+  },
+
+  computed: {
+    raHours () {
+      // current_image.right_ascension used hours until march 8, 2023, 9:20 UTC.
+      // this block checks for images taken before then, and doesn't do a decimal -> hours conversion.
+      // If we ever stop using images this old, this block can be removed.
+      const unixCaptureDate = this.dateToUnix(this.current_image.capture_date)
+      const whenWeSwitchedHoursToDegrees = 1678267200 // unix
+      if (unixCaptureDate < whenWeSwitchedHoursToDegrees) {
+        return this.current_image.right_ascension
+      }
+
+      // default is degrees, so convert to hours
+      return this.current_image.right_ascension / 15
     }
   }
 
