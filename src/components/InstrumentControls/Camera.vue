@@ -118,6 +118,7 @@
           v-model="filter_wheel_options_selection"
           placeholder="select filter..."
           size="is-small"
+          :disabled="auto_color_options_selection !== 'manual'"
         >
           <option
             v-for="(filter, index) in filter_wheel_options"
@@ -138,9 +139,9 @@
     </b-field>
 
     <b-field
+      v-if="auto_color_options.length > 1"
       horizontal
       label="Auto-Color"
-      v-if="auto_color_options.length > 1"
     >
       <b-field>
         <b-select
