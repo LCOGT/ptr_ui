@@ -56,8 +56,8 @@ const getters = {
     let sites = []
     Object.keys(state.global_config).forEach(site => {
       const s = {
+        site,
         name: state.global_config[site].name.toString(),
-        site: state.global_config[site].site.toString(),
         latitude: parseFloat(state.global_config[site].latitude),
         longitude: parseFloat(state.global_config[site].longitude),
         TZ_database_name: state.global_config[site].TZ_database_name

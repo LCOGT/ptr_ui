@@ -17,7 +17,7 @@
           >
             <div :class="[site_online_class(site), 'status-dot']" />
             <div class="site-name-short">
-              {{ global_config[site].site }}&nbsp;
+              {{ site }}&nbsp;
             </div>
             <div class="site-name-expanded">
               {{ global_config[site].name }}
@@ -33,7 +33,7 @@
           >
             <div :class="[site_online_class(site), 'status-dot']" />
             <div class="site-name-short">
-              {{ global_config[site].site }}&nbsp;
+              {{ site }}&nbsp;
             </div>
             <div class="site-name-expanded">
               {{ global_config[site].name }}
