@@ -187,6 +187,13 @@ const getters = {
     return fwo
   },
 
+  // Available automatic 3-color image options
+  auto_color_options: (state, getters) => {
+    const fwo = getters.selected_filter_wheel_config.settings?.auto_color_options
+    if (fwo == undefined) return [[]]
+    return fwo
+  },
+
   // Get the site events from the selected config (things like nautical dark start, etc)
   site_events: (state, getters) => {
     return getters.site_config.events ?? {}

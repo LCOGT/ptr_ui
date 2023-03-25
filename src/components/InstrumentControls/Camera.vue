@@ -118,6 +118,7 @@
           v-model="filter_wheel_options_selection"
           placeholder="select filter..."
           size="is-small"
+          :disabled="auto_color_options_selection !== 'manual'"
         >
           <option
             v-for="(filter, index) in filter_wheel_options"
@@ -134,6 +135,29 @@
             class="is-small"
           />
         </p>
+      </b-field>
+    </b-field>
+
+    <b-field
+      v-if="auto_color_options.length > 1"
+      horizontal
+      label="Auto-Color"
+    >
+      <b-field>
+        <b-select
+          v-model="auto_color_options_selection"
+          placeholder="auto-color..."
+          size="is-small"
+        >
+          <option
+            v-for="(color_opt, index) in auto_color_options"
+            :key="index"
+            :value="color_opt"
+            :selected="index === 0"
+          >
+            {{ color_opt }}
+          </option>
+        </b-select>
       </b-field>
     </b-field>
 
@@ -416,6 +440,11 @@ export default {
     filter_wheel_options_selection: {
       get () { return this.$store.getters['command_params/filter_wheel_options_selection'] },
       set (val) { this.$store.commit('command_params/filter_wheel_options_selection', val) }
+    },
+
+    auto_color_options_selection: {
+      get () { return this.$store.getters['command_params/auto_color_options_selection'] },
+      set (val) { this.$store.commit('command_params/auto_color_options_selection', val) }
     },
 
     selector_position: {

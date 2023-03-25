@@ -278,6 +278,7 @@ export const commands_mixin = {
       // (eg. what filters are available in the filter wheel)
       'camera_areas',
       'filter_wheel_options',
+      'auto_color_options',
       'camera_bin_options',
       'camera_can_bin'
     ]),
@@ -308,6 +309,7 @@ export const commands_mixin = {
       'camera_de_ice_cooling',
 
       'filter_wheel_options_selection',
+      'auto_color_options_selection',
 
       'selector_position',
 
@@ -431,6 +433,7 @@ export const commands_mixin = {
         count: this.camera_count.toString(),
         bin: JSON.stringify(this.camera_bin),
         filter: this.filter_wheel_options_selection,
+        auto_color: this.auto_color_options_selection,
         area: this.camera_areas_selection,
         dither: this.camera_dither,
         extract: this.camera_extract,
