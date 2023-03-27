@@ -21,8 +21,8 @@ export default {
   computed: {
 
     numFrames: {
-      get () { return this.$store.getters.takeSkyFlats_numFrames },
-      set (val) { this.$store.commit('takeSkyFlats_numFrames', val) }
+      get () { return this.$store.getters.collectSkyFlats_numFrames },
+      set (val) { this.$store.commit('collectSkyFlats_numFrames', val) }
     }
   }
 }

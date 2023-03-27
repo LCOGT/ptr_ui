@@ -86,16 +86,16 @@
 export default {
   computed: {
     target: {
-      get () { return this.$store.getters.focusExtensive },
-      set (val) { this.$store.commit('focusExtensive', val) }
+      get () { return this.$store.getters.focusExtensive_target },
+      set (val) { this.$store.commit('focusExtensive_target', val) }
     },
     bin: {
-      get () { return this.$store.getters.focusExtensive },
-      set (val) { this.$store.commit('focusExtensive', val) }
+      get () { return this.$store.getters.focusExtensive_bin },
+      set (val) { this.$store.commit('focusExtensive_bin', val) }
     },
     area: {
-      get () { return this.$store.getters.focusExtensive },
-      set (val) { this.$store.commit('focusExtensive', val) }
+      get () { return this.$store.getters.focusExtensive_area },
+      set (val) { this.$store.commit('focusExtensive_area', val) }
     }
   }
 }

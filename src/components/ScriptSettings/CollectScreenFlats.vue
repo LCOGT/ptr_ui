@@ -30,20 +30,20 @@
 
 <script>
 export default {
-  name: 'GenScreenFlatMasters',
+  name: 'CollectScreenFlats',
   computed: {
 
     numFrames: {
-      get () { return this.$store.getters.genScreenFlatMasters_numFrames },
-      set (val) { this.$store.commit('genScreenFlatMasters_numFrames', val) }
+      get () { return this.$store.getters.collectScreenFlats_numFrames },
+      set (val) { this.$store.commit('collectScreenFlats_numFrames', val) }
     },
     gainCalc: {
-      get () { return this.$store.getters.genScreenFlatMasters_gainCalc },
-      set (val) { this.$store.commit('genScreenFlatMasters_gainCalc', val) }
+      get () { return this.$store.getters.collectScreenFlats_gainCalc },
+      set (val) { this.$store.commit('collectScreenFlats_gainCalc', val) }
     },
     shutterCompensation: {
-      get () { return this.$store.getters.genScreenFlatMasters_shutterCompensation },
-      set (val) { this.$store.commit('genScreenFlatMasters_shutterCompensation', val) }
+      get () { return this.$store.getters.collectScreenFlats_shutterCompensation },
+      set (val) { this.$store.commit('collectScreenFlats_shutterCompensation', val) }
     }
 
   }

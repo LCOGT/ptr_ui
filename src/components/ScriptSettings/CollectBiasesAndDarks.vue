@@ -150,53 +150,53 @@
 
 <script>
 export default {
-  name: 'GenBiasDarkMaster',
+  name: 'CollectBiasesAndDarks',
 
   computed: {
 
     numOfBias: {
-      get () { return this.$store.getters.genBiasDarkMaster_numOfBias },
-      set (val) { this.$store.commit('genBiasDarkMaster_numOfBias', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_numOfBias },
+      set (val) { this.$store.commit('collectBiasesAndDarks_numOfBias', val) }
     },
     darkTime: {
-      get () { return this.$store.getters.genBiasDarkMaster_darkTime },
-      set (val) { this.$store.commit('genBiasDarkMaster_darkTime', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_darkTime },
+      set (val) { this.$store.commit('collectBiasesAndDarks_darkTime', val) }
     },
     numOfDark: {
-      get () { return this.$store.getters.genBiasDarkMaster_numOfDark },
-      set (val) { this.$store.commit('genBiasDarkMaster_numOfDark', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_numOfDark },
+      set (val) { this.$store.commit('collectBiasesAndDarks_numOfDark', val) }
     },
     dark2Time: {
-      get () { return this.$store.getters.genBiasDarkMaster_dark2Time },
-      set (val) { this.$store.commit('genBiasDarkMaster_dark2Time', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_dark2Time },
+      set (val) { this.$store.commit('collectBiasesAndDarks_dark2Time', val) }
     },
     numOfDark2: {
-      get () { return this.$store.getters.genBiasDarkMaster_numOfDark2 },
-      set (val) { this.$store.commit('genBiasDarkMaster_numOfDark2', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_numOfDark2 },
+      set (val) { this.$store.commit('collectBiasesAndDarks_numOfDark2', val) }
     },
     coldMap: {
-      get () { return this.$store.getters.genBiasDarkMaster_coldMap },
-      set (val) { this.$store.commit('genBiasDarkMaster_coldMap', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_coldMap },
+      set (val) { this.$store.commit('collectBiasesAndDarks_coldMap', val) }
     },
     hotMap: {
-      get () { return this.$store.getters.genBiasDarkMaster_hotMap },
-      set (val) { this.$store.commit('genBiasDarkMaster_hotMap', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_hotMap },
+      set (val) { this.$store.commit('collectBiasesAndDarks_hotMap', val) }
     },
     bin1: {
-      get () { return this.$store.getters.genBiasDarkMaster_bin1 },
-      set (val) { this.$store.commit('genBiasDarkMaster_bin1', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_bin1 },
+      set (val) { this.$store.commit('collectBiasesAndDarks_bin1', val) }
     },
     bin2: {
-      get () { return this.$store.getters.genBiasDarkMaster_bin2 },
-      set (val) { this.$store.commit('genBiasDarkMaster_bin2', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_bin2 },
+      set (val) { this.$store.commit('collectBiasesAndDarks_bin2', val) }
     },
     bin3: {
-      get () { return this.$store.getters.genBiasDarkMaster_bin3 },
-      set (val) { this.$store.commit('genBiasDarkMaster_bin3', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_bin3 },
+      set (val) { this.$store.commit('collectBiasesAndDarks_bin3', val) }
     },
     bin4: {
-      get () { return this.$store.getters.genBiasDarkMaster_bin4 },
-      set (val) { this.$store.commit('genBiasDarkMaster_bin4', val) }
+      get () { return this.$store.getters.collectBiasesAndDarks_bin4 },
+      set (val) { this.$store.commit('collectBiasesAndDarks_bin4', val) }
     }
   }
 }

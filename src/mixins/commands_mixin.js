@@ -675,7 +675,7 @@ export const commands_mixin = {
           bin: this.camera_bin
         }
       )
-    },
+    }
 
   }
 }
