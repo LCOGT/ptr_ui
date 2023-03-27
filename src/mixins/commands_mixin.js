@@ -555,14 +555,6 @@ export const commands_mixin = {
     mount_tracking_off_command () {
       return this.base_command('mount', 'set_tracking_off', 'Stop Tracking')
     },
-    mount_ngp_command () {
-      // slew to the north galactic pole
-      return this.base_command('mount', 'move_to_ngp', 'North Galactic Pole')
-    },
-    mount_sgp_command () {
-      // slew to the south galactic pole
-      return this.base_command('mount', 'move_to_sgp', 'South Galactic Pole')
-    },
     mount_park_command () {
       return this.base_command('mount', 'park', 'park')
     },
@@ -574,10 +566,6 @@ export const commands_mixin = {
     },
     mount_skyflat_command () {
       return this.base_command('mount', 'sky_flat_position', 'sky flat position')
-    },
-    // TODO: replace raSidDec0 with a sensible name and provide coordinates from frontend.
-    mount_raSidDec0_command () {
-      return this.base_command('mount', 'ra=sid, dec=0', 'ra=sid, dec=0')
     },
 
     focus_relative_command () {
