@@ -113,28 +113,20 @@
       horizontal
       label="Filter"
     >
-      <b-field>
-        <b-select
-          v-model="filter_wheel_options_selection"
-          placeholder="select filter..."
-          size="is-small"
+      <b-select
+        v-model="filter_wheel_options_selection"
+        placeholder="select filter..."
+        size="is-small"
+      >
+        <option
+          v-for="(filter, index) in filter_wheel_options"
+          :key="index"
+          :value="filter[0]"
+          :selected="index === 0"
         >
-          <option
-            v-for="(filter, index) in filter_wheel_options"
-            :key="index"
-            :value="filter[0]"
-            :selected="index === 0"
-          >
-            {{ filter[0] }}
-          </option>
-        </b-select>
-        <p class="control">
-          <command-button
-            :data="filter_wheel_command"
-            class="is-small"
-          />
-        </p>
-      </b-field>
+          {{ filter[0] }}
+        </option>
+      </b-select>
     </b-field>
 
     <!--b-field horizontal label="Bin" v-if="camera_can_bin">
