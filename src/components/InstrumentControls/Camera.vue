@@ -32,14 +32,14 @@
           placeholder="choose camera..."
         >
           <option
-            v-for="(val, index) in available_devices('camera', sitecode)"
-            :key="index"
-            :value="val"
+            v-for="(val, key) in site_config.camera"
+            :key="key"
+            :value="key"
           >
-            {{ val }}
+            {{ val.name }}
           </option>
           <option
-            v-if="number_of_cameras == 2"
+            v-if="Object.keys(site_config.camera).length == 2"
             value="both"
           >
             both
@@ -129,18 +129,6 @@
       </b-select>
     </b-field>
 
-    <!--b-field horizontal label="Bin" v-if="camera_can_bin">
-      <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
-        <option
-          v-for="(bin_option, index) in camera_bin_options"
-          v-bind:value="bin_option"
-          v-bind:selected="index === 0"
-          v-bind:key="index"
-          >
-          {{ bin_option }}
-        </option>
-      </b-select>
-    </b-field-->
     <CameraBinSelectField
       v-if="camera_can_bin"
       v-model="camera_bin"
@@ -347,15 +335,11 @@ export default {
     ]),
 
     ...mapGetters('site_config', [
-      'available_devices',
+      'site_config',
       'selected_camera_config',
       'camera_has_darkslide',
       'camera_can_bin'
     ]),
-
-    number_of_cameras () {
-      return Object.keys(this.available_devices('camera', this.sitecode)).length
-    },
 
     smartstackIsActive: {
       get () { return this.$store.getters['command_params/smartstackIsActive'] },
