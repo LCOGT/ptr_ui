@@ -186,6 +186,7 @@
     </b-field>
 
     <b-field
+      v-if="userIsAdmin"
       horizontal
       label="Image Type"
     >
