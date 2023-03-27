@@ -2,27 +2,27 @@
 <template>
   <div class="instrument-control-wrapper">
     <div class="autofocus-and-selected-camera">
-      <b-button
-        class="button is-outlined"
+      <CommandButton
+        :data="sequencer_autofocus_command"
         style="margin-bottom: 1em;"
-        @click="postCommand(focus_auto_command)"
+        class="is-outlined"
       >
         Autofocus
-      </b-button>
-      <b-button
-        class="button is-outlined"
+      </CommandButton>
+      <CommandButton
+        :data="sequencer_fix_pointing_command"
         style="margin-bottom: 1em;"
-        @click="postCommand(fix_pointing_command)"
+        class="is-outlined"
       >
         Fix Pointing
-      </b-button>
-      <b-button
-        class="button is-outlined"
+      </CommandButton>
+      <CommandButton
+        :data="mount_home_command"
         style="margin-bottom: 1em;"
-        @click="postCommand(zcompress_command)"
+        class="is-outlined"
       >
-        Z-Compress
-      </b-button>
+        Home Scope
+      </CommandButton>
       <b-field
         label-position="on-border"
         label="selected:"

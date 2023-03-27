@@ -156,11 +156,11 @@ export const commands_mixin = {
      * and where to send it.
      * @param {string} device_type Used to create the JSON command.
      * @param {string} action The thing that the device should do.
-     * @param {string} name The text on the button that sends the command.
+     * @param {string} button_name The text on the button that sends the command.
      * @param {object} req_params Required parameters for the command.
      * @param {object} opt_params Optional parameters for the command.
      */
-    base_command (device_type, action, name, req_params, opt_params) {
+    base_command (device_type, action, button_name, req_params, opt_params) {
       // Get the active device of the requested device type.
       let device
       switch (device_type) {
@@ -176,7 +176,7 @@ export const commands_mixin = {
       }
 
       const the_base_command = {
-        name, // used for naming the button
+        button_name, // used for naming the button
         site: this.active_site,
         mount: this.active_mount,
         form: {
@@ -205,6 +205,11 @@ export const commands_mixin = {
     script_stop_command () {
       this.$store.dispatch('script_stop_command')
     },
+
+    /*
+    The commands defined below (here in the methods hook) are for commands that require dynamic arguments.
+    Commands should be defined in the computed hook if possible.
+    */
     focus_relative_command_args (microns) {
       return this.base_command('focuser', 'move_relative', 'focus',
         { position: microns.toString() }
@@ -222,25 +227,6 @@ export const commands_mixin = {
           filter: this.filter_wheel_options_selection,
           bin: this.camera_bin
         }
-      )
-    },
-    fix_pointing_command () {
-      return this.base_command(
-        'sequencer',
-        'fixpointingscript',
-        '',
-        {},
-        {
-          filter: this.filter_wheel_options_selection,
-          bin: this.camera_bin
-        }
-      )
-    },
-    zcompress_command () {
-      return this.base_command(
-        'sequencer',
-        'zcompress',
-        ''
       )
     },
     mount_slew_clickposition_command (x, y, filename) {
@@ -668,7 +654,28 @@ export const commands_mixin = {
     },
     screen_open_and_turn_off_command () {
       return this.base_command('screen', 'open_and_turn_off', 'Open and turn off')
-    }
+    },
+
+    sequencer_autofocus_command () {
+      return this.base_command(
+        'sequencer', 'autofocus', 'Autofocus',
+        {},
+        {
+          filter: this.filter_wheel_options_selection,
+          bin: this.camera_bin
+        }
+      )
+    },
+    sequencer_fix_pointing_command () {
+      return this.base_command(
+        'sequencer', 'fixpointingscript', 'Fix Pointing',
+        {},
+        {
+          filter: this.filter_wheel_options_selection,
+          bin: this.camera_bin
+        }
+      )
+    },
 
   }
 }
