@@ -1,6 +1,9 @@
 <template>
   <div class="instrument-control-wrapper">
-    <div class="val">
+    <div
+      v-if="enclosure_message.val !== '-'"
+      class="val"
+    >
       {{ enclosure_message.val }}
     </div>
 
@@ -95,26 +98,30 @@
       </p>
     </b-field>
 
-    <b-field>
+    <b-field
+      v-if="userIsAdmin"
+    >
       <p class="control">
         <command-button
+          admin
           :data="enclosure_open_command"
           style="margin-bottom: 1em;"
           class="is-small"
         >
           <div slot="title">
-            Request Roof Open
+            Open Enclosure
           </div>
         </command-button>
       </p>
       <p class="control">
         <command-button
+          admin
           :data="enclosure_close_command"
           style="margin-bottom: 1em;"
           class="is-small"
         >
           <div slot="title">
-            Request Roof Close
+            Close Enclosure
           </div>
         </command-button>
       </p>
