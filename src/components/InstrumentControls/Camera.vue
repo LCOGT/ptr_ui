@@ -154,7 +154,10 @@
       v-model="camera_bin"
       :horizontal="true"
     />
+
+    <!-- Hide this field until we need it (requested march 2023) -->
     <b-field
+      v-show="false"
       v-if="camera_areas && camera_areas.length != 0"
       horizontal
       label="Area"
@@ -222,7 +225,9 @@
       </b-select>
     </b-field>
 
+    <!-- Hide this field until we need it (requested march 2023) -->
     <b-field
+      v-show="false"
       horizontal
       label="Dither"
     >
