@@ -2,27 +2,27 @@
 <template>
   <div class="instrument-control-wrapper">
     <div class="autofocus-and-selected-camera">
-      <b-button
-        class="button is-outlined"
+      <CommandButton
+        :data="sequencer_autofocus_command"
         style="margin-bottom: 1em;"
-        @click="postCommand(focus_auto_command)"
+        class="is-outlined"
       >
         Autofocus
-      </b-button>
-      <b-button
-        class="button is-outlined"
+      </CommandButton>
+      <CommandButton
+        :data="sequencer_fix_pointing_command"
         style="margin-bottom: 1em;"
-        @click="postCommand(fix_pointing_command)"
+        class="is-outlined"
       >
         Fix Pointing
-      </b-button>
-      <b-button
-        class="button is-outlined"
+      </CommandButton>
+      <CommandButton
+        :data="mount_home_command"
         style="margin-bottom: 1em;"
-        @click="postCommand(zcompress_command)"
+        class="is-outlined"
       >
-        Z-Compress
-      </b-button>
+        Home Scope
+      </CommandButton>
       <b-field
         label-position="on-border"
         label="selected:"
@@ -32,14 +32,14 @@
           placeholder="choose camera..."
         >
           <option
-            v-for="(val, index) in available_devices('camera', sitecode)"
-            :key="index"
-            :value="val"
+            v-for="(val, key) in site_config.camera"
+            :key="key"
+            :value="key"
           >
-            {{ val }}
+            {{ val.name }}
           </option>
           <option
-            v-if="number_of_cameras == 2"
+            v-if="Object.keys(site_config.camera).length == 2"
             value="both"
           >
             both
@@ -113,48 +113,31 @@
       horizontal
       label="Filter"
     >
-      <b-field>
-        <b-select
-          v-model="filter_wheel_options_selection"
-          placeholder="select filter..."
-          size="is-small"
-        >
-          <option
-            v-for="(filter, index) in filter_wheel_options"
-            :key="index"
-            :value="filter[0]"
-            :selected="index === 0"
-          >
-            {{ filter[0] }}
-          </option>
-        </b-select>
-        <p class="control">
-          <command-button
-            :data="filter_wheel_command"
-            class="is-small"
-          />
-        </p>
-      </b-field>
-    </b-field>
-
-    <!--b-field horizontal label="Bin" v-if="camera_can_bin">
-      <b-select placeholder="Select bin" v-model="camera_bin" size="is-small">
+      <b-select
+        v-model="filter_wheel_options_selection"
+        placeholder="select filter..."
+        size="is-small"
+      >
         <option
-          v-for="(bin_option, index) in camera_bin_options"
-          v-bind:value="bin_option"
-          v-bind:selected="index === 0"
-          v-bind:key="index"
-          >
-          {{ bin_option }}
+          v-for="(filter, index) in filter_wheel_options"
+          :key="index"
+          :value="filter[0]"
+          :selected="index === 0"
+        >
+          {{ filter[0] }}
         </option>
       </b-select>
-    </b-field-->
+    </b-field>
+
     <CameraBinSelectField
       v-if="camera_can_bin"
       v-model="camera_bin"
       :horizontal="true"
     />
+
+    <!-- Hide this field until we need it (requested march 2023) -->
     <b-field
+      v-show="false"
       v-if="camera_areas && camera_areas.length != 0"
       horizontal
       label="Area"
@@ -203,6 +186,7 @@
     </b-field>
 
     <b-field
+      v-if="userIsAdmin"
       horizontal
       label="Image Type"
     >
@@ -222,7 +206,9 @@
       </b-select>
     </b-field>
 
+    <!-- Hide this field until we need it (requested march 2023) -->
     <b-field
+      v-show="false"
       horizontal
       label="Dither"
     >
@@ -350,15 +336,11 @@ export default {
     ]),
 
     ...mapGetters('site_config', [
-      'available_devices',
+      'site_config',
       'selected_camera_config',
       'camera_has_darkslide',
       'camera_can_bin'
     ]),
-
-    number_of_cameras () {
-      return Object.keys(this.available_devices('camera', this.sitecode)).length
-    },
 
     smartstackIsActive: {
       get () { return this.$store.getters['command_params/smartstackIsActive'] },

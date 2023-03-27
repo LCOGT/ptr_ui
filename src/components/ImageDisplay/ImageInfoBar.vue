@@ -87,6 +87,10 @@ export default {
         // Round appropriately
         this.fwhm = Number(response.data.FWHMASEC).toFixed(2)
         this.sepsky = parseInt(response.data.SEPSKY)
+      }).catch(() => {
+        console.warn('Unable to get fwhm and/or sepsky from current image fits header.')
+        this.fwhm = 'n/a'
+        this.sepsky = 'n/a'
       })
     }
   },

@@ -73,7 +73,7 @@
 
 <script>
 export default {
-  name: 'TakeNarrowbandStack',
+  name: 'TakeO3HaS2N2Stack',
   computed: {
 
     numFrames: {

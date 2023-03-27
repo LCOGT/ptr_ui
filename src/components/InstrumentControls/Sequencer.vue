@@ -24,12 +24,6 @@
           <option value="stopScript">
             Stop Script
           </option>
-          <option value="findFieldCenter">
-            Find Field Center
-          </option>
-          <option value="calibrateAtFieldCenter">
-            Calibrate at Field Center
-          </option>
           <option value="focusAuto">
             Focus Auto
           </option>
@@ -38,9 +32,6 @@
           </option>
           <option value="focusFine">
             Focus Fine
-          </option>
-          <option value="focusVcurve">
-            Focus V-Curve
           </option>
           <option value="takeLRGBStack">
             Take LRGB Stack
@@ -57,35 +48,17 @@
           <option value="takeLunarStack">
             Take Lunar Stack
           </option>
-          <option value="genBiasDarkMaster">
-            Gen Bias/Dark Master
+          <option value="collectBiasesAndDarks">
+            Collect Biases and Darks
           </option>
-          <option value="genScreenFlatMasters">
-            Gen Screen Flat Masters
+          <option value="collectScreenFlats">
+            Collect Screen Flats
           </option>
-          <option value="genSkyFlatMasters">
-            Gen Sky Flat Masters
-          </option>
-          <option value="genCalibrations">
-            Gen Calibrations
-          </option>
-          <option value="calibrateFocusVcurve">
-            Calibrate Focus V-curve
+          <option value="collectSkyFlats">
+            Collect Sky Flats
           </option>
           <option value="pointingRun">
             Pointing Run
-          </option>
-          <option value="runWithMaximCamera">
-            Run w/Maxim Camera
-          </option>
-          <option value="runWithAscomCamera">
-            Run w/Ascom Camera
-          </option>
-          <option value="runUsingAcp">
-            Run Using ACP
-          </option>
-          <option value="stopUsingAcp">
-            Stop Using ACP
           </option>
         </b-select>
         <p class="control">
@@ -167,7 +140,7 @@ export default {
       isExpandedStatusVisible: false,
 
       // Toggles the script settings visiblity
-      isScriptSettingsActive: false
+      isScriptSettingsActive: true
     }
   },
 

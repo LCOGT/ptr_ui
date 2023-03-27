@@ -7,7 +7,7 @@ const state = {
 
   selected_subpage: 'home',
   selected_target_tab: 'telescope controls',
-  selected_image_tools_tab: 'analysis',
+  selected_image_tools_tab: 'controls',
   selected_controls_tab: 5 // camera tab default
 
 }

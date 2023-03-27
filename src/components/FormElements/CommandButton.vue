@@ -5,9 +5,7 @@
     :disabled="isDisabled"
     @click="handleClick"
   >
-    <slot name="title">
-      {{ data.name }}
-    </slot>
+    <slot> {{ data.button_name }} </slot>
   </button>
 </template>
 

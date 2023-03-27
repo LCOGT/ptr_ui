@@ -49,7 +49,7 @@ async function getAuthHeader () {
 // These default values (organized per script) are used to initialize values,
 // and also used when the user wishes to revert back to defaults.
 const defaults = {
-  genBiasDarkMaster () {
+  collectBiasesAndDarks () {
     return {
       numOfBias: 511,
       darkTime: 120,
@@ -64,7 +64,7 @@ const defaults = {
       bin4: false
     }
   },
-  genScreenFlatMasters () {
+  collectScreenFlats () {
     return {
       numFrames: 15,
       gainCalc: true,
@@ -110,7 +110,7 @@ const defaults = {
       numFrames: 127
     }
   },
-  takeSkyFlats () {
+  collectSkyFlats () {
     return {
       numFrames: 15
     }
@@ -141,13 +141,6 @@ const defaults = {
       bin: 1, // integer: 1, 2, or 4
       area: '100%' // percent, from 0 to 1
     }
-  },
-  focusVcurve () {
-    return {
-      target: 'near_tycho_star', // alternative: 'use_field'
-      bin: 1, // integer: 1, 2, or 4
-      area: '100%' // percent, from 0 to 1
-    }
   }
 }
 
@@ -157,35 +150,33 @@ const state = {
   // The currently active script. This is sent when 'run script' is clicked.
   selectedScript: 'none',
 
-  genBiasDarkMaster: defaults.genBiasDarkMaster(),
-  genScreenFlatMasters: defaults.genScreenFlatMasters(),
+  collectBiasesAndDarks: defaults.collectBiasesAndDarks(),
+  collectScreenFlats: defaults.collectScreenFlats(),
   takeUGRIZSStack: defaults.takeUGRIZSStack(),
   takeLRGBStack: defaults.takeLRGBStack(),
   takeO3HaS2N2Stack: defaults.takeO3HaS2N2Stack(),
   takePlanetStack: defaults.takePlanetStack(),
   takeLunarStack: defaults.takeLunarStack(),
-  takeSkyFlats: defaults.takeSkyFlats(),
+  collectSkyFlats: defaults.collectSkyFlats(),
   pointingRun: defaults.pointingRun(),
   focusAuto: defaults.focusAuto(),
   focusExtensive: defaults.focusExtensive(),
   focusFine: defaults.focusFine(),
-  focusVcurve: defaults.focusVcurve(),
 
   // If a script is not in this list, the UI settings button will be disabled.
   scriptsWithSettings: [
-    'genBiasDarkMaster',
-    'genScreenFlatMasters',
+    'collectBiasesAndDarks',
+    'collectScreenFlats',
     'takeUGRIZSStack',
     'takeLRGBStack',
     'takeO3HaS2N2Stack',
     'takePlanetStack',
     'takeLunarStack',
-    'takeSkyFlats',
+    'collectSkyFlats',
     'pointingRun',
     'focusAuto',
     'focusExtensive',
-    'focusFine',
-    'focusVcurve'
+    'focusFine'
   ],
 
   // This is used to fetch a user-friendly name in the UI.
@@ -195,14 +186,13 @@ const state = {
     takeUGRIZSStack: 'Take u/g/r/i/zs Stack',
     takePlanetStack: 'Take Planet Stack',
     takeLunarStack: 'Take Lunar Stack',
-    genBiasDarkMaster: 'Generate Bias/Dark Master',
-    genScreenFlatMasters: 'Generate Screen-Flat Masters',
-    takeSkyFlats: 'Take Sky-Flats',
+    collectBiasesAndDarks: 'Collect Biases and Darks',
+    collectScreenFlats: 'Collect Screen Flats',
+    collectSkyFlats: 'Collect Sky Flats',
     pointingRun: 'Pointing Run',
     focusAuto: 'Focus Auto',
     focusExtensive: 'Focus Extensive',
-    focusFine: 'Focus Fine',
-    focusVcurve: 'Focus V-Curve'
+    focusFine: 'Focus Fine'
   }
 }
 
@@ -220,26 +210,26 @@ const getters = {
   readableScriptNames: state => state.readableScriptNames,
 
   /* Specific script getters */
-  genBiasDarkMaster: state => state.genBiasDarkMaster,
-  genBiasDarkMaster_numOfBias: state => state.genBiasDarkMaster.numOfBias,
-  genBiasDarkMaster_darkTime: state => state.genBiasDarkMaster.darkTime,
-  genBiasDarkMaster_numOfDark: state => state.genBiasDarkMaster.numOfDark,
-  genBiasDarkMaster_dark2Time: state => state.genBiasDarkMaster.dark2Time,
-  genBiasDarkMaster_numOfDark2: state => state.genBiasDarkMaster.numOfDark2,
-  genBiasDarkMaster_coldMap: state => state.genBiasDarkMaster.coldMap,
-  genBiasDarkMaster_hotMap: state => state.genBiasDarkMaster.hotMap,
-  genBiasDarkMaster_bin1: state => state.genBiasDarkMaster.bin1,
-  genBiasDarkMaster_bin2: state => state.genBiasDarkMaster.bin2,
-  genBiasDarkMaster_bin3: state => state.genBiasDarkMaster.bin3,
-  genBiasDarkMaster_bin4: state => state.genBiasDarkMaster.bin4,
+  collectBiasesAndDarks: state => state.collectBiasesAndDarks,
+  collectBiasesAndDarks_numOfBias: state => state.collectBiasesAndDarks.numOfBias,
+  collectBiasesAndDarks_darkTime: state => state.collectBiasesAndDarks.darkTime,
+  collectBiasesAndDarks_numOfDark: state => state.collectBiasesAndDarks.numOfDark,
+  collectBiasesAndDarks_dark2Time: state => state.collectBiasesAndDarks.dark2Time,
+  collectBiasesAndDarks_numOfDark2: state => state.collectBiasesAndDarks.numOfDark2,
+  collectBiasesAndDarks_coldMap: state => state.collectBiasesAndDarks.coldMap,
+  collectBiasesAndDarks_hotMap: state => state.collectBiasesAndDarks.hotMap,
+  collectBiasesAndDarks_bin1: state => state.collectBiasesAndDarks.bin1,
+  collectBiasesAndDarks_bin2: state => state.collectBiasesAndDarks.bin2,
+  collectBiasesAndDarks_bin3: state => state.collectBiasesAndDarks.bin3,
+  collectBiasesAndDarks_bin4: state => state.collectBiasesAndDarks.bin4,
 
-  genScreenFlatMasters: state => state.genScreenFlatMasters,
-  genScreenFlatMasters_numFrames:
-        state => state.genScreenFlatMasters.numFrames,
-  genScreenFlatMasters_gainCalc:
-        state => state.genScreenFlatMasters.gainCalc,
-  genScreenFlatMasters_shutterCompensation:
-        state => state.genScreenFlatMasters.shutterCompensation,
+  collectScreenFlats: state => state.collectScreenFlats,
+  collectScreenFlats_numFrames:
+        state => state.collectScreenFlats.numFrames,
+  collectScreenFlats_gainCalc:
+        state => state.collectScreenFlats.gainCalc,
+  collectScreenFlats_shutterCompensation:
+        state => state.collectScreenFlats.shutterCompensation,
 
   takeUGRIZSStack: state => state.takeUGRIZSStack,
   takeUGRIZSStack_numFrames: state => state.takeUGRIZSStack.numFrames,
@@ -270,8 +260,8 @@ const getters = {
   takeLunarStack: state => state.takeLunarStack,
   takeLunarStack_numFrames: state => state.takeLunarStack.numFrames,
 
-  takeSkyFlats: state => state.takeSkyFlats,
-  takeSkyFlats_numFrames: state => state.takeSkyFlats.numFrames,
+  collectSkyFlats: state => state.collectSkyFlats,
+  collectSkyFlats_numFrames: state => state.collectSkyFlats.numFrames,
 
   pointingRun_gridType: state => state.pointingRun.gridType,
   pointingRun_numGridRuns: state => state.pointingRun.numGridRuns,
@@ -286,12 +276,7 @@ const getters = {
 
   focusFine_target: state => state.focusFine.target,
   focusFine_bin: state => state.focusFine.bin,
-  focusFine_area: state => state.focusFine.area,
-
-  focusVcurve_target: state => state.focusVcurve.target,
-  focusVcurve_bin: state => state.focusVcurve.bin,
-  focusVcurve_area: state => state.focusVcurve.area
-
+  focusFine_area: state => state.focusFine.area
 }
 
 // vuex mutations
@@ -305,21 +290,21 @@ const mutations = {
     state[payload.script_name][payload.script_param] = payload.val
   },
 
-  genBiasDarkMaster_numOfBias (state, val) { state.genBiasDarkMaster.numOfBias = val },
-  genBiasDarkMaster_darkTime (state, val) { state.genBiasDarkMaster.darkTime = val },
-  genBiasDarkMaster_numOfDark (state, val) { state.genBiasDarkMaster.numOfDark = val },
-  genBiasDarkMaster_dark2Time (state, val) { state.genBiasDarkMaster.dark2Time = val },
-  genBiasDarkMaster_numOfDark2 (state, val) { state.genBiasDarkMaster.numOfDark2 = val },
-  genBiasDarkMaster_coldMap (state, val) { state.genBiasDarkMaster.coldMap = val },
-  genBiasDarkMaster_hotMap (state, val) { state.genBiasDarkMaster.hotMap = val },
-  genBiasDarkMaster_bin1 (state, val) { state.genBiasDarkMaster.bin1 = val },
-  genBiasDarkMaster_bin2 (state, val) { state.genBiasDarkMaster.bin2 = val },
-  genBiasDarkMaster_bin3 (state, val) { state.genBiasDarkMaster.bin3 = val },
-  genBiasDarkMaster_bin4 (state, val) { state.genBiasDarkMaster.bin4 = val },
+  collectBiasesAndDarks_numOfBias (state, val) { state.collectBiasesAndDarks.numOfBias = val },
+  collectBiasesAndDarks_darkTime (state, val) { state.collectBiasesAndDarks.darkTime = val },
+  collectBiasesAndDarks_numOfDark (state, val) { state.collectBiasesAndDarks.numOfDark = val },
+  collectBiasesAndDarks_dark2Time (state, val) { state.collectBiasesAndDarks.dark2Time = val },
+  collectBiasesAndDarks_numOfDark2 (state, val) { state.collectBiasesAndDarks.numOfDark2 = val },
+  collectBiasesAndDarks_coldMap (state, val) { state.collectBiasesAndDarks.coldMap = val },
+  collectBiasesAndDarks_hotMap (state, val) { state.collectBiasesAndDarks.hotMap = val },
+  collectBiasesAndDarks_bin1 (state, val) { state.collectBiasesAndDarks.bin1 = val },
+  collectBiasesAndDarks_bin2 (state, val) { state.collectBiasesAndDarks.bin2 = val },
+  collectBiasesAndDarks_bin3 (state, val) { state.collectBiasesAndDarks.bin3 = val },
+  collectBiasesAndDarks_bin4 (state, val) { state.collectBiasesAndDarks.bin4 = val },
 
-  genScreenFlatMasters_numFrames (state, val) { state.genScreenFlatMasters.numFrames = val },
-  genScreenFlatMasters_gainCalc (state, val) { state.genScreenFlatMasters.gainCalc = val },
-  genScreenFlatMasters_shutterCompensation (state, val) { state.genScreenFlatMasters.shutterCompensation = val },
+  collectScreenFlats_numFrames (state, val) { state.collectScreenFlats.numFrames = val },
+  collectScreenFlats_gainCalc (state, val) { state.collectScreenFlats.gainCalc = val },
+  collectScreenFlats_shutterCompensation (state, val) { state.collectScreenFlats.shutterCompensation = val },
 
   takeUGRIZSStack_numFrames (state, val) { state.takeUGRIZSStack.numFrames = val },
   takeUGRIZSStack_skipU (state, val) { state.takeUGRIZSStack.skipU = val },
@@ -345,7 +330,7 @@ const mutations = {
 
   takeLunarStack_numFrames (state, val) { state.takeLunarStack.numFrames = val },
 
-  takeSkyFlats_numFrames (state, val) { state.takeSkyFlats.numFrames = val },
+  collectSkyFlats_numFrames (state, val) { state.collectSkyFlats.numFrames = val },
 
   pointingRun_gridType (state, val) { state.pointingRun.gridType = val },
   pointingRun_numGridRuns (state, val) { state.pointingRun.numGridRuns = val },
@@ -360,11 +345,7 @@ const mutations = {
 
   focusFine_target (state, val) { state.focusFine.target = val },
   focusFine_bin (state, val) { state.focusFine.bin = val },
-  focusFine_area (state, val) { state.focusFine.area = val },
-
-  focusVcurve_target (state, val) { state.focusVcurve.target = val },
-  focusVcurve_bin (state, val) { state.focusVcurve.bin = val },
-  focusVcurve_area (state, val) { state.focusVcurve.area = val }
+  focusFine_area (state, val) { state.focusFine.area = val }
 }
 
 // vuex actions
