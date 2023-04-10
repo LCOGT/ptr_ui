@@ -140,7 +140,14 @@ export default {
       isExpandedStatusVisible: false,
 
       // Toggles the script settings visiblity
-      isScriptSettingsActive: true
+      isScriptSettingsActive: true,
+
+      // Auto-hide settings for these scripts:
+      hideSettingsOnLoad: [
+        'focusAuto',
+        'focusExtensive',
+        'focusFine'
+      ]
     }
   },
 
@@ -157,7 +164,14 @@ export default {
     },
     selected_script: {
       get () { return this.$store.getters.selectedScript },
-      set (val) { this.$store.commit('selectedScript', val) }
+      set (val) {
+        this.$store.commit('selectedScript', val)
+        if (this.hideSettingsOnLoad.includes(val)) {
+          this.isScriptSettingsActive = false
+        } else {
+          this.isScriptSettingsActive = true
+        }
+      }
     }
   }
 

@@ -9,37 +9,35 @@
         {{ dropdown_active_site }}
       </h1>
       <div class="site-list">
-        <template v-for="site in real_sites">
-          <div
-            :key="site"
-            :class="[{'selected': dropdown_active_site==site}, 'site-row']"
-            @click="dropdown_active_site = site"
-          >
-            <div :class="[site_online_class(site), 'status-dot']" />
-            <div class="site-name-short">
-              {{ site }}&nbsp;
-            </div>
-            <div class="site-name-expanded">
-              {{ global_config[site]?.name || global_config[site].site_description }}
-            </div>
+        <div
+          v-for="site in real_sites"
+          :key="site"
+          :class="[{'selected': dropdown_active_site==site}, 'site-row']"
+          @click="dropdown_active_site = site"
+        >
+          <div :class="[site_online_class(site), 'status-dot']" />
+          <div class="site-name-short">
+            {{ site }}&nbsp;
           </div>
-        </template>
+          <div class="site-name-expanded">
+            {{ global_config[site]?.name || global_config[site].site_description }}
+          </div>
+        </div>
         <hr class="navbar-divider">
-        <template v-for="site in simulated_sites">
-          <div
-            :key="site"
-            :class="[{'selected': dropdown_active_site==site}, 'site-row']"
-            @click="dropdown_active_site = site"
-          >
-            <div :class="[site_online_class(site), 'status-dot']" />
-            <div class="site-name-short">
-              {{ site }}&nbsp;
-            </div>
-            <div class="site-name-expanded">
-              {{ global_config[site].name }}
-            </div>
+        <div
+          v-for="site in simulated_sites"
+          :key="site"
+          :class="[{'selected': dropdown_active_site==site}, 'site-row']"
+          @click="dropdown_active_site = site"
+        >
+          <div :class="[site_online_class(site), 'status-dot']" />
+          <div class="site-name-short">
+            {{ site }}&nbsp;
           </div>
-        </template>
+          <div class="site-name-expanded">
+            {{ global_config[site].name }}
+          </div>
+        </div>
       </div>
       <NavbarSitePreview
         class="site-preview"
@@ -124,7 +122,7 @@ export default {
         return 'not available'
       }
 
-      // Note: if one of these option-chained properties doesn't exist, the inequality evaluates to false. 
+      // Note: if one of these option-chained properties doesn't exist, the inequality evaluates to false.
       // E.g. if there is no device status, site_status?.device ==> undefined, and undefined < any_number is false.
       const weather_not_stale = site_status?.weather?.status_age_s < stale_age_s
       const device_not_stale = site_status?.device?.status_age_s < stale_age_s
@@ -268,8 +266,6 @@ export default {
     pointer-events: none;
     color: silver;
 
-}
-.control-room-button {
 }
 .status-dot {
   /* Center the content */
