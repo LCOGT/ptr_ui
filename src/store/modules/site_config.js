@@ -55,14 +55,31 @@ const getters = {
   all_sites: state => {
     let sites = []
     Object.keys(state.global_config).forEach(site => {
-      const s = {
-        site,
-        name: state.global_config[site].name.toString(),
-        latitude: parseFloat(state.global_config[site].latitude),
-        longitude: parseFloat(state.global_config[site].longitude),
-        TZ_database_name: state.global_config[site].TZ_database_name
+      // Get some basic info for each site, and add it to our array constituting "all sites"
+      try {
+        const config = state.global_config[site]
+        if (!config) { throw new Error('Site configuration not found.', site) }
+
+        const name = config.name?.toString() || config.site_description?.toString() || 'missing name'
+        const latitude = parseFloat(config?.latitude || config.site_latitude)
+        const longitude = parseFloat(config.longitude || config.site_longitude)
+        const TZ_database_name = config.TZ_database_name
+
+        if (isNaN(latitude)) { throw new Error('Latitude is missing or invalid.', site) }
+        if (isNaN(longitude)) { throw new Error('Longitude is missing or invalid.', site) }
+        if (!TZ_database_name) { throw new Error('TZ_database_name is missing.', site) }
+
+        const site_info = {
+          site,
+          name,
+          latitude,
+          longitude,
+          TZ_database_name
+        }
+        sites.push(site_info)
+      } catch (error) {
+        console.error(error.message)
       }
-      sites.push(s)
     })
     sites = _.orderBy(sites, [s => s.site], ['asc'])
     return sites

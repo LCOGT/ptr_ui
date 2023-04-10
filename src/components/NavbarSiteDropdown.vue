@@ -20,7 +20,7 @@
               {{ site }}&nbsp;
             </div>
             <div class="site-name-expanded">
-              {{ global_config[site].name }}
+              {{ global_config[site]?.name || global_config[site].site_description }}
             </div>
           </div>
         </template>
@@ -124,9 +124,11 @@ export default {
         return 'not available'
       }
 
-      const weather_not_stale = site_status.weather.status_age_s < stale_age_s
-      const device_not_stale = site_status.device.status_age_s < stale_age_s
-      const enclosure_not_stale = site_status.enclosure.status_age_s < stale_age_s
+      // Note: if one of these option-chained properties doesn't exist, the inequality evaluates to false. 
+      // E.g. if there is no device status, site_status?.device ==> undefined, and undefined < any_number is false.
+      const weather_not_stale = site_status?.weather?.status_age_s < stale_age_s
+      const device_not_stale = site_status?.device?.status_age_s < stale_age_s
+      const enclosure_not_stale = site_status?.enclosure?.status_age_s < stale_age_s
 
       if (weather_not_stale && device_not_stale && enclosure_not_stale) {
         return 'operational'
