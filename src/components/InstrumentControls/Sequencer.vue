@@ -24,44 +24,12 @@
           <option value="stopScript">
             Stop Script
           </option>
-          <option value="focusAuto">
-            Focus Auto
-          </option>
-          <option value="focusExtensive">
-            Focus Extensive
-          </option>
-          <option value="focusFine">
-            Focus Fine
-          </option>
-          <option value="takeLRGBStack">
-            Take LRGB Stack
-          </option>
-          <option value="takeO3HaS2N2Stack">
-            Take O3HaS2N2 Stack
-          </option>
-          <option value="takeUGRIZSStack">
-            Take ugrizs Stack
-          </option>
-          <option value="takePlanetStack">
-            Take Planet Stack
-          </option>
-          <option value="takeLunarStack">
-            Take Lunar Stack
-          </option>
-          <option value="collectBiasesAndDarks">
-            Collect Biases and Darks
-          </option>
-          <option value="collectScreenFlats">
-            Collect Screen Flats
-          </option>
-          <option value="collectSkyFlats">
-            Collect Sky Flats
-          </option>
-          <option value="restackLocalCalibrations">
-            Restack Local Calibrations
-          </option>
-          <option value="pointingRun">
-            Pointing Run
+          <option
+            v-for="script in scriptNames"
+            :key="script.value"
+            :value="script.value"
+          >
+            {{ script.name }}
           </option>
         </b-select>
         <p class="control">
@@ -180,6 +148,19 @@ export default {
     ...mapGetters('scriptSettings', [
       'selectedScriptHasSettings'
     ]),
+
+    scriptNames () {
+      const scripts = this.$store.state.scriptSettings.readableScriptNames
+      const options = []
+      Object.keys(scripts).forEach(key => {
+        options.push({
+          value: key,
+          name: scripts[key]
+        })
+      })
+      console.log(options)
+      return options
+    },
     sitecode () {
       return this.$route.params.sitecode
     },

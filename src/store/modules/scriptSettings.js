@@ -10,52 +10,52 @@ const state = {
 
   // This is where the params for each script are held.
   // Actual values are initialized in main.js, as soon as the site configs are loaded.
-  collectBiasesAndDarks: {},
-  restackLocalCalibrations: {},
-  collectScreenFlats: {},
-  takeUGRIZSStack: {},
-  takeLRGBStack: {},
-  takeO3HaS2N2Stack: {},
-  takePlanetStack: {},
-  takeLunarStack: {},
-  collectSkyFlats: {},
-  pointingRun: {},
   focusAuto: {},
   focusExtensive: {},
   focusFine: {},
+  restackLocalCalibrations: {},
+  collectBiasesAndDarks: {},
+  collectScreenFlats: {},
+  collectSkyFlats: {},
+  takeLRGBStack: {},
+  takeO3HaS2N2Stack: {},
+  takeUGRIZSStack: {},
+  takePlanetStack: {},
+  takeLunarStack: {},
+  pointingRun: {},
 
   // If a script is not in this list, the UI settings button will be disabled.
   scriptsWithSettings: [
-    'collectBiasesAndDarks',
-    'restackLocalCalibrations',
-    'collectScreenFlats',
-    'takeUGRIZSStack',
-    'takeLRGBStack',
-    'takeO3HaS2N2Stack',
-    'takePlanetStack',
-    'takeLunarStack',
-    'collectSkyFlats',
-    'pointingRun',
     'focusAuto',
     'focusExtensive',
-    'focusFine'
+    'focusFine',
+    'restackLocalCalibrations',
+    'collectBiasesAndDarks',
+    'collectScreenFlats',
+    'collectSkyFlats',
+    'takeLRGBStack',
+    'takeO3HaS2N2Stack',
+    'takeUGRIZSStack',
+    'takePlanetStack',
+    'takeLunarStack',
+    'pointingRun'
   ],
 
-  // This is used to fetch a user-friendly name in the UI.
+  // This is used to populate the dropdown list where users select a script in the UI
   readableScriptNames: {
+    focusAuto: 'Focus Auto',
+    focusExtensive: 'Focus Extensive',
+    focusFine: 'Focus Fine',
+    restackLocalCalibrations: 'Restack Local Calibrations',
+    collectBiasesAndDarks: 'Collect Biases and Darks',
+    collectScreenFlats: 'Collect Screen Flats',
+    collectSkyFlats: 'Collect Sky Flats',
     takeLRGBStack: 'Take L/R/G/B Stack',
     takeO3HaS2N2Stack: 'Take O3/Ha/N2/S2 Stack',
     takeUGRIZSStack: 'Take u/g/r/i/zs Stack',
     takePlanetStack: 'Take Planet Stack',
     takeLunarStack: 'Take Lunar Stack',
-    collectBiasesAndDarks: 'Collect Biases and Darks',
-    restackLocalCalibrations: 'Restack Local Calibrations',
-    collectScreenFlats: 'Collect Screen Flats',
-    collectSkyFlats: 'Collect Sky Flats',
-    pointingRun: 'Pointing Run',
-    focusAuto: 'Focus Auto',
-    focusExtensive: 'Focus Extensive',
-    focusFine: 'Focus Fine'
+    pointingRun: 'Pointing Run'
   }
 }
 
@@ -220,7 +220,28 @@ const actions = {
     const dark_exposure_time = camera_config?.settings?.dark_exposure || 120
 
     return {
-      collectBiasesAndDarks () {
+      focusAuto () {
+        return {
+          target: 'near_tycho_star', // alternative: 'use_field'
+          bin: 1, // integer: 1, 2, or 4
+          area: '100%' // percent, from 0 to 1
+        }
+      },
+      focusExtensive () {
+        return {
+          target: 'near_tycho_star', // alternative: 'use_field'
+          bin: 1, // integer: 1, 2, or 4
+          area: '100%' // percent, from 0 to 1
+        }
+      },
+      focusFine () {
+        return {
+          target: 'near_tycho_star', // alternative: 'use_field'
+          bin: 1, // integer: 1, 2, or 4
+          area: '100%' // percent, from 0 to 1
+        }
+      },
+      restackLocalCalibrations () {
         return {
           numOfBias: number_of_bias_to_collect,
           darkTime: dark_exposure_time,
@@ -229,7 +250,7 @@ const actions = {
           hotMap: true
         }
       },
-      restackLocalCalibrations () {
+      collectBiasesAndDarks () {
         return {
           numOfBias: number_of_bias_to_collect,
           darkTime: dark_exposure_time,
@@ -245,11 +266,9 @@ const actions = {
           shutterCompensation: true
         }
       },
-      takeUGRIZSStack () {
+      collectSkyFlats () {
         return {
-          numFrames: 1,
-          skipU: true,
-          skipZS: true
+          numFrames: number_of_flat_to_collect
         }
       },
       takeLRGBStack () {
@@ -274,6 +293,13 @@ const actions = {
           exposureTime: 30
         }
       },
+      takeUGRIZSStack () {
+        return {
+          numFrames: 1,
+          skipU: true,
+          skipZS: true
+        }
+      },
       takePlanetStack () {
         return {
           numFrames: 127
@@ -284,36 +310,10 @@ const actions = {
           numFrames: 127
         }
       },
-      collectSkyFlats () {
-        return {
-          numFrames: number_of_flat_to_collect
-        }
-      },
       pointingRun () {
         return {
           gridType: 'medium',
           numGridRuns: 1
-        }
-      },
-      focusAuto () {
-        return {
-          target: 'near_tycho_star', // alternative: 'use_field'
-          bin: 1, // integer: 1, 2, or 4
-          area: '100%' // percent, from 0 to 1
-        }
-      },
-      focusExtensive () {
-        return {
-          target: 'near_tycho_star', // alternative: 'use_field'
-          bin: 1, // integer: 1, 2, or 4
-          area: '100%' // percent, from 0 to 1
-        }
-      },
-      focusFine () {
-        return {
-          target: 'near_tycho_star', // alternative: 'use_field'
-          bin: 1, // integer: 1, 2, or 4
-          area: '100%' // percent, from 0 to 1
         }
       }
     }
