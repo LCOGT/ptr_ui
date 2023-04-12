@@ -21,8 +21,12 @@ export default {
   computed: {
 
     numFrames: {
-      get () { return this.$store.getters.takeLunarStack_numFrames },
-      set (val) { this.$store.commit('takeLunarStack_numFrames', val) }
+      get () { return this.$store.state.scriptSettings.takeLunarStack.numFrames },
+      set (value) {
+        const scriptName = 'takeLunarStack'
+        const paramName = 'numFrames'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

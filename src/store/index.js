@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import site_config from './modules/site_config'
 import images from './modules/images'
-import script_settings from './modules/script_settings'
+import scriptSettings from './modules/scriptSettings'
 import api_endpoints from './modules/api_endpoints'
 import js9 from './modules/js9'
 import command_params from './modules/command_params'
@@ -22,14 +22,14 @@ const store = new Vuex.Store({
     // Use this plugin to save state for the duration of a browser session.
     // createPersistedState({
     //    paths: [
-    //        'script_settings'
+    //        'scriptSettings'
     //    ]
     // })
   ],
   modules: {
     site_config,
     command_params,
-    script_settings,
+    scriptSettings,
     images,
     user_data,
     api_endpoints,

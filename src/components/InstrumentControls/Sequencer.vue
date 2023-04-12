@@ -14,7 +14,7 @@
     >
       <b-field>
         <b-select
-          v-model="selected_script"
+          v-model="selectedScript"
           value="none"
           size="is-small"
         >
@@ -57,6 +57,9 @@
           <option value="collectSkyFlats">
             Collect Sky Flats
           </option>
+          <option value="regenerateLocalMasters">
+            Regenerate Local Masters
+          </option>
           <option value="pointingRun">
             Pointing Run
           </option>
@@ -64,7 +67,7 @@
         <p class="control">
           <button
             class="button is-small"
-            :disabled="!scriptHasSettings"
+            :disabled="!selectedScriptHasSettings"
             @click="isScriptSettingsActive = !isScriptSettingsActive"
           >
             <span
@@ -77,10 +80,17 @@
       </b-field>
     </b-field>
 
+    <div
+      v-if="showNotImplementedWarning"
+      class="not-implemented-warning"
+    >
+      ⚠️  This script has not been implemented in the observatory yet ⚠️
+    </div>
+
     <div v-if="isScriptSettingsActive">
       <script-settings
-        :show="scriptHasSettings"
-        :script="selected_script"
+        :show="selectedScriptHasSettings"
+        :script="selectedScript"
       />
     </div>
 
@@ -92,14 +102,14 @@
         class="button is-small is-success"
         outlined
         style="width: 65%;"
-        @click="script_run_command"
+        @click="scriptRunCommand"
       >
         run script
       </b-button>
       <b-button
         class="button is-small"
         style="width: 35%; border-left: 1px solid #48c775;"
-        @click="script_stop_command"
+        @click="scriptStopCommand"
       >
         stop script
       </b-button>
@@ -147,6 +157,17 @@ export default {
         'focusAuto',
         'focusExtensive',
         'focusFine'
+      ],
+
+      // Display message for scripts that aren't implemented yet
+      notImplementedScripts: [
+        'takeLRGBStack',
+        'takeO3HaS2N2Stack',
+        'takeUGRIZSStack',
+        'takePlanetStack',
+        'takeLunarStack',
+        'collectScreenFlats',
+        'pointingRun'
       ]
     }
   },
@@ -156,21 +177,22 @@ export default {
       'sequencer_message',
       'sequencer_state'
     ]),
-    ...mapGetters([
-      'scriptHasSettings'
+    ...mapGetters('scriptSettings', [
+      'selectedScriptHasSettings'
     ]),
     sitecode () {
       return this.$route.params.sitecode
     },
-    selected_script: {
-      get () { return this.$store.getters.selectedScript },
+    showNotImplementedWarning () {
+      return this.notImplementedScripts.includes(this.selectedScript)
+    },
+    selectedScript: {
+      get () { return this.$store.state.scriptSettings.selectedScript },
       set (val) {
-        this.$store.commit('selectedScript', val)
-        if (this.hideSettingsOnLoad.includes(val)) {
-          this.isScriptSettingsActive = false
-        } else {
-          this.isScriptSettingsActive = true
-        }
+        this.$store.commit('scriptSettings/selectedScript', val)
+
+        // Auto hide or show settings
+        this.isScriptSettingsActive = !this.hideSettingsOnLoad.includes(val)
       }
     }
   }
@@ -180,4 +202,19 @@ export default {
 
 <style scoped lang="scss">
 @import "./instrument_controls_common.scss";
+
+.not-implemented-warning {
+  margin-bottom: 0.5em;
+  padding: 1em;
+  font-weight: bold;
+  text-align: center;
+  border: 1px solid grey;
+  // font for rendering emoji
+  font-family: "Segoe UI Emoji",
+               "Segoe UI Symbol",
+               "Noto Color Emoji",
+               "EmojiOne Color",
+               "Android Emoji",
+               sans-serif;
+}
 </style>

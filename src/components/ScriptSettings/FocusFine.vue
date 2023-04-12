@@ -86,16 +86,28 @@
 export default {
   computed: {
     target: {
-      get () { return this.$store.getters.focusFine_target },
-      set (val) { this.$store.commit('focusFine_target', val) }
+      get () { return this.$store.state.scriptSettings.focusFine.target },
+      set (value) {
+        const scriptName = 'focusFine'
+        const paramName = 'target'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     bin: {
-      get () { return this.$store.getters.focusFine_bin },
-      set (val) { this.$store.commit('focusFine_bin', val) }
+      get () { return this.$store.state.scriptSettings.focusFine.bin },
+      set (value) {
+        const scriptName = 'focusFine'
+        const paramName = 'bin'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     area: {
-      get () { return this.$store.getters.focusFine_area },
-      set (val) { this.$store.commit('focusFine_area', val) }
+      get () { return this.$store.state.scriptSettings.focusFine.area },
+      set (value) {
+        const scriptName = 'focusFine'
+        const paramName = 'area'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

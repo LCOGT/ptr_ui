@@ -199,11 +199,23 @@ export const commands_mixin = {
       return the_base_command
     },
 
-    script_run_command () {
-      this.$store.dispatch('script_run_command')
+    async scriptRunCommand () {
+      const auth_data = {
+        header: await this.getAuthHeader(),
+        user_name: this.username,
+        user_id: this.user_id,
+        user_roles: this.user_roles
+      }
+      this.$store.dispatch('scriptSettings/scriptRunCommand', auth_data)
     },
-    script_stop_command () {
-      this.$store.dispatch('script_stop_command')
+    async scriptStopCommand () {
+      const auth_data = {
+        header: await this.getAuthHeader(),
+        user_name: this.username,
+        user_id: this.user_id,
+        user_roles: this.user_roles
+      }
+      this.$store.dispatch('scriptSettings/scriptStopCommand', auth_data)
     },
 
     /*

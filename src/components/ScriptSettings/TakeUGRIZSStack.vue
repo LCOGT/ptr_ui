@@ -34,16 +34,28 @@ export default {
   computed: {
 
     numFrames: {
-      get () { return this.$store.getters.takeUGRIZSStack_numFrames },
-      set (val) { this.$store.commit('takeUGRIZSStack_numFrames', val) }
+      get () { return this.$store.state.scriptSettings.takeUGRIZSStack.numFrames },
+      set (value) {
+        const scriptName = 'takeUGRIZSStack'
+        const paramName = 'numFrames'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     skipU: {
-      get () { return this.$store.getters.takeUGRIZSStack_skipU },
-      set (val) { this.$store.commit('takeUGRIZSStack_skipU', val) }
+      get () { return this.$store.state.scriptSettings.takeUGRIZSStack.skipU },
+      set (value) {
+        const scriptName = 'takeUGRIZSStack'
+        const paramName = 'skipU'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     skipZS: {
-      get () { return this.$store.getters.takeUGRIZSStack_skipZS },
-      set (val) { this.$store.commit('takeUGRIZSStack_skipZS', val) }
+      get () { return this.$store.state.scriptSettings.takeUGRIZSStack.skipZS },
+      set (value) {
+        const scriptName = 'takeUGRIZSStack'
+        const paramName = 'skipZS'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

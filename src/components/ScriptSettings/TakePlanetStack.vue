@@ -21,8 +21,12 @@ export default {
   computed: {
 
     numFrames: {
-      get () { return this.$store.getters.takePlanetStack_numFrames },
-      set (val) { this.$store.commit('takePlanetStack_numFrames', val) }
+      get () { return this.$store.state.scriptSettings.takePlanetStack.numFrames },
+      set (value) {
+        const scriptName = 'takePlanetStack'
+        const paramName = 'numFrames'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

@@ -1,25 +1,5 @@
 <template>
   <section>
-    <!--div class="field-group">
-        <b-field label="No. of Bias" horizontal>
-            <b-numberinput v-model="numOfBias" type="is-light" controls-position="compact" min="0" class="inputfield"></b-numberinput>
-        </b-field>
-    </div>
-    <hr>
-    <div class="field-group">
-        <b-field label="Dark Time" horizontal position="is-right">
-            <b-field class="inputfield">
-                <b-input v-model="darkTime" name="subject" autocomplete="off" expanded></b-input>
-                <p class="control"> <span class="button is-static">s</span> </p>
-            </b-field>
-        </b-field>
-    </div>
-    <div class="field-group">
-        <b-field label="No. of Dark" horizontal>
-            <b-numberinput  class="inputfield" v-model="numOfDark" type="is-light" controls-position="compact" min="0" ></b-numberinput>
-        </b-field>
-    </div-->
-
     <div class="field is-horizontal">
       <div class="field-label is-normal">
         <label class="label">Number of Bias</label>
@@ -41,7 +21,7 @@
     <hr>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal">
+      <div class="field-label">
         <label class="label">Dark Time</label>
       </div>
       <div class="field">
@@ -94,46 +74,46 @@
 
 <script>
 export default {
-  name: 'CollectBiasesAndDarks',
+  name: 'RegenerateLocalMasters',
 
   computed: {
 
     numOfBias: {
-      get () { return this.$store.state.scriptSettings.collectBiasesAndDarks.numOfBias },
+      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.numOfBias },
       set (value) {
-        const scriptName = 'collectBiasesAndDarks'
+        const scriptName = 'regenerateLocalMasters'
         const paramName = 'numOfBias'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     },
     darkTime: {
-      get () { return this.$store.state.scriptSettings.collectBiasesAndDarks.darkTime },
+      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.darkTime },
       set (value) {
-        const scriptName = 'collectBiasesAndDarks'
+        const scriptName = 'regenerateLocalMasters'
         const paramName = 'darkTime'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     },
     numOfDark: {
-      get () { return this.$store.state.scriptSettings.collectBiasesAndDarks.numOfDark },
+      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.numOfDark },
       set (value) {
-        const scriptName = 'collectBiasesAndDarks'
+        const scriptName = 'regenerateLocalMasters'
         const paramName = 'numOfDark'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     },
     coldMap: {
-      get () { return this.$store.state.scriptSettings.collectBiasesAndDarks.coldMap },
+      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.coldMap },
       set (value) {
-        const scriptName = 'collectBiasesAndDarks'
+        const scriptName = 'regenerateLocalMasters'
         const paramName = 'coldMap'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     },
     hotMap: {
-      get () { return this.$store.state.scriptSettings.collectBiasesAndDarks.hotMap },
+      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.hotMap },
       set (value) {
-        const scriptName = 'collectBiasesAndDarks'
+        const scriptName = 'regenerateLocalMasters'
         const paramName = 'hotMap'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }

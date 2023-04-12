@@ -34,16 +34,28 @@ export default {
   computed: {
 
     numFrames: {
-      get () { return this.$store.getters.collectScreenFlats_numFrames },
-      set (val) { this.$store.commit('collectScreenFlats_numFrames', val) }
+      get () { return this.$store.state.scriptSettings.collectScreenFlats.numFrames },
+      set (value) {
+        const scriptName = 'collectScreenFlats'
+        const paramName = 'numFrames'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     gainCalc: {
-      get () { return this.$store.getters.collectScreenFlats_gainCalc },
-      set (val) { this.$store.commit('collectScreenFlats_gainCalc', val) }
+      get () { return this.$store.state.scriptSettings.collectScreenFlats.gainCalc },
+      set (value) {
+        const scriptName = 'collectScreenFlats'
+        const paramName = 'gainCalc'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     shutterCompensation: {
-      get () { return this.$store.getters.collectScreenFlats_shutterCompensation },
-      set (val) { this.$store.commit('collectScreenFlats_shutterCompensation', val) }
+      get () { return this.$store.state.scriptSettings.collectScreenFlats.shutterCompensation },
+      set (value) {
+        const scriptName = 'collectScreenFlats'
+        const paramName = 'shutterCompensation'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
 
   }
