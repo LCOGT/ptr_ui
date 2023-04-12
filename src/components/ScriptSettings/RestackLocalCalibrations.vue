@@ -74,46 +74,46 @@
 
 <script>
 export default {
-  name: 'RegenerateLocalMasters',
+  name: 'RestackLocalCalibrations',
 
   computed: {
 
     numOfBias: {
-      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.numOfBias },
+      get () { return this.$store.state.scriptSettings.restackLocalCalibrations.numOfBias },
       set (value) {
-        const scriptName = 'regenerateLocalMasters'
+        const scriptName = 'restackLocalCalibrations'
         const paramName = 'numOfBias'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     },
     darkTime: {
-      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.darkTime },
+      get () { return this.$store.state.scriptSettings.restackLocalCalibrations.darkTime },
       set (value) {
-        const scriptName = 'regenerateLocalMasters'
+        const scriptName = 'restackLocalCalibrations'
         const paramName = 'darkTime'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     },
     numOfDark: {
-      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.numOfDark },
+      get () { return this.$store.state.scriptSettings.restackLocalCalibrations.numOfDark },
       set (value) {
-        const scriptName = 'regenerateLocalMasters'
+        const scriptName = 'restackLocalCalibrations'
         const paramName = 'numOfDark'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     },
     coldMap: {
-      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.coldMap },
+      get () { return this.$store.state.scriptSettings.restackLocalCalibrations.coldMap },
       set (value) {
-        const scriptName = 'regenerateLocalMasters'
+        const scriptName = 'restackLocalCalibrations'
         const paramName = 'coldMap'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     },
     hotMap: {
-      get () { return this.$store.state.scriptSettings.regenerateLocalMasters.hotMap },
+      get () { return this.$store.state.scriptSettings.restackLocalCalibrations.hotMap },
       set (value) {
-        const scriptName = 'regenerateLocalMasters'
+        const scriptName = 'restackLocalCalibrations'
         const paramName = 'hotMap'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }

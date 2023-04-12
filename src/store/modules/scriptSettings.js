@@ -11,7 +11,7 @@ const state = {
   // This is where the params for each script are held.
   // Actual values are initialized in main.js, as soon as the site configs are loaded.
   collectBiasesAndDarks: {},
-  regenerateLocalMasters: {},
+  restackLocalCalibrations: {},
   collectScreenFlats: {},
   takeUGRIZSStack: {},
   takeLRGBStack: {},
@@ -27,7 +27,7 @@ const state = {
   // If a script is not in this list, the UI settings button will be disabled.
   scriptsWithSettings: [
     'collectBiasesAndDarks',
-    'regenerateLocalMasters',
+    'restackLocalCalibrations',
     'collectScreenFlats',
     'takeUGRIZSStack',
     'takeLRGBStack',
@@ -49,7 +49,7 @@ const state = {
     takePlanetStack: 'Take Planet Stack',
     takeLunarStack: 'Take Lunar Stack',
     collectBiasesAndDarks: 'Collect Biases and Darks',
-    regenerateLocalMasters: 'Regenerate Local Master Calibrations',
+    restackLocalCalibrations: 'Restack Local Calibrations',
     collectScreenFlats: 'Collect Screen Flats',
     collectSkyFlats: 'Collect Sky Flats',
     pointingRun: 'Pointing Run',
@@ -229,7 +229,7 @@ const actions = {
           hotMap: true
         }
       },
-      regenerateLocalMasters () {
+      restackLocalCalibrations () {
         return {
           numOfBias: number_of_bias_to_collect,
           darkTime: dark_exposure_time,

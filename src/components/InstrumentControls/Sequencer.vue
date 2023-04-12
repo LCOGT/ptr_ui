@@ -57,8 +57,8 @@
           <option value="collectSkyFlats">
             Collect Sky Flats
           </option>
-          <option value="regenerateLocalMasters">
-            Regenerate Local Masters
+          <option value="restackLocalCalibrations">
+            Restack Local Calibrations
           </option>
           <option value="pointingRun">
             Pointing Run

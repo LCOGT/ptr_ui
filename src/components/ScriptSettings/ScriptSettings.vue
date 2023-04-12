@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import RegenerateLocalMasters from '@/components/ScriptSettings/RegenerateLocalMasters'
+import RestackLocalCalibrations from '@/components/ScriptSettings/RestackLocalCalibrations'
 import CollectScreenFlats from '@/components/ScriptSettings/CollectScreenFlats'
 import CollectBiasesAndDarks from '@/components/ScriptSettings/CollectBiasesAndDarks'
 import CollectSkyFlats from '@/components/ScriptSettings/CollectSkyFlats'
@@ -36,7 +36,7 @@ import FocusFine from '@/components/ScriptSettings/FocusFine'
 export default {
   name: 'ScriptSettings',
   components: {
-    RegenerateLocalMasters,
+    RestackLocalCalibrations,
     CollectScreenFlats,
     CollectBiasesAndDarks,
     CollectSkyFlats,
