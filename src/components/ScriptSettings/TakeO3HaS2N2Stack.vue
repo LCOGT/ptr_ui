@@ -77,44 +77,84 @@ export default {
   computed: {
 
     numFrames: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_numFrames },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_numFrames', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.numFrames },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'numFrames'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     skipO3: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_skipO3 },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_skipO3', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.skipO3 },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'skipO3'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     skipHa: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_skipHa },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_skipHa', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.skipHa },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'skipHa'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     skipS2: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_skipS2 },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_skipS2', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.skipS2 },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'skipS2'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     skipN2: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_skipN2 },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_skipN2', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.skipN2 },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'skipN2'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     addRGB: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_addRGB },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_addRGB', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.addRGB },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'addRGB'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     addCR: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_addCR },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_addCR', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.addCR },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'addCR'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     addSloane: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_addSloane },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_addSloane', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.addSloane },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'addSloane'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     addL: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_addL },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_addL', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.addL },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'addL'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     exposureTime: {
-      get () { return this.$store.getters.takeO3HaS2N2Stack_exposureTime },
-      set (val) { this.$store.commit('takeO3HaS2N2Stack_exposureTime', val) }
+      get () { return this.$store.state.scriptSettings.takeO3HaS2N2Stack.exposureTime },
+      set (value) {
+        const scriptName = 'takeO3HaS2N2Stack'
+        const paramName = 'exposureTime'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

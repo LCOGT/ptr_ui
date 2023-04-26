@@ -86,16 +86,28 @@
 export default {
   computed: {
     target: {
-      get () { return this.$store.getters.focusAuto_target },
-      set (val) { this.$store.commit('focusAuto_target', val) }
+      get () { return this.$store.state.scriptSettings.focusAuto.target },
+      set (value) {
+        const scriptName = 'focusAuto'
+        const paramName = 'target'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     bin: {
-      get () { return this.$store.getters.focusAuto_bin },
-      set (val) { this.$store.commit('focusAuto_bin', val) }
+      get () { return this.$store.state.scriptSettings.focusAuto.bin },
+      set (value) {
+        const scriptName = 'focusAuto'
+        const paramName = 'bin'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     area: {
-      get () { return this.$store.getters.focusAuto_area },
-      set (val) { this.$store.commit('focusAuto_area', val) }
+      get () { return this.$store.state.scriptSettings.focusAuto.area },
+      set (value) {
+        const scriptName = 'focusAuto'
+        const paramName = 'area'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

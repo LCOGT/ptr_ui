@@ -86,16 +86,28 @@
 export default {
   computed: {
     target: {
-      get () { return this.$store.getters.focusExtensive_target },
-      set (val) { this.$store.commit('focusExtensive_target', val) }
+      get () { return this.$store.state.scriptSettings.focusExtensive.target },
+      set (value) {
+        const scriptName = 'focusExtensive'
+        const paramName = 'target'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     bin: {
-      get () { return this.$store.getters.focusExtensive_bin },
-      set (val) { this.$store.commit('focusExtensive_bin', val) }
+      get () { return this.$store.state.scriptSettings.focusExtensive.bin },
+      set (value) {
+        const scriptName = 'focusExtensive'
+        const paramName = 'bin'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     area: {
-      get () { return this.$store.getters.focusExtensive_area },
-      set (val) { this.$store.commit('focusExtensive_area', val) }
+      get () { return this.$store.state.scriptSettings.focusExtensive.area },
+      set (value) {
+        const scriptName = 'focusExtensive'
+        const paramName = 'area'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

@@ -43,20 +43,36 @@ export default {
   computed: {
 
     numFrames: {
-      get () { return this.$store.getters.takeLRGBStack_numFrames },
-      set (val) { this.$store.commit('takeLRGBStack_numFrames', val) }
+      get () { return this.$store.state.scriptSettings.takeLRGBStack.numFrames },
+      set (value) {
+        const scriptName = 'takeLRGBStack'
+        const paramName = 'numFrames'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     skipL: {
-      get () { return this.$store.getters.takeLRGBStack_skipL },
-      set (val) { this.$store.commit('takeLRGBStack_skipL', val) }
+      get () { return this.$store.state.scriptSettings.takeLRGBStack.skipL },
+      set (value) {
+        const scriptName = 'takeLRGBStack'
+        const paramName = 'skipL'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     exposureTime: {
-      get () { return this.$store.getters.takeLRGBStack_exposureTime },
-      set (val) { this.$store.commit('takeLRGBStack_exposureTime', val) }
+      get () { return this.$store.state.scriptSettings.takeLRGBStack.exposureTime },
+      set (value) {
+        const scriptName = 'takeLRGBStack'
+        const paramName = 'exposureTime'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     useSloane: {
-      get () { return this.$store.getters.takeLRGBStack_useSloane },
-      set (val) { this.$store.commit('takeLRGBStack_useSloane', val) }
+      get () { return this.$store.state.scriptSettings.takeLRGBStack.useSloane },
+      set (value) {
+        const scriptName = 'takeLRGBStack'
+        const paramName = 'useSloane'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

@@ -17,12 +17,16 @@
 
 <script>
 export default {
-  name: 'TakeSkyFlats',
+  name: 'CollectSkyFlats',
   computed: {
 
     numFrames: {
-      get () { return this.$store.getters.collectSkyFlats_numFrames },
-      set (val) { this.$store.commit('collectSkyFlats_numFrames', val) }
+      get () { return this.$store.state.scriptSettings.collectSkyFlats.numFrames },
+      set (value) {
+        const scriptName = 'collectSkyFlats'
+        const paramName = 'numFrames'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

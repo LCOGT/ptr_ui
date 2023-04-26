@@ -57,12 +57,20 @@ export default {
   computed: {
 
     gridType: {
-      get () { return this.$store.getters.pointingRun_gridType },
-      set (val) { this.$store.commit('pointingRun_gridType', val) }
+      get () { return this.$store.state.scriptSettings.pointingRun.gridType },
+      set (value) {
+        const scriptName = 'pointingRun'
+        const paramName = 'gridType'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     },
     numGridRuns: {
-      get () { return this.$store.getters.pointingRun_numGridRuns },
-      set (val) { this.$store.commit('pointingRun_numGridRuns', val) }
+      get () { return this.$store.state.scriptSettings.pointingRun.numGridRuns },
+      set (value) {
+        const scriptName = 'pointingRun'
+        const paramName = 'numGridRuns'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
   }
 }

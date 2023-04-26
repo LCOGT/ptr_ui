@@ -40,6 +40,9 @@ Vue.config.productionTip = false
 
 // Load the config for all sites
 store.dispatch('site_config/update_config').then(() => {
+  // Use config to set defaults for script settings
+  store.dispatch('scriptSettings/setAllDefaults')
+
   new Vue({
     el: '#app',
     router,

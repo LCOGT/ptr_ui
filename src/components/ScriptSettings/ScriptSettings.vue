@@ -3,11 +3,11 @@
     class="the-settings"
     :class="{'is-hidden': !show}"
   >
-    <!--p class="">settings: </p-->
-    <!--div class="heading is-light is-size-4 is-family-monospace">{{getReadableName(script)}}</div-->
-    <!--hr style="border-bottom: silver 4px solid; margin-bottom: 2em;"-->
     <section>
-      <component :is="script" />
+      <component
+        :is="script"
+        v-if="script!='none'"
+      />
     </section>
     <!--hr style="border-bottom: silver 4px solid; margin-bottom: 2em;"-->
     <b-button
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import RestackLocalCalibrations from '@/components/ScriptSettings/RestackLocalCalibrations'
 import CollectScreenFlats from '@/components/ScriptSettings/CollectScreenFlats'
 import CollectBiasesAndDarks from '@/components/ScriptSettings/CollectBiasesAndDarks'
 import CollectSkyFlats from '@/components/ScriptSettings/CollectSkyFlats'
@@ -35,6 +36,7 @@ import FocusFine from '@/components/ScriptSettings/FocusFine'
 export default {
   name: 'ScriptSettings',
   components: {
+    RestackLocalCalibrations,
     CollectScreenFlats,
     CollectBiasesAndDarks,
     CollectSkyFlats,
@@ -52,29 +54,14 @@ export default {
     script: String,
     show: Boolean
   },
+
   methods: {
     camelToSnake (s) {
       return s.replace(/\.?([A-Z]+)/g, function (x, y) { return '_' + y.toLowerCase() }).replace(/^_/, '')
     },
 
     revertDefaultSettings () {
-      this.$store.dispatch('setScriptDefaults', this.script)
-    },
-
-    // Render the script name in a nice readable format.
-    getReadableName (script_name) {
-      return (script_name in this.readableNames)
-        ? this.readableNames[script_name]
-        : script_name
-    },
-
-    script_run_command () {
-      this.$store.dispatch('script_run_command')
-    }
-  },
-  computed: {
-    readableNames: {
-      get () { return this.$store.getters.readableScriptNames }
+      this.$store.dispatch('scriptSettings/setScriptDefaults', this.script)
     }
   }
 }

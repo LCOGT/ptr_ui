@@ -63,18 +63,10 @@ export default {
     ...mapGetters('images', [
       'current_image'
     ]),
-    ...mapGetters([
-      'scriptHasSettings'
-    ]),
 
     ...mapGetters('site_config', [
       'camera_default_area'
     ]),
-
-    selected_script: {
-      get () { return this.$store.getters.selectedScript },
-      set (val) { this.$store.commit('selectedScript', val) }
-    },
 
     // command_params
     mount_ra: {

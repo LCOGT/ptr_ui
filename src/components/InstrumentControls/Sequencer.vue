@@ -14,7 +14,7 @@
     >
       <b-field>
         <b-select
-          v-model="selected_script"
+          v-model="selectedScript"
           value="none"
           size="is-small"
         >
@@ -24,47 +24,18 @@
           <option value="stopScript">
             Stop Script
           </option>
-          <option value="focusAuto">
-            Focus Auto
-          </option>
-          <option value="focusExtensive">
-            Focus Extensive
-          </option>
-          <option value="focusFine">
-            Focus Fine
-          </option>
-          <option value="takeLRGBStack">
-            Take LRGB Stack
-          </option>
-          <option value="takeO3HaS2N2Stack">
-            Take O3HaS2N2 Stack
-          </option>
-          <option value="takeUGRIZSStack">
-            Take ugrizs Stack
-          </option>
-          <option value="takePlanetStack">
-            Take Planet Stack
-          </option>
-          <option value="takeLunarStack">
-            Take Lunar Stack
-          </option>
-          <option value="collectBiasesAndDarks">
-            Collect Biases and Darks
-          </option>
-          <option value="collectScreenFlats">
-            Collect Screen Flats
-          </option>
-          <option value="collectSkyFlats">
-            Collect Sky Flats
-          </option>
-          <option value="pointingRun">
-            Pointing Run
+          <option
+            v-for="script in scriptNames"
+            :key="script.value"
+            :value="script.value"
+          >
+            {{ script.name }}
           </option>
         </b-select>
         <p class="control">
           <button
             class="button is-small"
-            :disabled="!scriptHasSettings"
+            :disabled="!selectedScriptHasSettings"
             @click="isScriptSettingsActive = !isScriptSettingsActive"
           >
             <span
@@ -77,10 +48,17 @@
       </b-field>
     </b-field>
 
+    <div
+      v-if="showNotImplementedWarning"
+      class="not-implemented-warning"
+    >
+      ⚠️  This script has not been implemented in the observatory yet ⚠️
+    </div>
+
     <div v-if="isScriptSettingsActive">
       <script-settings
-        :show="scriptHasSettings"
-        :script="selected_script"
+        :show="selectedScriptHasSettings"
+        :script="selectedScript"
       />
     </div>
 
@@ -92,14 +70,14 @@
         class="button is-small is-success"
         outlined
         style="width: 65%;"
-        @click="script_run_command"
+        @click="scriptRunCommand"
       >
         run script
       </b-button>
       <b-button
         class="button is-small"
         style="width: 35%; border-left: 1px solid #48c775;"
-        @click="script_stop_command"
+        @click="scriptStopCommand"
       >
         stop script
       </b-button>
@@ -140,7 +118,25 @@ export default {
       isExpandedStatusVisible: false,
 
       // Toggles the script settings visiblity
-      isScriptSettingsActive: true
+      isScriptSettingsActive: true,
+
+      // Auto-hide settings for these scripts:
+      hideSettingsOnLoad: [
+        'focusAuto',
+        'focusExtensive',
+        'focusFine'
+      ],
+
+      // Display message for scripts that aren't implemented yet
+      notImplementedScripts: [
+        'takeLRGBStack',
+        'takeO3HaS2N2Stack',
+        'takeUGRIZSStack',
+        'takePlanetStack',
+        'takeLunarStack',
+        'collectScreenFlats',
+        'pointingRun'
+      ]
     }
   },
 
@@ -149,15 +145,36 @@ export default {
       'sequencer_message',
       'sequencer_state'
     ]),
-    ...mapGetters([
-      'scriptHasSettings'
+    ...mapGetters('scriptSettings', [
+      'selectedScriptHasSettings'
     ]),
+
+    scriptNames () {
+      const scripts = this.$store.state.scriptSettings.readableScriptNames
+      const options = []
+      Object.keys(scripts).forEach(key => {
+        options.push({
+          value: key,
+          name: scripts[key]
+        })
+      })
+      console.log(options)
+      return options
+    },
     sitecode () {
       return this.$route.params.sitecode
     },
-    selected_script: {
-      get () { return this.$store.getters.selectedScript },
-      set (val) { this.$store.commit('selectedScript', val) }
+    showNotImplementedWarning () {
+      return this.notImplementedScripts.includes(this.selectedScript)
+    },
+    selectedScript: {
+      get () { return this.$store.state.scriptSettings.selectedScript },
+      set (val) {
+        this.$store.commit('scriptSettings/selectedScript', val)
+
+        // Auto hide or show settings
+        this.isScriptSettingsActive = !this.hideSettingsOnLoad.includes(val)
+      }
     }
   }
 
@@ -166,4 +183,19 @@ export default {
 
 <style scoped lang="scss">
 @import "./instrument_controls_common.scss";
+
+.not-implemented-warning {
+  margin-bottom: 0.5em;
+  padding: 1em;
+  font-weight: bold;
+  text-align: center;
+  border: 1px solid grey;
+  // font for rendering emoji
+  font-family: "Segoe UI Emoji",
+               "Segoe UI Symbol",
+               "Noto Color Emoji",
+               "EmojiOne Color",
+               "Android Emoji",
+               sans-serif;
+}
 </style>
