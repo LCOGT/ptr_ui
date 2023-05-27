@@ -43,9 +43,9 @@ const state = {
 
   // This is used to populate the dropdown list where users select a script in the UI
   readableScriptNames: {
-    focusAuto: 'Focus Auto',
-    focusExtensive: 'Focus Extensive',
-    focusFine: 'Focus Fine',
+    focusAuto: 'Auto Focus',
+    focusExtensive: 'Extensive Focus',
+    focusFine: 'Fine Focus',
     restackLocalCalibrations: 'Restack Local Calibrations',
     collectBiasesAndDarks: 'Collect Biases and Darks',
     collectScreenFlats: 'Collect Screen Flats',
