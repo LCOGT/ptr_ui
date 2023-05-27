@@ -1426,7 +1426,10 @@ export default {
             type: 'is-success'
           })
           this.addProjectToCalendarEvents(project.project_name, project.created_at, this.project_events)
-          this.getUserProjects()
+
+          // refresh the projects table
+          this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
+
           this.getUserEvents()
           this.clearProjectForm()
         }).catch(error => {
@@ -1486,7 +1489,10 @@ export default {
             message: 'Project has been modified.',
             type: 'is-success'
           })
-          this.getUserProjects()
+
+          // refresh the projects table
+          this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
+
           this.getUserEvents()
         }).catch(error => {
           this.$buefy.toast.open({
@@ -1508,9 +1514,6 @@ export default {
       }).catch(error => {
         console.log(error)
       })
-    },
-    getUserProjects () {
-      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
     },
     getUserEvents () {
       this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)

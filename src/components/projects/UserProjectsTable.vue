@@ -13,7 +13,7 @@
     </div>
     <b-table
       :data="projectsToDisplay"
-      :loading="user_projects_is_loading"
+      :loading="projectsIsLoading"
       :empty="user_projects=={}"
       :focusable="isFocusable"
       :paginated="true"
@@ -131,9 +131,6 @@ export default {
   data () {
     return {
 
-      // Admins can choose to see all ptr projects, not just their own.
-      show_everyones_projects: false,
-
       localTime: '-',
       siteTime: '-',
       utcTime: '-',
@@ -148,22 +145,18 @@ export default {
     }
   },
   created () {
-    this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+    this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
   },
   destroyed () {
   },
   watch: {
 
     user () {
-      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+      this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
     },
 
-    show_everyones_projects (show_all_projects) {
-      if (show_all_projects) {
-        this.$store.dispatch('user_data/fetchAllProjects')
-      } else {
-        this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
-      }
+    show_everyones_projects () {
+      this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
     }
 
   },
@@ -229,6 +222,10 @@ export default {
       'all_projects',
       'all_projects_is_loading'
     ]),
+    show_everyones_projects: {
+      get () { return this.$store.state.user_data.show_everyones_projects },
+      set (val) { console.log(this.show_everyones_projects); this.$store.commit('user_data/show_everyones_projects', val) }
+    },
     projectsToDisplay () {
       return this.show_everyones_projects
         ? this.all_projects
