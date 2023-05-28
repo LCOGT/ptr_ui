@@ -18,6 +18,8 @@
       :focusable="isFocusable"
       :paginated="true"
       :per-page="20"
+      default-sort="created_at"
+      default-sort-direction="desc"
       detailed
       class="my-table no-margin"
     >
@@ -27,6 +29,15 @@
         label="project name"
       >
         {{ props.row.project_name }}
+      </b-table-column>
+
+      <b-table-column
+        v-slot="props"
+        field="created_at"
+        label="created"
+        sortable
+      >
+        {{ formatCreatedAtDate(props.row.created_at) }}
       </b-table-column>
 
       <b-table-column
@@ -161,6 +172,15 @@ export default {
 
   },
   methods: {
+    formatCreatedAtDate (utcTimestamp) {
+      const date = new Date(utcTimestamp)
+      const formattedDate = date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      }).replace(/\//g, '/')
+      return formattedDate
+    },
     displayEventDuration (event) {
       const start = moment(event.start)
       const end = moment(event.end)
