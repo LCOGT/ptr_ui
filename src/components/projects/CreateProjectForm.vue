@@ -1311,9 +1311,12 @@ export default {
       } else {
         this.targets[target_index].ra = ''
         this.targets[target_index].dec = ''
-        this.$buefy.toast.open({
+        this.$buefy.notification.open({
+          duration: 10000,
           message: 'Could not resolve object with name ' + this.targets[target_index].name,
-          type: 'is-danger'
+          position: 'is-top',
+          type: 'is-danger',
+          hasIcon: true
         })
       }
     },
@@ -1344,6 +1347,13 @@ export default {
         this.$buefy.toast.open({
           message: "Please avoid '#' in the project name",
           type: 'is-danger'
+        })
+        this.$buefy.notification.open({
+          duration: 10000,
+          message: 'Please avoid \'#\' in the project name',
+          position: 'is-top',
+          type: 'is-danger',
+          hasIcon: true
         })
         // If user selects no sites, consider the selection to be the current site
         if (this.project_sites.length === 0) {
@@ -1522,12 +1532,24 @@ export default {
     // Function to get filters at any site to populate filter dropdown
     get_default_filter_options (site) {
       if (site == 'common pool') {
-        return
+        return []
       }
-      const site_cfg = this.global_config[site]
-      const default_filter_wheel_name = site_cfg.defaults.filter_wheel
-      const filter_wheel_options = site_cfg.filter_wheel[default_filter_wheel_name].settings.filter_data
-      return filter_wheel_options
+      try {
+        const site_cfg = this.global_config[site]
+        const default_filter_wheel_name = site_cfg.defaults?.filter_wheel
+        const filter_wheel_options = site_cfg.filter_wheel[default_filter_wheel_name].settings.filter_data
+        return filter_wheel_options
+      } catch (error) {
+        console.error('Error getting default filter wheels for site ', site)
+        this.$buefy.notification.open({
+          duration: 10000,
+          message: `Failed to fetch specific filters available for site <b>${site.toUpperCase()}</b>.`,
+          position: 'is-top',
+          type: 'is-danger',
+          hasIcon: true
+        })
+        return []
+      }
     }
   },
   computed: {
@@ -1541,7 +1563,7 @@ export default {
       const selected_sites = this.project_sites.flat(Infinity)
 
       if (selected_sites.length != 0) {
-        let fwo = []
+        let fwo = [] // fwo stands for filter wheel options
         for (const site of selected_sites) {
           if (site != 'common pool') {
             const filter_list = this.get_default_filter_options(site).map(x => x[0])
