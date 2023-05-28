@@ -97,7 +97,7 @@
         <button
           class="button is-text"
           :class="{'is-loading': projectsIsLoading}"
-          @click="$store.dispatch('user_data/fetchUserProjects', user.sub)"
+          @click="$store.dispatch('user_data/refreshProjectsTableData', user.sub)"
         >
           <span class="icon is-large has-text-grey-lighter">
             <i class="mdi mdi-refresh mdi-24px" />
