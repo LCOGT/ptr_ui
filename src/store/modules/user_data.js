@@ -33,7 +33,10 @@ const state = {
   user_projects_is_loading: false,
 
   all_projects: [],
-  all_projects_is_loading: false
+  all_projects_is_loading: false,
+
+  // Available to admin users only: if true, fetch and display projects from all users
+  show_everyones_projects: false
 }
 
 // getters
@@ -43,6 +46,17 @@ const getters = {
 
 // actions
 const actions = {
+
+  // refreshProjectsTableData automatically chooses whether to run fetchUserProjects or fetchAllProjects
+  // based on whether the projects table is set to show everyones projects or just
+  // the current user's.
+  async refreshProjectsTableData ({ state, dispatch }, user_id) {
+    if (state.show_everyones_projects) {
+      dispatch('fetchAllProjects')
+    } else {
+      dispatch('fetchUserProjects', user_id)
+    }
+  },
 
   async fetchUserProjects ({ commit, rootState }, user_id) {
     // This happens when the method is called before the current user is loaded.
@@ -102,7 +116,15 @@ const actions = {
     })
   },
 
-  async deleteProject ({ dispatch, rootState }, { project_name, created_at }) {
+  async deleteProject ({ state, commit, dispatch, rootState }, { project_name, created_at }) {
+    // Start the projects table loading animation
+    if (state.show_everyones_projects) {
+      commit('all_projects_is_loading', true)
+    } else {
+      commit('user_projects_is_loading', true)
+    }
+
+    // Prepare the projects api request
     const url = rootState.api_endpoints.projects_endpoint + '/delete-project'
     const header = await getAuthRequestHeader()
     const body = {
@@ -111,8 +133,11 @@ const actions = {
     }
 
     axios.post(url, body, header).then(async response => {
+      // If success, refresh the list of projects
       const user = await getInstance().user.sub
-      dispatch('fetchUserProjects', user)
+      dispatch('refreshProjectsTableData', user)
+
+      // Notify user with small success message
       Toast.open({
         duration: 5000,
         message: 'Successfully deleted project ' + project_name,
@@ -120,6 +145,18 @@ const actions = {
         type: 'is-info'
       })
     }).catch(err => {
+      // End the projects table loading animation.
+      // Note: no need to end in the successful block above
+      // because it will be covered during refresh. Additionally,
+      // we want to avoid ending the loading and immediately restarting it
+      // when the refresh action is dispatched.
+      if (state.show_everyones_projects) {
+        commit('all_projects_is_loading', false)
+      } else {
+        commit('user_projects_is_loading', false)
+      }
+
+      // Notify user of failure with small message
       Toast.open({
         duration: 5000,
         message: "Couldn't delete project.",
@@ -165,7 +202,9 @@ const mutations = {
   user_projects_is_loading (state, val) { state.user_projects_is_loading = val },
 
   all_projects (state, val) { state.all_projects = val },
-  all_projects_is_loading (state, val) { state.all_projects_is_loading = val }
+  all_projects_is_loading (state, val) { state.all_projects_is_loading = val },
+
+  show_everyones_projects (state, val) { state.show_everyones_projects = val }
 }
 
 export default {

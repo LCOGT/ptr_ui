@@ -13,11 +13,13 @@
     </div>
     <b-table
       :data="projectsToDisplay"
-      :loading="user_projects_is_loading"
+      :loading="projectsIsLoading"
       :empty="user_projects=={}"
       :focusable="isFocusable"
       :paginated="true"
       :per-page="20"
+      default-sort="created_at"
+      default-sort-direction="desc"
       detailed
       class="my-table no-margin"
     >
@@ -27,6 +29,15 @@
         label="project name"
       >
         {{ props.row.project_name }}
+      </b-table-column>
+
+      <b-table-column
+        v-slot="props"
+        field="created_at"
+        label="created"
+        sortable
+      >
+        {{ formatCreatedAtDate(props.row.created_at) }}
       </b-table-column>
 
       <b-table-column
@@ -86,7 +97,7 @@
         <button
           class="button is-text"
           :class="{'is-loading': projectsIsLoading}"
-          @click="$store.dispatch('user_data/fetchUserProjects', user.sub)"
+          @click="$store.dispatch('user_data/refreshProjectsTableData', user.sub)"
         >
           <span class="icon is-large has-text-grey-lighter">
             <i class="mdi mdi-refresh mdi-24px" />
@@ -131,9 +142,6 @@ export default {
   data () {
     return {
 
-      // Admins can choose to see all ptr projects, not just their own.
-      show_everyones_projects: false,
-
       localTime: '-',
       siteTime: '-',
       utcTime: '-',
@@ -148,26 +156,31 @@ export default {
     }
   },
   created () {
-    this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+    this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
   },
   destroyed () {
   },
   watch: {
 
     user () {
-      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+      this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
     },
 
-    show_everyones_projects (show_all_projects) {
-      if (show_all_projects) {
-        this.$store.dispatch('user_data/fetchAllProjects')
-      } else {
-        this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
-      }
+    show_everyones_projects () {
+      this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
     }
 
   },
   methods: {
+    formatCreatedAtDate (utcTimestamp) {
+      const date = new Date(utcTimestamp)
+      const formattedDate = date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      }).replace(/\//g, '/')
+      return formattedDate
+    },
     displayEventDuration (event) {
       const start = moment(event.start)
       const end = moment(event.end)
@@ -229,6 +242,10 @@ export default {
       'all_projects',
       'all_projects_is_loading'
     ]),
+    show_everyones_projects: {
+      get () { return this.$store.state.user_data.show_everyones_projects },
+      set (val) { console.log(this.show_everyones_projects); this.$store.commit('user_data/show_everyones_projects', val) }
+    },
     projectsToDisplay () {
       return this.show_everyones_projects
         ? this.all_projects
