@@ -570,6 +570,9 @@ export const commands_mixin = {
     mount_park_command () {
       return this.base_command('mount', 'park', 'park')
     },
+    mount_unpark_command () {
+      return this.base_command('mount', 'unpark', 'unpark')
+    },
     mount_home_command () {
       return this.base_command('mount', 'home', 'home')
     },

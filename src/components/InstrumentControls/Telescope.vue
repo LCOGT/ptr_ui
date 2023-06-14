@@ -211,13 +211,14 @@
       </button>
       <b-dropdown-item
         v-for="(command, idx) in [
-          mount_screenflat_command,
-          mount_skyflat_command,
-          mount_home_command,
           mount_park_command,
-          mount_stop_command,
+          mount_unpark_command,
+          mount_home_command,
+          mount_skyflat_command,
+          mount_screenflat_command,
           mount_tracking_on_command,
           mount_tracking_off_command,
+          mount_stop_command,
         ]"
         :key="idx"
         aria-role="listitem"
