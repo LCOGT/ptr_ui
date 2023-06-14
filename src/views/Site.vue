@@ -53,6 +53,7 @@
     </div>
 
     <div class="page-view">
+      <QuickSiteSwitchButtons :current-site="sitecode" />
       <component
         :is="`site-${subpage}`"
         :sitecode="sitecode"
@@ -78,6 +79,7 @@ import StatusPanelCollapsible from '@/components/status/StatusPanelCollapsible'
 import SiteStatusFooter from '@/components/status/SiteStatusFooter'
 import SiteStatusFooterMobile from '@/components/status/SiteStatusFooterMobile'
 import SiteNavbar from '@/components/SiteNavbar.vue'
+import QuickSiteSwitchButtons from '@/components/QuickSiteSwitchButtons.vue'
 
 import SiteHome from '@/components/sitepages/SiteHome'
 import SiteObserve from '@/components/sitepages/SiteObserve'
@@ -103,7 +105,8 @@ export default {
     StatusPanelCollapsible,
     SiteStatusFooter,
     SiteStatusFooterMobile,
-    SiteNavbar
+    SiteNavbar,
+    QuickSiteSwitchButtons
   },
   props: {
     sitecode: {
@@ -214,6 +217,8 @@ export default {
 .page-view {
   grid-row: 2;
   overflow-y: auto;
+  display:flex;
+  padding-top: 1em;
 }
 .status-footer {
   grid-row: 3;
@@ -234,10 +239,6 @@ export default {
   }
 }
 
-.main-page-content {
-  width: 100%;
-}
-
 .menu-column {
   height: auto;
   padding: 0 auto;
@@ -253,7 +254,8 @@ export default {
   bottom: 300px;
   z-index: 0;
   display:flex;
-  margin-bottom: 1em;
+  margin-bottom: -6px;
+  //margin-bottom: 1em;
 }
 .mobile-site-menu a {
   width: 100%;

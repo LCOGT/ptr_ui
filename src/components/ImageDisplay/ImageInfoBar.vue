@@ -32,7 +32,7 @@
       airmass:&nbsp;{{ current_image.airmass }}
     </div>
     <div class="image-info-bar-item altitude">
-      altitude:&nbsp;{{ current_image.altitude }}°
+      altitude:&nbsp;{{ truncateDecimalString(current_image.altitude, 4) }}°
     </div>
     <div class="image-info-bar-item obstime">
       {{ current_image.capture_date | dateToReadable }}
@@ -98,6 +98,12 @@ export default {
   methods: {
     dateToUnix (date) {
       return (new Date(date).getTime() / 1000).toFixed(0)
+    },
+    truncateDecimalString (decimalString, n) {
+      const number = parseFloat(decimalString)
+      const factor = Math.pow(10, n)
+      const truncatedNumber = Math.floor(number * factor) / factor
+      return truncatedNumber.toString()
     }
   },
 
