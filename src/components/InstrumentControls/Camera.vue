@@ -137,7 +137,6 @@
 
     <!-- Hide this field until we need it (requested march 2023) -->
     <b-field
-      v-show="false"
       v-if="camera_areas && camera_areas.length != 0"
       horizontal
       label="Area"
@@ -310,6 +309,12 @@ export default {
     SimpleDeviceStatus,
     CameraBinSelectField
   },
+  mounted () {
+    // set the initial value for camera areas based on the options specified in the config
+    if (this.camera_areas.length) {
+      this.camera_areas_selection = this.camera_areas[0]
+    }
+  },
   data () {
     return {
       isExpandedStatusVisible: false
@@ -321,6 +326,7 @@ export default {
     camera_areas_selection () {
       this.subframe_is_active = false
     }
+
   },
 
   computed: {

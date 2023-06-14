@@ -158,7 +158,6 @@ export default {
           name: scripts[key]
         })
       })
-      console.log(options)
       return options
     },
     sitecode () {
