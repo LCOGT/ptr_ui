@@ -199,7 +199,7 @@
       aria-role="list"
       style="width: 100%"
       size="is-small"
-      scrollable
+      position="is-top-right"
     >
       <button
         slot="trigger"
