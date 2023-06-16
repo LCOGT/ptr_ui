@@ -470,7 +470,6 @@ const actions = {
      * Set this_image as the current displayed image
      */
   set_current_image ({ commit }, this_image) {
-    console.log('in set current image', this_image)
     commit('setCurrentImage', this_image)
   },
 

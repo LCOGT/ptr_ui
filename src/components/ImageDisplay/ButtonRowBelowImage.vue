@@ -5,13 +5,13 @@
       style="margin-bottom: 0;"
     >
       <b-field>
-        <button
+        <!--button
           title="open the JS9 analysis tools"
           class="button is-small"
           @click="toggleJS9"
         >
           JS9
-        </button>
+        </button-->
       </b-field>
       <b-field>
         <p class="control">
@@ -51,9 +51,6 @@
           </button>
         </p>
       </b-field>
-    </b-field>
-
-    <b-field>
       <FitsHeaderModal
         :image="current_image"
         button_size="is-small"
@@ -133,6 +130,17 @@
           last 24hrs fits
         </b-dropdown-item>
       </b-dropdown>
+    </b-field>
+    <b-field
+      label="crosshairs"
+      class="ml-5"
+      size="small"
+      horizontal
+    >
+      <b-switch
+        v-model="crosshairsVisible"
+        type="is-info"
+      />
     </b-field>
   </div>
 </template>
@@ -314,6 +322,11 @@ export default {
     js9IsVisible: {
       get () { return this.$store.getters['js9/instanceIsVisible'] },
       set (val) { this.$store.commit('js9/instanceIsVisible', val) }
+    },
+
+    crosshairsVisible: {
+      get () { return this.$store.getters['drawshapes/crosshairsVisible'] },
+      set (val) { this.$store.commit('drawshapes/crosshairsVisible', val) }
     }
 
   }

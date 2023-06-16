@@ -4,7 +4,7 @@
       :size="button_size"
       @click="showFitsHeader"
     >
-      show fits header
+      fits header
     </b-button>
 
     <!-- Modal popup window showing the full fits header. -->

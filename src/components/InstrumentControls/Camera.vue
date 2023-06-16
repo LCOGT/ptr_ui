@@ -259,20 +259,6 @@
 
     <div class="horizontal-border" />
 
-    <b-field
-      style="width: 100%;"
-      label="show crosshairs"
-      class="ml-5"
-      horizontal
-    >
-      <b-switch
-        v-model="crosshairsVisible"
-        type="is-info"
-      />
-    </b-field>
-
-    <div class="horizontal-border" />
-
     <!--div class="val" v-if="camera_state && camera_state.message">{{camera_state.message}}</div-->
 
     <status-column
@@ -423,12 +409,8 @@ export default {
     selector_position: {
       get () { return this.$store.getters['command_params/selector_position'] },
       set (val) { this.$store.commit('command_params/selector_position', val) }
-    },
-
-    crosshairsVisible: {
-      get () { return this.$store.getters['drawshapes/crosshairsVisible'] },
-      set (val) { this.$store.commit('drawshapes/crosshairsVisible', val) }
     }
+
   }
 
 }
