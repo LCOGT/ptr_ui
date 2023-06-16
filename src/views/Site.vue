@@ -53,7 +53,11 @@
     </div>
 
     <div class="page-view">
-      <QuickSiteSwitchButtons :current-site="sitecode" />
+      <QuickSiteSwitchButtons
+        :current-site="sitecode"
+        style="position:fixed;"
+      />
+      <div class="quick-site-switch-buttons-spacer" />
       <component
         :is="`site-${subpage}`"
         :sitecode="sitecode"
@@ -239,6 +243,10 @@ export default {
   }
 }
 
+.quick-site-switch-buttons-spacer {
+  width: 50px;
+}
+
 .menu-column {
   height: auto;
   padding: 0 auto;
@@ -252,9 +260,12 @@ export default {
   width: 100%;
   top: 0;
   bottom: 300px;
-  z-index: 0;
   display:flex;
-  margin-bottom: -6px;
+  height: 30px;
+  position:relative;
+  z-index:5;
+  //background-color: rgba(255,0,0,0);
+  //margin-bottom: -6px;
   //margin-bottom: 1em;
 }
 .mobile-site-menu a {
@@ -266,6 +277,7 @@ export default {
   background-color: $dark;
   border: 1px solid $grey-dark;
   border-top: 1px solid grey;
+  height: 30px;
   width: 100%;
   margin: 0;
 
@@ -284,11 +296,12 @@ export default {
   }
 }
 .mobile-site-menu .selected {
-  background-color: rgba(3, 8, 14, 0.2);
+  background-color: rgba(3, 8, 14, 1);
   font-weight: bolder;
   font-size: 14px;
   border: 1px solid grey;
   border-top: none;
+  height: 35px;
 }
 
 </style>
