@@ -270,8 +270,8 @@ const actions = {
     const defaults = state.global_config[site].defaults
 
     commit('setActiveSite', site)
-    commit('setActiveWeather', defaults.observing_conditions)
-    commit('setActiveEnclosure', defaults.enclosure)
+    commit('setActiveWeather', defaults.observing_conditions || 'observing_conditions1')
+    commit('setActiveEnclosure', defaults.enclosure || 'enclosure1')
     commit('setActiveMount', defaults.mount)
     commit('setActiveTelescope', defaults.telescope)
     commit('setActiveCamera', defaults.camera)
