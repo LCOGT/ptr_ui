@@ -55,7 +55,7 @@
     <div class="page-view">
       <QuickSiteSwitchButtons
         :current-site="sitecode"
-        style="position:fixed;"
+        style="position:fixed; left: 10px;"
       />
       <div class="quick-site-switch-buttons-spacer" />
       <component
@@ -296,7 +296,8 @@ export default {
   }
 }
 .mobile-site-menu .selected {
-  background-color: rgba(3, 8, 14, 1);
+  //background-color: rgba(3, 8, 14, 1);
+  background-color: #0f1313;
   font-weight: bolder;
   font-size: 14px;
   border: 1px solid grey;

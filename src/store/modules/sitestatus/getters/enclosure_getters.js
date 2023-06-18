@@ -23,6 +23,14 @@ const enclosure_open_status = (state, getters) => {
   return { name, val, is_stale }
 }
 
+// Not implemented yet
+const enclosure_is_open = (state, getters) => {
+  const name = 'Enc. Open'
+  const val = get_val(getters, 'enclosure_is_open')
+  const is_stale = isItemStale(getters, 'enclosure_state', 'enclosure_is_open')
+  return { name, val, is_stale }
+}
+
 const enclosure_mode = (state, getters) => {
   const name = 'Enc. Mode'
   const val = get_val(getters, 'enclosure_mode')
@@ -61,6 +69,7 @@ const enclosure_message = (state, getters) => {
 export default {
   enclosure_state,
   enclosure_open_status,
+  enclosure_is_open,
   enclosure_mode,
   dome_azimuth,
   dome_slewing,

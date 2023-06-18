@@ -23,6 +23,7 @@ const state = {
   timestamp: '',
   now: Date.now(),
   site_open_status: {},
+  stale_age_ms: STALE_AGE_MS,
 
   /* new status stuff */
   weather_status_age: 1e8,
@@ -76,17 +77,59 @@ const getters = {
    */
   site_operational_status (state, getters) {
     const stale_age_s = STALE_AGE_MS / 1000
-    const weather_not_stale = getters.weather_status_age < stale_age_s
     const device_not_stale = getters.device_status_age < stale_age_s
     const enclosure_not_stale = getters.enclosure_status_age < stale_age_s
 
-    if (weather_not_stale && device_not_stale && enclosure_not_stale) {
-      return 'operational'
-    } else if (weather_not_stale || device_not_stale || enclosure_not_stale) {
-      return 'technical difficulty'
-    } else {
-      return 'offline'
+    // if all status is stale: OFFLINE
+    if (!device_not_stale && !enclosure_not_stale) {
+      return {
+        text: 'offline',
+        colorClass: 'is-grey'
+      }
     }
+
+    // if some of the status is stale: Technical Difficulty
+    if (!device_not_stale || !enclosure_not_stale) {
+      return {
+        text: 'technical difficulty',
+        colorClass: 'is-yellow'
+      }
+    }
+
+    // if all status reporting and enclosure is open: Operational
+    const enclosure_is_open = getters.enclosure_open_status.val.toLowerCase() == 'open'
+    if (device_not_stale && enclosure_not_stale) {
+      if (enclosure_is_open) {
+        return {
+          text: 'operational',
+          colorClass: 'is-green'
+        }
+      } else {
+        return {
+          text: 'enclosure closed',
+          colorClass: 'is-blue'
+        }
+      }
+    }
+  },
+
+  all_sites_status_color (state, getters) {
+    const site_status_colors = {}
+    const status_age_max = STALE_AGE_MS / 1000
+    for (const site in state.site_open_status) {
+      const enclosure_not_stale = state.site_open_status[site]?.enclosure?.status_age_s < status_age_max
+      const device_not_stale = state.site_open_status[site]?.device?.status_age_s < status_age_max
+      let color = ''
+      if (enclosure_not_stale && device_not_stale) {
+        color = 'status-green'
+      } else if (!enclosure_not_stale && !device_not_stale) {
+        color = 'status-grey'
+      } else {
+        color = 'status-yellow'
+      }
+      site_status_colors[site] = color
+    }
+    return site_status_colors
   },
 
   weather_status_age: state => (state.now - state.weather_timestamp) / 1000,

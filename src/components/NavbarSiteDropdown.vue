@@ -77,7 +77,8 @@ export default {
   computed: {
     ...mapState('site_config', ['selected_site', 'global_config']),
     ...mapGetters('site_config', ['all_sites_real', 'all_sites_simulated']),
-    ...mapState('sitestatus', ['site_open_status']),
+    ...mapState('sitestatus', ['site_open_status', 'stale_age_ms']),
+    ...mapGetters('sitestatus', ['all_sites_status_color']),
 
     real_sites () {
       return this.all_sites_real.map((s) => s.site)
@@ -124,13 +125,12 @@ export default {
 
       // Note: if one of these option-chained properties doesn't exist, the inequality evaluates to false.
       // E.g. if there is no device status, site_status?.device ==> undefined, and undefined < any_number is false.
-      const weather_not_stale = site_status?.weather?.status_age_s < stale_age_s
       const device_not_stale = site_status?.device?.status_age_s < stale_age_s
       const enclosure_not_stale = site_status?.enclosure?.status_age_s < stale_age_s
 
-      if (weather_not_stale && device_not_stale && enclosure_not_stale) {
+      if (device_not_stale && enclosure_not_stale) {
         return 'operational'
-      } else if (weather_not_stale || device_not_stale || enclosure_not_stale) {
+      } else if (device_not_stale || enclosure_not_stale) {
         return 'technical difficulty'
       } else {
         return 'offline'
@@ -174,11 +174,7 @@ export default {
       return 'offline'
     },
     site_online_class (site) {
-      const status = this.site_weather_status(site)
-      if (status == 'offline') return 'status-grey'
-      if (status == 'ok') return 'status-green'
-      if (status == 'poor') return 'status-red'
-      return 'status-grey'
+      return this.all_sites_status_color[site]
     }
   }
 }

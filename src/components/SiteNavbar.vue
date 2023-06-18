@@ -152,7 +152,7 @@ export default {
     user_mixin
   ],
   computed: {
-    ...mapState('sitestatus', ['site_open_status']),
+    ...mapState('sitestatus', ['site_open_status', 'stale_age_ms']),
     ...mapState('site_config', [
       'selected_site'
     ]),
@@ -177,43 +177,8 @@ export default {
 
     updateSiteStatus () {
       this.$store.dispatch('sitestatus/getSiteOpenStatus')
-    },
-
-    /*
-      Strategy:
-        if weather status is recent and wx_ok is true: green dot
-        if weather status is recent and wx_ok is false: red dot
-        otherwise: grey dot
-    */
-    siteOnlineClass (site) {
-      const status_age_online = 300 // max number of seconds to be considered online
-
-      // Do nothing if the site doesn't have any status records
-      if (!Object.keys(this.site_open_status).includes(site)) {
-        return 'status-grey'
-      }
-
-      // Extract the age of the latest status
-      // Keep these for reference even if currently unused.
-      /* eslint-disable */
-      const weather_age = this.site_open_status[site]?.weather?.status_age_s
-      const enclosure_age = this.site_open_status[site]?.enclosure?.status_age_s
-      const device_age = this.site_open_status[site]?.device?.status_age_s
-      /* eslint-enable */
-
-      // online sites: weather is sending and ok.
-      if (Object.keys(this.site_open_status[site]).includes('wx_ok')) {
-        const weather_ok = this.site_open_status[site].wx_ok
-        const weather_status_age = this.site_open_status[site].weather.status_age_s
-        const weather_is_recent = weather_status_age < status_age_online
-        if (!weather_is_recent) {
-          return 'status-grey'
-        } else {
-          return weather_ok ? 'status-green' : 'status-red'
-        }
-      }
-      return 'status-grey'
     }
+
   }
 }
 </script>

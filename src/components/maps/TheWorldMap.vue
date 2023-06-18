@@ -129,7 +129,7 @@ export default {
         const markerData = {
           lat: site.latitude,
           lng: site.longitude,
-          rgb: this.getSiteMapColor(this.site_open_status[site.site]),
+          rgb: this.getSiteMapColor(site.site),
           content: this.renderSiteContent(site.name, site.site, this.site_open_status[site.site]),
           name: site.site.toUpperCase()
         }
@@ -271,27 +271,14 @@ export default {
         if weather status is recent and wx_ok is false: red dot
         otherwise: grey dot
     */
-    getSiteMapColor (site_open_status) {
+    getSiteMapColor (site) {
       const colors = {
-        yellow: { r: 221, g: 156, b: 0 },
-        red: { r: 205, g: 0, b: 0 },
-        green: { r: 53, g: 154, b: 34 },
-        grey: { r: 100, g: 100, b: 100 }
+        'status-yellow': { r: 221, g: 156, b: 0 },
+        'status-red': { r: 205, g: 0, b: 0 },
+        'status-green': { r: 53, g: 154, b: 34 },
+        'status-grey': { r: 100, g: 100, b: 100 }
       }
-      const status_age_online = 300 // max number of seconds to be considered online
-      // online sites: weather is sending and ok.
-      if (Object.keys(site_open_status).includes('wx_ok')) {
-        const weather_ok = site_open_status.wx_ok
-        const weather_status_age = site_open_status.weather.status_age_s
-        const weather_is_recent = weather_status_age < status_age_online
-        if (!weather_is_recent) {
-          return colors.grey
-        }
-        else {
-          return weather_ok ? colors.green : colors.red
-        }
-      }
-      return colors.grey
+      return colors[this.all_sites_status_color[site]]
     },
 
     async redrawMapSites () {
@@ -303,7 +290,7 @@ export default {
         // Skip if the site doesn't have any status available
         if (!Object.keys(this.site_open_status).includes(site.site)) { return }
 
-        const icon_color = this.getSiteMapColor(this.site_open_status[site.site])
+        const icon_color = this.getSiteMapColor(site.site)
 
         const marker = new google.maps.Marker({
           position: { lat: site.latitude, lng: site.longitude },
@@ -330,7 +317,8 @@ export default {
     ...mapState('site_config', ['test_sites']),
     ...mapGetters('site_config', ['all_sites_real']),
     ...mapState('sitestatus', ['site_open_status']),
-    ...mapActions('sitestatus', ['getSiteOpenStatus'])
+    ...mapActions('sitestatus', ['getSiteOpenStatus']),
+    ...mapGetters('sitestatus', ['all_sites_status_color'])
   }
 }
 </script>

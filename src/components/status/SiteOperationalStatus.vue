@@ -41,7 +41,7 @@ export default {
         status = this.manual_status
         // Otherwise retrieve from the active site in vuex
       } else {
-        status = this.site_operational_status
+        status = this.site_operational_status.text
       }
       return status
     },
@@ -52,12 +52,7 @@ export default {
          * offline: grey
          */
     operational_status_color_class () {
-      const color_dict = {
-        'operational': 'is-green',
-        'technical difficulty': 'is-yellow',
-        'offline': 'is-grey'
-      }
-      return color_dict?.[this.operational_status] ?? 'is-grey'
+      return this.site_operational_status.colorClass
     }
   }
 }
@@ -83,6 +78,10 @@ export default {
 .is-grey {
     background-color: $ptr-grey;
     color: $ptr-grey;
+}
+.is-blue {
+  background-color: $ptr-blue;
+  color: $ptr-blue;
 }
 
 .online-status-wrapper {
