@@ -23,6 +23,8 @@ function user_id () {
 
 const state = {
 
+  cached_headers: {}, // save retrieved headers so we don't have to make duplicate api calls
+
   large_fits_reduction_level: '00',
   small_fits_reduction_level: '10',
 
@@ -56,6 +58,8 @@ const getters = {
   user_images: state => state.user_images,
   show_user_data_only: state => state.show_user_data_only,
 
+  current_image_fits_header: state => state.current_image.fits_header,
+
   large_fits_exists: state => state.current_image.fits_01_exists,
   small_fits_exists: state => state.current_image.fits_10_exists,
 
@@ -80,7 +84,11 @@ const mutations = {
   setUserImages (state, user_images_list) { state.user_images = user_images_list },
   show_user_data_only (state, val) { state.show_user_data_only = val },
   live_data (state, val) { state.live_data = val },
-  setInfoImage (state, val) { Vue.set(state.info_images, val.channel, val.info_image) }
+  setInfoImage (state, val) { Vue.set(state.info_images, val.channel, val.info_image) },
+  cacheHeader (state, { baseFilename, header }) {
+    // Cache the header in the state
+    state.cached_headers = { ...state.cached_headers, [baseFilename]: header }
+  }
 }
 
 const actions = {
@@ -444,6 +452,33 @@ const actions = {
       }).catch(error => {
         console.error('Error fetching info images', error)
       })
+    }
+  },
+
+  async loadCurrentImageFitsHeader ({ state, rootState, commit }) {
+    if ('base_filename' in state.current_image) {
+      const baseFilename = state.current_image.base_filename
+
+      // Check if the header is already cached
+      if (state.cached_headers[baseFilename]) {
+        return state.cached_headers[baseFilename]
+      }
+
+      const url = rootState.api_endpoints.active_api + `/fitsheader/${baseFilename}/`
+      try {
+        const response = await axios.get(url)
+        const header = response.data
+
+        // Cache the header in the Vuex state
+        commit('cacheHeader', { baseFilename, header })
+
+        return header
+      } catch (e) {
+        console.warn(e)
+        return {}
+      }
+    } else {
+      return {}
     }
   },
 

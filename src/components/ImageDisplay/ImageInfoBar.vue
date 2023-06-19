@@ -53,7 +53,6 @@
 import moment from 'moment'
 import RaDisplay from '@/components/display/RaDisplay'
 import DecDisplay from '@/components/display/DecDisplay'
-import axios from 'axios'
 export default {
   name: 'ImageInfoBar',
   components: {
@@ -82,11 +81,10 @@ export default {
   watch: {
     current_image () {
       // Get header for extra infobar values
-      const url = this.$store.state.api_endpoints.active_api + `/fitsheader/${this.current_image.base_filename}/`
-      axios.get(url).then(response => {
+      this.$store.dispatch('images/loadCurrentImageFitsHeader').then(header => {
         // Round appropriately
-        this.fwhm = Number(response.data.FWHMASEC).toFixed(2)
-        this.sepsky = parseInt(response.data.SEPSKY)
+        this.fwhm = Number(header.FWHMASEC).toFixed(2)
+        this.sepsky = parseInt(header.SEPSKY)
       }).catch(() => {
         console.warn('Unable to get fwhm and/or sepsky from current image fits header.')
         this.fwhm = 'n/a'

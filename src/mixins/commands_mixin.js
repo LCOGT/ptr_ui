@@ -83,10 +83,8 @@ export const commands_mixin = {
       const options = await this.getAuthHeader()
       let form
       if (args != null) {
-        console.log(args)
         form = formCreatorFunction(...args).form
       } else {
-        console.log('no args')
         form = formCreatorFunction().form
       }
       const url = `${this.$store.state.api_endpoints.jobs_api}/newjob?site=${this.active_site}`
@@ -241,7 +239,7 @@ export const commands_mixin = {
         }
       )
     },
-    mount_slew_clickposition_command (x, y, filename) {
+    mount_slew_clickposition_command (x, y, filename, rahrs, decdeg, pixscale, pierside) {
       return this.base_command(
         'mount',
         'center_on_pixels',
@@ -249,7 +247,11 @@ export const commands_mixin = {
         {
           image_x: x,
           image_y: y,
-          base_filename: filename
+          base_filename: filename,
+          header_rahrs: rahrs,
+          header_decdeg: decdeg,
+          header_pixscale: pixscale,
+          header_pierside: pierside
         },
         {}
       )

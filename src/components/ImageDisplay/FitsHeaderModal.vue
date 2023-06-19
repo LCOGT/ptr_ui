@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 export default {
   name: 'FitsHeaderModal',
   props: {
@@ -117,16 +116,9 @@ export default {
   methods: {
     refreshFitsHeader () {
       this.fitsHeader = {}
-
-      // First check if image is placeholder. If so, nothing to show.
-      if (this.image.base_filename == 'placeholder image') {
-        this.fitsHeader = {}
-        return
-      }
       this.headerIsLoading = true
-      const url = this.$store.state.api_endpoints.active_api + `/fitsheader/${this.image.base_filename}/`
-      axios.get(url).then(response => {
-        this.fitsHeader = response.data
+      this.$store.dispatch('images/loadCurrentImageFitsHeader').then(header => {
+        this.fitsHeader = header
       }).finally(() => {
         this.headerIsLoading = false
       })

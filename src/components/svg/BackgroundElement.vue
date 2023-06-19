@@ -75,12 +75,18 @@ export default {
       d3.event.preventDefault()
     },
 
-    send_pixels_center_command (x, y, filename) {
+    async send_pixels_center_command (x, y, filename) {
+      const header = await this.$store.dispatch('images/loadCurrentImageFitsHeader')
       const command_form = [
-        String(x / this.width), // x coordinate
-        String((this.height - y) / this.height), // y coord, starts at bottom.
-        filename
+        `${x / this.width}`, // x coordinate (normalized)
+        `${(this.height - y) / this.height}`, // y coordinate (normalized, starts at bottom)
+        filename, // Image filename
+        header?.RAHRS || 'unknown', // Right ascension in hours
+        header?.DECDEG || 'unknown', // Declination in degrees
+        header?.PIXSCALE || 'unknown', // Pixel scale
+        header?.PIERSIDE || 'unknown' // Pier side
       ]
+
       this.postCommand(this.mount_slew_clickposition_command, command_form)
     },
 
@@ -131,7 +137,8 @@ export default {
 
     ...mapGetters('images', [
       'recent_images',
-      'current_image'
+      'current_image',
+      'current_image_fits_header'
     ])
 
   }
