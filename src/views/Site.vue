@@ -222,7 +222,9 @@ export default {
   grid-row: 2;
   overflow-y: auto;
   display:flex;
+  justify-content: center;
   padding-top: 1em;
+  width: 100%;
 }
 .status-footer {
   grid-row: 3;
