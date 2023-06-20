@@ -9,7 +9,6 @@ module.exports = {
   ],
   globals: {
     A: true, // Aladin script
-    JS9: true,
     $: true,
     d3: true,
     google: true,

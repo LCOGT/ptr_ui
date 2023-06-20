@@ -6,7 +6,6 @@
       class="image-div"
     >
       <svg
-        v-show="!js9IsVisible"
         id="image_svg"
         ref="svgElement"
         :class="{'cursor-is-crosshair': activeDrawShape!='none'}"
@@ -27,7 +26,6 @@
       <svg-context-menu svg-id="image_svg" />
 
       <img
-        v-show="!js9IsVisible"
         id="main-image"
         ref="image"
         rel="preload"
@@ -37,17 +35,6 @@
         :src="current_image.jpg_url"
       >
 
-      <div
-        v-if="js9IsVisible"
-        id="js9-window"
-      >
-        <JS9
-          ref="js9"
-          :include-menu="true"
-          :initial-width="js9width"
-          :initial-height="js9height"
-        />
-      </div>
     </div>
   </div>
 </template>
@@ -58,7 +45,6 @@ import { mapGetters, mapState } from 'vuex'
 import { commands_mixin } from '../mixins/commands_mixin'
 import * as d3 from 'd3'
 
-import JS9 from '@/components/JS9'
 import ImageCrosshairs from '@/components/svg/ImageCrosshairs'
 import BackgroundElement from '@/components/svg/BackgroundElement'
 import SvgContextMenu from '@/components/svg/SvgContextMenu'
@@ -69,7 +55,6 @@ export default {
   name: 'ImageView',
 
   components: {
-    JS9,
     SvgContextMenu,
     ImageCrosshairs,
     BackgroundElement
@@ -98,9 +83,6 @@ export default {
       // Image ID of the currently highlighted image (focused)
       highlighted_image: 0,
 
-      js9width: 200,
-      js9height: 500
-
     }
   },
 
@@ -123,14 +105,6 @@ export default {
   watch: {
     site: function (newVal, oldVal) {
       this.$store.dispatch('images/load_latest_images')
-    },
-
-    current_image: function (newVal, oldVal) {
-      // If we're in the js9 window mode, keep the image updated with the
-      // selected thumbnail.
-      if (this.js9IsVisible) {
-        this.js9LoadImage(newVal)
-      }
     },
 
     lines: {
@@ -213,21 +187,6 @@ export default {
       this.drawLines.imageDimensions = [width, height]
       this.drawCircles.imageDimensions = [width, height]
       this.drawStarmarkers.imageDimensions = [width, height]
-
-      // This is fed to js9 just before displaying to set the matching size.
-      this.js9width = parseInt(width)
-      this.js9height = parseInt(height)
-      this.$store.commit('js9/js9Width', parseInt(width))
-      this.$store.commit('js9/js9Height', parseInt(height))
-      // Update the js9 size
-      if (this.js9IsVisible) {
-        const resize_opts = {
-          id: 'myJS9',
-          width,
-          height
-        }
-        this.$store.dispatch('js9/resizeDisplay', resize_opts)
-      }
     },
 
     handleMouseDown () {
@@ -317,38 +276,15 @@ export default {
       this.svg.on('mousemove', null)
 
       this.mouseIsDown = false
-    },
-
-    js9LoadImage (image) {
-      const the_load_options = {
-        site: image.site,
-        base_filename: image.base_filename
-      }
-      this.$store.dispatch('js9/loadImage', the_load_options)
-    },
-
-    toggleAnalysis () {
-      if (this.js9IsVisible) {
-        this.js9IsVisible = false
-        this.init()
-      } else {
-        this.js9LoadImage(this.current_image)
-        this.js9IsVisible = true
-      }
     }
-
   },
+
   computed: {
 
     ...mapGetters('images', [
       'recent_images',
       'current_image'
     ]),
-
-    js9IsVisible: {
-      get () { return this.$store.getters['js9/instanceIsVisible'] },
-      set (val) { this.$store.commit('js9/instanceIsVisible', val) }
-    },
 
     subframeIsActive: {
       get () { return this.$store.getters['command_params/subframeIsActive'] },
@@ -430,9 +366,6 @@ $max-div-width: $square-image-height;
   width: 100%;
 }
 
-#js9-window {
-  display: block;
-}
 .cursor-is-crosshair:hover {
   cursor: crosshair;
 }

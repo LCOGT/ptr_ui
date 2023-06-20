@@ -16,7 +16,6 @@ import ControlRoom from './views/ControlRoom.vue'
 import Site from './views/Site.vue'
 
 // Pages for testing
-import analysis from './views/analysis.vue'
 import { authGuard } from './auth/authGuard'
 import UserData from './views/UserData.vue'
 import NotFound from './views/NotFound'
@@ -43,7 +42,6 @@ const router = new VueRouter({
     { path: '/info/reservations', name: 'reservations', component: ReservationInfo },
 
     { path: '/profile', name: 'profile', component: Profile, beforeEnter: authGuard },
-    { path: '/analysis', name: 'analysis', component: analysis },
     { path: '/remotehq', name: 'remotehq', component: Remotehq },
     { path: '/data/:user', name: 'data', component: UserData },
     {

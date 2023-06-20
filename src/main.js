@@ -11,10 +11,6 @@ import './style/buefy-styles.scss'
 
 import JsonViewer from 'vue-json-viewer'
 
-// Import this (even if it's not used directly here) to register the local js9
-// crosshair plugin
-import JS9Helpers from '@/utils/js9Helpers' // eslint-disable-line
-
 // Import the Auth0 configuration and plugin
 import { domain, clientId, audience } from '../auth_config.json'
 import { Auth0Plugin } from './auth'

@@ -5,15 +5,6 @@
       style="margin-bottom: 0;"
     >
       <b-field>
-        <!--button
-          title="open the JS9 analysis tools"
-          class="button is-small"
-          @click="toggleJS9"
-        >
-          JS9
-        </button-->
-      </b-field>
-      <b-field>
         <p class="control">
           <button
             class="button level-item is-small"
@@ -285,23 +276,6 @@ export default {
     },
     download_jpg () {
       window.location.assign(this.current_image.jpg_url)
-    },
-    toggleJS9 () {
-      if (this.js9IsVisible) {
-        this.js9IsVisible = false
-        // this.init()
-      } else {
-        this.js9LoadImage(this.current_image)
-        this.js9IsVisible = true
-      }
-    },
-
-    js9LoadImage (image) {
-      const the_load_options = {
-        site: image.site,
-        base_filename: image.base_filename
-      }
-      this.$store.dispatch('js9/loadImage', the_load_options)
     }
   },
   computed: {
@@ -318,11 +292,6 @@ export default {
       'small_fits_filename',
       'large_fits_filename'
     ]),
-
-    js9IsVisible: {
-      get () { return this.$store.getters['js9/instanceIsVisible'] },
-      set (val) { this.$store.commit('js9/instanceIsVisible', val) }
-    },
 
     crosshairsVisible: {
       get () { return this.$store.getters['drawshapes/crosshairsVisible'] },

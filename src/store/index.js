@@ -4,7 +4,6 @@ import site_config from './modules/site_config'
 import images from './modules/images'
 import scriptSettings from './modules/scriptSettings'
 import api_endpoints from './modules/api_endpoints'
-import js9 from './modules/js9'
 import command_params from './modules/command_params'
 import user_data from './modules/user_data'
 import calendar from './modules/calendar'
@@ -33,7 +32,6 @@ const store = new Vuex.Store({
     images,
     user_data,
     api_endpoints,
-    js9,
     calendar,
     drawshapes,
     sitestatus,
