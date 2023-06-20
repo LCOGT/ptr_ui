@@ -18,6 +18,31 @@ const weather_ok = (state, getters) => {
   return { name, val, is_stale, color }
 }
 
+/*
+wx_ok (above) refers to the instantaneous state of the local weather station
+weather_report_good (this) is an estimate of the quality of the entire night (hour by hour).
+*/
+const weather_report_good = (state, getters) => {
+  const name = 'Wx Report Good'
+  const val = get_val(getters, 'weather_report_good')
+  const is_stale = isItemStale(getters, 'weather_state', 'weather_report_good')
+  return { name, val, is_stale }
+}
+
+/*
+A custom metric made by Michael Fitzgerald used to predict the weather quality for the night.
+0 means clear night
+<100 means good
+<600 means could be dodgy
+>600 probably isn't worth observing
+*/
+const fitzgerald_number = (getters) => {
+  const name = 'fitzgerald #'
+  const val = get_val(getters, 'fitzgerald_number')
+  const is_stale = isItemStale(getters, 'weather_state', 'fitzgerald_number')
+  return { name, val, is_stale }
+}
+
 const open_ok = (state, getters) => {
   const name = 'Open OK'
   const val = get_val(getters, 'open_ok')
@@ -134,6 +159,8 @@ const hold_duration = (state, getters) => {
 export default {
   weather_state,
   weather_ok,
+  weather_report_good,
+  fitzgerald_number,
   open_ok,
   sky_temp,
   air_temp,

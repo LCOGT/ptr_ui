@@ -23,11 +23,29 @@ const enclosure_open_status = (state, getters) => {
   return { name, val, is_stale }
 }
 
-// Not implemented yet
-const enclosure_is_open = (state, getters) => {
+const enclosure_is_open = (getters) => {
   const name = 'Enc. Open'
   const val = get_val(getters, 'enclosure_is_open')
   const is_stale = isItemStale(getters, 'enclosure_state', 'enclosure_is_open')
+  return { name, val, is_stale }
+}
+
+const shut_reason_is_bad_weather = (state, getters) => {
+  const name = 'Weather Closure'
+  const val = get_val(getters, 'shut_reason_bad_weather')
+  const is_stale = isItemStale(getters, 'enclosure_state', 'shut_reason_bad_weather')
+  return { name, val, is_stale }
+}
+const shut_reason_is_daytime = (state, getters) => {
+  const name = 'Daytime Closure'
+  const val = get_val(getters, 'shut_reason_daytime')
+  const is_stale = isItemStale(getters, 'enclosure_state', 'shut_reason_daytime')
+  return { name, val, is_stale }
+}
+const shut_reason_is_manual_mode = (state, getters) => {
+  const name = 'Manual Closure'
+  const val = get_val(getters, 'shut_reason_manual_mode')
+  const is_stale = isItemStale(getters, 'enclosure_state', 'shut_reason_manual_mode')
   return { name, val, is_stale }
 }
 
@@ -70,6 +88,9 @@ export default {
   enclosure_state,
   enclosure_open_status,
   enclosure_is_open,
+  shut_reason_is_bad_weather,
+  shut_reason_is_daytime,
+  shut_reason_is_manual_mode,
   enclosure_mode,
   dome_azimuth,
   dome_slewing,
