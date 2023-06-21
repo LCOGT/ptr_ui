@@ -55,7 +55,7 @@
     <div class="page-view">
       <QuickSiteSwitchButtons
         :current-site="sitecode"
-        style="position:fixed; left: 10px;"
+        class="quick-site-switch-buttons"
       />
       <div class="quick-site-switch-buttons-spacer" />
       <component
@@ -246,7 +246,19 @@ export default {
 }
 
 .quick-site-switch-buttons-spacer {
-  width: 50px;
+  width: 0px;
+  @include desktop {
+    width: 50px;
+  }
+}
+
+.quick-site-switch-buttons {
+  display:none;
+  position: fixed;
+  left: 10px;
+  @include desktop {
+    display:flex;
+  }
 }
 
 .menu-column {
