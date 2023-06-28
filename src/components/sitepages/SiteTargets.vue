@@ -85,14 +85,27 @@
             />
           </div>
           <div class="search-slew-container">
-            <command-button
-              :data="mount_slew_radec_command"
-              style="margin-bottom: 1em"
-              class="command-slew-button is-small is-success is-outlined"
-            />
+            <b-field>
+              <command-button
+                :data="mount_slew_radec_command"
+                style="margin-bottom: 1em"
+                class="command-slew-button is-small is-outlined"
+              >
+                slew to RA/Dec
+              </command-button>
+              <p class="control">
+                <command-button
+                  :data="mount_slew_and_center_radec_command"
+                  style="margin-bottom: 1em"
+                  class="command-slew-button is-small is-success is-outlined"
+                >
+                  slew & center
+                </command-button>
+              </p>
+            </b-field>
             <TargetSearchField
               v-model="mount_object"
-              label="Search for objects..."
+              label="Object search"
               size="is-small"
               @results="handle_object_name_search"
             />

@@ -539,6 +539,13 @@ export const commands_mixin = {
         { object: obj }
       )
     },
+    mount_slew_and_center_radec_command () {
+      // Just get the non-centering command and modify the name that is sent to the site
+      // Note: it is important to clone the object so we don't modify the other command payloads.
+      const slew_command = JSON.parse(JSON.stringify(this.mount_slew_radec_command))
+      slew_command.form.optional_params.do_centering_routine = true
+      return slew_command
+    },
     mount_slew_hadec_command () {
       const ha = emptyString(this.mount_ha.toString())
       const dec = emptyString(this.mount_dec.toString())
