@@ -303,7 +303,7 @@ export default {
 
     active_image_tools_tab: {
       get () { return this.$store.state.user_interface.selected_image_tools_tab },
-      set (value) { this.$store.commit('user_interface/setActiveImageToolsTab', value) }
+      set (value) { this.$store.commit('user_interface/selected_image_tools_tab', value) }
       // image tools tab set to analysis by default in user_interface
     },
 

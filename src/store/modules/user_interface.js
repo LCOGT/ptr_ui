@@ -34,16 +34,16 @@ const getters = {
 
 const mutations = {
 
-  setActiveSubpage (state, subpage) {
+  selected_subpage (state, subpage) {
     state.selected_subpage = subpage
   },
-  setActiveTargetTab (state, target_tab) {
+  selected_target_tab (state, target_tab) {
     state.selected_target_tab = target_tab
   },
-  setActiveImageToolsTab (state, image_tools_tab) {
+  selected_image_tools_tab (state, image_tools_tab) {
     state.selected_image_tools_tab = image_tools_tab
   },
-  setActiveControlsTab (state, controls_tab) {
+  selected_controls_tab (state, controls_tab) {
     state.selected_controls_tab = controls_tab
   }
 

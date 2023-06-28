@@ -147,7 +147,10 @@ export default {
   },
 
   beforeDestroy () {
-    this.$store.commit('site_config/removeActiveSite')
+    // Stop UI sync if the user is leader or follower
+    this.$store.commit('uiSync/ui_sync_role', 'none')
+
+    this.$store.commit('site_config/remove_selected_site')
     this.$store.dispatch('images/display_placeholder_image')
     datastreamer.close()
   },
@@ -162,7 +165,7 @@ export default {
   computed: {
     active_subpage: {
       get () { return this.$store.state.user_interface.selected_subpage },
-      set (value) { this.$store.commit('user_interface/setActiveSubpage', value) }
+      set (value) { this.$store.commit('user_interface/selected_subpage', value) }
       // subpage set to home by default in user_interface
     }
   },
@@ -179,6 +182,9 @@ export default {
     // Do this whenever the selected site changes
     // 'sitecode' argument is the new site being navigated to, not the old one.
     site_changed_routine (sitecode) {
+      // Stop UI sync if the user is leader or follower
+      this.$store.commit('uiSync/ui_sync_role', 'none')
+
       // Update the active devices
       this.$store.dispatch('site_config/set_default_active_devices', sitecode)
 

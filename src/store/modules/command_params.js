@@ -5,6 +5,40 @@
  */
 import helpers from '../../utils/helpers'
 
+// Handlers for the different forms in the page.
+// These accept data from the user and send it to the server in a
+// variety of ways
+/*
+$('form#emit').submit(function (event) {
+    socket.emit('my_event', { data: $('#emit_data').val() });
+    return false;
+});
+$('form#broadcast').submit(function (event) {
+    socket.emit('my_broadcast_event', { data: $('#broadcast_data').val() });
+    return false;
+});
+$('form#join').submit(function (event) {
+    socket.emit('join_room', { room: $('#join_room').val() });
+    return false;
+});
+$('form#leave').submit(function (event) {
+    socket.emit('leave_room', { room: $('#leave_room').val() });
+    return false;
+});
+$('form#send_room').submit(function (event) {
+    socket.emit('my_room_event', { room: $('#room_name').val(), data: $('#room_data').val() });
+    return false;
+});
+$('form#close').submit(function (event) {
+    socket.emit('close_room', { room: $('#close_room').val() });
+    return false;
+});
+$('form#disconnect').submit(function (event) {
+    socket.emit('disconnect_request');
+    return false;
+});
+*/
+
 const state = {
 
   // Mount parameters
@@ -151,6 +185,7 @@ const mutations = {
   object_name (state, val) { state.object_name = val },
   camera_exposure (state, val) { state.camera_exposure = val },
   camera_count (state, val) { state.camera_count = val },
+  camera_area (state, val) { state.camera_area = val },
   camera_bin (state, val) { state.camera_bin = val },
   camera_dither (state, val) { state.camera_dither = val },
   camera_extract (state, val) { state.camera_extract = val },

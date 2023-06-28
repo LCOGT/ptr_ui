@@ -88,54 +88,9 @@ export default {
         this.$store.commit('command_params/selector_position', val)
       }
     },
-
-    subframeIsActive: {
-      get () { return this.$store.getters['command_params/subframeIsActive'] },
-      set (val) { this.$store.commit('command_params/subframeIsActive', val) }
-    },
-    camera_areas_selection: {
-      get () { return this.$store.getters['command_params/camera_areas_selection'] },
-      set (val) { this.$store.commit('command_params/camera_areas_selection', val) }
-    },
-    camera_note: {
-      get () { return this.$store.getters['command_params/camera_note'] },
-      set (val) { this.$store.commit('command_params/camera_note', val) }
-    },
-    camera_exposure: {
-      get () { return this.$store.getters['command_params/camera_exposure'] },
-      set (val) { this.$store.commit('command_params/camera_exposure', val) }
-    },
-    camera_count: {
-      get () { return this.$store.getters['command_params/camera_count'] },
-      set (val) { this.$store.commit('command_params/camera_count', val) }
-    },
-    camera_bin: {
-      get () { return this.$store.getters['command_params/camera_bin'] },
-      set (val) { this.$store.commit('command_params/camera_bin', val) }
-    },
-    camera_dither: {
-      get () { return this.$store.getters['command_params/camera_dither'] },
-      set (val) { this.$store.commit('command_params/camera_dither', val) }
-    },
-    camera_extract: {
-      get () { return this.$store.getters['command_params/camera_extract'] },
-      set (val) { this.$store.commit('command_params/camera_extract', val) }
-    },
-    camera_image_type: {
-      get () { return this.$store.getters['command_params/camera_image_type'] },
-      set (val) { this.$store.commit('command_params/camera_image_type', val) }
-    },
-    filter_wheel_options_selection: {
-      get () { return this.$store.getters['command_params/filter_wheel_options_selection'] },
-      set (val) { this.$store.commit('command_params/filter_wheel_options_selection', val) }
-    }
   },
 
   watch: {
-    // If the user changes the chip area parameter, deactivate the subframe.
-    camera_areas_selection () {
-      this.subframeIsActive = false
-    },
 
     // When switching sites, make the instrument selector select field value be the active one.
     sitecode () {

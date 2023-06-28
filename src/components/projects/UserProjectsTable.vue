@@ -155,19 +155,16 @@ export default {
 
     }
   },
-  created () {
-    this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
-  },
-  destroyed () {
-  },
   watch: {
-
-    user () {
-      this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
+    userId () {
+      // Only do this if the active user is authenticated and loaded.
+      if (this.userIsAuthenticated) {
+        this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
+      }
     },
 
     show_everyones_projects () {
-      this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
+      this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
     }
 
   },
@@ -235,6 +232,9 @@ export default {
   },
   computed: {
     ...mapState('user_data', [
+      'userIsAuthenticated',
+      'userIsAdmin',
+      'userId',
       'user_events',
       'user_events_is_loading',
       'user_projects',

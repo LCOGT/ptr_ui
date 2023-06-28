@@ -12,18 +12,15 @@ import sitestatus from './modules/sitestatus'
 import starprofile from './modules/analysistools/starprofile'
 import userstatus from './modules/userstatus'
 import user_interface from './modules/user_interface'
+import uiSync from './modules/uiSync'
+
+import UiSyncPlugin from './plugins/ui_sync'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   plugins: [
-    // Vuex normally doesn't save between page reloads.
-    // Use this plugin to save state for the duration of a browser session.
-    // createPersistedState({
-    //    paths: [
-    //        'scriptSettings'
-    //    ]
-    // })
+    UiSyncPlugin
   ],
   modules: {
     site_config,
@@ -37,7 +34,8 @@ const store = new Vuex.Store({
     sitestatus,
     starprofile,
     userstatus,
-    user_interface
+    user_interface,
+    uiSync
   }
 })
 
