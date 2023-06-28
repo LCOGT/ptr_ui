@@ -1,7 +1,7 @@
 import { NotificationProgrammatic as Notification, DialogProgrammatic as Dialog } from 'buefy'
 
 const UiSyncPlugin = (store) => {
-  const websocketServerUrl = 'uisyncmanual-dev.us-east-1.elasticbeanstalk.com'
+  const websocketServerUrl = 'https://uisync.photonranch.org'
   const socket = io(websocketServerUrl) // eslint-disable-line
 
   socket.on('confirm_connect', payload => {
