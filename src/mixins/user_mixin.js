@@ -7,7 +7,6 @@ export const user_mixin = {
       'userIsAdmin',
       'userId',
       'userName',
-      'userName',
       'userNickname',
       'userEmail',
       'profileUrl'

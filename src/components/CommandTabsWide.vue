@@ -16,7 +16,7 @@
           :value="index.toString()"
           :title="instrument"
         >
-          <UiSyncControls />
+          <UiSyncControls class="ui-sync-controls"/>
           <component
             :is="instrument"
             class="accordion-content"
@@ -140,6 +140,10 @@ $accordion-header-background: $grey-darker;
     font-variant: small-caps;
     color: $grey-lighter;
   }
+}
+
+.ui-sync-controls {
+  padding: 5px;
 }
 
 .accordion-header {
