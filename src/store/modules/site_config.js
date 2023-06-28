@@ -31,6 +31,10 @@ const state = {
 
 const getters = {
 
+  get_site_attribute: state => site => attribute => {
+    return state.global_config[site][attribute]
+  },
+
   site_config: state => {
     return state.global_config[state.selected_site]
   },
@@ -255,8 +259,18 @@ const actions = {
   async update_config ({ commit, rootState }) {
     const url = `${rootState.api_endpoints.active_api}/all/config`
     const response = await axios.get(url)
-    commit('setGlobalConfig', response.data)
-    return response.data
+    const globalConfig = response.data
+    // Add wema-only values into obs configs
+    Object.keys(globalConfig).forEach(site => {
+      const wemaName = globalConfig[site].wema_name || site
+      if (wemaName != site) {
+        globalConfig[site].latitude = globalConfig[wemaName].latitude
+        globalConfig[site].longitude = globalConfig[wemaName].longitude
+        globalConfig[site].TZ_database_name = globalConfig[wemaName].TZ_database_name
+      }
+    })
+    commit('setGlobalConfig', globalConfig)
+    return globalConfig
   },
 
   set_default_filter_option ({ commit, getters }) {
