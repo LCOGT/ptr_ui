@@ -15,15 +15,6 @@
         {{ tab.title }}
       </li>
     </ul>
-    <!--div class="testgrid">
-        <div class="testitem">one</div>
-        <div class="testitem">two</div>
-        <div class="testitem">a long word</div>
-        <div class="testitem">four</div>
-        <div class="testitem">five</div>
-        <div class="testitem">six</div>
-        <div class="testitem">seven</div>
-    </div-->
     <slot />
   </div>
 </template>
@@ -44,7 +35,7 @@ export default {
     }
   },
   props: {
-    initial_tab_index: {
+    tab_index: {
       type: Number,
       default: 0
     }
@@ -56,7 +47,7 @@ export default {
   },
   mounted () {
     // this.set_lengths()
-    this.select_tab(this.initial_tab_index)
+    this.select_tab(this.tab_index)
   },
   methods: {
     select_tab (clicked_tab_index) {
@@ -81,6 +72,9 @@ export default {
     }
   },
   watch: {
+    tab_index () {
+      this.select_tab(this.tab_index)
+    },
     tabs () {
       this.set_lengths()
     }

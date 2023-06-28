@@ -168,25 +168,15 @@ export default {
   },
   created () {
     window.moment = moment // use moment lib in browser devtools
-
-    // Only do this if the active user is authenticated and loaded.
-    if (this.user.sub) {
-      this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
-      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
-    }
-  },
-  destroyed () {
   },
   watch: {
-
-    user () {
+    userId () {
       // Only do this if the active user is authenticated and loaded.
-      if (this.user.sub) {
-        this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
-        this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+      if (this.userIsAuthenticated) {
+        this.$store.dispatch('user_data/fetchUserEvents', this.userId)
+        this.$store.dispatch('user_data/fetchUserProjects', this.userId)
       }
     }
-
   },
   methods: {
     setActiveEvent (row) {
@@ -226,6 +216,9 @@ export default {
   },
   computed: {
     ...mapState('user_data', [
+      'userIsAuthenticated',
+      'userIsAdmin',
+      'userId',
       'user_events',
       'user_events_is_loading',
       'user_projects',

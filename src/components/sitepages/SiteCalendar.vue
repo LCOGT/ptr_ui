@@ -39,7 +39,7 @@
 <script>
 import TheCalendar from '@/components/calendar/TheCalendar'
 import SiteReservationStatus from '@/components/calendar/SiteReservationStatus'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import moment from 'moment'
 
 export default {
@@ -64,8 +64,8 @@ export default {
   },
   mounted () {
     // Load the users projects so they can add them to calendar events.
-    if (this.$auth.isAuthenticated) {
-      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+    if (this.userIsAuthenticated) {
+      this.$store.dispatch('user_data/fetchUserProjects', this.userId)
     }
   },
   destroyed () {
@@ -73,8 +73,8 @@ export default {
   },
   watch: {
     // Update the user's schedulable projects if the user changes.
-    user () {
-      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+    userId () {
+      this.$store.dispatch('user_data/fetchUserProjects', this.userId)
     }
   },
   methods: {
@@ -98,16 +98,12 @@ export default {
       'all_sites',
       'timezone'
     ]),
-
-    user () {
-      return this.$auth.user
-    },
-    username () {
-      if (this.$auth.isAuthenticated) {
-        return this.$auth.user.name
-      }
-      return '-'
-    },
+    ...mapState('user_data', [
+      'userIsAuthenticated',
+      'userIsAdmin',
+      'userId',
+      'userName'
+    ]),
 
     // Calendar Resources (Observatories) to feed into the calendar component
     listOfObservatories () {

@@ -5,9 +5,9 @@
       type="is-toggle"
       size="is-small"
       :animated="false"
-      :initial_tab_index="active_controls_tab"
+      :tab_index="active_controls_tab"
       multiline
-      @selected-index="active_controls_tab =$event"
+      @selected-index="active_controls_tab=$event"
     >
       <template v-for="(instrument, index) of instruments">
         <TabItem
@@ -16,13 +16,7 @@
           :value="index.toString()"
           :title="instrument"
         >
-          <!--div class="accordion-header">
-            <div class="instrument-type-label" >
-              {{instrument}}
-            </div>
-            <div style="flex-grow: 1;"/>
-            <div class="instrument-instance-label">{{selected_instrument(instrument)}}</div>
-          </div-->
+          <UiSyncControls class="ui-sync-controls" />
           <component
             :is="instrument"
             class="accordion-content"
@@ -45,6 +39,7 @@ import {
 } from '@/components/InstrumentControls'
 import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
+import UiSyncControls from '@/components/UiSyncControls'
 
 export default {
   name: 'CommandTabsWide',
@@ -60,7 +55,8 @@ export default {
     Sequencer,
     Settings,
     Tabs,
-    TabItem
+    TabItem,
+    UiSyncControls
   },
 
   methods: {
@@ -75,10 +71,11 @@ export default {
   },
 
   computed: {
+
+    // controls tab set to camera by default in user_interface
     active_controls_tab: {
       get () { return this.$store.state.user_interface.selected_controls_tab },
-      set (value) { this.$store.commit('user_interface/setActiveControlsTab', value) }
-      // controls tab set to camera by default in user_interface
+      set (value) { this.$store.commit('user_interface/selected_controls_tab', value) }
     },
 
     ...mapState('site_config', [
@@ -143,6 +140,10 @@ $accordion-header-background: $grey-darker;
     font-variant: small-caps;
     color: $grey-lighter;
   }
+}
+
+.ui-sync-controls {
+  padding: 5px;
 }
 
 .accordion-header {

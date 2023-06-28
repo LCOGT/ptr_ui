@@ -1032,7 +1032,7 @@ export default {
 
     active_target_tab: {
       get () { return this.$store.state.user_interface.selected_target_tab },
-      set (value) { this.$store.commit('user_interface/setActiveTargetTab', value) }
+      set (value) { this.$store.commit('user_interface/selected_target_tab', value) }
       // targets sidebar tab set to telescope controls by default in user_interface
     },
 

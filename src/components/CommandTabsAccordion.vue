@@ -1,6 +1,7 @@
 
 <template>
   <div class="command-tab-accordion-wrapper">
+    <UiSyncControls />
     <b-collapse
       v-for="(instrument, index) of instruments"
       :key="index"
@@ -44,6 +45,7 @@ import {
   Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
   Camera, Sequencer, Settings
 } from '@/components/InstrumentControls'
+import UiSyncControls from '@/components/UiSyncControls'
 
 export default {
   name: 'CommandTabAccordion',
@@ -56,7 +58,8 @@ export default {
     InstrumentSelector,
     Camera,
     Sequencer,
-    Settings
+    Settings,
+    UiSyncControls
   },
   props: {
     controls: {

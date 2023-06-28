@@ -362,51 +362,51 @@ export const commands_mixin = {
     // selection inputs.
     active_site: {
       get () { return this.selected_site },
-      set (value) { this.$store.commit('site_config/setActiveSite', value) }
+      set (value) { this.$store.commit('site_config/selected_site', value) }
     },
     active_enclosure: {
       get () { return this.selected_enclosure },
-      set (value) { this.$store.commit('site_config/setActiveEnclosure', value) }
+      set (value) { this.$store.commit('site_config/selected_enclosure', value) }
     },
     active_mount: {
       get () { return this.selected_mount },
-      set (value) { this.$store.commit('site_config/setActiveMount', value) }
+      set (value) { this.$store.commit('site_config/selected_mount', value) }
     },
     active_telescope: {
       get () { return this.selected_telescope },
-      set (value) { this.$store.commit('site_config/setActiveTelescope', value) }
+      set (value) { this.$store.commit('site_config/selected_telescope', value) }
     },
     active_rotator: {
       get () { return this.selected_rotator },
-      set (value) { this.$store.commit('site_config/setActiveRotator', value) }
+      set (value) { this.$store.commit('site_config/selected_rotator', value) }
     },
     active_focuser: {
       get () { return this.selected_focuser },
-      set (value) { this.$store.commit('site_config/setActiveFocuser', value) }
+      set (value) { this.$store.commit('site_config/selected_focuser', value) }
     },
     active_filter_wheel: {
       get () { return this.selected_filter_wheel },
-      set (value) { this.$store.commit('site_config/setActiveFilterWheel', value) }
+      set (value) { this.$store.dispatch('site_config/selected_filter_wheel', value) }
     },
     active_camera: {
       get () { return this.selected_camera },
-      set (value) { this.$store.commit('site_config/setActiveCamera', value) }
+      set (value) { this.$store.dispatch('site_config/selected_camera', value) }
     },
     active_screen: {
       get () { return this.selected_screen },
-      set (value) { this.$store.commit('site_config/setActiveScreen', value) }
+      set (value) { this.$store.commit('site_config/selected_screen', value) }
     },
     active_weather: {
       get () { return this.selected_weather },
-      set (value) { this.$store.commit('site_config/setActiveWeather', value) }
+      set (value) { this.$store.commit('site_config/selected_weather', value) }
     },
     active_sequencer: {
       get () { return this.selected_sequencer },
-      set (value) { this.$store.commit('site_config/setActiveSequencer', value) }
+      set (value) { this.$store.commit('site_config/selected_sequencer', value) }
     },
     active_selector: {
       get () { return this.selected_selector },
-      set (value) { this.$store.commit('site_config/setActiveSelector', value) }
+      set (value) { this.$store.commit('site_config/selected_selector', value) }
     },
 
     command_url: function () {

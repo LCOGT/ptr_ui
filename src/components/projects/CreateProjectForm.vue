@@ -1400,7 +1400,7 @@ export default {
       const project = {
         project_name: this.project_name,
         created_at: moment().utc().format(),
-        user_id: this.user.sub,
+        user_id: this.userId,
         project_note: this.project_note,
         project_constraints: this.project_constraints,
         // List of objects (targets in the project)
@@ -1438,7 +1438,7 @@ export default {
           this.addProjectToCalendarEvents(project.project_name, project.created_at, this.project_events)
 
           // refresh the projects table
-          this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
+          this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
 
           this.getUserEvents()
           this.clearProjectForm()
@@ -1459,7 +1459,7 @@ export default {
       const project = {
         project_name: this.project_name,
         created_at: moment().utc().format(),
-        user_id: this.user.sub,
+        user_id: this.userId,
         project_note: this.project_note,
         project_constraints: this.project_constraints,
         // List of objects (targets in the project)
@@ -1501,7 +1501,7 @@ export default {
           })
 
           // refresh the projects table
-          this.$store.dispatch('user_data/refreshProjectsTableData', this.user.sub)
+          this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
 
           this.getUserEvents()
         }).catch(error => {
@@ -1526,7 +1526,7 @@ export default {
       })
     },
     getUserEvents () {
-      this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
+      this.$store.dispatch('user_data/fetchUserEvents', this.userId)
     },
 
     // Function to get filters at any site to populate filter dropdown
@@ -1603,6 +1603,9 @@ export default {
       'filter_wheel_options'
     ]),
     ...mapState('user_data', [
+      'userIsAuthenticated',
+      'userIsAdmin',
+      'userId',
       'user_events',
       'user_projects'
     ]),
@@ -1622,9 +1625,6 @@ export default {
     user_events_without_projects () {
       return this.user_events
         .filter(event => event.project_id != 'none')
-    },
-    user () {
-      return this.$auth.user
     }
   }
 }

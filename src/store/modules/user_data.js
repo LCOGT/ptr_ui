@@ -26,6 +26,14 @@ async function getAuthRequestHeader () {
 // initial state
 const state = {
 
+  userIsAuthenticated: false,
+  userIsAdmin: false,
+  userName: '',
+  userId: '',
+  userNickname: '',
+  userEmail: '',
+  profileUrl: '',
+
   user_events: [],
   user_events_is_loading: false,
 
@@ -41,11 +49,67 @@ const state = {
 
 // getters
 const getters = {
-  api: state => state.active_api
+  api: state => state.active_api,
+  authenticatedUser: state => {
+    return {
+      admin: state.userIsAdmin,
+      name: state.userName,
+      id: state.userId,
+      nickname: state.userNickname,
+      email: state.userEmail,
+      profileUrl: state.profileUrl
+    }
+  }
+}
+
+// mutations
+const mutations = {
+
+  userIsAuthenticated (state, val) { state.userIsAuthenticated = val },
+  userIsAdmin (state, val) { state.userIsAdmin = val },
+  userName (state, val) { state.userName = val },
+  userId (state, val) { state.userId = val },
+  userNickname (state, val) { state.userNickname = val },
+  userEmail (state, val) { state.userEmail = val },
+  profileUrl (state, val) { state.profileUrl = val },
+
+  user_events (state, val) { state.user_events = val },
+  user_events_is_loading (state, val) { state.user_events_is_loading = val },
+
+  user_projects (state, val) { state.user_projects = val },
+  user_projects_is_loading (state, val) { state.user_projects_is_loading = val },
+
+  all_projects (state, val) { state.all_projects = val },
+  all_projects_is_loading (state, val) { state.all_projects_is_loading = val },
+
+  show_everyones_projects (state, val) { state.show_everyones_projects = val }
 }
 
 // actions
 const actions = {
+
+  newUserLogin ({ commit }, user) {
+    const roles = user['https://photonranch.org/user_metadata'].roles
+    const userIsAdmin = roles.includes('admin')
+
+    commit('userIsAuthenticated', true)
+    commit('userIsAdmin', userIsAdmin)
+    commit('userId', user.sub)
+    commit('userName', user.name)
+    commit('userNickname', user.nickname)
+    commit('userEmail', user.email)
+    commit('profileUrl', user.picture)
+  },
+
+  logoutUser ({ commit }) {
+    commit('userIsAuthenticated', false)
+    commit('userIsAdmin', false)
+    commit('userId', '')
+    commit('userName', '')
+    commit('userNickname', '')
+    commit('userEmail', '')
+    commit('profileUrl', '')
+  },
 
   // refreshProjectsTableData automatically chooses whether to run fetchUserProjects or fetchAllProjects
   // based on whether the projects table is set to show everyones projects or just
@@ -191,20 +255,6 @@ const actions = {
     })
   }
 
-}
-
-// mutations
-const mutations = {
-  user_events (state, val) { state.user_events = val },
-  user_events_is_loading (state, val) { state.user_events_is_loading = val },
-
-  user_projects (state, val) { state.user_projects = val },
-  user_projects_is_loading (state, val) { state.user_projects_is_loading = val },
-
-  all_projects (state, val) { state.all_projects = val },
-  all_projects_is_loading (state, val) { state.all_projects_is_loading = val },
-
-  show_everyones_projects (state, val) { state.show_everyones_projects = val }
 }
 
 export default {

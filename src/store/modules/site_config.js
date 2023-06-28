@@ -14,6 +14,8 @@ const state = {
   did_config_load_yet: false,
 
   selected_site: '',
+  prev_selected_site: '',
+
   selected_enclosure: '',
   selected_mount: '',
   selected_telescope: '',
@@ -195,7 +197,7 @@ const getters = {
   },
   // Does the camera bin or not? Returns string 'True' or 'False'.
   camera_can_bin: (state, getters) => {
-    return getters.selected_camera_config.settings?.bin_modes?.length
+    return getters.selected_camera_config.settings?.bin_modes?.length || false
   },
   camera_has_darkslide: (state, getters) => {
     return getters.selected_camera_config.settings?.has_darkslide ?? false
@@ -220,25 +222,27 @@ const mutations = {
     state.global_config = config
     state.did_config_load_yet = true
   },
-  setActiveSite (state, site) {
+  selected_site (state, site) {
+    state.prev_selected_site = state.selected_site
     state.selected_site = site
     state.is_site_selected = true
   },
-  removeActiveSite (state) {
+
+  remove_selected_site (state) {
     state.selected_site = ''
     state.is_site_selected = false
   },
-  setActiveEnclosure (state, enclosure) { state.selected_enclosure = enclosure },
-  setActiveMount (state, mount) { state.selected_mount = mount },
-  setActiveTelescope (state, telescope) { state.selected_telescope = telescope },
-  setActiveRotator (state, rotator) { state.selected_rotator = rotator },
-  setActiveFocuser (state, focuser) { state.selected_focuser = focuser },
-  setActiveFilterWheel (state, filter_wheel) { state.selected_filter_wheel = filter_wheel },
-  setActiveCamera (state, camera) { state.selected_camera = camera },
-  setActiveScreen (state, screen) { state.selected_screen = screen },
-  setActiveWeather (state, weather) { state.selected_weather = weather },
-  setActiveSequencer (state, sequencer) { state.selected_sequencer = sequencer },
-  setActiveSelector (state, selector) {
+  selected_enclosure (state, enclosure) { state.selected_enclosure = enclosure },
+  selected_mount (state, mount) { state.selected_mount = mount },
+  selected_telescope (state, telescope) { state.selected_telescope = telescope },
+  selected_rotator (state, rotator) { state.selected_rotator = rotator },
+  selected_focuser (state, focuser) { state.selected_focuser = focuser },
+  selected_filter_wheel (state, filter_wheel) { state.selected_filter_wheel = filter_wheel },
+  selected_camera (state, camera) { state.selected_camera = camera },
+  selected_screen (state, screen) { state.selected_screen = screen },
+  selected_weather (state, weather) { state.selected_weather = weather },
+  selected_sequencer (state, sequencer) { state.selected_sequencer = sequencer },
+  selected_selector (state, selector) {
     if (selector == '') {
       state.selector_exists = false
       state.selected_selector = ''
@@ -273,57 +277,22 @@ const actions = {
     return globalConfig
   },
 
-  set_default_filter_option ({ commit, getters }) {
-    commit('command_params/filter_wheel_options_selection',
-      getters.filter_wheel_options[0],
+  // Define actions (not just mutations) to change the active device when we also need to set default
+  // values for config-based options
+  selected_camera ({ commit, getters }, selectedCamera) {
+    commit('selected_camera', selectedCamera)
+    if (selectedCamera == '') return
+
+    // set default camera area
+    const areaSelection = getters.camera_areas[0]
+    commit('command_params/camera_areas_selection',
+      areaSelection,
       { root: true }
     )
-  },
 
-  set_default_active_devices ({ state, commit, getters, rootGetters }, site) {
-    const defaults = state.global_config[site].defaults
-
-    commit('setActiveSite', site)
-    commit('setActiveWeather', defaults.observing_conditions || 'observing_conditions1')
-    commit('setActiveEnclosure', defaults.enclosure || 'enclosure1')
-    commit('setActiveMount', defaults.mount)
-    commit('setActiveTelescope', defaults.telescope)
-    commit('setActiveCamera', defaults.camera)
-    commit('setActiveFilterWheel', defaults.filter_wheel)
-    commit('setActiveFocuser', defaults.focuser)
-    commit('setActiveRotator', defaults.rotator)
-    commit('setActiveSequencer', defaults.sequencer)
-    commit('setActiveScreen', defaults.screen)
-
-    // handle optional instrument selector
-    if (Object.keys(state.global_config[site]).includes('selector') &&
-          Object.keys(state.global_config[site].defaults).includes('selector') &&
-          state.global_config[site].defaults.selector !== null) {
-      commit('setActiveSelector', defaults.selector)
-    }
-    else {
-      commit('setActiveSelector', '')
-    }
-
-    // Set initial values in command fields
-    if (rootGetters['command_params/filter_wheel_options_selection'] == '') {
-      const filterSelection = getters.filter_wheel_options[0][0]
-      commit('command_params/filter_wheel_options_selection',
-        filterSelection,
-        { root: true }
-      )
-    }
-
-    if (rootGetters['command_params/camera_areas_selection'] == '' && getters.camera_areas != undefined) {
-      const areaSelection = getters.camera_areas[0]
-      commit('command_params/camera_areas_selection',
-        areaSelection,
-        { root: true }
-      )
-    }
-
-    if (rootGetters['command_params/camera_bin'] == '' && getters.camera_can_bin) {
-      const bin_selection = getters.camera_bin_options[0]
+    // set default bin setting if binning is enabled
+    const bin_selection = getters.camera_bin_options[0]
+    if (getters.camera_can_bin) {
       commit('command_params/camera_bin',
         bin_selection,
         { root: true }
@@ -331,19 +300,55 @@ const actions = {
     }
   },
 
+  selected_filter_wheel ({ commit, getters }, selectedFilterWheel) {
+    commit('selected_filter_wheel', selectedFilterWheel)
+    if (selectedFilterWheel == '') return
+
+    // set default filter selection
+    const filterSelection = getters.filter_wheel_options[0][0]
+    commit('command_params/filter_wheel_options_selection',
+      filterSelection,
+      { root: true }
+    )
+  },
+
+  set_default_active_devices ({ state, commit, getters, rootGetters, dispatch }, site) {
+    const defaults = state.global_config[site].defaults
+
+    commit('selected_site', site)
+    commit('selected_weather', defaults.observing_conditions || 'observing_conditions1')
+    commit('selected_enclosure', defaults.enclosure || 'enclosure1')
+    commit('selected_mount', defaults.mount)
+    commit('selected_telescope', defaults.telescope)
+    dispatch('selected_camera', defaults.camera)
+    dispatch('selected_filter_wheel', defaults.filter_wheel)
+    commit('selected_focuser', defaults.focuser)
+    commit('selected_rotator', defaults.rotator)
+    commit('selected_sequencer', defaults.sequencer)
+    commit('selected_screen', defaults.screen)
+
+    // handle optional instrument selector
+    commit('selected_selector', '')
+    if (Object.keys(state.global_config[site]).includes('selector') &&
+          Object.keys(state.global_config[site].defaults).includes('selector') &&
+          state.global_config[site].defaults.selector !== null) {
+      commit('selected_selector', defaults.selector)
+    }
+  },
+
   remove_active_site ({ commit }) {
-    commit('setActiveSite', '')
-    commit('setActiveWeather', '')
-    commit('setActiveEnclosure', '')
-    commit('setActiveMount', '')
-    commit('setActiveTelescope', '')
-    commit('setActiveCamera', '')
-    commit('setActiveFilterWheel', '')
-    commit('setActiveFocuser', '')
-    commit('setActiveRotator', '')
-    commit('setActiveSequencer', '')
-    commit('setActiveScreen', '')
-    commit('setActiveSelector', '')
+    commit('selected_site', '')
+    commit('selected_weather', '')
+    commit('selected_enclosure', '')
+    commit('selected_mount', '')
+    commit('selected_telescope', '')
+    commit('selected_camera', '')
+    commit('selected_filter_wheel', '')
+    commit('selected_focuser', '')
+    commit('selected_rotator', '')
+    commit('selected_sequencer', '')
+    commit('selected_screen', '')
+    commit('selected_selector', '')
   }
 
 }

@@ -63,19 +63,19 @@
     <template slot="end">
       <b-navbar-item tag="div">
         <div
-          v-if="$auth.isAuthenticated"
+          v-if="userIsAuthenticated"
           class="navbar-item has-dropdown is-hoverable is-dark"
         >
           <div class="navbar-link">
             <img
-              :src="$auth.user.picture"
+              :src="profileUrl"
               width="25"
               height="25"
               style="border-radius: 50%;"
               referrerpolicy="no-referrer"
             >
             <div style="width:5px" />
-            <p> {{ $auth.user.name }} </p>
+            <p> {{ userName }} </p>
           </div>
 
           <div class="navbar-dropdown">
@@ -117,7 +117,7 @@
             </b-button>
           </b-tooltip>
           <b-button
-            v-if="!$auth.isAuthenticated"
+            v-if="!userIsAuthenticated"
             class="button"
             @click="login"
           >
@@ -155,6 +155,12 @@ export default {
     ...mapState('sitestatus', ['site_open_status', 'stale_age_ms']),
     ...mapState('site_config', [
       'selected_site'
+    ]),
+    ...mapState('user_data', [
+      'userIsAuthenticated',
+      'userIsAdmin',
+      'userId',
+      'profileUrl'
     ]),
 
     real_sites () {

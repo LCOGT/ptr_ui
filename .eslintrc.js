@@ -36,6 +36,8 @@ module.exports = {
     'vue/require-prop-types': 'off',
     'vue/order-in-components': 'off',
     'vue/multi-word-component-names': 'off',
+    'vue/no-v-for-template-key': 'off',
+    'vue/no-v-for-template-key-on-child': 'off',
 
     /* Don't automatically fix these when running `eslint --fix`, but keep the warning/error */
 

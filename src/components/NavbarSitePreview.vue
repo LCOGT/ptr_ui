@@ -82,7 +82,7 @@ export default {
   computed: {
     active_subpage: {
       get () { return this.$store.state.user_interface.selected_subpage },
-      set (value) { this.$store.commit('user_interface/setActiveSubpage', value) }
+      set (value) { this.$store.commit('user_interface/selected_subpage', value) }
     }
   },
 
