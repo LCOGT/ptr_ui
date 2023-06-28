@@ -16,7 +16,7 @@
           :value="index.toString()"
           :title="instrument"
         >
-          <UiSyncControls class="ui-sync-controls"/>
+          <UiSyncControls class="ui-sync-controls" />
           <component
             :is="instrument"
             class="accordion-content"

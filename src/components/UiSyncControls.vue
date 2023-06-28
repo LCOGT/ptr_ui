@@ -85,7 +85,6 @@ export default {
     showHelp () {
       this.$buefy.dialog.alert({
         title: 'UI Sync',
-        //hasIcon: true,
         type: 'is-info',
         message: `
                   <p>
@@ -127,7 +126,7 @@ export default {
                   </p><br>
                   `,
         confirmText: 'close',
-        canCancel: ['escape', 'outside'],
+        canCancel: ['escape', 'outside']
       })
     }
   }

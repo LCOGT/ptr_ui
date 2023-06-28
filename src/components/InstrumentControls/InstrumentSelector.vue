@@ -87,7 +87,7 @@ export default {
       set (val) {
         this.$store.commit('command_params/selector_position', val)
       }
-    },
+    }
   },
 
   watch: {
