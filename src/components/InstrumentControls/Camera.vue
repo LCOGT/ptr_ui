@@ -243,14 +243,19 @@
       label="Darkslide"
     >
       <StatusVal :status-item="camera_darkslide" />
-      <div class="buttons has-addons">
+      <div
+        v-if="userIsAdmin"
+        class="buttons has-addons"
+      >
         <command-button
           :data="camera_darkslide_open_command"
+          admin
           style="width: 50%;"
           class="is-small mb-0"
         />
         <command-button
           :data="camera_darkslide_close_command"
+          admin
           style="width: 50%"
           class="is-small mb-0"
         />
