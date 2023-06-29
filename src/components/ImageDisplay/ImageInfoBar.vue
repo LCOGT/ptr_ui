@@ -9,7 +9,9 @@
     <div class="image-info-bar-item filter-used">
       filter:&nbsp;{{ current_image.filter_used }}
     </div>
-    <div />
+    <div class="image-info-bar-item smartstack">
+      stack:&nbsp;{{  smartstackProgress }}
+    </div>
     <div
       class="image-info-bar-item ra"
       style="display:flex"
@@ -68,7 +70,9 @@ export default {
   data () {
     return {
       fwhm: '',
-      sepsky: ''
+      sepsky: '',
+      smartstackLength: 1, // Total number of images for this smartstack
+      smartstackNumber: 0 // Value of n for "this image is the nth smartstack image", 0-indexed
     }
   },
 
@@ -83,12 +87,26 @@ export default {
       // Get header for extra infobar values
       this.$store.dispatch('images/loadCurrentImageFitsHeader').then(header => {
         // Round appropriately
-        this.fwhm = Number(header.FWHMASEC).toFixed(2)
-        this.sepsky = parseInt(header.SEPSKY)
-      }).catch(() => {
-        console.warn('Unable to get fwhm and/or sepsky from current image fits header.')
-        this.fwhm = 'n/a'
-        this.sepsky = 'n/a'
+        if ('FWHMASEC' in header) {
+          this.fwhm = Number(header.FWHMASEC).toFixed(2)
+        } else {
+          this.fwhm = 'n/a'
+        }
+        if ('SEPSKY' in header) {
+          this.sepsky = parseInt(header.SEPSKY)
+        } else {
+          this.sepsky = 'n/a'
+        }
+        if ('SSTKLEN' in header) {
+          this.smartstackLength = parseInt(header.SSTKLEN)
+        } else {
+          this.smartstackLength = 1
+        }
+        if ('SSTKNUM' in header) {
+          this.smartstackNumber = parseInt(header.SSTKNUM)
+        } else {
+          this.smartstackNumber = 0
+        }
       })
     }
   },
@@ -106,6 +124,12 @@ export default {
   },
 
   computed: {
+    smartstackProgress () {
+      if (this.smartstackLength == 1) {
+        return 'n/a'
+      }
+      return `${this.smartstackNumber + 1} of ${this.smartstackLength}`
+    },
     raHours () {
       // current_image.right_ascension used hours until march 8, 2023, 9:20 UTC.
       // this block checks for images taken before then, and doesn't do a decimal -> hours conversion.
@@ -135,7 +159,7 @@ export default {
   grid-template-columns:  1fr 2fr 0.5fr 1fr 1fr;
   grid-template-areas: 'site exptime . ra dec'
                        'filter-used obstime . airmass altitude'
-                       '. filename filename fwhm sepsky';
+                       'smartstack filename filename fwhm sepsky';
   grid-column-gap: 10px;
   padding: 1px 3px;
   font-size: 9pt;
@@ -145,6 +169,7 @@ export default {
   }
   .site { grid-area: site; }
   .filter-used { grid-area: filter-used; }
+  .smartstack { grid-area: smartstack; }
   .exptime { grid-area: exptime; }
   .ra { grid-area: ra; }
   .dec { grid-area: dec; }
