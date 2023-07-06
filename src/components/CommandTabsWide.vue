@@ -9,30 +9,32 @@
       multiline
       @selected-index="active_controls_tab=$event"
     >
-      <template v-for="(instrument, index) of instruments">
-        <TabItem
-          :key="index"
-          class="tab-item"
-          :value="index.toString()"
-          :title="instrument"
-        >
-          <UiSyncControls class="ui-sync-controls" />
-          <component
-            :is="instrument"
-            class="accordion-content"
-          />
-          <!--div class="accordion-content p-3 mt-4 is-size-7 has-text-centered is-italic has-text-weight-light is-family-code">
-            TODO: better status display here
-          </div-->
-        </TabItem>
-      </template>
+      <!-- <template v-for="(instrument, index) of instruments"> -->
+      <TabItem
+        v-for="(instrument, index) of instruments"
+        :key="index"
+        class="tab-item"
+        :value="index.toString()"
+        :title="instrument"
+        :is-active="index == active_controls_tab"
+      >
+        <UiSyncControls class="ui-sync-controls" />
+        <component
+          :is="instrument"
+          class="accordion-content"
+        />
+        <!--div class="accordion-content p-3 mt-4 is-size-7 has-text-centered is-italic has-text-weight-light is-family-code">
+          TODO: better status display here
+        </div-->
+      </TabItem>
+      <!-- </template> -->
     </Tabs>
   </div>
 </template>
 
 <script>
 import { commands_mixin } from '@/mixins/commands_mixin'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import {
   Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
   Camera, Sequencer, Settings
@@ -82,24 +84,32 @@ export default {
       'selector_exists'
     ]),
 
+    ...mapGetters('site_config', [
+      'site_is_wema'
+    ]),
+
     instruments () {
-      const inst = []
-      inst.push(...[
-        'Enclosure',
-        'Screen',
-        'Telescope',
-        'Rotator',
-        'Focuser',
-        'Camera'
-      ])
-      if (this.selector_exists) {
-        inst.push('InstrumentSelector')
+      if (this.site_is_wema) {
+        return ['Enclosure', 'Screen', 'Sequencer']
+      } else {
+        const inst = []
+        inst.push(...[
+          'Enclosure',
+          'Screen',
+          'Telescope',
+          'Rotator',
+          'Focuser',
+          'Camera'
+        ])
+        if (this.selector_exists) {
+          inst.push('InstrumentSelector')
+        }
+        inst.push(...[
+          'Sequencer',
+          'Settings'
+        ])
+        return inst
       }
-      inst.push(...[
-        'Sequencer',
-        'Settings'
-      ])
-      return inst
     }
   }
 

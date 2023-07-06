@@ -70,15 +70,50 @@ const getters = {
   },
 
   /**
-   *  Site operational status:
-   *    operational: recieving all status (weather, enclosure device), none are stale
+   *  Site operational status for obs platforms:
+   *    operational: recieving all status (weather, enclosure, device), none are stale
    *    technical difficulty: recieving some but not all status
    *    offline: all status is stale
+   *  Site operational status for wemas:
+   *    operational: recieving enclosure status
+   *    offline: enclosure status is stale
    */
-  site_operational_status (state, getters) {
+  site_operational_status (state, getters, rootState) {
     const stale_age_s = STALE_AGE_MS / 1000
     const device_not_stale = getters.device_status_age < stale_age_s
     const enclosure_not_stale = getters.enclosure_status_age < stale_age_s
+    const weather_not_stale = getters.weather_status_age < stale_age_s
+
+    // First handle WEMA sites
+    if (rootState.site_config.global_config[rootState.site_config.selected_site].instance_type == 'wema') {
+      // enclosure and weather both online
+      if (enclosure_not_stale && weather_not_stale) {
+        return {
+          text: 'operational',
+          colorClass: 'is-green'
+        }
+      // enclosure and weather both stale
+      } else if (!enclosure_not_stale && !weather_not_stale) {
+        return {
+          text: 'offline',
+          colorClass: 'is-grey'
+        }
+      // enclosure is stale
+      } else if (!enclosure_not_stale && weather_not_stale) {
+        return {
+          text: 'enclosure not reporting',
+          colorClass: 'is-yellow'
+        }
+      // weather is stale
+      } else if (!enclosure_not_stale && weather_not_stale) {
+        return {
+          text: 'enclosure not reporting',
+          colorClass: 'is-yellow'
+        }
+      }
+    }
+
+    // non-wema sites below:
 
     // if all status is stale: OFFLINE
     if (!device_not_stale && !enclosure_not_stale) {
@@ -113,20 +148,36 @@ const getters = {
     }
   },
 
-  all_sites_status_color (state, getters) {
+  all_sites_status_color (state, getters, rootState) {
     const site_status_colors = {}
     const status_age_max = STALE_AGE_MS / 1000
     for (const site in state.site_open_status) {
       const enclosure_not_stale = state.site_open_status[site]?.enclosure?.status_age_s < status_age_max
+      const weather_not_stale = state.site_open_status[site]?.weather?.status_age_s < status_age_max
       const device_not_stale = state.site_open_status[site]?.device?.status_age_s < status_age_max
+      const site_is_wema = rootState.site_config.global_config[site]?.instance_type == 'wema'
       let color = ''
-      if (enclosure_not_stale && device_not_stale) {
-        color = 'status-green'
-      } else if (!enclosure_not_stale && !device_not_stale) {
-        color = 'status-grey'
-      } else {
-        color = 'status-yellow'
+
+      if (site_is_wema) {
+        if (enclosure_not_stale && weather_not_stale) {
+          color = 'status-green'
+        } else if (!enclosure_not_stale && !weather_not_stale) {
+          color = 'status-grey'
+        } else {
+          color = 'status-yellow'
+        }
       }
+
+      if (!site_is_wema) {
+        if (enclosure_not_stale && device_not_stale) {
+          color = 'status-green'
+        } else if (!enclosure_not_stale && !device_not_stale) {
+          color = 'status-grey'
+        } else {
+          color = 'status-yellow'
+        }
+      }
+
       site_status_colors[site] = color
     }
     return site_status_colors

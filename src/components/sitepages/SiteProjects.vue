@@ -85,6 +85,7 @@ export default {
 
 .site-projects-wrapper {
   min-height: calc(100vh - #{$top-bottom-height});
+  width: 100%;
   margin: 2em 5em;
 
   display: grid;
@@ -99,9 +100,9 @@ export default {
     grid-template-areas: 'project' 'tables';
   }
   @include fullhd {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 60px 1fr auto;
     grid-template-rows: 1fr;
-    grid-template-areas: 'project tables';
+    grid-template-areas: 'quicksitepadding project tables';
   }
 }
 

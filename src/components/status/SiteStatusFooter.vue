@@ -118,7 +118,10 @@
             </div>
           </div>
 
-          <div class="status-container container">
+          <div
+            v-if="!site_is_wema"
+            class="status-container container"
+          >
             <div class="status-container-header">
               Device Status
               <div class="status-container-header-status-age">
@@ -220,19 +223,19 @@
               :status-list="primary_status_group_2"
             />
           </div>
-          <div>
+          <div v-if="!site_is_wema">
             <status-column
               style="padding: 0"
               :status-list="primary_status_group_3"
             />
           </div>
-          <div>
+          <div v-if="!site_is_wema">
             <status-column
               style="padding: 0"
               :status-list="primary_status_group_4"
             />
           </div>
-          <div>
+          <div v-if="!site_is_wema">
             <status-column
               style="padding: 0"
               :status-list="primary_status_group_5"
@@ -367,7 +370,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('site_config', ['site_longitude', 'timezone']),
+    ...mapGetters('site_config', ['site_is_wema', 'site_longitude', 'timezone']),
     ...mapGetters('sitestatus', [
       // "status_age_display",
       'weather_status_age_display',

@@ -58,7 +58,7 @@ export default {
 
       // loop over all the tabs
       this.tabs.forEach((tab, index) => {
-        tab.isActive = (index === clicked_tab_index)
+        tab.manualIsActive = (index === clicked_tab_index)
       })
     },
 
@@ -72,6 +72,7 @@ export default {
     }
   },
   watch: {
+
     tab_index () {
       this.select_tab(this.tab_index)
     },

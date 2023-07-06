@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import {
   Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
   Camera, Sequencer, Settings
@@ -91,8 +91,14 @@ export default {
     ...mapState('site_config', [
       'selector_exists'
     ]),
+    ...mapGetters('site_config', [
+      'site_is_wema'
+    ]),
 
     instruments () {
+      if (this.site_is_wema) {
+        return ['Enclosure', 'Screen', 'Sequencer']
+      }
       // Default display
       const inst = []
       inst.push(...[

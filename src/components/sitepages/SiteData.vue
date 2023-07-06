@@ -60,19 +60,34 @@
             </div>
 
             <Tabs class="analysis-tools-tabs">
-              <TabItem title="star inspector">
+              <TabItem
+                title="star inspector"
+                :is-active="activeAnalysisTab == 'star inspector'"
+              >
                 <star-profile />
               </TabItem>
-              <TabItem title="statistics">
+              <TabItem
+                title="statistics"
+                :is-active="activeAnalysisTab == 'statistics'"
+              >
                 <ImageStatisticsViewer />
               </TabItem>
-              <TabItem title="histogram">
+              <TabItem
+                title="histogram"
+                :is-active="activeAnalysisTab == 'histogram'"
+              >
                 <HistogramTool />
               </TabItem>
-              <TabItem title="line profile">
+              <TabItem
+                title="line profile"
+                :is-active="activeAnalysisTab == 'line profile'"
+              >
                 <LineProfileInspection :disabled="!large_fits_exists && !small_fits_exists" />
               </TabItem>
-              <TabItem title="image info">
+              <TabItem
+                title="image info"
+                :is-active="activeAnalysisTab == 'image info'"
+              >
                 <ImageMetadataViewer />
               </TabItem>
             </Tabs>
@@ -135,13 +150,19 @@
             :value="'dev'"
           >
             <Tabs class="dev-tools-tabs">
-              <TabItem title="recent s3 data">
+              <TabItem
+                title="recent s3 data"
+                :is-active="activeDevTab == 'recent s3 data'"
+              >
                 <RecentS3UploadsTable
                   :init_site="sitecode"
                   size="is-small"
                 />
               </TabItem>
-              <TabItem title="site config">
+              <TabItem
+                title="site config"
+                :is-active="activeDevTab == 'site config'"
+              >
                 <div class="subtitle">
                   Config file for {{ sitecode }}
                 </div>

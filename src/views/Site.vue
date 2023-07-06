@@ -191,7 +191,7 @@ export default {
       // Subscribe to datastream for the new site
       datastreamer.update_site(sitecode)
 
-      // get initial data/valuse for images, status, calendar
+      // get initial data/values for images, status, calendar
       this.$store.dispatch('images/display_placeholder_image')
       this.$store.dispatch('images/load_latest_images')
       this.$store.dispatch('images/load_latest_info_images')
@@ -200,6 +200,11 @@ export default {
       this.$store.dispatch('userstatus/fetch_recent_logs')
       this.$store.dispatch('calendar/fetchActiveReservations', sitecode)
       this.active_subpage = this.subpage
+
+      // If switching to a wema site
+      if (this.$store.getters['site_config/site_is_wema']) {
+        this.$store.commit('user_interface/selected_controls_tab', 0)
+      }
     }
 
   }

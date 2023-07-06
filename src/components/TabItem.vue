@@ -1,6 +1,6 @@
 <template>
   <div
-    v-show="isActive"
+    v-show="tabIsActive"
     class="tab"
   >
     <slot />
@@ -13,11 +13,27 @@ export default {
     title: {
       type: String,
       default: 'Tab'
+    },
+    isActive: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
     return {
-      isActive: true
+      manualIsActive: true,
+      tabIsActive: false
+    }
+  },
+  mounted () {
+    this.tabIsActive = this.isActive
+  },
+  watch: {
+    manualIsActive () {
+      this.tabIsActive = this.manualIsActive
+    },
+    isActive () {
+      this.tabIsActive = this.isActive
     }
   }
 }
