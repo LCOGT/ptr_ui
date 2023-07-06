@@ -10,7 +10,7 @@
       filter:&nbsp;{{ current_image.filter_used }}
     </div>
     <div class="image-info-bar-item smartstack">
-      stack:&nbsp;{{  smartstackProgress }}
+      stack:&nbsp;{{ smartstackProgress }}
     </div>
     <div
       class="image-info-bar-item ra"

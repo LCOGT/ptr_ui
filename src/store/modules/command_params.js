@@ -5,40 +5,6 @@
  */
 import helpers from '../../utils/helpers'
 
-// Handlers for the different forms in the page.
-// These accept data from the user and send it to the server in a
-// variety of ways
-/*
-$('form#emit').submit(function (event) {
-    socket.emit('my_event', { data: $('#emit_data').val() });
-    return false;
-});
-$('form#broadcast').submit(function (event) {
-    socket.emit('my_broadcast_event', { data: $('#broadcast_data').val() });
-    return false;
-});
-$('form#join').submit(function (event) {
-    socket.emit('join_room', { room: $('#join_room').val() });
-    return false;
-});
-$('form#leave').submit(function (event) {
-    socket.emit('leave_room', { room: $('#leave_room').val() });
-    return false;
-});
-$('form#send_room').submit(function (event) {
-    socket.emit('my_room_event', { room: $('#room_name').val(), data: $('#room_data').val() });
-    return false;
-});
-$('form#close').submit(function (event) {
-    socket.emit('close_room', { room: $('#close_room').val() });
-    return false;
-});
-$('form#disconnect').submit(function (event) {
-    socket.emit('disconnect_request');
-    return false;
-});
-*/
-
 const state = {
 
   // Mount parameters
@@ -89,23 +55,18 @@ const state = {
 }
 
 const getters = {
-
   mount_ra: state => state.mount_ra,
   mount_dec: state => state.mount_dec,
   mount_object: state => state.mount_object,
   mount_ha: state => state.mount_ha,
   mount_az: state => state.mount_az,
   mount_alt: state => state.mount_alt,
-
   telescope_selection: state => state.telescope_selection,
   telescope_coordinate_frame: state => state.telescope_coordinate_frame,
-
   smartstackIsActive: state => state.smartstackIsActive,
   longstackIsActive: state => state.longstackIsActive,
-
   subframeIsActive: state => state.subframeIsActive,
   subframeDefinedWithFile: state => state.subframeDefinedWithFile,
-
   camera_areas_selection: state => state.camera_areas_selection,
   camera_note: state => state.camera_note,
   object_name: state => state.object_name,
@@ -115,27 +76,19 @@ const getters = {
   camera_dither: state => state.camera_dither,
   camera_extract: state => state.camera_extract,
   camera_image_type: state => state.camera_image_type,
-
   camera_cooling: state => state.camera_cooling,
   camera_temperature: state => state.camera_temperature,
   camera_de_ice_cooling: state => state.camera_de_ice_cooling,
-
   filter_wheel_options_selection: state => state.filter_wheel_options_selection,
-
   selector_position: state => state.selector_position,
-
   focuser_relative: state => state.focuser_relative,
   focuser_absolute: state => state.focuser_absolute,
-
   rotator_relative: state => state.rotator_relative,
   rotator_absolute: state => state.rotator_absolute,
-
   screen_brightness: state => state.screen_brightness
-
 }
 
 const mutations = {
-
   mount_ra (state, val) {
     // Clear the mount object name if the new coordinates have changed significantly
     const large_anglular_difference_degrees = 3
@@ -170,16 +123,12 @@ const mutations = {
   mount_az (state, val) { state.mount_az = val },
   mount_alt (state, val) { state.mount_alt = val },
   mount_object (state, val) { state.mount_object = val },
-
   telescope_selection (state, val) { state.telescope_selection = val },
   telescope_coordinate_frame (state, val) { state.telescope_coordinate_frame = val },
-
   smartstackIsActive (state, val) { state.smartstackIsActive = val },
   longstackIsActive (state, val) { state.longstackIsActive = val },
-
   subframeIsActive (state, val) { state.subframeIsActive = val },
   subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },
-
   camera_areas_selection (state, val) { state.camera_areas_selection = val },
   camera_note (state, val) { state.camera_note = val },
   object_name (state, val) { state.object_name = val },
@@ -190,21 +139,15 @@ const mutations = {
   camera_dither (state, val) { state.camera_dither = val },
   camera_extract (state, val) { state.camera_extract = val },
   camera_image_type (state, val) { state.camera_image_type = val },
-
   camera_cooling (state, val) { state.camera_cooling = val },
   camera_temperature (state, val) { state.camera_temperature = val },
   camera_de_ice_cooling (state, val) { state.camera_de_ice_cooling = val },
-
   filter_wheel_options_selection (state, val) { state.filter_wheel_options_selection = val },
-
   selector_position (state, val) { state.selector_position = val },
-
   focuser_relative (state, val) { state.focuser_relative = val },
   focuser_absolute (state, val) { state.focuser_absolute = val },
-
   rotator_relative (state, val) { state.rotator_relative = val },
   rotator_absolute (state, val) { state.rotator_absolute = val },
-
   screen_brightness (state, val) { state.screen_brightness = val }
 }
 

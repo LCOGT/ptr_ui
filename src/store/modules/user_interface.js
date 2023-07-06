@@ -33,7 +33,6 @@ const getters = {
 }
 
 const mutations = {
-
   selected_subpage (state, subpage) {
     state.selected_subpage = subpage
   },
