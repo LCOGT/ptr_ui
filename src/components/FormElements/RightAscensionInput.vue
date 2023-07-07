@@ -87,7 +87,7 @@ export default {
           // Accept spaces or colon as valid delimiters
           const parts = value.trim().replaceAll(':', ' ').split(' ').map((part, index) => {
             if (isNaN(Number(part))) throw new Error('Sexagesimal requires a format of hours:minutes:seconds')
-            if (index == 1 && (Number(part) >= 24 || Number(part) < 0)) {
+            if (index == 0 && (Number(part) >= 24 || Number(part) < 0)) {
               throw new Error('Value for sexagesimal hours must be between 0 and 24')
             }
             if (index != 0 && (Number(part) >= 60 || Number(part) < 0)) {
