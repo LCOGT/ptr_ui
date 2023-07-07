@@ -129,11 +129,17 @@
       </b-select>
     </b-field>
 
-    <CameraBinSelectField
+    <b-field
       v-if="camera_can_bin"
-      v-model="camera_bin"
-      :horizontal="true"
-    />
+      horizontal
+      label="Resolution"
+    >
+      <CameraBinSelectField
+        v-model="camera_bin"
+        :bin-options="camera_bin_options"
+        :horizontal="true"
+      />
+    </b-field>
 
     <!-- Hide this field until we need it (requested march 2023) -->
     <b-field

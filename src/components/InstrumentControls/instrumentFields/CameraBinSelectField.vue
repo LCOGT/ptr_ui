@@ -1,23 +1,15 @@
 <template>
-  <b-field
-    :horizontal="horizontal"
-    label="Resolution"
-  >
+  <b-field>
     <b-select
       v-model="localSelection"
       size="is-small"
     >
       <option
-        value="optimal"
-        selected
+        v-for="(val, index) in binOptions"
+        :key="index"
+        :value="val"
       >
-        Optimal
-      </option>
-      <option value="coarse">
-        Coarse
-      </option>
-      <option value="fine">
-        Fine
+        {{ val }}
       </option>
     </b-select>
   </b-field>
@@ -27,30 +19,24 @@
 export default {
   name: 'CameraBinSelectField',
   props: {
-    horizontal: {
-      type: Boolean,
-      default: false
+    value: String,
+    binOptions: {
+      type: Array,
+      default: () => []
     }
   },
-
-  computed: {
-    localSelection: {
-      get () {
-        // If no default gets set, make sure default is optimal
-        if (this.value) {
-          return this.value
-        } else {
-          return 'optimal'
-        }
-      },
-      set (val) {
-        this.$emit('input', val)
-      }
+  data () {
+    return {
+      localSelection: this.value
+    }
+  },
+  watch: {
+    value (newVal) {
+      this.localSelection = newVal
+    },
+    localSelection (newVal) {
+      this.$emit('input', newVal)
     }
   }
-
 }
 </script>
-
-<style lang="scss" scoped>
-</style>

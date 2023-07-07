@@ -197,7 +197,7 @@ const getters = {
     return getters.selected_camera_config.settings?.default_area ?? []
   },
   camera_bin_options: (state, getters) => {
-    return getters.selected_camera_config.settings?.bin_modes ?? []
+    return getters.selected_camera_config.settings?.bin_modes?.map(o => String(o[0])) ?? []
   },
   // Does the camera bin or not? Returns string 'True' or 'False'.
   camera_can_bin: (state, getters) => {
