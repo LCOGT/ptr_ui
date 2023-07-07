@@ -58,8 +58,6 @@ const state = {
   deplete: true,
   cycle: true,
   tco: false,
-  RAhours: true,
-  hrsminssecs: false,
   expiry_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
   start_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
 
@@ -94,8 +92,6 @@ const getters = {
       deplete: state.deplete,
       cycle: state.cycle,
       tco: state.tco,
-      RAhours: state.RAhours,
-      hrsminssecs: state.hrsminssecs,
       expiry_date: state.expiry_date,
       start_date: state.start_date
     }
@@ -165,8 +161,6 @@ const mutations = {
   deplete (state, val) { state.deplete = val },
   cycle (state, val) { state.cycle = val },
   tco (state, val) { state.tco = val },
-  RAhours (state, val) { state.RAhours = val },
-  hrsminssecs (state, val) { state.hrsminssecs = val },
   expiry_date (state, val) { state.expiry_date = val },
   start_date (state, val) { state.start_date = val },
 
@@ -229,8 +223,6 @@ const actions = {
     commit('deplete', true)
     commit('cycle', true)
     commit('tco', false)
-    commit('RAhours', true)
-    commit('hrsminssecs', false)
 
     const today = new Date()
     const expiry_date = new Date()
@@ -247,7 +239,6 @@ const actions = {
     commit('longStackAllCheckbox', false)
   },
   loadProject ({ state, commit }, project) {
-    console.log('loading project: ', project)
     commit('project_name', project.project_name)
     commit('project_events', project.scheduled_with_events)
     commit('project_sites', project.project_sites)

@@ -244,7 +244,7 @@ export default {
     ]),
     show_everyones_projects: {
       get () { return this.$store.state.user_data.show_everyones_projects },
-      set (val) { console.log(this.show_everyones_projects); this.$store.commit('user_data/show_everyones_projects', val) }
+      set (val) { this.$store.commit('user_data/show_everyones_projects', val) }
     },
     projectsToDisplay () {
       return this.show_everyones_projects

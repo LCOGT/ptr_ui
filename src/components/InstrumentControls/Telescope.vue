@@ -66,44 +66,27 @@
       @results="handle_coordinate_search_results"
     />
 
-    <p>
-      <small>The default values for RA and Dec
-        are in RA decimal hours and Dec decimal degrees. To use RA decimal degrees, include the letter d at the end of your RA (e.g. 34.54d). Sexagesimal will be converted as normal.
-      </small>
-    </p>
-    <div style="border-bottom: 0.5px solid grey; margin: 1em 0" />
-
     <b-field
       horizontal
       label="Right Asc."
     >
-      <b-field>
-        <b-input
-          v-model="mount_ra"
-          name="subject"
-          type="search"
-          size="is-small"
-          autocomplete="off"
-        />
-        <!--p class="control"><span class="button is-static is-small">hrs</span></p-->
-      </b-field>
+      <RightAscensionInput
+        v-model="mount_ra"
+        size="is-small"
+      />
     </b-field>
 
     <b-field
       horizontal
       label="Declination"
     >
-      <b-field>
-        <b-input
-          v-model="mount_dec"
-          name="subject"
-          type="search"
-          size="is-small"
-          autocomplete="off"
-        />
-        <!--p class="control"><span class="button is-static is-small">deg</span></p-->
-      </b-field>
+      <DeclinationInput
+        v-model="mount_dec"
+        size="is-small"
+      />
     </b-field>
+
+    <div style="border-bottom: 0.5px solid grey; margin: 1em 0" />
 
     <b-field
       horizontal
@@ -263,6 +246,8 @@ import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 import { mapGetters } from 'vuex'
 import TargetSearchField from '@/components/FormElements/TargetSearchField'
+import RightAscensionInput from '@/components/FormElements/RightAscensionInput'
+import DeclinationInput from '@/components/FormElements/DeclinationInput'
 export default {
   name: 'Telescope',
   mixins: [commands_mixin, user_mixin, target_names],
@@ -270,7 +255,9 @@ export default {
     CommandButton,
     StatusColumn,
     SimpleDeviceStatus,
-    TargetSearchField
+    TargetSearchField,
+    RightAscensionInput,
+    DeclinationInput
   },
   data () {
     return {

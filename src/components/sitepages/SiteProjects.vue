@@ -28,7 +28,7 @@
 import UserEventsTable from '@/components/calendar/UserEventsTable'
 import UserProjectsTable from '@/components/projects/UserProjectsTable'
 import CreateProjectForm from '@/components/projects/CreateProjectForm'
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import moment from 'moment'
 
 export default {
@@ -52,6 +52,10 @@ export default {
     this.timeInterval = setInterval(this.updateTime, 1000)
     window.moment = moment // use moment lib in browser devtools
   },
+  mounted () {
+    this.refreshUserEvents()
+    this.refreshUserProjects()
+  },
   destroyed () {
     clearInterval(this.timeInterval)
   },
@@ -68,10 +72,17 @@ export default {
 
     load_project_form (project) {
       this.project_to_load = project
+    },
+    refreshUserEvents () {
+      this.$store.dispatch('user_data/fetchUserEvents', this.userId)
+    },
+    refreshUserProjects () {
+      this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
     }
   },
   computed: {
     ...mapGetters('site_config', ['timezone']),
+    ...mapState('user_data', ['userId']),
 
     user () {
       return this.$auth.user

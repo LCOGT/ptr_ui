@@ -114,22 +114,22 @@ const actions = {
   // refreshProjectsTableData automatically chooses whether to run fetchUserProjects or fetchAllProjects
   // based on whether the projects table is set to show everyones projects or just
   // the current user's.
-  async refreshProjectsTableData ({ state, dispatch }, user_id) {
+  async refreshProjectsTableData ({ state, dispatch }, userId) {
     if (state.show_everyones_projects) {
       dispatch('fetchAllProjects')
     } else {
-      dispatch('fetchUserProjects', user_id)
+      dispatch('fetchUserProjects', userId)
     }
   },
 
-  async fetchUserProjects ({ commit, rootState }, user_id) {
+  async fetchUserProjects ({ commit, rootState }, userId) {
     // This happens when the method is called before the current user is loaded.
-    if (user_id === undefined) return
+    if (userId === undefined) return
 
     commit('user_projects_is_loading', true)
 
     const url = rootState.api_endpoints.projects_endpoint + '/get-user-projects'
-    const body = { user_id }
+    const body = { user_id: userId }
     const header = await getAuthRequestHeader()
 
     axios.post(url, body, header).then(response => {
@@ -138,7 +138,7 @@ const actions = {
     }).catch(err => {
       commit('user_projects_is_loading', false)
       console.warn('error fetching user projects: ', err)
-      console.warn('user: ', user_id)
+      console.warn('user: ', userId)
     })
   },
   async fetchAllProjects ({ commit, rootState }) {
@@ -157,7 +157,7 @@ const actions = {
     })
   },
 
-  fetchUserEvents ({ commit, rootState }, user_id) {
+  fetchUserEvents ({ commit, rootState }, userId) {
     commit('user_events_is_loading', true)
 
     const url = rootState.api_endpoints.calendar_api + '/user-events-ending-after-time'
@@ -168,7 +168,7 @@ const actions = {
     }
     const body = {
       time: moment().utc().format(),
-      user_id
+      user_id: userId
     }
     axios.post(url, body, header).then(response => {
       commit('user_events_is_loading', false)
@@ -176,7 +176,7 @@ const actions = {
     }).catch(err => {
       commit('user_events_is_loading', false)
       console.warn('error fetching user events: ', err)
-      console.warn('user: ', user_id)
+      console.warn('user: ', userId)
     })
   },
 

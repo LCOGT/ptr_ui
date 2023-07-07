@@ -112,58 +112,22 @@
         <b-field
           :type="{'is-danger': warn.ra}"
           :label="n==1 ? 'RA' : ''"
-          style="width: 100px;"
+          style="width: 250px;"
         >
-          <b-input
-            v-model="targets[n-1].ra"
-            :disabled="!targets[n-1].active"
-          />
+          <RightAscensionInput v-model="targets[n-1].ra" />
         </b-field>
 
         <b-field
           :type="{'is-danger': warn.dec}"
           :label="n==1 ? 'Dec' : ''"
-          style="width: 100px;"
+          style="width: 250px;"
         >
-          <b-input
-            v-model="targets[n-1].dec"
-            :disabled="!targets[n-1].active"
-          />
-        </b-field>
-        <b-field>
-          <template #label>
-            Hours / Degrees
-            <b-tooltip
-              type="is-dark"
-              label="When this is turned on, PTR expects units in RA hours. When off, PTR expects units in RA degrees."
-            >
-              <b-icon
-                size="is-small"
-                icon="help-circle-outline"
-              />
-            </b-tooltip>
-          </template>
-          <b-checkbox v-model="RAhours" />
+          <DeclinationInput v-model="targets[n-1].dec" />
         </b-field>
 
         <b-field>
           <template #label>
-            Sexagesimal
-            <b-tooltip
-              type="is-dark"
-              label="When this is turned on, PTR expects units in Hours Minutes Seconds. When off, PTR expects units in Decimals."
-            >
-              <b-icon
-                size="is-small"
-                icon="help-circle-outline"
-              />
-            </b-tooltip>
-          </template>
-          <b-checkbox v-model="hrsminssecs" />
-        </b-field>
-        <b-field>
-          <template #label>
-            TCO
+            Time Critical Observation
             <b-tooltip
               type="is-dark"
               label="Time critical observation (e.g. exoplanet, variable star)"
@@ -970,6 +934,8 @@
 import { mapGetters, mapState, mapActions } from 'vuex'
 import { target_names } from '@/mixins/target_names'
 import { user_mixin } from '@/mixins/user_mixin'
+import RightAscensionInput from '@/components/FormElements/RightAscensionInput'
+import DeclinationInput from '@/components/FormElements/DeclinationInput'
 import axios from 'axios'
 
 const mapStateToComputed = (vuexModule, propertyNames) => {
@@ -988,6 +954,7 @@ export default {
   name: 'CreateProjectForm',
   props: ['sitecode', 'project_to_load'],
   mixins: [target_names, user_mixin],
+  components: { RightAscensionInput, DeclinationInput },
   data () {
     return {
       object_name_search_in_progress: false,
@@ -1068,21 +1035,6 @@ export default {
       'resetProjectForm',
       'loadProject'
     ]),
-    RAfromSexagesimal (rasexag) {
-      const raarray = rasexag.replace(':', ' ').replace(':', ' ').replace('.', ' ').split(' ')
-      const rahrs = Number(raarray[0]) + Number(raarray[1] / 60) + Number(raarray[2] / 3600)
-
-      return rahrs
-    },
-    DECfromSexagesimal (decsexag) {
-      const decarray = decsexag.replace(':', ' ').replace(':', ' ').replace('.', ' ').split(' ')
-      if (Math.sign(Number(decarray[[0]])) == -1) {
-        return Number(decarray[0]) - Number(decarray[1] / 60) - Number(decarray[2] / 3600)
-      }
-      else {
-        return Number(decarray[0]) + Number(decarray[1] / 60) + Number(decarray[2] / 3600)
-      }
-    },
     // Used for changing values in the targets array without losing reactivity
     updateTargetsValue (indexToMatch, key, val) {
       this.targets = this.targets.map((obj, index) => {
@@ -1188,19 +1140,6 @@ export default {
         const key = `bin${e.bin}#exposure${e.exposure}#filter${e.filter}`
         remaining[key] = e.count
       })
-      // Make sure that correct format of RA and dec is sent to the site-code
-      // Convert Sexagesimal
-      if (this.hrsminssecs == true) {
-        this.updateTargetsValue(0, 'ra', this.RAfromSexagesimal(this.targets[0].ra))
-        this.updateTargetsValue(0, 'dec', this.DECfromSexagesimal(this.targets[0].dec))
-        this.RAhours = true
-        this.hrsminssecs = false
-      }
-      // Decimal RA degrees to Decimal RA hours
-      if (this.RAhours == false) {
-        this.updateTargetsValue(0, 'ra', this.targets[0].ra / 15)
-        this.RAhours = true
-      }
 
       const project = this.projectToSend
 
@@ -1234,20 +1173,6 @@ export default {
 
     modifyProject () {
       const url = this.projects_api_url + '/modify-project'
-
-      // Make sure that correct format of RA and dec is sent to the site-code
-      // Convert Sexagesimal
-      if (this.hrsminssecs == true) {
-        this.updateTargetsValue(0, 'ra', this.RAfromSexagesimal(this.targets[0].ra))
-        this.updateTargetsValue(0, 'dec', this.DECfromSexagesimal(this.targets[0].dec))
-        this.RAhours = true
-        this.hrsminssecs = false
-      }
-      // Decimal RA degrees to Decimal RA hours
-      if (this.RAhours == false) {
-        this.updateTargetsValue(0, 'ra', this.targets[0].ra / 15)
-        this.RAhours = true
-      }
 
       const project = this.projectToSend
 
@@ -1353,8 +1278,6 @@ export default {
       'deplete',
       'cycle',
       'tco',
-      'RAhours',
-      'hrsminssecs',
       'expiry_date',
       'start_date',
       'smartStackAllCheckbox',
