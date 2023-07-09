@@ -346,7 +346,10 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="smartStackAllCheckbox" />
+          <b-checkbox
+            v-model="smartStackAllCheckbox"
+            :indeterminate="exposureSmartStackMixedStates"
+          />
         </b-field>
 
         <b-field>
@@ -363,7 +366,10 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="longStackAllCheckbox" />
+          <b-checkbox
+            v-model="longStackAllCheckbox"
+            :indeterminate="exposureLongStackMixedStates"
+          />
         </b-field>
       </div>
       <!-- we decided to only allow one target per project -->
@@ -1019,6 +1025,27 @@ export default {
 
       this.loadProject(project)
     },
+
+    // If the smartStackAllCheckbox comes out of an indeterminate state and is the opposite of each exposure
+    // row's 'smartstack' value, flip it.
+    // This would happen if the user uses the smartStackAllCheckbox to set all exposure rows to one value, and
+    // then manually changes each exposure row's smartstack value to the opposite.
+    exposureSmartStackMixedStates () {
+      if (!this.exposureSmartStackMixedStates) {
+        if (this.exposures.every(e => e.smartstack !== this.smartStackAllCheckbox)) {
+          this.smartStackAllCheckbox = !this.smartStackAllCheckbox
+        }
+      }
+    },
+    // Same rationale as the above
+    exposureLongStackMixedStates () {
+      if (!this.exposureLongStackMixedStates) {
+        if (this.exposures.every(e => e.longstack !== this.longStackAllCheckbox)) {
+          this.longStackAllCheckbox = !this.longStackAllCheckbox
+        }
+      }
+    },
+
     smartStackAllCheckbox () {
       // Any time the smartstackall checkbox is clicked, change all the individual exposure options
       const updatedExposures = this.exposures.map(e => ({ ...e, smartstack: this.smartStackAllCheckbox }))
@@ -1306,6 +1333,25 @@ export default {
       }
       // Default behavior (if no specific sites selected) returns the "site filters" for common pool, which are none
       return ''
+    },
+
+    // Check if the exposure row 'smartstack' checkbox is true for some and false for others.
+    // We use this to set an indeterminate state for the main smartStackAllCheckbox
+    exposureSmartStackMixedStates () {
+      if (this.exposures.every(e => e.smartstack === true) || this.exposures.every(e => e.smartstack === false)) {
+        return false
+      } else {
+        return true
+      }
+    },
+    // Check if the exposure row 'longstack' checkbox is true for some and false for others.
+    // We use this to set an indeterminate state for the main longStackAllCheckbox
+    exposureLongStackMixedStates () {
+      if (this.exposures.every(e => e.longstack === true) || this.exposures.every(e => e.longstack === false)) {
+        return false
+      } else {
+        return true
+      }
     },
 
     // True if we're modifying a project and the name is changed.
