@@ -1077,8 +1077,8 @@ export default {
     newExposureRow () {
       // Add another object to the list of exposures (but it is not visible yet)
       // Do this before rendering it to preserve reactivity.
-      // It should also be a copy of the previous row.
-      const previousRow = this.exposures[this.exposures.length - 1]
+      // It should also be a copy of the previous row. JSON stuff so they don't all share a single reference.
+      const previousRow = JSON.parse(JSON.stringify(this.exposures[this.exposures.length - 1]))
       this.exposures = [...this.exposures, previousRow]
       // Show the additional row
       this.exposures_index += 1
