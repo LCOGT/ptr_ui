@@ -1,7 +1,7 @@
 import { isItemStale, parseTrueFalse } from './status_utils'
 
 function get_val (getters, key) {
-  return getters.filter_wheel_state[key]?.val ?? getters.filter_wheel_state[key] ?? '-'
+  return getters.filter_wheel_state[key]?.val ?? '-'
 }
 
 const filter_wheel_state = (state, getters, rootState) => {

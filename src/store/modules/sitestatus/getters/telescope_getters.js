@@ -2,7 +2,7 @@ import { isItemStale } from './status_utils'
 
 // Handle status before and after the individual timestamp inclusion
 function get_val (getters, key) {
-  return getters.telescope_state[key]?.val ?? getters.telescope_state[key] ?? '-'
+  return getters.telescope_state[key]?.val ?? '-'
 }
 
 const telescope_state = (state, getters, rootState) => {

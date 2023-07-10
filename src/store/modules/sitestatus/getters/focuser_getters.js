@@ -1,7 +1,7 @@
 import { isItemStale, parseTrueFalse } from './status_utils'
 
 function get_val (getters, key) {
-  return getters.focuser_state[key]?.val ?? getters.focuser_state[key] ?? '-'
+  return getters.focuser_state[key]?.val ?? '-'
 }
 
 const focuser_state = (state, getters, rootState) => {

@@ -2,7 +2,7 @@ import { isItemStale, display_colors } from './status_utils'
 
 // Handle status before and after the individual timestamp inclusion
 function get_val (getters, key) {
-  return getters.weather_state[key]?.val ?? getters.weather_state[key] ?? '-'
+  return getters.weather_state[key]?.val ?? '-'
 }
 
 const weather_state = (state, getters, rootState) => {
@@ -14,7 +14,7 @@ const weather_ok = (state, getters) => {
   let color = display_colors.red
   const val = get_val(getters, 'wx_ok')
   const is_stale = isItemStale(getters, 'weather_state', 'wx_ok')
-  if (val.toLowerCase() == 'yes') { color = display_colors.green }
+  if (val === true || (typeof val === 'string' && val.toLowerCase() == 'yes')) { color = display_colors.green }
   return { name, val, is_stale, color }
 }
 
@@ -47,7 +47,7 @@ const open_ok = (state, getters) => {
   const name = 'Open OK'
   const val = get_val(getters, 'open_ok')
   let color = display_colors.red
-  if (val.toLowerCase() == 'yes') { color = display_colors.green }
+  if (val === true || (typeof val === 'string' && val.toLowerCase() == 'yes')) { color = display_colors.green }
   const is_stale = isItemStale(getters, 'weather_state', 'open_ok')
   return { name, val, color, is_stale }
 }

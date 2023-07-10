@@ -6,7 +6,7 @@ const camera_state = (state, getters, rootState) => {
 
 const camera_status = (state, getters) => {
   const name = 'Camera'
-  const val = getters.camera_state.status?.val ?? getters.camera_state.status ?? '-'
+  const val = getters.camera_state.status?.val ?? '-'
   const is_stale = isItemStale(getters, 'camera_state', 'status')
   const custom_styles = 'width:unset;'
   return { name, val, is_stale, custom_styles }

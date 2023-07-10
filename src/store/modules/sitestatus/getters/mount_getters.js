@@ -2,7 +2,7 @@
 import { isItemStale, parseTrueFalse } from './status_utils'
 
 function get_val (getters, key) {
-  return getters.mount_state[key]?.val ?? getters.mount_state[key] ?? '-'
+  return getters.mount_state[key]?.val ?? '-'
 }
 
 const mount_state = (state, getters, rootState) => {
