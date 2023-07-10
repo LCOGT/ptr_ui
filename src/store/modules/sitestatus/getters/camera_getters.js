@@ -4,6 +4,13 @@ const camera_state = (state, getters, rootState) => {
   return state.camera[rootState.site_config.selected_camera] ?? {}
 }
 
+const camera_active_device_name = (state, getters) => {
+  const name = 'Active Camera'
+  const val = getters.camera_state.active_camera?.val ?? '-'
+  const is_stale = isItemStale(getters, 'camera_state', 'active_camera')
+  return { name, val, is_stale }
+}
+
 const camera_status = (state, getters) => {
   const name = 'Camera'
   const val = getters.camera_state.status?.val ?? '-'
@@ -21,6 +28,7 @@ const camera_darkslide = (state, getters) => {
 
 export default {
   camera_state,
+  camera_active_device_name,
   camera_status,
   camera_darkslide
 }
