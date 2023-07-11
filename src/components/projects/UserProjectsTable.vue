@@ -171,12 +171,15 @@ export default {
   methods: {
     formatCreatedAtDate (utcTimestamp) {
       const date = new Date(utcTimestamp)
-      const formattedDate = date.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit'
-      }).replace(/\//g, '/')
-      return formattedDate
+      const year = date.getUTCFullYear()
+      let month = date.getUTCMonth() + 1 // months from 1-12
+      let day = date.getUTCDate()
+
+      // pad month and day with leading zeros if necessary
+      month = (month < 10 ? '0' : '') + month
+      day = (day < 10 ? '0' : '') + day
+
+      return `${year}/${month}/${day}`
     },
     displayEventDuration (event) {
       const start = moment(event.start)

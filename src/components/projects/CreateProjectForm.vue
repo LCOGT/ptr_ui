@@ -232,6 +232,7 @@
           <b-datetimepicker
             ref="stdatetimepicker"
             v-model="start_date"
+            locale="en-ZA"
             expanded
             placeholder="Select a date"
           />
@@ -260,6 +261,7 @@
           <b-datetimepicker
             ref="expdatetimepicker"
             v-model="expiry_date"
+            locale="en-ZA"
             expanded
             placeholder="Select a date"
           />
