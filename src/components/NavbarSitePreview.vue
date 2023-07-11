@@ -4,20 +4,20 @@
       <router-link
         tag="button"
         title="view this site"
-        class="button"
+        class="button is-success is-outlined"
         :to="{ path: '/site/' + site + '/' + active_subpage }"
         @click.native="$emit('view-site-clicked')"
       >
         view observatory
       </router-link>
-      <b-button
+      <!-- <b-button
         class="is-success is-outlined"
         icon-right="launch"
         title="enter control room"
         @click="open_control_room(site)"
       >
         enter control room &nbsp;
-      </b-button>
+      </b-button> -->
     </div>
     <div class="latest-site-image">
       <img
