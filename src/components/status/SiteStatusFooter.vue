@@ -162,16 +162,6 @@
                   overflow: hidden; "
               >
                 <div class="mr-5">
-                  <site-sidereal-time
-                    v-if="site_longitude"
-                    class="sidereal-time"
-                    :longitude="site_longitude"
-                  />
-                  <div class="sidereal-label">
-                    LMST
-                  </div>
-                </div>
-                <div class="mr-5">
                   <site-local-time
                     v-if="timezone"
                     class="sidereal-time"
@@ -187,7 +177,7 @@
                     Obs Time
                   </div>
                 </div>
-                <div class="mr-1">
+                <div class="mr-5">
                   <utc-time
                     v-if="timezone"
                     class="sidereal-time"
@@ -201,6 +191,16 @@
                   </div>
                   <div class="sidereal-label">
                     UTC Time
+                  </div>
+                </div>
+                <div class="mr-1">
+                  <site-sidereal-time
+                    v-if="site_longitude"
+                    class="sidereal-time"
+                    :longitude="site_longitude"
+                  />
+                  <div class="sidereal-label">
+                    Sidereal
                   </div>
                 </div>
               </div>
