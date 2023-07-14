@@ -57,7 +57,7 @@
             <b-navbar-item tag="router-link" :to="{ path: '/affiliates' }">
               Affiliates
             </b-navbar-item-->
-      <NavbarSiteDropdown label="Observatories" />
+      <NavbarSiteDropdown label="Sites" />
     </template>
 
     <template slot="end">

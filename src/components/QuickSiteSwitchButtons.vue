@@ -4,7 +4,7 @@
       v-for="site in available_sites"
       :key="site"
       size="is-small"
-      :class="[{ 'active-site': site == currentSite }, site_online_class(site)]"
+      :class="[{ 'active-site': site == currentSite }, site_online_class(site), 'justify-right']"
       @click="goToDifferentSite(site)"
     >
       {{ site }}
@@ -81,5 +81,9 @@ export default {
 }
 .status-blue {
   border-left: 4px solid $ptr_blue;
+}
+
+.justify-right {
+  text-align: right;
 }
 </style>

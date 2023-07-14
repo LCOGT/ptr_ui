@@ -2,77 +2,75 @@
   <b-navbar-dropdown
     ref="sites_dropdown"
     :label="label"
+    expanded
+    custom
     @active-change="dropdown_change"
   >
-    <div class="dropdown-wrapper">
-      <h1 class="site-name">
-        {{ dropdown_active_site }}
-      </h1>
-      <div class="site-list">
-        <div
-          v-for="site in real_sites"
-          :key="site"
-          :class="[{'selected': dropdown_active_site==site}, 'site-row']"
-          @click="dropdown_active_site = site"
+    <b-navbar-dropdown-item
+      custom
+      paddingless
+    >
+      <ul
+        style="width: 100%;"
+        class="navbar-dropdown-wrapper"
+      >
+        <li
+          v-for="wema in dropdownSitesData"
+          :key="wema.id"
+          :class="[site_online_class(wema.id), 'wema-and-obs']"
         >
-          <div :class="[site_online_class(site), 'status-dot']" />
-          <div class="site-name-short">
-            {{ site }}&nbsp;
+          <div class="site-row wema">
+            <div class="wema-name-expanded">
+              {{ wema.id.toUpperCase() }} - {{ wema.name }}
+            </div>
           </div>
-          <div class="site-name-expanded">
-            {{ global_config[site]?.name || global_config[site].site_description }}
-          </div>
-        </div>
-        <hr class="navbar-divider">
-        <div
-          v-for="site in simulated_sites"
-          :key="site"
-          :class="[{'selected': dropdown_active_site==site}, 'site-row']"
-          @click="dropdown_active_site = site"
-        >
-          <div :class="[site_online_class(site), 'status-dot']" />
-          <div class="site-name-short">
-            {{ site }}&nbsp;
-          </div>
-          <div class="site-name-expanded">
-            {{ global_config[site].name }}
-          </div>
-        </div>
-      </div>
-      <NavbarSitePreview
-        class="site-preview"
-        :site="dropdown_active_site"
-        :weather="site_weather_status(dropdown_active_site)"
-        :operation="site_operational_status(dropdown_active_site)"
-        :image_url="site_images[dropdown_active_site]"
-        @view-site-clicked="close_dropdown"
-      />
-    </div>
+          <ul class="obs-all">
+            <li
+              v-for="(obs, obs_index) in wema.observatories"
+              :key="obs_index"
+            >
+              <router-link
+                tag="div"
+                :class="[{'selected': dropdown_active_site==obs.id}, 'site-row', 'obs' ]"
+                :to="{ path: '/site/' + obs.id + '/' + active_subpage }"
+                @click="dropdown_active_site = obs.id"
+                @click.native="close_dropdown"
+              >
+                <div class="obs-name-short-container">
+                  <div class="tab-spacer" />
+                  <div :class="[site_online_class(obs.id), 'status-dot']" />
+                  <div class="obs-name-short">
+                    {{ obs.id }}&nbsp;
+                  </div>
+                </div>
+                <div class="obs-name-expanded">
+                  {{ obs.telescope_description }}
+                </div>
+              </router-link>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </b-navbar-dropdown-item>
   </b-navbar-dropdown>
 </template>
 
 <script>
-import NavbarSitePreview from '@/components/NavbarSitePreview'
 import { mapState, mapGetters } from 'vuex'
-import axios from 'axios'
 
 export default {
-  components: {
-    NavbarSitePreview
-  },
   props: {
     label: String,
     default: () => 'Observatories'
   },
   data () {
     return {
-      dropdown_active_site: 'mrc',
+      dropdown_active_site: 'mrc1',
       site_images: {}
     }
   },
   mounted () {
     this.update_site_status()
-    this.update_all_site_images()
   },
   computed: {
     ...mapState('site_config', ['selected_site', 'global_config']),
@@ -80,11 +78,60 @@ export default {
     ...mapState('sitestatus', ['site_open_status', 'stale_age_ms']),
     ...mapGetters('sitestatus', ['all_sites_status_color']),
 
+    dropdownSitesData () {
+      const state = this.$store.state.site_config
+      const sitesData = {}
+
+      // Add all wemas as empty objects
+      Object.keys(state.global_config)
+        .filter(site => { return state.global_config[site].instance_type === 'wema' })
+        .forEach(site => {
+          sitesData[site] = {
+            id: site,
+            name: state.global_config[site].name,
+            observatories: []
+          }
+        })
+
+      // Add obs sites to their respective wema array
+      Object.keys(state.global_config)
+        .filter(site => { return state.global_config[site].instance_type === 'obs' })
+        .forEach(site => {
+          const wema_parent = state.global_config[site].wema_name
+          sitesData[wema_parent].observatories.push({
+            id: site,
+            name: state.global_config[site].name,
+            telescope_description: state.global_config[site].telescope_description
+          })
+        })
+
+      // Add all other sites that don't adhere to the wema/obs structure yet.
+      // In this case, treat the config as both wema and obs, to get a nice menu layout
+      Object.keys(state.global_config)
+        .filter(site => { return !(['obs', 'wema'].includes(state.global_config[site].instance_type)) })
+        .forEach(site => {
+          sitesData[site] = {
+            id: site,
+            name: state.global_config[site].name,
+            observatories: [{
+              id: site,
+              name: state.global_config[site].name,
+              telescope_description: state.global_config[site].telescope_description || 'placeholder observatory'
+            }]
+          }
+        })
+      return sitesData
+    },
+
     real_sites () {
       return this.all_sites_real.map((s) => s.site)
     },
     simulated_sites () {
       return this.all_sites_simulated.map((s) => s.site)
+    },
+    active_subpage: {
+      get () { return this.$store.state.user_interface.selected_subpage },
+      set (value) { this.$store.commit('user_interface/selected_subpage', value) }
     }
 
   },
@@ -99,79 +146,8 @@ export default {
     close_dropdown () {
       this.$refs.sites_dropdown.closeMenu()
     },
-    open_control_room (site) {
-      const url = `https://rooms.remotehq.com/photon-ranch/control-room-${site}`
-      window.open(url)
-    },
-    update_all_site_images () {
-      const url = this.$store.state.api_endpoints.active_api + '/latest_image_all_sites'
-      axios.get(url).then(response => {
-        this.site_images = response.data
-      })
-    },
     update_site_status () {
       this.$store.dispatch('sitestatus/getSiteOpenStatus')
-    },
-    site_operational_status (site) {
-      if (!Object.keys(this.site_open_status).includes(site)) {
-        return 'not available'
-      }
-      const stale_age_s = 300 // 5 minutes
-      const site_status = this.site_open_status[site]
-
-      if (!Object.keys(site_status).includes('weather', 'enclosure', 'device')) {
-        return 'not available'
-      }
-
-      // Note: if one of these option-chained properties doesn't exist, the inequality evaluates to false.
-      // E.g. if there is no device status, site_status?.device ==> undefined, and undefined < any_number is false.
-      const device_not_stale = site_status?.device?.status_age_s < stale_age_s
-      const enclosure_not_stale = site_status?.enclosure?.status_age_s < stale_age_s
-
-      if (device_not_stale && enclosure_not_stale) {
-        return 'operational'
-      } else if (device_not_stale || enclosure_not_stale) {
-        return 'technical difficulty'
-      } else {
-        return 'offline'
-      }
-    },
-    /*
-      Strategy:
-        if weather status is recent and wx_ok is true: green dot
-        if weather status is recent and wx_ok is false: red dot
-        otherwise: grey dot
-    */
-    site_weather_status (site) {
-      const status_age_online = 300 // max number of seconds to be considered online
-
-      // Do nothing if the site doesn't have any status records
-      if (!Object.keys(this.site_open_status).includes(site)) {
-        return 'offline'
-      }
-
-      // Extract the age of the latest status
-      // Keep these for reference even if unused
-      /* eslint-disable */
-      const weather_age = this.site_open_status[site]?.weather?.status_age_s
-      const enclosure_age =
-        this.site_open_status[site]?.enclosure?.status_age_s
-      const device_age = this.site_open_status[site]?.device?.status_age_s
-      /* eslint-enable */
-
-      // online sites: weather is sending and ok.
-      if (Object.keys(this.site_open_status[site]).includes('wx_ok')) {
-        const weather_ok = this.site_open_status[site].wx_ok
-        const weather_status_age =
-          this.site_open_status[site].weather.status_age_s
-        const weather_is_recent = weather_status_age < status_age_online
-        if (!weather_is_recent) {
-          return 'offline'
-        } else {
-          return weather_ok ? 'ok' : 'poor'
-        }
-      }
-      return 'offline'
     },
     site_online_class (site) {
       return this.all_sites_status_color[site]
@@ -195,21 +171,76 @@ export default {
     left: -100px;
   }
 }
+
+.navbar-dropdown-wrapper {
+  max-height: 50vh;
+  overflow-y: scroll;
+}
+.wema-and-obs {
+  background-color: rgba(66, 66, 66, 0.044);
+  border-left: 3px solid $ptr-grey;
+  margin-bottom: 2em;
+  margin: 1em;
+
+  &.status-green {
+    border-left: 3px solid $ptr-green;
+  }
+  &.status-yellow {
+    border-left: 3px solid $ptr-yellow;
+  }
+  &.status-red {
+    border-left: 3px solid $ptr-red;
+  }
+  @include tablet {
+    min-width: 550px;
+  }
+}
+.wema {
+  display:flex;
+  align-items: center;
+}
+.wema-name-short-container {
+  display:flex;
+  align-items: center;
+  gap: 5px;
+  width: 120px;
+}
+.wema-name-short {
+    pointer-events: none;
+}
+.wema-name-expanded {
+    pointer-events: none;
+    font-size: 20px;
+    color: rgb(166, 166, 166);
+}
+.obs-all {
+  margin-bottom: 2em;
+  width: 100%;
+}
+.obs-name-short-container {
+  display:flex;
+  align-items: center;
+  gap: 5px;
+  width: 120px;
+  font-weight: bold;
+}
+.obs-name-short {
+    pointer-events: none;
+}
+.obs-name-expanded {
+    pointer-events: none;
+    color: silver;
+}
+.tab-spacer {
+  width: 10px;
+}
+
 .dropdown-wrapper {
     display: flex;
     flex-direction: column;
-    margin: 5px;
+    width: 300px;
+    // margin: 5px;
     gap: 2em;
-    @include tablet {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(max-content, 1fr));
-        grid-template-rows: 30px 1fr;
-        grid-template-areas: ".     name"
-                             "list  preview";
-        width: max-content;
-        grid-gap: 1em;
-        //grid-column-gap: 1em;
-    }
 }
 
 .site-name{
@@ -223,10 +254,10 @@ export default {
 }
 
 .site-list {
-    grid-area: list;
-    display:flex;
-    flex-direction: column;
-    align-items: flex-start;
+    // grid-area: list;
+    // display:flex;
+    // flex-direction: column;
+    // align-items: flex-start;
     padding: 0 10px;
 }
 .site-row {
@@ -239,12 +270,21 @@ export default {
     width: 100%;
 }
 .site-row.selected {
+  &.wema {
     background-color: darken($body-background-color, 3);
+  }
 }
 .site-row:hover {
-    background-color: darken($body-background-color, 3);
     //border: 1px solid blue;
     margin: 0;
+
+    &.obs {
+      cursor: pointer;
+      background-color: darken($body-background-color, 3);
+    }
+    &.placeholder {
+      cursor:disabled;
+    }
 }
 
 .navbar-divider {
@@ -279,19 +319,19 @@ export default {
 
   pointer-events: none;
 }
-.status-green {
+.status-dot.status-green {
   opacity: 0.8;
   background-color: $ptr-green;
 }
-.status-yellow {
+.status-dot.status-yellow {
   opacity: 0.8;
   background-color: $ptr-yellow;
 }
-.status-red {
+.status-dot.status-red {
   opacity: 0.8;
   background-color: $ptr-red;
 }
-.status-grey {
+.status-dot.status-grey {
   opacity: 0.8;
   background-color: $ptr-grey;
 }
