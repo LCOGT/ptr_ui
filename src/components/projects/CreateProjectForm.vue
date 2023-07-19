@@ -16,7 +16,7 @@
             :loading="createProjectButtonIsLoading"
             @click="saveNewProject"
           >
-            Create Project
+            {{ createButtonText }}
           </b-button>
         </b-tooltip>
 
@@ -31,7 +31,7 @@
             :loading="createProjectButtonIsLoading"
             @click="modifyProject"
           >
-            Modify Project
+            {{ editButtonText }}
           </b-button>
         </b-tooltip>
 
@@ -124,7 +124,24 @@
         >
           <DeclinationInput v-model="targets[n-1].dec" />
         </b-field>
+      </div>
 
+      <div class="button-row">
+        <b-field>
+          <template #label>
+            Low Priority
+            <b-tooltip
+              type="is-dark"
+              label="This adds a 'Feel free to cancel' message when calendared"
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </template>
+          <b-checkbox v-model="low_priority" />
+        </b-field>
         <b-field>
           <template #label>
             Time Critical Observation
@@ -138,7 +155,7 @@
               />
             </b-tooltip>
           </template>
-          <b-checkbox v-model="tco" />
+          <b-checkbox v-model="time_critical_observation" />
         </b-field>
       </div>
 
@@ -151,7 +168,7 @@
             <b-tooltip
               type="is-dark"
               position="is-right"
-              label="Choose which observatories this project can be scheduled at."
+              label="Choose where the project can run. This affects the available imaging filters."
             >
               <b-icon
                 size="is-small"
@@ -172,9 +189,18 @@
                   class="button"
                   icon-right="menu-down"
                 >
-                  Select sites ({{ project_sites.length }})
+                  <span v-for="(site, index) in project_sites" :key=site>
+                    <span>{{ index > 0 ? ', ' : '' }}</span> <span>{{ site }}</span>
+                  </span>
                 </b-button>
               </template>
+
+              <div class="separator">
+                <div class="line" />
+                <p>ANY SITE</p>
+                <div class="line" />
+              </div>
+
               <b-dropdown-item
                 key="common pool"
                 class="item"
@@ -185,15 +211,30 @@
 
               <div class="separator">
                 <div class="line" />
-                <p>SITES</p>
+                <p>THIS SITE</p>
                 <div class="line" />
               </div>
 
               <b-dropdown-item
-                v-for="site_real in available_sites_real"
+                :key="sitecode"
+                class="item"
+                :value="sitecode"
+              >
+                {{ sitecode }}
+              </b-dropdown-item>
+
+              <div class="separator">
+                <div class="line" />
+                <p>OTHER SITES</p>
+                <div class="line" />
+              </div>
+
+              <b-dropdown-item
+                v-for="site_real in available_sites_real.filter(site => site != sitecode)"
                 :key="site_real"
                 class="item"
                 :value="site_real"
+                disabled
               >
                 {{ site_real }}
               </b-dropdown-item>
@@ -205,16 +246,20 @@
               </div>
 
               <b-dropdown-item
-                v-for="site_sim in available_sites_simulated"
+                v-for="site_sim in available_sites_simulated.filter(site => site != sitecode)"
                 :key="site_sim"
                 class="item"
                 :value="site_sim"
+                disabled
               >
                 {{ site_sim }}
               </b-dropdown-item>
             </b-dropdown>
           </div>
         </b-field>
+      </div>
+
+      <div class="button-row">
         <b-field>
           <template #label>
             Start Date (UTC)
@@ -322,17 +367,6 @@
         </b-field>
       </div>
 
-      <div class="sites-text">
-        <span v-if="project_sites.length === 0 || project_sites == ['common pool']"> default (common pool)</span>
-        <span
-          v-for="project_site in project_sites"
-          :key="project_site"
-        >
-          <span v-if="project_sites.indexOf(project_site) > 0">, </span>
-          {{ project_site }}
-        </span>
-      </div>
-
       <div class="button-row">
         <b-field>
           <template #label>
@@ -423,7 +457,7 @@
           </b-field>
           <b-field
             :label="n==1 ? 'Count' : ''"
-            style="width: 50px;"
+            style="width: 80px;"
           >
             <b-input
               v-model="exposures[n-1].count"
@@ -450,27 +484,32 @@
               v-model="exposures[n-1].filter"
               size="is-small"
               :disabled="!exposures[n-1].active"
+              style="width: 80px;"
             >
-              <option
-                v-for="(filter, index) in generic_filter_list"
-                :key="filter"
-                :value="filter"
-                :selected="index === 0"
-              >
-                {{ filter }}
-              </option>
               <option
                 v-if="project_filter_list && project_filter_list.length>0"
                 disabled
                 value="------"
               >
-                ------
+                ---- Site Filters ----
               </option>
               <option
-                v-for="(filter, index) in project_filter_list"
+                v-for="filter in project_filter_list"
                 :key="filter"
                 :value="filter"
-                :selected="index === 0"
+              >
+                {{ filter }}
+              </option>
+              <option
+                disabled
+                value="------"
+              >
+                ---- Generic Filters ----
+              </option>
+              <option
+                v-for="filter in generic_filters_no_duplicates"
+                :key="filter"
+                :value="filter"
               >
                 {{ filter }}
               </option>
@@ -909,7 +948,7 @@
           :loading="createProjectButtonIsLoading"
           @click="saveNewProject"
         >
-          Create Project
+          {{ createButtonText }}
         </b-button>
       </b-tooltip>
 
@@ -924,7 +963,7 @@
           :loading="createProjectButtonIsLoading"
           @click="modifyProject"
         >
-          Modify Project
+          {{ editButtonText }}
         </b-button>
       </b-tooltip>
 
@@ -976,7 +1015,7 @@ export default {
       // Pos 10 to 80, including two single quotes containing the value.
       // This is used to limit the max length of the project note.
       max_fits_header_length: 68,
-      generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO'],
+      generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO', 'OSC'],
       generic_camera_areas: [
         '600%', '500%', '400%', '300%', '220%', '133%',
         'FULL', 'SQUARE', '71%', '50%', '35%', '25%', '12%'
@@ -994,7 +1033,9 @@ export default {
         lunar_phase_max: false
       },
 
-      createProjectButtonIsLoading: false
+      createProjectButtonIsLoading: false,
+      editButtonText: 'Edit Project',
+      createButtonText: 'Create Project'
     }
   },
   created () {
@@ -1005,6 +1046,8 @@ export default {
     // converting from user's timezone to UTC
     this.expiry_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
     this.start_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
+
+    this.project_sites = [this.sitecode]
   },
   mounted () {
     // initialize to the telescope command field ra/dec/name
@@ -1057,6 +1100,14 @@ export default {
       // Any time the longstackall checkbox is clicked, change all the individual exposure options
       const updatedExposures = this.exposures.map(e => ({ ...e, longstack: this.longStackAllCheckbox }))
       this.exposures = updatedExposures
+    },
+    sitecode (newVal, oldVal) {
+      const commonPoolSelected = this.project_sites.indexOf('common pool') >= 0
+      const selectedSites = [newVal]
+      if (commonPoolSelected) {
+        selectedSites.push('common pool')
+      }
+      this.project_sites = selectedSites
     }
   },
   methods: {
@@ -1306,7 +1357,8 @@ export default {
       'dark_sky_setting',
       'deplete',
       'cycle',
-      'tco',
+      'time_critical_observation',
+      'low_priority',
       'expiry_date',
       'start_date',
       'smartStackAllCheckbox',
@@ -1316,7 +1368,6 @@ export default {
 
     // Filter dropdown choices update based on which sites are selected.
     project_filter_list () {
-      const generics = this.generic_filter_list
       const selected_sites = this.project_sites.flat(Infinity)
 
       if (selected_sites.length != 0) {
@@ -1328,13 +1379,16 @@ export default {
           }
         }
         // Remove duplicates between site filter lists
-        let all_site_filters = [...new Set(fwo)]
-        // Remove duplicates that appear in generic filters
-        all_site_filters = all_site_filters.filter(item => generics.indexOf(item) < 0)
+        const all_site_filters = [...new Set(fwo)]
         return all_site_filters
       }
       // Default behavior (if no specific sites selected) returns the "site filters" for common pool, which are none
       return ''
+    },
+
+    // Return the generic filter list without filters already reported by sites.
+    generic_filters_no_duplicates () {
+      return this.generic_filter_list.filter(item => this.project_filter_list.indexOf(item) < 0)
     },
 
     // Check if the exposure row 'smartstack' checkbox is true for some and false for others.
@@ -1492,5 +1546,6 @@ export default {
 }
 .sites-text {
   margin-top: 1em;
+  font-style: italic;
 }
 </style>

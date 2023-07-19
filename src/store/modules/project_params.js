@@ -5,7 +5,7 @@ const state = {
   project_events: [],
   project_note: '',
   project_sites: ['common pool'],
-  project_window: 28, // in days, how long the project has a chance to be scheduled
+  project_window: 7, // in days, how long the project has a chance to be scheduled
   exposures_index: 1,
   exposures: [
     {
@@ -57,7 +57,8 @@ const state = {
   dark_sky_setting: false,
   deplete: true,
   cycle: true,
-  tco: false,
+  time_critical_observation: false,
+  low_priority: false,
   expiry_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
   start_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
 
@@ -91,7 +92,8 @@ const getters = {
       dark_sky_setting: state.dark_sky_setting,
       deplete: state.deplete,
       cycle: state.cycle,
-      tco: state.tco,
+      time_critical_observation: state.time_critical_observation,
+      low_priority: state.low_priority,
       expiry_date: state.expiry_date,
       start_date: state.start_date
     }
@@ -160,7 +162,8 @@ const mutations = {
   dark_sky_setting (state, val) { state.dark_sky_setting = val },
   deplete (state, val) { state.deplete = val },
   cycle (state, val) { state.cycle = val },
-  tco (state, val) { state.tco = val },
+  time_critical_observation (state, val) { state.time_critical_observation = val },
+  low_priority (state, val) { state.low_priority = val },
   expiry_date (state, val) { state.expiry_date = val },
   start_date (state, val) { state.start_date = val },
 
@@ -170,12 +173,11 @@ const mutations = {
 
 const actions = {
   // This action does nothing. It exists for easy reference.
-  resetProjectForm ({ state, commit }) {
+  resetProjectForm ({ state, commit, rootState }) {
     commit('project_name', '')
     commit('project_events', [])
-    commit('project_window', 28) // days
     commit('project_note', '')
-    commit('project_sites', ['common pool'])
+    commit('project_sites', [rootState.site_config.selected_site])
     commit('targets', [{
       active: true,
       name: '',
@@ -222,7 +224,8 @@ const actions = {
     commit('generic_instrument', 'Main Camera')
     commit('deplete', true)
     commit('cycle', true)
-    commit('tco', false)
+    commit('time_critical_observation', false)
+    commit('low_priority', false)
 
     const today = new Date()
     const expiry_date = new Date()

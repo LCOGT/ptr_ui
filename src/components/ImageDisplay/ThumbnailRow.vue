@@ -1,19 +1,16 @@
 <template>
   <div class="images">
-    <template
+    <img
       v-for="(item, index) in images"
+      :key="index"
+      :src="thumbnailWithFallback(item)"
+      onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
+      :title="item.base_filename"
+      :class="{'selected_thumbnail' : item.image_id == selected_image}"
+      loading="lazy"
+      class="recent-image"
+      @click="setActiveImage(item)"
     >
-      <img
-        :key="index"
-        :src="thumbnailWithFallback(item)"
-        onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
-        :title="item.base_filename"
-        :class="{'selected_thumbnail' : item.image_id == selected_image}"
-        loading="lazy"
-        class="recent-image"
-        @click="setActiveImage(item)"
-      >
-    </template>
   </div>
 </template>
 
