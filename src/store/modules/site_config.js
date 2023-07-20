@@ -213,6 +213,9 @@ const getters = {
     if (fwo == undefined) return [[]]
     return fwo
   },
+  default_filter_selection: (state, getters) => {
+    return getters.selected_filter_wheel_config.settings?.default_filter || getters.filter_wheel_options[0][0]
+  },
 
   // Get the site events from the selected config (things like nautical dark start, etc)
   site_events: (state, getters) => {
@@ -263,20 +266,41 @@ const actions = {
   /**
      * This action gets the most recent config from AWS, which applies to all
      * observatories in the network.
+     * It also saves the config to localstorage, which acts as a fallback if the config endpoint fails.
      */
   async update_config ({ commit, rootState }) {
     const url = `${rootState.api_endpoints.active_api}/all/config`
-    const response = await axios.get(url)
-    const globalConfig = response.data
-    // Add wema-only values into obs configs
-    Object.keys(globalConfig).forEach(site => {
-      const wemaName = globalConfig[site].wema_name || site
-      if (wemaName != site) {
-        globalConfig[site].latitude = globalConfig[wemaName].latitude
-        globalConfig[site].longitude = globalConfig[wemaName].longitude
-        globalConfig[site].TZ_database_name = globalConfig[wemaName].TZ_database_name
+    let globalConfig
+
+    try {
+      const response = await axios.get(url)
+      globalConfig = response.data
+
+      // Add wema-only values into obs configs
+      Object.keys(globalConfig).forEach(site => {
+        const wemaName = globalConfig[site].wema_name || site
+        if (wemaName != site) {
+          globalConfig[site].latitude = globalConfig[wemaName].latitude
+          globalConfig[site].longitude = globalConfig[wemaName].longitude
+          globalConfig[site].TZ_database_name = globalConfig[wemaName].TZ_database_name
+        }
+      })
+
+      // Save globalConfig to localStorage
+      localStorage.setItem('globalConfig', JSON.stringify(globalConfig))
+    } catch (error) {
+      console.error(error)
+
+      // Load globalConfig from localStorage
+      const loadedConfig = localStorage.getItem('globalConfig')
+      if (loadedConfig) {
+        globalConfig = JSON.parse(loadedConfig)
+      } else {
+        // Handle situation where there's neither API data nor localStorage data
+        throw error
       }
-    })
+    }
+
     commit('setGlobalConfig', globalConfig)
     return globalConfig
   },
@@ -309,7 +333,7 @@ const actions = {
     if (selectedFilterWheel == '') return
 
     // set default filter selection
-    const filterSelection = getters.filter_wheel_options[0][0]
+    const filterSelection = getters.default_filter_selection
     commit('command_params/filter_wheel_options_selection',
       filterSelection,
       { root: true }

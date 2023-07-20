@@ -1,11 +1,17 @@
 import moment from 'moment'
 
 const state = {
+  project_window: 7, // in days, how long the project has a chance to be scheduled; this is not sent with the project
+
   project_name: '',
   project_events: [],
   project_note: '',
-  project_sites: ['common pool'],
-  project_window: 7, // in days, how long the project has a chance to be scheduled
+  project_sites: ['common pool'], // can include 'common_pool' or any sitecode
+  project_priority: 'standard', // can be ['standard', 'time_critical', 'low_priority']
+  project_creator: {
+    username: '',
+    user_id: ''
+  },
   exposures_index: 1,
   exposures: [
     {
@@ -15,16 +21,9 @@ const state = {
       exposure: 1,
       filter: 'Lum',
       area: 'FULL',
-      bin: 'optimal',
-      dither: 'no',
-      drizzle: '1',
-      photometry: '-',
-      defocus: 0,
-      smartstack: true,
-      longstack: false
+      bin: 'optimal'
     }
   ],
-  targets_index: 1,
   targets: [
     {
       active: true,
@@ -61,10 +60,9 @@ const state = {
   low_priority: false,
   expiry_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
   start_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
-
-  // values below are not saved with the project
-  longStackAllCheckbox: false,
-  smartStackAllCheckbox: true
+  long_stack: false,
+  smart_stack: true,
+  defocus: 0
 }
 
 const getters = {
@@ -95,7 +93,10 @@ const getters = {
       time_critical_observation: state.time_critical_observation,
       low_priority: state.low_priority,
       expiry_date: state.expiry_date,
-      start_date: state.start_date
+      start_date: state.start_date,
+      smart_stack: state.smart_stack,
+      long_stack: state.long_stack,
+      defocus: state.defocus
     }
   },
   projectToSend: (state, getters, rootState) => {
@@ -104,6 +105,8 @@ const getters = {
       created_at: moment().utc().format(),
       user_id: rootState.user_data.userId,
       project_note: state.project_note,
+      project_priority: state.project_priority,
+      project_creator: state.project_creator,
       project_constraints: getters.project_constraints,
       project_targets: state.targets
         .filter(t => t.active)
@@ -135,9 +138,10 @@ const mutations = {
   project_note (state, val) { state.project_note = val },
   project_sites (state, val) { state.project_sites = val },
   project_window (state, val) { state.project_window = val },
+  project_priority (state, val) { state.project_priority = val },
+  project_creator (state, val) { state.project_creator = val },
   exposures_index (state, val) { state.exposures_index = val },
   exposures (state, val) { state.exposures = val },
-  targets_index (state, val) { state.targets_index = val },
   targets (state, val) { state.targets = val },
 
   project_is_active (state, val) { state.project_is_active = val },
@@ -166,25 +170,25 @@ const mutations = {
   low_priority (state, val) { state.low_priority = val },
   expiry_date (state, val) { state.expiry_date = val },
   start_date (state, val) { state.start_date = val },
-
-  longStackAllCheckbox (state, val) { state.longStackAllCheckbox = val },
-  smartStackAllCheckbox (state, val) { state.smartStackAllCheckbox = val }
+  long_stack (state, val) { state.long_stack = val },
+  smart_stack (state, val) { state.smart_stack = val },
+  defocus (state, val) { state.defocus = val }
 }
 
 const actions = {
-  // This action does nothing. It exists for easy reference.
   resetProjectForm ({ state, commit, rootState }) {
     commit('project_name', '')
     commit('project_events', [])
     commit('project_note', '')
     commit('project_sites', [rootState.site_config.selected_site])
+    commit('project_priority', 'standard')
+    commit('project_creator', { username: '', user_id: '' })
     commit('targets', [{
       active: true,
       name: '',
       ra: '',
       dec: ''
     }])
-    commit('targets_index', 1)
     commit('exposures', [
       {
         active: true,
@@ -193,13 +197,7 @@ const actions = {
         exposure: 1,
         filter: 'Lum',
         area: 'FULL',
-        bin: 'optimal',
-        dither: 'no',
-        drizzle: '1',
-        photometry: '-',
-        defocus: 0,
-        smartstack: true,
-        longstack: false
+        bin: 'optimal'
       }
     ])
     commit('exposures_index', 1)
@@ -224,8 +222,6 @@ const actions = {
     commit('generic_instrument', 'Main Camera')
     commit('deplete', true)
     commit('cycle', true)
-    commit('time_critical_observation', false)
-    commit('low_priority', false)
 
     const today = new Date()
     const expiry_date = new Date()
@@ -238,16 +234,18 @@ const actions = {
     start_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
     commit('start_date', start_date)
 
-    commit('smartStackAllCheckbox', true)
-    commit('longStackAllCheckbox', false)
+    commit('smart_stack', true)
+    commit('long_stack', false)
+    commit('defocus', 0)
   },
   loadProject ({ state, commit }, project) {
     commit('project_name', project.project_name)
     commit('project_events', project.scheduled_with_events)
     commit('project_sites', project.project_sites)
     commit('targets', project.project_targets.map(target => ({ ...target, active: true })))
-    commit('targets_index', state.targets.length)
     commit('project_note', project.project_note)
+    commit('project_priority', project?.project_priority || 'standard')
+    commit('project_creator', project?.project_creator || { username: 'n/a', user_id: project.user_id })
     commit('exposures', project.exposures.map(exposure => ({ ...exposure, active: true })))
     commit('exposures_index', state.exposures.length)
 

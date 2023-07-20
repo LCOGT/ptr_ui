@@ -69,13 +69,13 @@
         v-slot="props"
         field="edit"
         label=""
-        width="180px"
+        width="200px"
       >
         <button
           class="button is-info is-small mr-3"
           @click="getProject(props.row.project_name, props.row.created_at)"
         >
-          edit
+          modify
         </button>
         <button
           class="button is-info is-small mr-3"
@@ -209,7 +209,8 @@ export default {
         project.created_at = moment().utc().format()
         const project_loader = {
           project,
-          is_existing_project: false
+          is_modifying_project: false,
+          is_cloned_project: true
         }
         this.$emit('load_project_form', project_loader)
       }).catch(err => {
@@ -225,7 +226,8 @@ export default {
       axios.post(project_endpoint, request_params).then(response => {
         const project_loader = {
           project: response.data,
-          is_existing_project: true
+          is_modifying_project: true,
+          is_cloned_project: false
         }
         this.$emit('load_project_form', project_loader)
       }).catch(err => {

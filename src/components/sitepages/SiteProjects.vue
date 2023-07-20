@@ -53,11 +53,19 @@ export default {
     window.moment = moment // use moment lib in browser devtools
   },
   mounted () {
-    this.refreshUserEvents()
-    this.refreshUserProjects()
+    if (this.userId != '') {
+      this.refreshUserEvents()
+      this.refreshUserProjects()
+    }
   },
   destroyed () {
     clearInterval(this.timeInterval)
+  },
+  watch: {
+    userId () {
+      this.refreshUserEvents()
+      this.refreshUserProjects()
+    }
   },
   methods: {
     displayUtcTime (time) {
@@ -119,6 +127,7 @@ export default {
 
 .create-project-form {
   grid-area: project;
+  margin-bottom: 3em;
 }
 .projects-events-tables {
   grid-area: tables;
