@@ -68,57 +68,9 @@
 
         <b-dropdown-item
           aria-role="listitem"
-          :disabled="!small_fits_exists"
-          @click="download_current_fits('small')"
-        >
-          small fits
-        </b-dropdown-item>
-        <b-dropdown-item
-          aria-role="listitem"
-          :disabled="!large_fits_exists"
-          @click="download_current_fits('large')"
-        >
-          large fits
-        </b-dropdown-item>
-        <b-dropdown-item
-          aria-role="listitem"
-          :disabled="!small_fits_exists"
-          @click="download_tif('small', 'linear')"
-        >
-          small tif (linear)
-        </b-dropdown-item>
-        <b-dropdown-item
-          aria-role="listitem"
-          :disabled="!large_fits_exists"
-          @click="download_tif('large', 'linear')"
-        >
-          large tif (linear)
-        </b-dropdown-item>
-        <b-dropdown-item
-          aria-role="listitem"
-          :disabled="!small_fits_exists"
-          @click="download_tif('small', 'arcsinh')"
-        >
-          small tif (arcsinh)
-        </b-dropdown-item>
-        <b-dropdown-item
-          aria-role="listitem"
-          :disabled="!large_fits_exists"
-          @click="download_tif('large', 'arcsinh')"
-        >
-          large tif (arcsinh)
-        </b-dropdown-item>
-        <b-dropdown-item
-          aria-role="listitem"
           @click="download_jpg"
         >
           jpg
-        </b-dropdown-item>
-        <b-dropdown-item
-          aria-role="listitem"
-          @click="download_fits_previous_24hrs"
-        >
-          last 24hrs fits
         </b-dropdown-item>
       </b-dropdown>
     </b-field>

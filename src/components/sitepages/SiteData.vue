@@ -61,12 +61,6 @@
 
             <Tabs class="analysis-tools-tabs">
               <TabItem
-                title="star inspector"
-                :is-active="activeAnalysisTab == 'star inspector'"
-              >
-                <star-profile />
-              </TabItem>
-              <TabItem
                 title="statistics"
                 :is-active="activeAnalysisTab == 'statistics'"
               >
@@ -145,65 +139,14 @@
 
           <!-- Useful info for developers -->
           <b-tab-item
-            label="dev tools"
+            label="site config"
             class="dev-tab"
             :value="'dev'"
           >
-            <Tabs class="dev-tools-tabs">
-              <TabItem
-                title="recent s3 data"
-                :is-active="activeDevTab == 'recent s3 data'"
-              >
-                <RecentS3UploadsTable
-                  :init_site="sitecode"
-                  size="is-small"
-                />
-              </TabItem>
-              <TabItem
-                title="site config"
-                :is-active="activeDevTab == 'site config'"
-              >
-                <div class="subtitle">
-                  Config file for {{ sitecode }}
-                </div>
-                <SiteConfigViewer :init_site="sitecode" />
-              </TabItem>
-            </Tabs>
-            <div
-              class="flat-styled-tabs"
-              style="margin-top: 1em;"
-            >
-              <!-- Tab buttons -->
-              <div class="flat-styled-tabs-buttons">
-                <div
-                  :class="{'active': activeDevTab=='recents3'}"
-                  @click="activeDevTab='recents3'"
-                >
-                  recent s3 data
-                </div>
-                <div
-                  :class="{'active': activeDevTab=='config'}"
-                  @click="activeDevTab='config'"
-                >
-                  site config
-                </div>
-              </div>
-              <!-- Tab content-->
-              <div class="flat-styled-tabs-content">
-                <div v-if="activeDevTab=='recents3'">
-                  <RecentS3UploadsTable
-                    :init_site="sitecode"
-                    size="is-small"
-                  />
-                </div>
-                <div v-if="activeDevTab=='config'">
-                  <div class="subtitle">
-                    Config file for {{ sitecode }}
-                  </div>
-                  <SiteConfigViewer :init_site="sitecode" />
-                </div>
-              </div>
+            <div class="subtitle">
+              Config file for {{ sitecode }}
             </div>
+            <SiteConfigViewer :init_site="sitecode" />
           </b-tab-item>
         </b-tabs>
       </div>
@@ -272,8 +215,8 @@ export default {
   data () {
     return {
       accordionIsOpen: 1,
-      activeAnalysisTab: 'star inspector', // default tab in 'analysis'
-      activeDevTab: 'recents3', // default tab in 'dev tools'
+      activeAnalysisTab: 'statistics', // default tab in 'analysis'
+      activeDevTab: 'site config', // default tab in 'dev tools'
 
       region_stats_loading: false,
       image_stats_loading: false

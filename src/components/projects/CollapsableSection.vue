@@ -12,8 +12,8 @@
         class="icon"
       >
         <slot name="header">header</slot>
-        <span class="opened-icon"><i class="mdi mdi-chevron-down mdi-36px"></i></span>
-        <span class="closed-icon"><i class="mdi mdi-chevron-left mdi-36px"></i></span>
+        <span class="opened-icon"><i class="mdi mdi-chevron-down mdi-36px" /></span>
+        <span class="closed-icon"><i class="mdi mdi-chevron-left mdi-36px" /></span>
       </label>
     </div>
     <div class="content">

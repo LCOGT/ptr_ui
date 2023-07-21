@@ -136,6 +136,18 @@ import '@fullcalendar/resource-timeline/main.css'
     */
 // }
 
+// This function is used to convert the calendar's left time column into the UTC
+// values on the right column
+function transformLocalTimeToUTC (timezoneName, localTime) {
+  // localTime is a string formatted as hh:mm in 24hr time
+  const offsetInt = moment.tz(timezoneName).utcOffset() / 60
+  const time = localTime.split(':')
+  const hours = time[0]
+  const minutes = time[1]
+  const utcHours = (hours - (offsetInt - 24)) % 24
+  return `${utcHours}:${minutes}`
+}
+
 export default {
   name: 'TheCalendar',
   components: {
@@ -344,6 +356,45 @@ export default {
   },
 
   methods: {
+    addUTCTimeColumn () {
+      const rows = document.querySelectorAll('.fc-slats > table.table-bordered tbody > tr')
+      rows.forEach(r => {
+        if (r.querySelectorAll('.fc-axis.fc-time').length < 2) {
+          const timecol = r.querySelector('.fc-axis.fc-time')
+          console.log(timecol)
+          const timecolUtc = timecol.cloneNode(true)
+          if (timecolUtc.querySelector('span')) {
+            const timeText = timecolUtc.querySelector('span').textContent
+            const utcTime = transformLocalTimeToUTC(this.fc_timeZone, timeText)
+            timecolUtc.querySelector('span').textContent = utcTime
+          }
+          r.appendChild(timecolUtc)
+        }
+      })
+      const skeleton = document.querySelectorAll('.fc-content-skeleton > table > tbody > tr')
+      skeleton.forEach(e => {
+        if (e.querySelectorAll('td.fc-axis').length < 2) {
+          e.appendChild(e.querySelector('td.fc-axis').cloneNode(true))
+        }
+      })
+      const tableBorderedRows = document.querySelectorAll('.fc-bg table.table-bordered tbody tr')
+      tableBorderedRows.forEach(e => {
+        if (e.querySelectorAll('.fc-axis').length < 2) {
+          const utc_el = e.querySelector('.fc-axis').cloneNode(true)
+          if (utc_el.querySelector('span')) {
+            utc_el.querySelector('span').textContent = 'UTC'
+          }
+          e.appendChild(utc_el)
+        }
+      })
+      const tableBorderedRows2 = document.querySelectorAll('.fc-head-container table.table-bordered thead tr')
+      if (tableBorderedRows2.length > 0 && tableBorderedRows2[0].querySelectorAll('.fc-axis').length < 2) {
+        tableBorderedRows2.forEach(e => {
+          e.appendChild(e.querySelector('.fc-axis').cloneNode(true))
+        })
+      }
+    },
+
     async updateNowIndicator () {
       this.fullCalendarApi.unselect()
       this.fullCalendarApi.refetchEvents()
@@ -406,6 +457,8 @@ export default {
 
     // Display moon phase icons in the calendar
     dayRender (dayRenderInfo) {
+      this.addUTCTimeColumn()
+
       try { // ignore errors from the timezone not being loaded yet.
         const date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
         const moon_phase = this.getMoonPhaseDays(
