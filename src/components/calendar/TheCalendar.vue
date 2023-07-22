@@ -380,6 +380,9 @@ export default {
       const tableBorderedRows = document.querySelectorAll('.fc-bg table.table-bordered tbody tr')
       tableBorderedRows.forEach(e => {
         if (e.querySelectorAll('.fc-axis').length < 2) {
+          if (e.querySelector('.fc-axis span')) {
+            e.querySelector('.fc-axis span').textContent = 'Obs. Local'
+          }
           const utc_el = e.querySelector('.fc-axis').cloneNode(true)
           if (utc_el.querySelector('span')) {
             utc_el.querySelector('span').textContent = 'UTC'
