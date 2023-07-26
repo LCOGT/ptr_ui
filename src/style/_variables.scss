@@ -31,6 +31,19 @@ $ptr-red: orangered;
 $ptr-grey: grey;
 $ptr-blue: $blue;
 
+$ptr-calendar-realtime-color: #2196f3;
+$ptr-calendar-project-color: #9c27b0;
+$ptr-calendar-user-border: gold;
+$ptr-calendar-low-priority-border: $green;
+$ptr-calendar-time-critical-border: orangered;
+:root {
+  --ptr-calendar-project-color: #{$ptr-calendar-project-color};
+  --ptr-calendar-realtime-color: #{$ptr-calendar-realtime-color};
+  --ptr-calendar-user-border: #{$ptr-calendar-user-border};
+  --ptr-calendar-low-priority-border: #{$ptr-calendar-user-border};
+  --ptr-calendar-time-critical-border: #{$ptr-calendar-user-border};
+}
+
 $family-sans-serif: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 $family-monospace: "Inconsolata", "Consolas", "Monaco", monospace;
 

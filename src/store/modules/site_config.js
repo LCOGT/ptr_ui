@@ -5,6 +5,7 @@
 
 import _ from 'lodash'
 import axios from 'axios'
+import helpers from '../../utils/helpers'
 
 const state = {
   test_sites: ['tst', 'tst001', 'dht'],
@@ -218,8 +219,22 @@ const getters = {
   },
 
   // Get the site events from the selected config (things like nautical dark start, etc)
+  // convert the times from dublin julian days (the config format) to unix timestamps
   site_events: (state, getters) => {
-    return getters.site_config.events ?? {}
+    const site_events = { ...getters.site_config.events } ?? {}
+    for (const e in site_events) {
+      // convert dublin julian days to julian days
+      const jd = site_events[e] + 2415020
+      // convert julian days to unix
+      site_events[e] = helpers.jd2unix(jd)
+    }
+    return site_events
+  },
+  site_events_observing_start_time: (state, getters) => {
+    return getters.site_events['Observing Begins']
+  },
+  site_events_observing_end_time: (state, getters) => {
+    return getters.site_events['Observing Ends']
   }
 
 }

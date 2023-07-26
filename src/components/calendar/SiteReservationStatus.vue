@@ -80,10 +80,13 @@ export default {
       'endOfUserReservation',
       'endOfNextReservation'
     ]),
+    ...mapState('user_data', [
+      'userId',
+      'userIsAuthenticated'
+    ]),
     userHasActiveReservation () {
-      if (this.$auth.isAuthenticated) {
-        const user_id = this.$auth.user.sub
-        return this.userIDsWithActiveReservation.includes(user_id)
+      if (this.userIsAuthenticated) {
+        return this.userIDsWithActiveReservation.includes(this.userId)
       } else {
         return false
       }
@@ -102,8 +105,7 @@ export default {
     },
     userReservationTimeRemaining () {
       if (this.$auth.isAuthenticated) {
-        const user_id = this.$auth.user.sub
-        const expire_time = this.endOfUserReservation(user_id)
+        const expire_time = this.endOfUserReservation(this.userId)
         const current_time = this.current_time_millis
         const delta = expire_time - current_time
         const millis_per_minute = 60 * 1000

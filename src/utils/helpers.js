@@ -130,7 +130,15 @@ const helpers = {
 
     // convert A to degrees before returning
     return this.rad2deg(A)
+  },
+
+  // Function to convert from julian days to unix time
+  // Subtract difference in JD start vs unix start, then mulitply by
+  // the number of miliseconds in a day.
+  jd2unix (t) {
+    return (t - 2440587.5) * 86400 * 1000
   }
+
 }
 
 export default helpers

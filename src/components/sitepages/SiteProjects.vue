@@ -53,7 +53,7 @@ export default {
     window.moment = moment // use moment lib in browser devtools
   },
   mounted () {
-    if (this.userId != '') {
+    if (this.userIsAuthenticated) {
       this.refreshUserEvents()
       this.refreshUserProjects()
     }
@@ -90,7 +90,10 @@ export default {
   },
   computed: {
     ...mapGetters('site_config', ['timezone']),
-    ...mapState('user_data', ['userId']),
+    ...mapState('user_data', [
+      'userId',
+      'userIsAuthenticated'
+    ]),
 
     user () {
       return this.$auth.user

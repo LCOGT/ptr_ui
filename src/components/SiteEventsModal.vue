@@ -10,6 +10,7 @@
       sticky-header
       default-sort="unix"
     />
+    {{ config_site_events }}
     <div
       v-if="site_events.length == 0"
       class="empty-warning"
@@ -20,9 +21,9 @@
 </template>
 
 <script>
-import axios from 'axios'
 import moment from 'moment'
 import { mapGetters } from 'vuex'
+
 export default {
   name: 'SiteEventsModal',
   props: ['sitecode'],
@@ -94,39 +95,18 @@ export default {
   },
   data () {
     return {
-      site_events: [],
-      time_display_format: 'user' // 'user' or 'observatory',
+      site_events: []
     }
   },
   methods: {
     async getSiteEvents (source = 'config') {
-      let site_events
-
-      // The site events are also calculated at site and sent in the config.
-      // So to avoid overengineering an unneeeded solution, let's just use that
-      // instead of the (now outdated) calculations running in AWS. 2021-09-27
-      if (source == 'config') {
-        site_events = { ...this.config_site_events }
-        // convert dublin julian days to julian days to match the output of the photonranch-api results
-        Object.keys(site_events).forEach(key => { site_events[key] += 2415020 })
-      } else {
-        const url = `${this.$store.state.api_endpoints.active_api}/events?site=${this.sitecode}`
-        site_events = await axios.get(url)
-        site_events = site_events.data
-      }
-
-      // Function to convert from julian days to unix time
-      // Subtract difference in JD start vs unix start, then mulitply by
-      // the number of miliseconds in a day.
-      const jd2unix = t => (t - 2440587.5) * 86400 * 1000
-
       const tableData = []
 
       // Configure the time display format
       const formatString = 'HH:mm:ss'
 
-      for (const property in site_events) {
-        const time = moment(jd2unix(site_events[property]))
+      for (const property in this.config_site_events) {
+        const time = moment(this.config_site_events[property])
         // Exclude the 'day_directory' which is not actually a site event
         if (property != 'day_directory') {
           tableData.push({

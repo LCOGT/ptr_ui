@@ -56,8 +56,6 @@ const state = {
   dark_sky_setting: false,
   deplete: true,
   cycle: true,
-  time_critical_observation: false,
-  low_priority: false,
   expiry_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
   start_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
   long_stack: false,
@@ -90,8 +88,6 @@ const getters = {
       dark_sky_setting: state.dark_sky_setting,
       deplete: state.deplete,
       cycle: state.cycle,
-      time_critical_observation: state.time_critical_observation,
-      low_priority: state.low_priority,
       expiry_date: state.expiry_date,
       start_date: state.start_date,
       smart_stack: state.smart_stack,
@@ -166,8 +162,6 @@ const mutations = {
   dark_sky_setting (state, val) { state.dark_sky_setting = val },
   deplete (state, val) { state.deplete = val },
   cycle (state, val) { state.cycle = val },
-  time_critical_observation (state, val) { state.time_critical_observation = val },
-  low_priority (state, val) { state.low_priority = val },
   expiry_date (state, val) { state.expiry_date = val },
   start_date (state, val) { state.start_date = val },
   long_stack (state, val) { state.long_stack = val },

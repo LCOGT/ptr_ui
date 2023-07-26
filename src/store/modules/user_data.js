@@ -88,7 +88,7 @@ const mutations = {
 // actions
 const actions = {
 
-  newUserLogin ({ commit }, user) {
+  newUserLogin ({ state, commit, dispatch }, user) {
     const roles = user['https://photonranch.org/user_metadata'].roles
     const userIsAdmin = roles.includes('admin')
 
@@ -99,6 +99,9 @@ const actions = {
     commit('userNickname', user.nickname)
     commit('userEmail', user.email)
     commit('profileUrl', user.picture)
+
+    dispatch('fetchUserProjects', state.userId)
+    dispatch('fetchUserEvents', state.userId)
   },
 
   logoutUser ({ commit }) {
@@ -109,6 +112,8 @@ const actions = {
     commit('userNickname', '')
     commit('userEmail', '')
     commit('profileUrl', '')
+    commit('user_projects', [])
+    commit('user_events', [])
   },
 
   // refreshProjectsTableData automatically chooses whether to run fetchUserProjects or fetchAllProjects
@@ -122,9 +127,9 @@ const actions = {
     }
   },
 
-  async fetchUserProjects ({ commit, rootState }, userId) {
+  async fetchUserProjects ({ state, commit, rootState }, userId) {
     // This happens when the method is called before the current user is loaded.
-    if (userId === undefined) return
+    if (!state.userIsAuthenticated) return
 
     commit('user_projects_is_loading', true)
 
@@ -157,7 +162,9 @@ const actions = {
     })
   },
 
-  fetchUserEvents ({ commit, rootState }, userId) {
+  fetchUserEvents ({ state, commit, rootState }, userId) {
+    if (!state.userIsAuthenticated) return
+
     commit('user_events_is_loading', true)
 
     const url = rootState.api_endpoints.calendar_api + '/user-events-ending-after-time'

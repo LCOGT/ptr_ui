@@ -156,17 +156,9 @@ export default {
     }
   },
   watch: {
-    userId () {
-      // Only do this if the active user is authenticated and loaded.
-      if (this.userIsAuthenticated) {
-        this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
-      }
-    },
-
     show_everyones_projects () {
       this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
     }
-
   },
   methods: {
     formatCreatedAtDate (utcTimestamp) {

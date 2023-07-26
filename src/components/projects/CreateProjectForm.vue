@@ -17,7 +17,9 @@
     </div>
 
     <CollapsableSection>
-      <template #header>Project Info</template>
+      <template #header>
+        Project Info
+      </template>
       <template #content>
         <div style="display:flex; align-items: bottom; gap: 1em;">
           <b-field
@@ -123,13 +125,22 @@
                   <div><b>Time Critical: </b><span>Protected calendar events, used for e.g. exoplanets, variable stars</span></div>
                   <div><b>Low Priority: </b><span>Calendar events will be labeled "Feel free to cancel"</span></div>
                 </template>
-                <b-icon size="is-small" icon="help-circle-outline" />
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
               </b-tooltip>
             </template>
             <b-select v-model="project_priority">
-              <option value="standard">standard</option>
-              <option value="time_critical">time critical</option>
-              <option value="low_priority">low priority</option>
+              <option value="standard">
+                standard
+              </option>
+              <option value="time_critical">
+                time critical
+              </option>
+              <option value="low_priority">
+                low priority
+              </option>
             </b-select>
           </b-field>
         </div>
@@ -155,7 +166,9 @@
 
     <!-- Target Info -->
     <CollapsableSection>
-      <template #header>Target Info</template>
+      <template #header>
+        Target Info
+      </template>
       <template #content>
         <div style="display:flex; align-items: bottom; gap: 1em;">
           <b-field
@@ -202,7 +215,9 @@
 
     <!-- Exposure Info -->
     <CollapsableSection>
-      <template #header>Exposures</template>
+      <template #header>
+        Exposures
+      </template>
       <template #content>
         <div class="exposure-rows">
           <div
@@ -364,7 +379,10 @@
 
         <details style="margin-top: 3em;">
           <summary>additional options</summary>
-          <div class="flex-row" style="margin-top: 1em; gap: 3em;">
+          <div
+            class="flex-row"
+            style="margin-top: 1em; gap: 3em;"
+          >
             <b-field label="Defocus">
               <b-select v-model="defocus">
                 <option
@@ -447,13 +465,14 @@
             </div>
           </div>
         </details>
-
       </template>
     </CollapsableSection>
 
     <!-- Advanced Options-->
     <CollapsableSection closed>
-      <template #header>Advanced Options</template>
+      <template #header>
+        Advanced Options
+      </template>
       <template #content>
         <div class="flex-row">
           <b-field label="Meridian Flip">
@@ -496,7 +515,7 @@
         </div>
 
         <div class="flex-row">
-          <b-field label="Ra offset" >
+          <b-field label="Ra offset">
             <b-input
               v-model="ra_offset"
               style="max-width: 100px"
@@ -670,7 +689,10 @@
             Astronomical Dark & Moon Alt &lt; 6
           </b-checkbox>
         </b-field>
-        <b-field label="Generic Instrument" style="margin-top: 1em;">
+        <b-field
+          label="Generic Instrument"
+          style="margin-top: 1em;"
+        >
           <b-select v-model="generic_instrument">
             <option value="Main Camera">
               Main Camera
@@ -1156,8 +1178,6 @@ export default {
       'dark_sky_setting',
       'deplete',
       'cycle',
-      'time_critical_observation',
-      'low_priority',
       'expiry_date',
       'start_date',
       'smart_stack',

@@ -16,8 +16,18 @@
       />
 
       <div class="projects-section">
-        <p>Projects will be shown here.</p>
-        <p>You will be able to drag them onto the calendar to schedule them.</p>
+        <p>Under Construction</p>
+        <p style="text-decoration: line-through;">
+          Drag projects to the calendar to schedule them
+        </p>
+        <b-tag
+          v-for="(p, index) in user_projects"
+          :key="index"
+          type="is-info"
+          rounded
+        >
+          {{ p.project_name }}
+        </b-tag>
       </div>
 
       <div class="fc-settings-box">
@@ -29,6 +39,49 @@
             <b-switch v-model="showMoonEvents">
               Show moon events
             </b-switch>
+          </div>
+        </div>
+        <div style="border-bottom: 1px solid grey; width: 100%; height: 1em; margin-bottom: 1em;" />
+        <p class="menu-label">
+          Calendar Legend
+        </p>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="reservation-visual realtime" />
+            <div>
+              <b>Realtime Session</b>
+              <p>Blue events are used to reserve time for manual observing via the "Observe" tab.</p>
+              <p>You can schedule time in a 30 or 45 minute block.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="reservation-visual project" />
+            <div>
+              <b>Project Session</b>
+              <p>Purple events designate a project that has been created by the user.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="reservation-visual low-priority" />
+            <div>
+              <b>Low Priority Event</b>
+              <p>Events with the green border are ok to remove if you want to observe during this time</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="reservation-visual time-critical" />
+            <div>
+              <b>Time Critical Observation</b>
+              <p>Events with the red border require precise time schedules. </p>
+              <p>While they behave the same as standard events, they are shown here for informative purposes.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="reservation-visual self-owned" />
+            <div>
+              <b>Your Reservations</b>
+              <p>Calendar events created by you will be outlined in gold.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -71,12 +124,6 @@ export default {
   destroyed () {
     clearInterval(this.timeInterval)
   },
-  watch: {
-    // Update the user's schedulable projects if the user changes.
-    userId () {
-      this.$store.dispatch('user_data/fetchUserProjects', this.userId)
-    }
-  },
   methods: {
     displayUtcTime (time) {
       return moment(time).utc().format('MMM D, kk:mm')
@@ -102,7 +149,8 @@ export default {
       'userIsAuthenticated',
       'userIsAdmin',
       'userId',
-      'userName'
+      'userName',
+      'user_projects'
     ]),
 
     // Calendar Resources (Observatories) to feed into the calendar component
@@ -134,6 +182,7 @@ export default {
 
 <style scoped lang="scss">
 @import "@/style/_responsive.scss";
+@import "@/style/buefy-styles.scss";
 
 $content-view-height: calc(100vh - #{$top-bottom-height});
 $content-padding: 2em;
@@ -142,6 +191,7 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 .cal-page-wrapper {
   width: 100%;
   padding: $content-padding;
+  padding-left: calc($content-padding + 25px); // account for quick sites button column
   @include tablet {
     display: grid;
     grid-template-rows: 50vh 1fr 1fr;
@@ -151,7 +201,6 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
   @include desktop {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    //grid-template-rows: $calendar-height;
     grid-template-rows: $calendar-height;
   }
 }
@@ -165,21 +214,20 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 .calendar-adjacent {
   padding: 2em;
   display:flex;
+  gap: 2em;
 
   @include tablet {
     flex-direction: row;
-    padding: 2em 0;
     margin: 0;
   }
 
   @include desktop {
     flex-direction: column;
-    margin: 1em;
+    margin: 0;
   }
 
   & > div {
     padding: 1em;
-    margin: 1em;
     width: 100%;
     border-radius: 8px;
     background-color:rgba(10,10,10,0.8);
@@ -187,9 +235,6 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 }
 
 .projects-section {
-}
-
-.fc-settings-box {
 }
 
 #moon-info {
@@ -209,5 +254,41 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 .fc-moon-indicator:hover {
   opacity: 0.8;
   transition: 0.2s;
+}
+
+.legend {
+  display:flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.legend-item {
+  display: flex;
+  gap: 1em;
+}
+.reservation-visual {
+  width: 30px;
+  height: 50px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 6px; // align top of the visual with description to the right
+  &.realtime {
+    background-color: $ptr-calendar-realtime-color;
+  }
+  &.project{
+    background-color: $ptr-calendar-project-color;
+  }
+  &.low-priority {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-left: 6px solid $ptr-calendar-low-priority-border;
+  }
+  &.time-critical {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-left: 6px solid $ptr-calendar-time-critical-border;
+  }
+  &.self-owned {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 2px solid $ptr-calendar-user-border;
+  }
 }
 </style>

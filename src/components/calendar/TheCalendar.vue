@@ -1,12 +1,5 @@
 <template>
   <div class="calendar-container">
-    <!-- for development -->
-    <!--button class="level-item button is-danger" @click="refreshCalendarView">refresh</button-->
-    <!--button class="level-item button is-danger" @click="refreshIfUserIsScheduled">refresh current user is scheduled</button-->
-    <!--button class="level-item button is-danger" @click="updateNowIndicator">refresh</button-->
-    <!--div>{{currentUserScheduled}}</div-->
-    <!--button @click="resize">resize</button-->
-
     <FullCalendar
       ref="fullCalendar"
       class="demo-app-calendar"
@@ -131,11 +124,6 @@ import '@fullcalendar/daygrid/main.css'
 import '@fullcalendar/timegrid/main.css'
 import '@fullcalendar/resource-timeline/main.css'
 
-/* TODO:
-    - merge the idea of 'resources' with the existing site-based event filtering
-    */
-// }
-
 // This function is used to convert the calendar's left time column into the UTC
 // values on the right column
 function transformLocalTimeToUTC (timezoneName, localTime) {
@@ -185,13 +173,15 @@ export default {
 
     this.refreshCalendarView()
     this.nowIndicatorTimeInteval = setInterval(this.updateNowIndicator, 300000)
+
+    this.$store.dispatch('user_data/fetchAllProjects')
   },
   destroyed () {
     clearInterval(this.nowIndicatorTimeInterval)
   },
 
   watch: {
-    calendarSite: function (val) {
+    calendarSite () {
       this.refreshCalendarView()
     },
     global_config () {
@@ -229,7 +219,9 @@ export default {
         // Now Indicator
         { events: this.getNowIndicator },
         // Moon Indicator
-        { events: this.getMoonRiseSet }
+        { events: this.getMoonRiseSet },
+        // Observing Start/End times
+        { events: this.getObservingStartEndIndicators }
       ]
       return sources
     },
@@ -263,7 +255,15 @@ export default {
     ...mapGetters('site_config', [
       'site_latitude',
       'site_longitude',
-      'timezone'
+      'timezone',
+      'site_events',
+      'site_events_observing_start_time',
+      'site_events_observing_end_time'
+    ]),
+    ...mapState('user_data', [
+      'all_projects',
+      'userId',
+      'userIsAuthenticated'
     ]),
 
     user () {
@@ -361,7 +361,6 @@ export default {
       rows.forEach(r => {
         if (r.querySelectorAll('.fc-axis.fc-time').length < 2) {
           const timecol = r.querySelector('.fc-axis.fc-time')
-          console.log(timecol)
           const timecolUtc = timecol.cloneNode(true)
           if (timecolUtc.querySelector('span')) {
             const timeText = timecolUtc.querySelector('span').textContent
@@ -491,6 +490,26 @@ export default {
         }
       ]
       return now
+    },
+
+    async getObservingStartEndIndicators () {
+      const observeStart = moment(this.site_events_observing_start_time).tz(this.fc_timeZone)
+      const observeEnd = moment(this.site_events_observing_end_time).tz(this.fc_timeZone)
+      const startAndEnd = [
+        {
+          start: observeStart.format(),
+          end: observeStart.add('1', 'minutes').format(),
+          rendering: 'background',
+          classNames: ['fc-observing-start-end-time', 'start']
+        },
+        {
+          start: observeEnd.format(),
+          end: observeEnd.add('1', 'minutes').format(),
+          rendering: 'background',
+          classNames: ['fc-observing-start-end-time', 'end']
+        }
+      ]
+      return startAndEnd
     },
 
     fc_eventRender () {
@@ -656,11 +675,6 @@ export default {
         const currentDateObj = new Date(timestamp)
 
         // The event colors for the calendar
-        // let daylightColor = "rgb(129, 212, 250)"
-        // let civilColor = "rgb(52, 152, 219)"
-        // let nauticalColor = "rgb(36, 113, 163)"
-        // let astronomicalColor = "rgb(26, 82, 118)"
-
         const daylightColor = '#81D4FA'
         const civilColor = '#1B9FD8'
         const nauticalColor = '#166EA9'
@@ -822,10 +836,7 @@ export default {
       this.eventEditorIsActive = false
 
       // Update the list of active reservations
-      this.$store.dispatch(
-        'calendar/fetchActiveReservations',
-        this.calendarSite
-      )
+      this.$store.dispatch('calendar/fetchActiveReservations', this.calendarSite)
     },
 
     /* ===================================================/
@@ -853,9 +864,8 @@ export default {
     /**
      *  This is run when a user clicks on an existing event in the calendar.
      */
-    existingEventSelected (arg) {
+    async existingEventSelected (arg) {
       const event = arg.event
-      // console.log(event);
       this.activeEvent.id = event.id
       this.activeEvent.startStr = moment(event.start).format()
       this.activeEvent.endStr = moment(event.end).format()
@@ -949,6 +959,7 @@ export default {
         reservation_type: newEvent.reservation_type,
         resourceId: newEvent.resourceId,
         project_id: newEvent.project_id,
+        project_priority: newEvent.project_priority,
         reservation_note: newEvent.reservation_note,
         rendering: newEvent.rendering
       }
@@ -1029,6 +1040,7 @@ export default {
         reservation_type: modifiedEvent.reservation_type,
         resourceId: modifiedEvent.resourceId,
         project_id: modifiedEvent.project_id,
+        project_priority: modifiedEvent.project_priority,
         reservation_note: modifiedEvent.reservation_note,
         rendering: modifiedEvent.rendering
       }
@@ -1043,6 +1055,7 @@ export default {
         reservation_type: initialEvent.reservation_type,
         resourceId: initialEvent.resourceId,
         project_id: initialEvent.project_id,
+        project_priority: initialEvent.project_priority,
         reservation_note: initialEvent.reservation_note,
         rendering: initialEvent.rendering
       }
@@ -1103,12 +1116,12 @@ export default {
         }
 
         // Event colors
-        const projects_color = '#9c27b0' // "#4e1199"
-        const user_projects_border = 'gold' // "#a35ff7"
-        const realtime_color = '#2196f3' // "#006e64"
-        const user_realtime_border = 'gold' // "#00e5d0"
+        const projects_color = getComputedStyle(document.documentElement).getPropertyValue('--ptr-calendar-project-color')
+        const realtime_color = getComputedStyle(document.documentElement).getPropertyValue('--ptr-calendar-realtime-color')
+        const user_projects_border = getComputedStyle(document.documentElement).getPropertyValue('--ptr-calendar-user-border')
+        const user_realtime_border = user_projects_border
 
-        const user_owns_event = (this.$auth.isAuthenticated && fObj.creator_id == this.$auth.user.sub)
+        const user_owns_event = (this.userIsAuthenticated && fObj.creator_id == this.userId)
         if (obj.reservation_type == 'realtime') {
           fObj.backgroundColor = realtime_color
           fObj.borderColor = user_owns_event ? user_realtime_border : realtime_color
@@ -1118,6 +1131,12 @@ export default {
         } else {
           fObj.backgroundColor = projects_color
           fObj.borderColor = user_owns_event ? user_projects_border : projects_color
+        }
+
+        if (obj.project_priority === 'time_critical') {
+          fObj.className = 'time-critical-calendar-event'
+        } else if (obj.project_priority === 'low_priority') {
+          fObj.className = 'low-priority-calendar-event'
         }
 
         return fObj
@@ -1130,6 +1149,7 @@ export default {
 
 <!-- TODO: reduce the bootstrap css (below) to the minimum required for button groups. -->
 <style lang='scss'>
+@import "@/style/buefy-styles.scss";
 
 // Calendar grid styling
 .fc table * {
@@ -1158,6 +1178,13 @@ export default {
   }
 }
 
+.fc-event.low-priority-calendar-event {
+  border-left: 6px solid $green !important;
+}
+.fc-event.time-critical-calendar-event {
+  border-left: 6px solid $ptr-red !important;
+}
+
 /* the line showing the current time */
 .fc-now-indicator {
   &.fc-now-indicator-line {
@@ -1171,6 +1198,33 @@ export default {
     z-index: 15;
     opacity: 1;
   }
+}
+
+.fc-observing-start-end-time {
+  --line-color: rgb(22, 179, 163);
+  border-color: var(--line-color);
+  color: var(--line-color);
+  // border-width: 5px;
+  height: 3px;
+  z-index: 15;
+  opacity: 1;
+  background-color: var(--line-color);
+  font-size: 10px;
+  text-justify: center;
+  margin-left: 2px;
+
+}
+.fc-observing-start-end-time.start:before {
+  content: "Observing Starts";
+  position: absolute;
+  top: -15px;
+  left: 0;
+}
+.fc-observing-start-end-time.end:before {
+  content: "Observing Ends";
+  position: absolute;
+  top: 3px;
+  left: 0;
 }
 
 #moon-info {

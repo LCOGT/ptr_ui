@@ -169,9 +169,7 @@ import InfoImageThumb from '@/components/ImageDisplay/InfoImageThumb'
 import ThumbnailRow from '@/components/ImageDisplay/ThumbnailRow'
 import ButtonRowBelowImage from '@/components/ImageDisplay/ButtonRowBelowImage'
 import DrawShapesToolbar from '@/components/AnalysisTools/DrawShapesToolbar'
-import RecentS3UploadsTable from '@/components/AdminTools/RecentS3UploadsTable'
 import SiteConfigViewer from '@/components/AdminTools/SiteConfigViewer'
-import StarProfile from '@/components/AnalysisTools/StarProfile'
 import DownloadInterface from '@/components/DownloadInterface'
 import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsViewer'
 import ImageMetadataViewer from '@/components/AnalysisTools/ImageMetadataViewer'
@@ -199,8 +197,6 @@ export default {
     ThumbnailRow,
     ButtonRowBelowImage,
     DrawShapesToolbar,
-    StarProfile,
-    RecentS3UploadsTable,
     SiteConfigViewer,
     DownloadInterface,
     ImageStatisticsViewer,

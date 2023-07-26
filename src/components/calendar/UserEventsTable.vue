@@ -169,15 +169,6 @@ export default {
   created () {
     window.moment = moment // use moment lib in browser devtools
   },
-  watch: {
-    userId () {
-      // Only do this if the active user is authenticated and loaded.
-      if (this.userIsAuthenticated) {
-        this.$store.dispatch('user_data/fetchUserEvents', this.userId)
-        this.$store.dispatch('user_data/fetchUserProjects', this.userId)
-      }
-    }
-  },
   methods: {
     setActiveEvent (row) {
       this.activeEvent = row
