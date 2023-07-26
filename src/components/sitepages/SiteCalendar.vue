@@ -16,13 +16,16 @@
       />
 
       <div class="projects-section">
-        <p>Under Construction</p>
+        <p class="menu-label">
+          Your Projects
+        </p>
         <p style="text-decoration: line-through;">
           Drag projects to the calendar to schedule them
         </p>
         <b-tag
           v-for="(p, index) in user_projects"
           :key="index"
+          class="draggable-project-tag"
           type="is-info"
           rounded
         >
@@ -164,10 +167,6 @@ export default {
           eventBorderColor: '#200589',
           eventTextColor: '#fbf8fd',
           eventClassNames: '',
-          eventOverlap: false, // defines whether events are allowed to overlap
-          eventConstraint: '',
-          eventAllow: '',
-          businessHours: '',
           children: '',
           parentId: '',
           anyOtherPropsHere:

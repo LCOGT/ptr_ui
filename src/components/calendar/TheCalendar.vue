@@ -20,7 +20,6 @@
       :selectable="fc_selectable"
       :select-mirror="fc_selectMirror"
       :unselect-auto="fc_unselectAuto"
-      :editable="fc_editable"
       :weekends="fc_weekends"
       :now-indicator="fc_nowIndicator"
       :now="fc_now"
@@ -33,6 +32,17 @@
       :first-day="fc_firstDay"
       :resources="fc_resources"
       :plugins="fc_plugins"
+      :editable="fc_editable"
+      :all-day-maintain-duration="fc_allDayMaintainDuration"
+      :event-resizable-from-start="fc_eventResizableFromStart"
+      :event-resource-editable="fc_eventResourceEditable"
+      :droppable="fc_droppable"
+      :event-allow="fc_eventAllow"
+      :snap-duration="fc_snapDuration"
+      :drag-scroll="fc_dragScroll"
+      :event-overlap="fc_eventOverlap"
+      @eventDrop="fc_eventDrop"
+      @eventResize="fc_eventResize"
       @loading="fc_isLoading"
       @select="newEventSelected"
       @eventClick="existingEventSelected"
@@ -92,7 +102,7 @@
     <div id="moon-info">
       <p>Moon is above the horizon</p>
       <p>---</p>
-      <p>Illumination: &emsp;{{ (moon_hover_data.illumination * 100).toFixed(1) }} %</p>
+      <p>Illumination: &emsp;{{ (moon_hover_data.illumination * 100)?.toFixed(1) }} %</p>
       <p>Rise: &emsp;&emsp;&emsp;&emsp;&ensp;{{ moon_hover_data.rise }}</p>
       <p>Transit: &emsp;&emsp;&emsp;&ensp;{{ moon_hover_data.transit }}</p>
       <p>Set: &emsp;&emsp;&emsp;&emsp;&emsp;{{ moon_hover_data.set }}</p>
@@ -213,9 +223,13 @@ export default {
     fc_eventSources () {
       const sources = [
         // Astronomical twilight events (computed locally)
-        { events: this.getTwilightEvents },
+        {
+          events: this.getTwilightEvents
+        },
         // Events from dynamodb backend
-        { events: this.fetchSiteEvents },
+        {
+          events: this.fetchSiteEvents
+        },
         // Now Indicator
         { events: this.getNowIndicator },
         // Moon Indicator
@@ -306,10 +320,16 @@ export default {
       fc_navLinks: false, // whether to enable clicking on a day to view that day only.
       fc_selectMirror: true, // whether to draw placeholder event while user is dragging
       fc_unselectAuto: false, // whether clicking elsewhere closes the current selection
-      fc_editable: true, // whether events on calendar can be modified
       fc_weekends: true, // whether to show weekends in week view
       fc_nowIndicator: false, // whether to draw line indicating current time in grid views.
       fc_progressiveEventRendering: true,
+      fc_editable: true, // whether events on calendar can be modified
+      fc_allDayMaintainDuration: true, // keep the end-time if events are moved to all-day (even though this is disabled)
+      fc_eventResizableFromStart: true,
+      fc_eventResourceEditable: true,
+      fc_droppable: true, // specifies that external resources can be dropped on calendar
+      fc_snapDuration: 300000, // milliseconds defining the increments of change for dragged events. (5 minutes)
+      fc_dragScroll: true, // auto-scroll up/down when user drags an event near edge of view
       fc_themeSystem: 'bootstrap', // uses bootstrap css (see <style> below)
       fc_schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source', // free use of scheduler/resources
       // fullcalendar plugins
@@ -356,6 +376,78 @@ export default {
   },
 
   methods: {
+
+    // Take events from fullCalendar event handlers (e.g. drag/drop) and convert to the format used in our backend
+    convertFullCalendarEventToPTRFormat (event) {
+      return {
+        event_id: event.id,
+        start: moment(event.start).utc().format(),
+        end: moment(event.end).utc().format(),
+        creator: event.extendedProps.creator,
+        creator_id: event.extendedProps.creator_id,
+        site: event.extendedProps.site,
+        title: event.title,
+        reservation_type: event.extendedProps.reservation_type,
+        reservation_note: event.extendedProps.reservation_note,
+        resourceId: event.extendedProps.site,
+        project_id: event.extendedProps.project_id,
+        project_priority: event.extendedProps.project_priority,
+        rendering: event.rendering
+      }
+    },
+
+    // Method used to modify events in our backend database
+    async modifyEvent (originalEvent, modifiedEvent) {
+      // Maybe we don't need to update anything?
+      if (JSON.stringify(originalEvent) == JSON.stringify(modifiedEvent)) {
+        this.refreshCalendarView()
+        return
+      }
+
+      // Make request headers and include token.
+      // Requires user to be logged in.
+      const config = await this.getConfigWithAuth()
+      const url = `${this.$store.state.api_endpoints.calendar_api}/modifyevent`
+      const body = { originalEvent, modifiedEvent }
+      axios
+        .post(url, body, config)
+        .then((res) => {
+          this.isLoading = true
+          this.refreshCalendarView()
+        })
+        .catch((error) => {
+          this.eventEditorIsActive = false
+          this.handleNotAuthorizedResponse(error)
+        })
+    },
+
+    // Prevent drag and drop into all-day slots
+    fc_eventAllow (dropLocation) {
+      return !dropLocation.allDay
+    },
+
+    // Save events to the databse when they have been dragged to a new time
+    fc_eventDrop (info) {
+      const originalEvent = this.convertFullCalendarEventToPTRFormat(info.oldEvent)
+      const modifiedEvent = this.convertFullCalendarEventToPTRFormat(info.event)
+      this.modifyEvent(originalEvent, modifiedEvent)
+    },
+
+    // Save events to the database when they have been resized by dragging
+    fc_eventResize (info) {
+      const originalEvent = this.convertFullCalendarEventToPTRFormat(info.prevEvent)
+      const modifiedEvent = this.convertFullCalendarEventToPTRFormat(info.event)
+      this.modifyEvent(originalEvent, modifiedEvent)
+    },
+
+    // Allow drag and drop events to overlap if the non-dragged one is a background event
+    fc_eventOverlap (stillEvent, movingEvent) {
+      if (stillEvent.rendering === 'background') {
+        return true
+      } else {
+        return false
+      }
+    },
     addUTCTimeColumn () {
       const rows = document.querySelectorAll('.fc-slats > table.table-bordered tbody > tr')
       rows.forEach(r => {
@@ -459,7 +551,10 @@ export default {
 
     // Display moon phase icons in the calendar
     dayRender (dayRenderInfo) {
-      this.addUTCTimeColumn()
+      // Check if the current view is week view
+      if (this.fullCalendarApi?.view?.type === 'timeGridWeek') {
+        this.addUTCTimeColumn()
+      }
 
       try { // ignore errors from the timezone not being loaded yet.
         const date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
@@ -897,7 +992,7 @@ export default {
         this.moon_hover_data.transit = moment(mouseInfo.event.extendedProps
           .transit).tz(this.fc_timeZone).format('HH:mm MM/DD')
         this.moon_hover_data.illumination = mouseInfo.event.extendedProps
-          .illumination.toFixed(3)
+          .illumination?.toFixed(3)
 
         const page = document.getElementsByClassName('page-view')[0]
         const page_boundary = page.getBoundingClientRect()
@@ -943,26 +1038,11 @@ export default {
      * When the user clicks submit, event details are sent to the backend.
      */
     async submitButtonClicked (newEvent) {
+      const eventToPost = this.formatResponseFromCalendarEventEditor(newEvent)
       // Make request headers and include token.
       // Requires user to be logged in.
       const config = await this.getConfigWithAuth()
-
       const url = `${this.$store.state.api_endpoints.calendar_api}/newevent`
-      const eventToPost = {
-        event_id: newEvent.id,
-        start: moment(newEvent.startStr).utc().format(),
-        end: moment(newEvent.endStr).utc().format(),
-        creator: newEvent.creator,
-        creator_id: newEvent.creator_id,
-        site: newEvent.site,
-        title: newEvent.title,
-        reservation_type: newEvent.reservation_type,
-        resourceId: newEvent.resourceId,
-        project_id: newEvent.project_id,
-        project_priority: newEvent.project_priority,
-        reservation_note: newEvent.reservation_note,
-        rendering: newEvent.rendering
-      }
       axios
         .post(url, eventToPost, config)
         .then((res) => {
@@ -1015,65 +1095,28 @@ export default {
         })
     },
 
-    async modifyButtonClicked (events) {
-      const initialEvent = events.initialEvent
-      const modifiedEvent = events.modifiedEvent
+    formatResponseFromCalendarEventEditor (event) {
+      return {
+        event_id: event.id,
+        start: moment(event.startStr).utc().format(),
+        end: moment(event.endStr).utc().format(),
+        creator: event.creator,
+        creator_id: event.creator_id,
+        site: event.site,
+        title: event.title,
+        reservation_type: event.reservation_type,
+        resourceId: event.resourceId,
+        project_id: event.project_id,
+        project_priority: event.project_priority,
+        reservation_note: event.reservation_note,
+        rendering: event.rendering
+      }
+    },
 
-      // Maybe we don't need to update anything?
-      if (JSON.stringify(initialEvent) == JSON.stringify(modifiedEvent)) {
-        this.refreshCalendarView()
-        return
-      }
-
-      // Make request headers and include token.
-      // Requires user to be logged in.
-      const config = await this.getConfigWithAuth()
-      const url = `${this.$store.state.api_endpoints.calendar_api}/modifyevent`
-      const theModifiedEvent = {
-        event_id: modifiedEvent.id,
-        start: moment(modifiedEvent.startStr).utc().format(),
-        end: moment(modifiedEvent.endStr).utc().format(),
-        creator: modifiedEvent.creator,
-        creator_id: modifiedEvent.creator_id,
-        site: modifiedEvent.site,
-        title: modifiedEvent.title,
-        reservation_type: modifiedEvent.reservation_type,
-        resourceId: modifiedEvent.resourceId,
-        project_id: modifiedEvent.project_id,
-        project_priority: modifiedEvent.project_priority,
-        reservation_note: modifiedEvent.reservation_note,
-        rendering: modifiedEvent.rendering
-      }
-      const theInitialEvent = {
-        event_id: initialEvent.id,
-        start: moment(initialEvent.startStr).utc().format(),
-        end: moment(initialEvent.endStr).utc().format(),
-        creator: initialEvent.creator,
-        creator_id: initialEvent.creator_id,
-        site: initialEvent.site,
-        title: initialEvent.title,
-        reservation_type: initialEvent.reservation_type,
-        resourceId: initialEvent.resourceId,
-        project_id: initialEvent.project_id,
-        project_priority: initialEvent.project_priority,
-        reservation_note: initialEvent.reservation_note,
-        rendering: initialEvent.rendering
-      }
-      const body = {
-        originalEvent: theInitialEvent,
-        modifiedEvent: theModifiedEvent
-      }
-
-      axios
-        .post(url, body, config)
-        .then((res) => {
-          this.isLoading = true
-          this.refreshCalendarView()
-        })
-        .catch((error) => {
-          this.eventEditorIsActive = false
-          this.handleNotAuthorizedResponse(error)
-        })
+    modifyButtonClicked (events) {
+      const originalEvent = this.formatResponseFromCalendarEventEditor(events.initialEvent)
+      const modifiedEvent = this.formatResponseFromCalendarEventEditor(events.modifiedEvent)
+      this.modifyEvent(originalEvent, modifiedEvent)
     },
 
     /* ===================================================/
@@ -1112,7 +1155,10 @@ export default {
           resourceId: obj.resourceId,
           project_id: obj.project_id,
           reservation_note: obj.reservation_note,
-          rendering: obj.rendering
+          rendering: obj.rendering,
+          project_priority: obj?.project_priority || 'standard',
+          editable: obj.creator_id === this.userId,
+          durationEditable: obj.reservation_type !== 'realtime'
         }
 
         // Event colors
@@ -1138,7 +1184,6 @@ export default {
         } else if (obj.project_priority === 'low_priority') {
           fObj.className = 'low-priority-calendar-event'
         }
-
         return fObj
       })
       return formatted_events
