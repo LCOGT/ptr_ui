@@ -10,7 +10,6 @@
       sticky-header
       default-sort="unix"
     />
-    {{ config_site_events }}
     <div
       v-if="site_events.length == 0"
       class="empty-warning"
