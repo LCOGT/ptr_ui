@@ -463,6 +463,7 @@
       </p>
       <button
         v-if="!isNewEvent && lowPriorityEvent"
+        :disabled="!userIsAuthenticated"
         class="button level-item is-success"
         :class="{ 'is-loading': deleteIsLoading }"
         @click="handleDelete"

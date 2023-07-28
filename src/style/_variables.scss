@@ -34,8 +34,8 @@ $ptr-blue: $blue;
 $ptr-calendar-realtime-color: #3f45ec;
 $ptr-calendar-project-color: #9c27b0;
 $ptr-calendar-user-border: gold;
-$ptr-calendar-low-priority-border: $green;
-$ptr-calendar-time-critical-border: orangered;
+$ptr-calendar-low-priority-color: $green;
+$ptr-calendar-time-critical-color: orangered;
 :root {
   --ptr-calendar-project-color: #{$ptr-calendar-project-color};
   --ptr-calendar-realtime-color: #{$ptr-calendar-realtime-color};

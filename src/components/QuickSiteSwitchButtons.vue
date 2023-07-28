@@ -1,7 +1,26 @@
 <template>
   <div class="site-switch-buttons">
+    <div class="type-label menu-label">
+      Obs
+    </div>
     <b-button
-      v-for="site in available_sites"
+      v-for="site in available_obs"
+      :key="site"
+      size="is-small"
+      :class="[{ 'active-site': site == currentSite }, site_online_class(site), 'justify-right']"
+      @click="goToDifferentSite(site)"
+    >
+      {{ site }}
+    </b-button>
+    <div
+      class="type-label menu-label"
+      v-if="userIsAdmin"
+    >
+      <p>WEMAs</p>
+    </div>
+    <b-button
+      v-for="site in available_wemas"
+      v-show="userIsAdmin"
       :key="site"
       size="is-small"
       :class="[{ 'active-site': site == currentSite }, site_online_class(site), 'justify-right']"
@@ -13,12 +32,28 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'QuickSiteSwitchButtons',
   props: {
     currentSite: String
   },
+  data () {
+    return {
+      sites_to_hide: [
+        'whsmt',
+        'sqa',
+        'udro',
+        'stull',
+        'tst001'
+      ]
+    }
+  },
   computed: {
+    ...mapState('site_config', [
+      'global_config'
+    ]),
+    ...mapState('user_data', ['userIsAdmin']),
     all_sites_status_color () {
       return this.$store.getters['sitestatus/all_sites_status_color']
     },
@@ -27,6 +62,16 @@ export default {
         ...this.$store.getters['site_config/all_sites_real'].map(s => s.site),
         ...this.$store.getters['site_config/all_sites_simulated'].map(s => s.site)
       ]
+    },
+    available_wemas () {
+      return this.available_sites.filter(s => {
+        return this.global_config[s].instance_type === 'wema' && !this.sites_to_hide.includes(s)
+      })
+    },
+    available_obs () {
+      return this.available_sites.filter(s => {
+        return this.global_config[s].instance_type !== 'wema' && !this.sites_to_hide.includes(s)
+      })
     }
   },
   methods: {
@@ -55,6 +100,14 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/style/_variables.scss";
+
+.type-label {
+  padding-top: 1em;
+  text-align: center;
+}
+.type-label:first-of-type {
+  padding-top: 0;
+}
 .site-switch-buttons {
   padding-top: 15px;
   display:flex;

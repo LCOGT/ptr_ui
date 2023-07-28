@@ -46,6 +46,10 @@ const getters = {
     return state.global_config[state.selected_site]?.instance_type == 'wema'
   },
 
+  wema_name: state => {
+    return state.global_config[state.selected_site]?.wema_name || null
+  },
+
   available_devices: state => (deviceType, site) => {
     return Object.keys(state.global_config?.[site]?.[deviceType]) ?? []
   },

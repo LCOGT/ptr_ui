@@ -170,6 +170,10 @@ export default {
 
     showMoonEvents: {
       required: true
+    },
+
+    showWeatherForecast: {
+      required: true
     }
 
   },
@@ -202,6 +206,12 @@ export default {
     },
     showMoonEvents () {
       this.refreshCalendarView()
+    },
+    showWeatherForecast () {
+      this.refreshCalendarView()
+    },
+    forecast () {
+      this.refreshCalendarView()
     }
   },
 
@@ -221,21 +231,20 @@ export default {
 
     // Return the list of sources that feed fullCalendar with events
     fc_eventSources () {
+      // Note: all event source functions must be async!
       const sources = [
         // Astronomical twilight events (computed locally)
-        {
-          events: this.getTwilightEvents
-        },
+        { events: this.getTwilightEvents },
         // Events from dynamodb backend
-        {
-          events: this.fetchSiteEvents
-        },
-        // Now Indicator
-        { events: this.getNowIndicator },
+        { events: this.fetchSiteEvents },
         // Moon Indicator
         { events: this.getMoonRiseSet },
+        // Weather Forecast
+        { events: this.getWeatherForecast },
         // Observing Start/End times
-        { events: this.getObservingStartEndIndicators }
+        { events: this.getObservingStartEndIndicators },
+        // Now Indicator
+        { events: this.getNowIndicator }
       ]
       return sources
     },
@@ -278,6 +287,9 @@ export default {
       'all_projects',
       'userId',
       'userIsAuthenticated'
+    ]),
+    ...mapGetters('sitestatus', [
+      'forecast'
     ]),
 
     user () {
@@ -492,6 +504,29 @@ export default {
     async updateNowIndicator () {
       this.fullCalendarApi.unselect()
       this.fullCalendarApi.refetchEvents()
+    },
+
+    async getWeatherForecast () {
+      if (!this.showWeatherForecast) {
+        return []
+      }
+      const forecast = this.$store.getters['sitestatus/forecast']
+      if (forecast.length == 0) {
+        return []
+      } else {
+        return forecast.map(f => {
+          return {
+            start: moment(f.utc_long_form).utc().format(),
+            end: moment(f.utc_long_form).utc().add('1', 'hours').format(),
+            rendering: 'background',
+            backgroundColor: '#ff0000',
+            borderColor: '#ff0000',
+            title: 'weather forecast',
+            id: 'fc-custom-weather-forecast',
+            classNames: ['fc-forecast-event', `quality-${f.weather_quality_number}`]
+          }
+        })
+      }
     },
 
     getMoonPhaseDays (year, month, day) {
@@ -1158,7 +1193,7 @@ export default {
           rendering: obj.rendering,
           project_priority: obj?.project_priority || 'standard',
           editable: obj.creator_id === this.userId,
-          durationEditable: obj.reservation_type !== 'realtime'
+          durationEditable: obj.reservation_type !== 'realtime' && obj.creator_id === this.userId
         }
 
         // Event colors
@@ -1195,6 +1230,10 @@ export default {
 <!-- TODO: reduce the bootstrap css (below) to the minimum required for button groups. -->
 <style lang='scss'>
 @import "@/style/buefy-styles.scss";
+@import "@/style/_variables.scss";
+
+$moon-width: 10px;
+$forecast-width: 6px;
 
 // Calendar grid styling
 .fc table * {
@@ -1224,10 +1263,43 @@ export default {
 }
 
 .fc-event.low-priority-calendar-event {
-  border-left: 6px solid $green !important;
+  //border-bottom: 6px solid $green !important;
+  //border-bottom-left-radius: 0px;
+  //border-bottom-right-radius: 0px;
+  border-width: 1px;
+  box-shadow: 0 0 0 1px #000; /* outer border */
+  //background-image: linear-gradient(45deg, $green 25%, transparent 25%, transparent 50%, $green 50%, $green 75%, transparent 75%, transparent);
+  //background-size: 8px 8px;
+}
+// This is the colored corner indicating a low priority reservation
+.fc-event.low-priority-calendar-event::before {
+  content: "";
+  border-bottom-right-radius: 3px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-bottom: 20px solid $ptr-calendar-low-priority-color; /* size and color of triangle */
 }
 .fc-event.time-critical-calendar-event {
-  border-left: 6px solid $ptr-red !important;
+  //border-left: 6px solid $ptr-red !important;
+  //background-image: linear-gradient(45deg, rgba(255, 0, 0, 0.5) 25%, transparent 25%, transparent 50%, rgba(255, 0, 0, 0.5) 50%, rgba(255, 0, 0, 0.5) 75%, transparent 75%, transparent);
+  border-width: 1px;
+  box-shadow: 0 0 0 1px #000; /* outer border */
+}
+// This is the colored corner indicating a time critical reservation
+.fc-event.fc-event.time-critical-calendar-event::before {
+  content: "";
+  border-bottom-right-radius: 3px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-bottom: 20px solid $ptr-calendar-time-critical-color; /* size and color of triangle */
 }
 
 /* the line showing the current time */
@@ -1292,18 +1364,53 @@ export default {
 .fc-moon-transit-indicator {
   z-index: 15;
   opacity: 1;
-  width: 20px;
+  width: $moon-width;
+  // margin-left: $forecast-width;
 }
 .fc-moon-indicator {
   z-index: 15;
-  opacity: 0.5;
-  width: 20px;
-  border-radius: 12px;
+  //opacity: 0.5;
+  width: $moon-width;
+  // margin-left: $forecast-width;
   transition: 0.2s;
+  background: linear-gradient(to top,
+                                rgba(112, 112, 112, 0.3),
+                                rgb(255, 255, 255, 0.9),
+                                rgba(113, 113, 113, 0.3));
+  background-color: unset !important;
 }
 .fc-moon-indicator:hover {
   opacity: 0.8;
   transition: 0.2s;
+}
+
+.fc-forecast-event {
+  $background-opacity: 0;
+  $border-width: $forecast-width;
+  margin-left: $moon-width;
+  z-index: 15;
+  opacity: 1;
+
+  &.quality-1 {
+    background-color: rgba(green, $background-opacity) !important;
+    border-left: $border-width solid green !important;
+  }
+  &.quality-2 {
+    background-color: rgba(rgb(176, 213, 15), $background-opacity) !important;
+    border-left: $border-width solid rgb(173, 213, 15) !important;
+  }
+  &.quality-3 {
+    background-color: rgba(gold, $background-opacity) !important;
+    border-left: $border-width solid gold !important;
+  }
+  &.quality-4 {
+    background-color: rgba(orange, $background-opacity) !important;
+    border-left: $border-width solid orange !important;
+  }
+  &.quality-5 {
+    background-color: rgba(red, $background-opacity) !important;
+    border-left: $border-width solid red !important;
+  }
 }
 
 /*@import url("https://bootswatch.com/4/darkly/bootstrap.min.css");*/

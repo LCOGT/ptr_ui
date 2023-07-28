@@ -127,6 +127,9 @@ export default {
   // When the site page component loads for the first time, set the current site in vuex.
   created () {
     this.site_changed_routine(this.$route.params.sitecode)
+
+    const ten_minutes = 10 * 60 * 1000 // ms
+    this.refreshForecastInterval = setInterval(this.refreshForecast, ten_minutes)
   },
 
   // If the site changes while the component is still loaded, make sure to update the current site in vuex.
@@ -153,6 +156,7 @@ export default {
     this.$store.commit('site_config/remove_selected_site')
     this.$store.dispatch('images/display_placeholder_image')
     datastreamer.close()
+    clearInterval(this.refreshForecastInterval)
   },
 
   mounted () {
@@ -205,8 +209,11 @@ export default {
       if (this.$store.getters['site_config/site_is_wema']) {
         this.$store.commit('user_interface/selected_controls_tab', 0)
       }
-    }
+    },
 
+    refreshForecast () {
+      this.$store.dispatch('sitestatus/getLatestForecast')
+    }
   }
 }
 </script>

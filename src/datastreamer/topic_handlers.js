@@ -21,6 +21,11 @@ const status_stream_handler = message => {
     store.commit('sitestatus/new_enclosure_status', status)
     store.commit('sitestatus/updateLocalClock', now)
   }
+  else if (statusType == 'forecast') {
+    store.commit('sitestatus/latest_forecast_timestamp_ms', message.server_timestamp_ms)
+    store.commit('sitestatus/new_forecast_status', status)
+    store.commit('sitestatus/updateLocalClock', now)
+  }
   else {
     console.warn(statusType)
   }

@@ -116,7 +116,7 @@ export default {
             observatories: [{
               id: site,
               name: state.global_config[site].name,
-              telescope_description: state.global_config[site].telescope_description || 'placeholder observatory'
+              telescope_description: state.global_config[site].telescope_description || 'under construction'
             }]
           }
         })

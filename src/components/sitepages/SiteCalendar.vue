@@ -7,6 +7,7 @@
       :calendar-site="sitecode"
       :fc_resources="listOfObservatories"
       :show-moon-events="showMoonEvents"
+      :show-weather-forecast="showWeatherForecast"
     />
 
     <div class="calendar-adjacent">
@@ -22,15 +23,18 @@
         <p style="text-decoration: line-through;">
           Drag projects to the calendar to schedule them
         </p>
-        <b-tag
-          v-for="(p, index) in user_projects"
-          :key="index"
-          class="draggable-project-tag"
-          type="is-info"
-          rounded
-        >
-          {{ p.project_name }}
-        </b-tag>
+        <p>under construction</p>
+        <div class="projects-container">
+          <b-tag
+            v-for="(p, index) in user_projects"
+            :key="index"
+            class="draggable-project-tag"
+            type="is-info"
+            rounded
+          >
+            {{ p.project_name }}
+          </b-tag>
+        </div>
       </div>
 
       <div class="fc-settings-box">
@@ -41,6 +45,11 @@
           <div class="field">
             <b-switch v-model="showMoonEvents">
               Show moon events
+            </b-switch>
+          </div>
+          <div class="field">
+            <b-switch v-model="showWeatherForecast">
+              Show Weather Forecast
             </b-switch>
           </div>
         </div>
@@ -111,7 +120,8 @@ export default {
       siteTime: '-',
       utcTime: '-',
 
-      showMoonEvents: true
+      showMoonEvents: true,
+      showWeatherForecast: true
     }
   },
   created () {
@@ -181,6 +191,7 @@ export default {
 
 <style scoped lang="scss">
 @import "@/style/_responsive.scss";
+@import "@/style/_variables.scss";
 @import "@/style/buefy-styles.scss";
 
 $content-view-height: calc(100vh - #{$top-bottom-height});
@@ -234,6 +245,14 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 }
 
 .projects-section {
+  & .projects-container {
+    display: flex;
+    gap: 1em;
+  }
+}
+
+.draggable-project-tag {
+  background-color: $ptr-calendar-project-color !important;
 }
 
 #moon-info {
@@ -279,11 +298,33 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
   }
   &.low-priority {
     background-color: rgba(255, 255, 255, 0.25);
-    border-left: 6px solid $ptr-calendar-low-priority-border;
+    position: relative;
+  }
+  &.low-priority::before {
+    content: "";
+    border-bottom-right-radius: 3px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-bottom: 20px solid $ptr-calendar-low-priority-color;
   }
   &.time-critical {
     background-color: rgba(255, 255, 255, 0.25);
-    border-left: 6px solid $ptr-calendar-time-critical-border;
+    position: relative;
+  }
+  &.time-critical::before {
+    content: "";
+    border-bottom-right-radius: 3px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-bottom: 20px solid $ptr-calendar-time-critical-color;
   }
   &.self-owned {
     background-color: rgba(255, 255, 255, 0.25);

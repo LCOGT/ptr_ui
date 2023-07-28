@@ -4,6 +4,7 @@ import { statusAgeDisplay, STALE_AGE_MS } from './getters/status_utils'
 
 import enclosure_getters from './getters/enclosure_getters'
 import weather_getters from './getters/weather_getters'
+import forecast_getters from './getters/forecast_getters'
 import mount_getters from './getters/mount_getters'
 import telescope_getters from './getters/telescope_getters'
 import camera_getters from './getters/camera_getters'
@@ -28,12 +29,15 @@ const state = {
   /* new status stuff */
   weather_status_age: 1e8,
   enclosure_status_age: 1e8,
+  forecast_status_age: 1e8,
   device_status_age: 1e8,
 
   /* end new */
 
   weather: {},
   enclosure: {},
+
+  forecast: [],
 
   screen: {},
   focuser: {},
@@ -190,8 +194,10 @@ const getters = {
   weather_status_age_display: (state, getters) => statusAgeDisplay(getters.weather_status_age),
   enclosure_status_age_display: (state, getters) => statusAgeDisplay(getters.enclosure_status_age),
   device_status_age_display: (state, getters) => statusAgeDisplay(getters.device_status_age),
+  forecast_status_age_display: (state, getters) => statusAgeDisplay(getters.forecast_status_age),
 
   ...weather_getters,
+  ...forecast_getters,
   ...enclosure_getters,
   ...mount_getters,
   ...telescope_getters,
@@ -213,6 +219,7 @@ const mutations = {
   latest_device_timestamp_ms (state, time) { state.device_timestamp = time },
   latest_weather_timestamp_ms (state, time) { state.weather_timestamp = time },
   latest_enclosure_timestamp_ms (state, time) { state.enclosure_timestamp = time },
+  latest_forecast_timestamp_ms (state, time) { state.forecast_timestamp = time },
 
   updateLocalClock (state, time) { state.now = time },
 
@@ -220,6 +227,9 @@ const mutations = {
 
   new_weather_status (state, status) {
     state.weather = status.observing_conditions
+  },
+  new_forecast_status (state, status) {
+    state.forecast = status?.forecast || []
   },
   new_enclosure_status (state, status) {
     state.enclosure = status.enclosure
@@ -285,6 +295,8 @@ const mutations = {
     device_types.forEach(device_type => {
       state[device_type] = {}
     })
+
+    state.forecast = []
   }
 
 }
@@ -318,16 +330,33 @@ const actions = {
       // Set the status ages
       commit('latest_device_timestamp_ms', response.data.status_age_timestamps_ms.device)
       commit('latest_weather_timestamp_ms', response.data.status_age_timestamps_ms.weather)
+      commit('latest_forecast_timestamp_ms', response.data.status_age_timestamps_ms.forecast)
       commit('latest_enclosure_timestamp_ms', response.data.status_age_timestamps_ms.enclosure)
 
       // Set the status content
       commit('new_device_status', status)
       commit('new_weather_status', status)
+      commit('new_forecast_status', status)
       commit('new_enclosure_status', status)
 
       commit('site', current_site)
+
+      dispatch('getLatestForecast')
     } else {
       console.warn(`Status not available for ${current_site}.`)
+    }
+  },
+
+  getLatestForecast ({ state, commit, rootState, rootGetters }) {
+    const wema_name = rootGetters['site_config/wema_name']
+    if (wema_name) {
+      const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/forecast`
+      axios.get(url).then(response => {
+        commit('latest_forecast_timestamp_ms', response.data.server_timestamp_ms)
+        commit('new_forecast_status', response.data.status)
+      }).catch(e => {
+        console.log(e)
+      })
     }
   },
 
@@ -336,6 +365,7 @@ const actions = {
     // commit('status',empty_status)
     commit('resetStatus')
     commit('latest_weather_timestamp_ms', 0)
+    commit('latest_forecast_timestamp_ms', 0)
     commit('latest_enclosure_timestamp_ms', 0)
     commit('latest_device_timestamp_ms', 0)
   },
