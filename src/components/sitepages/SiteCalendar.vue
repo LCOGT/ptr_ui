@@ -25,7 +25,7 @@
         </p>
         <p>under construction</p>
         <div class="projects-container">
-          <b-tag
+          <!-- <b-tag
             v-for="(p, index) in user_projects"
             :key="index"
             class="draggable-project-tag"
@@ -33,7 +33,7 @@
             rounded
           >
             {{ p.project_name }}
-          </b-tag>
+          </b-tag> -->
         </div>
       </div>
 
