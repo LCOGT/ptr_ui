@@ -1335,13 +1335,13 @@ $forecast-width: 6px;
   content: "Observing Starts";
   position: absolute;
   top: -15px;
-  left: 0;
+  right: 2px;
 }
 .fc-observing-start-end-time.end:before {
   content: "Observing Ends";
   position: absolute;
   top: 3px;
-  left: 0;
+  right: 2px;
 }
 
 #moon-info {
