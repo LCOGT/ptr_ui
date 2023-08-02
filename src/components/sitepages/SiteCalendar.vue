@@ -59,6 +59,17 @@
         </p>
         <div class="legend">
           <div class="legend-item">
+            <div class="reservation-visual" />
+            <div>
+              <b>Weather Forecast</b>
+              <p class="forecast forecast-1">Excellent</p>
+              <p class="forecast forecast-2">Good</p>
+              <p class="forecast forecast-3">Ok</p>
+              <p class="forecast forecast-4">Poor</p>
+              <p class="forecast forecast-5">Terrible</p>
+            </div>
+          </div>
+          <div class="legend-item">
             <div class="reservation-visual realtime" />
             <div>
               <b>Realtime Session</b>
@@ -77,14 +88,14 @@
             <div class="reservation-visual low-priority" />
             <div>
               <b>Low Priority Event</b>
-              <p>Events with the green border are ok to remove if you want to observe during this time</p>
+              <p>Events with the green corner are ok to remove if you want to observe during this time</p>
             </div>
           </div>
           <div class="legend-item">
             <div class="reservation-visual time-critical" />
             <div>
               <b>Time Critical Observation</b>
-              <p>Events with the red border require precise time schedules. </p>
+              <p>Events with the red corner require precise time schedules. </p>
               <p>While they behave the same as standard events, they are shown here for informative purposes.</p>
             </div>
           </div>
@@ -283,6 +294,28 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 .legend-item {
   display: flex;
   gap: 1em;
+}
+
+.forecast {
+  border-left: 4px solid;
+  margin-left: -20px;
+  padding-left: 20px;
+
+  &.forecast-1 {
+    border-color: $ptr-calendar-forecast-1;
+  }
+  &.forecast-2 {
+    border-color: $ptr-calendar-forecast-2;
+  }
+  &.forecast-3 {
+    border-color: $ptr-calendar-forecast-3;
+  }
+  &.forecast-4 {
+    border-color: $ptr-calendar-forecast-4;
+  }
+  &.forecast-5 {
+    border-color: $ptr-calendar-forecast-5;
+  }
 }
 .reservation-visual {
   width: 30px;
