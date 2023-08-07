@@ -1123,6 +1123,13 @@ export default {
         const site_cfg = this.global_config[site]
         const default_filter_wheel_name = site_cfg.defaults?.filter_wheel
         const filter_wheel_options = site_cfg.filter_wheel[default_filter_wheel_name].settings.filter_data
+
+        // Handle sites without any filters
+        if (!filter_wheel_options) {
+          const none_filter = ['none', 'none']
+          return [none_filter]
+        }
+
         return filter_wheel_options
       } catch (error) {
         console.error('Error getting default filter wheels for site ', site)
@@ -1133,7 +1140,7 @@ export default {
           type: 'is-danger',
           hasIcon: true
         })
-        return []
+        return ['none']
       }
     }
   },
@@ -1203,7 +1210,7 @@ export default {
         return all_site_filters
       }
       // Default behavior (if no specific sites selected) returns the "site filters" for common pool, which are none
-      return ''
+      return []
     },
 
     // Return the generic filter list without filters already reported by sites.
