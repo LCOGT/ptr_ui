@@ -974,7 +974,6 @@ export default {
     verifyForm () {
       if (this.project_name === '') { this.warn.project_name = true }
       if (this.project_name.includes('#')) {
-        console.log('3')
         this.warn.project_name = true
         this.$buefy.toast.open({
           message: "Please avoid '#' in the project name",
@@ -993,7 +992,6 @@ export default {
         this.project_sites = [this.sitecode]
       }
 
-      console.log(this.exposures[0])
       if (this.targets[0].ra === '' || this.targets[0].dec === '') {
         this.warn.targetRA = this.targets[0].ra === ''
         this.warn.targetDec = this.targets[0].dec === ''
