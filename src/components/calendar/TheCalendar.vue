@@ -6,6 +6,8 @@
       height="parent"
       :views="fc_views"
       :default-view="fc_defaultView"
+      :custom-buttons="fc_customButtons"
+      :date-increment="fc_dateIncrement"
       :header="fc_header"
       :slot-duration="fc_slotDuration"
       :slot-label-interval="fc_slotLabelInterval"
@@ -29,7 +31,6 @@
       :event-sources="fc_eventSources"
       :event-render="fc_eventRender"
       :day-render="dayRender"
-      :first-day="fc_firstDay"
       :resources="fc_resources"
       :plugins="fc_plugins"
       :editable="fc_editable"
@@ -181,6 +182,10 @@ export default {
   mounted () {
     this.fullCalendarApi = this.$refs.fullCalendar.getApi()
 
+    // Simple way to define the default starting position with the current date in the third column
+    this.incrementDateBack()
+    this.incrementDateBack()
+
     // Once we've mounted, we're able to access the fullCalendar $ref.
     // We need this to access the fullCalendar.getApi() method.
     this.isMounted = true
@@ -251,24 +256,6 @@ export default {
       return this.$auth.isAuthenticated
     },
 
-    // Define the starting calendar day. 0=sunday, 1=monday, ...
-    fc_firstDay () {
-      // The fullCalendar ref doesn't work until the component is mounted.
-      if (!this.isMounted) { return }
-      // Get the fullCalendar api
-      const api = this.$refs.fullCalendar.getApi()
-
-      // If the week view is displayed, 'today' to be the second column.
-      if (api.view.type == 'timeGridWeek') {
-        const today_day_number = moment().tz(this.fc_timeZone).day()
-        const starting_day_number = (today_day_number - 1) % 6
-        return starting_day_number
-      } else {
-        // Otherwise, Sunday is the first day.
-        return 0
-      }
-    },
-
     ...mapState('site_config', [
       'global_config'
     ]),
@@ -311,12 +298,23 @@ export default {
           buttonText: '10 days'
         }
       },
+      fc_customButtons: {
+        customPrev: {
+          text: '<',
+          click: this.incrementDateBack
+        },
+        customNext: {
+          text: '>',
+          click: this.incrementDateForward
+        }
+      },
       fc_defaultView: 'timeGridWeek',
+      fc_dateIncrement: { days: 1 }, // how far the arrow buttons move forward and backwards in time
       fc_header: {
         // define the top row of buttons
-        left: 'prev,next today',
+        left: 'customPrev,customNext today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,listWeek'
+        right: 'dayGridMonth,timeGridWeek'
       },
       fc_slotDuration: '00:15:00', // horizontal guides; affects event drag precision
       fc_slotLabelInterval: '01:00:00',
@@ -385,6 +383,40 @@ export default {
   },
 
   methods: {
+
+    // This is connected to the < button in the calendar header left
+    incrementDateBack () {
+      // Move one day in week view
+      if (this.fullCalendarApi.state.viewType == 'timeGridWeek') {
+        this.fullCalendarApi.incrementDate({ days: -1 })
+      }
+      // Move one month in the month view
+      else if (this.fullCalendarApi.state.viewType == 'dayGridMonth') {
+        this.fullCalendarApi.incrementDate({ months: -1 })
+      }
+      else {
+        console.warn('Unknown calendar viewType, failed to increment date backwards')
+      }
+    },
+
+    // This is connected to the > button in the calendar header left
+    incrementDateForward () {
+      // Move one day in week view
+      if (this.fullCalendarApi.state.viewType == 'timeGridWeek') {
+        // Do this +7 - 6 weirdness because the calendar only likes to move forward in 7 day chunks
+        // while in week view, and the sensible { days: 1 } doesn't do anything unless you press it 7 times.
+        // See this general issue https://github.com/fullcalendar/fullcalendar/issues/4678
+        this.fullCalendarApi.incrementDate({ days: 7 })
+        this.fullCalendarApi.incrementDate({ days: -6 })
+      }
+      // Move one month in the month view
+      else if (this.fullCalendarApi.state.viewType == 'dayGridMonth') {
+        this.fullCalendarApi.incrementDate({ months: 1 })
+      }
+      else {
+        console.warn('Unknown calendar viewType, failed to increment date forwards')
+      }
+    },
 
     // Take events from fullCalendar event handlers (e.g. drag/drop) and convert to the format used in our backend
     convertFullCalendarEventToPTRFormat (event) {
