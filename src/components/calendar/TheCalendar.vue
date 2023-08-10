@@ -49,6 +49,8 @@
       @eventClick="existingEventSelected"
       @eventMouseEnter="eventMouseEnter"
       @eventMouseLeave="eventMouseLeave"
+      @eventDragStart="eventDragStart"
+      @eventDragStop="eventDragStop"
     />
 
     <div
@@ -115,7 +117,6 @@
 // { import scripts (collapsible)
 import axios from 'axios'
 import moment from 'moment'
-import SunCalc from 'suncalc'
 import { mapState, mapGetters } from 'vuex'
 
 import CalendarEventEditor from '@/components/calendar/CalendarEventEditor'
@@ -128,6 +129,8 @@ import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
 import momentTimezonePlugin from '@fullcalendar/moment-timezone'
+
+import { makeUniqueID, copyFcEvent, convertFullCalendarEventToPTRFormat, convertEventEditorResponseToPtrFormat, getMoonPhaseDays, rgba_from_illumination, oneDayTwilight } from '@/utils/calendar_utils.js'
 
 // must manually include stylesheets for each plugin
 import '@fullcalendar/core/main.css'
@@ -351,6 +354,7 @@ export default {
         momentTimezonePlugin
       ],
 
+      // This is set in the mounted hook, and allows access to the main fullcalendar calendar object
       fullCalendarApi: '',
 
       // Change to true when the 'mounted' hook is run.
@@ -376,9 +380,28 @@ export default {
       // properties of the selected calendar event
       activeEvent: {},
 
+      // Controls a spinner in the lower right corner of the calendar that appears
+      // while fetching events
       isLoading: false,
 
-      currentUserScheduled: false
+      currentUserScheduled: false,
+
+      // To keep events displaying "naturally" during drag and drop, sometimes we need
+      // to create temporary events on the calendar that are placeholders before the
+      // actual event can be saved and rendered. This array marks all the temp events
+      // to be cleared when the main event renders.
+      tempPlaceholderEvent: '',
+      // When the event with this ID renders to the calendar, the tempPlaceholderEvent will be removed.
+      eventIdWithPlaceholder: '',
+
+      // Use this to remember when a user starts dragging an event with the shift key pressed.
+      // Even if they lift it before dropping, we want to make sure to duplicate the event rather
+      // than simply moving it.
+      eventDuplicateStarted: false,
+
+      // Flag to indicate whether the eventDrop function ran (which means that our event was
+      // drag-and-dropped in a successful location)
+      eventDropDidRun: false
     }
   },
 
@@ -418,26 +441,20 @@ export default {
       }
     },
 
-    // Take events from fullCalendar event handlers (e.g. drag/drop) and convert to the format used in our backend
-    convertFullCalendarEventToPTRFormat (event) {
-      return {
-        event_id: event.id,
-        start: moment(event.start).utc().format(),
-        end: moment(event.end).utc().format(),
-        creator: event.extendedProps.creator,
-        creator_id: event.extendedProps.creator_id,
-        site: event.extendedProps.site,
-        title: event.title,
-        reservation_type: event.extendedProps.reservation_type,
-        reservation_note: event.extendedProps.reservation_note,
-        resourceId: event.extendedProps.site,
-        project_id: event.extendedProps.project_id,
-        project_priority: event.extendedProps.project_priority,
-        rendering: event.rendering
-      }
+    // This method inserts a duplicate event of the event passed in as an argument.
+    // It is used to preserve the original event when we want to make a copy by dragging.
+    // Without this, it would look like the user is modifying the original event, since it
+    // would leave a vacancy behind.
+    createPlaceholderEvent (e) {
+      const placeholder = copyFcEvent(e)
+      const tempDragEvent = this.fullCalendarApi.addEvent(placeholder)
+
+      // Save this placeholder to be deleted later (see the eventRender method)
+      this.tempPlaceholderEvent = tempDragEvent
     },
 
     // Method used to modify events in our backend database
+    // Arguments must be events that have been formatted to work with the ptr calendar server
     async modifyEvent (originalEvent, modifiedEvent) {
       // Maybe we don't need to update anything?
       if (JSON.stringify(originalEvent) == JSON.stringify(modifiedEvent)) {
@@ -462,26 +479,128 @@ export default {
         })
     },
 
+    // Input must be formatted correctly to work with the ptr calendar server
+    async createNewEvent (event) {
+      // Make request headers and include token.
+      // Requires user to be logged in.
+      const config = await this.getConfigWithAuth()
+      const url = `${this.$store.state.api_endpoints.calendar_api}/newevent`
+      axios
+        .post(url, event, config)
+        .then((res) => {
+          this.isLoading = true
+          this.refreshCalendarView()
+        })
+        .catch((error) => {
+          this.eventEditorIsActive = false
+          this.handleNotAuthorizedResponse(error)
+        })
+    },
+
     // Prevent drag and drop into all-day slots
     fc_eventAllow (dropLocation) {
       return !dropLocation.allDay
     },
 
+    // This method is run whenever a calendar event is dragged
+    eventDragStart (e) {
+      // reset this in case there is a stale value lingering
+      this.eventDuplicateStarted = false
+      // Dragging an event with shift means we need to preserve the original, and make a copy
+      // wherever the event is dropped.
+      if (e.jsEvent.shiftKey) {
+        this.eventDuplicateStarted = true
+        // remove the original event so the placeholder we add in its place doesn't render as an overlap
+        e.event.remove()
+        // put a placeholder event in the place of the original event being dragged.
+        // This will be removed when the event is dropped.
+        this.createPlaceholderEvent(e.event)
+      } else {
+        // Without the shift key, a drag means the event time will be modified to wherever it is dropped.
+        // So, nothing to do here.
+      }
+    },
+
+    // This method is guaranteed to run even if fc_eventDrop does not. So we can use it to handle
+    // cleanup in cases where fc_eventDrop doesn't run due to trying to drag and drop into a
+    // disallowed spot
+    eventDragStop (e) {
+      // Wrapping the functionality in this timeout forces it to run after fc_eventDrop
+      setTimeout(() => {
+        if (!this.eventDropDidRun) {
+          // Replace the placeholder event with the real event which we refetch from the database
+          this.tempPlaceholderEvent.remove()
+          this.refreshCalendarView()
+        }
+        this.eventDropDidRun = false // reset the flag
+      }, 0)
+    },
+
     // Save events to the databse when they have been dragged to a new time
     fc_eventDrop (info) {
-      const originalEvent = this.convertFullCalendarEventToPTRFormat(info.oldEvent)
-      const modifiedEvent = this.convertFullCalendarEventToPTRFormat(info.event)
-      this.modifyEvent(originalEvent, modifiedEvent)
+      this.eventDropDidRun = true
+      // Get a format that we can use to send to the ptr calendar server
+      const originalEvent = convertFullCalendarEventToPTRFormat(info.oldEvent)
+      const modifiedEvent = convertFullCalendarEventToPTRFormat(info.event)
+
+      // Check if we are in the process of duplicating an event or simply moving it.
+      if (this.eventDuplicateStarted) {
+        this.eventDuplicateStarted = false
+
+        // Remove the placeholder where the event initially came from. This is because we
+        // are about to revert the dropped event back to its origin.
+        // The reasoning is that we want that original event to stay unchanged, and we'll create
+        // a new event where the original drag was dropped.
+        this.tempPlaceholderEvent.remove()
+
+        // Create a new placeholder where the drag was dropped. This will be cleared when
+        // the new event is saved in our database and then rendered.
+        const placeholderEventDetails = copyFcEvent(info.event)
+        const placeholderEvent = this.fullCalendarApi.addEvent(placeholderEventDetails)
+        this.tempPlaceholderEvent = placeholderEvent
+
+        // Put the original event back where it came from (don't update it to the drop location)
+        info.revert()
+
+        // Create the new event we want to save as a duplicate
+        const duplicatedEvent = Object.assign({}, modifiedEvent)
+        duplicatedEvent.event_id = makeUniqueID() // new event means it should have a new id
+        // When the event with this ID is finally rendered, it will remove the placeholder we've saved
+        this.eventIdWithPlaceholder = duplicatedEvent.event_id
+        this.createNewEvent(duplicatedEvent)
+
+      // If no key is pressed, simply modify the original event
+      } else {
+        this.modifyEvent(originalEvent, modifiedEvent)
+      }
+    },
+
+    // This runs whenever an event is rendered to the calendar
+    fc_eventRender (e) {
+      // If the eventIdWithPlaceholder matches the event rendering, it means that there was
+      // a placeholder event in its place, and we want to remove that event now.
+      if (this.eventIdWithPlaceholder !== '' && e.event.id == this.eventIdWithPlaceholder) {
+        this.tempPlaceholderEvent.remove() // remove the placeholder event
+        this.eventIdWithPlaceholder = '' // neutralize the trigger
+      }
+      // Make sure the red line "now indicator" is visible above other elements.
+      const n = document.getElementsByClassName('fc-now-indicator')[0]
+      if (n) {
+        n.parentElement.style['z-index'] = 'auto'
+      }
     },
 
     // Save events to the database when they have been resized by dragging
+    // This method runs after an event has been resized by dragging on the bottom edge
     fc_eventResize (info) {
-      const originalEvent = this.convertFullCalendarEventToPTRFormat(info.prevEvent)
-      const modifiedEvent = this.convertFullCalendarEventToPTRFormat(info.event)
+      const originalEvent = convertFullCalendarEventToPTRFormat(info.prevEvent)
+      const modifiedEvent = convertFullCalendarEventToPTRFormat(info.event)
       this.modifyEvent(originalEvent, modifiedEvent)
     },
 
     // Allow drag and drop events to overlap if the non-dragged one is a background event
+    // This method runs continuously while an event is being dragged to determine if that
+    // event can be dropped or not.
     fc_eventOverlap (stillEvent, movingEvent) {
       if (stillEvent.rendering === 'background') {
         return true
@@ -489,6 +608,14 @@ export default {
         return false
       }
     },
+
+    // Displays loading spinner when calendar is fetching events.
+    fc_isLoading (val) {
+      this.isLoading = val
+    },
+
+    // This method does some manual DOM manipulation to add the right-side UTC column to the calendar.
+    // It's pretty hacky and will likely break if we update fullCalendar beyond v4
     addUTCTimeColumn () {
       const rows = document.querySelectorAll('.fc-slats > table.table-bordered tbody > tr')
       rows.forEach(r => {
@@ -535,82 +662,6 @@ export default {
       this.fullCalendarApi.refetchEvents()
     },
 
-    async getWeatherForecast () {
-      if (!this.showWeatherForecast) {
-        return []
-      }
-      const forecast = this.$store.getters['sitestatus/forecast']
-      if (forecast.length == 0) {
-        return []
-      } else {
-        return forecast.map(f => {
-          return {
-            start: moment(f.utc_long_form).utc().format(),
-            end: moment(f.utc_long_form).utc().add('1', 'hours').format(),
-            rendering: 'background',
-            title: 'weather forecast',
-            id: 'fc-custom-weather-forecast',
-            classNames: ['fc-forecast-event', `quality-${f.weather_quality_number}`]
-          }
-        })
-      }
-    },
-
-    getMoonPhaseDays (year, month, day) {
-      // https://gist.github.com/endel/dfe6bb2fbe679781948c
-      const Moon = {
-        phases: ['new', 'waxing-crescent', 'first-quarter', 'waxing-gibbous',
-          'full', 'waning-gibbous', 'last-quarter', 'waning-crescent'],
-        phase: function (year, month, day) {
-          let e
-          let jd
-          let b
-          let c = e = jd = b = 0
-
-          if (month < 3) {
-            year--
-            month += 12
-          }
-
-          ++month
-          c = 365.25 * year
-          e = 30.6 * month
-          jd = c + e + day - 694039.09 // jd is total days elapsed
-          jd /= 29.5305882 // divide by the moon cycle
-          b = parseInt(jd) // int(jd) -> b, take integer part of jd
-          jd -= b // subtract integer part to leave fractional part of original jd
-          b = Math.round(jd * 8) // scale fraction from 0-8 and round
-
-          if (b >= 8) b = 0 // 0 and 8 are the same so turn 8 into 0
-          return { phase: b, name: Moon.phases[b] }
-        }
-      }
-
-      try { // ignore errors caused by the timezone not being loaded yet.
-        const moment_today = moment([year, month, day]).utc()
-        const moment_yesterday = moment([year, month, day]).utc().add(-1, 'days')
-
-        const phase_today = Moon.phase(
-          moment_today.year(),
-          moment_today.month(),
-          moment_today.date())
-        const phase_yesterday = Moon.phase(
-          moment_yesterday.year(),
-          moment_yesterday.month(),
-          moment_yesterday.date())
-
-        // If the phase is changed from the previous day, then return it to
-        // display on the calendar.
-        if (phase_today.phase != phase_yesterday.phase) {
-          return phase_today
-        } else {
-          return false
-        }
-      } catch {
-        return false
-      }
-    },
-
     // Display moon phase icons in the calendar
     dayRender (dayRenderInfo) {
       // Check if the current view is week view
@@ -620,7 +671,7 @@ export default {
 
       try { // ignore errors from the timezone not being loaded yet.
         const date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
-        const moon_phase = this.getMoonPhaseDays(
+        const moon_phase = getMoonPhaseDays(
           date.year(),
           date.month(),
           date.date())
@@ -632,64 +683,6 @@ export default {
       } catch {
         console.warn('dayRender waiting for valid timezone.')
       }
-    },
-
-    async getNowIndicator (info) {
-      const now = [
-        {
-          start: moment().utc().format(),
-          end: moment().utc().add('1', 'minutes').format(),
-          rendering: 'background',
-          backgroundColor: '#ff0000',
-          borderColor: '#ff0000',
-          id: 'fc-custom-now-indicator',
-          classNames: ['fc-now-indicator', 'fc-now-indicator-line']
-        }
-      ]
-      return now
-    },
-
-    async getObservingStartEndIndicators () {
-      const observeStart = moment(this.site_events_observing_start_time).tz(this.fc_timeZone)
-      const observeEnd = moment(this.site_events_observing_end_time).tz(this.fc_timeZone)
-      const startAndEnd = [
-        {
-          start: observeStart.format(),
-          end: observeStart.add('1', 'minutes').format(),
-          rendering: 'background',
-          classNames: ['fc-observing-start-end-time', 'start']
-        },
-        {
-          start: observeEnd.format(),
-          end: observeEnd.add('1', 'minutes').format(),
-          rendering: 'background',
-          classNames: ['fc-observing-start-end-time', 'end']
-        }
-      ]
-      return startAndEnd
-    },
-
-    fc_eventRender () {
-      const n = document.getElementsByClassName('fc-now-indicator')[0]
-      if (n) {
-        n.parentElement.style['z-index'] = 'auto'
-      }
-    },
-
-    // Displays loading spinner when calendar is fetching.
-    fc_isLoading (val) {
-      this.isLoading = val
-    },
-
-    /**
-     * Helper function for displaying moon visibility in the calendar.
-     * Returns a grey color with brightness corresponding to moon brightness.
-     * @param {float} illum: moon illumination between 0 and 1.
-     * @returns {string}: css value, something like 'rgba(255,255,255,0.5)'
-     */
-    rgba_from_illumination (illum, peak) {
-      const alpha = 0.1 + (0.9 * illum) // should have minimum opacity of 0.1
-      return `rgba(${peak},${peak},${peak},${alpha})`
     },
 
     // Call the photonranch api to get moon times.
@@ -720,211 +713,6 @@ export default {
       this.moon_cache[payload_str] = riseset
 
       return riseset
-    },
-
-    // Return an array of fullcalendar background events to display the
-    // moon visibility
-    async getMoonRiseSet (info) {
-      if (!this.showMoonEvents) {
-        return []
-      }
-      const ms_per_day = 86400000
-
-      // Get the time range we need to display in the UI.
-      // Also convert from ms timestamp to iso utc seconds.
-      let start_timestamp = info.start.valueOf()
-      let end_timestamp = info.end.valueOf()
-
-      // Add buffer of a few days to the start and end window
-      start_timestamp -= ms_per_day * 12
-      end_timestamp += ms_per_day * 12
-
-      // Convert timestamps to utc iso format
-      const start_iso = moment(start_timestamp).format('YYYY-MM-DDTHH:mm:ss[Z]')
-      const end_iso = moment(end_timestamp).format('YYYY-MM-DDTHH:mm:ss[Z]')
-
-      // Make the api call to get moon rise/set times
-      const riseset = await this.getMoonTimesFromAPI(start_iso, end_iso)
-
-      const moonEvents = []
-      riseset.forEach((moon) => {
-        // The primary moon event
-        moonEvents.push({
-          start: new Date(moon.rise),
-          end: new Date(moon.set),
-          rendering: 'background',
-          backgroundColor: this.rgba_from_illumination(moon.illumination, 235),
-          borderColor: '#aaaaaa',
-          id: 'fc-custom-moon-indicator',
-          classNames: ['fc-moon-indicator'],
-          title: 'Moon Event',
-          extendedProps: {
-            illumination: moon.illumination,
-            transit: moon.transit
-          }
-        })
-
-        // The marker for transit time.
-        moonEvents.push({
-          start: moment(moon.transit).format(),
-          end: moment(moon.transit).add('1', 'minutes').format(),
-          title: 'Moon Event',
-          rendering: 'background',
-          // Opacity should vary with moon brightness, but not too much.
-          backgroundColor: `rgba(255,255,255,${moon.illumination ** 0.25})`,
-          classNames: ['fc-moon-transit-indicator']
-        })
-      }
-      )
-
-      return moonEvents
-    },
-
-    async getTwilightEvents (info) {
-      // Timer start
-      const t0 = performance.now()
-
-      // Get the time range we need to display in the UI.
-      const firstDay = info.start.valueOf()
-      const lastDay = info.end.valueOf()
-
-      // List all the days we'll need to display
-      const allDays = []
-      const msPerDay = 1000 * 60 * 60 * 24
-
-      // Generate events for 60 days before the start time to 60 days after.
-      // This is to prevent the loading flicker when changing weeks.
-      // note: this still only takes ~5ms to compute.
-      for (
-        let day = firstDay - 60 * msPerDay;
-        day < lastDay + 60 * msPerDay;
-        day += msPerDay
-      ) {
-        // Define each day by the timestamp a little after 1:01am to avoid DST hell
-        allDays.push(day + 3700000)
-      }
-
-      // Generate the twilight events (in proper fullCalendar format)
-      // for one day column (evening-of and morning-after the given date.)
-      function oneDayTwilight (timestamp, latitude, longitude) {
-        const events = {}
-
-        const msPerDay = 1000 * 60 * 60 * 24
-        const sunEvents = SunCalc.getTimes(
-          new Date(timestamp),
-          latitude,
-          longitude
-        )
-        const nextDayEvents = SunCalc.getTimes(
-          new Date(timestamp + msPerDay),
-          latitude,
-          longitude
-        )
-        // We don't currently use prevDayEvents but it's here for reference.
-        /*
-        const prevDayEvents = SunCalc.getTimes(
-          new Date(timestamp - msPerDay),
-          latitude,
-          longitude
-        )
-        */
-
-        const currentDateObj = new Date(timestamp)
-
-        // The event colors for the calendar
-        const daylightColor = '#81D4FA'
-        const civilColor = '#1B9FD8'
-        const nauticalColor = '#166EA9'
-        const astronomicalColor = '#084165'
-
-        events.civilTwilightDusk = {
-          title: 'Civil Twilight',
-          start: sunEvents.sunset,
-          end: sunEvents.dusk,
-          backgroundColor: civilColor,
-          rendering: 'background',
-          id: `${currentDateObj.toISOString()}_civil_dusk`
-        }
-        events.nauticalTwilightDusk = {
-          title: 'Nautical Twilight',
-          start: sunEvents.dusk,
-          end: sunEvents.nauticalDusk,
-          backgroundColor: nauticalColor,
-          rendering: 'background',
-          id: `${currentDateObj.toISOString()}_nautical_dusk`
-        }
-        events.astronomicalTwilightDusk = {
-          title: 'Astronomical Twilight',
-          start: sunEvents.nauticalDusk,
-          end: sunEvents.night,
-          backgroundColor: astronomicalColor,
-          rendering: 'background',
-          id: `${currentDateObj.toISOString()}_astronomical_dusk`
-        }
-
-        events.astronomicalTwilightDawn = {
-          title: 'Astronomical Twilight',
-          start: nextDayEvents.nightEnd,
-          end: nextDayEvents.nauticalDawn,
-          backgroundColor: astronomicalColor,
-          rendering: 'background',
-          id: `${currentDateObj.toISOString()}_astronomical_dawn`
-        }
-        events.nauticalTwilightDawn = {
-          title: 'Nautical Twilight',
-          start: nextDayEvents.nauticalDawn,
-          end: nextDayEvents.dawn,
-          backgroundColor: nauticalColor,
-          rendering: 'background',
-          id: `${currentDateObj.toISOString()}_nautical_dawn`
-        }
-        events.civilTwilightDawn = {
-          title: 'Civil Twilight',
-          start: nextDayEvents.dawn,
-          end: nextDayEvents.sunrise,
-          backgroundColor: civilColor,
-          rendering: 'background',
-          id: `${currentDateObj.toISOString()}_civil_dawn`
-        }
-        events.daylightMorning = {
-          title: 'Morning Daylight',
-          start: nextDayEvents.sunrise,
-          end: nextDayEvents.sunset,
-          // end: new Date(new Date(timestamp).setHours(36)),
-          rendering: 'background',
-          backgroundColor: daylightColor,
-          id: `${currentDateObj.toISOString()}_day_morning`
-        }
-        return events
-      }
-
-      // Collect all the events to display here
-      const twilightEvents = []
-
-      const site_lat = parseFloat(
-        this.global_config[this.calendarSite].latitude
-      )
-      const site_lng = parseFloat(
-        this.global_config[this.calendarSite].longitude
-      )
-
-      // Compute events for each day.
-      allDays.map((day) =>
-        twilightEvents.push(
-          ...Object.values(oneDayTwilight(day, site_lat, site_lng))
-        )
-      )
-
-      // Finish timer
-      const t1 = performance.now()
-      const twilightComputeTime = t1 - t0
-      if (twilightComputeTime > 100) {
-        console.warn(
-          'Slow computation of astro twilight: ',
-          twilightComputeTime.toFixed(2) + 'ms'
-        )
-      }
-      return twilightEvents
     },
 
     async getConfigWithAuth () {
@@ -974,22 +762,10 @@ export default {
       }
     },
 
-    // Make a unique id for calendar events. UUID style. This is the pk in dynamodb.
-    makeUniqueID () {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (
-        c
-      ) {
-        const r = (Math.random() * 16) | 0
-        const v = c == 'x' ? r : (r & 0x3) | 0x8
-        return v.toString(16)
-      })
-    },
-
     // Used when exiting event editor modals. Clear selections, close modal, and refresh events.
     async refreshCalendarView () {
-      const calendarApi = this.fullCalendarApi // this.$refs.fullCalendar.getApi();
-      calendarApi.unselect()
-      calendarApi.refetchEvents()
+      this.fullCalendarApi.unselect()
+      this.fullCalendarApi.refetchEvents()
       this.eventEditorIsActive = false
 
       // Update the list of active reservations
@@ -1008,7 +784,7 @@ export default {
       this.activeEvent.title = this.$auth.user.name
       this.activeEvent.reservation_type = 'realtime' // or "project"
       this.activeEvent.creator = this.$auth.user.name
-      this.activeEvent.id = this.makeUniqueID()
+      this.activeEvent.id = makeUniqueID()
       this.activeEvent.site = this.calendarSite
       this.activeEvent.resourceId = this.calendarSite
       this.activeEvent.creator_id = this.$auth.user.sub
@@ -1100,7 +876,7 @@ export default {
      * When the user clicks submit, event details are sent to the backend.
      */
     async submitButtonClicked (newEvent) {
-      const eventToPost = this.formatResponseFromCalendarEventEditor(newEvent)
+      const eventToPost = this.convertFcEventToPtrFormat(newEvent)
       // Make request headers and include token.
       // Requires user to be logged in.
       const config = await this.getConfigWithAuth()
@@ -1157,34 +933,190 @@ export default {
         })
     },
 
-    formatResponseFromCalendarEventEditor (event) {
-      return {
-        event_id: event.id,
-        start: moment(event.startStr).utc().format(),
-        end: moment(event.endStr).utc().format(),
-        creator: event.creator,
-        creator_id: event.creator_id,
-        site: event.site,
-        title: event.title,
-        reservation_type: event.reservation_type,
-        resourceId: event.resourceId,
-        project_id: event.project_id,
-        project_priority: event.project_priority,
-        reservation_note: event.reservation_note,
-        rendering: event.rendering
-      }
-    },
-
     modifyButtonClicked (events) {
-      const originalEvent = this.formatResponseFromCalendarEventEditor(events.initialEvent)
-      const modifiedEvent = this.formatResponseFromCalendarEventEditor(events.modifiedEvent)
+      const originalEvent = convertEventEditorResponseToPtrFormat(events.initialEvent)
+      const modifiedEvent = convertEventEditorResponseToPtrFormat(events.modifiedEvent)
       this.modifyEvent(originalEvent, modifiedEvent)
     },
 
     /* ===================================================/
-    Fetching Calendar Events
+    Calendar Event Sources
     /=================================================== */
 
+    // This is an eventSource that provides the red line indicating the current time
+    async getNowIndicator (info) {
+      const now = [
+        {
+          start: moment().utc().format(),
+          end: moment().utc().add('1', 'minutes').format(),
+          rendering: 'background',
+          backgroundColor: '#ff0000',
+          borderColor: '#ff0000',
+          id: 'fc-custom-now-indicator',
+          classNames: ['fc-now-indicator', 'fc-now-indicator-line']
+        }
+      ]
+      return now
+    },
+
+    // This method serves as an eventSource for the calendar.
+    // It provides indicators for the start and end time of the present observing night.
+    // These values are sourced from the site config, in the site events.
+    async getObservingStartEndIndicators () {
+      const observeStart = moment(this.site_events_observing_start_time).tz(this.fc_timeZone)
+      const observeEnd = moment(this.site_events_observing_end_time).tz(this.fc_timeZone)
+      const startAndEnd = [
+        {
+          start: observeStart.format(),
+          end: observeStart.add('1', 'minutes').format(),
+          rendering: 'background',
+          classNames: ['fc-observing-start-end-time', 'start']
+        },
+        {
+          start: observeEnd.format(),
+          end: observeEnd.add('1', 'minutes').format(),
+          rendering: 'background',
+          classNames: ['fc-observing-start-end-time', 'end']
+        }
+      ]
+      return startAndEnd
+    },
+
+    // This eventSource creates and returns the background events that shade the
+    // various stages of twilight each day
+    async getTwilightEvents (info) {
+      // Timer start
+      const t0 = performance.now()
+
+      // Get the time range we need to display in the UI.
+      const firstDay = info.start.valueOf()
+      const lastDay = info.end.valueOf()
+
+      // List all the days we'll need to display
+      const allDays = []
+      const msPerDay = 1000 * 60 * 60 * 24
+
+      // Generate events for 60 days before the start time to 60 days after.
+      // This is to prevent the loading flicker when changing weeks.
+      // note: this still only takes ~5ms to compute.
+      for (
+        let day = firstDay - 60 * msPerDay;
+        day < lastDay + 60 * msPerDay;
+        day += msPerDay
+      ) {
+        // Define each day by the timestamp a little after 1:01am to avoid DST hell
+        allDays.push(day + 3700000)
+      }
+
+      // Collect all the events to display here
+      const twilightEvents = []
+
+      const site_lat = parseFloat(
+        this.global_config[this.calendarSite].latitude
+      )
+      const site_lng = parseFloat(
+        this.global_config[this.calendarSite].longitude
+      )
+
+      // Compute events for each day.
+      allDays.map((day) =>
+        twilightEvents.push(
+          // Note oneDayTwilight generates all the twilight events for a single day
+          ...Object.values(oneDayTwilight(day, site_lat, site_lng))
+        )
+      )
+
+      // Finish timer
+      const t1 = performance.now()
+      const twilightComputeTime = t1 - t0
+      if (twilightComputeTime > 100) {
+        console.warn(
+          'Slow computation of astro twilight: ',
+          twilightComputeTime.toFixed(2) + 'ms'
+        )
+      }
+      return twilightEvents
+    },
+
+    // This is a fullCalendar eventSource
+    // Return an array of fullcalendar background events to display the moon visibility.
+    async getMoonRiseSet (info) {
+      if (!this.showMoonEvents) {
+        return []
+      }
+      const ms_per_day = 86400000
+
+      // Get the time range we need to display in the UI.
+      // Also convert from ms timestamp to iso utc seconds.
+      let start_timestamp = info.start.valueOf()
+      let end_timestamp = info.end.valueOf()
+
+      // Add buffer of a few days to the start and end window
+      start_timestamp -= ms_per_day * 12
+      end_timestamp += ms_per_day * 12
+
+      // Convert timestamps to utc iso format
+      const start_iso = moment(start_timestamp).format('YYYY-MM-DDTHH:mm:ss[Z]')
+      const end_iso = moment(end_timestamp).format('YYYY-MM-DDTHH:mm:ss[Z]')
+
+      // Make the api call to get moon rise/set times
+      const riseset = await this.getMoonTimesFromAPI(start_iso, end_iso)
+
+      const moonEvents = []
+      riseset.forEach((moon) => {
+        // The primary moon event
+        moonEvents.push({
+          start: new Date(moon.rise),
+          end: new Date(moon.set),
+          rendering: 'background',
+          backgroundColor: rgba_from_illumination(moon.illumination, 235),
+          borderColor: '#aaaaaa',
+          id: 'fc-custom-moon-indicator',
+          classNames: ['fc-moon-indicator'],
+          title: 'Moon Event',
+          extendedProps: {
+            illumination: moon.illumination,
+            transit: moon.transit
+          }
+        })
+
+        // The marker for transit time.
+        moonEvents.push({
+          start: moment(moon.transit).format(),
+          end: moment(moon.transit).add('1', 'minutes').format(),
+          title: 'Moon Event',
+          rendering: 'background',
+          // Opacity should vary with moon brightness, but not too much.
+          backgroundColor: `rgba(255,255,255,${moon.illumination ** 0.25})`,
+          classNames: ['fc-moon-transit-indicator']
+        })
+      })
+      return moonEvents
+    },
+
+    // This eventSource gets the latest weather forecast to display as vertical colored bars
+    async getWeatherForecast () {
+      if (!this.showWeatherForecast) {
+        return []
+      }
+      const forecast = this.$store.getters['sitestatus/forecast']
+      if (forecast.length == 0) {
+        return []
+      } else {
+        return forecast.map(f => {
+          return {
+            start: moment(f.utc_long_form).utc().format(),
+            end: moment(f.utc_long_form).utc().add('1', 'hours').format(),
+            rendering: 'background',
+            title: 'weather forecast',
+            id: 'fc-custom-weather-forecast',
+            classNames: ['fc-forecast-event', `quality-${f.weather_quality_number}`]
+          }
+        })
+      }
+    },
+
+    // This is the eventSource that gets the user reservations stored in the ptr calendar database
     async fetchSiteEvents (fetchInfo) {
       const site = this.calendarSite
       const url = `${this.$store.state.api_endpoints.calendar_api}/siteevents`
@@ -1260,7 +1192,6 @@ export default {
 @import "@/style/_variables.scss";
 
 $moon-width: 16px;
-$forecast-width: 10px;
 
 $event-left-margin: 4px;
 
@@ -1411,7 +1342,7 @@ These times are obtained from the events in the site config */
 }
 .moon-icon {
   padding: 5px;
-  z-index: $moon-icon-z-index;
+  z-index: $moon-icon-z-index; // note: position: static means this does nothing
   color: yellow;
 }
 .fc-moon-transit-indicator {
@@ -1433,7 +1364,7 @@ These times are obtained from the events in the site config */
 .fc-forecast-event {
   $background-opacity: 0;
   $border-width: $forecast-width;
-  z-index: $forecast-z-index !important;
+  // z-index: $forecast-z-index !important;
   opacity: 1;
   background-color: rgba(0,0,0,0);
   width: 0;

@@ -55,6 +55,12 @@
         </div>
         <div style="border-bottom: 1px solid grey; width: 100%; height: 1em; margin-bottom: 1em;" />
         <p class="menu-label">
+          Calendar Behavior
+        </p>
+        <p>Drag events to <b>move</b></p>
+        <p>SHIFT-Drag events to <b>copy</b></p>
+        <div style="border-bottom: 1px solid grey; width: 100%; height: 1em; margin-bottom: 1em;" />
+        <p class="menu-label">
           Calendar Legend
         </p>
         <div class="legend">
@@ -297,7 +303,7 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 }
 
 .forecast {
-  border-left: 4px solid;
+  border-left: $forecast-width solid;
   margin-left: -20px;
   padding-left: 20px;
 
