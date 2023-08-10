@@ -1151,8 +1151,8 @@ export default {
           reservation_note: obj.reservation_note,
           rendering: obj.rendering,
           project_priority: obj?.project_priority || 'standard',
-          editable: obj.creator_id === this.userId,
-          durationEditable: obj.reservation_type !== 'realtime' && obj.creator_id === this.userId
+          editable: obj.creator_id === this.userId || this.userIsAdmin,
+          durationEditable: obj.reservation_type !== 'realtime' && (obj.creator_id === this.userId || this.userIsAdmin)
         }
 
         // Event colors
