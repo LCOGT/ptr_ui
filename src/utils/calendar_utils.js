@@ -40,7 +40,8 @@ const copyFcEvent = (event) => {
 }
 
 // Take events from fullCalendar event handlers (e.g. drag/drop) and convert to the format used in our backend
-const convertFullCalendarEventToPTRFormat = event => {
+const convertFullCalendarEventToPtrFormat = event => {
+  console.log(event)
   return {
     event_id: event.id,
     start: moment(event.start).utc().format(),
@@ -239,7 +240,7 @@ const oneDayTwilight = (timestamp, latitude, longitude) => {
 export {
   makeUniqueID,
   copyFcEvent,
-  convertFullCalendarEventToPTRFormat,
+  convertFullCalendarEventToPtrFormat,
   convertEventEditorResponseToPtrFormat,
   getMoonPhaseDays,
   rgba_from_illumination,

@@ -130,7 +130,7 @@ import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
 import momentTimezonePlugin from '@fullcalendar/moment-timezone'
 
-import { makeUniqueID, copyFcEvent, convertFullCalendarEventToPTRFormat, convertEventEditorResponseToPtrFormat, getMoonPhaseDays, rgba_from_illumination, oneDayTwilight } from '@/utils/calendar_utils.js'
+import { makeUniqueID, copyFcEvent, convertFullCalendarEventToPtrFormat, convertEventEditorResponseToPtrFormat, getMoonPhaseDays, rgba_from_illumination, oneDayTwilight } from '@/utils/calendar_utils.js'
 
 // must manually include stylesheets for each plugin
 import '@fullcalendar/core/main.css'
@@ -540,8 +540,8 @@ export default {
     fc_eventDrop (info) {
       this.eventDropDidRun = true
       // Get a format that we can use to send to the ptr calendar server
-      const originalEvent = convertFullCalendarEventToPTRFormat(info.oldEvent)
-      const modifiedEvent = convertFullCalendarEventToPTRFormat(info.event)
+      const originalEvent = convertFullCalendarEventToPtrFormat(info.oldEvent)
+      const modifiedEvent = convertFullCalendarEventToPtrFormat(info.event)
 
       // Check if we are in the process of duplicating an event or simply moving it.
       if (this.eventDuplicateStarted) {
@@ -593,8 +593,8 @@ export default {
     // Save events to the database when they have been resized by dragging
     // This method runs after an event has been resized by dragging on the bottom edge
     fc_eventResize (info) {
-      const originalEvent = convertFullCalendarEventToPTRFormat(info.prevEvent)
-      const modifiedEvent = convertFullCalendarEventToPTRFormat(info.event)
+      const originalEvent = convertFullCalendarEventToPtrFormat(info.prevEvent)
+      const modifiedEvent = convertFullCalendarEventToPtrFormat(info.event)
       this.modifyEvent(originalEvent, modifiedEvent)
     },
 
@@ -876,7 +876,7 @@ export default {
      * When the user clicks submit, event details are sent to the backend.
      */
     async submitButtonClicked (newEvent) {
-      const eventToPost = this.convertFcEventToPtrFormat(newEvent)
+      const eventToPost = convertEventEditorResponseToPtrFormat(newEvent)
       // Make request headers and include token.
       // Requires user to be logged in.
       const config = await this.getConfigWithAuth()
