@@ -158,7 +158,7 @@ export const commands_mixin = {
      * @param {object} req_params Required parameters for the command.
      * @param {object} opt_params Optional parameters for the command.
      */
-    base_command (device_type, action, button_name, req_params, opt_params) {
+    base_command (device_type, action, button_name = '', req_params = {}, opt_params = {}) {
       // Get the active device of the requested device type.
       let device
       switch (device_type) {
@@ -185,16 +185,24 @@ export const commands_mixin = {
           user_roles: this.user_roles,
           timestamp: parseInt(Date.now() / 1000),
           action,
-          required_params: req_params || {},
+          required_params: req_params,
           optional_params: {
             instrument_selector_position: this.selector_position,
             telescope_selection: this.telescope_selection,
-            ...(opt_params || {})
+            ...opt_params
           }
         }
       }
 
       return the_base_command
+    },
+
+    // Same as the base_command method, but substitutes the wema instead of the site
+    wema_base_command (...args) {
+      const base_command = this.base_command(...args)
+      base_command.site = this.wema_name
+      delete base_command.mount
+      return base_command
     },
 
     async scriptRunCommand () {
@@ -472,33 +480,21 @@ export const commands_mixin = {
       return this.base_command('camera', 'darkslide_close', 'close')
     },
     enclosure_open_command () {
-      return this.base_command('enclosure', 'open', 'Request Roof to Open')
+      return this.wema_base_command('enclosure', 'open', 'Request Roof to Open')
     },
     enclosure_close_command () {
-      return this.base_command('enclosure', 'close', 'Request Roof to Close')
-    },
-    enclosure_manual_command () {
-      return this.base_command('enclosure', 'setManual', 'Set enclosure mode to manual',
-        {},
-        { username: this.username })
+      return this.wema_base_command('enclosure', 'close', 'Request Roof to Close')
     },
     enclosure_simulate_weather_hold () {
-      return this.base_command('enclosure', 'simulate_weather_hold', 'Home Dome',
-        {},
-        {})
-    },
-    enclosure_home_dome_command () {
-      return this.base_command('enclosure', 'home_dome', 'Simulate Weather Hold',
-        {},
-        {})
+      return this.wema_base_command('enclosure', 'simulate_weather_hold', 'Simulate 90 second weather hold')
     },
     enclosure_track_telescope_command () {
-      return this.base_command('enclosure', 'track_telescope', 'Track Telescope',
+      return this.wema_base_command('enclosure', 'track_telescope', 'Track Telescope',
         {},
         {})
     },
     enclosure_stop_tracking_telescope_command () {
-      return this.base_command('enclosure', 'stop_tracking_telescope', 'Stop Tracking Telescope',
+      return this.wema_base_command('enclosure', 'stop_tracking_telescope', 'Stop Tracking Telescope',
         {},
         {})
     },

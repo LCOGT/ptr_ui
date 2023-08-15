@@ -50,6 +50,10 @@ const getters = {
     return state.global_config[state.selected_site]?.wema_name || null
   },
 
+  wema_config: (state, getters) => {
+    return state.global_config[getters.wema_name]
+  },
+
   available_devices: state => (deviceType, site) => {
     return Object.keys(state.global_config?.[site]?.[deviceType]) ?? []
   },

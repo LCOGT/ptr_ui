@@ -101,8 +101,11 @@ export default {
       }
       // Default display
       const inst = []
+      // Enclosure should only be visible to admins
+      if (this.$store.state.user_data.userIsAdmin) {
+        inst.push('Enclosure')
+      }
       inst.push(...[
-        'Enclosure',
         'Screen',
         'Telescope',
         'Rotator',

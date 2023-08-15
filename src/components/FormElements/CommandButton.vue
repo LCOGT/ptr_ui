@@ -1,5 +1,6 @@
 <template>
   <button
+    v-if="isVisible"
     class="button"
     :class="{ 'is-loading': isLoading, 'is-admin': admin, 'is-preview-mode': previewMode }"
     :disabled="isDisabled"
@@ -7,18 +8,20 @@
     @mouseleave="isHovering = false"
     @click="handleClick"
   >
-    <slot> {{ data.button_name }} </slot>
+    <slot> {{ data?.button_name || 'command button'}} </slot>
   </button>
 </template>
 
 <script>
 import axios from 'axios'
-import { mapGetters } from 'vuex'
 import { commands_mixin } from '@/mixins/commands_mixin'
 
 export default {
   props: {
-    data: Object,
+    data: {
+      type: Object,
+      required: false
+    },
     isDisabled: {
       type: Boolean,
       default: false
@@ -38,6 +41,12 @@ export default {
   methods: {
 
     async handleClick () {
+      // Require a site to be specified
+      if (this.data.site == '') {
+        console.log('No site specified for the command. Command has been cancelled.')
+        this.isLoading = false
+        return
+      }
       // Use the value of preview mode when the button was first clicked
       // Preview mode doesn't send the command to the backend, but simply
       // displays the payload to the user.
@@ -46,12 +55,6 @@ export default {
       // Add a loading spinner to the button
       this.isLoading = true
 
-      if (this.data.site == '' || this.data.mount == '') {
-        console.log('No site and/or mount specified for the command. Command has been cancelled.')
-        this.isLoading = false
-        return
-      }
-
       const commandPayload = {
         ...this.data.form,
         site: this.data.site,
@@ -59,6 +62,7 @@ export default {
         timestamp: parseInt(Date.now() / 1000)
       }
 
+      // If in preview mode, show a popup and return without sending anything.
       if (inPreviewMode) {
         this.isLoading = false
         const commandPayloadString = JSON.stringify(commandPayload, null, 4)
@@ -66,16 +70,19 @@ export default {
           <b>Command Payload - Preview Mode</b>
           <p> Note: commands are not sent in preview mode. </p>
           <hr>
-          <div style="white-space: pre;">${commandPayloadString}</div>`
+          <div style="white-space: pre; max-height: 70vh; overflow-y: auto;">
+            ${commandPayloadString}
+          </div>`
         this.$buefy.notification.open({
           message,
           position: 'is-bottom',
           type: 'is-warning',
           hasIcon: true,
           indefinite: true
-
         })
-      } else {
+      }
+      // send the command to site here using the 'data' props
+      else {
         const url = `${this.$store.state.api_endpoints.jobs_api}/newjob?site=${this.data.site}`
         const options = await this.getAuthHeader()
         axios.post(url, commandPayload, options).then(response => {
@@ -111,16 +118,20 @@ export default {
     window.removeEventListener('keyup', this.onKeyup)
   },
   computed: {
-    ...mapGetters('auth', {
-      token: 'getToken'
-    }),
-
     // Preview mode is enabled when a user holds the shift key while clicking.
     // It changes the command button style and results in a preview
     // of the command payload being displayed. The command is not
     // sent to the backend.
     previewMode () {
       return this.shiftKeyActive && this.isHovering
+    },
+
+    isVisible () {
+      // Make sure admin buttons are only present if the user is an admin
+      if (this.admin) {
+        return this.$store.state.user_data.userIsAdmin
+      }
+      return true
     }
   }
 }

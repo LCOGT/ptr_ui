@@ -69,7 +69,15 @@ export default {
       } else {
         return ''
       }
+    },
+    setAdminOnlytabs (inst) {
+      const adminOnly = ['enclosure']
+      if (adminOnly.includes(inst) && !this.$store.state.user_data.userIsAdmin) {
+        return false
+      }
+      return true
     }
+
   },
 
   computed: {
@@ -93,8 +101,11 @@ export default {
         return ['Enclosure', 'Screen', 'Sequencer']
       } else {
         const inst = []
+        // Enclosure should only be visible to admins
+        if (this.$store.state.user_data.userIsAdmin) {
+          inst.push('Enclosure')
+        }
         inst.push(...[
-          'Enclosure',
           'Screen',
           'Telescope',
           'Rotator',
@@ -104,10 +115,8 @@ export default {
         if (this.selector_exists) {
           inst.push('InstrumentSelector')
         }
-        inst.push(...[
-          'Sequencer',
-          'Settings'
-        ])
+        inst.push('Sequencer')
+        inst.push('Settings')
         return inst
       }
     }
