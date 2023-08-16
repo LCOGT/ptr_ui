@@ -26,13 +26,13 @@
           v-model="selectedEnclosureMode"
           size="is-small"
         >
-          <option value="automatic">
+          <option value="Automatic">
             Automatic
           </option>
-          <option value="manual">
+          <option value="Manual">
             Manual
           </option>
-          <option value="shutdown">
+          <option value="Shutdown">
             Shut down
           </option>
         </b-select>
