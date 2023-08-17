@@ -372,6 +372,18 @@
 
     <br>
 
+    <div style="margin-bottom: 1em;">
+      OWM Report
+      <pre>{{ owm_report }}</pre>
+    </div>
+
+    <div style="margin-bottom: 1em;">
+      <b-button @click="showOwmStatus">(alternate method) show OWM Status</b-button>
+    </div>
+    <b-modal v-model="owmModalVisible">
+      <pre>{{ owm_report }}</pre>
+    </b-modal>
+
     <div
       class="status-toggle-bar"
       @click="isExpandedStatusVisible= !isExpandedStatusVisible"
@@ -397,6 +409,7 @@ import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 import StatusVal from '@/components/status/StatusVal'
 import { mapGetters } from 'vuex'
+import axios from 'axios'
 export default {
   name: 'Enclosure',
   mixins: [commands_mixin, user_mixin],
@@ -434,7 +447,20 @@ export default {
       skyTempLimitWarningLevel: 80,
       skyTempLimitDangerLevel: 90,
       lowestAmbientTemp: '',
-      highestAmbientTemp: ''
+      highestAmbientTemp: '',
+
+      owmModalVisible: false,
+      owm_report: '...loading...'
+    }
+  },
+
+  mounted () {
+    this.getOwmReport()
+  },
+  watch: {
+    '$route.params.sitecode' () {
+      this.owm_report = '...loading...'
+      this.getOwmReport()
     }
   },
 
@@ -445,6 +471,15 @@ export default {
           force_roof_state: val
         }
       )
+    },
+    getOwmReport () {
+      const endpoint = this.$store.state.api_endpoints.status_endpoint + '/' + this.wema_name + '/owm_report'
+      axios.get(endpoint).then(response => {
+        this.owm_report = JSON.parse(response.data.status.owm_report)
+      })
+    },
+    showOwmStatus () {
+      this.owmModalVisible = true
     }
   },
 
