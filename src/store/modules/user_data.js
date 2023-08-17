@@ -88,6 +88,12 @@ const mutations = {
 // actions
 const actions = {
 
+  checkUserStatus ({ dispatch }) {
+    this.$auth.loginWithPopup().then(() => {
+      dispatch('newUserLogin', this.$auth.user)
+    })
+  },
+
   newUserLogin ({ state, commit, dispatch }, user) {
     const roles = user['https://photonranch.org/user_metadata'].roles
     const userIsAdmin = roles.includes('admin')

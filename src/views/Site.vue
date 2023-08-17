@@ -93,7 +93,7 @@ import SiteProjects from '@/components/sitepages/SiteProjects'
 import SiteData from '@/components/sitepages/SiteData'
 
 import { commands_mixin } from '../mixins/commands_mixin'
-import datastreamer from '@/datastreamer'
+import Datastreamer from '@/datastreamer'
 
 export default {
   name: 'Site',
@@ -124,8 +124,16 @@ export default {
   },
   mixins: [commands_mixin],
 
+  data () {
+    return {
+      datastreamer: ''
+    }
+  },
+
   // When the site page component loads for the first time, set the current site in vuex.
   created () {
+    this.datastreamer = new Datastreamer(this.sitecode)
+
     this.site_changed_routine(this.$route.params.sitecode)
 
     const ten_minutes = 10 * 60 * 1000 // ms
@@ -145,7 +153,7 @@ export default {
 
   beforeRouteLeave (to, from, next) {
     // console.log('in BEFORE ROUTE LEAVE')
-    datastreamer.close()
+    this.datastreamer.close()
     next()
   },
 
@@ -155,7 +163,7 @@ export default {
 
     this.$store.commit('site_config/remove_selected_site')
     this.$store.dispatch('images/display_placeholder_image')
-    datastreamer.close()
+    this.datastreamer.close()
     clearInterval(this.refreshForecastInterval)
   },
 
@@ -193,7 +201,7 @@ export default {
       this.$store.dispatch('site_config/set_default_active_devices', sitecode)
 
       // Subscribe to datastream for the new site
-      datastreamer.update_site(sitecode)
+      this.datastreamer.update_site(sitecode)
 
       // get initial data/values for images, status, calendar
       this.$store.dispatch('images/display_placeholder_image')

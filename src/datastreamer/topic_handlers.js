@@ -26,6 +26,16 @@ const status_stream_handler = message => {
     store.commit('sitestatus/new_forecast_status', status)
     store.commit('sitestatus/updateLocalClock', now)
   }
+  else if (statusType == 'obs_settings') {
+    store.commit('sitestatus/latest_obs_settings_timestamp_ms', message.server_timestamp_ms)
+    store.commit('sitestatus/new_obs_settings_status', status)
+    store.commit('sitestatus/updateLocalClock', now)
+  }
+  else if (statusType == 'wema_settings') {
+    store.commit('sitestatus/latest_wema_settings_timestamp_ms', message.server_timestamp_ms)
+    store.commit('sitestatus/new_wema_settings_status', status)
+    store.commit('sitestatus/updateLocalClock', now)
+  }
   else {
     console.warn(statusType)
   }

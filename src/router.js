@@ -83,27 +83,3 @@ const router = new VueRouter({
 })
 
 export default router
-
-// router.beforeEach(async (to, from , next) => {
-// if(to.meta.requiresAuth) {
-
-// const authService = getInstance();
-// const user = await authService.user;
-
-// console.log(typeof authService)
-// console.log(authService.getUser())
-// next()
-
-// }
-// })
-
-router.beforeEach((to, from, next) => {
-  if (window._chatlio) {
-    // Chat should only be available in the control room.
-    // The script is loaded globally, so hide the widget everywhere else.
-    window._chatlio.hide()
-  } else {
-    // console.log('chatlio is not loaded')
-  }
-  next()
-})

@@ -38,6 +38,11 @@
   </div>
 </template>
 <script>
+
+/* TODO: handle phase status in vuex so we can use the site-wide datastreamer
+    websocket connection and we don't need to open a separate one for this component. 
+*/
+
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import moment from 'moment'
 import axios from 'axios'

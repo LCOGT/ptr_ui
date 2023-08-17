@@ -14,6 +14,7 @@ import rotator_getters from './getters/rotator_getters'
 import screen_getters from './getters/screen_getters'
 import sequencer_getters from './getters/sequencer_getters'
 import selector_getters from './getters/selector_getters'
+import wema_settings_getters from './getters/wema_settings_getters'
 import accumulated_getters from './getters/accumulated_getters'
 
 const hasKey = (obj, key) => { return Object.keys(obj).includes(key) }
@@ -25,14 +26,6 @@ const state = {
   now: Date.now(),
   site_open_status: {},
   stale_age_ms: STALE_AGE_MS,
-
-  /* new status stuff */
-  weather_status_age: 1e8,
-  enclosure_status_age: 1e8,
-  forecast_status_age: 1e8,
-  device_status_age: 1e8,
-
-  /* end new */
 
   weather: {},
   enclosure: {},
@@ -47,7 +40,10 @@ const state = {
   rotator: {},
   filter_wheel: {},
   sequencer: {},
-  selector: {}
+  selector: {},
+
+  obs_settings: {},
+  wema_settings: {}
 }
 
 const getters = {
@@ -82,14 +78,15 @@ const getters = {
    *    operational: recieving enclosure status
    *    offline: enclosure status is stale
    */
-  site_operational_status (state, getters, rootState) {
+  site_operational_status (state, getters, rootState, rootGetters) {
     const stale_age_s = STALE_AGE_MS / 1000
     const device_not_stale = getters.device_status_age < stale_age_s
     const enclosure_not_stale = getters.enclosure_status_age < stale_age_s
     const weather_not_stale = getters.weather_status_age < stale_age_s
 
     // First handle WEMA sites
-    if (rootState.site_config.global_config[rootState.site_config.selected_site].instance_type == 'wema') {
+    // if (rootState.site_config.global_config[rootState.site_config.selected_site].instance_type == 'wema') {
+    if (rootGetters['site_config/site_is_wema']) {
       // enclosure and weather both online
       if (enclosure_not_stale && weather_not_stale) {
         return {
@@ -190,11 +187,16 @@ const getters = {
   weather_status_age: state => (state.now - state.weather_timestamp) / 1000,
   enclosure_status_age: state => (state.now - state.enclosure_timestamp) / 1000,
   device_status_age: state => (state.now - state.device_timestamp) / 1000,
+  forecast_status_age: state => (state.now - state.forecast_timestamp) / 1000,
+  obs_settings_status_age: state => (state.now - state.obs_settings_timestamp) / 1000,
+  wema_settings_status_age: state => (state.now - state.wema_settings_timestamp) / 1000,
 
   weather_status_age_display: (state, getters) => statusAgeDisplay(getters.weather_status_age),
   enclosure_status_age_display: (state, getters) => statusAgeDisplay(getters.enclosure_status_age),
   device_status_age_display: (state, getters) => statusAgeDisplay(getters.device_status_age),
   forecast_status_age_display: (state, getters) => statusAgeDisplay(getters.forecast_status_age),
+  wema_settings_status_age_display: (state, getters) => statusAgeDisplay(getters.wema_settings_status_age),
+  obs_settings_status_age_display: (state, getters) => statusAgeDisplay(getters.obs_settings_status_age),
 
   ...weather_getters,
   ...forecast_getters,
@@ -208,6 +210,7 @@ const getters = {
   ...screen_getters,
   ...sequencer_getters,
   ...selector_getters,
+  ...wema_settings_getters,
   ...accumulated_getters
 }
 
@@ -220,6 +223,8 @@ const mutations = {
   latest_weather_timestamp_ms (state, time) { state.weather_timestamp = time },
   latest_enclosure_timestamp_ms (state, time) { state.enclosure_timestamp = time },
   latest_forecast_timestamp_ms (state, time) { state.forecast_timestamp = time },
+  latest_wema_settings_timestamp_ms (state, time) { state.wema_settings_timestamp = time },
+  latest_obs_settings_timestamp_ms (state, time) { state.obs_settings_timestamp = time },
 
   updateLocalClock (state, time) { state.now = time },
 
@@ -252,6 +257,12 @@ const mutations = {
         state[device_type] = status[device_type]
       }
     })
+  },
+  new_wema_settings_status (state, status) {
+    state.wema_settings = status.wema_settings
+  },
+  new_obs_settings_status (state, status) {
+    state.obs_settings = status.obs_settings
   },
 
   status (state, status) {
@@ -315,6 +326,10 @@ const actions = {
   async getLatestStatus ({ state, commit, dispatch, rootState }) {
     const current_site = rootState.site_config.selected_site
 
+    // Get this separately because the wema settings aren't included in the `complete_status` endpoint
+    dispatch('getLatestWemaSettings')
+    dispatch('getLatestForecast')
+
     // Clear the existing status if we load a new site
     if (state.site != current_site) {
       dispatch('clearStatus')
@@ -344,6 +359,31 @@ const actions = {
       dispatch('getLatestForecast')
     } else {
       console.warn(`Status not available for ${current_site}.`)
+    }
+  },
+
+  getLatestObsSettings ({ state, commit, rootState, rootGetters }) {
+    const wema_name = rootGetters['site_config/wema_name']
+    if (wema_name) {
+      const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/obs_settings`
+      axios.get(url).then(response => {
+        commit('latest_obs_settings_timestamp_ms', response.data.server_timestamp_ms)
+        commit('new_obs_settings_status', response.data.status)
+      }).catch(e => {
+        console.log(e)
+      })
+    }
+  },
+  getLatestWemaSettings ({ state, commit, rootState, rootGetters }) {
+    const wema_name = rootGetters['site_config/wema_name']
+    if (wema_name) {
+      const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/wema_settings`
+      axios.get(url).then(response => {
+        commit('latest_wema_settings_timestamp_ms', response.data.server_timestamp_ms)
+        commit('new_wema_settings_status', response.data.status)
+      }).catch(e => {
+        console.log(e)
+      })
     }
   },
 

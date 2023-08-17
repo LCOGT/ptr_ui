@@ -1,131 +1,178 @@
 <template>
   <div class="instrument-control-wrapper">
-    <div
+    <!-- <div
       v-if="enclosure_message.val !== '-'"
       class="val"
     >
       {{ enclosure_message.val }}
-    </div>
+    </div> -->
 
-    <status-column
+    <!-- <status-column
       class="status-column"
       :status-list="buildEnclosureTabStatus"
       :is-offline="!site_is_online"
     />
 
-    <div style="border-bottom: 0.5px solid grey; margin: 1em 0;" />
+    <div style="border-bottom: 0.5px solid grey; margin: 1em 0;" /> -->
 
-    <b-field grouped>
+    <!-- <pre>{{ wemaSettings }}</pre>
+    <pre>{{ obsSettings }}</pre> -->
+
+    <div class="button-state-group">
+      <b-field grouped>
+        <b-field
+          v-if="userIsAdmin"
+          label="Set Enclosure Mode"
+          class="is-small"
+        >
+          <b-select
+            v-model="selectedEnclosureMode"
+            size="is-small"
+          >
+            <option value="Automatic">
+              Automatic
+            </option>
+            <option value="Manual">
+              Manual
+            </option>
+            <option value="Shutdown">
+              Shut down
+            </option>
+          </b-select>
+          <p class="control">
+            <CommandButton
+              admin
+              :data="setEnclosureMode"
+              class="is-small"
+            >apply</CommandButton>
+          </p>
+        </b-field>
+      </b-field>
+      <div class="button-state-divider" />
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="enclosure_mode" />
+      </b-field>
+    </div>
+
+    <div class="button-state-group">
       <b-field
         v-if="userIsAdmin"
-        label="Set Enclosure Mode"
+        label="Set Observing Mode"
         class="is-small"
-        style="margin-bottom: 2em;"
       >
         <b-select
-          v-model="selectedEnclosureMode"
+          v-model="selectedObservingMode"
           size="is-small"
         >
-          <option value="Automatic">
-            Automatic
+          <option value="active">
+            Active
           </option>
-          <option value="Manual">
-            Manual
-          </option>
-          <option value="Shutdown">
-            Shut down
+          <option value="inactive">
+            Inactive
           </option>
         </b-select>
         <p class="control">
           <CommandButton
             admin
-            :data="setEnclosureMode"
+            :data="setObservingMode"
             class="is-small"
-          >apply</CommandButton>
+          >
+            apply
+          </CommandButton>
         </p>
       </b-field>
-    </b-field>
+      <div class="button-state-divider" />
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="observingMode" />
+      </b-field>
+    </div>
 
-    <b-field
-      v-if="userIsAdmin"
-      label="Set Observing Mode"
-      class="is-small"
-      style="margin-bottom: 2em;"
-    >
-      <b-select
-        v-model="selectedObservingMode"
-        size="is-small"
+    <div class="button-state-group">
+      <b-field
+        v-if="userIsAdmin"
+        label="Local Weather Response"
+        class="is-small"
       >
-        <option value="active">
-          Active
-        </option>
-        <option value="inactive">
-          Inactive
-        </option>
-      </b-select>
-      <p class="control">
         <CommandButton
           admin
-          :data="setObservingMode"
-          style="margin-bottom: 1em;"
-          class="is-small"
-        >
-          apply
-        </CommandButton>
-      </p>
-    </b-field>
+          class="button admin is-small"
+          :data="enclosure_configure_weather_local_on"
+        >On</CommandButton>
+        <p class="control">
+          <CommandButton
+            admin
+            class="button admin is-small"
+            :data="enclosure_configure_weather_local_off"
+          >Off</CommandButton>
+        </p>
+      </b-field>
+      <div class="button-state-divider"></div>
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="localWeatherActive" />
+      </b-field>
+    </div>
 
-    <b-field
-      v-if="userIsAdmin"
-      label="Local Weather Response"
-      class="is-small"
-      style="margin-bottom: 2em;"
-    >
-      <CommandButton
-        admin
-        class="button admin is-small"
-        :data="enclosure_configure_weather_local_on"
-      >On</CommandButton>
-      <CommandButton
-        admin
-        class="button admin is-small"
-        :data="enclosure_configure_weather_local_off"
-      >Off</CommandButton>
-    </b-field>
-    <b-field
-      v-if="userIsAdmin"
-      label="OWM Weather Response"
-      class="is-small"
-      style="margin-bottom: 2em;"
-    >
-      <CommandButton
-        admin
-        class="button admin is-small"
-        :data="enclosure_configure_weather_owm_on"
-      >On</CommandButton>
-      <CommandButton
-        admin
-        class="button admin is-small"
-        :data="enclosure_configure_weather_owm_off"
-      >Off</CommandButton>
-    </b-field>
-    <b-field
-      v-if="userIsAdmin"
-      label="Manually Force Roof State All Night:"
-      class="is-small"
-      style="margin-bottom: 2em;"
-    >
-      <CommandButton
-        admin
-        class="button admin is-small"
-        :data="enclosure_configure_keep_roof_open"
-      >Open</CommandButton>
-      <CommandButton
-        admin
-        class="button admin is-small"
-        :data="enclosure_configure_keep_roof_closed"
-      >Closed</CommandButton>
-    </b-field>
+    <div class="button-state-group">
+      <b-field
+        v-if="userIsAdmin"
+        label="OWM Weather Response"
+        class="is-small"
+        style="margin-bottom: 2em;"
+      >
+        <CommandButton
+          admin
+          class="button admin is-small"
+          :data="enclosure_configure_weather_owm_on"
+        >On</CommandButton>
+        <CommandButton
+          admin
+          class="button admin is-small"
+          :data="enclosure_configure_weather_owm_off"
+        >Off</CommandButton>
+      </b-field>
+      <div class="button-state-divider" />
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="owmActive" />
+      </b-field>
+    </div>
+
+    <div class="button-state-group">
+      <b-field 
+        grouped
+        label="Manually Force Roof State All Night:"
+      >
+        <b-field>
+          <CommandButton
+            admin
+            class="button admin is-small"
+            :data="enclosure_force_roof_state('open')"
+          >Open</CommandButton>
+          <p class="control">
+            <CommandButton
+              admin
+              class="button admin is-small"
+              :data="enclosure_force_roof_state('closed')"
+            >Closed</CommandButton>
+          </p>
+        </b-field>
+        <p class="control">
+          <CommandButton
+            admin
+            class="button admin is-small"
+            :data="enclosure_force_roof_state('auto')"
+          >Auto</CommandButton>
+        </p>
+      </b-field>
+      <div class="button-state-divider" />
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="manualRoofStateMode" />
+      </b-field>
+    </div>
     <hr>
     <div>Weather Indicator Configuration</div>
     <br>
@@ -350,6 +397,7 @@ import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/FormElements/CommandButton'
 import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
+import StatusVal from '@/components/status/StatusVal'
 import { mapGetters } from 'vuex'
 export default {
   name: 'Enclosure',
@@ -357,12 +405,13 @@ export default {
   components: {
     CommandButton,
     StatusColumn,
+    StatusVal,
     SimpleDeviceStatus
   },
   data () {
     return {
       isExpandedStatusVisible: false,
-      selectedEnclosureMode: 'automatic',
+      selectedEnclosureMode: 'Automatic',
       selectedObservingMode: 'active',
 
       rainConfigSetting: 'on',
@@ -391,6 +440,16 @@ export default {
     }
   },
 
+  methods: {
+    enclosure_force_roof_state (val) {
+      return this.wema_base_command('enclosure', 'force_roof_state', '',
+        {
+          force_roof_state: val
+        }
+      )
+    }
+  },
+
   computed: {
     ...mapGetters('site_config', [
       'enclosure_is_dome',
@@ -401,8 +460,21 @@ export default {
       'enclosure_state',
       'enclosure_message',
       'buildEnclosureTabStatus',
-      'enclosure_mode'
+      'enclosure_mode',
+
+      'wemaSettingsGenericGetter',
+      'localWeatherActive',
+      'owmActive',
+      'observingMode',
+      'manualRoofStateMode'
     ]),
+
+    wemaSettings () {
+      return this.$store.state.sitestatus.wema_settings
+    },
+    obsSettings () {
+      return this.$store.state.sitestatus.obs_settings
+    },
 
     setEnclosureMode () {
       return this.wema_base_command(
@@ -490,6 +562,31 @@ export default {
 <style scoped lang="scss">
 @import "./instrument_controls_common.scss";
 
+.button-state-divider {
+  // border-left: 1px solid grey;
+  border-top: 1px dotted grey;
+  height: 2px;
+  margin-top: 42px;
+  flex-grow: 1;
+
+  // width: 1em;
+  // margin-left: 1em;
+}
+.button-state-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  margin-bottom: 15px;
+}
+
+.button-state-group > :first-child {
+  // width: 200px;
+}
+
+.status-label {
+  color: grey;
+  font-weight: lighter;
+}
 .is-admin {
     background-color: rgba(68, 0, 255, 0.164);
     border-color: rgba(76, 0, 255, 0.541);
