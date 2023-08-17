@@ -1,22 +1,18 @@
 <template>
   <div class="instrument-control-wrapper">
-    <!-- <div
+    <div
       v-if="enclosure_message.val !== '-'"
       class="val"
     >
       {{ enclosure_message.val }}
-    </div> -->
+    </div>
 
-    <!-- <status-column
+    <status-column
       class="status-column"
       :status-list="buildEnclosureTabStatus"
       :is-offline="!site_is_online"
+      style="margin-bottom: 2em;"
     />
-
-    <div style="border-bottom: 0.5px solid grey; margin: 1em 0;" /> -->
-
-    <!-- <pre>{{ wemaSettings }}</pre>
-    <pre>{{ obsSettings }}</pre> -->
 
     <div class="button-state-group">
       <b-field grouped>
@@ -303,6 +299,7 @@
     <b-field horizontal>
       <CommandButton
         admin
+        warning="warning msg"
         class="is-small"
         :data="configureWeatherValues"
         style="width: 100%;"
@@ -333,6 +330,7 @@
         <CommandButton
           admin
           :data="enclosure_open_command"
+          warning="This will open the observatory roof or dome."
           class="is-small"
         />
       </p>

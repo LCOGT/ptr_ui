@@ -2,7 +2,7 @@
   <button
     v-if="isVisible"
     class="button"
-    :class="{ 'is-loading': isLoading, 'is-admin': admin, 'is-preview-mode': previewMode }"
+    :class="{ 'is-loading': isLoading, 'is-admin': admin, 'is-preview-mode': previewMode, 'has-warning': warning }"
     :disabled="isDisabled"
     @mouseover="isHovering = true"
     @mouseleave="isHovering = false"
@@ -25,6 +25,10 @@ export default {
     isDisabled: {
       type: Boolean,
       default: false
+    },
+    warning: {
+      type: String,
+      required: false
     },
     admin: {
       type: Boolean
@@ -55,6 +59,30 @@ export default {
       // Add a loading spinner to the button
       this.isLoading = true
 
+      const hasWarning = this.warning !== undefined
+
+      if (hasWarning && !inPreviewMode) {
+        try {
+          await new Promise((resolve, reject) => {
+            // popup asking confirmation
+            this.$buefy.dialog.confirm({
+              title: 'Just to be sure...',
+              message: this.warning + ' Are you sure you want to continue?',
+              confirmText: 'Continue',
+              cancelText: 'Cancel',
+              type: 'is-danger',
+              hasIcon: true,
+              onConfirm: () => resolve(),
+              // eslint-disable-next-line prefer-promise-reject-errors
+              onCancel: () => reject('Cancelled by user')
+            })
+          })
+        } catch (err) {
+          this.isLoading = false
+          console.log('User cancelled command')
+          return
+        }
+      }
       const commandPayload = {
         ...this.data.form,
         site: this.data.site,
@@ -137,7 +165,8 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "@/style/_variables.scss";
 
 .is-admin {
     background-color: rgba(68, 0, 255, 0.164);
@@ -149,5 +178,9 @@ export default {
   background-color: rgba(199, 172, 47, 0.164) !important;
   border-color: gold !important;
   border-style: dashed;
+}
+.has-warning:hover {
+  border-color: $ptr-red !important;
+  border-style: dashed !important;
 }
 </style>
