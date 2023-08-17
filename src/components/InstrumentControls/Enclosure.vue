@@ -476,6 +476,8 @@ export default {
       const endpoint = this.$store.state.api_endpoints.status_endpoint + '/' + this.wema_name + '/owm_report'
       axios.get(endpoint).then(response => {
         this.owm_report = JSON.parse(response.data.status.owm_report)
+      }).catch(() => {
+        this.owm_report = 'OWM report unavailable'
       })
     },
     showOwmStatus () {
