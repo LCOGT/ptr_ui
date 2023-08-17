@@ -171,6 +171,8 @@ export const commands_mixin = {
         case 'screen': device = this.active_screen; break
         case 'sequencer': device = this.active_sequencer; break
         case 'selector': device = this.active_selector; break
+        case 'obs': device = 'obs'; break
+        case 'wema': device = 'wema'; break
       }
 
       const the_base_command = {
@@ -683,7 +685,97 @@ export const commands_mixin = {
           bin: this.camera_bin
         }
       )
-    }
+    },
 
+    obs_set_scope_to_manual_mode () {
+      return this.base_command('obs', 'configure_telescope_mode', '',
+        {
+          mode: 'manual'
+        },
+        {
+          possible_modes: ['manual', 'automatic']
+        }
+      )
+    },
+    obs_set_scope_to_automatic_mode () {
+      return this.base_command('obs', 'configure_telescope_mode', '',
+        {
+          mode: 'automatic'
+        },
+        {
+          possible_modes: ['manual', 'automatic']
+        }
+      )
+    },
+    obs_configure_sun_safety_on () {
+      return this.base_command('obs', 'configure_sun_safety', '',
+        {
+          mode: 'on'
+        }
+      )
+    },
+    obs_configure_sun_safety_off () {
+      return this.base_command('obs', 'configure_sun_safety', '',
+        {
+          mode: 'off'
+        }
+      )
+    },
+    obs_configure_moon_safety_on () {
+      return this.base_command('obs', 'configure_moon_safety', '',
+        {
+          mode: 'on'
+        }
+      )
+    },
+    obs_configure_moon_safety_off () {
+      return this.base_command('obs', 'configure_moon_safety', '',
+        {
+          mode: 'off'
+        }
+      )
+    },
+    obs_configure_altitude_safety_on () {
+      return this.base_command('obs', 'configure_altitude_safety', '',
+        {
+          mode: 'on'
+        }
+      )
+    },
+    obs_configure_altitude_safety_off () {
+      return this.base_command('obs', 'configure_altitude_safety', '',
+        {
+          mode: 'off'
+        }
+      )
+    },
+    obs_configure_daytime_exposure_safety_on () {
+      return this.base_command('obs', 'configure_daytime_exposure_safety', '',
+        {
+          mode: 'on'
+        }
+      )
+    },
+    obs_configure_daytime_exposure_safety_off () {
+      return this.base_command('obs', 'configure_daytime_exposure_safety', '',
+        {
+          mode: 'off'
+        }
+      )
+    },
+    obs_configure_admin_owner_commands_only_true () {
+      return this.base_command('obs', 'configure_who_can_send_commands', '',
+        {
+          only_accept_admin_or_owner_commands: true
+        }
+      )
+    },
+    obs_configure_admin_owner_commands_only_false () {
+      return this.base_command('obs', 'configure_who_can_send_commands', '',
+        {
+          only_accept_admin_or_owner_commands: false
+        }
+      )
+    }
   }
 }

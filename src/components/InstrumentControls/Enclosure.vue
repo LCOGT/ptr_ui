@@ -137,7 +137,7 @@
     </div>
 
     <div class="button-state-group">
-      <b-field 
+      <b-field
         grouped
         label="Manually Force Roof State All Night:"
       >
@@ -596,27 +596,18 @@ export default {
 <style scoped lang="scss">
 @import "./instrument_controls_common.scss";
 
-.button-state-divider {
-  // border-left: 1px solid grey;
-  border-top: 1px dotted grey;
-  height: 2px;
-  margin-top: 42px;
-  flex-grow: 1;
-
-  // width: 1em;
-  // margin-left: 1em;
-}
 .button-state-group {
   display: flex;
   justify-content: space-between;
   gap: 1em;
   margin-bottom: 15px;
 }
-
-.button-state-group > :first-child {
-  // width: 200px;
+.button-state-divider {
+  border-top: 1px dotted grey;
+  height: 2px;
+  margin-top: 42px;
+  flex-grow: 1;
 }
-
 .status-label {
   color: grey;
   font-weight: lighter;

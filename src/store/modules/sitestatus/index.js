@@ -15,6 +15,7 @@ import screen_getters from './getters/screen_getters'
 import sequencer_getters from './getters/sequencer_getters'
 import selector_getters from './getters/selector_getters'
 import wema_settings_getters from './getters/wema_settings_getters'
+import obs_settings_getters from './getters/obs_settings_getters'
 import accumulated_getters from './getters/accumulated_getters'
 
 const hasKey = (obj, key) => { return Object.keys(obj).includes(key) }
@@ -184,12 +185,12 @@ const getters = {
     return site_status_colors
   },
 
-  weather_status_age: state => (state.now - state.weather_timestamp) / 1000,
-  enclosure_status_age: state => (state.now - state.enclosure_timestamp) / 1000,
-  device_status_age: state => (state.now - state.device_timestamp) / 1000,
-  forecast_status_age: state => (state.now - state.forecast_timestamp) / 1000,
-  obs_settings_status_age: state => (state.now - state.obs_settings_timestamp) / 1000,
-  wema_settings_status_age: state => (state.now - state.wema_settings_timestamp) / 1000,
+  weather_status_age: state => (state.now - state.weather_timestamp) / 1000 || Infinity,
+  enclosure_status_age: state => (state.now - state.enclosure_timestamp) / 1000 || Infinity,
+  device_status_age: state => (state.now - state.device_timestamp) / 1000 || Infinity,
+  forecast_status_age: state => (state.now - state.forecast_timestamp) / 1000 || Infinity,
+  obs_settings_status_age: state => (state.now - state.obs_settings_timestamp) / 1000 || Infinity,
+  wema_settings_status_age: state => (state.now - state.wema_settings_timestamp) / 1000 || Infinity,
 
   weather_status_age_display: (state, getters) => statusAgeDisplay(getters.weather_status_age),
   enclosure_status_age_display: (state, getters) => statusAgeDisplay(getters.enclosure_status_age),
@@ -211,6 +212,7 @@ const getters = {
   ...sequencer_getters,
   ...selector_getters,
   ...wema_settings_getters,
+  ...obs_settings_getters,
   ...accumulated_getters
 }
 

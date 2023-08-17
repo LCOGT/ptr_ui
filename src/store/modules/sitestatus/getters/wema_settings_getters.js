@@ -1,42 +1,42 @@
 import { STALE_AGE_MS } from './status_utils'
 
-const isStale = (state) => {
-  return state.wema_settings_status_age >= STALE_AGE_MS
+const isStale = (state, getters) => {
+  return getters.wema_settings_status_age >= (STALE_AGE_MS / 1000)
 }
 
-const wemaSettingsGenericGetter = state => key => {
+const wemaSettingsGenericGetter = (state, getters) => key => {
   return {
     name: key,
-    val: state.wema_settings[key] || 'n/a',
-    is_stale: isStale(state)
+    val: state.wema_settings[key] ?? 'n/a',
+    is_stale: isStale(state, getters)
   }
 }
 
-const localWeatherActive = state => {
+const localWeatherActive = (state, getters) => {
   return {
     name: 'Local Weather Active',
     val: state.wema_settings.local_weather_active ? 'On' : 'Off',
-    is_stale: isStale(state)
+    is_stale: isStale(state, getters)
   }
 }
 
-const owmActive = state => {
+const owmActive = (state, getters) => {
   return {
     name: 'OWM Active',
     val: state.wema_settings.OWM_active ? 'On' : 'Off',
-    is_stale: isStale(state)
+    is_stale: isStale(state, getters)
   }
 }
 
-const observingMode = state => {
+const observingMode = (state, getters) => {
   return {
     name: 'Observing Mode',
-    val: state.wema_settings.observing_mode || 'n/a',
-    is_stale: isStale(state)
+    val: state.wema_settings.observing_mode ?? 'n/a',
+    is_stale: isStale(state, getters)
   }
 }
 
-const manualRoofStateMode = state => {
+const manualRoofStateMode = (state, getters) => {
   const roofOpen = state.wema_settings.keep_roof_open_all_night
   const roofClosed = state.wema_settings.keep_roof_closed_all_night
   let val
@@ -54,7 +54,7 @@ const manualRoofStateMode = state => {
   return {
     name: 'Forced Roof State',
     val,
-    is_stale: isStale(state)
+    is_stale: isStale(state, getters)
   }
 }
 

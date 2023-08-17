@@ -35,12 +35,142 @@
 
       <!-- Collapsible panels on the right of the image -->
       <div class="image-tools-area">
+
+        <div v-if="userIsAdmin" class="obs-config-box">
+          <div class="obs-config-control-group">
+            <div class="obs-config-title">Manual Telescope</div>
+            <StatusVal :status-item="scopeInManualMode" style="width: 100%;"/>
+            <b-field class="is-small" expanded >
+              <p class="control">
+                <CommandButton
+                  class="is-small obs-config-command-button"
+                  admin
+                  :data="obs_set_scope_to_manual_mode"
+                >Set Manual</CommandButton>
+              </p>
+              <p class="control">
+                <CommandButton
+                  class="button admin is-small obs-config-command-button"
+                  admin
+                  :data="obs_set_scope_to_automatic_mode"
+                >Set Auto</CommandButton>
+              </p>
+            </b-field>
+          </div>
+
+          <div class="obs-config-control-group">
+            <div class="obs-config-title">Sun Safety</div>
+            <StatusVal :status-item="sunSafetyMode" style="width: 100%;"/>
+            <b-field class="is-small">
+              <p class="control">
+                <CommandButton
+                  class="is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_sun_safety_on"
+                >Enable</CommandButton>
+              </p>
+              <p class="control">
+                <CommandButton
+                  class="button admin is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_sun_safety_off"
+                >Disable</CommandButton>
+              </p>
+            </b-field>
+          </div>
+
+          <div class="obs-config-control-group">
+            <div class="obs-config-title">Moon Safety</div>
+            <StatusVal :status-item="moonSafetyMode" style="width: 100%;"/>
+            <b-field class="is-small">
+              <p class="control">
+                <CommandButton
+                  class="is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_moon_safety_on"
+                >Enable</CommandButton>
+              </p>
+              <p class="control">
+                <CommandButton
+                  class="button admin is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_moon_safety_off"
+                >Disable</CommandButton>
+              </p>
+            </b-field>
+          </div>
+
+          <div class="obs-config-control-group">
+            <div class="obs-config-title">Altitude Safety</div>
+            <StatusVal :status-item="altitudeSafetyMode" style="width: 100%;"/>
+            <b-field class="is-small">
+              <p class="control">
+                <CommandButton
+                  class="is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_altitude_safety_on"
+                >Enable</CommandButton>
+              </p>
+              <p class="control">
+                <CommandButton
+                  class="button admin is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_altitude_safety_off"
+                >Disable</CommandButton>
+              </p>
+            </b-field>
+          </div>
+          <div class="obs-config-control-group">
+            <div class="obs-config-title">Daytime Safety</div>
+            <StatusVal :status-item="daytimeExposureSafetyMode" style="width: 100%;"/>
+            <b-field class="is-small">
+              <p class="control">
+                <CommandButton
+                  class="is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_daytime_exposure_safety_on"
+                >Enable</CommandButton>
+              </p>
+              <p class="control">
+                <CommandButton
+                  class="button admin is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_daytime_exposure_safety_off"
+                >Disable</CommandButton>
+              </p>
+            </b-field>
+          </div>
+
+          <div class="obs-config-control-group">
+            <div class="obs-config-title">Who Can Operate</div>
+            <StatusVal :status-item="adminOwnerCommandsOnly" style="width: 100%;"/>
+            <b-field class="is-small">
+              <p class="control">
+                <CommandButton
+                  class="is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_admin_owner_commands_only_true"
+                >Only Owner</CommandButton>
+              </p>
+              <p class="control">
+                <CommandButton
+                  class="button admin is-small obs-config-command-button"
+                  admin
+                  :data="obs_configure_admin_owner_commands_only_false"
+                >Allow Anyone</CommandButton>
+              </p>
+            </b-field>
+          </div>
+
+        </div>
+
         <div class="night-log-container">
           <NightLog
             :site="sitecode"
             style="margin: 0 1em;"
           />
         </div>
+
         <b-tabs v-model="active_image_tools_tab">
           <b-tab-item
             label="controls"
@@ -156,6 +286,7 @@
 
 <script>
 import { commands_mixin } from '../../mixins/commands_mixin'
+import { user_mixin } from '../../mixins/user_mixin'
 
 import ImageView from '@/components/ImageView'
 import ImagesTable from '@/components/ImagesTable'
@@ -164,6 +295,7 @@ import ImageFilter from '@/components/ImageFilter'
 import HistogramTool from '@/components/AnalysisTools/HistogramTool'
 import CommandTabsAccordion from '@/components/CommandTabsAccordion'
 import CommandTabsWide from '@/components/CommandTabsWide'
+import CommandButton from '@/components/FormElements/CommandButton'
 import ImageInfoBar from '@/components/ImageDisplay/ImageInfoBar'
 import InfoImageThumb from '@/components/ImageDisplay/InfoImageThumb'
 import ThumbnailRow from '@/components/ImageDisplay/ThumbnailRow'
@@ -174,6 +306,7 @@ import DownloadInterface from '@/components/DownloadInterface'
 import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsViewer'
 import ImageMetadataViewer from '@/components/AnalysisTools/ImageMetadataViewer'
 import NightLog from '@/components/NightLog'
+import StatusVal from '@/components/status/StatusVal'
 
 import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
@@ -183,7 +316,7 @@ import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'SubpageData',
-  mixins: [commands_mixin],
+  mixins: [commands_mixin, user_mixin],
   components: {
     ImageView,
     ImagesTable,
@@ -191,6 +324,7 @@ export default {
     HistogramTool,
     CommandTabsAccordion,
     CommandTabsWide,
+    CommandButton,
     ImageInfoBar,
     ImageFilter,
     InfoImageThumb,
@@ -203,7 +337,8 @@ export default {
     ImageMetadataViewer,
     NightLog,
     Tabs,
-    TabItem
+    TabItem,
+    StatusVal
   },
   props: {
     sitecode: String
@@ -259,6 +394,18 @@ export default {
       'selectedId',
       'selectionExists',
       'selectedShapeType'
+    ]),
+
+    ...mapGetters('sitestatus', [
+      'adminOwnerCommandsOnly',
+      'obsSettingsGenericGetter',
+      'altitudeSafetyMode',
+      'daytimeExposureSafetyMode',
+      'daytimeExposureTime',
+      'lowestAltitude',
+      'moonSafetyMode',
+      'scopeInManualMode',
+      'sunSafetyMode'
     ]),
 
     active_image_tools_tab: {
@@ -341,8 +488,8 @@ export default {
 
 <style lang="scss" scoped>
 $tabs-toggle-link-border-width: 10px;
-@import "@/style/buefy-styles.scss";
 @import "@/style/_responsive.scss";
+@import "@/style/_variables.scss";
 
 $site-data-wrapper-padding: 1em;
 $infobar-height: 70px;
@@ -449,6 +596,39 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
 .night-log-container {
   position: absolute;
   right: 0;
+}
+
+.obs-config-box {
+  display: flex;
+  flex-direction:row;
+  flex-wrap: wrap;
+  gap: 1em;
+  width: 100%;
+  background-color: $background;
+  padding: 1em 10px;
+  margin-bottom: 1em;
+}
+.obs-config-box > div {
+  margin-bottom: 0px;
+}
+.obs-config-control-group {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-bottom: 1em;
+}
+.obs-config-title {
+  color: #a3a3a3;
+  // font-weight: bold;
+  padding-bottom: 5px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.obs-config-command-button {
+  border-radius: 0 !important;
+  border-width: 1px;
+  height: 24px;
+  // margin: 0 1px;
 }
 
 .command-tab-accordion {
