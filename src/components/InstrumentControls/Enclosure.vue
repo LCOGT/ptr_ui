@@ -299,7 +299,6 @@
     <b-field horizontal>
       <CommandButton
         admin
-        warning="warning msg"
         class="is-small"
         :data="configureWeatherValues"
         style="width: 100%;"
