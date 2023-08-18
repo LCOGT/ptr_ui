@@ -776,6 +776,12 @@ export const commands_mixin = {
           only_accept_admin_or_owner_commands: false
         }
       )
+    },
+    obs_start_simulating_open_roof () {
+      return this.base_command('obs', 'start_simulating_open_roof', '')
+    },
+    obs_stop_simulating_open_roof () {
+      return this.base_command('obs', 'stop_simulating_open_roof', '')
     }
   }
 }

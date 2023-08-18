@@ -6,7 +6,7 @@
     custom
     @active-change="dropdown_change"
   >
-    <b-navbar-dropdown-item
+    <b-navbar-item
       custom
       paddingless
     >
@@ -51,7 +51,7 @@
           </ul>
         </li>
       </ul>
-    </b-navbar-dropdown-item>
+    </b-navbar-item>
   </b-navbar-dropdown>
 </template>
 

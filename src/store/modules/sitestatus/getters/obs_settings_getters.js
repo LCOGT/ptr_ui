@@ -68,6 +68,21 @@ const sunSafetyMode = (state, getters) => {
     is_stale: isStale(getters)
   }
 }
+const simulatingOpenRoof = (state, getters) => {
+  if ('simulating_open_roof' in state.obs_settings) {
+    return {
+      name: 'Simulating Open roof',
+      val: state.obs_settings.simulating_open_roof ? 'On' : 'Off',
+      is_stale: isStale(getters)
+    }
+  } else {
+    return {
+      name: 'Simulating Open Roof',
+      val: 'missing `simulating_open_roof`',
+      is_stale: true
+    }
+  }
+}
 
 export default {
   adminOwnerCommandsOnly,
@@ -78,5 +93,6 @@ export default {
   lowestAltitude,
   moonSafetyMode,
   scopeInManualMode,
-  sunSafetyMode
+  sunSafetyMode,
+  simulatingOpenRoof
 }
