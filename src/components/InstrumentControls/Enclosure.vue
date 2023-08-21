@@ -7,12 +7,38 @@
       {{ enclosure_message.val }}
     </div>
 
-    <status-column
-      class="status-column"
-      :status-list="buildEnclosureTabStatus"
-      :is-offline="!site_is_online"
-      style="margin-bottom: 2em;"
-    />
+    <div class="button-state-group">
+      <b-field
+        v-if="userIsAdmin"
+        label="Enclosure Status"
+        class="is-small"
+      >
+        <p class="control">
+          <CommandButton
+            admin
+            :data="enclosure_open_command"
+            warning="This will open the observatory roof or dome."
+            class="is-small"
+          >Request Open</CommandButton>
+        </p>
+        <p class="control">
+          <CommandButton
+            admin
+            :data="enclosure_close_command"
+            class="is-small"
+          >Request Close</CommandButton>
+        </p>
+      </b-field>
+      <div class="button-state-divider"></div>
+      <b-field v-if="open_ok && open_ok.val && open_ok.val != '-'">
+        <template #label><div class="status-label">ok to open:</div></template>
+        <StatusVal :status-item="open_ok" />
+      </b-field>
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="enclosure_open_status" />
+      </b-field>
+    </div>
 
     <div class="button-state-group">
       <b-field grouped>
@@ -170,11 +196,11 @@
       </b-field>
     </div>
     <hr>
-    <div>Weather Indicator Configuration</div>
+    <div><b>Weather Indicator Configuration</b></div>
     <br>
     <b-field horizontal label="">
       <b-field>
-        <b-field label="setting" style="width: 80px;" />
+        <b-field label="setting" style="width: 100px; text-align:center;" />
         <p class="control">
           <b-field label="warning level" style="width: 110px;" />
         </p>
@@ -324,24 +350,6 @@
       </b-field>
     </b-field>
 
-    <b-field>
-      <p class="control">
-        <CommandButton
-          admin
-          :data="enclosure_open_command"
-          warning="This will open the observatory roof or dome."
-          class="is-small"
-        />
-      </p>
-      <p class="control">
-        <CommandButton
-          admin
-          :data="enclosure_close_command"
-          class="is-small"
-        />
-      </p>
-    </b-field>
-
     <b-field grouped label="Dome Settings">
       <b-field>
         <CommandButton
@@ -404,7 +412,6 @@
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/FormElements/CommandButton'
-import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 import StatusVal from '@/components/status/StatusVal'
 import { mapGetters } from 'vuex'
@@ -414,7 +421,6 @@ export default {
   mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton,
-    StatusColumn,
     StatusVal,
     SimpleDeviceStatus
   },
@@ -495,6 +501,8 @@ export default {
       'enclosure_message',
       'buildEnclosureTabStatus',
       'enclosure_mode',
+      'enclosure_open_status',
+      'open_ok',
 
       'wemaSettingsGenericGetter',
       'localWeatherActive',
