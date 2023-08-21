@@ -355,6 +355,7 @@ const actions = {
       commit('new_weather_status', status)
       commit('new_forecast_status', status)
       commit('new_enclosure_status', status)
+      commit('new_obs_settings_status', status)
 
       commit('site', current_site)
 
