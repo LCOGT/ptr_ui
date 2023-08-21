@@ -83,6 +83,21 @@ const simulatingOpenRoof = (state, getters) => {
     }
   }
 }
+const pointingReference = (state, getters) => {
+  if ('pointing_reference_on' in state.obs_settings) {
+    return {
+      name: 'Pointing Reference',
+      val: state.obs_settings.pointing_reference_on ? 'On' : 'Off',
+      is_stale: isStale(getters)
+    }
+  } else {
+    return {
+      name: 'Pointing Reference',
+      val: 'missing `pointing_reference_on`',
+      is_stale: true
+    }
+  }
+}
 
 export default {
   adminOwnerCommandsOnly,
@@ -94,5 +109,6 @@ export default {
   moonSafetyMode,
   scopeInManualMode,
   sunSafetyMode,
-  simulatingOpenRoof
+  simulatingOpenRoof,
+  pointingReference
 }

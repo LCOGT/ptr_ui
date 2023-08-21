@@ -782,6 +782,12 @@ export const commands_mixin = {
     },
     obs_stop_simulating_open_roof () {
       return this.base_command('obs', 'stop_simulating_open_roof', '')
+    },
+    obs_configure_pointing_reference_on () {
+      return this.base_command('obs', 'configure_pointing_reference_on', '')
+    },
+    obs_configure_pointing_reference_off () {
+      return this.base_command('obs', 'configure_pointing_reference_off', '')
     }
   }
 }

@@ -122,7 +122,7 @@
           </div>
 
           <div class="obs-config-control-group">
-            <div class="obs-config-title">Simulating Open Roof</div>
+            <div class="obs-config-title">Simulate Open Roof</div>
             <StatusVal :status-item="simulatingOpenRoof" style="width: 100%;"/>
             <div class="obs-config-command-button-group">
               <CommandButton
@@ -146,12 +146,29 @@
                 class="is-small obs-config-command-button"
                 admin
                 :data="obs_configure_admin_owner_commands_only_true"
-              >Only Owner</CommandButton>
+              >Owner</CommandButton>
               <CommandButton
                 class="button admin is-small obs-config-command-button"
                 admin
                 :data="obs_configure_admin_owner_commands_only_false"
-              >Allow Anyone</CommandButton>
+              >Anyone</CommandButton>
+            </div>
+          </div>
+
+          <div class="obs-config-control-group">
+            <div class="obs-config-title">Pointing Reference</div>
+            <StatusVal :status-item="pointingReference" style="width: 100%;"/>
+            <div class="obs-config-command-button-group">
+              <CommandButton
+                class="is-small obs-config-command-button"
+                admin
+                :data="obs_configure_pointing_reference_on"
+              >Enable</CommandButton>
+              <CommandButton
+                class="button admin is-small obs-config-command-button"
+                admin
+                :data="obs_configure_pointing_reference_off"
+              >Disable</CommandButton>
             </div>
           </div>
 
@@ -399,7 +416,8 @@ export default {
       'moonSafetyMode',
       'scopeInManualMode',
       'sunSafetyMode',
-      'simulatingOpenRoof'
+      'simulatingOpenRoof',
+      'pointingReference'
     ]),
 
     active_image_tools_tab: {
