@@ -14,7 +14,7 @@ const getters = {
     if (site in state.ui_sync_site_leaders) {
       return state.ui_sync_site_leaders[site]
     } else {
-      return '-'
+      return 'none'
     }
   }
 }

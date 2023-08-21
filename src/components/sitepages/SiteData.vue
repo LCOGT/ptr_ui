@@ -174,11 +174,10 @@
 
         </div>
 
-        <div class="night-log-container">
-          <NightLog
-            :site="sitecode"
-            style="margin: 0 1em;"
-          />
+        <div class="obs-config-box" style="padding-bottom: calc(1em - 11.25px); justify-content: space-between;">
+          <UiSyncControls />
+          <div style="width: 1px; height: 30px; border-left: 1px solid grey; margin: 0 1em;" />
+          <NightLog :site="sitecode" />
         </div>
 
         <b-tabs v-model="active_image_tools_tab">
@@ -317,6 +316,7 @@ import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsVie
 import ImageMetadataViewer from '@/components/AnalysisTools/ImageMetadataViewer'
 import NightLog from '@/components/NightLog'
 import StatusVal from '@/components/status/StatusVal'
+import UiSyncControls from '@/components/UiSyncControls'
 
 import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
@@ -348,7 +348,8 @@ export default {
     NightLog,
     Tabs,
     TabItem,
-    StatusVal
+    StatusVal,
+    UiSyncControls
   },
   props: {
     sitecode: String

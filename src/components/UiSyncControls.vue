@@ -12,6 +12,7 @@
             v-model="uiSyncRole"
             :disabled="!userIsAuthenticated || currentLeaderExists"
             native-value="leader"
+            size="is-small"
             type="is-warning is-light"
           >
             <span>Leader</span>
@@ -33,6 +34,7 @@
         <b-radio-button
           v-model="uiSyncRole"
           native-value="follower"
+          size="is-small"
           type="is-warning is-light"
         >
           <span>Follower</span>
@@ -41,6 +43,7 @@
         <b-radio-button
           v-model="uiSyncRole"
           native-value="none"
+          size="is-small"
           type="is-warning is-light"
         >
           None
@@ -48,14 +51,15 @@
       </b-field>
       <button
         class="help-button"
+        size="is-small"
         @click="showHelp"
       >
         <i class="fas fa-question" />
       </button>
-    </div>
-    <div class="leader-info">
-      <span>current leader: </span>
-      <b>{{ currentLeader }}</b>
+      <div class="leader-info">
+        <span>leader: </span>
+        <b>{{ currentLeader }}</b>
+      </div>
     </div>
   </div>
 </template>
@@ -71,7 +75,7 @@ export default {
       set (val) { return this.$store.commit('uiSync/ui_sync_role', val) }
     },
     currentLeaderExists () {
-      return this.uiSyncRole != 'leader' && this.currentLeader != '-'
+      return this.uiSyncRole != 'leader' && this.currentLeader != 'none'
     },
     currentLeader () {
       if (this.uiSyncRole == 'leader') {

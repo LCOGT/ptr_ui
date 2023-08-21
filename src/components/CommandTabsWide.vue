@@ -18,7 +18,6 @@
         :title="instrument"
         :is-active="index == active_controls_tab"
       >
-        <UiSyncControls class="ui-sync-controls" />
         <component
           :is="instrument"
           class="accordion-content"
@@ -41,7 +40,6 @@ import {
 } from '@/components/InstrumentControls'
 import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
-import UiSyncControls from '@/components/UiSyncControls'
 
 export default {
   name: 'CommandTabsWide',
@@ -57,8 +55,7 @@ export default {
     Sequencer,
     Settings,
     Tabs,
-    TabItem,
-    UiSyncControls
+    TabItem
   },
 
   methods: {
@@ -160,11 +157,6 @@ $accordion-header-background: $grey-darker;
     color: $grey-lighter;
   }
 }
-
-.ui-sync-controls {
-  padding: 5px;
-}
-
 .accordion-header {
   background-color:darken($accordion-header-background, 2);
   //border: 1px solid $grey-light;
