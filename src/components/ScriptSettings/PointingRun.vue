@@ -4,10 +4,21 @@
       <b-field label="No. of Pointings">
         <b-numberinput
           v-model="numPointingRuns"
-          type="is-light"
+          type="is-dark"
           controls-position="compact"
           min="1"
           max="10000"
+        />
+      </b-field>
+    </div>
+    <div class="field-group">
+      <b-field label="Min. Altitude (deg)">
+        <b-numberinput
+          v-model="minAltitude"
+          type="is-dark"
+          controls-position="compact"
+          min="0"
+          max="90"
         />
       </b-field>
     </div>
@@ -24,6 +35,14 @@ export default {
       set (value) {
         const scriptName = 'pointingRun'
         const paramName = 'numPointingRuns'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
+    },
+    minAltitude: {
+      get () { return this.$store.state.scriptSettings.pointingRun.minAltitude },
+      set (value) {
+        const scriptName = 'pointingRun'
+        const paramName = 'minAltitude'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     }

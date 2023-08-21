@@ -77,8 +77,8 @@ const state = {
     numFrames: 127
   },
   pointingRun: {
-    gridType: 'medium',
-    numPointingRuns: 25
+    numPointingRuns: 25,
+    minAltitude: 30
   },
 
   // If a script is not in this list, the UI settings button will be disabled.
@@ -369,8 +369,8 @@ const actions = {
       },
       pointingRun () {
         return {
-          gridType: 'medium',
-          numPointingRuns: 25
+          numPointingRuns: 25,
+          minAltitude: 30
         }
       }
     }
