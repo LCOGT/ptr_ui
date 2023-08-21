@@ -134,8 +134,7 @@ export default {
         'takeUGRIZSStack',
         'takePlanetStack',
         'takeLunarStack',
-        'collectScreenFlats',
-        'pointingRun'
+        'collectScreenFlats'
       ]
     }
   },

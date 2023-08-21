@@ -10,19 +10,76 @@ const state = {
 
   // This is where the params for each script are held.
   // Actual values are initialized in main.js, as soon as the site configs are loaded.
-  focusAuto: {},
-  focusExtensive: {},
-  focusFine: {},
-  restackLocalCalibrations: {},
-  collectBiasesAndDarks: {},
-  collectScreenFlats: {},
-  collectSkyFlats: {},
-  takeLRGBStack: {},
-  takeO3HaS2N2Stack: {},
-  takeUGRIZSStack: {},
-  takePlanetStack: {},
-  takeLunarStack: {},
-  pointingRun: {},
+  focusAuto: {
+    target: 'near_tycho_star', // alternative: 'use_field'
+    bin: 1, // integer: 1, 2, or 4
+    area: '100%' // percent, from 0 to 1
+  },
+  focusExtensive: {
+    target: 'near_tycho_star', // alternative: 'use_field'
+    bin: 1, // integer: 1, 2, or 4
+    area: '100%' // percent, from 0 to 1
+  },
+  focusFine: {
+    target: 'near_tycho_star', // alternative: 'use_field'
+    bin: 1, // integer: 1, 2, or 4
+    area: '100%' // percent, from 0 to 1
+  },
+  restackLocalCalibrations: {
+    numOfBias: '',
+    darkTime: '',
+    numOfDark: '',
+    coldMap: true,
+    hotMap: true
+  },
+  collectBiasesAndDarks: {
+    numOfBias: '',
+    darkTime: '',
+    numOfDark: '',
+    coldMap: true,
+    hotMap: true
+  },
+  collectScreenFlats: {
+    numFrames: '',
+    gainCalc: true,
+    shutterCompensation: true
+  },
+  collectSkyFlats: {
+    numFrames: ''
+  },
+  takeLRGBStack: {
+    numFrames: 1,
+    skipL: false,
+    exposureTime: 30,
+    useSloane: false
+  },
+  takeO3HaS2N2Stack: {
+    numFrames: 1,
+    skipO3: false,
+    skipHa: false,
+    skipS2: false,
+    skipN2: false,
+    addRGB: false,
+    addCR: false,
+    addSloane: false,
+    addL: false,
+    exposureTime: 30
+  },
+  takeUGRIZSStack: {
+    numFrames: 1,
+    skipU: true,
+    skipZS: true
+  },
+  takePlanetStack: {
+    numFrames: 127
+  },
+  takeLunarStack: {
+    numFrames: 127
+  },
+  pointingRun: {
+    gridType: 'medium',
+    numPointingRuns: 25
+  },
 
   // If a script is not in this list, the UI settings button will be disabled.
   scriptsWithSettings: [
@@ -313,7 +370,7 @@ const actions = {
       pointingRun () {
         return {
           gridType: 'medium',
-          numGridRuns: 1
+          numPointingRuns: 25
         }
       }
     }
