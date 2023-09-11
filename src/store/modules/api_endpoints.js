@@ -14,8 +14,8 @@ const state = {
     respective backend repositories.
     */
 
-  // active_api: 'https://api.photonranch.org/api', // prod
-  active_api: 'https://api.photonranch.org/dev', // dev
+  active_api: 'https://api.photonranch.org/api', // prod
+  // active_api: 'https://api.photonranch.org/dev', // dev
 
   jobs_api: 'https://jobs.photonranch.org/jobs', // prod
   // jobs_api: 'https://jobs.photonranch.org/dev', // dev
