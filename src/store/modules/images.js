@@ -46,6 +46,9 @@ const state = {
   // TODO: Write an action that will update a user's image list when images are added to their account
   user_images: [],
 
+  // grouped_images: object where key is SMARTSTK and value is an array of all the baseFilenames associated with it
+  grouped_images: {},
+
   show_user_data_only: false,
 
   // determines whether 'current_images' is set to show the most recent images with live updates.
@@ -56,6 +59,7 @@ const getters = {
   current_image: state => state.current_image,
   recent_images: state => state.recent_images,
   user_images: state => state.user_images,
+  grouped_images: state => state.grouped_images,
   show_user_data_only: state => state.show_user_data_only,
 
   current_image_fits_header: state => state.current_image.fits_header,
@@ -81,6 +85,7 @@ const getters = {
 const mutations = {
   setCurrentImage (state, the_current_image) { state.current_image = the_current_image },
   setRecentImages (state, recent_image_list) { state.recent_images = recent_image_list },
+  setGroupedImages (state, grouped_images) { state.grouped_images = grouped_images },
   setUserImages (state, user_images_list) { state.user_images = user_images_list },
   show_user_data_only (state, val) { state.show_user_data_only = val },
   live_data (state, val) { state.live_data = val },
@@ -128,6 +133,7 @@ const actions = {
      * image, and add it into the 'latest_images' list.
      *
      */
+
   update_new_image ({ commit, state, rootState, dispatch }, new_base_filename) {
     // No need to get the latest if the new image is from a different site.
     const site = rootState.site_config.selected_site
@@ -220,11 +226,14 @@ const actions = {
       }
 
       commit('setRecentImages', response)
+      // dispatching here because this is where we're getting images??
+      dispatch('group_images')
     }).catch(error => {
       console.warn(error)
     })
   },
 
+  // not sure what this does
   get_last_24hrs ({ commit, dispatch, rootState }) {
     dispatch('toggle_live_data', false)
     const apiName = rootState.api_endpoints.active_api
@@ -248,6 +257,7 @@ const actions = {
       }
 
       commit('setRecentImages', response)
+      dispatch('group_images')
     }).catch(error => {
       console.warn(error)
     })
@@ -258,6 +268,27 @@ const actions = {
      *  @param {boolean} user_data_only: whether or not to filter by images
      *     taken the active user or not.
      */
+
+  // we want to group images as they load and we group them based on their SMARTSTK value
+  // we dispatch this action in multiple places
+  group_images ({ commit, state }) {
+    const grouping_images = state.grouped_images
+    const recent_images = state.recent_images
+    for (let i = 0; i < recent_images.length; i++) {
+      const img = recent_images[i]
+      const header = recent_images[i].header
+      const base_filename = img.base_filename
+      const SMARTSTK = header.SMARTSTK
+      if (SMARTSTK === 'no') continue
+      if (!grouping_images[SMARTSTK]) {
+        grouping_images[SMARTSTK] = []
+        grouping_images[SMARTSTK].push(base_filename)
+      } else {
+        grouping_images[SMARTSTK].push(base_filename)
+      }
+      commit('setGroupedImages', grouping_images)
+    }
+  },
 
   async load_latest_x_images ({ dispatch, commit, state, rootState }, num_images) {
     // Old method of loading only a certain amount of images
@@ -294,6 +325,7 @@ const actions = {
 
       commit('setCurrentImage', response[0])
       commit('setRecentImages', response)
+      dispatch('group_images')
     }).catch(error => {
       console.error(error)
     })
@@ -386,7 +418,6 @@ const actions = {
     if (state.show_user_data_only && userid) {
       filterparams.user_id = user_id
     }
-
     /**
          * The response for this api call is a list of elements with the form:
          *  image = {
@@ -423,6 +454,8 @@ const actions = {
 
       commit('setCurrentImage', response[0])
       commit('setRecentImages', response)
+      dispatch('group_images')
+      // commit('setGroupedImages', { grouped_images })
     }).catch(error => {
       console.error(error)
     })
@@ -430,13 +463,13 @@ const actions = {
     dispatch('load_latest_info_images')
   },
 
-  load_latest_info_images ({ state, commit, rootState }) {
+  load_latest_info_images ({ state, commit, rootState, dispatch }) {
     const site = rootState.site_config.selected_site
     const base_url = rootState.api_endpoints.active_api
-
     // query each of the three channels
     for (let channel = 0; channel < 3; channel++) {
       const url = base_url + `/infoimage/${site}/${channel + 1}`
+      console.log('this is channel,', channel)
       axios.get(url).then(response => {
         // Handle case if no info image exists
         if (response.status == 204) {
@@ -447,6 +480,7 @@ const actions = {
         // Don't want to yank the focus from the user
         if (state.current_image.s3_directory == 'info-images') {
           commit('setCurrentImage', response.data)
+          dispatch('group_images')
         }
         commit('setInfoImage', { info_image: response.data, channel })
       }).catch(error => {
@@ -458,9 +492,11 @@ const actions = {
   async loadCurrentImageFitsHeader ({ state, rootState, commit }) {
     if ('base_filename' in state.current_image) {
       const baseFilename = state.current_image.base_filename
+      console.log('this is basefilename', baseFilename)
 
       // Check if the header is already cached
       if (state.cached_headers[baseFilename]) {
+        console.log('cached headers', state.cached_headers[baseFilename])
         return state.cached_headers[baseFilename]
       }
 
@@ -513,7 +549,9 @@ const actions = {
      */
   set_latest_image ({ commit, dispatch, state }) {
     const the_current_image = state.recent_images[0]
+    // const the_grouped_images = state.grouped_images
     commit('setCurrentImage', the_current_image)
+    // commit('setGroupedImages', the_grouped_images)
   },
 
   set_info_image_as_current_image ({ commit, state }, channel) {
@@ -539,6 +577,11 @@ const actions = {
   set_first_image ({ commit, state }) {
     const first_image = state.recent_images[state.recent_images.length - 1]
     commit('setCurrentImage', first_image)
+  },
+
+  set_grouped_images ({ commit, state }) {
+    const group_image_cover = state.grouped_images
+    commit('setGroupedImages', group_image_cover)
   },
 
   async get_fits_url ({ rootState }, { base_filename, data_type, reduction_level }) {
