@@ -482,31 +482,6 @@ const actions = {
     }
   },
 
-  async getImagesFitsHeaders ({ state, rootState, commit }) {
-    const headers = {}
-    for (const image of state.recent_images) {
-      const baseFilename = image.baseFilename
-
-      if (state.cachedHeaders[baseFilename]) {
-        headers[baseFilename] = state.cachedHeaders[baseFilename]
-      }
-
-      else {
-        const url = rootState.api_endpoints.active_api + `/fitsheader/${baseFilename}/`
-        try {
-          const response = await axios.get(url)
-          const header = response.data
-          // Cache the header in the Vuex state
-          commit('cacheHeader', { baseFilename, header })
-          headers[baseFilename] = header
-        } catch (e) {
-          console.warn(e)
-        }
-      }
-    }
-    return headers
-  },
-
   toggle_live_data ({ commit, dispatch }, val) {
     commit('live_data', val)
     if (val) {
