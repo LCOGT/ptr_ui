@@ -10,6 +10,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import moment from 'moment'
+import _ from 'lodash'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
 
 function user_id () {
@@ -278,8 +279,9 @@ const actions = {
       const img = recent_images[i]
       const header = recent_images[i].header
       const base_filename = img.base_filename
-      const SMARTSTK = header.SMARTSTK
-      if (SMARTSTK === 'no') continue
+      if (header === undefined) continue
+      const SMARTSTK = _.get(header, 'SMARTSTK', undefined)
+      if (SMARTSTK === 'no' || SMARTSTK === undefined) continue
       if (!grouping_images[SMARTSTK]) {
         grouping_images[SMARTSTK] = []
         grouping_images[SMARTSTK].push(base_filename)
