@@ -25,6 +25,7 @@
           <thumbnail-row
             class="data-thumbs"
             :images="recent_images"
+            :grouped_images="grouped_images"
             :selected_image="current_image.image_id"
             @thumbnailClicked="setActiveImage"
           />
@@ -35,146 +36,222 @@
 
       <!-- Collapsible panels on the right of the image -->
       <div class="image-tools-area">
-
-        <div v-if="userIsAdmin" class="obs-config-box">
+        <div
+          v-if="userIsAdmin"
+          class="obs-config-box"
+        >
           <div class="obs-config-control-group">
-            <div class="obs-config-title">Manual Telescope</div>
-            <StatusVal :status-item="scopeInManualMode" style="width: 100%;"/>
+            <div class="obs-config-title">
+              Manual Telescope
+            </div>
+            <StatusVal
+              :status-item="scopeInManualMode"
+              style="width: 100%;"
+            />
             <div class="obs-config-command-button-group">
               <CommandButton
                 class="is-small obs-config-command-button"
                 admin
                 :data="obs_set_scope_to_manual_mode"
-              >Set Manual</CommandButton>
+              >
+                Set Manual
+              </CommandButton>
               <CommandButton
                 class="button admin is-small obs-config-command-button"
                 admin
                 :data="obs_set_scope_to_automatic_mode"
-              >Set Auto</CommandButton>
+              >
+                Set Auto
+              </CommandButton>
             </div>
           </div>
 
           <div class="obs-config-control-group">
-            <div class="obs-config-title">Sun Safety</div>
-            <StatusVal :status-item="sunSafetyMode" style="width: 100%;"/>
+            <div class="obs-config-title">
+              Sun Safety
+            </div>
+            <StatusVal
+              :status-item="sunSafetyMode"
+              style="width: 100%;"
+            />
             <div class="obs-config-command-button-group">
               <CommandButton
                 class="is-small obs-config-command-button"
                 admin
                 :data="obs_configure_sun_safety_on"
-              >Enable</CommandButton>
+              >
+                Enable
+              </CommandButton>
               <CommandButton
                 class="button admin is-small obs-config-command-button"
                 admin
                 :data="obs_configure_sun_safety_off"
-              >Disable</CommandButton>
+              >
+                Disable
+              </CommandButton>
             </div>
           </div>
 
           <div class="obs-config-control-group">
-            <div class="obs-config-title">Moon Safety</div>
-            <StatusVal :status-item="moonSafetyMode" style="width: 100%;"/>
+            <div class="obs-config-title">
+              Moon Safety
+            </div>
+            <StatusVal
+              :status-item="moonSafetyMode"
+              style="width: 100%;"
+            />
             <div class="obs-config-command-button-group">
               <CommandButton
                 class="is-small obs-config-command-button"
                 admin
                 :data="obs_configure_moon_safety_on"
-              >Enable</CommandButton>
+              >
+                Enable
+              </CommandButton>
               <CommandButton
                 class="button admin is-small obs-config-command-button"
                 admin
                 :data="obs_configure_moon_safety_off"
-              >Disable</CommandButton>
+              >
+                Disable
+              </CommandButton>
             </div>
           </div>
 
           <div class="obs-config-control-group">
-            <div class="obs-config-title">Altitude Safety</div>
-            <StatusVal :status-item="altitudeSafetyMode" style="width: 100%;"/>
+            <div class="obs-config-title">
+              Altitude Safety
+            </div>
+            <StatusVal
+              :status-item="altitudeSafetyMode"
+              style="width: 100%;"
+            />
             <div class="obs-config-command-button-group">
               <CommandButton
                 class="is-small obs-config-command-button"
                 admin
                 :data="obs_configure_altitude_safety_on"
-              >Enable</CommandButton>
+              >
+                Enable
+              </CommandButton>
               <CommandButton
                 class="button admin is-small obs-config-command-button"
                 admin
                 :data="obs_configure_altitude_safety_off"
-              >Disable</CommandButton>
+              >
+                Disable
+              </CommandButton>
             </div>
           </div>
           <div class="obs-config-control-group">
-            <div class="obs-config-title">Daytime Safety</div>
-            <StatusVal :status-item="daytimeExposureSafetyMode" style="width: 100%;"/>
+            <div class="obs-config-title">
+              Daytime Safety
+            </div>
+            <StatusVal
+              :status-item="daytimeExposureSafetyMode"
+              style="width: 100%;"
+            />
             <div class="obs-config-command-button-group">
               <CommandButton
                 class="is-small obs-config-command-button"
                 admin
                 :data="obs_configure_daytime_exposure_safety_on"
-              >Enable</CommandButton>
+              >
+                Enable
+              </CommandButton>
               <CommandButton
                 class="button admin is-small obs-config-command-button"
                 admin
                 :data="obs_configure_daytime_exposure_safety_off"
-              >Disable</CommandButton>
+              >
+                Disable
+              </CommandButton>
             </div>
           </div>
 
           <div class="obs-config-control-group">
-            <div class="obs-config-title">Simulate Open Roof</div>
-            <StatusVal :status-item="simulatingOpenRoof" style="width: 100%;"/>
+            <div class="obs-config-title">
+              Simulate Open Roof
+            </div>
+            <StatusVal
+              :status-item="simulatingOpenRoof"
+              style="width: 100%;"
+            />
             <div class="obs-config-command-button-group">
               <CommandButton
                 class="is-small obs-config-command-button"
                 admin
                 :data="obs_start_simulating_open_roof"
-              >Start</CommandButton>
+              >
+                Start
+              </CommandButton>
               <CommandButton
                 class="button admin is-small obs-config-command-button"
                 admin
                 :data="obs_stop_simulating_open_roof"
-              >Stop</CommandButton>
+              >
+                Stop
+              </CommandButton>
             </div>
           </div>
 
           <div class="obs-config-control-group">
-            <div class="obs-config-title">Who Can Operate</div>
-            <StatusVal :status-item="adminOwnerCommandsOnly" style="width: 100%;"/>
+            <div class="obs-config-title">
+              Who Can Operate
+            </div>
+            <StatusVal
+              :status-item="adminOwnerCommandsOnly"
+              style="width: 100%;"
+            />
             <div class="obs-config-command-button-group">
               <CommandButton
                 class="is-small obs-config-command-button"
                 admin
                 :data="obs_configure_admin_owner_commands_only_true"
-              >Owner</CommandButton>
+              >
+                Owner
+              </CommandButton>
               <CommandButton
                 class="button admin is-small obs-config-command-button"
                 admin
                 :data="obs_configure_admin_owner_commands_only_false"
-              >Anyone</CommandButton>
+              >
+                Anyone
+              </CommandButton>
             </div>
           </div>
 
           <div class="obs-config-control-group">
-            <div class="obs-config-title">Pointing Reference</div>
-            <StatusVal :status-item="pointingReference" style="width: 100%;"/>
+            <div class="obs-config-title">
+              Pointing Reference
+            </div>
+            <StatusVal
+              :status-item="pointingReference"
+              style="width: 100%;"
+            />
             <div class="obs-config-command-button-group">
               <CommandButton
                 class="is-small obs-config-command-button"
                 admin
                 :data="obs_configure_pointing_reference_on"
-              >Enable</CommandButton>
+              >
+                Enable
+              </CommandButton>
               <CommandButton
                 class="button admin is-small obs-config-command-button"
                 admin
                 :data="obs_configure_pointing_reference_off"
-              >Disable</CommandButton>
+              >
+                Disable
+              </CommandButton>
             </div>
           </div>
-
         </div>
 
-        <div class="obs-config-box" style="padding-bottom: calc(1em - 11.25px); justify-content: space-between;">
+        <div
+          class="obs-config-box"
+          style="padding-bottom: calc(1em - 11.25px); justify-content: space-between;"
+        >
           <UiSyncControls />
           <div style="width: 1px; height: 30px; border-left: 1px solid grey; margin: 0 1em;" />
           <NightLog :site="sitecode" />
@@ -384,7 +461,8 @@ export default {
 
     ...mapState('images', [
       'recent_images',
-      'current_image'
+      'current_image',
+      'grouped_images'
     ]),
 
     ...mapGetters('images', [
@@ -493,6 +571,9 @@ export default {
       get () { return this.$store.getters['command_params/subframe_y1'] },
       set (val) { this.$store.commit('command_params/subframe_y1', val) }
     }
+  },
+  mounted () {
+    console.log('grouped_images from parent:', this.grouped_images)
   }
 
 }
