@@ -8,16 +8,14 @@
       <img
         :src="thumbnailWithFallback(item)"
         onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
-        :title="grouped_images.baseFilename"
-        :class="{'selected_thumbnail' : grouped_images.image_id == selected_image}"
+        :title="item[item.length - 1].baseFilename"
+        :class="{'selected_thumbnail' : item[item.length - 1].image_id == selected_image}"
         loading="lazy"
         class="recent-image"
         alt="heck"
-        @click="setActiveImage(item)"
+        @click="setActiveImage(item[item.length - 1])"
       >
-      <group-images-button
-        :grouped_images="grouped_images"
-      />
+      <group-images-button :grouped_images="grouped_images" />
     </div>
   </div>
 </template>
@@ -47,7 +45,7 @@ export default {
 
   methods: {
     setActiveImage (item) {
-      console.log('this is item at setactiveimage yes,', item)
+      console.log('this is item at setactiveimage ys,', item)
       this.$emit('thumbnailClicked', item)
     },
 
