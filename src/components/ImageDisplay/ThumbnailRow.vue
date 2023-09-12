@@ -5,7 +5,7 @@
       :key="SMARTSTK"
     >
       <p>SMARTSTK: {{ SMARTSTK }}</p>
-      <!-- <img
+      <img
         :src="thumbnailWithFallback(item)"
         onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
         :title="grouped_images.baseFilename"
@@ -14,7 +14,7 @@
         class="recent-image"
         alt="heck"
         @click="setActiveImage(item)"
-      > -->
+      >
       <group-images-button
         :grouped_images="grouped_images"
       />
@@ -52,10 +52,9 @@ export default {
     },
 
     thumbnailWithFallback (item) {
-      const last = item[item.length - 1]
+      const last = item[item.length - 1].jpg_thumbnail_url
       return last || 'https://via.placeholder.com/768?text=no+jpg+preview+available'
     }
-
   }
 }
 

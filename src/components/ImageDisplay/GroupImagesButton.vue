@@ -6,10 +6,14 @@
     >
       <!-- Show the last image by default -->
       <!-- <div v-if="!showAllImages[SMARTSTK]"> -->
-      <img
-        :src="imageList[imageList.length - 1]"
-        alt="Thumbnail bb"
-      >
+      <!-- <ul>
+        <li>
+          <img
+            :src="imageList[imageList.length - 1]"
+            alt="Thumbnail bb"
+          >
+        </li>
+      </ul> -->
       <!-- </div> -->
 
       <!-- Show all images if toggled -->
@@ -55,3 +59,14 @@ export default {
 // }
 //   }
 </script>
+
+<!-- <style lang="scss" scoped>
+
+ul {
+    display: inline
+}
+.list {
+    display:inline;
+}
+
+</style> -->
