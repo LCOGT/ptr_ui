@@ -10,7 +10,6 @@
 import Vue from 'vue'
 import axios from 'axios'
 import moment from 'moment'
-import _ from 'lodash'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
 
 function user_id () {
@@ -277,15 +276,16 @@ const actions = {
     const recent_images = state.recent_images
     for (let i = 0; i < recent_images.length; i++) {
       const img = recent_images[i]
-      const header = recent_images[i].header
-      if (header === undefined) continue
-      const SMARTSTK = _.get(header, 'SMARTSTK', undefined)
+      const src = img && img.jpg_thumbnail_url
+      const header = img && img.header
+      // if (header === undefined) continue
+      const SMARTSTK = header && header.SMARTSTK
       if (SMARTSTK === 'no' || SMARTSTK === undefined) continue
       if (!grouping_images[SMARTSTK]) {
         grouping_images[SMARTSTK] = []
-        grouping_images[SMARTSTK].push(img)
+        grouping_images[SMARTSTK].push(src)
       } else {
-        grouping_images[SMARTSTK].push(img)
+        grouping_images[SMARTSTK].push(src)
       }
       commit('setGroupedImages', grouping_images)
     }

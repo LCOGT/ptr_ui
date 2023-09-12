@@ -1,22 +1,23 @@
 <template>
   <div class="images">
     <div
-      v-for="(group, groupKey) in grouped_images"
-      :key="groupKey"
+      v-for="(item, SMARTSTK) in grouped_images"
+      :key="SMARTSTK"
     >
-      <h3>{{ groupKey }}</h3>
-      <img
-        v-for="(item, index) in group"
-        :key="index"
+      <p>SMARTSTK: {{ SMARTSTK }}</p>
+      <!-- <img
         :src="thumbnailWithFallback(item)"
         onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
-        :title="item.base_filename"
-        :class="{'selected_thumbnail' : item.image_id == selected_image}"
+        :title="grouped_images.baseFilename"
+        :class="{'selected_thumbnail' : grouped_images.image_id == selected_image}"
         loading="lazy"
         class="recent-image"
+        alt="heck"
         @click="setActiveImage(item)"
-      >
-      <group-images-button :grouped_images="grouped_images" />
+      > -->
+      <group-images-button
+        :grouped_images="grouped_images"
+      />
     </div>
   </div>
 </template>
@@ -46,17 +47,18 @@ export default {
 
   methods: {
     setActiveImage (item) {
+      console.log('this is item at setactiveimage yes,', item)
       this.$emit('thumbnailClicked', item)
     },
 
     thumbnailWithFallback (item) {
-      return item.jpg_thumbnail_url || item.jpg_url
+      const last = item[item.length - 1]
+      return last || 'https://via.placeholder.com/768?text=no+jpg+preview+available'
     }
-  },
-  mounted () {
-    console.log('grouped_images in child 2:', this.grouped_images)
+
   }
 }
+
 </script>
 
 <style lang="scss" scoped>
