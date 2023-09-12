@@ -3,8 +3,8 @@
     <div
       v-for="(item, SMARTSTK) in grouped_images"
       :key="SMARTSTK"
+      class="image-container"
     >
-      <p>SMARTSTK: {{ SMARTSTK }}</p>
       <img
         :src="thumbnailWithFallback(item)"
         onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
@@ -45,12 +45,12 @@ export default {
 
   methods: {
     setActiveImage (item) {
-      console.log('this is item at setactiveimage ys,', item)
+      console.log('this is item at setactiveimage yes,', item)
       this.$emit('thumbnailClicked', item)
     },
 
     thumbnailWithFallback (item) {
-      const last = item[item.length - 1].jpg_thumbnail_url
+      const last = item[0].jpg_thumbnail_url
       return last || 'https://via.placeholder.com/768?text=no+jpg+preview+available'
     }
   }
@@ -59,24 +59,32 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .images {
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
 }
+
+.image-container {
+  flex: none;
+  width: auto;
+}
+
 .recent-image {
   cursor: pointer;
   margin: 0;
   margin-bottom: 5px;
-  flex: 0 0 auto;
-  height: 60px;
+  /* flex: 0 0 auto; */
+  width: 120px;  /* or auto */
+  height: 90px;  /* or auto */
+  object-fit: cover;
 }
+
 .recent-image:not(:first-child) {
   margin-left: 5px;
 }
+
 .selected_thumbnail {
   border: 3px solid rgb(241, 183, 36);
 }
-
 </style>
