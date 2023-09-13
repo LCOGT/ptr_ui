@@ -272,7 +272,7 @@ const actions = {
   // we want to group images as they load and we group them based on their SMARTSTK value
   // we dispatch this action in multiple places
   group_images ({ commit, state }) {
-    const grouping_images = state.grouped_images
+    const grouping_images = JSON.parse(JSON.stringify(state.grouped_images))
     const recent_images = state.recent_images
     for (let i = 0; i < recent_images.length; i++) {
       const img = recent_images[i]

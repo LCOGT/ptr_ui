@@ -1,5 +1,8 @@
 <template>
-  <div class="images">
+  <div
+    v-if="Object.keys(grouped_images).length > 0"
+    class="images"
+  >
     <div
       v-for="(item, SMARTSTK) in grouped_images"
       :key="SMARTSTK"
@@ -8,12 +11,12 @@
       <img
         :src="thumbnailWithFallback(item)"
         onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
-        :title="item[item.length - 1].baseFilename"
-        :class="{'selected_thumbnail' : item[item.length - 1].image_id == selected_image}"
+        :title="item[0].baseFilename"
+        :class="{'selected_thumbnail' : item[0].image_id == selected_image}"
         loading="lazy"
         class="recent-image"
         alt="heck"
-        @click="setActiveImage(item[item.length - 1])"
+        @click="setActiveImage(item[0])"
       >
       <group-images-button :grouped_images="grouped_images" />
     </div>
@@ -42,10 +45,9 @@ export default {
       required: true
     }
   },
-
   methods: {
     setActiveImage (item) {
-      console.log('this is item at setactiveimage yes,', item)
+      console.log('heywxw')
       this.$emit('thumbnailClicked', item)
     },
 
@@ -74,9 +76,8 @@ export default {
   cursor: pointer;
   margin: 0;
   margin-bottom: 5px;
-  /* flex: 0 0 auto; */
-  width: 120px;  /* or auto */
-  height: 90px;  /* or auto */
+  width: 120px;
+  height: 90px;
   object-fit: cover;
 }
 

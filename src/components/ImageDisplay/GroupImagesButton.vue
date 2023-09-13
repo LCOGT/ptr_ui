@@ -49,10 +49,10 @@ export default {
     return {
       showAllImages: {}
     }
-  },
-  mounted () {
-    console.log('this is grouped_images in gib,', this.grouped_images)
   }
+//   mounted () {
+//     console.log('this is grouped_images in gib,', this.grouped_images)
+//   }
 }
 // toggleShowAllImages (SMARTSTK) {
 //   this.$set(this.showAllImages, SMARTSTK, !this.showAllImages[SMARTSTK])
