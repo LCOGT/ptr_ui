@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="Object.keys(grouped_images).length > 0"
     class="images"
   >
     <div
@@ -42,12 +41,12 @@ export default {
     },
     grouped_images: {
       type: Object,
+      default: () => {},
       required: true
     }
   },
   methods: {
     setActiveImage (item) {
-      console.log('heywxw')
       this.$emit('thumbnailClicked', item)
     },
 
@@ -55,6 +54,10 @@ export default {
       const last = item[0].jpg_thumbnail_url
       return last || 'https://via.placeholder.com/768?text=no+jpg+preview+available'
     }
+    // updateSelectedSite (event) {
+    //   const site = event.target.value
+    //   this.$store.dispatch('group_images', site)
+    // }
   }
 }
 

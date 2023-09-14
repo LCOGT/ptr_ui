@@ -6,7 +6,6 @@
  * for computing various attributes, etc.
  */
 
-// import { API } from 'aws-amplify'
 import Vue from 'vue'
 import axios from 'axios'
 import moment from 'moment'
@@ -134,7 +133,7 @@ const actions = {
      *
      */
 
-  update_new_image ({ commit, state, rootState, dispatch }, new_base_filename) {
+  update_new_image ({ commit, state, rootState }, new_base_filename) {
     // No need to get the latest if the new image is from a different site.
     const site = rootState.site_config.selected_site
     // Get the image's site of origin from the beginning of the filename.
@@ -226,8 +225,6 @@ const actions = {
       }
 
       commit('setRecentImages', response)
-      // dispatching here because this is where we're getting images??
-      dispatch('group_images')
     }).catch(error => {
       console.warn(error)
     })
@@ -271,9 +268,19 @@ const actions = {
 
   // we want to group images as they load and we group them based on their SMARTSTK value
   // we dispatch this action in multiple places
-  group_images ({ commit, state }) {
-    const grouping_images = JSON.parse(JSON.stringify(state.grouped_images))
+  group_images ({ commit, state, rootState, dispatch }) {
+    const currentSite = rootState.site_config.selected_site
+    let grouping_images = JSON.parse(JSON.stringify(state.grouped_images))
     const recent_images = state.recent_images
+    if (grouping_images.site && grouping_images.site !== currentSite) {
+      dispatch('reset_grouped_images')
+      grouping_images = { site: currentSite }
+      console.log('this is grouping_images in the if statement,', grouping_images)
+    } else if (!grouping_images.site) {
+      grouping_images.site = currentSite
+    } else if (grouping_images.site && grouping_images.site == currentSite) {
+      console.log('nothing to view here')
+    }
     for (let i = 0; i < recent_images.length; i++) {
       const img = recent_images[i]
       const header = img && img.header
@@ -285,8 +292,11 @@ const actions = {
       } else {
         grouping_images[SMARTSTK].push(img)
       }
-      commit('setGroupedImages', grouping_images)
     }
+    commit('setGroupedImages', { ...grouping_images })
+  },
+  reset_grouped_images ({ commit }) {
+    commit('setGroupedImages', {})
   },
 
   async load_latest_x_images ({ dispatch, commit, state, rootState }, num_images) {
@@ -345,6 +355,7 @@ const actions = {
     // Get site and user_id
     let url = null
     const site = rootState.site_config.selected_site
+
     const filterparams = {}
 
     const userid = user_id()
@@ -548,9 +559,7 @@ const actions = {
      */
   set_latest_image ({ commit, dispatch, state }) {
     const the_current_image = state.recent_images[0]
-    // const the_grouped_images = state.grouped_images
     commit('setCurrentImage', the_current_image)
-    // commit('setGroupedImages', the_grouped_images)
   },
 
   set_info_image_as_current_image ({ commit, state }, channel) {
@@ -579,8 +588,8 @@ const actions = {
   },
 
   set_grouped_images ({ commit, state }) {
-    const group_image_cover = state.grouped_images
-    commit('setGroupedImages', group_image_cover)
+    const grouped_image = state.grouped_images
+    commit('setGroupedImages', { ...grouped_image })
   },
 
   async get_fits_url ({ rootState }, { base_filename, data_type, reduction_level }) {
