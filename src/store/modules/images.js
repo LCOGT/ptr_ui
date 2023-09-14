@@ -278,13 +278,17 @@ const actions = {
     } else if (!grouping_images.site) {
       grouping_images.site = currentSite
     } else if (grouping_images.site && grouping_images.site == currentSite) {
-      console.log('nothing to see here')
+      console.log('continuing')
     }
     for (let i = 0; i < recent_images.length; i++) {
       const img = recent_images[i]
       const header = img && img.header
-      const SMARTSTK = header && header.SMARTSTK
-      if (SMARTSTK === 'no' || SMARTSTK === undefined) continue
+      let SMARTSTK = header && header.SMARTSTK
+      if (SMARTSTK === 'no') {
+        SMARTSTK = img && img.base_filename
+        grouping_images[SMARTSTK] = []
+        grouping_images[SMARTSTK].push(img)
+      }
       if (!grouping_images[SMARTSTK]) {
         grouping_images[SMARTSTK] = []
         grouping_images[SMARTSTK].push(img)

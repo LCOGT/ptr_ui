@@ -11,7 +11,7 @@
       <img
         v-if="SMARTSTK !== 'site'"
         :src="thumbnailWithFallback(item)"
-        onerror="this.onerror=null;console.log('this is error', this.onerror);this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
+        onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
         :title="item[0].baseFilename"
         :class="{'selected_thumbnail' : item[0].image_id == selected_image}"
         loading="lazy"
@@ -53,8 +53,11 @@ export default {
     },
 
     thumbnailWithFallback (item) {
-      const last = item && item[0] && item[0].jpg_thumbnail_url
-      return last || 'https://via.placeholder.com/768?text=no+jpg+preview+available'
+      let thumbnailCover = item && item[0] && item[0].jpg_thumbnail_url
+      if (!thumbnailCover) {
+        thumbnailCover = item && item[0] && item[0].jpg_url
+      }
+      return thumbnailCover || 'https://via.placeholder.com/768?text=no+jpg+preview+available'
     }
   }
 }
