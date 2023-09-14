@@ -275,11 +275,10 @@ const actions = {
     if (grouping_images.site && grouping_images.site !== currentSite) {
       dispatch('reset_grouped_images')
       grouping_images = { site: currentSite }
-      console.log('this is grouping_images in the if statement,', grouping_images)
     } else if (!grouping_images.site) {
       grouping_images.site = currentSite
     } else if (grouping_images.site && grouping_images.site == currentSite) {
-      console.log('nothing to view here')
+      console.log('nothing to see here')
     }
     for (let i = 0; i < recent_images.length; i++) {
       const img = recent_images[i]
@@ -490,7 +489,7 @@ const actions = {
         // Don't want to yank the focus from the user
         if (state.current_image.s3_directory == 'info-images') {
           commit('setCurrentImage', response.data)
-          dispatch('group_images')
+          // dispatch('group_images')
         }
         commit('setInfoImage', { info_image: response.data, channel })
       }).catch(error => {
@@ -555,8 +554,8 @@ const actions = {
   },
 
   /**
-     * Set the current image to the most recent one in recent_images.
-     */
+  * Set the current image to the most recent one in recent_images.
+  */
   set_latest_image ({ commit, dispatch, state }) {
     const the_current_image = state.recent_images[0]
     commit('setCurrentImage', the_current_image)
