@@ -1,47 +1,35 @@
 <template>
-  <div>
-    <div
-      v-if="Object.keys(grouped_images).length > 0"
-      class="images"
+  <div
+    v-if="grouped_images.imageGroups && Object.keys(grouped_images.imageGroups).length > 0"
+    class="images"
+  >
+    <img
+      v-for="(item, SMARTSTK) in grouped_images.imageGroups"
+      :key="SMARTSTK"
+      :src="thumbnailWithFallback(item)"
+      onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
+      :title="item[0].baseFilename"
+      :class="{'selected_thumbnail' : item[0].image_id == selected_image}"
+      loading="lazy"
+      class="recent-image"
+      @click="setActiveImage(item[0])"
     >
-      <div
-        v-for="(item, SMARTSTK) in grouped_images"
-        :key="SMARTSTK"
-        class="image-container"
-      >
-        <img
-          v-if="SMARTSTK !== 'site'"
-          :src="thumbnailWithFallback(item)"
-          onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
-          :title="item[0].baseFilename"
-          :class="{'selected_thumbnail' : item[0].image_id == selected_image}"
-          loading="lazy"
-          class="recent-image"
-          @click="setActiveImage(item[0])"
-        >
-        <group-images-button :grouped_images="grouped_images" />
-      </div>
-    </div>
-    <div
-      v-else-if="Object.keys(grouped_images).length == 0"
-      class="placeholder"
+  </div>
+  <div
+    v-else
+    class="placeholder"
+  >
+    <img
+      :src="'https://via.placeholder.com/768?text=no+jpg+preview+available'"
+      class="recent-image"
     >
-      <img
-        :src="'https://via.placeholder.com/768?text=no+jpg+preview+available'"
-        class="recent-image"
-      >
-    </div>
   </div>
 </template>
 
 <script>
-import GroupImagesButton from '@/components/ImageDisplay/GroupImagesButton'
 
 export default {
   name: 'ThumbnailRow',
-  components: {
-    GroupImagesButton
-  },
   props: {
     images: {
       type: Array,
@@ -80,12 +68,6 @@ export default {
   overflow-x: auto;
   overflow-y: hidden;
 }
-
-.image-container {
-  flex: none;
-  width: auto;
-}
-
 .recent-image {
   cursor: pointer;
   margin: 0;
@@ -93,11 +75,9 @@ export default {
   flex: 0 0 auto;
   height: 60px;
 }
-
 .recent-image:not(:first-child) {
   margin-left: 5px;
 }
-
 .selected_thumbnail {
   border: 3px solid rgb(241, 183, 36);
 }

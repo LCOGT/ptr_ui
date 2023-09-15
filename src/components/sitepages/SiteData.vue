@@ -29,9 +29,6 @@
             :selected_image="current_image.image_id"
             @thumbnailClicked="setActiveImage"
           />
-          <group-images-button
-            :grouped_images="grouped_images"
-          />
         </div>
 
         <ButtonRowBelowImage class="mt-3" />
@@ -388,7 +385,6 @@ import CommandButton from '@/components/FormElements/CommandButton'
 import ImageInfoBar from '@/components/ImageDisplay/ImageInfoBar'
 import InfoImageThumb from '@/components/ImageDisplay/InfoImageThumb'
 import ThumbnailRow from '@/components/ImageDisplay/ThumbnailRow'
-import GroupImagesButton from '@/components/ImageDisplay/GroupImagesButton'
 import ButtonRowBelowImage from '@/components/ImageDisplay/ButtonRowBelowImage'
 import DrawShapesToolbar from '@/components/AnalysisTools/DrawShapesToolbar'
 import SiteConfigViewer from '@/components/AdminTools/SiteConfigViewer'
@@ -420,7 +416,6 @@ export default {
     ImageFilter,
     InfoImageThumb,
     ThumbnailRow,
-    GroupImagesButton,
     ButtonRowBelowImage,
     DrawShapesToolbar,
     SiteConfigViewer,
