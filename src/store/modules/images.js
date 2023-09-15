@@ -273,18 +273,18 @@ const actions = {
     let grouping_images = JSON.parse(JSON.stringify(state.grouped_images))
     const recent_images = state.recent_images
     if (grouping_images.site && grouping_images.site !== currentSite) {
+      // resetting grouped_images to an empty object when selecting a different site
       dispatch('reset_grouped_images')
       grouping_images = { site: currentSite }
     } else if (!grouping_images.site) {
       grouping_images.site = currentSite
-    } else if (grouping_images.site && grouping_images.site == currentSite) {
-      console.log('continuing')
     }
     for (let i = 0; i < recent_images.length; i++) {
       const img = recent_images[i]
       const header = img && img.header
       let SMARTSTK = header && header.SMARTSTK
       if (SMARTSTK === 'no') {
+        // creating unique key for images where SMARTSK is 'no' and avoids grouping them as one stack
         SMARTSTK = img && img.base_filename
         grouping_images[SMARTSTK] = []
         grouping_images[SMARTSTK].push(img)
@@ -332,6 +332,7 @@ const actions = {
       // Empty response:
       if (response.length == 0) {
         dispatch('display_placeholder_image')
+        // dispatch('reset_grouped_images')
         return
       }
 
@@ -539,7 +540,7 @@ const actions = {
   },
 
   // Load and display a single placeholder image for a site.
-  display_placeholder_image ({ commit }) {
+  display_placeholder_image ({ commit, dispatch }) {
     const placeholder_url = 'https://via.placeholder.com/768x768?text=nothing here yet'
     const placeholder_image = {
       jpg_url: placeholder_url,
@@ -548,6 +549,7 @@ const actions = {
     }
     commit('setRecentImages', [placeholder_image])
     commit('setCurrentImage', placeholder_image)
+    dispatch('reset_grouped_images')
   },
 
   /**

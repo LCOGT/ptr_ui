@@ -1,25 +1,35 @@
 <template>
-  <div
-    v-if="Object.keys(grouped_images).length > 0"
-    class="images"
-  >
+  <div>
     <div
-      v-for="(item, SMARTSTK) in grouped_images"
-      :key="SMARTSTK"
-      class="image-container"
+      v-if="Object.keys(grouped_images).length > 0"
+      class="images"
+    >
+      <div
+        v-for="(item, SMARTSTK) in grouped_images"
+        :key="SMARTSTK"
+        class="image-container"
+      >
+        <img
+          v-if="SMARTSTK !== 'site'"
+          :src="thumbnailWithFallback(item)"
+          onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
+          :title="item[0].baseFilename"
+          :class="{'selected_thumbnail' : item[0].image_id == selected_image}"
+          loading="lazy"
+          class="recent-image"
+          @click="setActiveImage(item[0])"
+        >
+        <group-images-button :grouped_images="grouped_images" />
+      </div>
+    </div>
+    <div
+      v-else-if="Object.keys(grouped_images).length == 0"
+      class="placeholder"
     >
       <img
-        v-if="SMARTSTK !== 'site'"
-        :src="thumbnailWithFallback(item)"
-        onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
-        :title="item[0].baseFilename"
-        :class="{'selected_thumbnail' : item[0].image_id == selected_image}"
-        loading="lazy"
+        :src="'https://via.placeholder.com/768?text=no+jpg+preview+available'"
         class="recent-image"
-        alt="heck"
-        @click="setActiveImage(item[0])"
       >
-      <group-images-button :grouped_images="grouped_images" />
     </div>
   </div>
 </template>
@@ -80,9 +90,8 @@ export default {
   cursor: pointer;
   margin: 0;
   margin-bottom: 5px;
-  width: 120px;
-  height: 90px;
-  object-fit: cover;
+  flex: 0 0 auto;
+  height: 60px;
 }
 
 .recent-image:not(:first-child) {
