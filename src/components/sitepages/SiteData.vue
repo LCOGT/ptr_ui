@@ -25,7 +25,6 @@
           <thumbnail-row
             class="data-thumbs"
             :images="recent_images"
-            :grouped_images="grouped_images"
             :selected_image="current_image.image_id"
             @thumbnailClicked="setActiveImage"
           />
@@ -385,8 +384,7 @@ export default {
 
     ...mapState('images', [
       'recent_images',
-      'current_image',
-      'grouped_images'
+      'current_image'
     ]),
 
     ...mapGetters('images', [
