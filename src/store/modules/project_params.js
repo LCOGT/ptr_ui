@@ -20,8 +20,11 @@ const state = {
       imtype: 'light',
       exposure: 1,
       filter: 'Lum',
-      area: 'FULL',
-      bin: 'optimal'
+      zoomin: '100%',
+      bin: 'optimal',
+      width: '0.0',
+      height: '0.0',
+      angle: '0.0'
     }
   ],
   targets: [

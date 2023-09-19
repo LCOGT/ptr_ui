@@ -347,10 +347,10 @@
               </b-select>
             </b-field>
             <b-field
-              :label="n==1 ? 'Area' : ''"
+              :label="n==1 ? 'Zoom in' : ''"
             >
               <b-select
-                v-model="exposures[n-1].area"
+                v-model="exposures[n-1].zoomin"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
               >
@@ -359,9 +359,48 @@
                   :key="index"
                   :value="val"
                 >
-                  {{ val.toLowerCase() }}
+                  {{ val }}
                 </option>
               </b-select>
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Width' : ''"
+              style="width: 80px;"
+            >
+              <b-input
+                v-model="exposures[n-1].width"
+                size="is-small"
+                :disabled="!exposures[n-1].active"
+                type="number"
+                min="-4.5"
+                max="4.5"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Height' : ''"
+              style="width: 80px;"
+            >
+              <b-input
+                v-model="exposures[n-1].height"
+                size="is-small"
+                :disabled="!exposures[n-1].active"
+                type="number"
+                min="-4.5"
+                max="4.5"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Angle' : ''"
+              style="width: 80px;"
+            >
+              <b-input
+                v-model="exposures[n-1].angle"
+                size="is-small"
+                :disabled="!exposures[n-1].active"
+                type="number"
+                min="-45.0"
+                max="45.0"
+              />
             </b-field>
             <div />
           </div>
@@ -820,8 +859,8 @@ export default {
       max_fits_header_length: 68,
       generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO'],
       generic_camera_areas: [
-        '600%', '500%', '400%', '300%', '220%', '133%',
-        'FULL', 'SQUARE', '71%', '50%', '35%', '25%', '12%'
+        'Sel.', '220%', '133%',
+        '100%', 'Sqr.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
       site: this.sitecode,
       warn: {
