@@ -374,7 +374,7 @@
                 type="number"
                 :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minWidth * 60 : minWidth"
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidth * 60 : maxWidth"
-                step="0.1"
+                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
               />
             </b-field>
             <b-field
@@ -388,7 +388,7 @@
                 type="number"
                 :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minHeight * 60 : minHeight"
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeight * 60 : maxHeight"
-                step="0.1"
+                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
               />
             </b-field>
             <b-field
@@ -871,6 +871,7 @@ export default {
       maxWidth: 4.5,
       minHeight: -4.5,
       maxHeight: 4.5,
+      conditionalStep: 0.1,
       site: this.sitecode,
       warn: {
         project_name: false,
