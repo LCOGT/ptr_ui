@@ -372,8 +372,8 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minWidth * 60 : minWidth"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidth * 60 : maxWidth"
+                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minWidthDegrees * degreesToArcminutes : minWidthDegrees"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidthDegrees * degreesToArcminutes : maxWidthDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
               />
             </b-field>
@@ -386,8 +386,8 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minHeight * 60 : minHeight"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeight * 60 : maxHeight"
+                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minHeightDegrees * degreesToArcminutes : minHeightDegrees"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeightDegrees * degreesToArcminutes : maxHeightDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
               />
             </b-field>
@@ -865,10 +865,11 @@ export default {
         'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
-      minWidth: -4.5,
-      maxWidth: 4.5,
-      minHeight: -4.5,
-      maxHeight: 4.5,
+      minWidthDegrees: -4.5,
+      maxWidthDegrees: 4.5,
+      minHeightDegrees: -4.5,
+      maxHeightDegrees: 4.5,
+      degreesToArcminutes: 60,
       conditionalStep: 0.1,
       site: this.sitecode,
       warn: {
