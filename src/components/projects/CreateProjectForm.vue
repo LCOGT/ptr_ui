@@ -372,8 +372,8 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="minWidth"
-                :max="maxWidth"
+                :min="-4.5"
+                :max="4.5"
                 step="0.1"
               />
             </b-field>
@@ -386,8 +386,8 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="minHeight"
-                :max="maxHeight"
+                :min="-4.5"
+                :max="4.5"
                 step="0.1"
               />
             </b-field>
@@ -840,7 +840,7 @@ export default {
   name: 'CreateProjectForm',
   // passing 'n' as a prop to be able to adjust height and width depending on the zoom selection
   // have to specify the type of props for all 3
-  props: ['sitecode', 'project_to_load', 'n'],
+  props: ['sitecode', 'project_to_load'],
   mixins: [target_names, user_mixin],
   components: {
     RightAscensionInput,
@@ -979,11 +979,6 @@ export default {
       this.exposures = this.exposures.map((obj, index) => {
         return index === indexToMatch ? { ...obj, [key]: val } : obj
       })
-    },
-
-    isZoomArcminute () {
-      // console.log('Current Zoom:', this.exposures[this.n - 1].zoom)
-      return this.exposures[this.n - 1].zoom === 'Mosaic arcmin.'
     },
 
     clearProjectForm () {
@@ -1272,23 +1267,6 @@ export default {
     // True if we're modifying a project and the name is changed.
     project_name_changed () {
       return this.modifying_existing_project && this.loaded_project_name != this.project_name
-    },
-
-    adjustedWidth: {
-      get () {
-        return this.exposures[this.n - 1].width // Directly return the value without any condition
-      },
-      set (value) {
-        this.exposures[this.n - 1].width = value
-      }
-    },
-    adjustedHeight: {
-      get () {
-        return this.isZoomArcminute() ? this.exposures[this.n - 1].height * 60 : this.exposures[this.n - 1].height
-      },
-      set (value) {
-        this.exposures[this.n - 1].height = this.isZoomArcminute() ? value / 60 : value
-      }
     },
 
     ...mapGetters('command_params', [
