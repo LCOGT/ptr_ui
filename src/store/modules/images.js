@@ -173,12 +173,14 @@ const actions = {
 
       // If it doesn't already exist, just add it to the array (front).
       if (old_image_index == -1) {
+        console.log('old')
         const updated_recent_images = [new_image, ...recent_images]
         commit('setRecentImages', updated_recent_images)
         dispatch('group_images')
       }
       // Otherwise, replace the old version with the new one we fetched.
       else {
+        console.log('new image')
         recent_images[old_image_index] = new_image
         dispatch('group_images')
       }
@@ -273,7 +275,6 @@ const actions = {
   */
   group_images ({ commit, state, rootState, dispatch }) {
     const currentSite = rootState.site_config.selected_site
-    console.log('this is currentSite,', currentSite)
     let grouped_images_local = JSON.parse(JSON.stringify(state.grouped_images))
     if (!grouped_images_local.imageGroups) {
       grouped_images_local.imageGroups = {}
@@ -285,13 +286,11 @@ const actions = {
     if (grouped_images_local.site && grouped_images_local.site !== currentSite) {
       dispatch('reset_grouped_images')
       grouped_images_local = { site: currentSite }
-      console.log('site !== site,', grouped_images_local)
 
       // If grouped_images_local object doesn't have a key of site (i.e. when page first loads and when user selects
       // a different site), assign the value of currentSite to the new key of site
     } else if (!grouped_images_local.site) {
       grouped_images_local.site = currentSite
-      console.log('else if,', grouped_images_local.site)
     }
 
     for (const img of recent_images) {

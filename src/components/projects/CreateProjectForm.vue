@@ -347,10 +347,10 @@
               </b-select>
             </b-field>
             <b-field
-              :label="n==1 ? 'Zoom in' : ''"
+              :label="n==1 ? 'Area' : ''"
             >
               <b-select
-                v-model="exposures[n-1].zoomin"
+                v-model="exposures[n-1].area"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
               >
@@ -362,45 +362,6 @@
                   {{ val }}
                 </option>
               </b-select>
-            </b-field>
-            <b-field
-              :label="n==1 ? 'Width' : ''"
-              style="width: 80px;"
-            >
-              <b-input
-                v-model="exposures[n-1].width"
-                size="is-small"
-                :disabled="!exposures[n-1].active"
-                type="number"
-                min="-4.5"
-                max="4.5"
-              />
-            </b-field>
-            <b-field
-              :label="n==1 ? 'Height' : ''"
-              style="width: 80px;"
-            >
-              <b-input
-                v-model="exposures[n-1].height"
-                size="is-small"
-                :disabled="!exposures[n-1].active"
-                type="number"
-                min="-4.5"
-                max="4.5"
-              />
-            </b-field>
-            <b-field
-              :label="n==1 ? 'Angle' : ''"
-              style="width: 80px;"
-            >
-              <b-input
-                v-model="exposures[n-1].angle"
-                size="is-small"
-                :disabled="!exposures[n-1].active"
-                type="number"
-                min="-45.0"
-                max="45.0"
-              />
             </b-field>
             <div />
           </div>
@@ -860,7 +821,7 @@ export default {
       generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO'],
       generic_camera_areas: [
         'Sel.', '220%', '133%',
-        '100%', 'Sqr.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
+        'FULL', 'Sqr.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
       site: this.sitecode,
       warn: {
