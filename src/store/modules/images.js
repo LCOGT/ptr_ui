@@ -131,7 +131,7 @@ const actions = {
      *
      */
 
-  update_new_image ({ commit, state, rootState }, new_base_filename) {
+  update_new_image ({ commit, state, rootState, dispatch }, new_base_filename) {
     // No need to get the latest if the new image is from a different site.
     const site = rootState.site_config.selected_site
     // Get the image's site of origin from the beginning of the filename.
@@ -173,13 +173,16 @@ const actions = {
 
       // If it doesn't already exist, just add it to the array (front).
       if (old_image_index == -1) {
+        console.log('old')
         const updated_recent_images = [new_image, ...recent_images]
         commit('setRecentImages', updated_recent_images)
+        dispatch('group_images')
       }
       // Otherwise, replace the old version with the new one we fetched.
       else {
+        console.log('new image')
         recent_images[old_image_index] = new_image
-        commit('setRecentImages', recent_images)
+        dispatch('group_images')
       }
 
       // We don't have a toggle implemented yet.
