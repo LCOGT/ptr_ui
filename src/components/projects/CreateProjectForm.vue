@@ -372,8 +372,8 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                min="-4.5"
-                max="4.5"
+                :min="minWidth"
+                :max="maxWidth"
                 step="0.1"
               />
             </b-field>
@@ -386,8 +386,8 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                min="-4.5"
-                max="4.5"
+                :min="minHeight"
+                :max="maxHeight"
                 step="0.1"
               />
             </b-field>
@@ -838,7 +838,9 @@ const mapStateToComputed = (vuexModule, propertyNames) => {
 
 export default {
   name: 'CreateProjectForm',
-  props: ['sitecode', 'project_to_load'],
+  // passing 'n' as a prop to be able to adjust height and width depending on the zoom selection
+  // have to specify the type of props for all 3
+  props: ['sitecode', 'project_to_load', 'n'],
   mixins: [target_names, user_mixin],
   components: {
     RightAscensionInput,
@@ -865,6 +867,10 @@ export default {
         'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
+      minWidth: -4.5 * 60,
+      maxWidth: 4.5 * 60,
+      minHeight: -4.5 * 60,
+      maxHeight: 4.5 * 60,
       site: this.sitecode,
       warn: {
         project_name: false,
@@ -973,6 +979,11 @@ export default {
       this.exposures = this.exposures.map((obj, index) => {
         return index === indexToMatch ? { ...obj, [key]: val } : obj
       })
+    },
+
+    isZoomArcminute () {
+      // console.log('Current Zoom:', this.exposures[this.n - 1].zoom)
+      return this.exposures[this.n - 1].zoom === 'Mosaic arcmin.'
     },
 
     clearProjectForm () {
@@ -1262,6 +1273,24 @@ export default {
     project_name_changed () {
       return this.modifying_existing_project && this.loaded_project_name != this.project_name
     },
+
+    adjustedWidth: {
+      get () {
+        return this.exposures[this.n - 1].width // Directly return the value without any condition
+      },
+      set (value) {
+        this.exposures[this.n - 1].width = value
+      }
+    },
+    adjustedHeight: {
+      get () {
+        return this.isZoomArcminute() ? this.exposures[this.n - 1].height * 60 : this.exposures[this.n - 1].height
+      },
+      set (value) {
+        this.exposures[this.n - 1].height = this.isZoomArcminute() ? value / 60 : value
+      }
+    },
+
     ...mapGetters('command_params', [
       'mount_ra',
       'mount_dec',
