@@ -838,8 +838,6 @@ const mapStateToComputed = (vuexModule, propertyNames) => {
 
 export default {
   name: 'CreateProjectForm',
-  // passing 'n' as a prop to be able to adjust height and width depending on the zoom selection
-  // have to specify the type of props for all 3
   props: ['sitecode', 'project_to_load'],
   mixins: [target_names, user_mixin],
   components: {
