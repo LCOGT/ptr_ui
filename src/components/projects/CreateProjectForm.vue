@@ -820,8 +820,8 @@ export default {
       max_fits_header_length: 68,
       generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO'],
       generic_camera_areas: [
-        'Sel.', '220%', '133%',
-        'FULL', 'Sqr.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
+        '600%', '500%', '400%', '300%', '220%', '133%',
+        'FULL', 'SQUARE', '71%', '50%', '35%', '25%', '12%'
       ],
       site: this.sitecode,
       warn: {
