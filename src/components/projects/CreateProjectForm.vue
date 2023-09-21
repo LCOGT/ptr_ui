@@ -347,10 +347,10 @@
               </b-select>
             </b-field>
             <b-field
-              :label="n==1 ? 'Zoom in' : ''"
+              :label="n==1 ? 'Zoom' : ''"
             >
               <b-select
-                v-model="exposures[n-1].zoomin"
+                v-model="exposures[n-1].zoom"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
               >
@@ -374,6 +374,7 @@
                 type="number"
                 min="-4.5"
                 max="4.5"
+                step="0.1"
               />
             </b-field>
             <b-field
@@ -387,6 +388,7 @@
                 type="number"
                 min="-4.5"
                 max="4.5"
+                step="0.1"
               />
             </b-field>
             <b-field
@@ -400,6 +402,7 @@
                 type="number"
                 min="-45.0"
                 max="45.0"
+                step="5"
               />
             </b-field>
             <div />
@@ -859,8 +862,8 @@ export default {
       max_fits_header_length: 68,
       generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO'],
       generic_camera_areas: [
-        'Sel.', '220%', '133%',
-        '100%', 'Sqr.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
+        'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
+        'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
       site: this.sitecode,
       warn: {
