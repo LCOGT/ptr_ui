@@ -372,8 +372,8 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="-4.5"
-                :max="4.5"
+                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minWidth * 60 : minWidth"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidth * 60 : maxWidth"
                 step="0.1"
               />
             </b-field>
@@ -386,8 +386,8 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="-4.5"
-                :max="4.5"
+                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minHeight * 60 : minHeight"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeight * 60 : maxHeight"
                 step="0.1"
               />
             </b-field>
@@ -867,10 +867,10 @@ export default {
         'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
-      minWidth: -4.5 * 60,
-      maxWidth: 4.5 * 60,
-      minHeight: -4.5 * 60,
-      maxHeight: 4.5 * 60,
+      minWidth: -4.5,
+      maxWidth: 4.5,
+      minHeight: -4.5,
+      maxHeight: 4.5,
       site: this.sitecode,
       warn: {
         project_name: false,
