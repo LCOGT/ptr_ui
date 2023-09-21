@@ -497,6 +497,7 @@ const actions = {
   load_latest_info_images ({ state, commit, rootState, dispatch }) {
     const site = rootState.site_config.selected_site
     const base_url = rootState.api_endpoints.active_api
+
     // query each of the three channels
     for (let channel = 0; channel < 3; channel++) {
       const url = base_url + `/infoimage/${site}/${channel + 1}`

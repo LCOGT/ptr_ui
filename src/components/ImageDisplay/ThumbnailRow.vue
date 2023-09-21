@@ -45,6 +45,7 @@ export default {
       required: true
     }
   },
+
   methods: {
     setActiveImage (item) {
       this.$emit('thumbnailClicked', item)
@@ -59,10 +60,10 @@ export default {
     }
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
+
 .images {
   display: flex;
   overflow-x: auto;
@@ -81,4 +82,5 @@ export default {
 .selected_thumbnail {
   border: 3px solid rgb(241, 183, 36);
 }
+
 </style>
