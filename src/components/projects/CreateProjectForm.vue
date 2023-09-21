@@ -347,10 +347,10 @@
               </b-select>
             </b-field>
             <b-field
-              :label="n==1 ? 'Area' : ''"
+              :label="n==1 ? 'Zoom' : ''"
             >
               <b-select
-                v-model="exposures[n-1].area"
+                v-model="exposures[n-1].zoom"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
               >
@@ -359,9 +359,51 @@
                   :key="index"
                   :value="val"
                 >
-                  {{ val.toLowerCase() }}
+                  {{ val }}
                 </option>
               </b-select>
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Width' : ''"
+              style="width: 80px;"
+            >
+              <b-input
+                v-model="exposures[n-1].width"
+                size="is-small"
+                :disabled="!exposures[n-1].active"
+                type="number"
+                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minWidthDegrees * degreesToArcminutes : minWidthDegrees"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidthDegrees * degreesToArcminutes : maxWidthDegrees"
+                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Height' : ''"
+              style="width: 80px;"
+            >
+              <b-input
+                v-model="exposures[n-1].height"
+                size="is-small"
+                :disabled="!exposures[n-1].active"
+                type="number"
+                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minHeightDegrees * degreesToArcminutes : minHeightDegrees"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeightDegrees * degreesToArcminutes : maxHeightDegrees"
+                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Angle' : ''"
+              style="width: 80px;"
+            >
+              <b-input
+                v-model="exposures[n-1].angle"
+                size="is-small"
+                :disabled="!exposures[n-1].active"
+                type="number"
+                min="-45.0"
+                max="45.0"
+                step="5"
+              />
             </b-field>
             <div />
           </div>
@@ -820,9 +862,15 @@ export default {
       max_fits_header_length: 68,
       generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO'],
       generic_camera_areas: [
-        '600%', '500%', '400%', '300%', '220%', '133%',
-        'FULL', 'SQUARE', '71%', '50%', '35%', '25%', '12%'
+        'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
+        'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
+      minWidthDegrees: -4.5,
+      maxWidthDegrees: 4.5,
+      minHeightDegrees: -4.5,
+      maxHeightDegrees: 4.5,
+      degreesToArcminutes: 60,
+      conditionalStep: 0.1,
       site: this.sitecode,
       warn: {
         project_name: false,
@@ -1220,6 +1268,7 @@ export default {
     project_name_changed () {
       return this.modifying_existing_project && this.loaded_project_name != this.project_name
     },
+
     ...mapGetters('command_params', [
       'mount_ra',
       'mount_dec',
