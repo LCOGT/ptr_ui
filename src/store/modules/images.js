@@ -173,16 +173,12 @@ const actions = {
 
       // If it doesn't already exist, just add it to the array (front).
       if (old_image_index == -1) {
-        console.log('old')
         const updated_recent_images = [new_image, ...recent_images]
         commit('setRecentImages', updated_recent_images)
-        dispatch('group_images')
       }
       // Otherwise, replace the old version with the new one we fetched.
       else {
-        console.log('new image')
         recent_images[old_image_index] = new_image
-        dispatch('group_images')
       }
 
       // We don't have a toggle implemented yet.
