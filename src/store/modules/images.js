@@ -130,10 +130,10 @@ const actions = {
      * image, and add it into the 'latest_images' list.
      *
      */
-
   update_new_image ({ commit, state, rootState, dispatch }, new_base_filename) {
     // No need to get the latest if the new image is from a different site.
     const site = rootState.site_config.selected_site
+
     // Get the image's site of origin from the beginning of the filename.
     const image_site_origin = new_base_filename.split('-')[0]
     if (site != image_site_origin) {
@@ -152,8 +152,8 @@ const actions = {
       if (response.data.length == 0) {
         return
       }
-
       const new_image = response.data
+      console.log('new_image,', new_image)
       const recent_images = state.recent_images
 
       // Don't show add the image if the user is requesting their data
@@ -175,10 +175,12 @@ const actions = {
       if (old_image_index == -1) {
         const updated_recent_images = [new_image, ...recent_images]
         commit('setRecentImages', updated_recent_images)
+        dispatch('group_images')
       }
       // Otherwise, replace the old version with the new one we fetched.
       else {
         recent_images[old_image_index] = new_image
+        dispatch('group_images')
       }
 
       // We don't have a toggle implemented yet.
@@ -327,7 +329,6 @@ const actions = {
     // If a query size is specified, use the old method of retrieving X images
     const querySize = num_images // || 25 (original default);
     url = rootState.api_endpoints.active_api + `/${site}/latest_images/${querySize}`
-
     // If a user is logged in and they want to see only their data,
     // add their id as a query string param for the api call.
     if (state.show_user_data_only && userid) {
@@ -388,7 +389,6 @@ const actions = {
 
     // Query for site's local noon to noon
     url = rootState.api_endpoints.active_api + '/filtered_images'
-
     let queryStart = null
     let queryEnd = null
 
@@ -473,7 +473,6 @@ const actions = {
 
     await axios(body).then(async response => {
       response = response.data
-
       // Empty response:
       if (response.length == 0) {
         dispatch('display_placeholder_image')
@@ -500,7 +499,7 @@ const actions = {
       axios.get(url).then(response => {
         // Handle case if no info image exists
         if (response.status == 204) {
-          commit('setInfoImage', { info_image: { jpg_url: '' }, channel }) // reset to default empty value
+          commit('setInfoImage', { info_image: { jpg_url: '' }, channel }) // reset to default empty value 
           return
         }
         // Only update the current image if currently set to the old info image

@@ -27,7 +27,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'ThumbnailRow',
   props: {
@@ -45,7 +44,16 @@ export default {
       required: true
     }
   },
-
+  watch: {
+    groupedImagesFromStore: {
+      handler (newVal) {
+        console.log('groupedImagesFromStore changed:', newVal)
+        // you can do something here when the state changes.
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   methods: {
     setActiveImage (item) {
       this.$emit('thumbnailClicked', item)
