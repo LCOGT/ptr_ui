@@ -153,7 +153,6 @@ const actions = {
         return
       }
       const new_image = response.data
-      console.log('new_image,', new_image)
       const recent_images = state.recent_images
 
       // Don't show add the image if the user is requesting their data
@@ -165,12 +164,10 @@ const actions = {
       }
 
       const new_image_filename = new_image.base_filename
-
       // Find the index of the image we want to update.
       // value will be -1 if it doesn't exist.
       const old_image_index = recent_images.findIndex(image =>
         image.base_filename == new_image_filename)
-
       // If it doesn't already exist, just add it to the array (front).
       if (old_image_index == -1) {
         const updated_recent_images = [new_image, ...recent_images]
@@ -182,7 +179,6 @@ const actions = {
         recent_images[old_image_index] = new_image
         dispatch('group_images')
       }
-
       // We don't have a toggle implemented yet.
       // But eventually we want one to focus on the new image immediately.
       const incoming_image_takes_focus = false
@@ -278,13 +274,11 @@ const actions = {
       grouped_images_local.imageGroups = {}
     }
     const recent_images = state.recent_images
-
     // Resetting grouped_images to an empty object when selecting a different site
     // This prevents accumulation of thumbnails from previous sites selected by user
     if (grouped_images_local.site && grouped_images_local.site !== currentSite) {
       dispatch('reset_grouped_images')
       grouped_images_local = { site: currentSite }
-
       // If grouped_images_local object doesn't have a key of site (i.e. when page first loads and when user selects
       // a different site), assign the value of currentSite to the new key of site
     } else if (!grouped_images_local.site) {
@@ -296,7 +290,7 @@ const actions = {
       let SMARTSTK = header && header.SMARTSTK
       // Creating a unique key (i.e. base_filename) for images where SMARTSK is 'no' while also avoiding grouping them as one stack
       // We need this in order to display these images as thumbnails
-      if (SMARTSTK === 'no') {
+      if (!SMARTSTK || SMARTSTK === 'no') {
         SMARTSTK = img && img.base_filename
         grouped_images_local.imageGroups[SMARTSTK] = []
         grouped_images_local.imageGroups[SMARTSTK].push(img)
@@ -311,6 +305,8 @@ const actions = {
       }
     }
     commit('setGroupedImages', { ...grouped_images_local })
+    console.log('grouped images local,', grouped_images_local)
+    console.log('grouped images state,', state.grouped_images)
   },
 
   // Resets grouped_images to an empty object
@@ -499,7 +495,7 @@ const actions = {
       axios.get(url).then(response => {
         // Handle case if no info image exists
         if (response.status == 204) {
-          commit('setInfoImage', { info_image: { jpg_url: '' }, channel }) // reset to default empty value 
+          commit('setInfoImage', { info_image: { jpg_url: '' }, channel }) // reset to default empty value
           return
         }
         // Only update the current image if currently set to the old info image

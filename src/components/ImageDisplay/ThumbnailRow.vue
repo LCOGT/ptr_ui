@@ -39,21 +39,24 @@ export default {
       required: false
     },
     grouped_images: {
+      default: () => ({}),
       type: Object,
-      default: () => {},
       required: true
     }
   },
-  watch: {
-    groupedImagesFromStore: {
-      handler (newVal) {
-        console.log('groupedImagesFromStore changed:', newVal)
-        // you can do something here when the state changes.
-      },
-      deep: true,
-      immediate: true
-    }
+  mounted () {
+    console.log('Mounted Grouped Images:', this.grouped_images)
   },
+  // watch: {
+  //   grouped_images: {
+  //     handler (newVal, oldVal) {
+  //       console.log('New Value:', JSON.stringify(newVal, null, 2))
+  //       console.log('Old Value:', JSON.stringify(oldVal, null, 2))
+  //     },
+  //     deep: true,
+  //     immediate: true
+  //   }
+  // },
   methods: {
     setActiveImage (item) {
       this.$emit('thumbnailClicked', item)
