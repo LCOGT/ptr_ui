@@ -60,6 +60,27 @@ const getters = {
   recent_images: state => state.recent_images,
   user_images: state => state.user_images,
   grouped_images: state => state.grouped_images,
+  recent_images_condensed: state => {
+    // First, generate a map of maximum SSTKNUM for each SMARTSTK
+    const maxSSTKNUMs = state.recent_images.reduce((acc, cur) => {
+      if (!cur.header || !cur.header.SMARTSTK || !cur.header.SSTKNUM) return acc // Skip if missing header, SMARTSTK or SSTKNUM
+
+      if (!acc[cur.header.SMARTSTK] || cur.header.SSTKNUM > acc[cur.header.SMARTSTK]) {
+        acc[cur.header.SMARTSTK] = cur.header.SSTKNUM
+      }
+      return acc
+    }, {})
+
+    // Now, filter the original array
+    const filteredArr = state.recent_images.filter(el => {
+      // Keep if missing header, SMARTSTK or SSTKNUM
+      if (!el.header || !el.header.SMARTSTK || !el.header.SSTKNUM) return true
+
+      // Keep if SSTKNUM is the maximum for its SMARTSTK
+      return el.header.SSTKNUM >= maxSSTKNUMs[el.header.SMARTSTK]
+    })
+    return filteredArr
+  },
   show_user_data_only: state => state.show_user_data_only,
 
   current_image_fits_header: state => state.current_image.fits_header,
@@ -172,12 +193,12 @@ const actions = {
       if (old_image_index == -1) {
         const updated_recent_images = [new_image, ...recent_images]
         commit('setRecentImages', updated_recent_images)
-        dispatch('group_images')
+        // dispatch('group_images')
       }
       // Otherwise, replace the old version with the new one we fetched.
       else {
         recent_images[old_image_index] = new_image
-        dispatch('group_images')
+        // dispatch('group_images')
       }
       // We don't have a toggle implemented yet.
       // But eventually we want one to focus on the new image immediately.
@@ -245,7 +266,7 @@ const actions = {
       }
 
       commit('setRecentImages', response)
-      dispatch('group_images')
+      // dispatch('group_images')
     }).catch(error => {
       console.warn(error)
     })
@@ -266,48 +287,47 @@ const actions = {
       9012: [...grouped images...]
     }
   }
+
   */
-  group_images ({ commit, state, rootState, dispatch }) {
-    const currentSite = rootState.site_config.selected_site
-    let grouped_images_local = JSON.parse(JSON.stringify(state.grouped_images))
-    if (!grouped_images_local.imageGroups) {
-      grouped_images_local.imageGroups = {}
-    }
-    const recent_images = state.recent_images
-    // Resetting grouped_images to an empty object when selecting a different site
-    // This prevents accumulation of thumbnails from previous sites selected by user
-    if (grouped_images_local.site && grouped_images_local.site !== currentSite) {
-      dispatch('reset_grouped_images')
-      grouped_images_local = { site: currentSite }
-      // If grouped_images_local object doesn't have a key of site (i.e. when page first loads and when user selects
-      // a different site), assign the value of currentSite to the new key of site
-    } else if (!grouped_images_local.site) {
-      grouped_images_local.site = currentSite
-    }
+  // group_images ({ commit, state, rootState, dispatch }) {
+  //   const currentSite = rootState.site_config.selected_site
+  //   let grouped_images_local = JSON.parse(JSON.stringify(state.grouped_images))
+  //   if (!grouped_images_local.imageGroups) {
+  //     grouped_images_local.imageGroups = {}
+  //   }
+  //   const recent_images = state.recent_images
+  //   // Resetting grouped_images to an empty object when selecting a different site
+  //   // This prevents accumulation of thumbnails from previous sites selected by user
+  //   if (grouped_images_local.site && grouped_images_local.site !== currentSite) {
+  //     dispatch('reset_grouped_images')
+  //     grouped_images_local = { site: currentSite }
+  //     // If grouped_images_local object doesn't have a key of site (i.e. when page first loads and when user selects
+  //     // a different site), assign the value of currentSite to the new key of site
+  //   } else if (!grouped_images_local.site) {
+  //     grouped_images_local.site = currentSite
+  //   }
 
-    for (const img of recent_images) {
-      const header = img && img.header
-      let SMARTSTK = header && header.SMARTSTK
-      // Creating a unique key (i.e. base_filename) for images where SMARTSK is 'no' while also avoiding grouping them as one stack
-      // We need this in order to display these images as thumbnails
-      if (!SMARTSTK || SMARTSTK === 'no') {
-        SMARTSTK = img && img.base_filename
-        grouped_images_local.imageGroups[SMARTSTK] = []
-        grouped_images_local.imageGroups[SMARTSTK].push(img)
-      }
+  //   for (const img of recent_images) {
+  //     const header = img && img.header
+  //     let SMARTSTK = header && header.SMARTSTK
+  //     // Creating a unique key (i.e. base_filename) for images where SMARTSK is 'no' while also avoiding grouping them as one stack
+  //     // We need this in order to display these images as thumbnails
+  //     if (!SMARTSTK || SMARTSTK === 'no') {
+  //       SMARTSTK = img && img.base_filename
+  //       grouped_images_local.imageGroups[SMARTSTK] = []
+  //       grouped_images_local.imageGroups[SMARTSTK].push(img)
+  //     }
 
-      // Grouping images based on SMARTSTK
-      if (!grouped_images_local.imageGroups[SMARTSTK]) {
-        grouped_images_local.imageGroups[SMARTSTK] = []
-        grouped_images_local.imageGroups[SMARTSTK].push(img)
-      } else {
-        grouped_images_local.imageGroups[SMARTSTK].push(img)
-      }
-    }
-    commit('setGroupedImages', { ...grouped_images_local })
-    console.log('grouped images local,', grouped_images_local)
-    console.log('grouped images state,', state.grouped_images)
-  },
+  //     // Grouping images based on SMARTSTK
+  //     if (!grouped_images_local.imageGroups[SMARTSTK]) {
+  //       grouped_images_local.imageGroups[SMARTSTK] = []
+  //       grouped_images_local.imageGroups[SMARTSTK].push(img)
+  //     } else {
+  //       grouped_images_local.imageGroups[SMARTSTK].push(img)
+  //     }
+  //   }
+  //   commit('setGroupedImages', { ...grouped_images_local })
+  // },
 
   // Resets grouped_images to an empty object
   // Dispatched when a different site is selected
@@ -349,7 +369,7 @@ const actions = {
 
       commit('setCurrentImage', response[0])
       commit('setRecentImages', response)
-      dispatch('group_images')
+      // dispatch('group_images')
     }).catch(error => {
       console.error(error)
     })
@@ -477,7 +497,7 @@ const actions = {
 
       commit('setCurrentImage', response[0])
       commit('setRecentImages', response)
-      dispatch('group_images')
+      // dispatch('group_images')
     }).catch(error => {
       console.error(error)
     })
