@@ -331,9 +331,9 @@ const actions = {
 
   // Resets grouped_images to an empty object
   // Dispatched when a different site is selected
-  reset_grouped_images ({ commit }) {
-    commit('setGroupedImages', {})
-  },
+  // reset_grouped_images ({ commit }) {
+  //   commit('setGroupedImages', {})
+  // },
 
   async load_latest_x_images ({ dispatch, commit, state, rootState }, num_images) {
     // Old method of loading only a certain amount of images
@@ -574,7 +574,7 @@ const actions = {
     }
     commit('setRecentImages', [placeholder_image])
     commit('setCurrentImage', placeholder_image)
-    dispatch('reset_grouped_images')
+    // dispatch('reset_grouped_images')
   },
 
   // Set this_image as the current displayed image
@@ -613,10 +613,10 @@ const actions = {
     commit('setCurrentImage', first_image)
   },
 
-  set_grouped_images ({ commit, state }) {
-    const grouped_images_local = state.grouped_images
-    commit('setGroupedImages', { ...grouped_images_local })
-  },
+  // set_grouped_images ({ commit, state }) {
+  //   const grouped_images_local = state.grouped_images
+  //   commit('setGroupedImages', { ...grouped_images_local })
+  // },
 
   async get_fits_url ({ rootState }, { base_filename, data_type, reduction_level }) {
     // Get the global configuration for all sites from an api call.
