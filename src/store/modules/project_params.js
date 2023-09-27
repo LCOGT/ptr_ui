@@ -20,8 +20,11 @@ const state = {
       imtype: 'light',
       exposure: 1,
       filter: 'Lum',
-      area: 'FULL',
-      bin: 'optimal'
+      zoom: 'Full',
+      bin: 'optimal',
+      width: '0.0',
+      height: '0.0',
+      angle: '0.0'
     }
   ],
   targets: [
@@ -112,7 +115,7 @@ const getters = {
         .filter(e => e.active)
         .map(({ active, ...stuff_to_keep }) => stuff_to_keep),
       // Nested arrays such that
-      // remaining[target_index][exposure_index] = number of remaining exposures
+      // remaining[exposure_index] = number of remaining exposures
       remaining: state.exposures.map(e => parseInt(e.count)),
       // Empty nested arrays such that
       // project_data[exposure_index] = [array of filenames]
@@ -190,8 +193,11 @@ const actions = {
         imtype: 'light',
         exposure: 1,
         filter: 'Lum',
-        area: 'FULL',
-        bin: 'optimal'
+        zoom: 'Full',
+        bin: 'optimal',
+        width: '0.0',
+        height: '0.0',
+        angle: '0.0'
       }
     ])
     commit('exposures_index', 1)
