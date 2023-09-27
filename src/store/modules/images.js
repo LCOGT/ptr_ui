@@ -151,10 +151,10 @@ const actions = {
      * image, and add it into the 'latest_images' list.
      *
      */
+
   update_new_image ({ commit, state, rootState, dispatch }, new_base_filename) {
     // No need to get the latest if the new image is from a different site.
     const site = rootState.site_config.selected_site
-
     // Get the image's site of origin from the beginning of the filename.
     const image_site_origin = new_base_filename.split('-')[0]
     if (site != image_site_origin) {
@@ -173,6 +173,7 @@ const actions = {
       if (response.data.length == 0) {
         return
       }
+
       const new_image = response.data
       const recent_images = state.recent_images
 
@@ -185,10 +186,12 @@ const actions = {
       }
 
       const new_image_filename = new_image.base_filename
+
       // Find the index of the image we want to update.
       // value will be -1 if it doesn't exist.
       const old_image_index = recent_images.findIndex(image =>
         image.base_filename == new_image_filename)
+
       // If it doesn't already exist, just add it to the array (front).
       if (old_image_index == -1) {
         const updated_recent_images = [new_image, ...recent_images]
@@ -200,6 +203,7 @@ const actions = {
         recent_images[old_image_index] = new_image
         // dispatch('group_images')
       }
+
       // We don't have a toggle implemented yet.
       // But eventually we want one to focus on the new image immediately.
       const incoming_image_takes_focus = false
@@ -345,6 +349,7 @@ const actions = {
     // If a query size is specified, use the old method of retrieving X images
     const querySize = num_images // || 25 (original default);
     url = rootState.api_endpoints.active_api + `/${site}/latest_images/${querySize}`
+
     // If a user is logged in and they want to see only their data,
     // add their id as a query string param for the api call.
     if (state.show_user_data_only && userid) {
@@ -405,6 +410,7 @@ const actions = {
 
     // Query for site's local noon to noon
     url = rootState.api_endpoints.active_api + '/filtered_images'
+
     let queryStart = null
     let queryEnd = null
 
@@ -489,6 +495,7 @@ const actions = {
 
     await axios(body).then(async response => {
       response = response.data
+
       // Empty response:
       if (response.length == 0) {
         dispatch('display_placeholder_image')
