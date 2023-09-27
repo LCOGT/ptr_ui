@@ -45,10 +45,6 @@ const state = {
   // TODO: Write an action that will update a user's image list when images are added to their account
   user_images: [],
 
-  // grouped_images: object where images are grouped based on their SMARTSTK value
-  // Before the action group_images, there's an example of what this object looks like after being populated
-  // grouped_images: {},
-
   show_user_data_only: false,
 
   // determines whether 'current_images' is set to show the most recent images with live updates.
@@ -59,7 +55,6 @@ const getters = {
   current_image: state => state.current_image,
   recent_images: state => state.recent_images,
   user_images: state => state.user_images,
-  // grouped_images: state => state.grouped_images,
   recent_images_condensed: state => {
     // First, generate a map of maximum SSTKNUM for each SMARTSTK
     const maxSSTKNUMs = state.recent_images.reduce((acc, cur) => {
@@ -107,7 +102,6 @@ const getters = {
 const mutations = {
   setCurrentImage (state, the_current_image) { state.current_image = the_current_image },
   setRecentImages (state, recent_image_list) { state.recent_images = recent_image_list },
-  // setGroupedImages (state, grouped_images) { state.grouped_images = grouped_images },
   setUserImages (state, user_images_list) { state.user_images = user_images_list },
   show_user_data_only (state, val) { state.show_user_data_only = val },
   live_data (state, val) { state.live_data = val },
@@ -197,12 +191,10 @@ const actions = {
       if (old_image_index == -1) {
         const updated_recent_images = [new_image, ...recent_images]
         commit('setRecentImages', updated_recent_images)
-        // dispatch('group_images')
       }
       // Otherwise, replace the old version with the new one we fetched.
       else {
         recent_images[old_image_index] = new_image
-        // dispatch('group_images')
       }
 
       // We don't have a toggle implemented yet.
@@ -271,7 +263,6 @@ const actions = {
       }
 
       commit('setRecentImages', response)
-      // dispatch('group_images')
     }).catch(error => {
       console.warn(error)
     })
@@ -282,63 +273,7 @@ const actions = {
   @param {boolean} user_data_only: whether or not to filter by images
   Taken the active user or not.
 
-  Grouping images as they load and we group them based on their SMARTSTK value
-  After the for loop, the grouped_images_local looks something like this:
-  grouped_images_local: {
-    site: 'tst',
-    imageGroups: {
-      1234: [...grouped images...],
-      5678: [...grouped images...],
-      9012: [...grouped images...]
-    }
-  }
-
   */
-  // group_images ({ commit, state, rootState, dispatch }) {
-  //   const currentSite = rootState.site_config.selected_site
-  //   let grouped_images_local = JSON.parse(JSON.stringify(state.grouped_images))
-  //   if (!grouped_images_local.imageGroups) {
-  //     grouped_images_local.imageGroups = {}
-  //   }
-  //   const recent_images = state.recent_images
-  //   // Resetting grouped_images to an empty object when selecting a different site
-  //   // This prevents accumulation of thumbnails from previous sites selected by user
-  //   if (grouped_images_local.site && grouped_images_local.site !== currentSite) {
-  //     dispatch('reset_grouped_images')
-  //     grouped_images_local = { site: currentSite }
-  //     // If grouped_images_local object doesn't have a key of site (i.e. when page first loads and when user selects
-  //     // a different site), assign the value of currentSite to the new key of site
-  //   } else if (!grouped_images_local.site) {
-  //     grouped_images_local.site = currentSite
-  //   }
-
-  //   for (const img of recent_images) {
-  //     const header = img && img.header
-  //     let SMARTSTK = header && header.SMARTSTK
-  //     // Creating a unique key (i.e. base_filename) for images where SMARTSK is 'no' while also avoiding grouping them as one stack
-  //     // We need this in order to display these images as thumbnails
-  //     if (!SMARTSTK || SMARTSTK === 'no') {
-  //       SMARTSTK = img && img.base_filename
-  //       grouped_images_local.imageGroups[SMARTSTK] = []
-  //       grouped_images_local.imageGroups[SMARTSTK].push(img)
-  //     }
-
-  //     // Grouping images based on SMARTSTK
-  //     if (!grouped_images_local.imageGroups[SMARTSTK]) {
-  //       grouped_images_local.imageGroups[SMARTSTK] = []
-  //       grouped_images_local.imageGroups[SMARTSTK].push(img)
-  //     } else {
-  //       grouped_images_local.imageGroups[SMARTSTK].push(img)
-  //     }
-  //   }
-  //   commit('setGroupedImages', { ...grouped_images_local })
-  // },
-
-  // Resets grouped_images to an empty object
-  // Dispatched when a different site is selected
-  // reset_grouped_images ({ commit }) {
-  //   commit('setGroupedImages', {})
-  // },
 
   async load_latest_x_images ({ dispatch, commit, state, rootState }, num_images) {
     // Old method of loading only a certain amount of images
@@ -375,7 +310,6 @@ const actions = {
 
       commit('setCurrentImage', response[0])
       commit('setRecentImages', response)
-      // dispatch('group_images')
     }).catch(error => {
       console.error(error)
     })
@@ -505,7 +439,6 @@ const actions = {
 
       commit('setCurrentImage', response[0])
       commit('setRecentImages', response)
-      // dispatch('group_images')
     }).catch(error => {
       console.error(error)
     })
@@ -582,7 +515,6 @@ const actions = {
     }
     commit('setRecentImages', [placeholder_image])
     commit('setCurrentImage', placeholder_image)
-    // dispatch('reset_grouped_images')
   },
 
   // Set this_image as the current displayed image
@@ -620,11 +552,6 @@ const actions = {
     const first_image = state.recent_images[state.recent_images.length - 1]
     commit('setCurrentImage', first_image)
   },
-
-  // set_grouped_images ({ commit, state }) {
-  //   const grouped_images_local = state.grouped_images
-  //   commit('setGroupedImages', { ...grouped_images_local })
-  // },
 
   async get_fits_url ({ rootState }, { base_filename, data_type, reduction_level }) {
     // Get the global configuration for all sites from an api call.
