@@ -47,7 +47,7 @@ const state = {
 
   // grouped_images: object where images are grouped based on their SMARTSTK value
   // Before the action group_images, there's an example of what this object looks like after being populated
-  grouped_images: {},
+  // grouped_images: {},
 
   show_user_data_only: false,
 
@@ -59,7 +59,7 @@ const getters = {
   current_image: state => state.current_image,
   recent_images: state => state.recent_images,
   user_images: state => state.user_images,
-  grouped_images: state => state.grouped_images,
+  // grouped_images: state => state.grouped_images,
   recent_images_condensed: state => {
     // First, generate a map of maximum SSTKNUM for each SMARTSTK
     const maxSSTKNUMs = state.recent_images.reduce((acc, cur) => {
@@ -106,7 +106,7 @@ const getters = {
 const mutations = {
   setCurrentImage (state, the_current_image) { state.current_image = the_current_image },
   setRecentImages (state, recent_image_list) { state.recent_images = recent_image_list },
-  setGroupedImages (state, grouped_images) { state.grouped_images = grouped_images },
+  // setGroupedImages (state, grouped_images) { state.grouped_images = grouped_images },
   setUserImages (state, user_images_list) { state.user_images = user_images_list },
   show_user_data_only (state, val) { state.show_user_data_only = val },
   live_data (state, val) { state.live_data = val },
