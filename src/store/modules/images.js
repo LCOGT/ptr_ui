@@ -55,6 +55,7 @@ const getters = {
   current_image: state => state.current_image,
   recent_images: state => state.recent_images,
   user_images: state => state.user_images,
+  // Uses recent_images but removes any intermediate smartstack frames, so you only see the latest version of each smart stack
   recent_images_condensed: state => {
     // First, generate a map of maximum SSTKNUM for each SMARTSTK
     const maxSSTKNUMs = state.recent_images.reduce((acc, cur) => {
