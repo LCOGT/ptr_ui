@@ -59,7 +59,6 @@ export default {
   props: {
     sitecode: String
   },
-
   methods: {
     ...mapActions('images', [
       'set_current_image'

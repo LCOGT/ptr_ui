@@ -27,11 +27,6 @@ export default {
       type: Number,
       required: false
     }
-    // grouped_images: {
-    //   default: () => ({}),
-    //   type: Object,
-    //   required: true
-    // }
   },
   methods: {
     setActiveImage (item) {
@@ -40,17 +35,6 @@ export default {
     thumbnailWithFallback (item) {
       return item.jpg_thumbnail_url || item.jpg_url
     }
-    // setActiveImage (item) {
-    //   this.$emit('thumbnailClicked', item)
-    // },
-
-    // thumbnailWithFallback (item) {
-    //   let thumbnailCover = item && item[0] && item[0].jpg_thumbnail_url
-    //   if (!thumbnailCover) {
-    //     thumbnailCover = item && item[0] && item[0].jpg_url
-    //   }
-    //   return thumbnailCover || 'https://via.placeholder.com/768?text=no+jpg+preview+available'
-    // }
   }
 }
 </script>
