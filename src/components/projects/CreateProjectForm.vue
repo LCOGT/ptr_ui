@@ -400,8 +400,8 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                min="-45.0"
-                max="45.0"
+                min="-90.0"
+                max="90.0"
                 step="5"
               />
             </b-field>
@@ -865,9 +865,9 @@ export default {
         'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
-      minWidthDegrees: -4.5,
+      minWidthDegrees: 0.0,
       maxWidthDegrees: 4.5,
-      minHeightDegrees: -4.5,
+      minHeightDegrees: 0.0,
       maxHeightDegrees: 4.5,
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
