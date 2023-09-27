@@ -65,8 +65,9 @@ const getters = {
     const maxSSTKNUMs = state.recent_images.reduce((acc, cur) => {
       if (!cur.header || !cur.header.SMARTSTK || !cur.header.SSTKNUM) return acc // Skip if missing header, SMARTSTK or SSTKNUM
 
-      if (!acc[cur.header.SMARTSTK] || Number(cur.header.SSTKNUM) > Number(acc[cur.header.SMARTSTK])) {
-        acc[cur.header.SMARTSTK] = cur.header.SSTKNUM
+      const num = parseInt(cur.header.SSTKNUM) // convert string to number
+      if (!acc[cur.header.SMARTSTK] || num > acc[cur.header.SMARTSTK]) {
+        acc[cur.header.SMARTSTK] = num
       }
       return acc
     }, {})
