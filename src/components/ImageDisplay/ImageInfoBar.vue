@@ -1,27 +1,49 @@
 <template>
   <div>
-    <div class="image-info-bar-item site"> site:&nbsp;{{ site }} </div>
-    <div class="image-info-bar-item exptime">exposure:&nbsp;{{ exposure }}s </div>
-    <div class="image-info-bar-item filter-used"> filter:&nbsp;{{ filter }} </div>
-    <div class="image-info-bar-item smartstack"> stack:&nbsp;{{ smartstackProgress }} </div>
-    <div class="image-info-bar-item ra"> ra:&nbsp;
+    <div class="image-info-bar-item site">
+      site:&nbsp;{{ site }}
+    </div>
+    <div class="image-info-bar-item exptime">
+      exposure:&nbsp;{{ exposure }}s
+    </div>
+    <div class="image-info-bar-item filter-used">
+      filter:&nbsp;{{ filter }}
+    </div>
+    <div class="image-info-bar-item smartstack">
+      stack:&nbsp;{{ smartstackProgress }}
+    </div>
+    <div class="image-info-bar-item ra">
+      ra:&nbsp;
       <RaDisplay
         :ra_hours_decimal="raHours"
         :decimal_precision="3"
       />
     </div>
-    <div class="image-info-bar-item dec"> dec:&nbsp;
+    <div class="image-info-bar-item dec">
+      dec:&nbsp;
       <DecDisplay
         :dec_deg_decimal="current_image.declination"
         :decimal_precision="3"
       />
     </div>
-    <div class="image-info-bar-item airmass"> airmass:&nbsp;{{ airmass }} </div>
-    <div class="image-info-bar-item altitude"> altitude:&nbsp;{{ altitude }}° </div>
-    <div class="image-info-bar-item obstime"> {{ obstime }}</div>
-    <div class="image-info-bar-item fwhm"> fwhm: {{ fwhm }}" </div>
-    <div class="image-info-bar-item sepsky"> sky: {{ sepsky }} adu </div>
-    <div class="image-info-bar-item filename"> {{ filename }} </div>
+    <div class="image-info-bar-item airmass">
+      airmass:&nbsp;{{ airmass }}
+    </div>
+    <div class="image-info-bar-item altitude">
+      altitude:&nbsp;{{ altitude }}°
+    </div>
+    <div class="image-info-bar-item obstime">
+      {{ obstime }}
+    </div>
+    <div class="image-info-bar-item fwhm">
+      fwhm: {{ fwhm }}"
+    </div>
+    <div class="image-info-bar-item sepsky">
+      sky: {{ sepsky }} adu
+    </div>
+    <div class="image-info-bar-item filename">
+      {{ filename }}
+    </div>
   </div>
 </template>
 
