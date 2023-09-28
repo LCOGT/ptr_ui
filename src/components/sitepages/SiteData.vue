@@ -505,7 +505,7 @@ $tabs-toggle-link-border-width: 10px;
 @import "@/style/_variables.scss";
 
 $site-data-wrapper-padding: 1em;
-$infobar-height: 70px;
+$infobar-height: 80px;
 $thumbnails-height: 100px;
 $controls-height: 55px;
 
@@ -570,7 +570,7 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
   grid-area: image;
   width: 100%;
   //display: grid; // for some reason this breaks the layout when loading lots of images
-  grid-template-rows: $infobar-height auto auto auto 1fr;
+  grid-template-rows: auto auto auto 1fr;
   grid-template-columns: auto;
   overflow: hidden;
 
