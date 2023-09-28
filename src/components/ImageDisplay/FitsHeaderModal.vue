@@ -53,7 +53,6 @@
             :data="fitsHeaderTable"
             :columns="columns"
             style="width: auto; flex: 0"
-            :loading="headerIsLoading"
           />
         </div>
       </div>
@@ -76,9 +75,7 @@ export default {
   },
   data () {
     return {
-      fitsHeader: {},
       showFitsHeaderModal: false,
-      headerIsLoading: false,
       columns: [
         {
           field: 'key',
@@ -94,41 +91,22 @@ export default {
       ]
     }
   },
-  watch: {
-    image () {
-      if (this.showFitsHeaderModal) {
-        this.refreshFitsHeader()
-      }
-    }
-  },
   computed: {
     fitsHeaderTable () {
       const tableData = []
-      for (const property in this.fitsHeader) {
+      for (const property in this.image.header) {
         tableData.push({
           key: property.toLowerCase(),
-          val: this.fitsHeader[property]
+          val: this.image.header[property]
         })
       }
       return tableData
     }
   },
   methods: {
-    refreshFitsHeader () {
-      this.fitsHeader = {}
-      this.headerIsLoading = true
-      this.$store.dispatch('images/loadCurrentImageFitsHeader').then(header => {
-        this.fitsHeader = header
-      }).finally(() => {
-        this.headerIsLoading = false
-      })
-    },
     showFitsHeader () {
-      this.refreshFitsHeader()
       this.showFitsHeaderModal = true
     }
   }
 }
 </script>
-<style lang="scss" scoped>
-</style>
