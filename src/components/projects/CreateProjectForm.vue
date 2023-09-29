@@ -1188,6 +1188,13 @@ export default {
         })
         return ['none']
       }
+    },
+    getSymbol (zoom) {
+      if (zoom === 'Mosaic deg.') {
+        console.log('zoom deg')
+        return '°'
+      } else if (zoom === 'Mosaic arcmin.') return "'"
+      return '' // return an empty string if there is no match
     }
   },
   computed: {
