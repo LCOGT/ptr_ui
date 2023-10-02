@@ -1191,7 +1191,7 @@ export default {
     },
     getSymbol (zoom) {
       if (zoom === 'Mosaic deg.') {
-        console.log('zoom deg')
+        console.log('data max,', zoom + '°')
         return '°'
       } else if (zoom === 'Mosaic arcmin.') return "'"
       return '' // return an empty string if there is no match
