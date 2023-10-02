@@ -15,6 +15,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'ThumbnailRow',
   props: {
@@ -27,12 +28,10 @@ export default {
       required: false
     }
   },
-
   methods: {
     setActiveImage (item) {
       this.$emit('thumbnailClicked', item)
     },
-
     thumbnailWithFallback (item) {
       return item.jpg_thumbnail_url || item.jpg_url
     }

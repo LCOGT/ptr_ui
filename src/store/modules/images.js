@@ -6,7 +6,6 @@
  * for computing various attributes, etc.
  */
 
-// import { API } from 'aws-amplify'
 import Vue from 'vue'
 import axios from 'axios'
 import moment from 'moment'
@@ -56,6 +55,29 @@ const getters = {
   current_image: state => state.current_image,
   recent_images: state => state.recent_images,
   user_images: state => state.user_images,
+  // Uses recent_images but removes any intermediate smartstack frames, so you only see the latest version of each smart stack
+  recent_images_condensed: state => {
+    // First, generate a map of maximum SSTKNUM for each SMARTSTK
+    const maxSSTKNUMs = state.recent_images.reduce((acc, cur) => {
+      if (!cur.header || !cur.header.SMARTSTK || !cur.header.SSTKNUM) return acc // Skip if missing header, SMARTSTK or SSTKNUM
+
+      const num = parseInt(cur.header.SSTKNUM) // convert string to number
+      if (!acc[cur.header.SMARTSTK] || num > acc[cur.header.SMARTSTK]) {
+        acc[cur.header.SMARTSTK] = num
+      }
+      return acc
+    }, {})
+
+    // Now, filter the original array
+    const filteredArr = state.recent_images.filter(el => {
+      // Keep if missing header, SMARTSTK or SSTKNUM
+      if (!el.header || !el.header.SMARTSTK || !el.header.SSTKNUM) return true
+
+      // Keep if SSTKNUM is the maximum for its SMARTSTK
+      return el.header.SSTKNUM >= maxSSTKNUMs[el.header.SMARTSTK]
+    })
+    return filteredArr
+  },
   show_user_data_only: state => state.show_user_data_only,
 
   current_image_fits_header: state => state.current_image.fits_header,
@@ -116,9 +138,6 @@ const actions = {
      * image from SAF as the active image even after the user has navigated to
      * the WMD images page (where all the thumbnails are WMD images).
      *
-     */
-
-  /**
      * UPDATE the view with new incoming data.
      * This action is dispatched whenever a new-image-notification arrives.
      * It will get the latest image and add it to the stack of recent images,
@@ -128,6 +147,7 @@ const actions = {
      * image, and add it into the 'latest_images' list.
      *
      */
+
   update_new_image ({ commit, state, rootState, dispatch }, new_base_filename) {
     // No need to get the latest if the new image is from a different site.
     const site = rootState.site_config.selected_site
@@ -147,7 +167,6 @@ const actions = {
     axios.get(apiName + path).then(async response => {
       // Empty response. If this runs, something is wrong.
       if (response.data.length == 0) {
-        // dispatch('display_placeholder_image')
         return
       }
 
@@ -177,7 +196,6 @@ const actions = {
       // Otherwise, replace the old version with the new one we fetched.
       else {
         recent_images[old_image_index] = new_image
-        commit('setRecentImages', recent_images)
       }
 
       // We don't have a toggle implemented yet.
@@ -197,9 +215,7 @@ const actions = {
     })
   },
 
-  /**
-     *  This action will retrieve a list of images filtered by the parameters in filter_params
-     */
+  // This action will retrieve a list of images filtered by the parameters in filter_params
   get_filtered_images ({ commit, dispatch, rootState }, filter_params) {
     dispatch('toggle_live_data', false)
     const apiName = rootState.api_endpoints.active_api
@@ -254,10 +270,11 @@ const actions = {
   },
 
   /**
-     *  LOAD the latest images, replacing the current list of latest_images.
-     *  @param {boolean} user_data_only: whether or not to filter by images
-     *     taken the active user or not.
-     */
+  LOAD the latest images, replacing the current list of latest_images.
+  @param {boolean} user_data_only: whether or not to filter by images
+  Taken the active user or not.
+
+  */
 
   async load_latest_x_images ({ dispatch, commit, state, rootState }, num_images) {
     // Old method of loading only a certain amount of images
@@ -314,6 +331,7 @@ const actions = {
     // Get site and user_id
     let url = null
     const site = rootState.site_config.selected_site
+
     const filterparams = {}
 
     const userid = user_id()
@@ -386,7 +404,6 @@ const actions = {
     if (state.show_user_data_only && userid) {
       filterparams.user_id = user_id
     }
-
     /**
          * The response for this api call is a list of elements with the form:
          *  image = {
@@ -430,7 +447,7 @@ const actions = {
     dispatch('load_latest_info_images')
   },
 
-  load_latest_info_images ({ state, commit, rootState }) {
+  load_latest_info_images ({ state, commit, rootState, dispatch }) {
     const site = rootState.site_config.selected_site
     const base_url = rootState.api_endpoints.active_api
 
@@ -490,7 +507,7 @@ const actions = {
   },
 
   // Load and display a single placeholder image for a site.
-  display_placeholder_image ({ commit }) {
+  display_placeholder_image ({ commit, dispatch }) {
     const placeholder_url = 'https://via.placeholder.com/768x768?text=nothing here yet'
     const placeholder_image = {
       jpg_url: placeholder_url,
@@ -501,16 +518,12 @@ const actions = {
     commit('setCurrentImage', placeholder_image)
   },
 
-  /**
-     * Set this_image as the current displayed image
-     */
+  // Set this_image as the current displayed image
   set_current_image ({ commit }, this_image) {
     commit('setCurrentImage', this_image)
   },
 
-  /**
-     * Set the current image to the most recent one in recent_images.
-     */
+  // Set the current image to the most recent one in recent_images.
   set_latest_image ({ commit, dispatch, state }) {
     const the_current_image = state.recent_images[0]
     commit('setCurrentImage', the_current_image)
