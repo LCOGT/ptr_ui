@@ -1193,7 +1193,6 @@ export default {
     },
     getSymbol (zoom) {
       if (zoom === 'Mosaic deg.') {
-        console.log('test')
         return 'degree-input'
       } else if (zoom === 'Mosaic arcmin.') return 'arcmin-input'
       return '' // return an empty string if there is no match
