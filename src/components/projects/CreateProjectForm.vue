@@ -399,6 +399,7 @@
             >
               <b-input
                 v-model="exposures[n-1].angle"
+                :class="addSymbol(exposures[n-1].angle)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
@@ -406,6 +407,7 @@
                 max="90.0"
                 step="5"
               />
+              <template v-slot:append>°</template>
             </b-field>
             <div />
           </div>
@@ -1196,6 +1198,11 @@ export default {
         return 'degree-input'
       } else if (zoom === 'Mosaic arcmin.') return 'arcmin-input'
       return '' // return an empty string if there is no match
+    },
+    addSymbol (angle) {
+      if (angle) {
+        return 'angle-input'
+      }
     }
   },
   computed: {
@@ -1348,6 +1355,16 @@ export default {
 
 .arcmin-input::after {
   content: "'";
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+}
+
+.angle-input::after {
+  content: '°';
   position: absolute;
   top: 50%;
   left: 40%;
