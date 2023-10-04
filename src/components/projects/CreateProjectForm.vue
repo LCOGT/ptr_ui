@@ -399,7 +399,7 @@
             >
               <b-input
                 v-model="exposures[n-1].angle"
-                :class="addSymbol(exposures[n-1].angle)"
+                class="angle-input"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
@@ -1197,11 +1197,6 @@ export default {
         return 'degree-input'
       } else if (zoom === 'Mosaic arcmin.') return 'arcmin-input'
       return '' // return an empty string if there is no match
-    },
-    addSymbol (angle) {
-      if (angle) {
-        return 'angle-input'
-      }
     }
   },
   computed: {
