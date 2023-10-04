@@ -369,6 +369,7 @@
             >
               <b-input
                 v-model="exposures[n-1].width"
+                :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
@@ -383,6 +384,7 @@
             >
               <b-input
                 v-model="exposures[n-1].height"
+                :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
@@ -397,6 +399,7 @@
             >
               <b-input
                 v-model="exposures[n-1].angle"
+                :class="addSymbol(exposures[n-1].angle)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
@@ -1191,10 +1194,14 @@ export default {
     },
     getSymbol (zoom) {
       if (zoom === 'Mosaic deg.') {
-        console.log('zoom deg')
-        return '°'
-      } else if (zoom === 'Mosaic arcmin.') return "'"
+        return 'degree-input'
+      } else if (zoom === 'Mosaic arcmin.') return 'arcmin-input'
       return '' // return an empty string if there is no match
+    },
+    addSymbol (angle) {
+      if (angle) {
+        return 'angle-input'
+      }
     }
   },
   computed: {
@@ -1334,5 +1341,34 @@ export default {
     flex-direction: row;
     gap: 1em;
     margin-bottom: 1em;
+}
+.degree-input::after {
+  content: '°';
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+}
+
+.arcmin-input::after {
+  content: "'";
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+}
+
+.angle-input::after {
+  content: '°';
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
 }
 </style>
