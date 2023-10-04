@@ -407,7 +407,6 @@
                 max="90.0"
                 step="5"
               />
-              <template v-slot:append>°</template>
             </b-field>
             <div />
           </div>
