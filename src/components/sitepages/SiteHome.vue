@@ -52,6 +52,9 @@
     </div>
 
     <div style="height: 2em;" />
+
+    <OWMReport />
+
   </div>
 </template>
 
@@ -60,14 +63,16 @@ import { mapGetters } from 'vuex'
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import SiteEventsModal from '@/components/SiteEventsModal'
+import OWMReport from '@/components/status/OWMReport'
 
 export default {
   name: 'SiteHome',
   props: ['sitecode'],
   mixins: [commands_mixin, user_mixin],
   components: {
-    SiteEventsModal
-  },
+    SiteEventsModal,
+    OWMReport
+},
   computed: {
     ...mapGetters('site_config', [
       'site_latitude',

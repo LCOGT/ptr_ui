@@ -379,17 +379,7 @@
 
     <br>
 
-    <div style="margin-bottom: 1em;">
-      OWM Report
-      <pre>{{ owm_report }}</pre>
-    </div>
-
-    <div style="margin-bottom: 1em;">
-      <b-button @click="showOwmStatus">(alternate method) show OWM Status</b-button>
-    </div>
-    <b-modal v-model="owmModalVisible">
-      <pre>{{ owm_report }}</pre>
-    </b-modal>
+    <OWMReport />
 
     <div
       class="status-toggle-bar"
@@ -414,15 +404,16 @@ import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/FormElements/CommandButton'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
 import StatusVal from '@/components/status/StatusVal'
+import OWMReport from '@/components/status/OWMReport'
 import { mapGetters } from 'vuex'
-import axios from 'axios'
 export default {
   name: 'Enclosure',
   mixins: [commands_mixin, user_mixin],
   components: {
     CommandButton,
     StatusVal,
-    SimpleDeviceStatus
+    SimpleDeviceStatus,
+    OWMReport
   },
   data () {
     return {
@@ -453,22 +444,8 @@ export default {
       skyTempLimitDangerLevel: 90,
       lowestAmbientTemp: '',
       highestAmbientTemp: '',
-
-      owmModalVisible: false,
-      owm_report: '...loading...'
     }
   },
-
-  mounted () {
-    this.getOwmReport()
-  },
-  watch: {
-    '$route.params.sitecode' () {
-      this.owm_report = '...loading...'
-      this.getOwmReport()
-    }
-  },
-
   methods: {
     enclosure_force_roof_state (val) {
       return this.wema_base_command('enclosure', 'force_roof_state', '',
@@ -477,17 +454,6 @@ export default {
         }
       )
     },
-    getOwmReport () {
-      const endpoint = this.$store.state.api_endpoints.status_endpoint + '/' + this.wema_name + '/owm_report'
-      axios.get(endpoint).then(response => {
-        this.owm_report = JSON.parse(response.data.status.owm_report)
-      }).catch(() => {
-        this.owm_report = 'OWM report unavailable'
-      })
-    },
-    showOwmStatus () {
-      this.owmModalVisible = true
-    }
   },
 
   computed: {
