@@ -369,6 +369,7 @@
             >
               <b-input
                 v-model="exposures[n-1].width"
+                :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
@@ -383,6 +384,7 @@
             >
               <b-input
                 v-model="exposures[n-1].height"
+                :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
@@ -397,11 +399,12 @@
             >
               <b-input
                 v-model="exposures[n-1].angle"
+                class="angle-input"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                min="-45.0"
-                max="45.0"
+                min="-90.0"
+                max="90.0"
                 step="5"
               />
             </b-field>
@@ -865,9 +868,9 @@ export default {
         'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
-      minWidthDegrees: -4.5,
+      minWidthDegrees: 0.0,
       maxWidthDegrees: 4.5,
-      minHeightDegrees: -4.5,
+      minHeightDegrees: 0.0,
       maxHeightDegrees: 4.5,
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
@@ -1188,6 +1191,12 @@ export default {
         })
         return ['none']
       }
+    },
+    getSymbol (zoom) {
+      if (zoom === 'Mosaic deg.') {
+        return 'degree-input'
+      } else if (zoom === 'Mosaic arcmin.') return 'arcmin-input'
+      return '' // return an empty string if there is no match
     }
   },
   computed: {
@@ -1327,5 +1336,34 @@ export default {
     flex-direction: row;
     gap: 1em;
     margin-bottom: 1em;
+}
+.degree-input::after {
+  content: '°';
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+}
+
+.arcmin-input::after {
+  content: "'";
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+}
+
+.angle-input::after {
+  content: '°';
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
 }
 </style>
