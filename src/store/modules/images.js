@@ -169,7 +169,6 @@ const actions = {
       if (response.data.length == 0) {
         return
       }
-      console.log('api: ', apiName + path)
 
       const new_image = response.data
       const recent_images = state.recent_images
@@ -204,7 +203,7 @@ const actions = {
       let current_image = state.current_image
       const current_image_SMARTSTK = current_image.header && current_image.header.SMARTSTK
       const new_image_SMARTSTK = new_image.header && new_image.header.SMARTSTK
-      if (current_image_SMARTSTK !== 'no' && current_image_SMARTSTK === new_image_SMARTSTK) {
+      if (current_image_SMARTSTK && current_image_SMARTSTK !== 'no' && current_image_SMARTSTK === new_image_SMARTSTK) {
         current_image = new_image
       }
 
