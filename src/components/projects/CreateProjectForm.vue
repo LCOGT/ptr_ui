@@ -365,10 +365,10 @@
             </b-field>
             <b-field
               :label="n==1 ? 'Width' : ''"
-              style="width: 80px;"
+              style="width: 150px;"
             >
-              <b-input
-                v-model="exposures[n-1].width"
+              <b-numberinput
+                :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
@@ -376,14 +376,16 @@
                 :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minWidthDegrees * degreesToArcminutes : minWidthDegrees"
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidthDegrees * degreesToArcminutes : maxWidthDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
+                min-step="0.001"
+                @input="val => exposures[n-1].width = val"
               />
             </b-field>
             <b-field
               :label="n==1 ? 'Height' : ''"
-              style="width: 80px;"
+              style="width: 150px;"
             >
-              <b-input
-                v-model="exposures[n-1].height"
+              <b-numberinput
+                :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
@@ -391,21 +393,25 @@
                 :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minHeightDegrees * degreesToArcminutes : minHeightDegrees"
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeightDegrees * degreesToArcminutes : maxHeightDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
+                min-step="0.001"
+                @input="val => exposures[n-1].height = val"
               />
             </b-field>
             <b-field
               :label="n==1 ? 'Angle' : ''"
-              style="width: 80px;"
+              style="width: 150px;"
             >
-              <b-input
-                v-model="exposures[n-1].angle"
+              <b-numberinput
+                :value="Number(exposures[n-1].angle)"
                 class="angle-input"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                min="-90.0"
-                max="90.0"
-                step="5"
+                :min="-90.0"
+                :max="90.0"
+                :step="5"
+                min-step="0.001"
+                @input="val => exposures[n-1].angle = val"
               />
             </b-field>
             <div />
@@ -874,6 +880,7 @@ export default {
       maxHeightDegrees: 4.5,
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
+      keyDownTime: null,
       site: this.sitecode,
       warn: {
         project_name: false,
@@ -1337,33 +1344,54 @@ export default {
     gap: 1em;
     margin-bottom: 1em;
 }
+.b-numberinput {
+    position: relative;
+}
 .degree-input::after {
-  content: '°';
-  position: absolute;
-  top: 50%;
-  left: 40%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: white;
+    content: "°";
+    position: absolute;
+    right: 35%;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
 }
-
 .arcmin-input::after {
-  content: "'";
-  position: absolute;
-  top: 50%;
-  left: 40%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: white;
+    content: "'";
+    position: absolute;
+    right: 35%;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
 }
-
 .angle-input::after {
   content: '°';
   position: absolute;
   top: 50%;
-  left: 40%;
+  left: 63%;
   transform: translateY(-50%);
   pointer-events: none;
   color: white;
+  z-index: 1;
+}
+</style>
+
+<style>
+/* Global styles */
+.b-numberinput {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
+.b-numberinput button {
+    margin: 0 !important;
+    padding: 0 4px;
+    height: 24px;
+    font-size: 0.8rem;
+}
+
+.b-numberinput input[type="number"] {
+    margin: 0 !important;
 }
 </style>
