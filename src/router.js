@@ -54,6 +54,7 @@ const router = new VueRouter({
         if (!_.includes(store.getters['site_config/available_sites'], to.params.sitecode)) {
           return next('/')
         }
+        next()
       },
       component: ControlRoom,
       props: route => {
@@ -69,6 +70,7 @@ const router = new VueRouter({
         if (!_.includes(store.getters['site_config/available_sites'], to.params.sitecode)) {
           return next('/')
         }
+        next()
       },
       component: Site,
       props: route => {
