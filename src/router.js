@@ -2,6 +2,7 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '@/store/index'
 
 import Home from './views/Home.vue'
 import Profile from './views/Profile.vue'
@@ -20,6 +21,8 @@ import { authGuard } from './auth/authGuard'
 import UserData from './views/UserData.vue'
 import NotFound from './views/NotFound'
 import Remotehq from './views/Remotehq'
+
+import _ from 'lodash'
 
 Vue.use(VueRouter)
 
@@ -47,6 +50,11 @@ const router = new VueRouter({
     {
       path: '/cr/:sitecode',
       name: 'controlroom',
+      beforeEnter: (to, from, next) => {
+        if (!_.includes(store.getters['site_config/available_sites'], to.params.sitecode)) {
+          return next('/')
+        }
+      },
       component: ControlRoom,
       props: route => {
         return {
@@ -57,6 +65,11 @@ const router = new VueRouter({
     {
       path: '/site/:sitecode/:subpage',
       name: 'site',
+      beforeEnter: (to, from, next) => {
+        if (!_.includes(store.getters['site_config/available_sites'], to.params.sitecode)) {
+          return next('/')
+        }
+      },
       component: Site,
       props: route => {
         return {
