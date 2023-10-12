@@ -53,7 +53,7 @@
 
     <div style="height: 2em;" />
 
-    <OWMReport />
+    <OWMReport v-if="userIsAdmin" />
 
   </div>
 </template>
@@ -78,7 +78,10 @@ export default {
       'site_latitude',
       'site_longitude',
       'site_name'
-    ])
+    ]),
+    userIsAdmin () {
+      return this.$store.state.user_data.userIsAdmin
+    }
   }
 }
 

@@ -43,8 +43,15 @@ export default {
   methods: {
     // TODO: Need to cache this
     getOwmReport () {
+      // call to cache to check if we have the report already
+
+      // load report from store if we do
+
+      // call the api if we don't
       const endpoint = this.$store.state.api_endpoints.status_endpoint + '/' + this.wema_name + '/owm_report'
       axios.get(endpoint).then(response => {
+        // cache the report in store for only 1 hour
+
         this.owmReport = JSON.parse(response.data.status.owm_report)
       }).catch(() => {
         this.owmReport = 'OWM report unavailable'
