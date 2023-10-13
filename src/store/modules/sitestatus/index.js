@@ -30,7 +30,7 @@ const state = {
 
   weather: {},
   enclosure: {},
-
+  owmReport: null,
   forecast: [],
 
   screen: {},
@@ -51,6 +51,7 @@ const getters = {
 
   site: state => state.site,
   now: state => state.now,
+  owmReport: state => JSON.parse(state.owmReport),
 
   /**
    *  Site operational status:
@@ -310,6 +311,10 @@ const mutations = {
     })
 
     state.forecast = []
+  },
+
+  new_owmReport(state, owmReport){
+    state.owmReport = owmReport;
   }
 
 }
@@ -399,6 +404,26 @@ const actions = {
         commit('new_forecast_status', response.data.status)
       }).catch(e => {
         console.log(e)
+      })
+    }
+  },
+
+  //TODO: We need to store each site as its own report with its own time
+  getLatestOwmReport({ commit, rootState, rootGetters, state}){
+    const wema_name = rootGetters['site_config/wema_name']
+    // TODO check for site wema_name 
+    if( state.owmReport === null){
+      return new Promise((resolve, reject) => {
+        if(wema_name){
+          const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/owm_report`
+          axios.get(url).then(response => {
+            commit('new_owmReport', response.data.status.owm_report)
+            resolve()
+          }).catch(e => {
+            console.log(e)
+            reject()
+          })
+        }
       })
     }
   },
