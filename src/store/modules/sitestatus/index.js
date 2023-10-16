@@ -273,6 +273,14 @@ const mutations = {
     state.obs_settings = status.obs_settings
   },
 
+  new_owmReport(state, newOwmReport){
+    // only keep the most up to date report per site
+    state.owmReport= state.owmReport.filter(function(reportObj){
+      return reportObj.wema_name !== newOwmReport.wema_name
+    })
+    state.owmReport.push( newOwmReport );
+  },
+
   status (state, status) {
     state.status = status
     const device_types = [
@@ -317,15 +325,6 @@ const mutations = {
 
     state.forecast = []
   },
-
-  new_owmReport(state, newOwmReport){
-    // remove old reports
-    state.owmReport= state.owmReport.filter(function(obj){
-      return obj.wema_name !== newOwmReport.wema_name
-    })
-    state.owmReport.push( newOwmReport );
-  }
-
 }
 
 const actions = {
@@ -417,14 +416,12 @@ const actions = {
     }
   },
 
-  // ensures owmReport is up to date
   getLatestOwmReport({ commit, rootState, rootGetters, state}){
     const wema_name = rootGetters['site_config/wema_name']
     if(wema_name){
       const owmReportObj = state.owmReport.find(owmReport => owmReport.wema_name === wema_name)
-      // request new report if not cached or cached > 1 hour ago
+      // request and store a new report if not cached or cached more than 1 hour ago
       if(owmReportObj == undefined ||  (Date.now() - owmReportObj.timestamp) > (1000 * 60 * 60)){
-        // TODO remove the old owm report
         return new Promise((resolve, reject) => {
             const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/owm_report`
             axios.get(url).then(response => {
