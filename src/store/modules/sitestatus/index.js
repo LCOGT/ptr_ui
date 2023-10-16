@@ -53,7 +53,7 @@ const getters = {
   now: state => state.now,
   owmReport: (state, getters, rootState, rootGetters) => {
     const wema_name = rootGetters['site_config/wema_name']
-    if(wema_name){
+    if (wema_name) {
       return JSON.parse(state.owmReport.find(owmReport => owmReport.wema_name === wema_name).report)
     }
   },
@@ -273,12 +273,12 @@ const mutations = {
     state.obs_settings = status.obs_settings
   },
 
-  new_owmReport(state, newOwmReport){
+  new_owmReport (state, newOwmReport) {
     // only keep the most up to date report per site
-    state.owmReport= state.owmReport.filter(function(reportObj){
+    state.owmReport = state.owmReport.filter(function (reportObj) {
       return reportObj.wema_name !== newOwmReport.wema_name
     })
-    state.owmReport.push( newOwmReport );
+    state.owmReport.push(newOwmReport)
   },
 
   status (state, status) {
@@ -324,7 +324,7 @@ const mutations = {
     })
 
     state.forecast = []
-  },
+  }
 }
 
 const actions = {
@@ -416,21 +416,21 @@ const actions = {
     }
   },
 
-  getLatestOwmReport({ commit, rootState, rootGetters, state}){
+  getLatestOwmReport ({ commit, rootState, rootGetters, state }) {
     const wema_name = rootGetters['site_config/wema_name']
-    if(wema_name){
+    if (wema_name) {
       const owmReportObj = state.owmReport.find(owmReport => owmReport.wema_name === wema_name)
       // request and store a new report if not cached or cached more than 1 hour ago
-      if(owmReportObj == undefined ||  (Date.now() - owmReportObj.timestamp) > (1000 * 60 * 60)){
+      if (owmReportObj == undefined || (Date.now() - owmReportObj.timestamp) > (1000 * 60 * 60)) {
         return new Promise((resolve, reject) => {
-            const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/owm_report`
-            axios.get(url).then(response => {
-              commit('new_owmReport', {wema_name: wema_name, report: response.data.status.owm_report, timestamp: Date.now()})
-              resolve()
-            }).catch(e => {
-              console.log(e)
-              reject()
-            })
+          const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/owm_report`
+          axios.get(url).then(response => {
+            commit('new_owmReport', { wema_name, report: response.data.status.owm_report, timestamp: Date.now() })
+            resolve()
+          }).catch(e => {
+            console.log(e)
+            reject(e)
+          })
         })
       }
     }
