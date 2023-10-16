@@ -197,6 +197,14 @@ const actions = {
       else {
         recent_images[old_image_index] = new_image
       }
+      // Reassigning value of current_image to new_image
+      // If a user takes smart stack photos and they select the image as it's updating,
+      // then the selected image (i.e. the thumbnail with the surrounding yellow border) keeps the yellow border
+      const current_image_SMARTSTK = state.current_image.header && state.current_image.header.SMARTSTK
+      const new_image_SMARTSTK = new_image.header && new_image.header.SMARTSTK
+      if (current_image_SMARTSTK && current_image_SMARTSTK !== 'no' && current_image_SMARTSTK === new_image_SMARTSTK) {
+        commit('setCurrentImage', new_image)
+      }
 
       // We don't have a toggle implemented yet.
       // But eventually we want one to focus on the new image immediately.
