@@ -30,7 +30,7 @@ const state = {
 
   weather: {},
   enclosure: {},
-  owmReport: null,
+  owmReport: [],
   forecast: [],
 
   screen: {},
@@ -51,7 +51,12 @@ const getters = {
 
   site: state => state.site,
   now: state => state.now,
-  owmReport: state => JSON.parse(state.owmReport),
+  owmReport: (state, getters, rootState, rootGetters) => {
+    const wema_name = rootGetters['site_config/wema_name']
+    if(wema_name){
+      return JSON.parse(state.owmReport.find(owmReport => owmReport.wema_name === wema_name).report)
+    }
+  },
 
   /**
    *  Site operational status:
@@ -313,8 +318,12 @@ const mutations = {
     state.forecast = []
   },
 
-  new_owmReport(state, owmReport){
-    state.owmReport = owmReport;
+  new_owmReport(state, newOwmReport){
+    // remove old reports
+    state.owmReport= state.owmReport.filter(function(obj){
+      return obj.wema_name !== newOwmReport.wema_name
+    })
+    state.owmReport.push( newOwmReport );
   }
 
 }
@@ -408,23 +417,25 @@ const actions = {
     }
   },
 
-  //TODO: We need to store each site as its own report with its own time
+  // ensures owmReport is up to date
   getLatestOwmReport({ commit, rootState, rootGetters, state}){
     const wema_name = rootGetters['site_config/wema_name']
-    // TODO check for site wema_name 
-    if( state.owmReport === null){
-      return new Promise((resolve, reject) => {
-        if(wema_name){
-          const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/owm_report`
-          axios.get(url).then(response => {
-            commit('new_owmReport', response.data.status.owm_report)
-            resolve()
-          }).catch(e => {
-            console.log(e)
-            reject()
-          })
-        }
-      })
+    if(wema_name){
+      const owmReportObj = state.owmReport.find(owmReport => owmReport.wema_name === wema_name)
+      // request new report if not cached or cached > 1 hour ago
+      if(owmReportObj == undefined ||  (Date.now() - owmReportObj.timestamp) > (1000 * 60 * 60)){
+        // TODO remove the old owm report
+        return new Promise((resolve, reject) => {
+            const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/owm_report`
+            axios.get(url).then(response => {
+              commit('new_owmReport', {wema_name: wema_name, report: response.data.status.owm_report, timestamp: Date.now()})
+              resolve()
+            }).catch(e => {
+              console.log(e)
+              reject()
+            })
+        })
+      }
     }
   },
 
