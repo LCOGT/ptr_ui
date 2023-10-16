@@ -6,7 +6,9 @@
     </div>
 
     <div style="margin-bottom: 1em;">
-      <b-button @click="showOwmStatus">(alternate method) show OWM Status</b-button>
+      <b-button @click="showOwmStatus">
+        (alternate method) show OWM Status
+      </b-button>
     </div>
     <b-modal v-model="owmModalVisible">
       <pre>{{ owmReport }}</pre>
@@ -16,7 +18,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import NightLog from '../NightLog.vue'
 
 export default {
   name: 'OWMReport',
@@ -44,7 +45,7 @@ export default {
     getOwmReport () {
       this.$store.dispatch('sitestatus/getLatestOwmReport').then((res) => {
         this.owmReport = this.$store.getters['sitestatus/owmReport']
-      })      
+      })
     },
     showOwmStatus () {
       this.owmModalVisible = true

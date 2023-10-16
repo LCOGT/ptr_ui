@@ -54,7 +54,6 @@
     <div style="height: 2em;" />
 
     <OWMReport v-if="userIsAdmin" />
-
   </div>
 </template>
 
@@ -72,7 +71,7 @@ export default {
   components: {
     SiteEventsModal,
     OWMReport
-},
+  },
   computed: {
     ...mapGetters('site_config', [
       'site_latitude',
