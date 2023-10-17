@@ -16,12 +16,18 @@ import user_interface from './modules/user_interface'
 import uiSync from './modules/uiSync'
 
 import UiSyncPlugin from './plugins/ui_sync'
+import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
+const dataState = createPersistedState({
+  paths: ['sitestatus.owmReport']
+})
+
 const store = new Vuex.Store({
   plugins: [
-    UiSyncPlugin
+    UiSyncPlugin,
+    dataState
   ],
   modules: {
     site_config,
