@@ -880,7 +880,6 @@ export default {
       maxHeightDegrees: 4.5,
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
-      keyDownTime: null,
       site: this.sitecode,
       warn: {
         project_name: false,
