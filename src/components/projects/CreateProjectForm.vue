@@ -368,7 +368,6 @@
               style="width: 150px;"
             >
               <b-numberinput
-                :v-model="exposures[n-1].width"
                 :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
@@ -378,6 +377,7 @@
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidthDegrees * degreesToArcminutes : maxWidthDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
+                @input="val => exposures[n-1].width = val"
               />
             </b-field>
             <b-field
@@ -385,7 +385,6 @@
               style="width: 150px;"
             >
               <b-numberinput
-                :v-model="exposures[n-1].height"
                 :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
@@ -395,6 +394,7 @@
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeightDegrees * degreesToArcminutes : maxHeightDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
+                @input="val => exposures[n-1].height = val"
               />
             </b-field>
             <b-field
@@ -402,7 +402,6 @@
               style="width: 150px;"
             >
               <b-numberinput
-                :v-model="exposures[n-1].angle"
                 :value="Number(exposures[n-1].angle)"
                 class="angle-input"
                 size="is-small"
@@ -412,6 +411,7 @@
                 :max="90.0"
                 :step="5"
                 min-step="0.001"
+                @input="val => exposures[n-1].angle = val"
               />
             </b-field>
             <div />
