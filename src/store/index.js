@@ -20,6 +20,7 @@ import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
+// Todo: research more into other state variables could benefit from a persisted state and seperate into a module
 const dataState = createPersistedState({
   paths: ['sitestatus.owmReport']
 })
