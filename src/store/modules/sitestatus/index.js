@@ -114,9 +114,9 @@ const getters = {
           colorClass: 'is-yellow'
         }
         // weather is stale
-      } else if (enclosure_not_stale && !weather_not_stale) {
+      } else if (!enclosure_not_stale && weather_not_stale) {
         return {
-          text: 'weather not reporting',
+          text: 'enclosure not reporting',
           colorClass: 'is-yellow'
         }
       }
