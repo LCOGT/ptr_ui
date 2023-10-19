@@ -101,19 +101,19 @@ const getters = {
           text: 'operational',
           colorClass: 'is-green'
         }
-        // enclosure and weather both stale
+      // enclosure and weather both stale
       } else if (!enclosure_not_stale && !weather_not_stale) {
         return {
           text: 'offline',
           colorClass: 'is-grey'
         }
-        // enclosure is stale
+      // enclosure is stale
       } else if (!enclosure_not_stale && weather_not_stale) {
         return {
           text: 'enclosure not reporting',
           colorClass: 'is-yellow'
         }
-        // weather is stale
+      // weather is stale
       } else if (!enclosure_not_stale && weather_not_stale) {
         return {
           text: 'enclosure not reporting',
