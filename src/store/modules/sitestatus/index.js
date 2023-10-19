@@ -17,6 +17,7 @@ import selector_getters from './getters/selector_getters'
 import wema_settings_getters from './getters/wema_settings_getters'
 import obs_settings_getters from './getters/obs_settings_getters'
 import accumulated_getters from './getters/accumulated_getters'
+import moment from 'moment'
 
 const hasKey = (obj, key) => { return Object.keys(obj).includes(key) }
 
@@ -30,7 +31,7 @@ const state = {
 
   weather: {},
   enclosure: {},
-  owmReport: [],
+  siteOwmReports: {},
   forecast: [],
 
   screen: {},
@@ -54,7 +55,7 @@ const getters = {
   owmReport: (state, getters, rootState, rootGetters) => {
     const wema_name = rootGetters['site_config/wema_name']
     if (wema_name) {
-      return JSON.parse(state.owmReport.find(owmReport => owmReport.wema_name === wema_name).report)
+      return JSON.parse(state.siteOwmReports[wema_name].report)
     }
   },
 
@@ -100,22 +101,22 @@ const getters = {
           text: 'operational',
           colorClass: 'is-green'
         }
-      // enclosure and weather both stale
+        // enclosure and weather both stale
       } else if (!enclosure_not_stale && !weather_not_stale) {
         return {
           text: 'offline',
           colorClass: 'is-grey'
         }
-      // enclosure is stale
+        // enclosure is stale
       } else if (!enclosure_not_stale && weather_not_stale) {
         return {
           text: 'enclosure not reporting',
           colorClass: 'is-yellow'
         }
-      // weather is stale
-      } else if (!enclosure_not_stale && weather_not_stale) {
+        // weather is stale
+      } else if (enclosure_not_stale && !weather_not_stale) {
         return {
-          text: 'enclosure not reporting',
+          text: 'weather not reporting',
           colorClass: 'is-yellow'
         }
       }
@@ -273,12 +274,8 @@ const mutations = {
     state.obs_settings = status.obs_settings
   },
 
-  new_owmReport (state, newOwmReport) {
-    // only keep the most up to date report per site
-    state.owmReport = state.owmReport.filter(function (reportObj) {
-      return reportObj.wema_name !== newOwmReport.wema_name
-    })
-    state.owmReport.push(newOwmReport)
+  storeNewOwmReport (state, { wema_name, newReport, newTimestamp }) {
+    state.siteOwmReports[wema_name] = { report: newReport, timestamp: newTimestamp }
   },
 
   status (state, status) {
@@ -419,13 +416,12 @@ const actions = {
   getLatestOwmReport ({ commit, rootState, rootGetters, state }) {
     const wema_name = rootGetters['site_config/wema_name']
     if (wema_name) {
-      const owmReportObj = state.owmReport.find(owmReport => owmReport.wema_name === wema_name)
       // request and store a new report if not cached or cached more than 1 hour ago
-      if (owmReportObj == undefined || (Date.now() - owmReportObj.timestamp) > (1000 * 60 * 60)) {
+      if (!(wema_name in state.siteOwmReports) || moment(state.siteOwmReports[wema_name].timestamp).isBefore(moment().subtract(1, 'hours'))) {
         return new Promise((resolve, reject) => {
           const url = rootState.api_endpoints.status_endpoint + `/${wema_name}/owm_report`
           axios.get(url).then(response => {
-            commit('new_owmReport', { wema_name, report: response.data.status.owm_report, timestamp: Date.now() })
+            commit('storeNewOwmReport', { wema_name, newReport: response.data.status.owm_report, newTimestamp: moment() })
             resolve()
           }).catch(e => {
             console.log(e)

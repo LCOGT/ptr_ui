@@ -20,9 +20,12 @@ import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
-// Todo: research more into other state variables could benefit from a persisted state and seperate into a module
+/**
+ * Todo: research more into other state variables could benefit from a persisted
+ * state and seperate into a module persisting this state to save api calls when page refreshes
+ */
 const dataState = createPersistedState({
-  paths: ['sitestatus.owmReport']
+  paths: ['sitestatus.siteOwmReports']
 })
 
 const store = new Vuex.Store({
