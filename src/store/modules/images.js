@@ -59,11 +59,11 @@ const getters = {
   recent_images_condensed: state => {
     // First, generate a map of maximum SSTKNUM for each SMARTSTK
     const maxSSTKNUMs = state.recent_images.reduce((acc, cur) => {
-      if (!cur.header || !cur.header.SMARTSTK || !cur.header.SSTKNUM) return acc // Skip if missing header, SMARTSTK or SSTKNUM
+      if (!cur.SMARTSTK || !cur.SSTKNUM) return acc // Skip if missing header, SMARTSTK or SSTKNUM
 
-      const num = parseInt(cur.header.SSTKNUM) // convert string to number
-      if (!acc[cur.header.SMARTSTK] || num > acc[cur.header.SMARTSTK]) {
-        acc[cur.header.SMARTSTK] = num
+      const num = parseInt(cur.SSTKNUM) // convert string to number
+      if (!acc[cur.SMARTSTK] || num > acc[cur.SMARTSTK]) {
+        acc[cur.SMARTSTK] = num
       }
       return acc
     }, {})
@@ -71,10 +71,10 @@ const getters = {
     // Now, filter the original array
     const filteredArr = state.recent_images.filter(el => {
       // Keep if missing header, SMARTSTK or SSTKNUM
-      if (!el.header || !el.header.SMARTSTK || !el.header.SSTKNUM) return true
+      if (!el.SMARTSTK || !el.SSTKNUM) return true
 
       // Keep if SSTKNUM is the maximum for its SMARTSTK
-      return el.header.SSTKNUM >= maxSSTKNUMs[el.header.SMARTSTK]
+      return el.SSTKNUM >= maxSSTKNUMs[el.SMARTSTK]
     })
     return filteredArr
   },
@@ -200,8 +200,8 @@ const actions = {
       // Reassigning value of current_image to new_image
       // If a user takes smart stack photos and they select the image as it's updating,
       // then the selected image (i.e. the thumbnail with the surrounding yellow border) keeps the yellow border
-      const current_image_SMARTSTK = state.current_image.header && state.current_image.header.SMARTSTK
-      const new_image_SMARTSTK = new_image.header && new_image.header.SMARTSTK
+      const current_image_SMARTSTK = state.current_image.header && state.current_image.SMARTSTK
+      const new_image_SMARTSTK = new_image.header && new_image.SMARTSTK
       if (current_image_SMARTSTK && current_image_SMARTSTK !== 'no' && current_image_SMARTSTK === new_image_SMARTSTK) {
         commit('setCurrentImage', new_image)
       }
