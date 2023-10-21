@@ -2,10 +2,10 @@
   <div>
     <b-field>
       <button
-        :disabled="!large_fits_exists && !small_fits_exists"
         title="first draw a line on the image to inspect"
         class="button"
         :class="{'is-loading': analysisInProgress}"
+        :disabled="!this.current_image.fits_filename"
         @click="getLineProfile"
       >
         get line profile
@@ -127,8 +127,8 @@ export default {
       }
 
       const payload = {
-        full_filename: this.useLargeFits ? this.large_fits_filename : this.small_fits_filename,
-        s3_directory: this.current_image.s3_directory || 'data',
+        full_filename: this.current_image.fits_filename,
+        s3_directory: this.current_image.fits_path,
         start: startingPoint,
         end: endingPoint
       }
@@ -151,11 +151,7 @@ export default {
 
   computed: {
     ...mapGetters('images', [
-      'current_image',
-      'large_fits_exists',
-      'small_fits_exists',
-      'large_fits_filename',
-      'small_fits_filename'
+      'current_image'
     ]),
 
     ...mapGetters('drawshapes', [

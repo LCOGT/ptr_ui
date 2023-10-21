@@ -96,7 +96,7 @@ const getters = {
     return `${image.base_filename}-${image.data_type}${state.large_fits_reduction_level}.fits.fz`
   },
 
-  info_image_is_active: state => state.current_image.s3_direcotry == 'info-images',
+  info_image_is_active: state => state.current_image.s3_directory == 'info-images',
   info_images_exist: state => state.info_images.some(i => 'channel' in i)
 }
 
