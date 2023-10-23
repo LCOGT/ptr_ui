@@ -875,9 +875,9 @@ export default {
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
       minWidthDegrees: 0.0,
-      maxWidthDegrees: 4.5,
+      maxWidthDegrees: 12.0,
       minHeightDegrees: 0.0,
-      maxHeightDegrees: 4.5,
+      maxHeightDegrees: 12.0,
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
       site: this.sitecode,
