@@ -6,7 +6,7 @@
           title="Get histogram from the selected rectangle region."
           class="button"
           :class="{ 'is-loading': region_histogram_loading }"
-          :disabled="!this.current_image.fits_filename"
+          :disabled="!current_image.fits_filename"
           @click="getHistogram(true)"
         >
           inspect region
@@ -16,7 +16,7 @@
         <button
           class="button"
           :class="{ 'is-loading': image_histogram_loading }"
-          :disabled="!this.current_image.fits_filename"
+          :disabled="!current_image.fits_filename"
           @click="getHistogram(false)"
         >
           inspect image

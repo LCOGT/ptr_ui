@@ -6,7 +6,7 @@
           title="Only inspect the selected rectangle region."
           class="button"
           :class="{'is-loading':region_stats_loading}"
-          :disabled="!this.current_image.fits_filename"
+          :disabled="!current_image.fits_filename"
           @click="getRegionStats(true)"
         >
           inspect region
@@ -16,7 +16,7 @@
         <button
           class="button"
           :class="{'is-loading':image_stats_loading}"
-          :disabled="!this.current_image.fits_filename"
+          :disabled="!current_image.fits_filename"
           @click="getRegionStats(false)"
         >
           inspect image

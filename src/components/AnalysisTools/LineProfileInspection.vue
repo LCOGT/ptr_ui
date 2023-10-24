@@ -5,7 +5,7 @@
         title="first draw a line on the image to inspect"
         class="button"
         :class="{'is-loading': analysisInProgress}"
-        :disabled="!this.current_image.fits_filename"
+        :disabled="!current_image.fits_filename"
         @click="getLineProfile"
       >
         get line profile
