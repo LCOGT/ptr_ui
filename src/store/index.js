@@ -16,12 +16,22 @@ import user_interface from './modules/user_interface'
 import uiSync from './modules/uiSync'
 
 import UiSyncPlugin from './plugins/ui_sync'
+import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
+/**
+ * Todo: research more into other state variables could benefit from a persisted
+ * state and seperate into a module persisting this state to save api calls when page refreshes
+ */
+const dataState = createPersistedState({
+  paths: ['sitestatus.siteOwmReports']
+})
+
 const store = new Vuex.Store({
   plugins: [
-    UiSyncPlugin
+    UiSyncPlugin,
+    dataState
   ],
   modules: {
     site_config,
