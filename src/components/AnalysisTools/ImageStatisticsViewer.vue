@@ -6,7 +6,7 @@
           title="Only inspect the selected rectangle region."
           class="button"
           :class="{'is-loading':region_stats_loading}"
-          :disabled="!large_fits_exists && !small_fits_exists"
+          :disabled="!current_image.fits_filename"
           @click="getRegionStats(true)"
         >
           inspect region
@@ -16,7 +16,7 @@
         <button
           class="button"
           :class="{'is-loading':image_stats_loading}"
-          :disabled="!large_fits_exists && !small_fits_exists"
+          :disabled="!current_image.fits_filename"
           @click="getRegionStats(false)"
         >
           inspect image
@@ -122,8 +122,8 @@ export default {
 
       const body = {
         site: this.sitecode,
-        full_filename: this.best_available_full_filename,
-        s3_directory: this.current_image.s3_directory || 'data'
+        full_filename: this.current_image.fits_filename,
+        s3_directory: this.current_image.fits_path
       }
       if (useSubregion) {
         if (this.selectedShapeType != 'rects') {
@@ -180,14 +180,6 @@ export default {
       'current_image'
     ]),
 
-    ...mapGetters('images', [
-      'small_fits_exists',
-      'large_fits_exists',
-      'small_fits_filename',
-      'large_fits_filename',
-      'info_images_exist'
-    ]),
-
     ...mapGetters('drawshapes', [
       'selectedId',
       'selectionExists',
@@ -196,12 +188,6 @@ export default {
 
     markedStars () {
       return this.$store.getters['starprofile/marked_stars']
-    },
-
-    best_available_full_filename () {
-      return this.large_fits_exists
-        ? this.large_fits_filename
-        : this.small_fits_filename
     },
 
     activeDrawShape: {
