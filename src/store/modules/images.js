@@ -41,7 +41,9 @@ const state = {
 
   // recent_images is updated whenever the action 'load_latest_images' is called.
   recent_images: [],
-  lasSiteRequested: null,
+  // lastSiteRequested is used to keep track of the most recently requested site by user
+  // Basically, a form of debouncing to handle rapid user input without losing the last state requested
+  lastSiteRequested: null,
   // user_images a list of all a user's images associated with their account
   // TODO: Write an action that will update a user's image list when images are added to their account
   user_images: [],
