@@ -369,7 +369,7 @@ const actions = {
       method: 'GET',
       url: rootState.api_endpoints.active_api + '/' + site + '/latest_images/1'
     }
-
+    // Doing a try...catch block instead of an await because we get better response time
     try {
       let response = await axios(firstbody)
       response = response.data
