@@ -343,6 +343,7 @@ const actions = {
     // Get site and user_id
     let url = null
     const site = rootState.site_config.selected_site
+
     const filterparams = {}
 
     // Set the lastSiteRequested before the API call
@@ -374,6 +375,7 @@ const actions = {
       let response = await axios(firstbody)
       response = response.data
 
+      // Empty response
       if (response.length === 0) {
         dispatch('display_placeholder_image')
         return
@@ -396,7 +398,7 @@ const actions = {
         queryEnd = endDate.add(1, 'days')
       } else {
         // If the image was taken earlier than noon, set the start of query to noon yesterday
-        queryStart = noonDate.subtract(1, 'days')
+        queryStart = noonDate.add(-1, 'days')
 
         // and the end to noon today
         queryEnd = endDate
