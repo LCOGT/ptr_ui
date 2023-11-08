@@ -41,6 +41,9 @@ const state = {
 
   // recent_images is updated whenever the action 'load_latest_images' is called.
   recent_images: [],
+  // lastSiteRequested is used to keep track of the most recently requested site by user
+  // Basically, a form of debouncing to handle rapid user input without losing the last state requested
+  lastSiteRequested: null,
   // user_images a list of all a user's images associated with their account
   // TODO: Write an action that will update a user's image list when images are added to their account
   user_images: [],
@@ -103,6 +106,7 @@ const getters = {
 const mutations = {
   setCurrentImage (state, the_current_image) { state.current_image = the_current_image },
   setRecentImages (state, recent_image_list) { state.recent_images = recent_image_list },
+  setLastSiteRequested (state, site) { state.lastSiteRequested = site },
   setUserImages (state, user_images_list) { state.user_images = user_images_list },
   show_user_data_only (state, val) { state.show_user_data_only = val },
   live_data (state, val) { state.live_data = val },
@@ -342,6 +346,9 @@ const actions = {
 
     const filterparams = {}
 
+    // Set the lastSiteRequested before the API call
+    commit('setLastSiteRequested', site)
+
     const userid = user_id()
 
     let siteDate = moment()
@@ -363,12 +370,13 @@ const actions = {
       method: 'GET',
       url: rootState.api_endpoints.active_api + '/' + site + '/latest_images/1'
     }
-
-    await axios(firstbody).then(async response => {
+    // Doing a try...catch block instead of an await because we get better response time
+    try {
+      let response = await axios(firstbody)
       response = response.data
 
-      // Empty response:
-      if (response.length == 0) {
+      // Empty response
+      if (response.length === 0) {
         dispatch('display_placeholder_image')
         return
       }
@@ -381,76 +389,73 @@ const actions = {
 
       // Extra variable (in site timezone) for the end date noon, initialized same as noonDate
       endDate = moment(response[0].capture_date).tz(siteTimezone).hours(12).minutes(0).seconds(0).milliseconds(0)
-    }).catch(error => {
-      console.error(error)
-    })
 
-    if (siteDate.format('HH') > 12) {
-      // If the image was taken later than noon, set the start of query to noon today
-      queryStart = noonDate
+      if (siteDate.format('HH') > 12) {
+        // If the image was taken later than noon, set the start of query to noon today
+        queryStart = noonDate
 
-      // and the end to noon tomorrow
-      queryEnd = endDate.add(1, 'days')
-    } else {
-      // If the image was taken earlier than noon, set the start of query to noon yesterday
-      queryStart = noonDate.add(-1, 'days')
+        // and the end to noon tomorrow
+        queryEnd = endDate.add(1, 'days')
+      } else {
+        // If the image was taken earlier than noon, set the start of query to noon yesterday
+        queryStart = noonDate.add(-1, 'days')
 
-      // and the end to noon today
-      queryEnd = endDate
-    }
-
-    // Set the parameters for this query
-    filterparams.site = site
-
-    // API endpoint expects the start/end dates in UTC, so convert using the site offset
-    filterparams.start_date = queryStart.add(siteOffset, 'hours').format('YYYY-MM-DD HH:mm:ss')
-    filterparams.end_date = queryEnd.add(siteOffset, 'hours').format('YYYY-MM-DD HH:mm:ss')
-
-    // If a user is logged in and they want to see only their data,
-    // add their id as a parameter for the api call
-
-    if (state.show_user_data_only && userid) {
-      filterparams.user_id = user_id
-    }
-    /**
-         * The response for this api call is a list of elements with the form:
-         *  image = {
-         *      "recency_order": int,
-         *      "site": str,
-         *      "base_filename": str,
-         *      "capture_date": int (js timestamp, in milis),
-         *      "observer": str,
-         *      "right_ascension": str,
-         *      "declination": str,
-         *      "filter_used": str,
-         *      "exposure_time": str,
-         *      "airmass": str,
-         *      "jpg_url": str,
-         *      "user_id": str,
-         *      "username": str,
-         *  }
-        */
-
-    const body = {
-      method: 'GET',
-      params: filterparams,
-      url
-    }
-
-    await axios(body).then(async response => {
-      response = response.data
-
-      // Empty response:
-      if (response.length == 0) {
-        dispatch('display_placeholder_image')
-        return
+        // and the end to noon today
+        queryEnd = endDate
       }
 
-      commit('setCurrentImage', response[0])
-      commit('setRecentImages', response)
-    }).catch(error => {
+      // Set the parameters for this query
+      filterparams.site = site
+      // API endpoint expects the start/end dates in UTC, so convert using the site offset
+      filterparams.start_date = queryStart.add(siteOffset, 'hours').format('YYYY-MM-DD HH:mm:ss')
+      filterparams.end_date = queryEnd.add(siteOffset, 'hours').format('YYYY-MM-DD HH:mm:ss')
+
+      // If a user is logged in and they want to see only their data,
+      // add their id as a parameter for the api call
+      if (state.show_user_data_only && userid) {
+        filterparams.user_id = userid
+      }
+      /**
+  //        * The response for this api call is a list of elements with the form:
+  //        *  image = {
+  //        *      "recency_order": int,
+  //        *      "site": str,
+  //        *      "base_filename": str,
+  //        *      "capture_date": int (js timestamp, in milis),
+  //        *      "observer": str,
+  //        *      "right_ascension": str,
+  //        *      "declination": str,
+  //        *      "filter_used": str,
+  //        *      "exposure_time": str,
+  //        *      "airmass": str,
+  //        *      "jpg_url": str,
+  //        *      "user_id": str,
+  //        *      "username": str,
+  //        *  }
+  //       */
+
+      // Make the second API call to get images
+      const body = {
+        method: 'GET',
+        params: filterparams,
+        url
+      }
+
+      response = await axios(body)
+      response = response.data
+
+      // Check if the current site is still the last requested before committing data
+      if (site === state.lastSiteRequested) {
+        if (response.length === 0) {
+          dispatch('display_placeholder_image')
+        } else {
+          commit('setCurrentImage', response[0])
+          commit('setRecentImages', response)
+        }
+      }
+    } catch (error) {
       console.error(error)
-    })
+    }
 
     dispatch('load_latest_info_images')
   },
