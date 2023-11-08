@@ -2,8 +2,10 @@
   <div>
     <div class="project-form-header">
       <h1 class="title">
-        <span v-if="cloning_existing_project"><span class="project-title-verb">Cloning: </span><i>{{ project_name }}</i></span>
-        <span v-else-if="modifying_existing_project"><span class="project-title-verb">Modifying: </span><i>{{ project_name }}</i></span>
+        <span v-if="cloning_existing_project"><span class="project-title-verb">Cloning: </span><i>{{ project_name
+        }}</i></span>
+        <span v-else-if="modifying_existing_project"><span class="project-title-verb">Modifying: </span><i>{{ project_name
+        }}</i></span>
         <span v-else>Create new project</span>
       </h1>
       <div>
@@ -23,7 +25,7 @@
       <template #content>
         <div style="display:flex; align-items: bottom; gap: 1em;">
           <b-field
-            :type="{'is-warning': project_name_changed || warn.project_name}"
+            :type="{ 'is-warning': project_name_changed || warn.project_name }"
             label="Project Name"
           >
             <template #message>
@@ -122,7 +124,10 @@
               <b-tooltip type="is-dark">
                 <template #content>
                   <div><b>Standard: </b><span>Default priority</span></div>
-                  <div><b>Time Critical: </b><span>Protected calendar events, used for e.g. exoplanets, variable stars</span></div>
+                  <div>
+                    <b>Time Critical: </b><span>Protected calendar events, used for e.g. exoplanets, variable
+                      stars</span>
+                  </div>
                   <div><b>Low Priority: </b><span>Calendar events will be labeled "Feel free to cancel"</span></div>
                 </template>
                 <b-icon
@@ -195,7 +200,7 @@
           </b-field>
 
           <b-field
-            :type="{'is-danger': warn.projectRA}"
+            :type="{ 'is-danger': warn.projectRA }"
             label="RA"
             style="width: 230px;"
           >
@@ -203,7 +208,7 @@
           </b-field>
 
           <b-field
-            :type="{'is-danger': warn.projectDec}"
+            :type="{ 'is-danger': warn.projectDec }"
             label="Dec"
             style="width: 230px;"
           >
@@ -225,19 +230,17 @@
             :key="n"
             class="exposure-row"
           >
-            <b-field
-              :label="n==1 ? '  ' : ' '"
-            >
-              <b-checkbox v-model="exposures[n-1].active" />
+            <b-field :label="n == 1 ? '  ' : ' '">
+              <b-checkbox v-model="exposures[n - 1].active" />
             </b-field>
             <b-field
               size="is-small"
-              :label="n==1 ? 'Imtype' : ''"
+              :label="n == 1 ? 'Imtype' : ''"
             >
               <b-select
-                v-model="exposures[n-1].imtype"
+                v-model="exposures[n - 1].imtype"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n - 1].active"
               >
                 <option value="light">
                   light
@@ -245,42 +248,36 @@
                 <option value="dark">
                   dark
                 </option>
-                <option value="skyflat">
-                  skyflat
-                </option>
-                <option value="screenflat">
-                  screenflat
-                </option>
                 <option value="bias">
                   bias
                 </option>
                 <option value="autofocus">
-                  autofocus
+                  focus
                 </option>
               </b-select>
             </b-field>
             <b-field
-              :label="n==1 ? 'Count' : ''"
+              :label="n == 1 ? 'Count' : ''"
               style="width: 80px;"
             >
               <b-input
-                v-model="exposures[n-1].count"
+                v-model="exposures[n - 1].count"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n - 1].active"
                 type="number"
                 min="1"
                 max="100000"
               />
             </b-field>
             <b-field
-              :label="n==1 ? 'Exposure' : ''"
+              :label="n == 1 ? 'Exposure' : ''"
               style="max-width: 100px;"
               title="Exposure Time [seconds]"
             >
               <b-input
-                v-model="exposures[n-1].exposure"
+                v-model="exposures[n - 1].exposure"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n - 1].active"
                 type="number"
                 min="0"
                 max="100000"
@@ -289,17 +286,15 @@
                 <span class="button is-static is-small">s</span>
               </p>
             </b-field>
-            <b-field
-              :label="n==1 ? 'Filter' : ''"
-            >
+            <b-field :label="n == 1 ? 'Filter' : ''">
               <b-select
-                v-model="exposures[n-1].filter"
+                v-model="exposures[n - 1].filter"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n - 1].active"
                 style="width: 80px;"
               >
                 <option
-                  v-if="project_filter_list && project_filter_list.length>0"
+                  v-if="project_filter_list && project_filter_list.length > 0"
                   disabled
                   value="------"
                 >
@@ -327,13 +322,11 @@
                 </option>
               </b-select>
             </b-field>
-            <b-field
-              :label="n==1 ? 'Resolution' : ''"
-            >
+            <b-field :label="n == 1 ? 'Resolution' : ''">
               <b-select
-                v-model="exposures[n-1].bin"
+                v-model="exposures[n - 1].bin"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n - 1].active"
               >
                 <option value="optimal">
                   Optimal
@@ -346,13 +339,11 @@
                 </option>
               </b-select>
             </b-field>
-            <b-field
-              :label="n==1 ? 'Zoom' : ''"
-            >
+            <b-field :label="n == 1 ? 'Zoom' : ''">
               <b-select
-                v-model="exposures[n-1].zoom"
+                v-model="exposures[n - 1].zoom"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n - 1].active"
               >
                 <option
                   v-for="(val, index) in generic_camera_areas"
@@ -364,54 +355,54 @@
               </b-select>
             </b-field>
             <b-field
-              :label="n==1 ? 'Width' : ''"
+              :label="n == 1 ? 'Width' : ''"
               style="width: 150px;"
             >
               <b-numberinput
-                :value="Number(exposures[n-1].width)"
-                :class="getSymbol(exposures[n-1].zoom)"
+                :value="Number(exposures[n - 1].width)"
+                :class="getSymbol(exposures[n - 1].zoom)"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n - 1].active"
                 type="number"
-                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minWidthDegrees * degreesToArcminutes : minWidthDegrees"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidthDegrees * degreesToArcminutes : maxWidthDegrees"
-                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
+                :min="exposures[n - 1].zoom === 'Mosaic arcmin.' ? minWidthDegrees * degreesToArcminutes : minWidthDegrees"
+                :max="exposures[n - 1].zoom === 'Mosaic arcmin.' ? maxWidthDegrees * degreesToArcminutes : maxWidthDegrees"
+                :step="exposures[n - 1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => exposures[n-1].width = val"
+                @input="val => exposures[n - 1].width = val"
               />
             </b-field>
             <b-field
-              :label="n==1 ? 'Height' : ''"
+              :label="n == 1 ? 'Height' : ''"
               style="width: 150px;"
             >
               <b-numberinput
-                :value="Number(exposures[n-1].height)"
-                :class="getSymbol(exposures[n-1].zoom)"
+                :value="Number(exposures[n - 1].height)"
+                :class="getSymbol(exposures[n - 1].zoom)"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n - 1].active"
                 type="number"
-                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minHeightDegrees * degreesToArcminutes : minHeightDegrees"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeightDegrees * degreesToArcminutes : maxHeightDegrees"
-                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
+                :min="exposures[n - 1].zoom === 'Mosaic arcmin.' ? minHeightDegrees * degreesToArcminutes : minHeightDegrees"
+                :max="exposures[n - 1].zoom === 'Mosaic arcmin.' ? maxHeightDegrees * degreesToArcminutes : maxHeightDegrees"
+                :step="exposures[n - 1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => exposures[n-1].height = val"
+                @input="val => exposures[n - 1].height = val"
               />
             </b-field>
             <b-field
-              :label="n==1 ? 'Angle' : ''"
+              :label="n == 1 ? 'Angle' : ''"
               style="width: 150px;"
             >
               <b-numberinput
-                :value="Number(exposures[n-1].angle)"
+                :value="Number(exposures[n - 1].angle)"
                 class="angle-input"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n - 1].active"
                 type="number"
                 :min="-90.0"
                 :max="90.0"
                 :step="5"
                 min-step="0.001"
-                @input="val => exposures[n-1].angle = val"
+                @input="val => exposures[n - 1].angle = val"
               />
             </b-field>
             <div />
@@ -427,95 +418,6 @@
           <b-icon icon="plus" />
           <span>add row</span>
         </button>
-
-        <details style="margin-top: 3em;">
-          <summary>additional options</summary>
-          <div
-            class="flex-row"
-            style="margin-top: 1em; gap: 3em;"
-          >
-            <b-field label="Defocus">
-              <b-select v-model="defocus">
-                <option
-                  v-for="i in 6"
-                  :key="i-1"
-                  :value="i-1"
-                >
-                  {{ i-1 }}
-                </option>
-                <option value="diffuser">
-                  diffuser
-                </option>
-              </b-select>
-            </b-field>
-            <div style="padding-top: 1em;">
-              <b-field>
-                <b-checkbox v-model="smart_stack">
-                  Smart Stack
-                </b-checkbox>
-                <b-tooltip
-                  type="is-dark"
-                  position="is-right"
-                  label="Automatically stack shorter exposures over long exposure time for all exposures."
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="help-circle-outline"
-                  />
-                </b-tooltip>
-              </b-field>
-
-              <b-field>
-                <b-checkbox v-model="long_stack">
-                  Long Stack
-                </b-checkbox>
-                <b-tooltip
-                  type="is-dark"
-                  position="is-right"
-                  label="Stacking multiple longer exposure times for all exposures."
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="help-circle-outline"
-                  />
-                </b-tooltip>
-              </b-field>
-            </div>
-            <div style="padding-top: 1em;">
-              <b-field>
-                <b-checkbox v-model="deplete">
-                  Deplete
-                </b-checkbox>
-                <b-tooltip
-                  type="is-dark"
-                  position="is-right"
-                  label="Decrement count."
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="help-circle-outline"
-                  />
-                </b-tooltip>
-              </b-field>
-
-              <b-field>
-                <b-checkbox v-model="cycle">
-                  Cycle
-                </b-checkbox>
-                <b-tooltip
-                  type="is-dark"
-                  position="is-right"
-                  label="Do each line first."
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="help-circle-outline"
-                  />
-                </b-tooltip>
-              </b-field>
-            </div>
-          </div>
-        </details>
       </template>
     </CollapsableSection>
 
@@ -526,40 +428,24 @@
       </template>
       <template #content>
         <div class="flex-row">
-          <b-field label="Meridian Flip">
+          <b-field label="Observing Side">
             <b-field>
               <b-radio-button
-                v-model="meridian_flip"
+                v-model="observing_side"
                 type="is-light"
                 native-value="east_only"
               >
-                <b-icon icon="close" />
-                <span>East Only</span>
+                <b-icon icon="check" />
+                <span>Ascending</span>
               </b-radio-button>
 
               <b-radio-button
-                v-model="meridian_flip"
+                v-model="observing_side"
                 type="is-light"
                 native-value="west_only"
               >
                 <b-icon icon="check" />
-                <span>West Only</span>
-              </b-radio-button>
-
-              <b-radio-button
-                v-model="meridian_flip"
-                type="is-light"
-                native-value="flip_ok"
-              >
-                Flip OK
-              </b-radio-button>
-
-              <b-radio-button
-                v-model="meridian_flip"
-                type="is-light"
-                native-value="no_flip"
-              >
-                No Flip
+                <span>Descending</span>
               </b-radio-button>
             </b-field>
           </b-field>
@@ -601,7 +487,7 @@
           </b-field>
           <b-field
             label="Position Angle"
-            :type="{'is-danger': warn.position_angle}"
+            :type="{ 'is-danger': warn.position_angle }"
           >
             <b-input
               v-model="position_angle"
@@ -621,7 +507,7 @@
         <div class="flex-row">
           <b-field
             label="Max HA"
-            :type="{'is-danger': warn.max_ha}"
+            :type="{ 'is-danger': warn.max_ha }"
           >
             <b-input
               v-model="max_ha"
@@ -639,7 +525,7 @@
 
           <b-field
             label="Min Zenith Distance"
-            :type="{'is-danger': warn.min_zenith_dist}"
+            :type="{ 'is-danger': warn.min_zenith_dist }"
           >
             <b-input
               v-model="min_zenith_dist"
@@ -660,19 +546,19 @@
           <b-field
             style="max-width: 120px;"
             label="Max Airmass"
-            :type="{'is-danger': warn.max_airmass}"
+            :type="{ 'is-danger': warn.max_airmass }"
           >
             <b-input
               v-model="max_airmass"
               class="project-input"
               type="number"
-              min="0"
-              max="100"
+              min="1"
+              max="5"
             />
           </b-field>
           <b-field
             label="Min Lunar Distance"
-            :type="{'is-danger': warn.lunar_dist_min}"
+            :type="{ 'is-danger': warn.lunar_dist_min }"
           >
             <b-input
               v-model="lunar_dist_min"
@@ -688,7 +574,7 @@
           </b-field>
           <b-field
             label="Max Lunar Phase"
-            :type="{'is-danger': warn.lunar_phase_max}"
+            :type="{ 'is-danger': warn.lunar_phase_max }"
           >
             <b-input
               v-model="lunar_phase_max"
@@ -711,11 +597,6 @@
           </b-checkbox>
         </b-field>
         <b-field>
-          <b-checkbox v-model="near_tycho_star">
-            Autofocus: Use Near Tycho Star
-          </b-checkbox>
-        </b-field>
-        <b-field>
           <b-checkbox v-model="prefer_bessell">
             Prefer Bessell
           </b-checkbox>
@@ -723,11 +604,6 @@
         <b-field>
           <b-checkbox v-model="enhance_photometry">
             Enhance Photometry
-          </b-checkbox>
-        </b-field>
-        <b-field>
-          <b-checkbox v-model="close_on_block_completion">
-            Close on block completion
           </b-checkbox>
         </b-field>
         <b-field>
@@ -740,31 +616,88 @@
             Astronomical Dark & Moon Alt &lt; 6
           </b-checkbox>
         </b-field>
-        <b-field
-          label="Generic Instrument"
-          style="margin-top: 1em;"
+        <div
+          class="flex-row"
+          style="margin-top: 1em; gap: 3em;"
         >
-          <b-select v-model="generic_instrument">
-            <option value="Main Camera">
-              Main Camera
-            </option>
-            <option value="Auxiliary Camera">
-              Auxiliary Camera
-            </option>
-            <option value="Echelle Spectrometer">
-              Echelle Spectrometer
-            </option>
-            <option value="UXEX Spectrometer">
-              UXEX Spectrometer
-            </option>
-            <option value="Planet Camera">
-              Planet Camera
-            </option>
-            <option value="IR Photometer">
-              IR Photometer
-            </option>
-          </b-select>
-        </b-field>
+          <b-field label="Defocus (mags)">
+            <b-select v-model="defocus">
+              <option
+                v-for="i in 7"
+                :key="i - 1"
+                :value="i - 1"
+              >
+                {{ i - 1 }}
+              </option>
+            </b-select>
+          </b-field>
+          <div style="padding-top: 1em;">
+            <b-field>
+              <b-checkbox v-model="smart_stack">
+                Smart Stack
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Automatically stack shorter exposures over long exposure time for all exposures."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+
+            <b-field>
+              <b-checkbox v-model="long_stack">
+                Long Stack
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Stacking multiple longer exposure times for all exposures."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+          </div>
+          <div style="padding-top: 1em;">
+            <b-field>
+              <b-checkbox v-model="deplete">
+                Deplete
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Decrement count."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+
+            <b-field>
+              <b-checkbox v-model="cycle">
+                Cycle
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Do each line first."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+          </div>
+        </div>
       </template>
     </CollapsableSection>
 
@@ -1226,7 +1159,7 @@ export default {
       'targets',
       'project_is_active',
       'generic_instrument',
-      'meridian_flip',
+      'observing_side',
       'ra_offset',
       'ra_offset_units',
       'dec_offset',
@@ -1314,56 +1247,67 @@ export default {
 <style lang="scss" scoped>
 @import "@/style/buefy-styles.scss";
 @import "@/style/_responsive.scss";
+
 .project-form-header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
+
 .project-title-verb {
   color: $ptr-blue;
 }
+
 .project-form-footer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1em;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1em;
 }
+
 .exposure-rows {
-    overflow-x: auto;
-    margin-top: 1em;
+  overflow-x: auto;
+  margin-top: 1em;
 }
+
 .exposure-row {
-    white-space: nowrap;
+  white-space: nowrap;
 }
-.exposure-row > * {
-    margin-right: 8px;
-    display: inline-block;
+
+.exposure-row>* {
+  margin-right: 8px;
+  display: inline-block;
 }
+
 .flex-row {
-    display: flex;
-    flex-direction: row;
-    gap: 1em;
-    margin-bottom: 1em;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  margin-bottom: 1em;
 }
+
 .b-numberinput {
-    position: relative;
+  position: relative;
 }
+
 .degree-input::after {
-    content: "°";
-    position: absolute;
-    right: 35%;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    z-index: 1;
+  content: "°";
+  position: absolute;
+  right: 35%;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
 }
+
 .arcmin-input::after {
-    content: "'";
-    position: absolute;
-    right: 35%;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    z-index: 1;
+  content: "'";
+  position: absolute;
+  right: 35%;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
 }
+
 .angle-input::after {
   content: '°';
   position: absolute;
@@ -1379,18 +1323,19 @@ export default {
 <style>
 /* Global styles */
 .b-numberinput {
-    display: flex;
-    align-items: center;
-    gap: 0px;
+  display: flex;
+  align-items: center;
+  gap: 0px;
 }
+
 .b-numberinput button {
-    margin: 0 !important;
-    padding: 0 4px;
-    height: 24px;
-    font-size: 0.8rem;
+  margin: 0 !important;
+  padding: 0 4px;
+  height: 24px;
+  font-size: 0.8rem;
 }
 
 .b-numberinput input[type="number"] {
-    margin: 0 !important;
+  margin: 0 !important;
 }
 </style>

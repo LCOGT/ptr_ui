@@ -38,8 +38,8 @@ const state = {
 
   // Project constraints below
   project_is_active: true,
-  generic_instrument: 'Main Camera',
-  meridian_flip: 'flip_ok', // can be ['flip_ok', 'no_flip', 'east_only', 'west_only']
+  generic_instrument: 'Main Camera', // removed from ui with options Auxiliary, Echelle, UXEX, Planet, IR at waynes request
+  observing_side: 'flip_ok', // can be ['flip_ok', 'no_flip', 'east_only', 'west_only']
   ra_offset: 0.0,
   ra_offset_units: 'deg',
   dec_offset: 0.0,
@@ -51,10 +51,10 @@ const state = {
   lunar_dist_min: 30, // deg
   lunar_phase_max: 60, // %
   frequent_autofocus: false,
-  near_tycho_star: false,
+  near_tycho_star: false, // no longer available on ui at Wayne's request
   prefer_bessell: false,
   enhance_photometry: false,
-  close_on_block_completion: false,
+  close_on_block_completion: false, // no longer available on ui at Wayne's request
   add_center_to_mosaic: false,
   dark_sky_setting: false,
   deplete: true,
@@ -71,7 +71,7 @@ const getters = {
     return {
       project_is_active: state.project_is_active,
       generic_instrument: state.generic_instrument,
-      meridian_flip: state.meridian_flip,
+      observing_side: state.observing_side,
       ra_offset: state.ra_offset,
       ra_offset_units: state.ra_offset_units,
       dec_offset: state.dec_offset,
@@ -145,7 +145,7 @@ const mutations = {
 
   project_is_active (state, val) { state.project_is_active = val },
   generic_instrument (state, val) { state.generic_instrument = val },
-  meridian_flip (state, val) { state.meridian_flip = val },
+  observing_side (state, val) { state.observing_side = val },
   ra_offset (state, val) { state.ra_offset = val },
   ra_offset_units (state, val) { state.ra_offset_units = val },
   dec_offset (state, val) { state.dec_offset = val },
