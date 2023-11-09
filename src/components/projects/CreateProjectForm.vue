@@ -322,7 +322,7 @@
               </b-select>
             </b-field>
             <b-field
-              :label="n == 1 ? 'Resolution' : ''"
+              :label="n==1 ? 'Resolution' : ''"
             >
               <b-select
                 v-model="exposures[n-1].bin"
@@ -341,7 +341,7 @@
               </b-select>
             </b-field>
             <b-field
-              :label="n == 1 ? 'Zoom' : ''"
+              :label="n==1 ? 'Zoom' : ''"
             >
               <b-select
                 v-model="exposures[n-1].zoom"
@@ -1269,7 +1269,7 @@ export default {
 .exposure-row {
     white-space: nowrap;
 }
-.exposure-row>* {
+.exposure-row > * {
     margin-right: 8px;
     display: inline-block;
 }
@@ -1319,7 +1319,6 @@ export default {
     align-items: center;
     gap: 0px;
 }
-
 .b-numberinput button {
     margin: 0 !important;
     padding: 0 4px;
