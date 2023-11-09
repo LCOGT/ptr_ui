@@ -823,6 +823,7 @@
 </template>
 
 <script>
+// adding a comment to test linter
 import { mapGetters, mapState, mapActions } from 'vuex'
 import { target_names } from '@/mixins/target_names'
 import { user_mixin } from '@/mixins/user_mixin'
