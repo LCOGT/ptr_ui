@@ -226,9 +226,9 @@
             class="exposure-row"
           >
             <b-field
-              :label="n == 1 ? '  ' : ' '"
+              :label="n==1 ? '  ' : ' '"
             >
-              <b-checkbox v-model="exposures[n - 1].active" />
+              <b-checkbox v-model="exposures[n-1].active" />
             </b-field>
             <b-field
               size="is-small"
@@ -1250,67 +1250,56 @@ export default {
 <style lang="scss" scoped>
 @import "@/style/buefy-styles.scss";
 @import "@/style/_responsive.scss";
-
 .project-form-header {
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 }
-
 .project-title-verb {
   color: $ptr-blue;
 }
-
 .project-form-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1em;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1em;
 }
-
 .exposure-rows {
-  overflow-x: auto;
-  margin-top: 1em;
+    overflow-x: auto;
+    margin-top: 1em;
 }
-
 .exposure-row {
-  white-space: nowrap;
+    white-space: nowrap;
 }
-
 .exposure-row>* {
-  margin-right: 8px;
-  display: inline-block;
+    margin-right: 8px;
+    display: inline-block;
 }
-
 .flex-row {
-  display: flex;
-  flex-direction: row;
-  gap: 1em;
-  margin-bottom: 1em;
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    margin-bottom: 1em;
 }
-
 .b-numberinput {
-  position: relative;
+    position: relative;
 }
-
 .degree-input::after {
-  content: "°";
-  position: absolute;
-  right: 35%;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  z-index: 1;
+    content: "°";
+    position: absolute;
+    right: 35%;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
 }
-
 .arcmin-input::after {
-  content: "'";
-  position: absolute;
-  right: 35%;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  z-index: 1;
+    content: "'";
+    position: absolute;
+    right: 35%;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
 }
-
 .angle-input::after {
   content: '°';
   position: absolute;
@@ -1326,19 +1315,19 @@ export default {
 <style>
 /* Global styles */
 .b-numberinput {
-  display: flex;
-  align-items: center;
-  gap: 0px;
+    display: flex;
+    align-items: center;
+    gap: 0px;
 }
 
 .b-numberinput button {
-  margin: 0 !important;
-  padding: 0 4px;
-  height: 24px;
-  font-size: 0.8rem;
+    margin: 0 !important;
+    padding: 0 4px;
+    height: 24px;
+    font-size: 0.8rem;
 }
 
 .b-numberinput input[type="number"] {
-  margin: 0 !important;
+    margin: 0 !important;
 }
 </style>
