@@ -245,17 +245,11 @@
                 <option value="dark">
                   dark
                 </option>
-                <option value="skyflat">
-                  skyflat
-                </option>
-                <option value="screenflat">
-                  screenflat
-                </option>
                 <option value="bias">
                   bias
                 </option>
                 <option value="autofocus">
-                  autofocus
+                  focus
                 </option>
               </b-select>
             </b-field>
@@ -427,95 +421,6 @@
           <b-icon icon="plus" />
           <span>add row</span>
         </button>
-
-        <details style="margin-top: 3em;">
-          <summary>additional options</summary>
-          <div
-            class="flex-row"
-            style="margin-top: 1em; gap: 3em;"
-          >
-            <b-field label="Defocus">
-              <b-select v-model="defocus">
-                <option
-                  v-for="i in 6"
-                  :key="i-1"
-                  :value="i-1"
-                >
-                  {{ i-1 }}
-                </option>
-                <option value="diffuser">
-                  diffuser
-                </option>
-              </b-select>
-            </b-field>
-            <div style="padding-top: 1em;">
-              <b-field>
-                <b-checkbox v-model="smart_stack">
-                  Smart Stack
-                </b-checkbox>
-                <b-tooltip
-                  type="is-dark"
-                  position="is-right"
-                  label="Automatically stack shorter exposures over long exposure time for all exposures."
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="help-circle-outline"
-                  />
-                </b-tooltip>
-              </b-field>
-
-              <b-field>
-                <b-checkbox v-model="long_stack">
-                  Long Stack
-                </b-checkbox>
-                <b-tooltip
-                  type="is-dark"
-                  position="is-right"
-                  label="Stacking multiple longer exposure times for all exposures."
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="help-circle-outline"
-                  />
-                </b-tooltip>
-              </b-field>
-            </div>
-            <div style="padding-top: 1em;">
-              <b-field>
-                <b-checkbox v-model="deplete">
-                  Deplete
-                </b-checkbox>
-                <b-tooltip
-                  type="is-dark"
-                  position="is-right"
-                  label="Decrement count."
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="help-circle-outline"
-                  />
-                </b-tooltip>
-              </b-field>
-
-              <b-field>
-                <b-checkbox v-model="cycle">
-                  Cycle
-                </b-checkbox>
-                <b-tooltip
-                  type="is-dark"
-                  position="is-right"
-                  label="Do each line first."
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="help-circle-outline"
-                  />
-                </b-tooltip>
-              </b-field>
-            </div>
-          </div>
-        </details>
       </template>
     </CollapsableSection>
 
@@ -526,40 +431,24 @@
       </template>
       <template #content>
         <div class="flex-row">
-          <b-field label="Meridian Flip">
+          <b-field label="Observing Side">
             <b-field>
               <b-radio-button
-                v-model="meridian_flip"
+                v-model="observing_side"
                 type="is-light"
                 native-value="east_only"
               >
-                <b-icon icon="close" />
-                <span>East Only</span>
+                <b-icon icon="check" />
+                <span>Ascending</span>
               </b-radio-button>
 
               <b-radio-button
-                v-model="meridian_flip"
+                v-model="observing_side"
                 type="is-light"
                 native-value="west_only"
               >
                 <b-icon icon="check" />
-                <span>West Only</span>
-              </b-radio-button>
-
-              <b-radio-button
-                v-model="meridian_flip"
-                type="is-light"
-                native-value="flip_ok"
-              >
-                Flip OK
-              </b-radio-button>
-
-              <b-radio-button
-                v-model="meridian_flip"
-                type="is-light"
-                native-value="no_flip"
-              >
-                No Flip
+                <span>Descending</span>
               </b-radio-button>
             </b-field>
           </b-field>
@@ -666,8 +555,8 @@
               v-model="max_airmass"
               class="project-input"
               type="number"
-              min="0"
-              max="100"
+              min="1"
+              max="5"
             />
           </b-field>
           <b-field
@@ -711,11 +600,6 @@
           </b-checkbox>
         </b-field>
         <b-field>
-          <b-checkbox v-model="near_tycho_star">
-            Autofocus: Use Near Tycho Star
-          </b-checkbox>
-        </b-field>
-        <b-field>
           <b-checkbox v-model="prefer_bessell">
             Prefer Bessell
           </b-checkbox>
@@ -723,11 +607,6 @@
         <b-field>
           <b-checkbox v-model="enhance_photometry">
             Enhance Photometry
-          </b-checkbox>
-        </b-field>
-        <b-field>
-          <b-checkbox v-model="close_on_block_completion">
-            Close on block completion
           </b-checkbox>
         </b-field>
         <b-field>
@@ -740,31 +619,88 @@
             Astronomical Dark & Moon Alt &lt; 6
           </b-checkbox>
         </b-field>
-        <b-field
-          label="Generic Instrument"
-          style="margin-top: 1em;"
+        <div
+          class="flex-row"
+          style="margin-top: 1em; gap: 3em;"
         >
-          <b-select v-model="generic_instrument">
-            <option value="Main Camera">
-              Main Camera
-            </option>
-            <option value="Auxiliary Camera">
-              Auxiliary Camera
-            </option>
-            <option value="Echelle Spectrometer">
-              Echelle Spectrometer
-            </option>
-            <option value="UXEX Spectrometer">
-              UXEX Spectrometer
-            </option>
-            <option value="Planet Camera">
-              Planet Camera
-            </option>
-            <option value="IR Photometer">
-              IR Photometer
-            </option>
-          </b-select>
-        </b-field>
+          <b-field label="Defocus (mags)">
+            <b-select v-model="defocus">
+              <option
+                v-for="i in 7"
+                :key="i - 1"
+                :value="i - 1"
+              >
+                {{ i - 1 }}
+              </option>
+            </b-select>
+          </b-field>
+          <div style="padding-top: 1em;">
+            <b-field>
+              <b-checkbox v-model="smart_stack">
+                Smart Stack
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Automatically stack shorter exposures over long exposure time for all exposures."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+
+            <b-field>
+              <b-checkbox v-model="long_stack">
+                Long Stack
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Stacking multiple longer exposure times for all exposures."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+          </div>
+          <div style="padding-top: 1em;">
+            <b-field>
+              <b-checkbox v-model="deplete">
+                Deplete
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Decrement count."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+
+            <b-field>
+              <b-checkbox v-model="cycle">
+                Cycle
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Do each line first."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+          </div>
+        </div>
       </template>
     </CollapsableSection>
 
@@ -1226,7 +1162,7 @@ export default {
       'targets',
       'project_is_active',
       'generic_instrument',
-      'meridian_flip',
+      'observing_side',
       'ra_offset',
       'ra_offset_units',
       'dec_offset',
