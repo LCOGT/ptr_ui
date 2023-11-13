@@ -862,6 +862,9 @@ export default {
 
     // set default filter
     this.exposures[targets_index].filter = this.default_filter_selection
+
+    // loading min_zenith_dist fromt config
+    this.load_default_zenith_from_mount()
   },
   watch: {
     // This runs any time an existing project is passed into the component.
@@ -913,6 +916,10 @@ export default {
       'resetProjectForm',
       'loadProject'
     ]),
+    // Set store value for min_zenith_dist if it exists in mount config
+    load_default_zenith_from_mount () {
+      this.$store.commit('project_params/min_zenith_dist', this.selected_mount_config?.default_zenith_avoid ?? 0)
+    },
     // Used for changing values in the targets array without losing reactivity
     updateTargetsValue (indexToMatch, key, val) {
       this.targets = this.targets.map((obj, index) => {
@@ -1232,7 +1239,8 @@ export default {
       'available_sites_real',
       'available_sites_simulated',
       'filter_wheel_options',
-      'default_filter_selection'
+      'default_filter_selection',
+      'selected_mount_config'
     ]),
     ...mapState('site_config', ['global_config']),
     ...mapState('user_data', [
