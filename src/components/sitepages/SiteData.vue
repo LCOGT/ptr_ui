@@ -56,11 +56,11 @@
           </b-tab-item>
 
           <b-tab-item
+            v-if="userIsAdmin"
             label="telescope"
             :value="'telescope'"
           >
             <div
-              v-if="userIsAdmin"
               class="obs-config-box"
             >
               <div class="obs-config-control-group">
