@@ -57,8 +57,8 @@
 
           <b-tab-item
             v-if="userIsAdmin"
-            label="telescope"
-            :value="'telescope'"
+            label="telescope config"
+            :value="'telescope config'"
           >
             <div
               class="obs-config-box"
