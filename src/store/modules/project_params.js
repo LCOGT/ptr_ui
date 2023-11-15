@@ -39,8 +39,8 @@ const state = {
   // Project constraints below
   project_is_active: true,
   generic_instrument: 'Main Camera', // removed from ui with options Auxiliary, Echelle, UXEX, Planet, IR at waynes request
-  ascending: false,
-  descending: false,
+  ascending: true,
+  descending: true,
   ra_offset: 0.0,
   ra_offset_units: 'deg',
   dec_offset: 0.0,
