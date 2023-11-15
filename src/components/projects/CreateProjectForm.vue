@@ -433,23 +433,12 @@
         <div class="flex-row">
           <b-field label="Observing Side">
             <b-field>
-              <b-radio-button
-                v-model="observing_side"
-                type="is-light"
-                native-value="east_only"
-              >
-                <b-icon icon="check" />
-                <span>Ascending</span>
-              </b-radio-button>
-
-              <b-radio-button
-                v-model="observing_side"
-                type="is-light"
-                native-value="west_only"
-              >
-                <b-icon icon="check" />
-                <span>Descending</span>
-              </b-radio-button>
+              <b-checkbox v-model="ascending">
+                Ascending
+              </b-checkbox>
+              <b-checkbox v-model="descending">
+                Descending
+              </b-checkbox>
             </b-field>
           </b-field>
         </div>
@@ -1169,7 +1158,8 @@ export default {
       'targets',
       'project_is_active',
       'generic_instrument',
-      'observing_side',
+      'ascending',
+      'descending',
       'ra_offset',
       'ra_offset_units',
       'dec_offset',

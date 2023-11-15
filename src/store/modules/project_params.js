@@ -39,7 +39,8 @@ const state = {
   // Project constraints below
   project_is_active: true,
   generic_instrument: 'Main Camera', // removed from ui with options Auxiliary, Echelle, UXEX, Planet, IR at waynes request
-  observing_side: 'flip_ok', // can be ['flip_ok', 'no_flip', 'east_only', 'west_only']
+  ascending: false,
+  descending: false,
   ra_offset: 0.0,
   ra_offset_units: 'deg',
   dec_offset: 0.0,
@@ -71,7 +72,8 @@ const getters = {
     return {
       project_is_active: state.project_is_active,
       generic_instrument: state.generic_instrument,
-      observing_side: state.observing_side,
+      ascending: state.ascending,
+      descending: state.descending,
       ra_offset: state.ra_offset,
       ra_offset_units: state.ra_offset_units,
       dec_offset: state.dec_offset,
@@ -145,7 +147,8 @@ const mutations = {
 
   project_is_active (state, val) { state.project_is_active = val },
   generic_instrument (state, val) { state.generic_instrument = val },
-  observing_side (state, val) { state.observing_side = val },
+  ascending (state, val) { state.ascending = val },
+  descending (state, val) { state.descending = val },
   ra_offset (state, val) { state.ra_offset = val },
   ra_offset_units (state, val) { state.ra_offset_units = val },
   dec_offset (state, val) { state.dec_offset = val },
