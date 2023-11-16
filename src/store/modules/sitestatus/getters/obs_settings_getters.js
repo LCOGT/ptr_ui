@@ -123,6 +123,22 @@ const pointingReference = (state, getters) => {
   }
 }
 
+const autoCenter = (state, getters) => {
+  if (state.obs_settings && 'auto_center_on' in state.obs_settings) {
+    return {
+      name: 'Auto Center',
+      val: state.obs_settings.auto_center_on ? 'On' : 'Off',
+      is_stale: isStale(getters)
+    }
+  } else {
+    return {
+      name: 'Auto Center',
+      val: 'missing `auto_center_on`',
+      is_stale: true
+    }
+  }
+}
+
 export default {
   adminOwnerCommandsOnly,
   obsSettingsGenericGetter,
@@ -134,5 +150,6 @@ export default {
   scopeInManualMode,
   sunSafetyMode,
   simulatingOpenRoof,
-  pointingReference
+  pointingReference,
+  autoCenter
 }

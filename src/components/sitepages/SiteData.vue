@@ -269,6 +269,32 @@
                   </CommandButton>
                 </div>
               </div>
+
+              <div class="obs-config-control-group">
+                <div class="obs-config-title">
+                  Auto Center
+                </div>
+                <StatusVal
+                  :status-item="autoCenter"
+                  style="width: 100%;"
+                />
+                <div class="obs-config-command-button-group">
+                  <CommandButton
+                    class="is-small obs-config-command-button"
+                    admin
+                    :data="obs_configure_auto_center_on"
+                  >
+                    Enable
+                  </CommandButton>
+                  <CommandButton
+                    class="button admin is-small obs-config-command-button"
+                    admin
+                    :data="obs_configure_auto_center_off"
+                  >
+                    Disable
+                  </CommandButton>
+                </div>
+              </div>
             </div>
           </b-tab-item>
 
@@ -501,7 +527,8 @@ export default {
       'scopeInManualMode',
       'sunSafetyMode',
       'simulatingOpenRoof',
-      'pointingReference'
+      'pointingReference',
+      'autoCenter'
     ]),
 
     active_image_tools_tab: {

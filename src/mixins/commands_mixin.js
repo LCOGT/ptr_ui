@@ -788,6 +788,12 @@ export const commands_mixin = {
     },
     obs_configure_pointing_reference_off () {
       return this.base_command('obs', 'configure_pointing_reference_off', '')
+    },
+    obs_configure_auto_center_on () {
+      return this.base_command('obs', 'obs_configure_auto_center_on', '')
+    },
+    obs_configure_auto_center_off () {
+      return this.base_command('obs', 'obs_configure_auto_center_off', '')
     }
   }
 }
