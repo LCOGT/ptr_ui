@@ -805,6 +805,7 @@ export default {
       maxHeightDegrees: 12.0,
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
+      limit: this.adjustLimits(),
       site: this.sitecode,
       warn: {
         project_name: false,
@@ -1136,28 +1137,67 @@ export default {
       return '' // return an empty string if there is no match
     },
 
+    // Getting limits for width and height
     getMosaicLimits (site) {
       const site_config = this.global_config && this.global_config[site]
       const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
       const size_x = camera_config && camera_config.camera_size_x
       const size_y = camera_config && camera_config.camera_size_y
+      // size 's value will be the larger of of size_x and size_y, if these values exist
       let size
+      // If size_x and size_y don't exist, then limit is 5
       let limit = 5
       const settings = camera_config && camera_config.settings
       const pix = settings && settings.onebyone_pix_scale
+      // Checking for the existence of these values since not all sites have them
+      // And we want the largest of the sizes
       if (size_x && size_y && pix) {
         if (size_x > size_y) {
           size = size_x
+          console.log('this is sizex:', size)
         } else {
           size = size_y
+          console.log('this is sizey:', size)
         }
+        // Getting the size in degrees
         const sizeDeg = (size * pix) / 3600
+        console.log('this is sizedeg:', sizeDeg)
         const fiveFieldsOfView = sizeDeg * 5
+        console.log('this is ffov:', fiveFieldsOfView)
         if (fiveFieldsOfView > limit) {
           limit = fiveFieldsOfView
         }
       }
       return limit
+    },
+
+    // Converting limits depending on what 'zoom' is selected
+    adjustLimits (zoom) {
+      // Getting limit value
+      const limit = this.getMosaicLimits()
+      let limitVal
+      if (zoom === 'Mosaic arcmin.') {
+        limitVal = limit * 60
+      } else if (zoom === '71%') {
+        limitVal = limit * 0.71
+      } else if (zoom === '50%') {
+        limitVal = limit * 0.5
+      } else if (zoom === '35%') {
+        limitVal = limit * 0.35
+      } else if (zoom === '25%') {
+        limitVal = limit * 0.25
+      } else if (zoom === '18%') {
+        limitVal = limit * 0.18
+      } else if (zoom === '12.5%') {
+        limitVal = limit * 0.125
+      } else if (zoom === '9%') {
+        limitVal = limit * 0.09
+      } else if (zoom === '6%') {
+        limitVal = limit * 0.06
+      } else {
+        limitVal = limit
+      }
+      return limitVal
     }
   },
   computed: {
