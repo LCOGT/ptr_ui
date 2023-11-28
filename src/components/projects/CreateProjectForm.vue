@@ -1167,10 +1167,8 @@ export default {
       if (size_x && size_y && pix) {
         if (size_x > size_y) {
           size = size_x
-          console.log('this is sizex:', size)
         } else {
           size = size_y
-          console.log('this is sizey:', size)
         }
         // Getting the size in degrees
         const sizeDeg = (size * pix) / 3600
