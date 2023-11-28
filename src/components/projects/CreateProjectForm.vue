@@ -362,15 +362,26 @@
               style="width: 150px;"
             >
               <b-numberinput
+                v-if="exposures[n-1].zoom === 'Full' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
                 :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minWidthDegrees * degreesToArcminutes : minWidthDegrees"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidthDegrees * degreesToArcminutes : maxWidthDegrees"
+                :min="minWidthDegrees"
+                :max="maxWidthDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
+                @input="val => exposures[n-1].width = val"
+              />
+              <b-numberinput
+                v-else
+                :value="adjustLimits(exposures[n-1].zoom)"
+                :class="getSymbol(exposures[n-1].zoom)"
+                size="is-small"
+                :disabled="!exposures[n-1].active"
+                type="number"
+                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 @input="val => exposures[n-1].width = val"
               />
             </b-field>
@@ -1138,8 +1149,10 @@ export default {
     },
 
     // Getting limits for width and height
-    getMosaicLimits (site) {
-      const site_config = this.global_config && this.global_config[site]
+    getMosaicLimits () {
+      const global_config = this.global_config
+      const site = this.sitecode
+      const site_config = global_config && global_config[site]
       const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
       const size_x = camera_config && camera_config.camera_size_x
       const size_y = camera_config && camera_config.camera_size_y
@@ -1161,9 +1174,7 @@ export default {
         }
         // Getting the size in degrees
         const sizeDeg = (size * pix) / 3600
-        console.log('this is sizedeg:', sizeDeg)
         const fiveFieldsOfView = sizeDeg * 5
-        console.log('this is ffov:', fiveFieldsOfView)
         if (fiveFieldsOfView > limit) {
           limit = fiveFieldsOfView
         }
@@ -1176,26 +1187,28 @@ export default {
       // Getting limit value
       const limit = this.getMosaicLimits()
       let limitVal
+      if (zoom === 'Mosaic deg.') {
+        // Rounding to the third decimal point
+        limitVal = Math.round(limit * 1e3) / 1e3
+      }
       if (zoom === 'Mosaic arcmin.') {
-        limitVal = limit * 60
+        limitVal = Math.round(limit * 60 * 1e3) / 1e3
       } else if (zoom === '71%') {
-        limitVal = limit * 0.71
+        limitVal = Math.round(limit * 0.71 * 1e3) / 1e3
       } else if (zoom === '50%') {
-        limitVal = limit * 0.5
+        limitVal = Math.round(limit * 0.5 * 1e3) / 1e3
       } else if (zoom === '35%') {
-        limitVal = limit * 0.35
+        limitVal = Math.round(limit * 0.35 * 1e3) / 1e3
       } else if (zoom === '25%') {
-        limitVal = limit * 0.25
+        limitVal = Math.round(limit * 0.25 * 1e3) / 1e3
       } else if (zoom === '18%') {
-        limitVal = limit * 0.18
+        limitVal = Math.round(limit * 0.18 * 1e3) / 1e3
       } else if (zoom === '12.5%') {
-        limitVal = limit * 0.125
+        limitVal = Math.round(limit * 0.125 * 1e3) / 1e3
       } else if (zoom === '9%') {
-        limitVal = limit * 0.09
+        limitVal = Math.round(limit * 0.09 * 1e3) / 1e3
       } else if (zoom === '6%') {
-        limitVal = limit * 0.06
-      } else {
-        limitVal = limit
+        limitVal = Math.round(limit * 0.06 * 1e3) / 1e3
       }
       return limitVal
     }
