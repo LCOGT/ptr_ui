@@ -24,7 +24,7 @@
           />
           <thumbnail-row
             class="data-thumbs"
-            :images="$store.getters['images/recent_images_condensed']"
+            :images="$store.getters['images/recent_images']"
             :selected_image="current_image.image_id"
             @thumbnailClicked="setActiveImage"
           />
