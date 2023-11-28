@@ -1100,7 +1100,6 @@ export default {
     refreshUserProjects () {
       this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
     },
-
     // Function to get filters at any site to populate filter dropdown
     get_default_filter_options (site) {
       if (site == 'common pool') {
@@ -1135,6 +1134,30 @@ export default {
         return 'degree-input'
       } else if (zoom === 'Mosaic arcmin.') return 'arcmin-input'
       return '' // return an empty string if there is no match
+    },
+
+    getMosaicLimits (site) {
+      const site_config = this.global_config && this.global_config[site]
+      const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
+      const size_x = camera_config && camera_config.camera_size_x
+      const size_y = camera_config && camera_config.camera_size_y
+      let size
+      let limit = 5
+      const settings = camera_config && camera_config.settings
+      const pix = settings && settings.onebyone_pix_scale
+      if (size_x && size_y && pix) {
+        if (size_x > size_y) {
+          size = size_x
+        } else {
+          size = size_y
+        }
+        const sizeDeg = (size * pix) / 3600
+        const fiveFieldsOfView = sizeDeg * 5
+        if (fiveFieldsOfView > limit) {
+          limit = fiveFieldsOfView
+        }
+      }
+      return limit
     }
   },
   computed: {
