@@ -364,7 +364,6 @@
               <b-numberinput
                 v-if="exposures[n-1].zoom === 'Full' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
                 :value="Number(exposures[n-1].width)"
-                :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
@@ -379,9 +378,8 @@
                 :value="adjustLimits(exposures[n-1].zoom)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="true"
                 type="number"
-                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 @input="val => exposures[n-1].width = val"
               />
             </b-field>
@@ -390,15 +388,24 @@
               style="width: 150px;"
             >
               <b-numberinput
+                v-if="exposures[n-1].zoom === 'Full' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
                 :value="Number(exposures[n-1].height)"
-                :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minHeightDegrees * degreesToArcminutes : minHeightDegrees"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeightDegrees * degreesToArcminutes : maxHeightDegrees"
+                :min="minHeightDegrees"
+                :max="maxHeightDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
+                @input="val => exposures[n-1].height = val"
+              />
+              <b-numberinput
+                v-else
+                :value="adjustLimits(exposures[n-1].zoom)"
+                :class="getSymbol(exposures[n-1].zoom)"
+                size="is-small"
+                :disabled="true"
+                type="number"
                 @input="val => exposures[n-1].height = val"
               />
             </b-field>
