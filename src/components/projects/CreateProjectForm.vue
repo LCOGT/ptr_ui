@@ -876,28 +876,28 @@ export default {
   watch: {
     // Resetting values of height and width to 0.0 when Full, Big sq., or Small sq. are selected
     // Doing this because some preset values are up to the thousands and the limit here is 12
-    'exposures': {
-      // Called whenever exposures changes
-      handler (newExposures, oldExposures) {
-        console.log('this exposures:', this.exposures)
-        newExposures.forEach((exposure, index) => {
-          // Getting the corresponding 'exposure' from 'oldExposures' or an empty object if undefined
-          const oldExposure = oldExposures[index] || {}
-          // Checking if the selected zoom meets the condition in which we have to reset values
-          const conditionMet = exposure.zoom === 'Full' || exposure.zoom === 'Big sq.' || exposure.zoom === 'Small sq.'
-          const conditionChanged = exposure.zoom !== oldExposure.zoom
+    // 'exposures': {
+    //   // Called whenever exposures changes
+    //   handler (newExposures, oldExposures) {
+    //     console.log('this exposures:', this.exposures)
+    //     newExposures.forEach((exposure, index) => {
+    //       // Getting the corresponding 'exposure' from 'oldExposures' or an empty object if undefined
+    //       const oldExposure = oldExposures[index] || {}
+    //       // Checking if the selected zoom meets the condition in which we have to reset values
+    //       const conditionMet = exposure.zoom === 'Full' || exposure.zoom === 'Big sq.' || exposure.zoom === 'Small sq.'
+    //       const conditionChanged = exposure.zoom !== oldExposure.zoom
 
-          if (conditionMet && conditionChanged) {
-            this.$set(this.exposures, index, {
-              ...exposure,
-              width: this.minDegrees,
-              height: this.minDegrees
-            })
-          }
-        })
-      },
-      deep: true
-    },
+    //       if (conditionMet && conditionChanged) {
+    //         this.$set(this.exposures, index, {
+    //           ...exposure,
+    //           width: this.minDegrees,
+    //           height: this.minDegrees
+    //         })
+    //       }
+    //     })
+    //   },
+    //   deep: true
+    // },
     // This runs any time an existing project is passed into the component.
     // It transforms the project data into a format that works nicely with the form elements and user interaction.
     project_to_load ({ project, is_modifying_project, is_cloned_project }) {
@@ -1172,7 +1172,7 @@ export default {
       }
     },
     getSymbol (zoom) {
-      if (zoom === 'Mosaic armin.') {
+      if (zoom === 'Mosaic arcmin.') {
         return 'arcmin-input'
       } else return 'degree-input'
     },
