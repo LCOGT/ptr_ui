@@ -362,20 +362,21 @@
               style="width: 150px;"
             >
               <b-numberinput
-                v-if="exposures[n-1].zoom === 'Full' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
+                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
                 :value="Number(exposures[n-1].width)"
+                :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="minWidthDegrees"
-                :max="maxWidthDegrees"
+                :min="minDegrees"
+                :max="getMosaicLimits()"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
                 @input="val => exposures[n-1].width = val"
               />
               <b-numberinput
                 v-else
-                :value="adjustLimits(exposures[n-1].zoom)"
+                :value="adjustSize(exposures[n-1].zoom)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="true"
@@ -388,20 +389,21 @@
               style="width: 150px;"
             >
               <b-numberinput
-                v-if="exposures[n-1].zoom === 'Full' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
+                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
                 :value="Number(exposures[n-1].height)"
+                :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="minHeightDegrees"
-                :max="maxHeightDegrees"
+                :min="minDegrees"
+                :max="getMosaicLimits()"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
                 @input="val => exposures[n-1].height = val"
               />
               <b-numberinput
                 v-else
-                :value="adjustLimits(exposures[n-1].zoom)"
+                :value="adjustSize(exposures[n-1].zoom)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="true"
@@ -817,13 +819,10 @@ export default {
         'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
-      minWidthDegrees: 0.0,
-      maxWidthDegrees: 12.0,
-      minHeightDegrees: 0.0,
-      maxHeightDegrees: 12.0,
+      minDegrees: 0.0,
+      maxDegrees: this.getMosaicLimits(),
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
-      limit: this.adjustLimits(),
       site: this.sitecode,
       warn: {
         project_name: false,
@@ -875,6 +874,30 @@ export default {
     this.load_default_zenith_from_mount()
   },
   watch: {
+    // Resetting values of height and width to 0.0 when Full, Big sq., or Small sq. are selected
+    // Doing this because some preset values are up to the thousands and the limit here is 12
+    'exposures': {
+      // Called whenever exposures changes
+      handler (newExposures, oldExposures) {
+        console.log('this exposures:', this.exposures)
+        newExposures.forEach((exposure, index) => {
+          // Getting the corresponding 'exposure' from 'oldExposures' or an empty object if undefined
+          const oldExposure = oldExposures[index] || {}
+          // Checking if the selected zoom meets the condition in which we have to reset values
+          const conditionMet = exposure.zoom === 'Full' || exposure.zoom === 'Big sq.' || exposure.zoom === 'Small sq.'
+          const conditionChanged = exposure.zoom !== oldExposure.zoom
+
+          if (conditionMet && conditionChanged) {
+            this.$set(this.exposures, index, {
+              ...exposure,
+              width: this.minDegrees,
+              height: this.minDegrees
+            })
+          }
+        })
+      },
+      deep: true
+    },
     // This runs any time an existing project is passed into the component.
     // It transforms the project data into a format that works nicely with the form elements and user interaction.
     project_to_load ({ project, is_modifying_project, is_cloned_project }) {
@@ -1149,14 +1172,13 @@ export default {
       }
     },
     getSymbol (zoom) {
-      if (zoom === 'Mosaic deg.') {
-        return 'degree-input'
-      } else if (zoom === 'Mosaic arcmin.') return 'arcmin-input'
-      return '' // return an empty string if there is no match
+      if (zoom === 'Mosaic armin.') {
+        return 'arcmin-input'
+      } else return 'degree-input'
     },
 
     // Getting limits for width and height
-    getMosaicLimits () {
+    getSizeDegrees () {
       const global_config = this.global_config
       const site = this.sitecode
       const site_config = global_config && global_config[site]
@@ -1165,8 +1187,6 @@ export default {
       const size_y = camera_config && camera_config.camera_size_y
       // size 's value will be the larger of of size_x and size_y, if these values exist
       let size
-      // If size_x and size_y don't exist, then limit is 5
-      let limit = 5
       const settings = camera_config && camera_config.settings
       const pix = settings && settings.onebyone_pix_scale
       // Checking for the existence of these values since not all sites have them
@@ -1179,43 +1199,50 @@ export default {
         }
         // Getting the size in degrees
         const sizeDeg = (size * pix) / 3600
-        const fiveFieldsOfView = sizeDeg * 5
+        return sizeDeg
+      }
+    },
+
+    getMosaicLimits () {
+      let limit = 5
+      const sizeDeg = this.getSizeDegrees()
+      if (sizeDeg) {
+        const fiveFieldsOfView = sizeDeg * limit
         if (fiveFieldsOfView > limit) {
           limit = fiveFieldsOfView
         }
       }
       return limit
     },
-
     // Converting limits depending on what 'zoom' is selected
-    adjustLimits (zoom) {
-      // Getting limit value
-      const limit = this.getMosaicLimits()
-      let limitVal
+    adjustSize (zoom) {
+      // Getting width and height values
+      const size = this.getSizeDegrees()
+      let sizeVal
       if (zoom === 'Mosaic deg.') {
         // Rounding to the third decimal point
-        limitVal = Math.round(limit * 1e3) / 1e3
+        sizeVal = Math.round(size * 1e3) / 1e3
       }
       if (zoom === 'Mosaic arcmin.') {
-        limitVal = Math.round(limit * 60 * 1e3) / 1e3
+        sizeVal = Math.round(size * 60 * 1e3) / 1e3
       } else if (zoom === '71%') {
-        limitVal = Math.round(limit * 0.71 * 1e3) / 1e3
+        sizeVal = Math.round(size * 0.71 * 1e3) / 1e3
       } else if (zoom === '50%') {
-        limitVal = Math.round(limit * 0.5 * 1e3) / 1e3
+        sizeVal = Math.round(size * 0.5 * 1e3) / 1e3
       } else if (zoom === '35%') {
-        limitVal = Math.round(limit * 0.35 * 1e3) / 1e3
+        sizeVal = Math.round(size * 0.35 * 1e3) / 1e3
       } else if (zoom === '25%') {
-        limitVal = Math.round(limit * 0.25 * 1e3) / 1e3
+        sizeVal = Math.round(size * 0.25 * 1e3) / 1e3
       } else if (zoom === '18%') {
-        limitVal = Math.round(limit * 0.18 * 1e3) / 1e3
+        sizeVal = Math.round(size * 0.18 * 1e3) / 1e3
       } else if (zoom === '12.5%') {
-        limitVal = Math.round(limit * 0.125 * 1e3) / 1e3
+        sizeVal = Math.round(size * 0.125 * 1e3) / 1e3
       } else if (zoom === '9%') {
-        limitVal = Math.round(limit * 0.09 * 1e3) / 1e3
+        sizeVal = Math.round(size * 0.09 * 1e3) / 1e3
       } else if (zoom === '6%') {
-        limitVal = Math.round(limit * 0.06 * 1e3) / 1e3
+        sizeVal = Math.round(size * 0.06 * 1e3) / 1e3
       }
-      return limitVal
+      return sizeVal
     }
   },
   computed: {
@@ -1364,7 +1391,7 @@ export default {
 .degree-input::after {
     content: "°";
     position: absolute;
-    right: 35%;
+    right: 32%;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
@@ -1373,7 +1400,7 @@ export default {
 .arcmin-input::after {
     content: "'";
     position: absolute;
-    right: 35%;
+    right: 32%;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
