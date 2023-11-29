@@ -376,7 +376,7 @@
               />
               <b-numberinput
                 v-else
-                :value="adjustSize(exposures[n-1].zoom)"
+                :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="true"
@@ -876,28 +876,28 @@ export default {
   watch: {
     // Resetting values of height and width to 0.0 when Full, Big sq., or Small sq. are selected
     // Doing this because some preset values are up to the thousands and the limit here is 12
-    // 'exposures': {
-    //   // Called whenever exposures changes
-    //   handler (newExposures, oldExposures) {
-    //     console.log('this exposures:', this.exposures)
-    //     newExposures.forEach((exposure, index) => {
-    //       // Getting the corresponding 'exposure' from 'oldExposures' or an empty object if undefined
-    //       const oldExposure = oldExposures[index] || {}
-    //       // Checking if the selected zoom meets the condition in which we have to reset values
-    //       const conditionMet = exposure.zoom === 'Full' || exposure.zoom === 'Big sq.' || exposure.zoom === 'Small sq.'
-    //       const conditionChanged = exposure.zoom !== oldExposure.zoom
+    'exposures': {
+      // Called whenever exposures changes
+      handler (newExposures, oldExposures) {
+        console.log('this exposures:', this.exposures)
+        newExposures.forEach((exposure, index) => {
+          // Getting the corresponding 'exposure' from 'oldExposures' or an empty object if undefined
+          const oldExposure = oldExposures[index] || {}
+          // Checking if the selected zoom meets the condition in which we have to reset values
+          const conditionMet = exposure.zoom === 'Full' || exposure.zoom === 'Big sq.' || exposure.zoom === 'Small sq.'
+          const conditionChanged = exposure.zoom !== oldExposure.zoom
 
-    //       if (conditionMet && conditionChanged) {
-    //         this.$set(this.exposures, index, {
-    //           ...exposure,
-    //           width: this.minDegrees,
-    //           height: this.minDegrees
-    //         })
-    //       }
-    //     })
-    //   },
-    //   deep: true
-    // },
+          if (conditionMet && conditionChanged) {
+            this.$set(this.exposures, index, {
+              ...exposure,
+              width: this.minDegrees,
+              height: this.minDegrees
+            })
+          }
+        })
+      },
+      deep: true
+    },
     // This runs any time an existing project is passed into the component.
     // It transforms the project data into a format that works nicely with the form elements and user interaction.
     project_to_load ({ project, is_modifying_project, is_cloned_project }) {
@@ -1214,17 +1214,13 @@ export default {
       }
       return limit
     },
-    // Converting limits depending on what 'zoom' is selected
+    // Converting size values depending on what 'zoom' is selected
     adjustSize (zoom) {
       // Getting width and height values
       const size = this.getSizeDegrees()
       let sizeVal
-      if (zoom === 'Mosaic deg.') {
-        // Rounding to the third decimal point
+      if (zoom === 'Full') {
         sizeVal = Math.round(size * 1e3) / 1e3
-      }
-      if (zoom === 'Mosaic arcmin.') {
-        sizeVal = Math.round(size * 60 * 1e3) / 1e3
       } else if (zoom === '71%') {
         sizeVal = Math.round(size * 0.71 * 1e3) / 1e3
       } else if (zoom === '50%') {
