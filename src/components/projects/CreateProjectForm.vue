@@ -880,8 +880,14 @@ export default {
         console.log('this.exposures:', this.exposures)
         const updatedExposures = newExposures.map((exposure) => {
           if (exposure.zoom !== oldExposures.zoom) {
-            const newSize = this.adjustSize(exposure.zoom)
-            return { ...exposure, width: newSize, height: newSize }
+            if (exposure.zoom === 'Mosaic deg.' || exposure.zoom === 'Mosaic arcmin.' || exposure.zoom === 'Big sq.' || exposure.zoom === 'Small sq.') {
+              const widthSize = Number(exposure.width)
+              const heightSize = Number(exposure.height)
+              return {...exposure, width: widthSize, height: heightSize}
+            } else {
+              const newSize = this.adjustSize(exposure.zoom)
+              return { ...exposure, width: newSize, height: newSize }
+            }
           }
           return exposure
         })
