@@ -824,6 +824,7 @@ export default {
       maxDegrees: this.getMosaicLimits(),
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
+      customZoomValues: {},
       site: this.sitecode,
       warn: {
         project_name: false,
@@ -877,13 +878,32 @@ export default {
   watch: {
     'exposures': {
       handler (newExposures, oldExposures) {
+        const customZooms = ['Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Small sq.']
+
+        console.log('this exposures:', this.exposures)
+        console.log('this storedvalues:', this.storedValues)
         const updatedExposures = newExposures.map((exposure) => {
           if (exposure.zoom !== oldExposures.zoom) {
-            if (exposure.zoom === 'Mosaic deg.' || exposure.zoom === 'Mosaic arcmin.' || exposure.zoom === 'Big sq.' || exposure.zoom === 'Small sq.') {
-              const widthSize = Number(exposure.width)
-              const heightSize = Number(exposure.height)
-              return { ...exposure, width: widthSize, height: heightSize }
+            if (customZooms.includes(exposure.zoom)) {
+            // Use stored values for custom zooms, if available
+              const storedValues = this.customZoomValues
+              return {
+                ...exposure,
+                width: storedValues ? storedValues.width : Number(exposure.width),
+                height: storedValues ? storedValues.height : Number(exposure.height)
+              }
             } else {
+            // Store current custom zoom values before changing
+              if (customZooms.includes(oldExposures.zoom)) {
+                this.customZoomValues = {
+                  width: Number(oldExposures.width),
+                  height: Number(oldExposures.height)
+                }
+              }
+              // const widthSize = Number(exposure.width)
+              // const heightSize = Number(exposure.height)
+              // return { ...exposure, width: widthSize, height: heightSize }
+
               const newSize = this.adjustSize(exposure.zoom)
               return { ...exposure, width: newSize, height: newSize }
             }
