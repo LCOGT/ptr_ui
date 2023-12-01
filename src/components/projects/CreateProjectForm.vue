@@ -364,7 +364,7 @@
             >
               <b-numberinput
                 v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
-                :value="Number(exposures[n-1].width)"
+                :value="customZoomValues[exposures[n-1].zoom] && customZoomValues[exposures[n-1].zoom].width !== undefined ? customZoomValues[exposures[n-1].zoom].width : 0.0"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
@@ -373,7 +373,7 @@
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => exposures[n-1].width = val"
+                @input="val => updateCustomZoomValue(exposures[n-1].zoom, 'width', val)"
               />
               <b-numberinput
                 v-else
@@ -879,31 +879,9 @@ export default {
     'exposures': {
       handler (newExposures, oldExposures) {
         const customZooms = ['Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Small sq.']
-
-        console.log('this exposures:', this.exposures)
-        console.log('this storedvalues:', this.storedValues)
         const updatedExposures = newExposures.map((exposure) => {
           if (exposure.zoom !== oldExposures.zoom) {
-            if (customZooms.includes(exposure.zoom)) {
-            // Use stored values for custom zooms, if available
-              const storedValues = this.customZoomValues
-              return {
-                ...exposure,
-                width: storedValues ? storedValues.width : Number(exposure.width),
-                height: storedValues ? storedValues.height : Number(exposure.height)
-              }
-            } else {
-            // Store current custom zoom values before changing
-              if (customZooms.includes(oldExposures.zoom)) {
-                this.customZoomValues = {
-                  width: Number(oldExposures.width),
-                  height: Number(oldExposures.height)
-                }
-              }
-              // const widthSize = Number(exposure.width)
-              // const heightSize = Number(exposure.height)
-              // return { ...exposure, width: widthSize, height: heightSize }
-
+            if (!customZooms.includes(exposure.zoom)) {
               const newSize = this.adjustSize(exposure.zoom)
               return { ...exposure, width: newSize, height: newSize }
             }
@@ -1260,6 +1238,13 @@ export default {
         sizeVal = Math.round(size * 0.06 * 1e3) / 1e3
       }
       return sizeVal
+    },
+    updateCustomZoomValue (zoom, field, value) {
+      if (!this.customZoomValues[zoom]) {
+        this.$set(this.customZoomValues, zoom, { width: 0.0, height: 0.0 })
+      }
+      this.customZoomValues[zoom][field] = value
+      this.exposures[0][field] = value
     }
   },
   computed: {
