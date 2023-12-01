@@ -877,13 +877,12 @@ export default {
   watch: {
     'exposures': {
       handler (newExposures, oldExposures) {
-        console.log('this.exposures:', this.exposures)
         const updatedExposures = newExposures.map((exposure) => {
           if (exposure.zoom !== oldExposures.zoom) {
             if (exposure.zoom === 'Mosaic deg.' || exposure.zoom === 'Mosaic arcmin.' || exposure.zoom === 'Big sq.' || exposure.zoom === 'Small sq.') {
               const widthSize = Number(exposure.width)
               const heightSize = Number(exposure.height)
-              return {...exposure, width: widthSize, height: heightSize}
+              return { ...exposure, width: widthSize, height: heightSize }
             } else {
               const newSize = this.adjustSize(exposure.zoom)
               return { ...exposure, width: newSize, height: newSize }
@@ -1240,7 +1239,6 @@ export default {
       } else if (zoom === '6%') {
         sizeVal = Math.round(size * 0.06 * 1e3) / 1e3
       }
-      console.log('this is sizeval: ', sizeVal)
       return sizeVal
     }
   },
