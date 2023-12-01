@@ -347,6 +347,7 @@
                 v-model="exposures[n-1].zoom"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
+                @change="() => adjustSize(n-1, exposures[n-1].zoom)"
               >
                 <option
                   v-for="(val, index) in generic_camera_areas"
@@ -369,7 +370,7 @@
                 :disabled="!exposures[n-1].active"
                 type="number"
                 :min="minDegrees"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? getMosaicLimits() * degreesToArcminutes : getMosaicLimits()"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
                 @input="val => exposures[n-1].width = val"
@@ -396,14 +397,14 @@
                 :disabled="!exposures[n-1].active"
                 type="number"
                 :min="minDegrees"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? getMosaicLimits() * degreesToArcminutes : getMosaicLimits()"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
                 @input="val => exposures[n-1].height = val"
               />
               <b-numberinput
                 v-else
-                :value="adjustSize(exposures[n-1].zoom)"
+                :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="true"
@@ -874,30 +875,25 @@ export default {
     this.load_default_zenith_from_mount()
   },
   watch: {
-    // Resetting values of height and width to 0.0 when Full, Big sq., or Small sq. are selected
-    // Doing this because some preset values are up to the thousands and the limit here is 12
     'exposures': {
-      // Called whenever exposures changes
       handler (newExposures, oldExposures) {
-        console.log('this exposures:', this.exposures)
-        newExposures.forEach((exposure, index) => {
-          // Getting the corresponding 'exposure' from 'oldExposures' or an empty object if undefined
-          const oldExposure = oldExposures[index] || {}
-          // Checking if the selected zoom meets the condition in which we have to reset values
-          const conditionMet = exposure.zoom === 'Full' || exposure.zoom === 'Big sq.' || exposure.zoom === 'Small sq.'
-          const conditionChanged = exposure.zoom !== oldExposure.zoom
-
-          if (conditionMet && conditionChanged) {
-            this.$set(this.exposures, index, {
-              ...exposure,
-              width: this.minDegrees,
-              height: this.minDegrees
-            })
+        console.log('this.exposures:', this.exposures)
+        const updatedExposures = newExposures.map((exposure) => {
+          if (exposure.zoom !== oldExposures.zoom) {
+            const newSize = this.adjustSize(exposure.zoom)
+            return { ...exposure, width: newSize, height: newSize }
           }
+          return exposure
         })
+
+        // Update only if there is a change
+        if (JSON.stringify(newExposures) !== JSON.stringify(updatedExposures)) {
+          this.exposures = updatedExposures
+        }
       },
       deep: true
     },
+
     // This runs any time an existing project is passed into the component.
     // It transforms the project data into a format that works nicely with the form elements and user interaction.
     project_to_load ({ project, is_modifying_project, is_cloned_project }) {
@@ -1238,6 +1234,7 @@ export default {
       } else if (zoom === '6%') {
         sizeVal = Math.round(size * 0.06 * 1e3) / 1e3
       }
+      console.log('this is sizeval: ', sizeVal)
       return sizeVal
     }
   },
