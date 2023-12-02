@@ -391,7 +391,7 @@
             >
               <b-numberinput
                 v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
-                :value="Number(exposures[n-1].height)"
+                :value="customZoomValues[exposures[n-1].zoom] && customZoomValues[exposures[n-1].zoom].heigth !== undefined ? customZoomValues[exposures[n-1].zoom].height : 0.0"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
