@@ -400,7 +400,7 @@
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => exposures[n-1].height = val"
+                @input="val => updateCustomZoomValue(exposures[n-1].zoom, 'height', val)"
               />
               <b-numberinput
                 v-else
