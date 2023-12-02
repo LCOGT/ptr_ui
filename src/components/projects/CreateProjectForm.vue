@@ -1199,6 +1199,8 @@ export default {
         // Getting the size in degrees
         const sizeDeg = (size * pix) / 3600
         return sizeDeg
+      } else {
+        return 1
       }
     },
 
@@ -1239,6 +1241,7 @@ export default {
       }
       return sizeVal
     },
+    // Saving values so that when user returns to custom width and heights, whatever they had before remains saved
     updateCustomZoomValue (zoom, field, value) {
       if (!this.customZoomValues[zoom]) {
         this.$set(this.customZoomValues, zoom, { width: 0.0, height: 0.0 })
