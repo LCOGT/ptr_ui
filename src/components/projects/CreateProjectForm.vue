@@ -776,7 +776,6 @@ import RightAscensionInput from '@/components/FormElements/RightAscensionInput'
 import DeclinationInput from '@/components/FormElements/DeclinationInput'
 import CollapsableSection from '@/components/projects/CollapsableSection'
 import ProjectSitesSelector from '@/components/projects/ProjectSitesSelector'
-import ResolveFiltersDialog from '@/components/projects/ResolveFiltersDialog'
 import axios from 'axios'
 
 const mapStateToComputed = (vuexModule, propertyNames) => {
@@ -799,8 +798,7 @@ export default {
     RightAscensionInput,
     DeclinationInput,
     CollapsableSection,
-    ProjectSitesSelector,
-    ResolveFiltersDialog
+    ProjectSitesSelector
   },
   data () {
     return {
@@ -878,6 +876,7 @@ export default {
   watch: {
     'exposures': {
       handler (newExposures, oldExposures) {
+        console.log('this exposures:', this.exposures)
         const customZooms = ['Mosaic deg.', 'Mosaic arcmin.']
         const updatedExposures = newExposures.map((exposure) => {
           if (exposure.zoom !== oldExposures.zoom) {
@@ -916,6 +915,10 @@ export default {
         selectedSites.push('common pool')
       }
       this.project_sites = selectedSites
+      // Resetting values of width and height
+      if (newVal !== oldVal) {
+        this.resetExposures()
+      }
 
       // Check if any of the filters are no longer available in the new site
 
@@ -944,7 +947,8 @@ export default {
   methods: {
     ...mapActions('project_params', [
       'resetProjectForm',
-      'loadProject'
+      'loadProject',
+      'resetExposures'
     ]),
     // Set store value for min_zenith_dist if it exists in mount config
     load_default_zenith_from_mount () {
