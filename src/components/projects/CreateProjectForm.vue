@@ -363,7 +363,7 @@
               style="width: 150px;"
             >
               <b-numberinput
-                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
+                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
                 :value="customZoomValues[exposures[n-1].zoom] && customZoomValues[exposures[n-1].zoom].width !== undefined ? customZoomValues[exposures[n-1].zoom].width : 0.0"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
@@ -390,7 +390,7 @@
               style="width: 150px;"
             >
               <b-numberinput
-                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.' || exposures[n-1].zoom === 'Big sq.' || exposures[n-1].zoom === 'Small sq.'"
+                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
                 :value="customZoomValues[exposures[n-1].zoom] && customZoomValues[exposures[n-1].zoom].height !== undefined ? customZoomValues[exposures[n-1].zoom].height : 0.0"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
@@ -824,8 +824,6 @@ export default {
       maxDegrees: this.getMosaicLimits(),
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
-      bigSquare: this.getBigSquareValues(),
-      smallSquare: this.getSmallSquareValues(),
       customZoomValues: {},
       site: this.sitecode,
       warn: {
@@ -880,7 +878,7 @@ export default {
   watch: {
     'exposures': {
       handler (newExposures, oldExposures) {
-        const customZooms = ['Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Small sq.']
+        const customZooms = ['Mosaic deg.', 'Mosaic arcmin.']
         const updatedExposures = newExposures.map((exposure) => {
           if (exposure.zoom !== oldExposures.zoom) {
             if (!customZooms.includes(exposure.zoom)) {
@@ -1224,9 +1222,11 @@ export default {
       let bigSquare
       if (size_x && size_y && pix) {
         if (size_x > size_y) {
-          bigSquare = (size_x * pix) / 3600
+          const bigSq = (size_x * pix) / 3600
+          bigSquare = Number(bigSq.toFixed(3))
         } else {
-          bigSquare = (size_y * pix) / 3600
+          const bigSq = (size_y * pix) / 3600
+          bigSquare = Number(bigSq.toFixed(3))
         }
       }
       return bigSquare
@@ -1240,15 +1240,17 @@ export default {
       let smallSquare
       if (size_x && size_y && pix) {
         if (size_x < size_y) {
-          smallSquare = (size_x * pix) / 3600
+          const smallSq = (size_x * pix) / 3600
+          smallSquare = Number(smallSq.toFixed(3))
         } else {
-          smallSquare = (size_y * pix) / 3600
+          const smallSq = (size_y * pix) / 3600
+          smallSquare = Number(smallSq.toFixed(3))
         }
       }
       return smallSquare
     },
 
-    // getting size in degrees to be able to get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections 
+    // getting size in degrees to be able to get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
     // as well as to adjust width and height depending on zoom selection (i.e. adjustSize())
     getSizeDegrees () {
       const size_x = this.getSizeX()
@@ -1265,40 +1267,46 @@ export default {
       return sizeDegrees
     },
 
+    // Getting limits for width and height for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
     getMosaicLimits () {
       let limit = 5
       const sizeDeg = this.getSizeDegrees()
       if (sizeDeg) {
         const fiveFieldsOfView = sizeDeg * limit
         if (fiveFieldsOfView > limit) {
-          limit = fiveFieldsOfView
+          limit = Number(fiveFieldsOfView.toFixed(3))
         }
       }
       return limit
     },
+
     // Converting size values depending on what 'zoom' is selected
     adjustSize (zoom) {
-      // Getting width and height values
+      // Getting adjusted width and height values
       const size = this.getSizeDegrees()
       let sizeVal
       if (zoom === 'Full') {
-        sizeVal = Math.round(size * 1e3) / 1e3
+        sizeVal = Number(size.toFixed(3))
       } else if (zoom === '71%') {
-        sizeVal = Math.round(size * 0.71 * 1e3) / 1e3
+        sizeVal = Number((size * 0.71).toFixed(3))
       } else if (zoom === '50%') {
-        sizeVal = Math.round(size * 0.5 * 1e3) / 1e3
+        sizeVal = Number((size * 0.5).toFixed(3))
       } else if (zoom === '35%') {
-        sizeVal = Math.round(size * 0.35 * 1e3) / 1e3
+        sizeVal = Number((size * 0.35).toFixed(3))
       } else if (zoom === '25%') {
-        sizeVal = Math.round(size * 0.25 * 1e3) / 1e3
+        sizeVal = Number((size * 0.25).toFixed(3))
       } else if (zoom === '18%') {
-        sizeVal = Math.round(size * 0.18 * 1e3) / 1e3
+        sizeVal = Number((size * 0.18).toFixed(3))
       } else if (zoom === '12.5%') {
-        sizeVal = Math.round(size * 0.125 * 1e3) / 1e3
+        sizeVal = Number((size * 0.125).toFixed(3))
       } else if (zoom === '9%') {
-        sizeVal = Math.round(size * 0.09 * 1e3) / 1e3
+        sizeVal = Number((size * 0.09).toFixed(3))
       } else if (zoom === '6%') {
-        sizeVal = Math.round(size * 0.06 * 1e3) / 1e3
+        sizeVal = Number((size * 0.06).toFixed(3))
+      } else if (zoom === 'Big sq.') {
+        sizeVal = this.getBigSquareValues()
+      } else if (zoom === 'Small sq.') {
+        sizeVal = this.getSmallSquareValues()
       }
       return sizeVal
     },
