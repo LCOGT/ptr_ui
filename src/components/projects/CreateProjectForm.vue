@@ -824,6 +824,8 @@ export default {
       maxDegrees: this.getMosaicLimits(),
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
+      bigSquare: this.getBigSquareValues(),
+      smallSquare: this.getSmallSquareValues(),
       customZoomValues: {},
       site: this.sitecode,
       warn: {
@@ -1176,32 +1178,91 @@ export default {
       } else return 'degree-input'
     },
 
-    // Getting limits for width and height
-    getSizeDegrees () {
+    getCameraConfig () {
       const global_config = this.global_config
       const site = this.sitecode
       const site_config = global_config && global_config[site]
       const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
-      const size_x = camera_config && camera_config.camera_size_x
-      const size_y = camera_config && camera_config.camera_size_y
-      // size 's value will be the larger of of size_x and size_y, if these values exist
-      let size
-      const settings = camera_config && camera_config.settings
-      const pix = settings && settings.onebyone_pix_scale
-      // Checking for the existence of these values since not all sites have them
-      // And we want the largest of the sizes
+      if (camera_config) {
+        return camera_config
+      }
+    },
+    // Getting pixels to get size degrees and mosaic limits
+    getPixels () {
+      const camera_config = this.getCameraConfig()
+      if (camera_config) {
+        const settings = camera_config.settings
+        const pix = settings && settings.onebyone_pix_scale
+        return pix
+      }
+    },
+
+    // getting camera_size_x and camera_size_y below to
+    // 1. get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections,
+    // 2. be able to adjust preset sizes based on zoom selections
+    // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
+    getSizeX () {
+      const camera_config = this.getCameraConfig()
+      if (camera_config) {
+        const size_x = camera_config.camera_size_x
+        return size_x
+      }
+    },
+
+    getSizeY () {
+      const camera_config = this.getCameraConfig()
+      if (camera_config) {
+        const size_y = camera_config.camera_size_y
+        return size_y
+      }
+    },
+    // getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
+    getBigSquareValues () {
+      const size_x = this.getSizeX()
+      const size_y = this.getSizeY()
+      const pix = this.getPixels()
+      let bigSquare
       if (size_x && size_y && pix) {
         if (size_x > size_y) {
-          size = size_x
+          bigSquare = (size_x * pix) / 3600
         } else {
-          size = size_y
+          bigSquare = (size_y * pix) / 3600
         }
-        // Getting the size in degrees
-        const sizeDeg = (size * pix) / 3600
-        return sizeDeg
-      } else {
-        return 1
       }
+      return bigSquare
+    },
+
+    // getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
+    getSmallSquareValues () {
+      const size_x = this.getSizeX()
+      const size_y = this.getSizeY()
+      const pix = this.getPixels()
+      let smallSquare
+      if (size_x && size_y && pix) {
+        if (size_x < size_y) {
+          smallSquare = (size_x * pix) / 3600
+        } else {
+          smallSquare = (size_y * pix) / 3600
+        }
+      }
+      return smallSquare
+    },
+
+    // getting size in degrees to be able to get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections 
+    // as well as to adjust width and height depending on zoom selection (i.e. adjustSize())
+    getSizeDegrees () {
+      const size_x = this.getSizeX()
+      const size_y = this.getSizeY()
+      const pix = this.getPixels()
+      let sizeDegrees = 1
+      if (size_x && size_y && pix) {
+        if (size_x > size_y) {
+          sizeDegrees = (size_x * pix) / 3600
+        } else {
+          sizeDegrees = (size_y * pix) / 3600
+        }
+      }
+      return sizeDegrees
     },
 
     getMosaicLimits () {
