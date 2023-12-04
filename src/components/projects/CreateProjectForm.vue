@@ -1176,18 +1176,9 @@ export default {
       } else return 'degree-input'
     },
 
-    getCameraConfig () {
-      const global_config = this.global_config
-      const site = this.sitecode
-      const site_config = global_config && global_config[site]
-      const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
-      if (camera_config) {
-        return camera_config
-      }
-    },
     // Getting pixels to get size degrees and mosaic limits
     getPixels () {
-      const camera_config = this.getCameraConfig()
+      const camera_config = this.get_camera_config
       if (camera_config) {
         const settings = camera_config.settings
         const pix = settings && settings.onebyone_pix_scale
@@ -1200,7 +1191,7 @@ export default {
     // 2. be able to adjust preset sizes based on zoom selections
     // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
     getSizeX () {
-      const camera_config = this.getCameraConfig()
+      const camera_config = this.get_camera_config
       if (camera_config) {
         const size_x = camera_config.camera_size_x
         return size_x
@@ -1208,7 +1199,7 @@ export default {
     },
 
     getSizeY () {
-      const camera_config = this.getCameraConfig()
+      const camera_config = this.get_camera_config
       if (camera_config) {
         const size_y = camera_config.camera_size_y
         return size_y
@@ -1412,7 +1403,8 @@ export default {
       'available_sites_simulated',
       'filter_wheel_options',
       'default_filter_selection',
-      'selected_mount_config'
+      'selected_mount_config',
+      'get_camera_config'
     ]),
     ...mapState('site_config', ['global_config']),
     ...mapState('user_data', [

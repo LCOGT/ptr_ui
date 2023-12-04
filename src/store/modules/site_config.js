@@ -42,6 +42,15 @@ const getters = {
     return state.global_config[state.selected_site]
   },
 
+  get_camera_config: state => {
+    const global_config = state.global_config
+    const site_config = global_config && global_config[state.selected_site]
+    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
+    if (camera_config) {
+      return camera_config
+    }
+  },
+
   site_is_wema: state => {
     return state.global_config[state.selected_site]?.instance_type == 'wema'
   },
