@@ -1219,7 +1219,7 @@ export default {
       const size_x = this.getSizeX()
       const size_y = this.getSizeY()
       const pix = this.getPixels()
-      let bigSquare
+      let bigSquare = 1
       if (size_x && size_y && pix) {
         if (size_x > size_y) {
           const bigSq = (size_x * pix) / 3600
@@ -1237,7 +1237,7 @@ export default {
       const size_x = this.getSizeX()
       const size_y = this.getSizeY()
       const pix = this.getPixels()
-      let smallSquare
+      let smallSquare = 1
       if (size_x && size_y && pix) {
         if (size_x < size_y) {
           const smallSq = (size_x * pix) / 3600
