@@ -43,7 +43,7 @@ const getters = {
   },
 
   get_camera_config: state => {
-    // '&&' is for existence checks
+    // '&&' is for existence checks so that if some values don't exist, we can return safely
     const global_config = state.global_config
     const site_config = global_config && global_config[state.selected_site]
     const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
