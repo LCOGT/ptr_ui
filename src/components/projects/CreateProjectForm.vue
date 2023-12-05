@@ -347,7 +347,7 @@
                 v-model="exposures[n-1].zoom"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
-                @change="() => adjustSize(n-1, exposures[n-1].zoom)"
+                @input="onZoomChange(n-1, exposures[n-1].zoom)"
               >
                 <option
                   v-for="(val, index) in generic_camera_areas"
@@ -364,7 +364,7 @@
             >
               <b-numberinput
                 v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
-                :value="customZoomValues[exposures[n-1].zoom] && customZoomValues[exposures[n-1].zoom].width !== undefined ? customZoomValues[exposures[n-1].zoom].width : 0.0"
+                :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
@@ -373,7 +373,7 @@
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => updateCustomZoomValue(exposures[n-1].zoom, 'width', val)"
+                @input="val => exposures[n-1].width = val"
               />
               <b-numberinput
                 v-else
@@ -391,7 +391,7 @@
             >
               <b-numberinput
                 v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
-                :value="customZoomValues[exposures[n-1].zoom] && customZoomValues[exposures[n-1].zoom].height !== undefined ? customZoomValues[exposures[n-1].zoom].height : 0.0"
+                :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
@@ -400,7 +400,7 @@
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => updateCustomZoomValue(exposures[n-1].zoom, 'height', val)"
+                @input="val => exposures[n-1].height = val"
               />
               <b-numberinput
                 v-else
@@ -822,7 +822,7 @@ export default {
       maxDegrees: this.getMosaicLimits(),
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
-      customZoomValues: {},
+      sizeInDegrees: this.getSizeDegrees(),
       site: this.sitecode,
       warn: {
         project_name: false,
@@ -872,29 +872,12 @@ export default {
 
     // loading min_zenith_dist fromt config
     this.load_default_zenith_from_mount()
+
+    // initializing width and height to the appropriate value
+    this.exposures[0].width = this.adjustSize(this.exposures[0].zoom)
+    this.exposures[0].height = this.adjustSize(this.exposures[0].zoom)
   },
   watch: {
-    'exposures': {
-      handler (newExposures, oldExposures) {
-        console.log('this exposures:', this.exposures)
-        const customZooms = ['Mosaic deg.', 'Mosaic arcmin.']
-        const updatedExposures = newExposures.map((exposure) => {
-          if (exposure.zoom !== oldExposures.zoom) {
-            if (!customZooms.includes(exposure.zoom)) {
-              const newSize = this.adjustSize(exposure.zoom)
-              return { ...exposure, width: newSize, height: newSize }
-            }
-          }
-          return exposure
-        })
-
-        // Update only if there is a change
-        if (JSON.stringify(newExposures) !== JSON.stringify(updatedExposures)) {
-          this.exposures = updatedExposures
-        }
-      },
-      deep: true
-    },
 
     // This runs any time an existing project is passed into the component.
     // It transforms the project data into a format that works nicely with the form elements and user interaction.
@@ -915,9 +898,13 @@ export default {
         selectedSites.push('common pool')
       }
       this.project_sites = selectedSites
-      // Resetting values of width and height
+      // Resetting values of width and height if site changes
+      // We also maintain the exposure rows with the same zoom values but adjusted width and height values depending on the site
       if (newVal !== oldVal) {
-        this.resetExposures()
+        this.exposures.forEach((exposure) => {
+          exposure.height = this.adjustSize(exposure.zoom)
+          exposure.width = this.adjustSize(exposure.zoom)
+        })
       }
 
       // Check if any of the filters are no longer available in the new site
@@ -947,8 +934,7 @@ export default {
   methods: {
     ...mapActions('project_params', [
       'resetProjectForm',
-      'loadProject',
-      'resetExposures'
+      'loadProject'
     ]),
     // Set store value for min_zenith_dist if it exists in mount config
     load_default_zenith_from_mount () {
@@ -1005,6 +991,7 @@ export default {
       // Show the additional row
       this.exposures_index += 1
     },
+
     verifyForm () {
       if (this.project_name === '') { this.warn.project_name = true }
       if (this.project_name.includes('#')) {
@@ -1174,6 +1161,7 @@ export default {
         return ['none']
       }
     },
+    // This function is used to dynamically change classes of width and height so that they display the appropriate symbol depending on the zoom selection
     getSymbol (zoom) {
       if (zoom === 'Mosaic arcmin.') {
         return 'arcmin-input'
@@ -1190,7 +1178,7 @@ export default {
       }
     },
 
-    // getting camera_size_x and camera_size_y below to
+    // Getting camera_size_x and camera_size_y below to
     // 1. get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections,
     // 2. be able to adjust preset sizes based on zoom selections
     // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
@@ -1209,7 +1197,7 @@ export default {
         return size_y
       }
     },
-    // getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
+    // Getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
     getBigSquareValues () {
       const size_x = this.getSizeX()
       const size_y = this.getSizeY()
@@ -1227,7 +1215,7 @@ export default {
       return bigSquare
     },
 
-    // getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
+    // Getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
     getSmallSquareValues () {
       const size_x = this.getSizeX()
       const size_y = this.getSizeY()
@@ -1245,7 +1233,7 @@ export default {
       return smallSquare
     },
 
-    // getting size in degrees to be able to get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
+    // Getting size in degrees to be able to get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
     // as well as to adjust width and height depending on zoom selection (i.e. adjustSize())
     getSizeDegrees () {
       const size_x = this.getSizeX()
@@ -1275,6 +1263,14 @@ export default {
       return limit
     },
 
+    // Triggered when a different zoom is selected
+    // This invokes the adjustSize function below and sets the values of width and height to their corresponding values depending on the zoom selection
+    onZoomChange (exposureIndex, zoom) {
+      const newSize = this.adjustSize(zoom)
+      this.exposures[exposureIndex].width = newSize
+      this.exposures[exposureIndex].height = newSize
+    },
+
     // Converting size values depending on what 'zoom' is selected
     adjustSize (zoom) {
       // Getting adjusted width and height values
@@ -1302,16 +1298,10 @@ export default {
         sizeVal = this.getBigSquareValues()
       } else if (zoom === 'Small sq.') {
         sizeVal = this.getSmallSquareValues()
+      } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
+        sizeVal = 0.0
       }
       return sizeVal
-    },
-    // Saving values so that when user returns to custom width and heights, whatever they had before remains saved
-    updateCustomZoomValue (zoom, field, value) {
-      if (!this.customZoomValues[zoom]) {
-        this.$set(this.customZoomValues, zoom, { width: 0.0, height: 0.0 })
-      }
-      this.customZoomValues[zoom][field] = value
-      this.exposures[0][field] = value
     }
   },
   computed: {

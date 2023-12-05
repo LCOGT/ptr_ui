@@ -257,22 +257,6 @@ const actions = {
     }
     commit('start_date', moment(project.project_constraints.start_date).toDate())
     commit('expiry_date', moment(project.project_constraints.expiry_date).toDate())
-  },
-  resetExposures ({ commit }) {
-    commit('exposures', [
-      {
-        active: true,
-        count: 1,
-        imtype: 'light',
-        exposure: 1,
-        filter: 'Lum',
-        zoom: 'Full',
-        bin: 'optimal',
-        width: '0.0',
-        height: '0.0',
-        angle: '0.0'
-      }
-    ])
   }
 }
 
