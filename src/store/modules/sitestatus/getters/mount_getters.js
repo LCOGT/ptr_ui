@@ -22,7 +22,6 @@ const dec = (state, getters) => {
 const azimuth = (state, getters) => {
   const name = 'Azimuth'
   const val = parseFloat(getters.mount_state.azimuth?.val)?.toFixed(4) ?? '-'
-
   const is_stale = isItemStale(getters, 'mount_state', 'azimuth')
   return { name, val, is_stale }
 }
