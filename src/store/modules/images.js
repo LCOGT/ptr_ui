@@ -83,6 +83,7 @@ const getters = {
 const mutations = {
   setCurrentImage (state, the_current_image) { state.current_image = the_current_image },
   setRecentImages (state, recent_image_list) { state.recent_images = recent_image_list },
+  setRecentImagesIndex (state, { oldIndex, newImage }) { Vue.set(state.recent_images, oldIndex, newImage) },
   setLastSiteRequested (state, site) { state.lastSiteRequested = site },
   setUserImages (state, user_images_list) { state.user_images = user_images_list },
   show_user_data_only (state, val) { state.show_user_data_only = val },
@@ -176,7 +177,11 @@ const actions = {
       }
       // Otherwise, replace the old version with the new one we fetched.
       else {
-        recent_images[old_image_index] = new_image
+        commit('setRecentImagesIndex', { oldIndex: old_image_index, newImage: new_image })
+        // handle the edge case where current image is the image that was updated
+        if (state.current_image.baseFilename == new_image.baseFilename) {
+          commit('setCurrentImage', new_image)
+        }
       }
       // Reassigning value of current_image to new_image
       // If a user takes smart stack photos and they select the image as it's updating,
