@@ -50,7 +50,6 @@ const zenith_distance = (state, getters) => {
 
 const airmass = (state, getters) => {
   const name = 'Airmass'
-  // const val = get_val(getters, '')
   const val = parseFloat(getters.mount_state.airmass?.val)?.toFixed(4) ?? '-'
   const is_stale = isItemStale(getters, 'mount_state', 'airmass')
   return { name, val, is_stale }
