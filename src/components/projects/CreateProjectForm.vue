@@ -1168,24 +1168,6 @@ export default {
       } else return 'degree-input'
     },
 
-    // Getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
-    getBigSquareValues () {
-      const size_x = this.get_camera_size_x
-      const size_y = this.get_camera_size_y
-      const pix = this.get_pixels
-      let bigSquare = 1
-      if (size_x && size_y && pix) {
-        if (size_x > size_y) {
-          const bigSq = (size_x * pix) / 3600
-          bigSquare = Number(bigSq.toFixed(3))
-        } else {
-          const bigSq = (size_y * pix) / 3600
-          bigSquare = Number(bigSq.toFixed(3))
-        }
-      }
-      return bigSquare
-    },
-
     // Getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
     getSmallSquareValues () {
       const size_x = this.get_camera_size_x
@@ -1247,7 +1229,8 @@ export default {
       // Getting adjusted width and height values
       const size = this.getSizeDegrees()
       let sizeVal
-      if (zoom === 'Full') {
+      // Full and Big sq. share the same value since they both use the largest of the camera sizes
+      if (zoom === 'Full' || zoom === 'Big sq.') {
         sizeVal = Number(size.toFixed(3))
       } else if (zoom === '71%') {
         sizeVal = Number((size * 0.71).toFixed(3))
@@ -1265,8 +1248,6 @@ export default {
         sizeVal = Number((size * 0.09).toFixed(3))
       } else if (zoom === '6%') {
         sizeVal = Number((size * 0.06).toFixed(3))
-      } else if (zoom === 'Big sq.') {
-        sizeVal = this.getBigSquareValues()
       } else if (zoom === 'Small sq.') {
         sizeVal = this.getSmallSquareValues()
       } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
