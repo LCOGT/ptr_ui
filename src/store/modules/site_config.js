@@ -42,7 +42,7 @@ const getters = {
     return state.global_config[state.selected_site]
   },
 
-  get_camera_config: state => {
+  camera_config: state => {
     // '&&' is for existence checks so that if some values don't exist, we can return safely
     const global_config = state.global_config
     const site_config = global_config && global_config[state.selected_site]
@@ -50,6 +50,30 @@ const getters = {
     if (camera_config) {
       return camera_config
     }
+  },
+
+  get_pixels: state => {
+    const global_config = state.global_config
+    const site_config = global_config && global_config[state.selected_site]
+    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
+    const pixels = camera_config.settings.onebyone_pix_scale
+    return pixels
+  },
+
+  get_camera_size_x: state => {
+    const global_config = state.global_config
+    const site_config = global_config && global_config[state.selected_site]
+    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
+    const camera_size_x = camera_config && camera_config.camera_size_x
+    return camera_size_x
+  },
+
+  get_camera_size_y: state => {
+    const global_config = state.global_config
+    const site_config = global_config && global_config[state.selected_site]
+    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
+    const camera_size_y = camera_config && camera_config.camera_size_y
+    return camera_size_y
   },
 
   site_is_wema: state => {

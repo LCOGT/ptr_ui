@@ -1169,39 +1169,39 @@ export default {
     },
 
     // Getting pixels to get size degrees and mosaic limits
-    getPixels () {
-      const camera_config = this.get_camera_config
-      if (camera_config) {
-        const settings = camera_config.settings
-        const pix = settings && settings.onebyone_pix_scale
-        return pix
-      }
-    },
+    // getPixels () {
+    //   const camera_config = this.camera_config
+    //   if (camera_config) {
+    //     const settings = camera_config.settings
+    //     const pix = settings && settings.onebyone_pix_scale
+    //     return pix
+    //   }
+    // },
 
     // Getting camera_size_x and camera_size_y below to
     // 1. get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections,
     // 2. be able to adjust preset sizes based on zoom selections
     // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
-    getSizeX () {
-      const camera_config = this.get_camera_config
-      if (camera_config) {
-        const size_x = camera_config.camera_size_x
-        return size_x
-      }
-    },
+    // getSizeX () {
+    //   const camera_config = this.camera_config
+    //   if (camera_config) {
+    //     const size_x = camera_config.camera_size_x
+    //     return size_x
+    //   }
+    // },
 
-    getSizeY () {
-      const camera_config = this.get_camera_config
-      if (camera_config) {
-        const size_y = camera_config.camera_size_y
-        return size_y
-      }
-    },
+    // getSizeY () {
+    //   const camera_config = this.camera_config
+    //   if (camera_config) {
+    //     const size_y = camera_config.camera_size_y
+    //     return size_y
+    //   }
+    // },
     // Getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
     getBigSquareValues () {
-      const size_x = this.getSizeX()
-      const size_y = this.getSizeY()
-      const pix = this.getPixels()
+      const size_x = this.get_camera_size_x
+      const size_y = this.get_camera_size_y
+      const pix = this.get_pixels
       let bigSquare = 1
       if (size_x && size_y && pix) {
         if (size_x > size_y) {
@@ -1217,9 +1217,12 @@ export default {
 
     // Getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
     getSmallSquareValues () {
-      const size_x = this.getSizeX()
-      const size_y = this.getSizeY()
-      const pix = this.getPixels()
+      const size_x = this.get_camera_size_x
+      const size_y = this.get_camera_size_y
+      const pix = this.get_pixels
+      console.log('pixels::', this.get_pixels)
+      console.log('camera config:', this.camera_config)
+      console.log('size_x', size_x)
       let smallSquare = 1
       if (size_x && size_y && pix) {
         if (size_x < size_y) {
@@ -1236,9 +1239,9 @@ export default {
     // Getting size in degrees to be able to get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
     // as well as to adjust width and height depending on zoom selection (i.e. adjustSize())
     getSizeDegrees () {
-      const size_x = this.getSizeX()
-      const size_y = this.getSizeY()
-      const pix = this.getPixels()
+      const size_x = this.get_camera_size_x
+      const size_y = this.get_camera_size_y
+      const pix = this.get_pixels
       let sizeDegrees = 1
       if (size_x && size_y && pix) {
         if (size_x > size_y) {
@@ -1398,7 +1401,10 @@ export default {
       'filter_wheel_options',
       'default_filter_selection',
       'selected_mount_config',
-      'get_camera_config'
+      'camera_config',
+      'get_pixels',
+      'get_camera_size_x',
+      'get_camera_size_y'
     ]),
     ...mapState('site_config', ['global_config']),
     ...mapState('user_data', [
