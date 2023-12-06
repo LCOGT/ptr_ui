@@ -364,6 +364,7 @@
             >
               <b-numberinput
                 v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
+                v-model="exposures[n-1].width"
                 :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
@@ -373,16 +374,15 @@
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => exposures[n-1].width = val"
               />
               <b-numberinput
                 v-else
+                v-model="exposures[n-1].width"
                 :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="true"
                 type="number"
-                @input="val => exposures[n-1].width = val"
               />
             </b-field>
             <b-field
@@ -391,6 +391,7 @@
             >
               <b-numberinput
                 v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
+                v-model="exposures[n-1].height"
                 :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
@@ -400,16 +401,15 @@
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => exposures[n-1].height = val"
               />
               <b-numberinput
                 v-else
+                v-model="exposures[n-1].height"
                 :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="true"
                 type="number"
-                @input="val => exposures[n-1].height = val"
               />
             </b-field>
             <b-field
@@ -1168,35 +1168,6 @@ export default {
       } else return 'degree-input'
     },
 
-    // Getting pixels to get size degrees and mosaic limits
-    // getPixels () {
-    //   const camera_config = this.camera_config
-    //   if (camera_config) {
-    //     const settings = camera_config.settings
-    //     const pix = settings && settings.onebyone_pix_scale
-    //     return pix
-    //   }
-    // },
-
-    // Getting camera_size_x and camera_size_y below to
-    // 1. get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections,
-    // 2. be able to adjust preset sizes based on zoom selections
-    // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
-    // getSizeX () {
-    //   const camera_config = this.camera_config
-    //   if (camera_config) {
-    //     const size_x = camera_config.camera_size_x
-    //     return size_x
-    //   }
-    // },
-
-    // getSizeY () {
-    //   const camera_config = this.camera_config
-    //   if (camera_config) {
-    //     const size_y = camera_config.camera_size_y
-    //     return size_y
-    //   }
-    // },
     // Getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
     getBigSquareValues () {
       const size_x = this.get_camera_size_x
@@ -1220,9 +1191,6 @@ export default {
       const size_x = this.get_camera_size_x
       const size_y = this.get_camera_size_y
       const pix = this.get_pixels
-      console.log('pixels::', this.get_pixels)
-      console.log('camera config:', this.camera_config)
-      console.log('size_x', size_x)
       let smallSquare = 1
       if (size_x && size_y && pix) {
         if (size_x < size_y) {

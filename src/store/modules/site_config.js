@@ -52,11 +52,16 @@ const getters = {
     }
   },
 
+  // Getting pixels to get size degrees and mosaic limits
   get_pixels: (state, getters) => {
     const pixels = getters.camera_config.settings.onebyone_pix_scale
     return pixels
   },
 
+  // Getting camera_size_x and camera_size_y below to
+  // 1. get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections,
+  // 2. be able to adjust preset sizes based on zoom selections
+  // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
   get_camera_size_x: (state, getters) => {
     const camera_size_x = getters.camera_config.camera_size_x
     return camera_size_x
