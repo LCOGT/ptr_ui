@@ -52,27 +52,18 @@ const getters = {
     }
   },
 
-  get_pixels: state => {
-    const global_config = state.global_config
-    const site_config = global_config && global_config[state.selected_site]
-    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
-    const pixels = camera_config.settings.onebyone_pix_scale
+  get_pixels: (state, getters) => {
+    const pixels = getters.camera_config.settings.onebyone_pix_scale
     return pixels
   },
 
-  get_camera_size_x: state => {
-    const global_config = state.global_config
-    const site_config = global_config && global_config[state.selected_site]
-    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
-    const camera_size_x = camera_config && camera_config.camera_size_x
+  get_camera_size_x: (state, getters) => {
+    const camera_size_x = getters.camera_config.camera_size_x
     return camera_size_x
   },
 
-  get_camera_size_y: state => {
-    const global_config = state.global_config
-    const site_config = global_config && global_config[state.selected_site]
-    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
-    const camera_size_y = camera_config && camera_config.camera_size_y
+  get_camera_size_y: (state, getters) => {
+    const camera_size_y = getters.camera_config.camera_size_y
     return camera_size_y
   },
 
