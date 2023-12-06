@@ -3,7 +3,7 @@
  * that are either available for selection or currently selected and active.
  */
 
-import _, { get } from 'lodash'
+import _ from 'lodash'
 import axios from 'axios'
 import helpers from '../../utils/helpers'
 
