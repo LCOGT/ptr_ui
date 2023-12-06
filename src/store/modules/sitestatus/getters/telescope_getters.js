@@ -9,8 +9,6 @@ const telescope_state = (state, getters, rootState) => {
   return state.telescope?.[rootState.site_config.selected_telescope] ?? {}
 }
 
-
-
 const telescope_message = (state, getters) => {
   const name = 'Telescope Message'
   const val = get_val(getters, 'message')
