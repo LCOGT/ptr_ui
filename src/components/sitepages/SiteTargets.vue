@@ -681,15 +681,19 @@ export default {
     this.$loadScript('https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js')
       .then(async () => {
         // Default: load aladin on m33, but use coords in mount fields if possible.
-        let target = 'M33'
+        let target = 'M65'
         if (parseFloat(this.mount_ra) && parseFloat(this.mount_dec)) {
           target = `${15 * this.mount_ra} ${this.mount_dec}`
         }
 
+        // Defaults FOV of 1, use pixel size of camera if present
+        const fov = this.autoAladinFov()
+        console.log('fov: ' + fov)
+
         // Initialize Aladin
         this.aladin = A.aladin('#aladin-lite-div', {
           survey: 'P/DSS2/color',
-          fov: 1,
+          fov,
           target,
           cooFrame: 'ICRSd',
           showFullscreenControl: false,
@@ -950,6 +954,24 @@ export default {
 
       if (window.screen.availWidth < 970) {
         setTimeout(function () { document.getElementById('common-targets').scrollIntoView({ behavior: 'smooth' }) }, 30) }
+    },
+
+    // calculates the fov based on the max side length for the sites camera, if parameters are undefined by site defaults to a fov of 1
+    // TODO Carolina is creating a get fov function that we will just import and reuse here or above, most likely a getter
+    autoAladinFov () {
+      const camConfig = this.$store.getters['site_config/get_camera_config']
+      const pixelScale = camConfig?.settings?.onebyone_pix_scale
+      const camSizeX = camConfig?.camera_size_x
+      const camSizeY = camConfig?.camera_size_y
+      const DEG_PER_ARCSEC = 1 / 3600
+
+      if (camConfig === undefined || pixelScale === undefined || camSizeX === undefined || camSizeY === undefined) {
+        return 1
+      }
+
+      const pixels = Math.max(camSizeX, camSizeY)
+
+      return pixelScale * pixels * DEG_PER_ARCSEC
     }
 
   },
