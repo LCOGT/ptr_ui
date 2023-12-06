@@ -3,7 +3,7 @@
  * that are either available for selection or currently selected and active.
  */
 
-import _ from 'lodash'
+import _, { get } from 'lodash'
 import axios from 'axios'
 import helpers from '../../utils/helpers'
 
@@ -53,7 +53,7 @@ const getters = {
   },
 
   // Getting pixels to get size degrees and mosaic limits
-  get_pixels: (state, getters) => {
+  pixel_scale: (state, getters) => {
     const pixels = getters.camera_config.settings.onebyone_pix_scale
     return pixels
   },
@@ -62,14 +62,29 @@ const getters = {
   // 1. get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections,
   // 2. be able to adjust preset sizes based on zoom selections
   // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
-  get_camera_size_x: (state, getters) => {
+  camera_size_x: (state, getters) => {
     const camera_size_x = getters.camera_config.camera_size_x
     return camera_size_x
   },
 
-  get_camera_size_y: (state, getters) => {
+  camera_size_y: (state, getters) => {
     const camera_size_y = getters.camera_config.camera_size_y
     return camera_size_y
+  },
+
+  camera_size_degrees: (state, getters) => {
+    const pixelScale = getters.pixel_scale
+    const camSizeX = getters.camera_size_x
+    const camSizeY = getters.camera_size_y
+    const DEG_PER_ARCSEC = 1 / 3600
+
+    if (pixelScale === undefined || camSizeX === undefined || camSizeY === undefined) {
+      return 1
+    }
+
+    const max_pixels = Math.max(camSizeX, camSizeY)
+
+    return pixelScale * max_pixels * DEG_PER_ARCSEC
   },
 
   site_is_wema: state => {
