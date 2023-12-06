@@ -347,6 +347,7 @@
                 v-model="exposures[n-1].zoom"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
+                @input="onZoomChange(n-1, exposures[n-1].zoom)"
               >
                 <option
                   v-for="(val, index) in generic_camera_areas"
@@ -362,16 +363,26 @@
               style="width: 150px;"
             >
               <b-numberinput
+                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
+                v-model="exposures[n-1].width"
                 :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minWidthDegrees * degreesToArcminutes : minWidthDegrees"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxWidthDegrees * degreesToArcminutes : maxWidthDegrees"
+                :min="minDegrees"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => exposures[n-1].width = val"
+              />
+              <b-numberinput
+                v-else
+                v-model="exposures[n-1].width"
+                :value="Number(exposures[n-1].width)"
+                :class="getSymbol(exposures[n-1].zoom)"
+                size="is-small"
+                :disabled="true"
+                type="number"
               />
             </b-field>
             <b-field
@@ -379,16 +390,26 @@
               style="width: 150px;"
             >
               <b-numberinput
+                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
+                v-model="exposures[n-1].height"
                 :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
                 :disabled="!exposures[n-1].active"
                 type="number"
-                :min="exposures[n-1].zoom === 'Mosaic arcmin.' ? minHeightDegrees * degreesToArcminutes : minHeightDegrees"
-                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxHeightDegrees * degreesToArcminutes : maxHeightDegrees"
+                :min="minDegrees"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
                 :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
                 min-step="0.001"
-                @input="val => exposures[n-1].height = val"
+              />
+              <b-numberinput
+                v-else
+                v-model="exposures[n-1].height"
+                :value="Number(exposures[n-1].height)"
+                :class="getSymbol(exposures[n-1].zoom)"
+                size="is-small"
+                :disabled="true"
+                type="number"
               />
             </b-field>
             <b-field
@@ -755,7 +776,6 @@ import RightAscensionInput from '@/components/FormElements/RightAscensionInput'
 import DeclinationInput from '@/components/FormElements/DeclinationInput'
 import CollapsableSection from '@/components/projects/CollapsableSection'
 import ProjectSitesSelector from '@/components/projects/ProjectSitesSelector'
-import ResolveFiltersDialog from '@/components/projects/ResolveFiltersDialog'
 import axios from 'axios'
 
 const mapStateToComputed = (vuexModule, propertyNames) => {
@@ -778,8 +798,7 @@ export default {
     RightAscensionInput,
     DeclinationInput,
     CollapsableSection,
-    ProjectSitesSelector,
-    ResolveFiltersDialog
+    ProjectSitesSelector
   },
   data () {
     return {
@@ -799,12 +818,11 @@ export default {
         'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
-      minWidthDegrees: 0.0,
-      maxWidthDegrees: 12.0,
-      minHeightDegrees: 0.0,
-      maxHeightDegrees: 12.0,
+      minDegrees: 0.0,
+      maxDegrees: this.getMosaicLimits(),
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
+      sizeInDegrees: this.getSizeDegrees(),
       site: this.sitecode,
       warn: {
         project_name: false,
@@ -854,8 +872,13 @@ export default {
 
     // loading min_zenith_dist fromt config
     this.load_default_zenith_from_mount()
+
+    // initializing width and height to the appropriate value
+    this.exposures[0].width = this.adjustSize(this.exposures[0].zoom)
+    this.exposures[0].height = this.adjustSize(this.exposures[0].zoom)
   },
   watch: {
+
     // This runs any time an existing project is passed into the component.
     // It transforms the project data into a format that works nicely with the form elements and user interaction.
     project_to_load ({ project, is_modifying_project, is_cloned_project }) {
@@ -875,6 +898,14 @@ export default {
         selectedSites.push('common pool')
       }
       this.project_sites = selectedSites
+      // Resetting values of width and height if site changes
+      // We also maintain the exposure rows with the same zoom values but adjusted width and height values depending on the site
+      if (newVal !== oldVal) {
+        this.exposures.forEach((exposure) => {
+          exposure.height = this.adjustSize(exposure.zoom)
+          exposure.width = this.adjustSize(exposure.zoom)
+        })
+      }
 
       // Check if any of the filters are no longer available in the new site
 
@@ -960,6 +991,7 @@ export default {
       // Show the additional row
       this.exposures_index += 1
     },
+
     verifyForm () {
       if (this.project_name === '') { this.warn.project_name = true }
       if (this.project_name.includes('#')) {
@@ -1100,7 +1132,6 @@ export default {
     refreshUserProjects () {
       this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
     },
-
     // Function to get filters at any site to populate filter dropdown
     get_default_filter_options (site) {
       if (site == 'common pool') {
@@ -1130,11 +1161,118 @@ export default {
         return ['none']
       }
     },
+    // This function is used to dynamically change classes of width and height so that they display the appropriate symbol depending on the zoom selection
     getSymbol (zoom) {
-      if (zoom === 'Mosaic deg.') {
-        return 'degree-input'
-      } else if (zoom === 'Mosaic arcmin.') return 'arcmin-input'
-      return '' // return an empty string if there is no match
+      if (zoom === 'Mosaic arcmin.') {
+        return 'arcmin-input'
+      } else return 'degree-input'
+    },
+
+    // Getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
+    getBigSquareValues () {
+      const size_x = this.get_camera_size_x
+      const size_y = this.get_camera_size_y
+      const pix = this.get_pixels
+      let bigSquare = 1
+      if (size_x && size_y && pix) {
+        if (size_x > size_y) {
+          const bigSq = (size_x * pix) / 3600
+          bigSquare = Number(bigSq.toFixed(3))
+        } else {
+          const bigSq = (size_y * pix) / 3600
+          bigSquare = Number(bigSq.toFixed(3))
+        }
+      }
+      return bigSquare
+    },
+
+    // Getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
+    getSmallSquareValues () {
+      const size_x = this.get_camera_size_x
+      const size_y = this.get_camera_size_y
+      const pix = this.get_pixels
+      let smallSquare = 1
+      if (size_x && size_y && pix) {
+        if (size_x < size_y) {
+          const smallSq = (size_x * pix) / 3600
+          smallSquare = Number(smallSq.toFixed(3))
+        } else {
+          const smallSq = (size_y * pix) / 3600
+          smallSquare = Number(smallSq.toFixed(3))
+        }
+      }
+      return smallSquare
+    },
+
+    // Getting size in degrees to be able to get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
+    // as well as to adjust width and height depending on zoom selection (i.e. adjustSize())
+    getSizeDegrees () {
+      const size_x = this.get_camera_size_x
+      const size_y = this.get_camera_size_y
+      const pix = this.get_pixels
+      let sizeDegrees = 1
+      if (size_x && size_y && pix) {
+        if (size_x > size_y) {
+          sizeDegrees = (size_x * pix) / 3600
+        } else {
+          sizeDegrees = (size_y * pix) / 3600
+        }
+      }
+      return sizeDegrees
+    },
+
+    // Getting limits for width and height for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
+    getMosaicLimits () {
+      let limit = 5
+      const sizeDeg = this.getSizeDegrees()
+      if (sizeDeg) {
+        const fiveFieldsOfView = sizeDeg * limit
+        if (fiveFieldsOfView > limit) {
+          limit = Number(fiveFieldsOfView.toFixed(3))
+        }
+      }
+      return limit
+    },
+
+    // Triggered when a different zoom is selected
+    // This invokes the adjustSize function below and sets the values of width and height to their corresponding values depending on the zoom selection
+    onZoomChange (exposureIndex, zoom) {
+      const newSize = this.adjustSize(zoom)
+      this.exposures[exposureIndex].width = newSize
+      this.exposures[exposureIndex].height = newSize
+    },
+
+    // Converting size values depending on what 'zoom' is selected
+    adjustSize (zoom) {
+      // Getting adjusted width and height values
+      const size = this.getSizeDegrees()
+      let sizeVal
+      if (zoom === 'Full') {
+        sizeVal = Number(size.toFixed(3))
+      } else if (zoom === '71%') {
+        sizeVal = Number((size * 0.71).toFixed(3))
+      } else if (zoom === '50%') {
+        sizeVal = Number((size * 0.5).toFixed(3))
+      } else if (zoom === '35%') {
+        sizeVal = Number((size * 0.35).toFixed(3))
+      } else if (zoom === '25%') {
+        sizeVal = Number((size * 0.25).toFixed(3))
+      } else if (zoom === '18%') {
+        sizeVal = Number((size * 0.18).toFixed(3))
+      } else if (zoom === '12.5%') {
+        sizeVal = Number((size * 0.125).toFixed(3))
+      } else if (zoom === '9%') {
+        sizeVal = Number((size * 0.09).toFixed(3))
+      } else if (zoom === '6%') {
+        sizeVal = Number((size * 0.06).toFixed(3))
+      } else if (zoom === 'Big sq.') {
+        sizeVal = this.getBigSquareValues()
+      } else if (zoom === 'Small sq.') {
+        sizeVal = this.getSmallSquareValues()
+      } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
+        sizeVal = 0.0
+      }
+      return sizeVal
     }
   },
   computed: {
@@ -1230,7 +1368,11 @@ export default {
       'available_sites_simulated',
       'filter_wheel_options',
       'default_filter_selection',
-      'selected_mount_config'
+      'selected_mount_config',
+      'camera_config',
+      'get_pixels',
+      'get_camera_size_x',
+      'get_camera_size_y'
     ]),
     ...mapState('site_config', ['global_config']),
     ...mapState('user_data', [
@@ -1283,7 +1425,7 @@ export default {
 .degree-input::after {
     content: "°";
     position: absolute;
-    right: 35%;
+    right: 32%;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
@@ -1292,7 +1434,7 @@ export default {
 .arcmin-input::after {
     content: "'";
     position: absolute;
-    right: 35%;
+    right: 32%;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;

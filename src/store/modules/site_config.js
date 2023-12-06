@@ -42,6 +42,36 @@ const getters = {
     return state.global_config[state.selected_site]
   },
 
+  camera_config: state => {
+    // '&&' is for existence checks so that if some values don't exist, we can return safely
+    const global_config = state.global_config
+    const site_config = global_config && global_config[state.selected_site]
+    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
+    if (camera_config) {
+      return camera_config
+    }
+  },
+
+  // Getting pixels to get size degrees and mosaic limits
+  get_pixels: (state, getters) => {
+    const pixels = getters.camera_config.settings.onebyone_pix_scale
+    return pixels
+  },
+
+  // Getting camera_size_x and camera_size_y below to
+  // 1. get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections,
+  // 2. be able to adjust preset sizes based on zoom selections
+  // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
+  get_camera_size_x: (state, getters) => {
+    const camera_size_x = getters.camera_config.camera_size_x
+    return camera_size_x
+  },
+
+  get_camera_size_y: (state, getters) => {
+    const camera_size_y = getters.camera_config.camera_size_y
+    return camera_size_y
+  },
+
   site_is_wema: state => {
     return state.global_config[state.selected_site]?.instance_type == 'wema'
   },
