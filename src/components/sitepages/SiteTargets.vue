@@ -678,43 +678,7 @@ export default {
   async mounted () {
     this.start_resize_observer()
 
-    this.$loadScript('https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js')
-      .then(async () => {
-        // Default: load aladin on m33, but use coords in mount fields if possible.
-        let target = 'M33'
-        if (parseFloat(this.mount_ra) && parseFloat(this.mount_dec)) {
-          target = `${15 * this.mount_ra} ${this.mount_dec}`
-        }
-
-        // Initialize Aladin
-        this.aladin = A.aladin('#aladin-lite-div', {
-          survey: 'P/DSS2/color',
-          fov: 1,
-          target,
-          cooFrame: 'ICRSd',
-          showFullscreenControl: false,
-          showGotoControl: false,
-          showSimbadPointerControl: true
-        })
-        // cheap way to sync the skymap and mount coordinates to the aladin view.
-        setTimeout(this.set_coordinates_from_aladin, 1000)
-
-        // The following code creates an overlay element that hides aladin from mouseevents.
-        // This is mainly to let the user scroll the sidebar without aladin zooming instead.
-        // If the user clicks on aladin, then normal mouse behavior returns.
-        const scroll_hide_overlay = document.createElement('div')
-        scroll_hide_overlay.style.height = '100%'
-        scroll_hide_overlay.style.width = '100%'
-        scroll_hide_overlay.style.position = 'relative'
-        scroll_hide_overlay.style['z-index'] = 4 // the aladin-reticleCanvas layer has z-index==3
-        // When user clicks on the aladin window, click and scroll events revert to normal
-        scroll_hide_overlay.setAttribute('onClick', "style.pointerEvents='none'")
-        document.getElementById('aladin-lite-div').appendChild(scroll_hide_overlay)
-      })
-      .catch(error => {
-        console.warn('failed to load Aladin')
-        console.warn(error)
-      })
+    this.intializeAladinView()
 
     // Clicking on the sky chart should update the Aladin view.
     this.mapEl = document.getElementById('celestial-map')
@@ -747,6 +711,46 @@ export default {
   },
 
   methods: {
+
+    async intializeAladinView () {
+      this.$loadScript('https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js')
+        .then(async () => {
+        // Default: load aladin on m17, but use coords in mount fields if possible.
+          let target = 'M17'
+          if (parseFloat(this.mount_ra) && parseFloat(this.mount_dec)) {
+            target = `${15 * this.mount_ra} ${this.mount_dec}`
+          }
+
+          // Initialize Aladin
+          this.aladin = A.aladin('#aladin-lite-div', {
+            survey: 'P/DSS2/color',
+            fov: this.camera_size_degrees,
+            target,
+            cooFrame: 'ICRSd',
+            showFullscreenControl: false,
+            showGotoControl: false,
+            showSimbadPointerControl: true
+          })
+          // cheap way to sync the skymap and mount coordinates to the aladin view.
+          setTimeout(this.set_coordinates_from_aladin, 1000)
+
+          // The following code creates an overlay element that hides aladin from mouseevents.
+          // This is mainly to let the user scroll the sidebar without aladin zooming instead.
+          // If the user clicks on aladin, then normal mouse behavior returns.
+          const scroll_hide_overlay = document.createElement('div')
+          scroll_hide_overlay.style.height = '100%'
+          scroll_hide_overlay.style.width = '100%'
+          scroll_hide_overlay.style.position = 'relative'
+          scroll_hide_overlay.style['z-index'] = 4 // the aladin-reticleCanvas layer has z-index==3
+          // When user clicks on the aladin window, click and scroll events revert to normal
+          scroll_hide_overlay.setAttribute('onClick', "style.pointerEvents='none'")
+          document.getElementById('aladin-lite-div').appendChild(scroll_hide_overlay)
+        })
+        .catch(error => {
+          console.warn('failed to load Aladin')
+          console.warn(error)
+        })
+    },
 
     start_resize_observer () {
       const skychart_wrapper = document.getElementById('site-targets-wrapper')
@@ -987,6 +991,9 @@ export default {
       // reset skychart to live display for new site
       this.isLiveSkyDisplay = true
       this.use_custom_date_location = false
+
+      // set aladin fov for new site
+      this.aladin.setFov(this.camera_size_degrees)
     }
 
   },
@@ -1040,7 +1047,8 @@ export default {
       'site_latitude',
       'site_longitude',
       'site_name',
-      'timezone'
+      'timezone',
+      'camera_size_degrees'
     ])
   }
 

@@ -822,7 +822,7 @@ export default {
       maxDegrees: this.getMosaicLimits(),
       degreesToArcminutes: 60,
       conditionalStep: 0.1,
-      sizeInDegrees: this.getSizeDegrees(),
+      sizeInDegrees: this.camera_size_degrees,
       site: this.sitecode,
       warn: {
         project_name: false,
@@ -1170,9 +1170,9 @@ export default {
 
     // Getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
     getSmallSquareValues () {
-      const size_x = this.get_camera_size_x
-      const size_y = this.get_camera_size_y
-      const pix = this.get_pixels
+      const size_x = this.camera_size_x
+      const size_y = this.camera_size_y
+      const pix = this.pixel_scale
       let smallSquare = 1
       if (size_x && size_y && pix) {
         if (size_x < size_y) {
@@ -1186,27 +1186,10 @@ export default {
       return smallSquare
     },
 
-    // Getting size in degrees to be able to get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
-    // as well as to adjust width and height depending on zoom selection (i.e. adjustSize())
-    getSizeDegrees () {
-      const size_x = this.get_camera_size_x
-      const size_y = this.get_camera_size_y
-      const pix = this.get_pixels
-      let sizeDegrees = 1
-      if (size_x && size_y && pix) {
-        if (size_x > size_y) {
-          sizeDegrees = (size_x * pix) / 3600
-        } else {
-          sizeDegrees = (size_y * pix) / 3600
-        }
-      }
-      return sizeDegrees
-    },
-
     // Getting limits for width and height for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
     getMosaicLimits () {
       let limit = 5
-      const sizeDeg = this.getSizeDegrees()
+      const sizeDeg = this.camera_size_degrees
       if (sizeDeg) {
         const fiveFieldsOfView = sizeDeg * limit
         if (fiveFieldsOfView > limit) {
@@ -1227,7 +1210,7 @@ export default {
     // Converting size values depending on what 'zoom' is selected
     adjustSize (zoom) {
       // Getting adjusted width and height values
-      const size = this.getSizeDegrees()
+      const size = this.camera_size_degrees
       let sizeVal
       // Full and Big sq. share the same value since they both use the largest of the camera sizes
       if (zoom === 'Full' || zoom === 'Big sq.') {
@@ -1351,9 +1334,10 @@ export default {
       'default_filter_selection',
       'selected_mount_config',
       'camera_config',
-      'get_pixels',
-      'get_camera_size_x',
-      'get_camera_size_y'
+      'pixel_scale',
+      'camera_size_x',
+      'camera_size_y',
+      'camera_size_degrees'
     ]),
     ...mapState('site_config', ['global_config']),
     ...mapState('user_data', [
