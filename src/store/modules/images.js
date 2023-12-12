@@ -58,6 +58,29 @@ const getters = {
   current_image: state => state.current_image,
   recent_images: state => state.recent_images,
   user_images: state => state.user_images,
+  // Uses recent_images but removes any intermediate smartstack frames, so you only see the latest version of each smart stack
+  recent_images_condensed: state => {
+    // First, generate a map of maximum SSTKNUM for each SMARTSTK
+    const maxSSTKNUMs = state.recent_images.reduce((acc, cur) => {
+      if (!cur.SMARTSTK || !cur.SSTKNUM) return acc // Skip if missing SMARTSTK or SSTKNUM
+
+      const num = parseInt(cur.SSTKNUM) // convert string to number
+      if (!acc[cur.SMARTSTK] || num > acc[cur.SMARTSTK]) {
+        acc[cur.SMARTSTK] = num
+      }
+      return acc
+    }, {})
+
+    // Now, filter the original array
+    const filteredArr = state.recent_images.filter(el => {
+      // Keep if missing SMARTSTK or SSTKNUM
+      if (!el.SMARTSTK || !el.SSTKNUM) return true
+
+      // Keep if SSTKNUM is the maximum for its SMARTSTK
+      return el.SSTKNUM >= maxSSTKNUMs[el.SMARTSTK]
+    })
+    return filteredArr
+  },
   show_user_data_only: state => state.show_user_data_only,
 
   current_image_fits_header: state => state.current_image.fits_header,
