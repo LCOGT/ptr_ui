@@ -874,8 +874,8 @@ export default {
     this.load_default_zenith_from_mount()
 
     // initializing width and height to the appropriate value
-    this.exposures[0].width = this.adjustSize(this.exposures[0].zoom)
-    this.exposures[0].height = this.adjustSize(this.exposures[0].zoom)
+    this.exposures[0].width = this.adjustWidth(this.exposures[0].zoom)
+    this.exposures[0].height = this.adjustHeight(this.exposures[0].zoom)
   },
   watch: {
 
@@ -902,8 +902,8 @@ export default {
       // We also maintain the exposure rows with the same zoom values but adjusted width and height values depending on the site
       if (newVal !== oldVal) {
         this.exposures.forEach((exposure) => {
-          exposure.height = this.adjustSize(exposure.zoom)
-          exposure.width = this.adjustSize(exposure.zoom)
+          exposure.height = this.adjustHeight(exposure.zoom)
+          exposure.width = this.adjustWidth(exposure.zoom)
         })
       }
 
@@ -1168,6 +1168,19 @@ export default {
       } else return 'degree-input'
     },
 
+    // Getting width for 'Full' zoom selection
+    getFullWidth () {
+      const size_x = this.camera_size_x
+      const pix = this.pixel_scale
+      return (size_x * pix) / 3600
+    },
+    // Getting height for 'Full' zoom selection
+    getFullHeight () {
+      const size_y = this.camera_size_y
+      const pix = this.pixel_scale
+      return (size_y * pix) / 3600
+    },
+
     // Getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
     getSmallSquareValues () {
       const size_x = this.camera_size_x
@@ -1186,6 +1199,24 @@ export default {
       return smallSquare
     },
 
+    // Getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels and dividing all by 3600
+    getBigSquareValues () {
+      const size_x = this.camera_size_x
+      const size_y = this.camera_size_y
+      const pix = this.pixel_scale
+      let bigSquare = 1
+      if (size_x && size_y && pix) {
+        if (size_x > size_y) {
+          const bigSq = (size_x * pix) / 3600
+          bigSquare = Number(bigSq.toFixed(3))
+        } else {
+          const bigSq = (size_y * pix) / 3600
+          bigSquare = Number(bigSq.toFixed(3))
+        }
+      }
+      return bigSquare
+    },
+
     // Getting limits for width and height for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
     getMosaicLimits () {
       let limit = 5
@@ -1200,43 +1231,80 @@ export default {
     },
 
     // Triggered when a different zoom is selected
-    // This invokes the adjustSize function below and sets the values of width and height to their corresponding values depending on the zoom selection
+    // This invokes the adjustWidth and adjustHeight function below and sets the values of width and height to their corresponding values depending on the zoom selection
     onZoomChange (exposureIndex, zoom) {
-      const newSize = this.adjustSize(zoom)
-      this.exposures[exposureIndex].width = newSize
-      this.exposures[exposureIndex].height = newSize
+      const newWidth = this.adjustWidth(zoom)
+      const newHeight = this.adjustHeight(zoom)
+      this.exposures[exposureIndex].width = newWidth
+      this.exposures[exposureIndex].height = newHeight
     },
 
-    // Converting size values depending on what 'zoom' is selected
-    adjustSize (zoom) {
+    // Adjusting width values depending on what 'zoom' is selected
+    adjustWidth (zoom) {
       // Getting adjusted width and height values
-      const size = this.camera_size_degrees
-      let sizeVal
-      // Full and Big sq. share the same value since they both use the largest of the camera sizes
-      if (zoom === 'Full' || zoom === 'Big sq.') {
-        sizeVal = Number(size.toFixed(3))
+      const width = this.getFullWidth()
+      let widthVal
+      // Full and Big sq. share the same value since they both use the largest of the camera widths
+      if (zoom === 'Full') {
+        widthVal = Number(width.toFixed(3))
       } else if (zoom === '71%') {
-        sizeVal = Number((size * 0.71).toFixed(3))
+        widthVal = Number((width * 0.71).toFixed(3))
       } else if (zoom === '50%') {
-        sizeVal = Number((size * 0.5).toFixed(3))
+        widthVal = Number((width * 0.5).toFixed(3))
       } else if (zoom === '35%') {
-        sizeVal = Number((size * 0.35).toFixed(3))
+        widthVal = Number((width * 0.35).toFixed(3))
       } else if (zoom === '25%') {
-        sizeVal = Number((size * 0.25).toFixed(3))
+        widthVal = Number((width * 0.25).toFixed(3))
       } else if (zoom === '18%') {
-        sizeVal = Number((size * 0.18).toFixed(3))
+        widthVal = Number((width * 0.18).toFixed(3))
       } else if (zoom === '12.5%') {
-        sizeVal = Number((size * 0.125).toFixed(3))
+        widthVal = Number((width * 0.125).toFixed(3))
       } else if (zoom === '9%') {
-        sizeVal = Number((size * 0.09).toFixed(3))
+        widthVal = Number((width * 0.09).toFixed(3))
       } else if (zoom === '6%') {
-        sizeVal = Number((size * 0.06).toFixed(3))
+        widthVal = Number((width * 0.06).toFixed(3))
       } else if (zoom === 'Small sq.') {
-        sizeVal = this.getSmallSquareValues()
+        widthVal = this.getSmallSquareValues()
+      } else if (zoom === 'Big sq.') {
+        widthVal = this.getBigSquareValues()
       } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
-        sizeVal = 0.0
+        widthVal = 0.0
       }
-      return sizeVal
+      return widthVal
+    },
+
+    // Adjusting height values depending on what 'zoom' is selected
+    adjustHeight (zoom) {
+      // Getting adjusted width and height values
+      const height = this.getFullHeight()
+      let heightVal
+      // Full and Big sq. share the same value since they both use the largest of the camera heights
+      if (zoom === 'Full') {
+        heightVal = Number(height.toFixed(3))
+      } else if (zoom === '71%') {
+        heightVal = Number((height * 0.71).toFixed(3))
+      } else if (zoom === '50%') {
+        heightVal = Number((height * 0.5).toFixed(3))
+      } else if (zoom === '35%') {
+        heightVal = Number((height * 0.35).toFixed(3))
+      } else if (zoom === '25%') {
+        heightVal = Number((height * 0.25).toFixed(3))
+      } else if (zoom === '18%') {
+        heightVal = Number((height * 0.18).toFixed(3))
+      } else if (zoom === '12.5%') {
+        heightVal = Number((height * 0.125).toFixed(3))
+      } else if (zoom === '9%') {
+        heightVal = Number((height * 0.09).toFixed(3))
+      } else if (zoom === '6%') {
+        heightVal = Number((height * 0.06).toFixed(3))
+      } else if (zoom === 'Small sq.') {
+        heightVal = this.getSmallSquareValues()
+      } else if (zoom === 'Big sq.') {
+        heightVal = this.getBigSquareValues()
+      } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
+        heightVal = 0.0
+      }
+      return heightVal
     }
   },
   computed: {
