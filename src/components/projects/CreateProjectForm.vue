@@ -1172,47 +1172,41 @@ export default {
     getFullWidth () {
       const size_x = this.camera_size_x
       const pix = this.pixel_scale
-      return (size_x * pix) / 3600
+      if (size_x && pix) {
+        return (size_x * pix) / 3600
+      } else return 1
     },
     // Getting height for 'Full' zoom selection
     getFullHeight () {
       const size_y = this.camera_size_y
       const pix = this.pixel_scale
-      return (size_y * pix) / 3600
+      if (size_y && pix) {
+        return (size_y * pix) / 3600
+      } else return 1
     },
 
     // Getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
     getSmallSquareValues () {
-      const size_x = this.camera_size_x
-      const size_y = this.camera_size_y
-      const pix = this.pixel_scale
-      let smallSquare = 1
-      if (size_x && size_y && pix) {
-        if (size_x < size_y) {
-          const smallSq = (size_x * pix) / 3600
-          smallSquare = Number(smallSq.toFixed(3))
-        } else {
-          const smallSq = (size_y * pix) / 3600
-          smallSquare = Number(smallSq.toFixed(3))
-        }
+      const width = this.getFullWidth()
+      const height = this.getFullHeight()
+      let smallSquare
+      if (width < height) {
+        smallSquare = Number(width.toFixed(3))
+      } else {
+        smallSquare = Number(height.toFixed(3))
       }
       return smallSquare
     },
 
     // Getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels and dividing all by 3600
     getBigSquareValues () {
-      const size_x = this.camera_size_x
-      const size_y = this.camera_size_y
-      const pix = this.pixel_scale
-      let bigSquare = 1
-      if (size_x && size_y && pix) {
-        if (size_x > size_y) {
-          const bigSq = (size_x * pix) / 3600
-          bigSquare = Number(bigSq.toFixed(3))
-        } else {
-          const bigSq = (size_y * pix) / 3600
-          bigSquare = Number(bigSq.toFixed(3))
-        }
+      const width = this.getFullWidth()
+      const height = this.getFullHeight()
+      let bigSquare
+      if (width > height) {
+        bigSquare = Number(width.toFixed(3))
+      } else {
+        bigSquare = Number(height.toFixed(3))
       }
       return bigSquare
     },
