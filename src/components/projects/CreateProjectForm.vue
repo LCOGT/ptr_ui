@@ -815,7 +815,7 @@ export default {
       max_fits_header_length: 68,
       generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO'],
       generic_camera_areas: [
-        'Mosaic deg.', 'Mosaic arcmin.', 'Full', 'Big sq.',
+        'Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Full',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
       ],
       minDegrees: 0.0,
