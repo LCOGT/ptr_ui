@@ -42,7 +42,7 @@ const state = {
   camera_de_ice_cooling: false,
 
   filter_wheel_options_selection: '',
-  zoom_options_selection: '',
+  zoom_options_selection: 'Full',
 
   selector_position: 0, // the chosen inst. selector position.
 
