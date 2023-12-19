@@ -145,11 +145,6 @@ export default {
       set (val) { this.$store.commit('command_params/filter_wheel_options_selection', val) }
     },
 
-    zoom_options_selection: {
-      get () { return this.$store.getters['command_params/zoom_options_selection'] },
-      set (val) { this.$store.commit('command_params/zoom_options_selection', val) }
-    },
-
     selector_position: {
       get () { return this.$store.getters['command_params/selector_position'] },
       set (val) { this.$store.commit('command_params/selector_position', val) }
