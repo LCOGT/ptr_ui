@@ -130,6 +130,26 @@
     </b-field>
 
     <b-field
+      horizontal
+      label="Zoom"
+    >
+      <b-select
+        v-model="zoom_options_selection"
+        placeholder="select zoom..."
+        size="is-small"
+      >
+        <option
+          v-for="(zoom, index) in zoom_options"
+          :key="index"
+          :value="zoom"
+          :selected="index === 0"
+        >
+          {{ zoom }}
+        </option>
+      </b-select>
+    </b-field>
+
+    <b-field
       v-if="camera_can_bin"
       horizontal
       label="Resolution"
@@ -328,7 +348,10 @@ export default {
   },
   data () {
     return {
-      isExpandedStatusVisible: false
+      isExpandedStatusVisible: false,
+      zoom_options: [
+        'Full', 'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
+      ]
     }
   },
 
@@ -415,6 +438,11 @@ export default {
     filter_wheel_options_selection: {
       get () { return this.$store.getters['command_params/filter_wheel_options_selection'] },
       set (val) { this.$store.commit('command_params/filter_wheel_options_selection', val) }
+    },
+
+    zoom_options_selection: {
+      get () { return this.$store.getters['command_params/zoom_options_selection'] },
+      set (val) { this.$store.commit('command_params/zoom_options_selection', val) }
     },
 
     selector_position: {
