@@ -814,6 +814,7 @@ export default {
       // This is used to limit the max length of the project note.
       max_fits_header_length: 68,
       generic_filter_list: ['Lum', 'Blue', 'Green', 'Red', 'NIR', 'Exo', 'HA', 'O3', 'S2'],
+      quick_stacks_filter_list: ['RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'],
       generic_camera_areas: [
         'Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Full',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
