@@ -813,7 +813,7 @@ export default {
       // Pos 10 to 80, including two single quotes containing the value.
       // This is used to limit the max length of the project note.
       max_fits_header_length: 68,
-      generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO'],
+      generic_filter_list: ['Lum', 'Blue', 'Green', 'Red', 'Hello', 'Test', 'Test2', 'EXO2'],
       generic_camera_areas: [
         'Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Full',
         'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
