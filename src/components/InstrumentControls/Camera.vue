@@ -139,6 +139,19 @@
         >
           {{ filter }}
         </option>
+        <option
+          disabled
+          value="------"
+        >
+          ---- Generic Filters ----
+        </option>
+        <option
+          v-for="(filter, index) in generic_filter_list"
+          :key="index"
+          :value="filter"
+        >
+          {{ filter }}
+        </option>
       </b-select>
     </b-field>
     <b-field
@@ -366,6 +379,9 @@ export default {
       ],
       quick_stacks_filter_list: [
         'RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'
+      ],
+      generic_filter_list: [
+        'Lum', 'Blue', 'Green', 'Red', 'NIR', 'Exo'
       ]
     }
   },
