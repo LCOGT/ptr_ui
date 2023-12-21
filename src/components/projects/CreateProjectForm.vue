@@ -319,6 +319,19 @@
                 >
                   {{ filter }}
                 </option>
+                <option
+                  disabled
+                  value="------"
+                >
+                  ---- Quick Stacks ----
+                </option>
+                <option
+                  v-for="filter in quick_stacks_filter_list"
+                  :key="filter"
+                  :value="filter"
+                >
+                  {{ filter }}
+                </option>
               </b-select>
             </b-field>
             <b-field
