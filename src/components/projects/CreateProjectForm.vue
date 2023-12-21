@@ -313,7 +313,7 @@
                   ---- Generic Filters ----
                 </option>
                 <option
-                  v-for="filter in generic_filters_no_duplicates"
+                  v-for="filter in generic_filter_list"
                   :key="filter"
                   :value="filter"
                 >
@@ -1386,9 +1386,10 @@ export default {
     },
 
     // Return the generic filter list without filters already reported by sites.
-    generic_filters_no_duplicates () {
-      return this.generic_filter_list.filter(item => this.project_filter_list.indexOf(item) < 0)
-    },
+    // For now, Wayne said it's okay to have duplicates
+    // generic_filters_no_duplicates () {
+    //   return this.generic_filter_list.filter(item => this.project_filter_list.indexOf(item) < 0)
+    // },
 
     // True if we're modifying a project and the name is changed.
     project_name_changed () {
