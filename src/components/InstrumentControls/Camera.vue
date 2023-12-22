@@ -133,8 +133,8 @@
           ---- Quick Stacks ----
         </option>
         <option
-          v-for="(filter, index) in quick_stacks_filter_list"
-          :key="index"
+          v-for="filter in quick_stacks_filter_list"
+          :key="filter"
           :value="filter"
         >
           {{ filter }}
@@ -146,8 +146,8 @@
           ---- Generic Filters ----
         </option>
         <option
-          v-for="(filter, index) in generic_filter_list"
-          :key="index"
+          v-for="filter in generic_filter_list"
+          :key="filter"
           :value="filter"
         >
           {{ filter }}
