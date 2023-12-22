@@ -450,7 +450,6 @@ export const commands_mixin = {
         // object_name: 'test test test',
         username: this.username // from auth0
       }
-      console.log('opt params:', opt_params)
       // Avoid empty strings (thanks, dynamodb)
       if (this.camera_note != '') {
         opt_params.hint = this.camera_note
