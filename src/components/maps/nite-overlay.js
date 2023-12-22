@@ -10,6 +10,7 @@ const nite = {
   map: null,
   date: null,
   sun_position: null,
+  moon_position: null,
   earth_radius_meters: 6371008,
   marker_twilight_civil: null,
   marker_twilight_nautical: null,
@@ -22,6 +23,7 @@ const nite = {
 
     this.map = map
     this.sun_position = this.calculatePositionOfSun()
+    this.moon_position = this.calculatePositionOfMoon()
 
     this.marker_twilight_civil = new google.maps.Circle({
       map: this.map,
@@ -72,12 +74,16 @@ const nite = {
   getSunPosition: function () {
     return this.sun_position
   },
+  getMoonPosition: function () {
+    return this.moon_position
+  },
   getShadowPosition: function () {
     return (this.sun_position) ? new google.maps.LatLng(-this.sun_position.lat(), this.sun_position.lng() + 180) : null
   },
   refresh: function () {
     if (!this.isVisible()) return
     this.sun_position = this.calculatePositionOfSun(this.date)
+    this.moon_position = this.calculatePositionOfMoon(this.date)
     const shadow_position = this.getShadowPosition()
     this.marker_twilight_civil.setCenter(shadow_position)
     this.marker_twilight_nautical.setCenter(shadow_position)
@@ -113,6 +119,28 @@ const nite = {
     const lng = -((true_solar_time_in_deg < 0) ? true_solar_time_in_deg + 180 : true_solar_time_in_deg - 180)
 
     return new google.maps.LatLng(lat, lng)
+  },
+  calculatePositionOfMoon: function (date){
+    date = (date instanceof Date) ? date : new Date()
+
+    // Orbital parameters
+    const perigeeDate = new Date('2023-01-21T20:59:00');
+    const orbitalPeriod = 365.25; // Earth's orbital period in days
+    const moonInclination = 5.145; // Moon's orbital inclination in degrees
+
+    // Time elapsed since the known perigee date in days
+    const daysSincePerigee = (date - perigeeDate) / (1000 * 60 * 60 * 24);
+
+    // Calculate the Earth's position in its orbit (0 to 1)
+    const earthPosition = (daysSincePerigee % orbitalPeriod) / orbitalPeriod;
+
+    // Approximate Earth's position in longitude (0 to 360 degrees)
+    const long = earthPosition * 360;
+
+    // Approximate Earth's position in latitude, considering Moon's inclination
+    const lat = Math.sin((daysSincePerigee / orbitalPeriod) * 2 * Math.PI) * moonInclination;
+
+    return new google.maps.LatLng(lat, long)
   },
   setDate: function (date) {
     this.date = date
