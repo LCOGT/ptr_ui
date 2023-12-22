@@ -312,6 +312,7 @@ export const commands_mixin = {
       'camera_dither',
       'camera_extract',
       'camera_image_type',
+      'zoom_options_selection',
 
       'camera_cooling',
       'camera_temperature',
@@ -445,10 +446,11 @@ export const commands_mixin = {
         dither: this.camera_dither,
         extract: this.camera_extract,
         object_name: this.object_name,
+        zoom: this.zoom_options_selection,
         // object_name: 'test test test',
         username: this.username // from auth0
       }
-
+      console.log('opt params:', opt_params)
       // Avoid empty strings (thanks, dynamodb)
       if (this.camera_note != '') {
         opt_params.hint = this.camera_note
