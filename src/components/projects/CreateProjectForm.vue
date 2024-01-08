@@ -830,7 +830,7 @@ export default {
       quick_stacks_filter_list: ['RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'],
       generic_camera_areas: [
         'Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Full',
-        'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
+        'Small sq.', '1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X'
       ],
       minDegrees: 0.0,
       maxDegrees: this.getMosaicLimits(),
