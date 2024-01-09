@@ -126,9 +126,34 @@
         >
           {{ filter[0] }}
         </option>
+        <option
+          disabled
+          value="------"
+        >
+          ---- Quick Stacks ----
+        </option>
+        <option
+          v-for="filter in quick_stacks_filter_list"
+          :key="filter"
+          :value="filter"
+        >
+          {{ filter }}
+        </option>
+        <option
+          disabled
+          value="------"
+        >
+          ---- Generic Filters ----
+        </option>
+        <option
+          v-for="filter in generic_filter_list"
+          :key="filter"
+          :value="filter"
+        >
+          {{ filter }}
+        </option>
       </b-select>
     </b-field>
-
     <b-field
       horizontal
       label="Zoom"
@@ -350,7 +375,13 @@ export default {
     return {
       isExpandedStatusVisible: false,
       zoom_options: [
-        'Full', 'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
+        'Full', ' 1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X'
+      ],
+      quick_stacks_filter_list: [
+        'RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'
+      ],
+      generic_filter_list: [
+        'Lum', 'Blue', 'Green', 'Red', 'NIR', 'Exo'
       ]
     }
   },

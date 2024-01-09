@@ -313,7 +313,20 @@
                   ---- Generic Filters ----
                 </option>
                 <option
-                  v-for="filter in generic_filters_no_duplicates"
+                  v-for="filter in generic_filter_list"
+                  :key="filter"
+                  :value="filter"
+                >
+                  {{ filter }}
+                </option>
+                <option
+                  disabled
+                  value="------"
+                >
+                  ---- Quick Stacks ----
+                </option>
+                <option
+                  v-for="filter in quick_stacks_filter_list"
                   :key="filter"
                   :value="filter"
                 >
@@ -813,10 +826,11 @@ export default {
       // Pos 10 to 80, including two single quotes containing the value.
       // This is used to limit the max length of the project note.
       max_fits_header_length: 68,
-      generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'HA', 'O3', 'S2', 'EXO'],
+      generic_filter_list: ['Lum', 'Blue', 'Green', 'Red', 'NIR', 'Exo', 'HA', 'O3', 'S2'],
+      quick_stacks_filter_list: ['RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'],
       generic_camera_areas: [
         'Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Full',
-        'Small sq.', '71%', '50%', '35%', '25%', '18%', '12.5%', '9%', '6%'
+        'Small sq.', '1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X'
       ],
       minDegrees: 0.0,
       maxDegrees: this.getMosaicLimits(),
@@ -1372,9 +1386,10 @@ export default {
     },
 
     // Return the generic filter list without filters already reported by sites.
-    generic_filters_no_duplicates () {
-      return this.generic_filter_list.filter(item => this.project_filter_list.indexOf(item) < 0)
-    },
+    // For now, Wayne said it's okay to have duplicates
+    // generic_filters_no_duplicates () {
+    //   return this.generic_filter_list.filter(item => this.project_filter_list.indexOf(item) < 0)
+    // },
 
     // True if we're modifying a project and the name is changed.
     project_name_changed () {
