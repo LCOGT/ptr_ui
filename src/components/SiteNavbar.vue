@@ -119,7 +119,7 @@
           <b-button
             v-if="!userIsAuthenticated"
             class="button"
-            @click="login"
+            @click="loginModalActive = !loginModalActive"
           >
             Log in
           </b-button>
@@ -127,6 +127,11 @@
 
         <!-- userway accessbility widget -->
         <UserwayButton />
+      </b-navbar-item>
+      <b-navbar-item>
+        <b-modal v-model="loginModalActive">
+          <Login />
+        </b-modal>
       </b-navbar-item>
     </template>
   </b-navbar>
@@ -137,8 +142,8 @@ import PhotonRanch from '@/components/logoText/PhotonRanch'
 import UserwayButton from '@/components/UserwayButton'
 import PTR from '@/components/logoText/PTR'
 import NavbarSiteDropdown from '@/components/NavbarSiteDropdown'
+import Login from '@/components/User/Login'
 import { mapState } from 'vuex'
-import { user_mixin } from '@/mixins/user_mixin'
 
 export default {
   name: 'SiteNavbar',
@@ -146,11 +151,14 @@ export default {
     PTR,
     PhotonRanch,
     NavbarSiteDropdown,
-    UserwayButton
+    UserwayButton,
+    Login
   },
-  mixins: [
-    user_mixin
-  ],
+  data () {
+    return {
+      loginModalActive: false
+    }
+  },
   computed: {
     ...mapState('sitestatus', ['site_open_status', 'stale_age_ms']),
     ...mapState('site_config', [
@@ -180,7 +188,6 @@ export default {
 
   },
   methods: {
-
     updateSiteStatus () {
       this.$store.dispatch('sitestatus/getSiteOpenStatus')
     }

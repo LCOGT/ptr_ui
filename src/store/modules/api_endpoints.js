@@ -32,8 +32,10 @@ const state = {
   quickanalysis_endpoint: 'https://quickanalysis.photonranch.org',
   // quickanalysis_endpoint: 'http://localhost:5000',
 
-  status_endpoint: 'https://status.photonranch.org/status' // prod
+  status_endpoint: 'https://status.photonranch.org/status', // prod
   // status_endpoint: 'https://status.photonranch.org/dev' // dev
+
+  observationPortalApiUrl: 'http://127.0.0.1:8000/api'
 }
 
 // getters

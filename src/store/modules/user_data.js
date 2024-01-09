@@ -3,6 +3,7 @@ import axios from 'axios'
 import moment from 'moment'
 import { ToastProgrammatic as Toast } from 'buefy'
 import { getInstance } from '../../auth/index' // get user object: getInstance().user
+import { dispatch } from 'd3'
 
 async function getAuthRequestHeader () {
   let token
@@ -93,7 +94,27 @@ const actions = {
       dispatch('newUserLogin', this.$auth.user)
     })
   },
-
+  getOcsToken ({ rootState }, credentials) {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: rootState.api_endpoints.observationPortalApiUrl + '/api-token-auth/',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          username: credentials.username,
+          password: credentials.password
+        })
+      })
+        .done(function (response) {
+          localStorage.setItem('ocsToken', response.token)
+          dispatch('newUserLogin')
+          resolve(response)
+        })
+        .fail(function (response) {
+          reject(response)
+        })
+    })
+  },
   newUserLogin ({ state, commit, dispatch }, user) {
     const roles = user['https://photonranch.org/user_metadata'].roles
     const userIsAdmin = roles.includes('admin')
