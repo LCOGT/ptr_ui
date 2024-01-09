@@ -19,7 +19,7 @@ const nite = {
 
   init: function (map) {
     if (typeof google === 'undefined' ||
-           typeof google.maps === 'undefined') throw 'Nite Overlay: no google.maps detected'
+      typeof google.maps === 'undefined') throw 'Nite Overlay: no google.maps detected'
 
     this.map = map
     this.sun_position = this.calculatePositionOfSun()
@@ -120,27 +120,71 @@ const nite = {
 
     return new google.maps.LatLng(lat, lng)
   },
-  calculatePositionOfMoon: function (date){
-    date = (date instanceof Date) ? date : new Date()
+  // Don't ask me how this works, formula from here -> https://stjarnhimlen.se/comp/tutorial.html#7
+  calculatePositionOfMoon: function (date) {
+    date = new Date()
+    // Get the Julian Day Number for the given date
+    const jdn = (date.getTime() / 86400000) + 2440587.5; // Convert milliseconds to days
 
-    // Orbital parameters
-    const perigeeDate = new Date('2023-01-21T20:59:00');
-    const orbitalPeriod = 365.25; // Earth's orbital period in days
-    const moonInclination = 5.145; // Moon's orbital inclination in degrees
+    // Reference epoch (J2000)
+    const referenceJDN = 2451545.0;
 
-    // Time elapsed since the known perigee date in days
-    const daysSincePerigee = (date - perigeeDate) / (1000 * 60 * 60 * 24);
+    // Calculate d
+    const d = jdn - referenceJDN;
 
-    // Calculate the Earth's position in its orbit (0 to 1)
-    const earthPosition = (daysSincePerigee % orbitalPeriod) / orbitalPeriod;
+    // Constants
+    const degToRad = Math.PI / 180;
+    const radToDeg = 180 / Math.PI;
 
-    // Approximate Earth's position in longitude (0 to 360 degrees)
-    const long = earthPosition * 360;
+    // Normalize angle to 0-360 degrees
+    function rev(angle) {
+      const normalizedAngle = angle % 360;
+      return normalizedAngle >= 0 ? normalizedAngle : normalizedAngle + 360;
+    }
 
-    // Approximate Earth's position in latitude, considering Moon's inclination
-    const lat = Math.sin((daysSincePerigee / orbitalPeriod) * 2 * Math.PI) * moonInclination;
+    // Initial orbital elements
+    const N = rev(125.1228 - 0.0529538083 * d);
+    const i = 5.1454;
+    const w = rev(318.0634 + 0.1643573223 * d);
+    const a = 60.2666;
+    const e = 0.054900;
+    const M = rev(115.3654 + 13.0649929509 * d);
 
-    return new google.maps.LatLng(lat, long)
+    // Normalize M
+    const normalizedM = rev(M + 129 * 360);
+
+    // Compute eccentric anomaly (E)
+    let E0 = normalizedM + (180 / Math.PI) * e * Math.sin(normalizedM) * (1 + e * Math.cos(normalizedM));
+    let E1;
+
+    do {
+      E1 = E0 - (E0 - (180 / Math.PI) * e * Math.sin(E0) - normalizedM) / (1 - e * Math.cos(E0));
+      E0 = E1;
+    } while (Math.abs(E0 - E1) > 0.005);
+
+    const E = E1;
+
+    // Rectangular coordinates in the plane of the lunar orbit
+    const x = a * (Math.cos(degToRad * E) - e);
+    const y = a * Math.sqrt(1 - e * e) * Math.sin(degToRad * E);
+
+    // Distance and true anomaly
+    const r = Math.sqrt(x * x + y * y);
+    const v = Math.atan2(y, x) * radToDeg;
+
+    // Convert to ecliptic coordinates
+    const xeclip = r * (Math.cos(degToRad * N) * Math.cos(degToRad * (v + w)) - Math.sin(degToRad * N) * Math.sin(degToRad * (v + w)) * Math.cos(degToRad * i));
+    const yeclip = r * (Math.sin(degToRad * N) * Math.cos(degToRad * (v + w)) + Math.cos(degToRad * N) * Math.sin(degToRad * (v + w)) * Math.cos(degToRad * i));
+    const zeclip = r * Math.sin(degToRad * (v + w)) * Math.sin(degToRad * i);
+
+    // Convert to ecliptic longitude, latitude, and distance
+    const eclipticLongitude = Math.atan2(yeclip, xeclip) * radToDeg;
+    const eclipticLatitude = Math.atan2(zeclip, Math.sqrt(xeclip * xeclip + yeclip * yeclip)) * radToDeg;
+
+    console.log(eclipticLongitude)
+    console.log(eclipticLatitude)
+
+    return new google.maps.LatLng(eclipticLatitude, eclipticLongitude)
   },
   setDate: function (date) {
     this.date = date
