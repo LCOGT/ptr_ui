@@ -15,6 +15,11 @@ const state = {
     bin: 1, // integer: 1, 2, or 4
     area: '100%' // percent, from 0 to 1
   },
+  estimateFocusOffset: {
+    target: 'near_tycho_star', // alternative: 'use_field'
+    bin: 1, // integer: 1, 2, or 4
+    area: '100%' // percent, from 0 to 1
+  },
   focusExtensive: {
     target: 'near_tycho_star', // alternative: 'use_field'
     bin: 1, // integer: 1, 2, or 4
@@ -84,6 +89,7 @@ const state = {
   // If a script is not in this list, the UI settings button will be disabled.
   scriptsWithSettings: [
     'focusAuto',
+    'estimateFocusOffset',
     'focusExtensive',
     'focusFine',
     'restackLocalCalibrations',
@@ -101,6 +107,7 @@ const state = {
   // This is used to populate the dropdown list where users select a script in the UI
   readableScriptNames: {
     focusAuto: 'Auto Focus',
+    estimateFocusOffset: 'Estimate Focus Offset',
     focusExtensive: 'Extensive Focus',
     focusFine: 'Fine Focus',
     restackLocalCalibrations: 'Restack Local Calibrations',
@@ -133,11 +140,11 @@ const getters = {
 // vuex mutations
 const mutations = {
 
-  updateScriptParam (state, { scriptName, paramName, value }) {
+  updateScriptParam(state, { scriptName, paramName, value }) {
     state[scriptName][paramName] = value
   },
 
-  selectedScript (state, script) { state.selectedScript = script }
+  selectedScript(state, script) { state.selectedScript = script }
 }
 
 // vuex actions
@@ -146,7 +153,7 @@ const actions = {
      *  Send a command to the observatory to stop any current running script.
      *  The command is sent to a specific mount at the site (like all commands).
      */
-  async scriptRunCommand ({ getters, rootState }, { header, user_name, user_id, user_roles }) {
+  async scriptRunCommand({ getters, rootState }, { header, user_name, user_id, user_roles }) {
     const url = `${rootState.api_endpoints.jobs_api}/newjob?site=${rootState.site_config.selected_site}`
 
     // Command to send
@@ -200,7 +207,7 @@ const actions = {
      *  Send a command to the observatory to stop any current running script.
      *  The command is sent to a specific mount at the site (like all commands).
      */
-  async scriptStopCommand ({ rootState }, { header, user_name, user_id, user_roles }) {
+  async scriptStopCommand({ rootState }, { header, user_name, user_id, user_roles }) {
     // API parameters
     const url = `${rootState.api_endpoints.jobs_api}/newjob`// ?site=${rootState.site_config.selected_site}`
     const site = rootState.site_config.selected_site
@@ -253,7 +260,7 @@ const actions = {
      * given script.
      * @param {string} script_name defines the script to reset
      */
-  async setScriptDefaults ({ commit, dispatch }, script_name) {
+  async setScriptDefaults({ commit, dispatch }, script_name) {
     const defaults = await dispatch('defineScriptDefaults')
     const default_params = defaults[script_name]()
 
@@ -262,12 +269,12 @@ const actions = {
     }
   },
 
-  async setAllDefaults ({ dispatch }) {
+  async setAllDefaults({ dispatch }) {
     const defaults = await dispatch('defineScriptDefaults')
     Object.keys(defaults).forEach(script => dispatch('setScriptDefaults', script))
   },
 
-  defineScriptDefaults ({ rootGetters }) {
+  defineScriptDefaults({ rootGetters }) {
     const camera_config = rootGetters['site_config/selected_camera_config']
     // Set some defaults using the config, with fallbacks in case the config doesn't specify
     // Fallback values were given by Wayne a long time ago... I guess powers of 2 are significant here somehow.
@@ -277,28 +284,35 @@ const actions = {
     const dark_exposure_time = camera_config?.settings?.dark_exposure || 120
 
     return {
-      focusAuto () {
+      focusAuto() {
         return {
           target: 'near_tycho_star', // alternative: 'use_field'
           bin: 1, // integer: 1, 2, or 4
           area: '100%' // percent, from 0 to 1
         }
       },
-      focusExtensive () {
+      estimateFocusOffset() {
         return {
           target: 'near_tycho_star', // alternative: 'use_field'
           bin: 1, // integer: 1, 2, or 4
           area: '100%' // percent, from 0 to 1
         }
       },
-      focusFine () {
+      focusExtensive() {
         return {
           target: 'near_tycho_star', // alternative: 'use_field'
           bin: 1, // integer: 1, 2, or 4
           area: '100%' // percent, from 0 to 1
         }
       },
-      restackLocalCalibrations () {
+      focusFine() {
+        return {
+          target: 'near_tycho_star', // alternative: 'use_field'
+          bin: 1, // integer: 1, 2, or 4
+          area: '100%' // percent, from 0 to 1
+        }
+      },
+      restackLocalCalibrations() {
         return {
           numOfBias: number_of_bias_to_collect,
           darkTime: dark_exposure_time,
@@ -307,7 +321,7 @@ const actions = {
           hotMap: true
         }
       },
-      collectBiasesAndDarks () {
+      collectBiasesAndDarks() {
         return {
           numOfBias: number_of_bias_to_collect,
           darkTime: dark_exposure_time,
@@ -316,19 +330,19 @@ const actions = {
           hotMap: true
         }
       },
-      collectScreenFlats () {
+      collectScreenFlats() {
         return {
           numFrames: number_of_flat_to_collect,
           gainCalc: true,
           shutterCompensation: true
         }
       },
-      collectSkyFlats () {
+      collectSkyFlats() {
         return {
           numFrames: number_of_flat_to_collect
         }
       },
-      takeLRGBStack () {
+      takeLRGBStack() {
         return {
           numFrames: 1,
           skipL: false,
@@ -336,7 +350,7 @@ const actions = {
           useSloane: false
         }
       },
-      takeO3HaS2N2Stack () {
+      takeO3HaS2N2Stack() {
         return {
           numFrames: 1,
           skipO3: false,
@@ -350,24 +364,24 @@ const actions = {
           exposureTime: 30
         }
       },
-      takeUGRIZSStack () {
+      takeUGRIZSStack() {
         return {
           numFrames: 1,
           skipU: true,
           skipZS: true
         }
       },
-      takePlanetStack () {
+      takePlanetStack() {
         return {
           numFrames: 127
         }
       },
-      takeLunarStack () {
+      takeLunarStack() {
         return {
           numFrames: 127
         }
       },
-      pointingRun () {
+      pointingRun() {
         return {
           numPointingRuns: 25,
           minAltitude: 30
