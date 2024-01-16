@@ -1,6 +1,11 @@
 
 <template>
   <div :style="fontSizeStyle">
+    <img
+      class="lco-logo"
+      src="/img/logos/LCO_logo.png"
+      alt="LCO logo"
+    >
     <span
       v-if="text"
       style="margin-left: -5px;"
@@ -87,5 +92,8 @@ export default {
 .lambda img {
     height: 0.8em;
     margin-left: 0.45em;
+}
+.lco-logo{
+  margin-right: 0.4em;
 }
 </style>
