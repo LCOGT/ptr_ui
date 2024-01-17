@@ -15,6 +15,11 @@ const state = {
     bin: 1, // integer: 1, 2, or 4
     area: '100%' // percent, from 0 to 1
   },
+  estimateFocusOffset: {
+    target: 'near_tycho_star', // alternative: 'use_field'
+    bin: 1, // integer: 1, 2, or 4
+    area: '100%' // percent, from 0 to 1
+  },
   focusExtensive: {
     target: 'near_tycho_star', // alternative: 'use_field'
     bin: 1, // integer: 1, 2, or 4
@@ -84,6 +89,7 @@ const state = {
   // If a script is not in this list, the UI settings button will be disabled.
   scriptsWithSettings: [
     'focusAuto',
+    'estimateFocusOffset',
     'focusExtensive',
     'focusFine',
     'restackLocalCalibrations',
@@ -101,6 +107,7 @@ const state = {
   // This is used to populate the dropdown list where users select a script in the UI
   readableScriptNames: {
     focusAuto: 'Auto Focus',
+    estimateFocusOffset: 'Estimate Focus Offset',
     focusExtensive: 'Extensive Focus',
     focusFine: 'Fine Focus',
     restackLocalCalibrations: 'Restack Local Calibrations',
@@ -278,6 +285,13 @@ const actions = {
 
     return {
       focusAuto () {
+        return {
+          target: 'near_tycho_star', // alternative: 'use_field'
+          bin: 1, // integer: 1, 2, or 4
+          area: '100%' // percent, from 0 to 1
+        }
+      },
+      estimateFocusOffset () {
         return {
           target: 'near_tycho_star', // alternative: 'use_field'
           bin: 1, // integer: 1, 2, or 4
