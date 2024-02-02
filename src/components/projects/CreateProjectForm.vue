@@ -1020,8 +1020,8 @@ export default {
     },
 
     verifyForm () {
-      if (this.project_name === '') { this.warn.project_name = true }
-      if (this.targets[0].name === '') { this.warn.target_name = true }
+      if (this.project_name.trim() === '') { this.warn.project_name = true }
+      if (this.targets[0].name.trim() === '') { this.warn.target_name = true }
       if (this.project_name.includes('#')) {
         this.warn.project_name = true
         this.$buefy.toast.open({
