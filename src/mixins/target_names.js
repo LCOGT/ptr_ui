@@ -15,7 +15,7 @@ export const target_names = {
       return new Promise(resolve => {
         axios.get(url).then(response => {
           const result = JSON.parse(response.data.slice(10, -3))
-          if (!result.Target || !result.Target.Resolver || !result.Target.Resolver.jradeg || !result.Target.Resolver.jdedeg) {
+          if (!result.Target.Resolver || !result.Target.Resolver.jradeg || !result.Target.Resolver.jdedeg) {
             console.error('failed to fetch coordinates for ', common_name)
             error = true
           } else {
