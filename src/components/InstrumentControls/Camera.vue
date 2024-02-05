@@ -63,7 +63,7 @@
 
     <b-field
       horizontal
-      label="Object Name"
+      label="Object"
     >
       <b-input
         v-model="object_name"

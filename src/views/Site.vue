@@ -18,7 +18,7 @@
             class="button"
             :class="{'selected': subpage == 'targets'}"
           >
-            Targets
+            Sky Map
           </button>
         </router-link>
         <router-link :to="'/site/' + sitecode + '/observe'">
