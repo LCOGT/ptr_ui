@@ -10,9 +10,9 @@
         type="search"
         autocomplete="off"
         :size="size"
+        placeholder="Search for object"
         @input="$emit('input', object_name)"
         @keyup.enter.native="search_for_coordinates"
-        placeholder="Search for object"
       />
       <p class="control">
         <b-button
