@@ -105,7 +105,6 @@
             </b-field>
             <TargetSearchField
               v-model="mount_object"
-              label="Object search"
               size="is-small"
               @results="handle_object_name_search"
             />
