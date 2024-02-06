@@ -1085,8 +1085,6 @@ export default {
       }
 
       const project = this.projectToSend
-      console.log('saving new project: ')
-      console.log(project)
 
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
