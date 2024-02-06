@@ -174,39 +174,60 @@
           <b-field
             label="Name"
             style="width: 230px;"
+            :type="{'is-warning': warn.target_name}"
           >
-            <b-field>
-              <b-input
-                v-model="targets[0].name"
-                :disabled="!targets[0].active"
-                style="max-width: 130px;"
-                class="project-input"
-              />
-              <p class="control">
-                <b-button
-                  class="button"
-                  :loading="object_name_search_in_progress"
-                  @click="getCoordinatesFromName(0)"
-                >
-                  <b-icon icon="magnify" />
-                </b-button>
-              </p>
-            </b-field>
+            <template #message>
+              <div v-if="warn.target_name">
+                missing value
+              </div>
+            </template>
+            <b-input
+              v-model="targets[0].name"
+            />
           </b-field>
-
           <b-field
-            :type="{'is-danger': warn.projectRA}"
+            label="Object Search"
+            style="width: 230px;"
+          >
+            <b-input
+              v-model="objectSearch"
+              :disabled="!targets[0].active"
+              style="max-width: 130px;"
+              class="project-input"
+            />
+            <p class="control">
+              <b-button
+                class="button"
+                :loading="object_name_search_in_progress"
+                @click="getCoordinatesFromName(0)"
+              >
+                <b-icon icon="magnify" />
+              </b-button>
+            </p>
+          </b-field>
+          <b-field
+            :type="{'is-warning': warn.targetRA}"
             label="RA"
             style="width: 230px;"
           >
+            <template #message>
+              <div v-if="warn.targetRA">
+                missing value
+              </div>
+            </template>
             <RightAscensionInput v-model="targets[0].ra" />
           </b-field>
 
           <b-field
-            :type="{'is-danger': warn.projectDec}"
+            :type="{'is-warning': warn.targetDec}"
             label="Dec"
             style="width: 230px;"
           >
+            <template #message>
+              <div v-if="warn.targetDec">
+                missing value
+              </div>
+            </template>
             <DeclinationInput v-model="targets[0].dec" />
           </b-field>
         </div>
@@ -838,6 +859,7 @@ export default {
       conditionalStep: 0.1,
       sizeInDegrees: this.camera_size_degrees,
       site: this.sitecode,
+      objectSearch: '',
       warn: {
         project_name: false,
         position_angle: false,
@@ -848,6 +870,7 @@ export default {
         max_airmass: false,
         lunar_dist_min: false,
         lunar_phase_max: false,
+        target_name: false,
         targetRA: false,
         targetDec: false
       },
@@ -978,7 +1001,7 @@ export default {
     async getCoordinatesFromName () {
       const target_index = 0 // legacy, eventually we want to make `targets` a dict, not an array containing the dict
       this.object_name_search_in_progress = true
-      const name = this.targets[target_index].name
+      const name = this.objectSearch
       const search_results = await this.get_coordinates_from_object_name(name)
       this.object_name_search_in_progress = false
       if (!search_results.error) {
@@ -989,10 +1012,9 @@ export default {
         this.updateTargetsValue(target_index, 'dec', '')
         this.$buefy.notification.open({
           duration: 10000,
-          message: 'Could not resolve object with name ' + this.targets[target_index].name,
+          message: 'Could not find target ' + this.objectSearch,
           position: 'is-top',
-          type: 'is-danger',
-          hasIcon: true
+          type: 'is-info'
         })
       }
     },
@@ -1007,7 +1029,8 @@ export default {
     },
 
     verifyForm () {
-      if (this.project_name === '') { this.warn.project_name = true }
+      if (this.project_name.trim() === '') { this.warn.project_name = true }
+      if (this.targets[0].name.trim() === '') { this.warn.target_name = true }
       if (this.project_name.includes('#')) {
         this.warn.project_name = true
         this.$buefy.toast.open({
@@ -1027,10 +1050,8 @@ export default {
         this.project_sites = [this.sitecode]
       }
 
-      if (this.targets[0].ra === '' || this.targets[0].dec === '') {
-        this.warn.targetRA = this.targets[0].ra === ''
-        this.warn.targetDec = this.targets[0].dec === ''
-      }
+      this.warn.targetRA = this.targets[0].ra === ''
+      this.warn.targetDec = this.targets[0].dec === ''
     },
     resetInputWarnings () {
       Object.keys(this.warn).forEach(k => { this.warn[k] = false })
@@ -1065,13 +1086,6 @@ export default {
 
       const project = this.projectToSend
 
-      if (!Object.values(this.warn).every(x => !x)) {
-        this.$buefy.toast.open({
-          message: 'Please fix the highlighted fields and try again',
-          type: 'is-warning'
-        })
-      }
-
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
         this.createProjectButtonIsLoading = true
@@ -1100,11 +1114,18 @@ export default {
         }).finally(() => {
           this.createProjectButtonIsLoading = false
         })
+      } else {
+        this.$buefy.toast.open({
+          message: 'Please fix the highlighted fields',
+          type: 'is-warning'
+        })
       }
       console.log(this.warn)
     },
 
     modifyProject () {
+      this.resetInputWarnings()
+      this.verifyForm()
       const url = this.projects_api_url + '/modify-project'
 
       const project = this.projectToSend
@@ -1137,6 +1158,11 @@ export default {
           console.error(error)
         }).finally(() => {
           this.createProjectButtonIsLoading = false
+        })
+      } else {
+        this.$buefy.toast.open({
+          message: 'Please fix the highlighted fields',
+          type: 'is-warning'
         })
       }
     },
