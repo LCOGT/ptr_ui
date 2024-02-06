@@ -183,6 +183,14 @@
             </template>
             <b-input
               v-model="targets[0].name"
+            />
+          </b-field>
+          <b-field
+            label="Object Search"
+            style="width: 230px;"
+          >
+            <b-input
+              v-model="objectSearch"
               :disabled="!targets[0].active"
               style="max-width: 130px;"
               class="project-input"
@@ -851,6 +859,7 @@ export default {
       conditionalStep: 0.1,
       sizeInDegrees: this.camera_size_degrees,
       site: this.sitecode,
+      objectSearch: '',
       warn: {
         project_name: false,
         position_angle: false,
@@ -992,7 +1001,7 @@ export default {
     async getCoordinatesFromName () {
       const target_index = 0 // legacy, eventually we want to make `targets` a dict, not an array containing the dict
       this.object_name_search_in_progress = true
-      const name = this.targets[target_index].name
+      const name = this.objectSearch
       const search_results = await this.get_coordinates_from_object_name(name)
       this.object_name_search_in_progress = false
       if (!search_results.error) {
@@ -1003,7 +1012,7 @@ export default {
         this.updateTargetsValue(target_index, 'dec', '')
         this.$buefy.notification.open({
           duration: 10000,
-          message: 'Could not find target ' + this.targets[target_index].name,
+          message: 'Could not find target ' + this.objectSearch,
           position: 'is-top',
           type: 'is-info'
         })
@@ -1076,6 +1085,8 @@ export default {
       }
 
       const project = this.projectToSend
+      console.log('saving new project: ')
+      console.log(project)
 
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
