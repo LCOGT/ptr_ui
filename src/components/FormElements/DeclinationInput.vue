@@ -9,10 +9,12 @@
         v-model="localDec"
         :size="size"
         lazy
+        :disabled="disabled"
       />
       <b-select
         v-model="units"
         :size="size"
+        :disabled="disabled"
       >
         <option value="deg">
           deg
@@ -27,10 +29,10 @@
 
 <script>
 export default {
-  props: ['value', 'size'],
+  props: ['value', 'size', 'disabled'],
   data () {
     return {
-      localDec: null,
+      localDec: this.value,
       units: 'deg',
       hasError: false,
       errorMessage: ''

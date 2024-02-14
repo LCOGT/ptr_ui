@@ -22,6 +22,7 @@
       default-sort-direction="desc"
       detailed
       class="my-table no-margin"
+      @click="inspectProject($event.row.project_name, $qevent.row.created_at)"
     >
       <b-table-column
         v-slot="props"
@@ -82,6 +83,12 @@
           @click="cloneProject(props.row.project_name, props.row.created_at)"
         >
           clone
+        </button>
+        <button
+          class="button is-info is-small mr-3"
+          @click="inspectProject(props.row.project_name, props.row.created_at)"
+        >
+          inspect
         </button>
         <button
           class="button is-danger is-small"
@@ -205,6 +212,22 @@ export default {
           is_cloned_project: true
         }
         this.$emit('load_project_form', project_loader)
+      }).catch(err => {
+        console.warn(err)
+      })
+    },
+    inspectProject (project_name, created_at) {
+      const request_params = {
+        project_name,
+        created_at
+      }
+      // TODO: Factor this out to its own call.
+      const project_endpoint = this.$store.state.api_endpoints.projects_endpoint + '/get-project'
+      axios.post(project_endpoint, request_params).then(response => {
+        const project_loader = {
+          project: response.data
+        }
+        this.$emit('inspect_project', project_loader)
       }).catch(err => {
         console.warn(err)
       })

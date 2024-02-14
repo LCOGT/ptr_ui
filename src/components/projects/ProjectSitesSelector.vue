@@ -22,6 +22,7 @@
         class="site-dropdown"
         multiple
         scrollable
+        :disabled="disabled"
       >
         <template #trigger>
           <b-button
@@ -105,7 +106,8 @@
 import { mapGetters } from 'vuex'
 export default {
   props: {
-    obsId: String
+    obsId: String,
+    disabled: Boolean
   },
   computed: {
     project_sites: {

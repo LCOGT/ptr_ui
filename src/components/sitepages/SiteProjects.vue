@@ -1,5 +1,16 @@
 <template>
   <div class="site-projects-wrapper">
+    <div>
+      <b-modal
+        v-model="inspectModalActive">
+        <create-project-form
+          class="create-project-form"
+          :sitecode="sitecode"
+          :project_to_load="project_to_load"
+          :read_only="true"
+        />
+      </b-modal>
+    </div>
     <create-project-form
       class="create-project-form"
       :sitecode="sitecode"
@@ -12,6 +23,7 @@
         class="user-projects-table"
         :user="user"
         @load_project_form="load_project_form"
+        @inspect_project="inspect_project"
       />
 
       <div class="user-events-table">
@@ -45,7 +57,8 @@ export default {
       siteTime: '-',
       utcTime: '-',
 
-      project_to_load: ''
+      project_to_load: '',
+      inspectModalActive: false
     }
   },
   created () {
@@ -77,7 +90,10 @@ export default {
       this.siteTime = moment().tz(this.timezone).format('MMM D, kk:mm')
       this.utcTime = moment().utc().format('MMM D, kk:mm')
     },
-
+    inspect_project (project) {
+      this.project_to_load = project
+      this.inspectModalActive = true
+    },
     load_project_form (project) {
       this.project_to_load = project
     },
