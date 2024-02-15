@@ -1,4 +1,6 @@
+import Vue from 'vue'
 import moment from 'moment'
+import _ from 'lodash'
 
 const state = {
   project_window: 7, // in days, how long the project has a chance to be scheduled; this is not sent with the project
@@ -64,7 +66,8 @@ const state = {
   start_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
   long_stack: false,
   smart_stack: true,
-  defocus: 0
+  defocus: 0,
+  draft_project_params: {} // If a user has entered some info into the project form, save it here so we can go back to it.
 }
 
 const getters = {
@@ -172,7 +175,14 @@ const mutations = {
   start_date (state, val) { state.start_date = val },
   long_stack (state, val) { state.long_stack = val },
   smart_stack (state, val) { state.smart_stack = val },
-  defocus (state, val) { state.defocus = val }
+  defocus (state, val) { state.defocus = val },
+  draft_project_params (state, val) { state.draft_project_params = val }, // project params that have saved off in saveProjectDraft
+  rewrite_state (state, val) {
+    // loop through and rewrite the state
+    for (const stateItem in val) {
+      Vue.set(state, stateItem, val[stateItem])
+    }
+  }
 }
 
 const actions = {
@@ -257,6 +267,18 @@ const actions = {
     }
     commit('start_date', moment(project.project_constraints.start_date).toDate())
     commit('expiry_date', moment(project.project_constraints.expiry_date).toDate())
+  },
+  saveProjectDraft ({ state, commit }) {
+    // make a deep copy of the current draft of the project params, without the project params
+    const stateCopy = _.cloneDeep(state)
+    stateCopy.draft_project_params = {}
+    commit('draft_project_params', stateCopy)
+  },
+  reloadProjectDraft ({ state, commit }) {
+    // make a deep copy of the project params and load into the current state
+    const projectParamsCopy = _.cloneDeep(state.draft_project_params)
+    commit('rewrite_state', projectParamsCopy)
+    commit('draft_project_params', {})
   }
 }
 

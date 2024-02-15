@@ -505,8 +505,10 @@
       </template>
     </CollapsableSection>
 
-    <!-- Advanced Options-->
-    <CollapsableSection closed>
+    <!-- Advanced Options - set to open when we're in read-only mode-->
+    <CollapsableSection
+      :closed="!read_only"
+    >
       <template #header>
         Advanced Options
       </template>
@@ -828,7 +830,7 @@
     </CollapsableSection>
 
     <div
-      :v-if="!read_only"
+      v-if="!read_only"
       class="project-form-footer"
     >
       <b-tooltip

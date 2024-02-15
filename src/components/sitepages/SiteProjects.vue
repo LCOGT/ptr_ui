@@ -2,7 +2,9 @@
   <div class="site-projects-wrapper">
     <div>
       <b-modal
-        v-model="inspectModalActive">
+        v-model="inspectModalActive"
+        @close="closeInspectModal"
+      >
         <create-project-form
           class="create-project-form"
           :sitecode="sitecode"
@@ -22,8 +24,8 @@
       <user-projects-table
         class="user-projects-table"
         :user="user"
-        @load_project_form="load_project_form"
-        @inspect_project="inspect_project"
+        @load_project_form="loadProjectForm"
+        @inspect_project="inspectProject"
       />
 
       <div class="user-events-table">
@@ -84,17 +86,21 @@ export default {
     displayUtcTime (time) {
       return moment(time).utc().format('MMM D, kk:mm')
     },
-
     updateTime () {
       this.localTime = moment().format('MMM D, kk:mm')
       this.siteTime = moment().tz(this.timezone).format('MMM D, kk:mm')
       this.utcTime = moment().utc().format('MMM D, kk:mm')
     },
-    inspect_project (project) {
+    inspectProject (project) {
       this.project_to_load = project
       this.inspectModalActive = true
     },
-    load_project_form (project) {
+    closeInspectModal () {
+      this.inspectModalActive = false
+      // return the project params state back to where it was before we opened the modal
+      this.$store.dispatch('project_params/reloadProjectDraft')
+    },
+    loadProjectForm (project) {
       this.project_to_load = project
     },
     refreshUserEvents () {

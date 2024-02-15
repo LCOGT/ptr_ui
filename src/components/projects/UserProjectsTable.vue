@@ -22,7 +22,6 @@
       default-sort-direction="desc"
       detailed
       class="my-table no-margin"
-      @click="inspectProject($event.row.project_name, $qevent.row.created_at)"
     >
       <b-table-column
         v-slot="props"
@@ -30,6 +29,15 @@
         label="project name"
       >
         {{ props.row.project_name }}
+      </b-table-column>
+
+      <b-table-column
+        v-slot="props"
+        field="project_creator.username"
+        label="user"
+        sortable
+      >
+        {{ props.row.project_creator ? props.row.project_creator.username : '' }}
       </b-table-column>
 
       <b-table-column
@@ -225,8 +233,9 @@ export default {
       const project_endpoint = this.$store.state.api_endpoints.projects_endpoint + '/get-project'
       axios.post(project_endpoint, request_params).then(response => {
         const project_loader = {
-          project: response.data
+          project: response.dataqq
         }
+        this.$store.dispatch('project_params/saveProjectDraft')
         this.$emit('inspect_project', project_loader)
       }).catch(err => {
         console.warn(err)
