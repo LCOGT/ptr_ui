@@ -233,7 +233,7 @@ export default {
       const project_endpoint = this.$store.state.api_endpoints.projects_endpoint + '/get-project'
       axios.post(project_endpoint, request_params).then(response => {
         const project_loader = {
-          project: response.dataqq
+          project: response.data
         }
         this.$store.dispatch('project_params/saveProjectDraft')
         this.$emit('inspect_project', project_loader)
