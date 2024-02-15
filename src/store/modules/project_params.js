@@ -269,7 +269,7 @@ const actions = {
     commit('expiry_date', moment(project.project_constraints.expiry_date).toDate())
   },
   saveProjectDraft ({ state, commit }) {
-    // make a deep copy of the current draft of the project params, without the project params
+    // make a deep copy of the current state of the project params, without draft project params
     const stateCopy = _.cloneDeep(state)
     stateCopy.draft_project_params = {}
     commit('draft_project_params', stateCopy)
