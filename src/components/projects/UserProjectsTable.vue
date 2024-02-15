@@ -229,7 +229,6 @@ export default {
         project_name,
         created_at
       }
-      // TODO: Factor this out to its own call.
       const project_endpoint = this.$store.state.api_endpoints.projects_endpoint + '/get-project'
       axios.post(project_endpoint, request_params).then(response => {
         const project_loader = {
