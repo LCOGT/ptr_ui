@@ -50,7 +50,7 @@ const state = {
   position_angle: 0,
   max_ha: 4, // decimal hours
   min_zenith_dist: 0, // degrees
-  max_airmass: 2.0,
+  max_airmass: 3.0,
   lunar_dist_min: 30, // deg
   lunar_phase_max: 60, // %
   frequent_autofocus: false,
