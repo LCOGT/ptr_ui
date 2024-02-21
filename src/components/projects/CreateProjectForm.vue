@@ -704,8 +704,21 @@
               <span class="button is-static">%</span>
             </p>
           </b-field>
+          <b-field label="Defocus (mags)">
+            <b-select
+              v-model="defocus"
+              :disabled="read_only"
+            >
+              <option
+                v-for="i in 7"
+                :key="i - 1"
+                :value="i - 1"
+              >
+                {{ i - 1 }}
+              </option>
+            </b-select>
+          </b-field>
         </div>
-
         <div style="height: 5px;" />
         <b-field>
           <b-checkbox
@@ -751,20 +764,6 @@
           class="flex-row"
           style="margin-top: 1em; gap: 3em;"
         >
-          <b-field label="Defocus (mags)">
-            <b-select
-              v-model="defocus"
-              :disabled="read_only"
-            >
-              <option
-                v-for="i in 7"
-                :key="i - 1"
-                :value="i - 1"
-              >
-                {{ i - 1 }}
-              </option>
-            </b-select>
-          </b-field>
           <div style="padding-top: 1em;">
             <b-field>
               <b-checkbox
