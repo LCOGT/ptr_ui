@@ -635,6 +635,24 @@
               <span class="button is-static">deg</span>
             </p>
           </b-field>
+          <b-field
+            label="Max Night Duration"
+            :type="{'is-danger': warn.max_night_duration}"
+          >
+            <b-input
+              v-model="max_night_duration"
+              class="project-input"
+              style="max-width: 150px;"
+              type="number"
+              step="0.5"
+              min="0"
+              max="10"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <span class="button is-static">hours</span>
+            </p>
+          </b-field>
         </div>
 
         <div class="flex-row">
@@ -1455,6 +1473,7 @@ export default {
       'position_angle',
       'max_ha',
       'min_zenith_dist',
+      'max_night_duration',
       'max_airmass',
       'lunar_dist_min',
       'lunar_phase_max',
