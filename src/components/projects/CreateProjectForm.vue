@@ -646,7 +646,7 @@
               type="number"
               step="0.5"
               min="0"
-              max="10"
+              max="24"
               :disabled="read_only"
             />
             <p class="control">
