@@ -82,9 +82,9 @@
       >
         <button
           class="button is-info is-small mr-3"
-          @click="getProject(props.row.project_name, props.row.created_at)"
+          @click="inspectProject(props.row.project_name, props.row.created_at)"
         >
-          modify
+          inspect
         </button>
         <button
           class="button is-info is-small mr-3"
@@ -94,12 +94,12 @@
         </button>
         <button
           class="button is-info is-small mr-3"
-          @click="inspectProject(props.row.project_name, props.row.created_at)"
+          @click="getProject(props.row.project_name, props.row.created_at)"
         >
-          inspect
+          modify
         </button>
         <button
-          class="button is-danger is-small"
+          class="button is-danger is-small delete-button"
           @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created_at': props.row.created_at})"
         >
           <span class="icon is-small ">
@@ -304,6 +304,10 @@ export default {
 .table-header {
     display:flex;
     justify-content: space-between;
+}
+
+.delete-button {
+  margin-left: 18%;
 }
 
 </style>
