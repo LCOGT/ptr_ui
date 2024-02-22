@@ -50,7 +50,8 @@ const state = {
   position_angle: 0,
   max_ha: 4, // decimal hours
   min_zenith_dist: 0, // degrees
-  max_airmass: 2.0,
+  max_night_duration: 6, // hours
+  max_airmass: 3.0,
   lunar_dist_min: 30, // deg
   lunar_phase_max: 60, // %
   frequent_autofocus: false,
@@ -84,6 +85,7 @@ const getters = {
       position_angle: state.position_angle,
       max_ha: state.max_ha,
       min_zenith_dist: state.min_zenith_dist,
+      max_night_duration: state.max_night_duration,
       max_airmass: state.max_airmass,
       lunar_dist_min: state.lunar_dist_min,
       lunar_phase_max: state.lunar_phase_max,
@@ -159,6 +161,7 @@ const mutations = {
   position_angle (state, val) { state.position_angle = val },
   max_ha (state, val) { state.max_ha = val },
   min_zenith_dist (state, val) { state.min_zenith_dist = val },
+  max_night_duration (state, val) { state.max_night_duration = val },
   max_airmass (state, val) { state.max_airmass = val },
   lunar_dist_min (state, val) { state.lunar_dist_min = val },
   lunar_phase_max (state, val) { state.lunar_phase_max = val },
@@ -222,6 +225,7 @@ const actions = {
     commit('position_angle', 0)
     commit('max_ha', 4) // decimal hrs
     commit('min_zenith_dist', 0) // deg
+    commit('max_night_duration', 6) // hours
     commit('max_airmass', 2.0)
     commit('lunar_dist_min', 30) // deg
     commit('lunar_phase_max', 60) // %

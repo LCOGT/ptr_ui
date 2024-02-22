@@ -635,6 +635,24 @@
               <span class="button is-static">deg</span>
             </p>
           </b-field>
+          <b-field
+            label="Max Night Duration"
+            :type="{'is-danger': warn.max_night_duration}"
+          >
+            <b-input
+              v-model="max_night_duration"
+              class="project-input"
+              style="max-width: 150px;"
+              type="number"
+              step="0.5"
+              min="0"
+              max="24"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <span class="button is-static">hours</span>
+            </p>
+          </b-field>
         </div>
 
         <div class="flex-row">
@@ -686,8 +704,21 @@
               <span class="button is-static">%</span>
             </p>
           </b-field>
+          <b-field label="Defocus (mags)">
+            <b-select
+              v-model="defocus"
+              :disabled="read_only"
+            >
+              <option
+                v-for="i in 7"
+                :key="i - 1"
+                :value="i - 1"
+              >
+                {{ i - 1 }}
+              </option>
+            </b-select>
+          </b-field>
         </div>
-
         <div style="height: 5px;" />
         <b-field>
           <b-checkbox
@@ -733,20 +764,6 @@
           class="flex-row"
           style="margin-top: 1em; gap: 3em;"
         >
-          <b-field label="Defocus (mags)">
-            <b-select
-              v-model="defocus"
-              :disabled="read_only"
-            >
-              <option
-                v-for="i in 7"
-                :key="i - 1"
-                :value="i - 1"
-              >
-                {{ i - 1 }}
-              </option>
-            </b-select>
-          </b-field>
           <div style="padding-top: 1em;">
             <b-field>
               <b-checkbox
@@ -1455,6 +1472,7 @@ export default {
       'position_angle',
       'max_ha',
       'min_zenith_dist',
+      'max_night_duration',
       'max_airmass',
       'lunar_dist_min',
       'lunar_phase_max',
