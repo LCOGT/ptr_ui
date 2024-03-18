@@ -1171,7 +1171,7 @@ $toggle-button-height: 32px;
     }
 }
 .sidebar-tab-content {
-    padding: 1em;
+    padding: 0.5em;
     background-color: $background;
 }
 

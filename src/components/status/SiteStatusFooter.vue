@@ -386,6 +386,8 @@ export default {
       'azimuth',
       'altitude',
       'airmass',
+      'transition_time',
+      'transition_airmass',
       'refraction',
       'zenith_distance',
 
@@ -467,6 +469,8 @@ export default {
         spacer,
         this.hour_angle,
         this.airmass,
+        this.transition_time,
+        this.transition_airmass,
         this.zenith_distance,
         this.refraction
       ]
