@@ -27,6 +27,7 @@ const buildTelescopeTabStatus1Shorter = (state, getters) => {
   if (getters.azimuth.val != '-') { status.push({ ...getters.azimuth, name: 'Az' }) }
   if (getters.altitude.val != '-') { status.push({ ...getters.altitude, name: 'Alt' }) }
   if (getters.refraction.val != '-') { status.push({ ...getters.refraction, name: 'Refr.' }) }
+  if (getters.transition_time.val != '-') { status.push({ ...getters.transition_time, name: 'Trans. Time' }) }
   return status
 }
 
