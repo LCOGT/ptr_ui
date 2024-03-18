@@ -33,6 +33,15 @@
 
       <b-table-column
         v-slot="props"
+        field="project_creator.username"
+        label="user"
+        sortable
+      >
+        {{ props.row.project_creator ? props.row.project_creator.username : '' }}
+      </b-table-column>
+
+      <b-table-column
+        v-slot="props"
         field="created_at"
         label="created"
         sortable
@@ -73,9 +82,9 @@
       >
         <button
           class="button is-info is-small mr-3"
-          @click="getProject(props.row.project_name, props.row.created_at)"
+          @click="inspectProject(props.row.project_name, props.row.created_at)"
         >
-          modify
+          inspect
         </button>
         <button
           class="button is-info is-small mr-3"
@@ -84,7 +93,13 @@
           clone
         </button>
         <button
-          class="button is-danger is-small"
+          class="button is-info is-small mr-3"
+          @click="getProject(props.row.project_name, props.row.created_at)"
+        >
+          modify
+        </button>
+        <button
+          class="button is-danger is-small delete-button"
           @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created_at': props.row.created_at})"
         >
           <span class="icon is-small ">
@@ -209,6 +224,22 @@ export default {
         console.warn(err)
       })
     },
+    inspectProject (project_name, created_at) {
+      const request_params = {
+        project_name,
+        created_at
+      }
+      const project_endpoint = this.$store.state.api_endpoints.projects_endpoint + '/get-project'
+      axios.post(project_endpoint, request_params).then(response => {
+        const project_loader = {
+          project: response.data
+        }
+        this.$store.dispatch('project_params/saveProjectDraft')
+        this.$emit('inspect_project', project_loader)
+      }).catch(err => {
+        console.warn(err)
+      })
+    },
     getProject (project_name, created_at) {
       const request_params = {
         project_name,
@@ -273,6 +304,10 @@ export default {
 .table-header {
     display:flex;
     justify-content: space-between;
+}
+
+.delete-button {
+  margin-left: 18%;
 }
 
 </style>

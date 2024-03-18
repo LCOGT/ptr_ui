@@ -54,6 +54,20 @@ const airmass = (state, getters) => {
   return { name, val, is_stale }
 }
 
+const transition_time = (state, getters) => {
+  const name = 'Trans. Time'
+  const val = parseFloat(getters.mount_state.transition_time?.val)?.toFixed(4) ?? '-'
+  const is_stale = isItemStale(getters, 'mount_state', 'transition_time')
+  return { name, val, is_stale }
+}
+
+const transition_airmass = (state, getters) => {
+  const name = 'Trans. Airmass'
+  const val = parseFloat(getters.mount_state.transition_airmass?.val)?.toFixed(4) ?? '-'
+  const is_stale = isItemStale(getters, 'mount_state', 'transition_airmass')
+  return { name, val, is_stale }
+}
+
 const refraction = (state, getters) => {
   const name = 'Refraction'
   const val = parseFloat(getters.mount_state.refraction?.val)?.toFixed(4) ?? '-'
@@ -142,6 +156,8 @@ export default {
   sidereal_time,
   zenith_distance,
   airmass,
+  transition_time,
+  transition_airmass,
   refraction,
   hour_angle,
   mount_state,

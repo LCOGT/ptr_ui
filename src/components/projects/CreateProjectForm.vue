@@ -4,10 +4,12 @@
       <h1 class="title">
         <span v-if="cloning_existing_project"><span class="project-title-verb">Cloning: </span><i>{{ project_name }}</i></span>
         <span v-else-if="modifying_existing_project"><span class="project-title-verb">Modifying: </span><i>{{ project_name }}</i></span>
+        <span v-else-if="read_only"><span class="project-title-verb">Inspecting: </span><i>{{ project_name }}</i></span>
         <span v-else>Create new project</span>
       </h1>
       <div>
         <button
+          v-if="!read_only"
           class="button is-light is-outlined mr-1"
           @click="clearProjectForm"
         >
@@ -44,6 +46,7 @@
               v-model="project_name"
               class="project-input"
               :lazy="false"
+              :disabled="read_only"
             />
           </b-field>
 
@@ -54,9 +57,13 @@
             <b-input
               v-model="project_note"
               :maxlength="max_fits_header_length"
+              :disabled="read_only"
             />
           </b-field>
-          <ProjectSitesSelector :obs-id="sitecode" />
+          <ProjectSitesSelector
+            :obs-id="sitecode"
+            :disabled="read_only"
+          />
         </div>
 
         <div class="flex-row">
@@ -79,9 +86,11 @@
               locale="en-ZA"
               expanded
               placeholder="Select a date"
+              :disabled="read_only"
             />
             <p class="control">
               <b-button
+                v-if="!read_only"
                 icon-left="calendar-today"
                 type="is-primary"
                 @click="$refs.stdatetimepicker.toggle()"
@@ -107,9 +116,11 @@
               locale="en-ZA"
               expanded
               placeholder="Select a date"
+              :disabled="read_only"
             />
             <p class="control">
               <b-button
+                v-if="!read_only"
                 icon-left="calendar-today"
                 type="is-primary"
                 @click="$refs.expdatetimepicker.toggle()"
@@ -131,7 +142,10 @@
                 />
               </b-tooltip>
             </template>
-            <b-select v-model="project_priority">
+            <b-select
+              v-model="project_priority"
+              :disabled="read_only"
+            >
               <option value="standard">
                 standard
               </option>
@@ -146,7 +160,10 @@
         </div>
         <div>
           <b-field>
-            <b-checkbox v-model="project_is_active">
+            <b-checkbox
+              v-model="project_is_active"
+              :disabled="read_only"
+            >
               Active
             </b-checkbox>
             <b-tooltip
@@ -174,40 +191,69 @@
           <b-field
             label="Name"
             style="width: 230px;"
+            :type="{'is-warning': warn.target_name}"
           >
-            <b-field>
-              <b-input
-                v-model="targets[0].name"
-                :disabled="!targets[0].active"
-                style="max-width: 130px;"
-                class="project-input"
-              />
-              <p class="control">
-                <b-button
-                  class="button"
-                  :loading="object_name_search_in_progress"
-                  @click="getCoordinatesFromName(0)"
-                >
-                  <b-icon icon="magnify" />
-                </b-button>
-              </p>
-            </b-field>
+            <template #message>
+              <div v-if="warn.target_name">
+                missing value
+              </div>
+            </template>
+            <b-input
+              v-model="targets[0].name"
+              :disabled="read_only"
+            />
           </b-field>
-
           <b-field
-            :type="{'is-danger': warn.projectRA}"
+            v-if="!read_only"
+            label="Object Search"
+            style="width: 230px;"
+          >
+            <b-input
+              v-model="objectSearch"
+              :disabled="!targets[0].active"
+              style="max-width: 130px;"
+              class="project-input"
+            />
+            <p class="control">
+              <b-button
+                class="button"
+                :loading="object_name_search_in_progress"
+                @click="getCoordinatesFromName(0)"
+              >
+                <b-icon icon="magnify" />
+              </b-button>
+            </p>
+          </b-field>
+          <b-field
+            :type="{'is-warning': warn.targetRA}"
             label="RA"
             style="width: 230px;"
           >
-            <RightAscensionInput v-model="targets[0].ra" />
+            <template #message>
+              <div v-if="warn.targetRA">
+                missing value
+              </div>
+            </template>
+            <RightAscensionInput
+              v-model="targets[0].ra"
+              :disabled="read_only"
+            />
           </b-field>
 
           <b-field
-            :type="{'is-danger': warn.projectDec}"
+            :type="{'is-warning': warn.targetDec}"
             label="Dec"
             style="width: 230px;"
           >
-            <DeclinationInput v-model="targets[0].dec" />
+            <template #message>
+              <div v-if="warn.targetDec">
+                missing value
+              </div>
+            </template>
+            <DeclinationInput
+              v-model="targets[0].dec"
+              :disabled="read_only"
+            />
           </b-field>
         </div>
       </template>
@@ -237,7 +283,7 @@
               <b-select
                 v-model="exposures[n-1].imtype"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n-1].active || read_only"
               >
                 <option value="light">
                   light
@@ -260,7 +306,7 @@
               <b-input
                 v-model="exposures[n-1].count"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n-1].active || read_only"
                 type="number"
                 min="1"
                 max="100000"
@@ -274,7 +320,7 @@
               <b-input
                 v-model="exposures[n-1].exposure"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n-1].active || read_only"
                 type="number"
                 min="0"
                 max="100000"
@@ -289,7 +335,7 @@
               <b-select
                 v-model="exposures[n-1].filter"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n-1].active || read_only"
                 style="width: 80px;"
               >
                 <option
@@ -340,7 +386,7 @@
               <b-select
                 v-model="exposures[n-1].bin"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n-1].active || read_only"
               >
                 <option value="optimal">
                   Optimal
@@ -359,7 +405,7 @@
               <b-select
                 v-model="exposures[n-1].zoom"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n-1].active || read_only"
                 @input="onZoomChange(n-1, exposures[n-1].zoom)"
               >
                 <option
@@ -381,7 +427,7 @@
                 :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n-1].active || read_only"
                 type="number"
                 :min="minDegrees"
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
@@ -408,7 +454,7 @@
                 :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n-1].active || read_only"
                 type="number"
                 :min="minDegrees"
                 :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
@@ -433,7 +479,7 @@
                 :value="Number(exposures[n-1].angle)"
                 class="angle-input"
                 size="is-small"
-                :disabled="!exposures[n-1].active"
+                :disabled="!exposures[n-1].active || read_only"
                 type="number"
                 :min="-90.0"
                 :max="90.0"
@@ -448,6 +494,7 @@
         </div>
 
         <button
+          v-if="!read_only"
           style="margin-top: 1em;"
           class="button"
           @click="newExposureRow"
@@ -458,8 +505,10 @@
       </template>
     </CollapsableSection>
 
-    <!-- Advanced Options-->
-    <CollapsableSection closed>
+    <!-- Advanced Options - set to open when we're in read-only mode-->
+    <CollapsableSection
+      :closed="!read_only"
+    >
       <template #header>
         Advanced Options
       </template>
@@ -467,10 +516,16 @@
         <div class="flex-row">
           <b-field label="Observing Side">
             <b-field>
-              <b-checkbox v-model="ascending">
+              <b-checkbox
+                v-if="!read_only"
+                v-model="ascending"
+              >
                 Ascending
               </b-checkbox>
-              <b-checkbox v-model="descending">
+              <b-checkbox
+                v-if="!read_only"
+                v-model="descending"
+              >
                 Descending
               </b-checkbox>
             </b-field>
@@ -483,8 +538,12 @@
               v-model="ra_offset"
               style="max-width: 100px"
               class="project-input"
+              :disabled="read_only"
             />
-            <b-select v-model="ra_offset_units">
+            <b-select
+              v-model="ra_offset_units"
+              :disabled="read_only"
+            >
               <option value="deg">
                 deg
               </option>
@@ -501,8 +560,12 @@
               v-model="dec_offset"
               style="max-width: 100px"
               class="project-input"
+              :disabled="read_only"
             />
-            <b-select v-model="dec_offset_units">
+            <b-select
+              v-model="dec_offset_units"
+              :disabled="read_only"
+            >
               <option value="deg">
                 deg
               </option>
@@ -521,8 +584,12 @@
               type="number"
               min="-360"
               max="360"
+              :disabled="read_only"
             />
-            <b-select value="deg">
+            <b-select
+              value="deg"
+              :disabled="read_only"
+            >
               <option value="deg">
                 deg
               </option>
@@ -543,6 +610,7 @@
               step="0.5"
               min="0"
               max="12"
+              :disabled="read_only"
             />
             <p class="control">
               <span class="button is-static">hours</span>
@@ -561,9 +629,28 @@
               step="0.1"
               min="0"
               max="7.5"
+              :disabled="read_only"
             />
             <p class="control">
               <span class="button is-static">deg</span>
+            </p>
+          </b-field>
+          <b-field
+            label="Max Night Duration"
+            :type="{'is-danger': warn.max_night_duration}"
+          >
+            <b-input
+              v-model="max_night_duration"
+              class="project-input"
+              style="max-width: 150px;"
+              type="number"
+              step="0.5"
+              min="0"
+              max="24"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <span class="button is-static">hours</span>
             </p>
           </b-field>
         </div>
@@ -580,6 +667,7 @@
               type="number"
               min="1"
               max="5"
+              :disabled="read_only"
             />
           </b-field>
           <b-field
@@ -593,6 +681,7 @@
               type="number"
               min="0"
               max="360"
+              :disabled="read_only"
             />
             <p class="control">
               <span class="button is-static">deg</span>
@@ -609,45 +698,17 @@
               type="number"
               min="0"
               max="100"
+              :disabled="read_only"
             />
             <p class="control">
               <span class="button is-static">%</span>
             </p>
           </b-field>
-        </div>
-
-        <div style="height: 5px;" />
-        <b-field>
-          <b-checkbox v-model="frequent_autofocus">
-            Autofocus: focus more frequently
-          </b-checkbox>
-        </b-field>
-        <b-field>
-          <b-checkbox v-model="prefer_bessell">
-            Prefer Bessell
-          </b-checkbox>
-        </b-field>
-        <b-field>
-          <b-checkbox v-model="enhance_photometry">
-            Enhance Photometry
-          </b-checkbox>
-        </b-field>
-        <b-field>
-          <b-checkbox v-model="add_center_to_mosaic">
-            Add center to mosaic
-          </b-checkbox>
-        </b-field>
-        <b-field>
-          <b-checkbox v-model="dark_sky_setting">
-            Astronomical Dark & Moon Alt &lt; 6
-          </b-checkbox>
-        </b-field>
-        <div
-          class="flex-row"
-          style="margin-top: 1em; gap: 3em;"
-        >
           <b-field label="Defocus (mags)">
-            <b-select v-model="defocus">
+            <b-select
+              v-model="defocus"
+              :disabled="read_only"
+            >
               <option
                 v-for="i in 7"
                 :key="i - 1"
@@ -657,9 +718,58 @@
               </option>
             </b-select>
           </b-field>
+        </div>
+        <div style="height: 5px;" />
+        <b-field>
+          <b-checkbox
+            v-model="frequent_autofocus"
+            :disabled="read_only"
+          >
+            Autofocus: focus more frequently
+          </b-checkbox>
+        </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="prefer_bessell"
+            :disabled="read_only"
+          >
+            Prefer Bessell
+          </b-checkbox>
+        </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="enhance_photometry"
+            :disabled="read_only"
+          >
+            Enhance Photometry
+          </b-checkbox>
+        </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="add_center_to_mosaic"
+            :disabled="read_only"
+          >
+            Add center to mosaic
+          </b-checkbox>
+        </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="dark_sky_setting"
+            :disabled="read_only"
+          >
+            Astronomical Dark & Moon Alt &lt; 6
+          </b-checkbox>
+        </b-field>
+        <div
+          class="flex-row"
+          style="margin-top: 1em; gap: 3em;"
+        >
           <div style="padding-top: 1em;">
             <b-field>
-              <b-checkbox v-model="smart_stack">
+              <b-checkbox
+                v-model="smart_stack"
+                :disabled="read_only"
+              >
                 Smart Stack
               </b-checkbox>
               <b-tooltip
@@ -675,7 +785,10 @@
             </b-field>
 
             <b-field>
-              <b-checkbox v-model="long_stack">
+              <b-checkbox
+                v-model="long_stack"
+                :disabled="read_only"
+              >
                 Long Stack
               </b-checkbox>
               <b-tooltip
@@ -692,7 +805,10 @@
           </div>
           <div style="padding-top: 1em;">
             <b-field>
-              <b-checkbox v-model="deplete">
+              <b-checkbox
+                v-model="deplete"
+                :disabled="read_only"
+              >
                 Deplete
               </b-checkbox>
               <b-tooltip
@@ -708,7 +824,10 @@
             </b-field>
 
             <b-field>
-              <b-checkbox v-model="cycle">
+              <b-checkbox
+                v-model="cycle"
+                :disabled="read_only"
+              >
                 Cycle
               </b-checkbox>
               <b-tooltip
@@ -727,7 +846,10 @@
       </template>
     </CollapsableSection>
 
-    <div class="project-form-footer">
+    <div
+      v-if="!read_only"
+      class="project-form-footer"
+    >
       <b-tooltip
         v-if="cloning_existing_project"
         :active="!$auth.isAuthenticated"
@@ -805,7 +927,7 @@ const mapStateToComputed = (vuexModule, propertyNames) => {
 
 export default {
   name: 'CreateProjectForm',
-  props: ['sitecode', 'project_to_load'],
+  props: { sitecode: { type: String }, project_to_load: { type: Object }, read_only: { type: Boolean, default: false } },
   mixins: [target_names, user_mixin],
   components: {
     RightAscensionInput,
@@ -838,6 +960,7 @@ export default {
       conditionalStep: 0.1,
       sizeInDegrees: this.camera_size_degrees,
       site: this.sitecode,
+      objectSearch: '',
       warn: {
         project_name: false,
         position_angle: false,
@@ -848,6 +971,7 @@ export default {
         max_airmass: false,
         lunar_dist_min: false,
         lunar_phase_max: false,
+        target_name: false,
         targetRA: false,
         targetDec: false
       },
@@ -978,7 +1102,7 @@ export default {
     async getCoordinatesFromName () {
       const target_index = 0 // legacy, eventually we want to make `targets` a dict, not an array containing the dict
       this.object_name_search_in_progress = true
-      const name = this.targets[target_index].name
+      const name = this.objectSearch
       const search_results = await this.get_coordinates_from_object_name(name)
       this.object_name_search_in_progress = false
       if (!search_results.error) {
@@ -989,10 +1113,9 @@ export default {
         this.updateTargetsValue(target_index, 'dec', '')
         this.$buefy.notification.open({
           duration: 10000,
-          message: 'Could not resolve object with name ' + this.targets[target_index].name,
+          message: 'Could not find target ' + this.objectSearch,
           position: 'is-top',
-          type: 'is-danger',
-          hasIcon: true
+          type: 'is-info'
         })
       }
     },
@@ -1007,7 +1130,8 @@ export default {
     },
 
     verifyForm () {
-      if (this.project_name === '') { this.warn.project_name = true }
+      if (this.project_name.trim() === '') { this.warn.project_name = true }
+      if (this.targets[0].name.trim() === '') { this.warn.target_name = true }
       if (this.project_name.includes('#')) {
         this.warn.project_name = true
         this.$buefy.toast.open({
@@ -1027,10 +1151,8 @@ export default {
         this.project_sites = [this.sitecode]
       }
 
-      if (this.targets[0].ra === '' || this.targets[0].dec === '') {
-        this.warn.targetRA = this.targets[0].ra === ''
-        this.warn.targetDec = this.targets[0].dec === ''
-      }
+      this.warn.targetRA = this.targets[0].ra === ''
+      this.warn.targetDec = this.targets[0].dec === ''
     },
     resetInputWarnings () {
       Object.keys(this.warn).forEach(k => { this.warn[k] = false })
@@ -1065,13 +1187,6 @@ export default {
 
       const project = this.projectToSend
 
-      if (!Object.values(this.warn).every(x => !x)) {
-        this.$buefy.toast.open({
-          message: 'Please fix the highlighted fields and try again',
-          type: 'is-warning'
-        })
-      }
-
       // Make sure all warnings are false, otherwise don't create the project.
       if (Object.values(this.warn).every(x => !x)) {
         this.createProjectButtonIsLoading = true
@@ -1100,11 +1215,18 @@ export default {
         }).finally(() => {
           this.createProjectButtonIsLoading = false
         })
+      } else {
+        this.$buefy.toast.open({
+          message: 'Please fix the highlighted fields',
+          type: 'is-warning'
+        })
       }
       console.log(this.warn)
     },
 
     modifyProject () {
+      this.resetInputWarnings()
+      this.verifyForm()
       const url = this.projects_api_url + '/modify-project'
 
       const project = this.projectToSend
@@ -1137,6 +1259,11 @@ export default {
           console.error(error)
         }).finally(() => {
           this.createProjectButtonIsLoading = false
+        })
+      } else {
+        this.$buefy.toast.open({
+          message: 'Please fix the highlighted fields',
+          type: 'is-warning'
         })
       }
     },
@@ -1345,6 +1472,7 @@ export default {
       'position_angle',
       'max_ha',
       'min_zenith_dist',
+      'max_night_duration',
       'max_airmass',
       'lunar_dist_min',
       'lunar_phase_max',

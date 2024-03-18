@@ -1,4 +1,6 @@
+import Vue from 'vue'
 import moment from 'moment'
+import _ from 'lodash'
 
 const state = {
   project_window: 7, // in days, how long the project has a chance to be scheduled; this is not sent with the project
@@ -48,7 +50,8 @@ const state = {
   position_angle: 0,
   max_ha: 4, // decimal hours
   min_zenith_dist: 0, // degrees
-  max_airmass: 2.0,
+  max_night_duration: 6, // hours
+  max_airmass: 3.0,
   lunar_dist_min: 30, // deg
   lunar_phase_max: 60, // %
   frequent_autofocus: false,
@@ -64,7 +67,8 @@ const state = {
   start_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
   long_stack: false,
   smart_stack: true,
-  defocus: 0
+  defocus: 0,
+  draft_project_params: {} // If a user has entered some info into the project form, save it here so we can go back to it.
 }
 
 const getters = {
@@ -81,6 +85,7 @@ const getters = {
       position_angle: state.position_angle,
       max_ha: state.max_ha,
       min_zenith_dist: state.min_zenith_dist,
+      max_night_duration: state.max_night_duration,
       max_airmass: state.max_airmass,
       lunar_dist_min: state.lunar_dist_min,
       lunar_phase_max: state.lunar_phase_max,
@@ -156,6 +161,7 @@ const mutations = {
   position_angle (state, val) { state.position_angle = val },
   max_ha (state, val) { state.max_ha = val },
   min_zenith_dist (state, val) { state.min_zenith_dist = val },
+  max_night_duration (state, val) { state.max_night_duration = val },
   max_airmass (state, val) { state.max_airmass = val },
   lunar_dist_min (state, val) { state.lunar_dist_min = val },
   lunar_phase_max (state, val) { state.lunar_phase_max = val },
@@ -172,7 +178,14 @@ const mutations = {
   start_date (state, val) { state.start_date = val },
   long_stack (state, val) { state.long_stack = val },
   smart_stack (state, val) { state.smart_stack = val },
-  defocus (state, val) { state.defocus = val }
+  defocus (state, val) { state.defocus = val },
+  draft_project_params (state, val) { state.draft_project_params = val }, // project params that have saved off in saveProjectDraft
+  rewrite_state (state, val) {
+    // loop through and rewrite the state
+    for (const stateItem in val) {
+      Vue.set(state, stateItem, val[stateItem])
+    }
+  }
 }
 
 const actions = {
@@ -212,6 +225,7 @@ const actions = {
     commit('position_angle', 0)
     commit('max_ha', 4) // decimal hrs
     commit('min_zenith_dist', 0) // deg
+    commit('max_night_duration', 6) // hours
     commit('max_airmass', 2.0)
     commit('lunar_dist_min', 30) // deg
     commit('lunar_phase_max', 60) // %
@@ -257,6 +271,18 @@ const actions = {
     }
     commit('start_date', moment(project.project_constraints.start_date).toDate())
     commit('expiry_date', moment(project.project_constraints.expiry_date).toDate())
+  },
+  saveProjectDraft ({ state, commit }) {
+    // make a deep copy of the current state of the project params, without draft project params
+    const stateCopy = _.cloneDeep(state)
+    stateCopy.draft_project_params = {}
+    commit('draft_project_params', stateCopy)
+  },
+  reloadProjectDraft ({ state, commit }) {
+    // make a deep copy of the project params and load into the current state
+    const projectParamsCopy = _.cloneDeep(state.draft_project_params)
+    commit('rewrite_state', projectParamsCopy)
+    commit('draft_project_params', {})
   }
 }
 

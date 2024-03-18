@@ -105,7 +105,6 @@
             </b-field>
             <TargetSearchField
               v-model="mount_object"
-              label="Object search"
               size="is-small"
               @results="handle_object_name_search"
             />
@@ -1172,7 +1171,7 @@ $toggle-button-height: 32px;
     }
 }
 .sidebar-tab-content {
-    padding: 1em;
+    padding: 0.5em;
     background-color: $background;
 }
 
