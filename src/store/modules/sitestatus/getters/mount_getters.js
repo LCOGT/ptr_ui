@@ -57,7 +57,7 @@ const airmass = (state, getters) => {
 const transition_time = (state, getters) => {
   const name = 'Trans. Time'
   const val = parseFloat(getters.mount_state.airmass?.val)?.toFixed(4) ?? '-'
-  const is_stale = isItemStale(getters, 'mount_state', 'transit_time')
+  const is_stale = isItemStale(getters, 'mount_state', 'transition_time')
   return { name, val, is_stale }
 }
 
