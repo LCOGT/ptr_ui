@@ -20,6 +20,10 @@ const state = {
     bin: 1, // integer: 1, 2, or 4
     area: '100%' // percent, from 0 to 1
   },
+  equatorialSweep: {
+    points: 12,
+    minAltitude: 30
+  },
   focusExtensive: {
     target: 'near_tycho_star', // alternative: 'use_field'
     bin: 1, // integer: 1, 2, or 4
@@ -90,6 +94,7 @@ const state = {
   scriptsWithSettings: [
     'focusAuto',
     'estimateFocusOffset',
+    'equatorialSweep',
     'focusExtensive',
     'focusFine',
     'restackLocalCalibrations',
@@ -108,6 +113,7 @@ const state = {
   readableScriptNames: {
     focusAuto: 'Auto Focus',
     estimateFocusOffset: 'Estimate Focus Offset',
+    equatorialSweep: 'Equatorial Sweep',
     focusExtensive: 'Extensive Focus',
     focusFine: 'Fine Focus',
     restackLocalCalibrations: 'Restack Local Calibrations',
@@ -296,6 +302,12 @@ const actions = {
           target: 'near_tycho_star', // alternative: 'use_field'
           bin: 1, // integer: 1, 2, or 4
           area: '100%' // percent, from 0 to 1
+        }
+      },
+      equatorialSweep () {
+        return {
+          points: 12,
+          minAltitude: 30
         }
       },
       focusExtensive () {
