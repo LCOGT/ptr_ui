@@ -24,11 +24,6 @@ import RestackLocalCalibrations from '@/components/ScriptSettings/RestackLocalCa
 import CollectScreenFlats from '@/components/ScriptSettings/CollectScreenFlats'
 import CollectBiasesAndDarks from '@/components/ScriptSettings/CollectBiasesAndDarks'
 import CollectSkyFlats from '@/components/ScriptSettings/CollectSkyFlats'
-import TakeUGRIZSStack from '@/components/ScriptSettings/TakeUGRIZSStack'
-import TakeLRGBStack from '@/components/ScriptSettings/TakeLRGBStack'
-import TakeO3HaS2N2Stack from '@/components/ScriptSettings/TakeO3HaS2N2Stack'
-import TakePlanetStack from '@/components/ScriptSettings/TakePlanetStack'
-import TakeLunarStack from '@/components/ScriptSettings/TakeLunarStack'
 import PointingRun from '@/components/ScriptSettings/PointingRun'
 import FocusAuto from '@/components/ScriptSettings/FocusAuto'
 import EstimateFocusOffset from './EstimateFocusOffset.vue'
@@ -42,11 +37,6 @@ export default {
     CollectScreenFlats,
     CollectBiasesAndDarks,
     CollectSkyFlats,
-    TakeUGRIZSStack,
-    TakeLRGBStack,
-    TakeO3HaS2N2Stack,
-    TakePlanetStack,
-    TakeLunarStack,
     PointingRun,
     FocusAuto,
     EstimateFocusOffset,

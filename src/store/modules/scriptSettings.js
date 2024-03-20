@@ -56,35 +56,6 @@ const state = {
   collectSkyFlats: {
     numFrames: ''
   },
-  takeLRGBStack: {
-    numFrames: 1,
-    skipL: false,
-    exposureTime: 30,
-    useSloane: false
-  },
-  takeO3HaS2N2Stack: {
-    numFrames: 1,
-    skipO3: false,
-    skipHa: false,
-    skipS2: false,
-    skipN2: false,
-    addRGB: false,
-    addCR: false,
-    addSloane: false,
-    addL: false,
-    exposureTime: 30
-  },
-  takeUGRIZSStack: {
-    numFrames: 1,
-    skipU: true,
-    skipZS: true
-  },
-  takePlanetStack: {
-    numFrames: 127
-  },
-  takeLunarStack: {
-    numFrames: 127
-  },
   pointingRun: {
     numPointingRuns: 25,
     minAltitude: 30
@@ -101,11 +72,6 @@ const state = {
     'collectBiasesAndDarks',
     'collectScreenFlats',
     'collectSkyFlats',
-    'takeLRGBStack',
-    'takeO3HaS2N2Stack',
-    'takeUGRIZSStack',
-    'takePlanetStack',
-    'takeLunarStack',
     'pointingRun'
   ],
 
@@ -120,11 +86,6 @@ const state = {
     collectBiasesAndDarks: 'Collect Biases and Darks',
     collectScreenFlats: 'Collect Screen Flats',
     collectSkyFlats: 'Collect Sky Flats',
-    takeLRGBStack: 'Take L/R/G/B Stack',
-    takeO3HaS2N2Stack: 'Take O3/Ha/N2/S2 Stack',
-    takeUGRIZSStack: 'Take u/g/r/i/zs Stack',
-    takePlanetStack: 'Take Planet Stack',
-    takeLunarStack: 'Take Lunar Stack',
     pointingRun: 'Pointing Run'
   }
 }
@@ -352,45 +313,6 @@ const actions = {
       collectSkyFlats () {
         return {
           numFrames: number_of_flat_to_collect
-        }
-      },
-      takeLRGBStack () {
-        return {
-          numFrames: 1,
-          skipL: false,
-          exposureTime: 30,
-          useSloane: false
-        }
-      },
-      takeO3HaS2N2Stack () {
-        return {
-          numFrames: 1,
-          skipO3: false,
-          skipHa: false,
-          skipS2: false,
-          skipN2: false,
-          addRGB: false,
-          addCR: false,
-          addSloane: false,
-          addL: false,
-          exposureTime: 30
-        }
-      },
-      takeUGRIZSStack () {
-        return {
-          numFrames: 1,
-          skipU: true,
-          skipZS: true
-        }
-      },
-      takePlanetStack () {
-        return {
-          numFrames: 127
-        }
-      },
-      takeLunarStack () {
-        return {
-          numFrames: 127
         }
       },
       pointingRun () {
