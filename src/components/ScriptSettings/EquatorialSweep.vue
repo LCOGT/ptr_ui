@@ -1,26 +1,22 @@
 <template>
   <section>
     <div class="field-group">
-      <b-field label="No. of Pointings">
+      <b-field label="Points">
         <b-numberinput
-          v-model="numPointingRuns"
+          v-model="points"
           type="is-light"
           size="is-small"
           controls-position="compact"
-          min="1"
-          max="10000"
+          min="0"
         />
       </b-field>
-    </div>
-    <div class="field-group">
-      <b-field label="Min. Altitude (deg)">
+      <b-field label="Minimum Altitude">
         <b-numberinput
           v-model="minAltitude"
           type="is-light"
           size="is-small"
           controls-position="compact"
           min="0"
-          max="90"
         />
       </b-field>
     </div>
@@ -29,21 +25,20 @@
 
 <script>
 export default {
-  name: 'PointingRun',
   computed: {
 
-    numPointingRuns: {
-      get () { return this.$store.state.scriptSettings.pointingRun.numPointingRuns },
+    points: {
+      get () { return this.$store.state.scriptSettings.equatorialSweep.points },
       set (value) {
-        const scriptName = 'pointingRun'
-        const paramName = 'numPointingRuns'
+        const scriptName = 'equatorialSweep'
+        const paramName = 'points'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }
     },
     minAltitude: {
-      get () { return this.$store.state.scriptSettings.pointingRun.minAltitude },
+      get () { return this.$store.state.scriptSettings.equatorialSweep.minAltitude },
       set (value) {
-        const scriptName = 'pointingRun'
+        const scriptName = 'equatorialSweep'
         const paramName = 'minAltitude'
         this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
       }

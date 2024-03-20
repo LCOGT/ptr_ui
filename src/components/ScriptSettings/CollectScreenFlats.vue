@@ -6,6 +6,7 @@
           <b-numberinput
             v-model="numFrames"
             type="is-light"
+            size="is-small"
             controls-position="compact"
             min="0"
             max="63"

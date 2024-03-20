@@ -32,6 +32,7 @@ import TakeLunarStack from '@/components/ScriptSettings/TakeLunarStack'
 import PointingRun from '@/components/ScriptSettings/PointingRun'
 import FocusAuto from '@/components/ScriptSettings/FocusAuto'
 import EstimateFocusOffset from './EstimateFocusOffset.vue'
+import EquatorialSweep from './EquatorialSweep.vue'
 import FocusExtensive from '@/components/ScriptSettings/FocusExtensive'
 import FocusFine from '@/components/ScriptSettings/FocusFine'
 export default {
@@ -49,6 +50,7 @@ export default {
     PointingRun,
     FocusAuto,
     EstimateFocusOffset,
+    EquatorialSweep,
     FocusExtensive,
     FocusFine
   },
