@@ -4,7 +4,8 @@
       <b-field label="No. of Pointings">
         <b-numberinput
           v-model="numPointingRuns"
-          type="is-dark"
+          type="is-light"
+          size="is-small"
           controls-position="compact"
           min="1"
           max="10000"
@@ -15,7 +16,8 @@
       <b-field label="Min. Altitude (deg)">
         <b-numberinput
           v-model="minAltitude"
-          type="is-dark"
+          type="is-light"
+          size="is-small"
           controls-position="compact"
           min="0"
           max="90"

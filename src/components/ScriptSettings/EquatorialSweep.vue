@@ -5,6 +5,7 @@
         <b-numberinput
           v-model="points"
           type="is-light"
+          size="is-small"
           controls-position="compact"
           min="0"
         />
@@ -13,6 +14,7 @@
         <b-numberinput
           v-model="minAltitude"
           type="is-light"
+          size="is-small"
           controls-position="compact"
           min="0"
         />
