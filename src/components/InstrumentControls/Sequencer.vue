@@ -130,12 +130,6 @@ export default {
 
       // Display message for scripts that aren't implemented yet
       notImplementedScripts: [
-        'estimateFocusOffset',
-        'takeLRGBStack',
-        'takeO3HaS2N2Stack',
-        'takeUGRIZSStack',
-        'takePlanetStack',
-        'takeLunarStack',
         'collectScreenFlats'
       ]
     }
