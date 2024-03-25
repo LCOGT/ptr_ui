@@ -322,12 +322,10 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active || read_only"
                 type="number"
-                min="0"
+                min="0.000001"
                 max="100000"
+                step="any"
               />
-              <p class="control">
-                <span class="button is-static is-small">s</span>
-              </p>
             </b-field>
             <b-field
               :label="n==1 ? 'Filter' : ''"
@@ -1090,7 +1088,6 @@ export default {
         return index === indexToMatch ? { ...obj, [key]: val } : obj
       })
     },
-
     clearProjectForm () {
       this.modifying_existing_project = false
       this.cloning_existing_project = false
