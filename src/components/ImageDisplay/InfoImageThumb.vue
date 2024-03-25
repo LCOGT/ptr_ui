@@ -1,14 +1,14 @@
 <template>
-  <div class="info-thumbnail-row"> 
+  <div class="info-thumbnail-row">
     <template v-for="img in exisiting_info_images">
       <img
         :key="img.channel"
         :src="img.jpg_url"
         onerror="this.onerror=null;this.src='https://via.placeholder.com/60/FF0000/FFFFFF?text=jpg'"
-        @click="setActiveImage(img.channel)" 
         class="info-image-thumbnail"
-        v-bind:class="{'is_selected': img.base_filename == current_image.base_filename}"
-      />
+        :class="{'is_selected': img.base_filename == current_image.base_filename}"
+        @click="setActiveImage(img.channel)"
+      >
     </template>
   </div>
 </template>
@@ -16,26 +16,26 @@
 <script>
 import { mapState } from 'vuex'
 export default {
-  name: "InfoImageThumb",
+  name: 'InfoImageThumb',
   methods: {
-    setActiveImage(channel) {
-      const info_image_index = channel - 1  // channels are 1-indexed, arrays are 0-indexed
+    setActiveImage (channel) {
+      const info_image_index = channel - 1 // channels are 1-indexed, arrays are 0-indexed
       this.$store.dispatch('images/set_info_image_as_current_image', info_image_index)
-    },
+    }
   },
   computed: {
     ...mapState('images', [
       'current_image',
-      'info_images',
+      'info_images'
     ]),
 
     // Channels without images should not display thumbnails
-    exisiting_info_images() {
+    exisiting_info_images () {
       return this.info_images.filter(i => 'channel' in i)
-    },
+    }
 
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

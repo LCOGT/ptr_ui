@@ -1,62 +1,56 @@
-
+import { mapState } from 'vuex'
 export const user_mixin = {
 
   computed: {
-
-    userIsAdmin() {
-      try {
-        let user = this.$auth.user 
-        let roles = user['https://photonranch.org/user_metadata'].roles
-        return roles.includes('admin')
-      } catch {
-        return false
-      }
-    },
-
-		userIsAuthenticated() {
-			let user = this.$auth.user
-			return user !== undefined
-		},
-
-    userId() {
-      return this.userIsAuthenticated 
-        ? this.$auth.user.sub
-        : null
-    },
-    userName() {
-      return this.userIsAuthenticated 
-        ? this.$auth.user.name
-        : null
-    },
-    userNickname() {
-      return this.userIsAuthenticated 
-        ? this.$auth.user.nickname
-        : null
-    },
-    userEmail() {
-      return this.userIsAuthenticated 
-        ? this.$auth.user.email
-        : null
-    },
-
+    ...mapState('user_data', [
+      'userIsAuthenticated',
+      'userIsAdmin',
+      'userId',
+      'userName',
+      'userNickname',
+      'userEmail',
+      'profileUrl'
+    ])
   },
 
   methods: {
+    async getAuthRequestHeader () {
+      let token
+      try {
+        token = await this.$auth.getTokenSilently()
+      } catch (err) {
+        console.warn('Did not acquire the needed token. Stopping request.')
 
-    login() {
-      this.$auth.loginWithPopup();
+        // small popup notification
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: "Oops! You aren't authorized to do that.",
+          position: 'is-bottom',
+          type: 'is-danger'
+        })
+      }
+      return {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${token}`
+        }
+      }
     },
-
-    logout() {
+    login () {
+      this.$auth.loginWithPopup().then(() => {
+        this.$store.dispatch('user_data/newUserLogin', this.$auth.user)
+      })
+    },
+    logout () {
       // save the path we will redirect back to after logout is complete
       window.localStorage.setItem('ptr_logout_redirect_path', this.$router.currentRoute.fullPath)
+
+      // update vuex
+      this.$store.dispatch('user_data/logoutUser')
+
       this.$auth.logout({
         returnTo: `${window.location.origin}/logout`
       })
-    },
-
-
-
+    }
   }
-
 }

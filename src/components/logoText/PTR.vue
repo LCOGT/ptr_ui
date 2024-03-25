@@ -1,29 +1,35 @@
 <template>
-    <div class="logo-container" :style="fontSizeStyle">
-        <span class="logo pt">PT</span>
-        <span class="logo r">R</span>
-        <span v-if="withLambda" class="lambda"><img src="/img/logos/PTR-lambda.png" /></span>
-    </div>
+  <div
+    class="logo-container"
+    :style="fontSizeStyle"
+  >
+    <span class="logo pt">PT</span>
+    <span class="logo r">R</span>
+    <span
+      v-if="withLambda"
+      class="lambda"
+    ><img src="/img/logos/PTR-lambda.png"></span>
+  </div>
 </template>
 
 <script>
 export default {
-    name: "PTR",
-    props: {
-        withLambda: {
-            type: Boolean,
-            default: false,
-        },
-        fontSize: {
-            type: String,
-            default: () => "38px"
-        },
+  name: 'PTR',
+  props: {
+    withLambda: {
+      type: Boolean,
+      default: false
     },
-    computed: {
-        fontSizeStyle() {
-            return `font-size: ${this.fontSize};`
-        }
-    },
+    fontSize: {
+      type: String,
+      default: () => '38px'
+    }
+  },
+  computed: {
+    fontSizeStyle () {
+      return `font-size: ${this.fontSize};`
+    }
+  }
 }
 </script>
 

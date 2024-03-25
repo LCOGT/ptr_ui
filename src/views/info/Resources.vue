@@ -5,7 +5,9 @@
     <div class="container">
       <slot>
         <div class="description-text">
-          <h1 class="title">Observing Resources</h1>
+          <h1 class="title">
+            Observing Resources
+          </h1>
           <p>
             This page will provide information about astronomy and the process
             of observing.
@@ -17,12 +19,12 @@
 </template>
 
 <script>
-import SiteNavbar from "@/components/SiteNavbar";
+import SiteNavbar from '@/components/SiteNavbar'
 export default {
   components: {
-    SiteNavbar,
-  },
-};
+    SiteNavbar
+  }
+}
 </script>
 
 <style lang="scss" scoped>

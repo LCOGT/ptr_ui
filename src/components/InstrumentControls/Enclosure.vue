@@ -1,92 +1,399 @@
 <template>
   <div class="instrument-control-wrapper">
+    <div
+      v-if="enclosure_message.val !== '-'"
+      class="val"
+    >
+      {{ enclosure_message.val }}
+    </div>
 
-    <div class="val">{{enclosure_message.val}}</div>
+    <div class="button-state-group">
+      <b-field
+        v-if="userIsAdmin"
+        label="Enclosure Status"
+        class="is-small"
+      >
+        <p class="control">
+          <CommandButton
+            admin
+            :data="enclosure_open_command"
+            warning="This will open the observatory roof or dome."
+            class="is-small"
+          >Request Open</CommandButton>
+        </p>
+        <p class="control">
+          <CommandButton
+            admin
+            :data="enclosure_close_command"
+            class="is-small"
+          >Request Close</CommandButton>
+        </p>
+      </b-field>
+      <div class="button-state-divider"></div>
+      <b-field v-if="open_ok && open_ok.val && open_ok.val != '-'">
+        <template #label><div class="status-label">ok to open:</div></template>
+        <StatusVal :status-item="open_ok" />
+      </b-field>
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="enclosure_open_status" />
+      </b-field>
+    </div>
 
-    <status-column 
-      class="status-column"
-      :statusList="buildEnclosureTabStatus" 
-      :isOffline="!site_is_online"
-    />
+    <div class="button-state-group">
+      <b-field grouped>
+        <b-field
+          v-if="userIsAdmin"
+          label="Set Enclosure Mode"
+          class="is-small"
+        >
+          <b-select
+            v-model="selectedEnclosureMode"
+            size="is-small"
+          >
+            <option value="Automatic">
+              Automatic
+            </option>
+            <option value="Manual">
+              Manual
+            </option>
+            <option value="Shutdown">
+              Shut down
+            </option>
+          </b-select>
+          <p class="control">
+            <CommandButton
+              admin
+              :data="setEnclosureMode"
+              class="is-small"
+            >apply</CommandButton>
+          </p>
+        </b-field>
+      </b-field>
+      <div class="button-state-divider" />
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="enclosure_mode" />
+      </b-field>
+    </div>
 
-		<div style="border-bottom: 0.5px solid grey; margin: 1em 0;" />
+    <div class="button-state-group">
+      <b-field
+        v-if="userIsAdmin"
+        label="Set Observing Mode"
+        class="is-small"
+      >
+        <b-select
+          v-model="selectedObservingMode"
+          size="is-small"
+        >
+          <option value="active">
+            Active
+          </option>
+          <option value="inactive">
+            Inactive
+          </option>
+        </b-select>
+        <p class="control">
+          <CommandButton
+            admin
+            :data="setObservingMode"
+            class="is-small"
+          >
+            apply
+          </CommandButton>
+        </p>
+      </b-field>
+      <div class="button-state-divider" />
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="observingMode" />
+      </b-field>
+    </div>
 
-    <b-field label="Set Enclosure Mode" v-if="userIsAdmin" class="is-small" style="margin-bottom: 2em;">
-      <b-select v-model="selected_enclosure_mode" size="is-small" >
-				<option value="setAuto" >Automatic</option> 
-				<option value="setManual">Manual</option> 
-				<option value="shutDown">Shut down</option> 
-      </b-select>
-			<p class="control">
-				<button class="button is-admin is-small" :disabled="!userIsAuthenticated" @click="set_enclosure_mode" > apply </button>
-			</p>
+    <div class="button-state-group">
+      <b-field
+        v-if="userIsAdmin"
+        label="Local Weather Response"
+        class="is-small"
+      >
+        <CommandButton
+          admin
+          class="button admin is-small"
+          :data="enclosure_configure_weather_local_on"
+        >On</CommandButton>
+        <p class="control">
+          <CommandButton
+            admin
+            class="button admin is-small"
+            :data="enclosure_configure_weather_local_off"
+          >Off</CommandButton>
+        </p>
+      </b-field>
+      <div class="button-state-divider"></div>
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="localWeatherActive" />
+      </b-field>
+    </div>
+
+    <div class="button-state-group">
+      <b-field
+        v-if="userIsAdmin"
+        label="OWM Weather Response"
+        class="is-small"
+        style="margin-bottom: 2em;"
+      >
+        <CommandButton
+          admin
+          class="button admin is-small"
+          :data="enclosure_configure_weather_owm_on"
+        >On</CommandButton>
+        <CommandButton
+          admin
+          class="button admin is-small"
+          :data="enclosure_configure_weather_owm_off"
+        >Off</CommandButton>
+      </b-field>
+      <div class="button-state-divider" />
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="owmActive" />
+      </b-field>
+    </div>
+
+    <div class="button-state-group">
+      <b-field
+        grouped
+        label="Manually Force Roof State All Night:"
+      >
+        <b-field>
+          <CommandButton
+            admin
+            class="button admin is-small"
+            :data="enclosure_force_roof_state('open')"
+          >Open</CommandButton>
+          <p class="control">
+            <CommandButton
+              admin
+              class="button admin is-small"
+              :data="enclosure_force_roof_state('closed')"
+            >Closed</CommandButton>
+          </p>
+        </b-field>
+        <p class="control">
+          <CommandButton
+            admin
+            class="button admin is-small"
+            :data="enclosure_force_roof_state('auto')"
+          >Auto</CommandButton>
+        </p>
+      </b-field>
+      <div class="button-state-divider" />
+      <b-field>
+        <template #label><div class="status-label">current state:</div></template>
+        <StatusVal :status-item="manualRoofStateMode" />
+      </b-field>
+    </div>
+    <hr>
+    <div><b>Weather Indicator Configuration</b></div>
+    <br>
+    <b-field horizontal label="">
+      <b-field>
+        <b-field label="setting" style="width: 100px; text-align:center;" />
+        <p class="control">
+          <b-field label="warning level" style="width: 110px;" />
+        </p>
+        <p class="control">
+          <b-field label="danger level" style="width: 110px;" />
+        </p>
+      </b-field>
     </b-field>
 
-    <b-field label="Admin Tests" v-if="userIsAdmin" class="is-small" style="margin-bottom: 2em;">
-      <command-button 
-        admin 
-        class="button admin is-small" 
-        :disabled="!userIsAuthenticated" 
-        :data="enclosure_simulate_weather_hold"> 
-        <div slot="title">toggle simulated weather hold</div>
-      </command-button>
+    <b-field horizontal label="rain">
+      <b-field>
+        <b-select v-model="rainConfigSetting">
+          <option value="on">on</option>
+          <option value="warn">warn</option>
+          <option value="ignore">ignore</option>
+        </b-select>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="rainWarningLevel"/>
+        </p>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="rainDangerLevel"/>
+        </p>
+      </b-field>
     </b-field>
 
-    <command-button 
-      v-if="enclosure_is_dome"
-      :data="enclosure_home_dome_command" 
-      style="margin-bottom: 1em;" 
-      class="is-small">
-      <div slot="title">Home Dome</div>
-    </command-button>
-
-    <b-field v-if="enclosure_is_dome">
-      <p class="control">
-        <command-button 
-          :data="enclosure_track_telescope_command" 
-          class="is-small">
-          <div slot="title">Track Telescope</div>
-        </command-button>
-      </p>
-      <p class="control">
-        <command-button 
-          :data="enclosure_stop_tracking_telescope_command" 
-          class="is-small">
-          <div slot="title">Stop Tracking Telescope</div>
-        </command-button>
-      </p>
+    <b-field horizontal label="humidity">
+      <b-field>
+        <b-select v-model="humidityConfigSetting">
+          <option value="on">on</option>
+          <option value="warn">warn</option>
+          <option value="ignore">ignore</option>
+        </b-select>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="humidityWarningLevel"/>
+        </p>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="humidityDangerLevel"/>
+        </p>
+      </b-field>
     </b-field>
 
-    <b-field>
-      <p class="control">
-        <command-button 
-          :data="enclosure_open_command" 
-          style="margin-bottom: 1em;" 
-          class="is-small">
-          <div slot="title">Request Roof Open</div>
-        </command-button>
-      </p>
-      <p class="control">
-        <command-button 
-          :data="enclosure_close_command" 
-          style="margin-bottom: 1em;" 
-          class="is-small">
-          <div slot="title">Request Roof Close</div>
-        </command-button>
-      </p>
+    <b-field horizontal label="clouds">
+      <b-field>
+        <b-select v-model="cloudsConfigSetting">
+          <option value="on">on</option>
+          <option value="warn">warn</option>
+          <option value="ignore">ignore</option>
+        </b-select>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="cloudsWarningLevel"/>
+        </p>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="cloudsDangerLevel"/>
+        </p>
+      </b-field>
     </b-field>
+
+    <b-field horizontal label="windspeed">
+      <b-field>
+        <b-select v-model="windspeedConfigSetting">
+          <option value="on">on</option>
+          <option value="warn">warn</option>
+          <option value="ignore">ignore</option>
+        </b-select>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="windspeedWarningLevel"/>
+        </p>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="windspeedDangerLevel"/>
+        </p>
+      </b-field>
+    </b-field>
+
+    <b-field horizontal label="lightning">
+      <b-field>
+        <b-select v-model="lightningConfigSetting">
+          <option value="on">on</option>
+          <option value="warn">warn</option>
+          <option value="ignore">ignore</option>
+        </b-select>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="lightningWarningLevel"/>
+        </p>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="lightningDangerLevel"/>
+        </p>
+      </b-field>
+    </b-field>
+
+    <b-field horizontal label="tempDew">
+      <b-field>
+        <b-select v-model="tempDewConfigSetting">
+          <option value="on">on</option>
+          <option value="warn">warn</option>
+          <option value="ignore">ignore</option>
+        </b-select>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="tempDewWarningLevel"/>
+        </p>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="tempDewDangerLevel"/>
+        </p>
+      </b-field>
+    </b-field>
+
+    <b-field horizontal label="skyTempLimit">
+      <b-field>
+        <b-select v-model="skyTempLimitConfigSetting">
+          <option value="on">on</option>
+          <option value="warn">warn</option>
+          <option value="ignore">ignore</option>
+        </b-select>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="skyTempLimitWarningLevel"/>
+        </p>
+        <p class="control">
+          <b-input style="width: 110px;" type="number" min="0" max="100" v-model="skyTempLimitDangerLevel"/>
+        </p>
+      </b-field>
+    </b-field>
+
+    <b-field horizontal>
+      <CommandButton
+        admin
+        class="is-small"
+        :data="configureWeatherValues"
+        style="width: 100%;"
+      >Set Values</CommandButton>
+    </b-field>
+
+    <hr>
+
+    <b-field grouped>
+      <b-field>
+        <CommandButton
+          admin
+          class="button admin is-small"
+          :data="enclosure_simulate_weather_hold"
+        />
+      </b-field>
+      <b-field>
+        <CommandButton
+          admin
+          :data="enclosure_follow_owm_open_plan"
+          class="is-small"
+        />
+      </b-field>
+    </b-field>
+
+    <b-field grouped label="Dome Settings">
+      <b-field>
+        <CommandButton
+          :is-disabled="!enclosure_is_dome"
+          admin
+          :data="enclosure_home_dome_command"
+          class="is-small"
+        />
+      </b-field>
+      <b-field>
+        <CommandButton
+          admin
+          :is-disabled="!enclosure_is_dome"
+          :data="enclosure_track_telescope_command"
+          class="is-small"
+        />
+        <p class="control">
+          <CommandButton
+            admin
+            :is-disabled="!enclosure_is_dome"
+            :data="enclosure_stop_tracking_telescope_command"
+            class="is-small"
+          />
+        </p>
+      </b-field>
+    </b-field>
+
     <br>
 
-    <div class="status-toggle-bar" 
-      @click="isExpandedStatusVisible= !isExpandedStatusVisible">
-      {{isExpandedStatusVisible ? 'collapse status' : 'expand status'}}
+    <OWMReport />
+
+    <div
+      class="status-toggle-bar"
+      @click="isExpandedStatusVisible= !isExpandedStatusVisible"
+    >
+      {{ isExpandedStatusVisible ? 'collapse status' : 'expand status' }}
     </div>
 
     <pre v-if="isExpandedStatusVisible">
-      <simple-device-status 
-        :device_name="active_enclosure" 
-        device_type="enclosure" 
-        :device_status="enclosure_state" />
+      <simple-device-status
+        :device_name="active_enclosure"
+        device_type="enclosure"
+        :device_status="enclosure_state"
+/>
     </pre>
   </div>
 </template>
@@ -95,61 +402,190 @@
 import { commands_mixin } from '../../mixins/commands_mixin'
 import { user_mixin } from '../../mixins/user_mixin'
 import CommandButton from '@/components/FormElements/CommandButton'
-import StatusColumn from '@/components/status/StatusColumn'
 import SimpleDeviceStatus from '@/components/status/SimpleDeviceStatus'
+import StatusVal from '@/components/status/StatusVal'
+import OWMReport from '@/components/status/OWMReport'
 import { mapGetters } from 'vuex'
 export default {
-  name: "Enclosure", 
+  name: 'Enclosure',
   mixins: [commands_mixin, user_mixin],
   components: {
-    CommandButton, 
-    StatusColumn,
+    CommandButton,
+    StatusVal,
     SimpleDeviceStatus,
+    OWMReport
   },
-  data() {
+  data () {
     return {
       isExpandedStatusVisible: false,
-			selected_enclosure_mode: "setAuto",
+      selectedEnclosureMode: 'Automatic',
+      selectedObservingMode: 'active',
+
+      rainConfigSetting: 'on',
+      rainWarningLevel: 80,
+      rainDangerLevel: 90,
+      cloudsConfigSetting: 'on',
+      cloudsWarningLevel: 80,
+      cloudsDangerLevel: 90,
+      humidityConfigSetting: 'on',
+      humidityWarningLevel: 80,
+      humidityDangerLevel: 90,
+      windspeedConfigSetting: 'on',
+      windspeedWarningLevel: 80,
+      windspeedDangerLevel: 90,
+      lightningConfigSetting: 'on',
+      lightningWarningLevel: 80,
+      lightningDangerLevel: 90,
+      tempDewConfigSetting: 'on',
+      tempDewWarningLevel: 80,
+      tempDewDangerLevel: 90,
+      skyTempLimitConfigSetting: 'on',
+      skyTempLimitWarningLevel: 80,
+      skyTempLimitDangerLevel: 90,
+      lowestAmbientTemp: '',
+      highestAmbientTemp: '',
     }
   },
-
-	methods: {
-
-		set_enclosure_mode() {
-			const command_body = this.base_command(
-				'enclosure',  // inst type
-				this.selected_enclosure_mode,  // action setAuto setManual setStayClosed
-				'',	 // name (only used for rendering button names) 
-				{}, // reqired params
-				{ username: this.username } // optional params
-			)
-			this.send_site_command(command_body.form)
-
-		}
-
-	},
+  methods: {
+    enclosure_force_roof_state (val) {
+      return this.wema_base_command('enclosure', 'force_roof_state', '',
+        {
+          force_roof_state: val
+        }
+      )
+    },
+  },
 
   computed: {
-    sitecode() {
-      return this.$route.params.sitecode
-    },
     ...mapGetters('site_config', [
       'enclosure_is_dome',
+      'wema_name'
     ]),
     ...mapGetters('sitestatus', [
       'site_is_online',
+      'enclosure_state',
       'enclosure_message',
       'buildEnclosureTabStatus',
       'enclosure_mode',
-    ])
-  },
-  
+      'enclosure_open_status',
+      'open_ok',
+
+      'wemaSettingsGenericGetter',
+      'localWeatherActive',
+      'owmActive',
+      'observingMode',
+      'manualRoofStateMode'
+    ]),
+
+    wemaSettings () {
+      return this.$store.state.sitestatus.wema_settings
+    },
+    obsSettings () {
+      return this.$store.state.sitestatus.obs_settings
+    },
+
+    setEnclosureMode () {
+      return this.wema_base_command(
+        'enclosure', // inst type
+        'set_enclosure_mode', // action setAuto setManual setStayClosed
+        '', // name (only used for rendering button names)
+        { enclosure_mode: this.selectedEnclosureMode }
+      )
+    },
+    setObservingMode () {
+      const command_body = this.wema_base_command(
+        'enclosure', // inst type
+        'set_observing_mode', // action setObserving
+        '', // name (only used for rendering button names)
+        { observing_mode: this.selectedObservingMode } // reqired params
+      )
+      return command_body
+    },
+    enclosure_configure_weather_owm_on () {
+      return this.wema_base_command('enclosure', 'configure_active_weather_report', '',
+        {
+          weather_type: 'owm',
+          weather_type_value: 'on'
+        }
+      )
+    },
+    enclosure_configure_weather_owm_off () {
+      return this.wema_base_command('enclosure', 'configure_active_weather_report', '',
+        {
+          weather_type: 'owm',
+          weather_type_value: 'off'
+        }
+      )
+    },
+    enclosure_configure_weather_local_on () {
+      return this.wema_base_command('enclosure', 'configure_active_weather_report', '',
+        {
+          weather_type: 'local',
+          weather_type_value: 'on'
+        }
+      )
+    },
+    enclosure_configure_weather_local_off () {
+      return this.wema_base_command('enclosure', 'configure_active_weather_report', '',
+        {
+          weather_type: 'local',
+          weather_type_value: 'off'
+        }
+      )
+    },
+    enclosure_configure_keep_roof_open () {
+      return this.wema_base_command('enclosure', 'keep_roof_open_all_night', '')
+    },
+    enclosure_configure_keep_roof_closed () {
+      return this.wema_base_command('enclosure', 'keep_roof_closed_all_night', '')
+    },
+    enclosure_follow_owm_open_plan () {
+      return this.wema_base_command('enclosure', 'open_no_earlier_than_owm_plan', 'Open no earlier than OWM plan')
+    },
+    enclosure_home_dome_command () {
+      return this.wema_base_command('enclosure', 'home_dome', 'Home Dome')
+    },
+
+    configureWeatherValues () {
+      const weatherVals = {
+        rain: { status: this.rainConfigSetting, warning_level: this.rainWarningLevel, danger_level: this.rainDangerLevel },
+        humidity: { status: this.humidityConfigSetting, warning_level: this.humidityWarningLevel, danger_level: this.humidityDangerLevel },
+        clouds: { status: this.cloudsConfigSetting, warning_level: this.cloudsWarningLevel, danger_level: this.cloudsDangerLevel },
+        windspeed: { status: this.windspeedConfigSetting, warning_level: this.windspeedWarningLevel, danger_level: this.windspeedDangerLevel },
+        lightning: { status: this.lightningConfigSetting, warning_level: this.lightningWarningLevel, danger_level: this.lightningDangerLevel },
+        tempDew: { status: this.tempDewConfigSetting, warning_level: this.tempDewWarningLevel, danger_level: this.tempDewDangerLevel },
+        skyTempLimit: { status: this.skyTempLimitConfigSetting, warning_level: this.skyTempLimitWarningLevel, danger_level: this.skyTempLimitDangerLevel }
+      }
+      const base_command = this.base_command('enclosure', 'set_weather_values', '', {
+        weather_values: weatherVals
+      })
+      base_command.site = this.wema_name
+      return base_command
+    }
+  }
+
 }
 </script>
 
 <style scoped lang="scss">
 @import "./instrument_controls_common.scss";
 
+.button-state-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  margin-bottom: 15px;
+}
+.button-state-divider {
+  border-top: 1px dotted grey;
+  height: 2px;
+  margin-top: 42px;
+  flex-grow: 1;
+}
+.status-label {
+  color: grey;
+  font-weight: lighter;
+}
 .is-admin {
     background-color: rgba(68, 0, 255, 0.164);
     border-color: rgba(76, 0, 255, 0.541);

@@ -1,45 +1,49 @@
 
 <template>
   <div class="command-tab-accordion-wrapper">
-    <Tabs  
-      type="is-toggle" 
-      size="is-small" 
+    <Tabs
+      type="is-toggle"
+      size="is-small"
       :animated="false"
-      v-model="active_tab"
-      :initial_tab_index="5"
-      multiline>
-      <template v-for="(instrument, index) of instruments">
-        <TabItem
-          class="tab-item"
-          :key="index"
-          :value="index.toString()"
-          :title="instrument">
-          <!--div class="accordion-header">
-            <div class="instrument-type-label" >
-              {{instrument}}
-            </div>
-            <div style="flex-grow: 1;"/>
-            <div class="instrument-instance-label">{{selected_instrument(instrument)}}</div>
-          </div-->
-          <component class="accordion-content" v-bind:is="instrument"/>
-          <!--div class="accordion-content p-3 mt-4 is-size-7 has-text-centered is-italic has-text-weight-light is-family-code">
-            TODO: better status display here
-          </div-->
-        </TabItem>
-      </template>
+      :tab_index="active_controls_tab"
+      multiline
+      @selected-index="active_controls_tab=$event"
+    >
+      <!-- <template v-for="(instrument, index) of instruments"> -->
+      <TabItem
+        v-for="(instrument, index) of instruments"
+        :key="index"
+        class="tab-item"
+        :value="index.toString()"
+        :title="instrument"
+        :is-active="index == active_controls_tab"
+      >
+        <component
+          :is="instrument"
+          class="accordion-content"
+        />
+        <!--div class="accordion-content p-3 mt-4 is-size-7 has-text-centered is-italic has-text-weight-light is-family-code">
+          TODO: better status display here
+        </div-->
+      </TabItem>
+      <!-- </template> -->
     </Tabs>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import { Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
-  Camera, Sequencer, Settings, } from '@/components/InstrumentControls'
+import { commands_mixin } from '@/mixins/commands_mixin'
+import { mapState, mapGetters } from 'vuex'
+import {
+  Enclosure, Screen, Telescope, Rotator, Focuser, InstrumentSelector,
+  Camera, Sequencer, Settings
+} from '@/components/InstrumentControls'
 import Tabs from '@/components/Tabs'
 import TabItem from '@/components/TabItem'
 
 export default {
-  name: "CommandTabAccordion",
+  name: 'CommandTabsWide',
+  mixins: [commands_mixin],
   components: {
     Enclosure,
     Screen,
@@ -51,55 +55,72 @@ export default {
     Sequencer,
     Settings,
     Tabs,
-    TabItem,
+    TabItem
   },
-  data() {
-    return {
-      active_tab: 5,
-    }
-  },
+
   methods: {
-    selected_instrument(instrument) {
-      let inst = instrument.toLowerCase()
+    selected_instrument (instrument) {
+      const inst = instrument.toLowerCase()
       if (['enclosure', 'screen', 'telescope', 'mount', 'rotator', 'focuser', 'camera', 'sequencer'].includes(inst)) {
-        return this.$store.getters['site_config/'+inst]
-      }
-      else {
+        return this.$store.getters['site_config/' + inst]
+      } else {
         return ''
       }
     },
+    setAdminOnlytabs (inst) {
+      const adminOnly = ['enclosure']
+      if (adminOnly.includes(inst) && !this.$store.state.user_data.userIsAdmin) {
+        return false
+      }
+      return true
+    }
+
   },
 
   computed: {
+
+    // controls tab set to camera by default in user_interface
+    active_controls_tab: {
+      get () { return this.$store.state.user_interface.selected_controls_tab },
+      set (value) { this.$store.commit('user_interface/selected_controls_tab', value) }
+    },
+
     ...mapState('site_config', [
-      'selector_exists',
+      'selector_exists'
     ]),
 
-    instruments() {
-      let inst = []
-      inst.push(...[
-        'Enclosure',
-        'Screen', 
-        'Telescope',
-        'Rotator',
-        'Focuser',
-        'Camera', 
-      ])
-      if (this.selector_exists) {
-        inst.push('InstrumentSelector')
+    ...mapGetters('site_config', [
+      'site_is_wema'
+    ]),
+
+    instruments () {
+      if (this.site_is_wema) {
+        return ['Enclosure', 'Screen', 'Sequencer']
+      } else {
+        const inst = []
+        // Enclosure should only be visible to admins
+        if (this.$store.state.user_data.userIsAdmin) {
+          inst.push('Enclosure')
+        }
+        inst.push(...[
+          'Screen',
+          'Telescope',
+          'Rotator',
+          'Focuser',
+          'Camera'
+        ])
+        if (this.selector_exists) {
+          inst.push('InstrumentSelector')
+        }
+        inst.push('Sequencer')
+        inst.push('Settings')
+        return inst
       }
-      inst.push(...[
-        'Sequencer',
-        'Settings',
-      ])
-      return inst
     }
   }
-  
+
 }
 </script>
-
-
 
 <style lang="scss" scoped>
 @import "@/style/buefy-styles.scss";
@@ -136,7 +157,6 @@ $accordion-header-background: $grey-darker;
     color: $grey-lighter;
   }
 }
-
 .accordion-header {
   background-color:darken($accordion-header-background, 2);
   //border: 1px solid $grey-light;

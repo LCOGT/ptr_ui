@@ -1,64 +1,80 @@
 <template>
   <div class="calendar-container">
-
-    <!-- for development -->
-    <!--button class="level-item button is-danger" @click="refreshCalendarView">refresh</button-->
-    <!--button class="level-item button is-danger" @click="refreshIfUserIsScheduled">refresh current user is scheduled</button-->
-    <!--button class="level-item button is-danger" @click="ping">ping</button-->
-    <!--button class="level-item button is-danger" @click="updateNowIndicator">refresh</button-->
-    <!--div>{{currentUserScheduled}}</div-->
-    <!--button @click="resize">resize</button-->
-
-
     <FullCalendar
-      class="demo-app-calendar"
       ref="fullCalendar"
+      class="fullCalendar-observatory-calendar"
       height="parent"
       :views="fc_views"
-      :defaultView="fc_defaultView"
+      :default-view="fc_defaultView"
+      :custom-buttons="fc_customButtons"
+      :date-increment="fc_dateIncrement"
       :header="fc_header"
-      :slotDuration="fc_slotDuration"
-      :slotLabelInterval="fc_slotLabelInterval"
-      :slotLabelFormat="fc_slotLabelFormat"
-      :eventTimeFormat="fc_eventTimeFormat"
+      :slot-duration="fc_slotDuration"
+      :slot-label-interval="fc_slotLabelInterval"
+      :slot-label-format="fc_slotLabelFormat"
+      :event-time-format="fc_eventTimeFormat"
       :locale="fc_locale"
-      :timeZone="fc_timeZone"
+      :time-zone="fc_timeZone"
       :min-time="fc_minTime"
       :max-time="fc_maxTime"
-      :scrollTime="fc_scrollTime"
-      :navLinks="fc_navLinks"
+      :scroll-time="fc_scrollTime"
+      :nav-links="fc_navLinks"
       :selectable="fc_selectable"
-      :selectMirror="fc_selectMirror"
-      :unselectAuto="fc_unselectAuto"
-      :editable="fc_editable"
+      :select-mirror="fc_selectMirror"
+      :unselect-auto="fc_unselectAuto"
       :weekends="fc_weekends"
-      :nowIndicator="fc_nowIndicator"
+      :now-indicator="fc_nowIndicator"
       :now="fc_now"
-      :progressiveEventRendering="fc_progressiveEventRendering"
-      :themeSystem="fc_themeSystem"
-      :schedulerLicenseKey="fc_schedulerLicenseKey"
-      :eventSources="fc_eventSources"
-      :eventRender="fc_eventRender"
-      :dayRender="dayRender"
-      :firstDay="fc_firstDay"
+      :progressive-event-rendering="fc_progressiveEventRendering"
+      :theme-system="fc_themeSystem"
+      :scheduler-license-key="fc_schedulerLicenseKey"
+      :event-sources="fc_eventSources"
+      :event-render="fc_eventRender"
+      :day-render="dayRender"
       :resources="fc_resources"
       :plugins="fc_plugins"
+      :editable="fc_editable"
+      :all-day-maintain-duration="fc_allDayMaintainDuration"
+      :event-resizable-from-start="fc_eventResizableFromStart"
+      :event-resource-editable="fc_eventResourceEditable"
+      :droppable="fc_droppable"
+      :event-allow="fc_eventAllow"
+      :snap-duration="fc_snapDuration"
+      :drag-scroll="fc_dragScroll"
+      :event-overlap="fc_eventOverlap"
+      @eventDrop="fc_eventDrop"
+      @eventResize="fc_eventResize"
       @loading="fc_isLoading"
       @select="newEventSelected"
       @eventClick="existingEventSelected"
       @eventMouseEnter="eventMouseEnter"
       @eventMouseLeave="eventMouseLeave"
+      @eventDragStart="eventDragStart"
+      @eventDragStop="eventDragStop"
     />
 
-    <div class="level" style="margin: 0;">
+    <div
+      class="level"
+      style="margin: 0;"
+    >
       <div class="level-left">
         <div class="level-item">
-          <button class="button" style="opacity: 0;">padding only</button>
+          <button
+            class="button"
+            style="opacity: 0;"
+          >
+            padding only
+          </button>
         </div>
       </div>
       <div class="level-right">
         <div class="level-item">
-          <button v-if="isLoading" class="level-item button is-text is-loading">loading</button>
+          <button
+            v-if="isLoading"
+            class="level-item button is-text is-loading"
+          >
+            loading
+          </button>
         </div>
       </div>
     </div>
@@ -73,9 +89,9 @@
       <div class="card">
         <div class="card-content">
           <calendar-event-editor
-            :eventDetails="activeEvent"
-            :isNewEvent="isNewEvent"
-            :eventIsLoading="isLoading"
+            :event-details="activeEvent"
+            :is-new-event="isNewEvent"
+            :event-is-loading="isLoading"
             @submit="submitButtonClicked"
             @cancel="cancelButtonClicked"
             @delete="deleteButtonClicked"
@@ -89,204 +105,243 @@
     <div id="moon-info">
       <p>Moon is above the horizon</p>
       <p>---</p>
-      <p>Illumination: &emsp;{{(moon_hover_data.illumination * 100).toFixed(1)}} %</p>
-      <p>Rise: &emsp;&emsp;&emsp;&emsp;&ensp;{{moon_hover_data.rise}}</p>
-      <p>Transit: &emsp;&emsp;&emsp;&ensp;{{moon_hover_data.transit}}</p>
-      <p>Set: &emsp;&emsp;&emsp;&emsp;&emsp;{{moon_hover_data.set}}</p>
+      <p>Illumination: &emsp;{{ (moon_hover_data.illumination * 100)?.toFixed(1) }} %</p>
+      <p>Rise: &emsp;&emsp;&emsp;&emsp;&ensp;{{ moon_hover_data.rise }}</p>
+      <p>Transit: &emsp;&emsp;&emsp;&ensp;{{ moon_hover_data.transit }}</p>
+      <p>Set: &emsp;&emsp;&emsp;&emsp;&emsp;{{ moon_hover_data.set }}</p>
     </div>
-
   </div>
 </template>
 
 <script>
-//{ import scripts (collapsible)
-import axios from "axios";
-import moment from "moment";
-import titleGenerator from "@/utils/titleGenerator";
-import SunCalc from "suncalc";
-import { mapState, mapGetters } from "vuex";
+// { import scripts (collapsible)
+import axios from 'axios'
+import moment from 'moment'
+import { mapState, mapGetters } from 'vuex'
 
-import CalendarEventEditor from "@/components/calendar/CalendarEventEditor";
+import CalendarEventEditor from '@/components/calendar/CalendarEventEditor'
 
-import FullCalendar from "@fullcalendar/vue";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
-import bootstrapPlugin from "@fullcalendar/bootstrap";
-import momentTimezonePlugin from "@fullcalendar/moment-timezone";
-import { toMoment } from "@fullcalendar/moment"; // only for formatting
+import FullCalendar from '@fullcalendar/vue'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import timeGridPlugin from '@fullcalendar/timegrid'
+import interactionPlugin from '@fullcalendar/interaction'
+import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
+import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid'
+import bootstrapPlugin from '@fullcalendar/bootstrap'
+import momentTimezonePlugin from '@fullcalendar/moment-timezone'
+
+import { makeUniqueID, copyFcEvent, convertFullCalendarEventToPtrFormat, convertEventEditorResponseToPtrFormat, getMoonPhaseDays, rgba_from_illumination, oneDayTwilight } from '@/utils/calendar_utils.js'
 
 // must manually include stylesheets for each plugin
-import "@fullcalendar/core/main.css";
-import "@fullcalendar/daygrid/main.css";
-import "@fullcalendar/timegrid/main.css";
-import "@fullcalendar/resource-timeline/main.css";
+import '@fullcalendar/core/main.css'
+import '@fullcalendar/daygrid/main.css'
+import '@fullcalendar/timegrid/main.css'
+import '@fullcalendar/resource-timeline/main.css'
 
-/* TODO:
-    - merge the idea of 'resources' with the existing site-based event filtering
-    */
-//}
+// This function is used to convert the calendar's left time column into the UTC
+// values on the right column
+function transformLocalTimeToUTC (timezoneName, localTime) {
+  // localTime is a string formatted as hh:mm in 24hr time
+  const offsetInt = moment.tz(timezoneName).utcOffset() / 60
+  const time = localTime.split(':')
+  const hours = time[0]
+  const minutes = time[1]
+  const utcHours = (hours - (offsetInt - 24)) % 24
+  return `${utcHours}:${minutes}`
+}
 
 export default {
-  name: "TheCalendar",
+  name: 'TheCalendar',
   components: {
     FullCalendar, // make the <FullCalendar> tag available
-    CalendarEventEditor,
+    CalendarEventEditor
   },
-  props: [
+  props: {
     // The active site (resource) disaplyed in the calendar
-    "calendarSite",
+    calendarSite: {
+      required: true
+    },
 
     // Resources for fullcalendar (in our case they are observatories)
-    "fc_resources",
+    fc_resources: {
+      required: true
+    },
 
     // Timezone of the site
-    "fc_timeZone",
+    fc_timeZone: {
+      required: true
+    },
 
-    "showMoonEvents",
-    
-  ],
+    showMoonEvents: {
+      required: true
+    },
 
-  mounted() {
+    showWeatherForecast: {
+      required: true
+    }
 
-    // Once we've mounted, we're able to access the fullCalendar $ref. 
-    // We need this to access the fullCalendar.getApi() method. 
-    this.isMounted = true;
+  },
 
+  mounted () {
     this.fullCalendarApi = this.$refs.fullCalendar.getApi()
 
-    this.refreshCalendarView();
-    this.nowIndicatorTimeInteval = setInterval(this.updateNowIndicator, 300000);
+    // Simple way to define the default starting position with the current date in the third column
+    this.incrementDateBack()
+    this.incrementDateBack()
+
+    // Once we've mounted, we're able to access the fullCalendar $ref.
+    // We need this to access the fullCalendar.getApi() method.
+    this.isMounted = true
+
+    this.refreshCalendarView()
+    this.nowIndicatorTimeInteval = setInterval(this.updateNowIndicator, 300000)
+
+    this.$store.dispatch('user_data/fetchAllProjects')
   },
-  destroyed() {
-    clearInterval(this.nowIndicatorTimeInterval);
+  destroyed () {
+    clearInterval(this.nowIndicatorTimeInterval)
   },
 
   watch: {
-    calendarSite: function (val) {
-      this.refreshCalendarView();
+    calendarSite () {
+      this.refreshCalendarView()
     },
-    global_config() {
-      this.refreshCalendarView();
+    global_config () {
+      this.refreshCalendarView()
     },
-    user() {
-      this.refreshCalendarView();
+    user () {
+      this.refreshCalendarView()
     },
-    showMoonEvents() {
-      this.refreshCalendarView();
+    showMoonEvents () {
+      this.refreshCalendarView()
+    },
+    showWeatherForecast () {
+      this.refreshCalendarView()
+    },
+    forecast () {
+      this.refreshCalendarView()
     }
   },
 
   computed: {
-    //fullCalendarApi() {
-      //return this.$refs.fullCalendar.getApi();
-    //},
 
-    fc_now() {
-      if (this.fc_timeZone) {
-        // make sure timezone has loaded from the config
-        return moment().tz(this.fc_timeZone).format();
+    fc_now () {
+      // make sure timezone has loaded from the config
+      if (!this.fc_timeZone) {
+        console.error('timezone in fullcalendar is\'nt loaded yet')
+        return 'timezone not loaded'
       }
+      return moment().tz(this.fc_timeZone).format()
     },
 
     // Return the list of sources that feed fullCalendar with events
-    fc_eventSources() {
-      let sources = [
+    fc_eventSources () {
+      // Note: all event source functions must be async!
+      const sources = [
         // Astronomical twilight events (computed locally)
         { events: this.getTwilightEvents },
         // Events from dynamodb backend
         { events: this.fetchSiteEvents },
-        // Now Indicator
-        { events: this.getNowIndicator },
         // Moon Indicator
         { events: this.getMoonRiseSet },
-      ];
+        // Weather Forecast
+        { events: this.getWeatherForecast },
+        // Observing Start/End times
+        { events: this.getObservingStartEndIndicators },
+        // Now Indicator
+        { events: this.getNowIndicator }
+      ]
       return sources
     },
 
-    fc_selectable() {
+    fc_selectable () {
       // whether to let user click and drag to select a time range.
-      return this.$auth.isAuthenticated;
-    },
-
-    // Define the starting calendar day. 0=sunday, 1=monday, ...
-    fc_firstDay() {
-      // The fullCalendar ref doesn't work until the component is mounted.
-      if (!this.isMounted)
-        return;
-
-      // Get the fullCalendar api
-      let api = this.$refs.fullCalendar.getApi();
-
-      // If the week view is displayed, 'today' to be the second column.
-      if (api.view.type == 'timeGridWeek') {
-        let today_day_number = moment().tz(this.fc_timeZone).day()
-        let starting_day_number = (today_day_number - 1) % 6
-        return starting_day_number
-      }
-      else {
-        // Otherwise, Sunday is the first day. 
-        return 0
-      }
+      return this.$auth.isAuthenticated
     },
 
     ...mapState('site_config', [
-      'global_config',
+      'global_config'
     ]),
-    ...mapGetters("site_config", [
-      "site_latitude",
-      "site_longitude",
-      "timezone",
+    ...mapGetters('site_config', [
+      'site_latitude',
+      'site_longitude',
+      'timezone',
+      'site_events',
+      'site_events_observing_start_time',
+      'site_events_observing_end_time'
+    ]),
+    ...mapState('user_data', [
+      'all_projects',
+      'userId',
+      'userIsAuthenticated'
+    ]),
+    ...mapGetters('sitestatus', [
+      'forecast'
     ]),
 
-    user() {
-      return this.$auth.user;
-    },
+    user () {
+      return this.$auth.user
+    }
   },
 
   data: function () {
     return {
-      /*===================================================/
+      /* ===================================================/
       Configs for fullCalendar (anything with fc_ namespace)
-      /===================================================*/
+      /=================================================== */
       fc_views: {
         // definitions for additional calendar views (eg. 10 day grid)
         resourceTimelineDay: {
-          buttonText: ":15 slots",
-          slotDuration: "00:15",
+          buttonText: ':15 slots',
+          slotDuration: '00:15'
         },
         resourceTimelineTenDay: {
-          type: "resourceTimeline",
+          type: 'resourceTimeline',
           duration: { days: 10 },
-          buttonText: "10 days",
-        },
+          buttonText: '10 days'
+        }
       },
-      fc_defaultView: "timeGridWeek",
+      fc_customButtons: {
+        customPrev: {
+          text: '<',
+          click: this.incrementDateBack
+        },
+        customNext: {
+          text: '>',
+          click: this.incrementDateForward
+        }
+      },
+      fc_defaultView: 'timeGridWeek',
+      fc_dateIncrement: { days: 1 }, // how far the arrow buttons move forward and backwards in time
       fc_header: {
         // define the top row of buttons
-        left: "prev,next today",
-        center: "title",
-        right: "dayGridMonth,timeGridWeek,listWeek",
+        left: 'customPrev,customNext today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek'
       },
-      fc_slotDuration: "00:15:00", // horizontal guides; affects event drag precision
-      fc_slotLabelInterval: "01:00:00",
-      fc_eventTimeFormat: { hour: "numeric", minute: "2-digit", hour12: false }, // 24hr times on events
-      fc_slotLabelFormat: { hour: "numeric", minute: "2-digit", hour12: false }, // 24hr time on axis labels
-      fc_locale: 'en-GB',  // so we can use 0:00 instead of 24:00
-      fc_minTime: "12:00:00", // start the day column at noon
-      fc_maxTime: "36:00:00", // end the day column at noon for the following day
-      fc_scrollTime: "16:00:00", // calendar default view starts at 4pm.
+      fc_slotDuration: '00:15:00', // horizontal guides; affects event drag precision
+      fc_slotLabelInterval: '01:00:00',
+      fc_eventTimeFormat: { hour: 'numeric', minute: '2-digit', hour12: false }, // 24hr times on events
+      fc_slotLabelFormat: { hour: 'numeric', minute: '2-digit', hour12: false }, // 24hr time on axis labels
+      fc_locale: 'en-GB', // so we can use 0:00 instead of 24:00
+      fc_minTime: '12:00:00', // start the day column at noon
+      fc_maxTime: '36:00:00', // end the day column at noon for the following day
+      fc_scrollTime: '16:00:00', // calendar default view starts at 4pm.
       fc_navLinks: false, // whether to enable clicking on a day to view that day only.
       fc_selectMirror: true, // whether to draw placeholder event while user is dragging
       fc_unselectAuto: false, // whether clicking elsewhere closes the current selection
-      fc_editable: true, // whether events on calendar can be modified
       fc_weekends: true, // whether to show weekends in week view
       fc_nowIndicator: false, // whether to draw line indicating current time in grid views.
       fc_progressiveEventRendering: true,
-      fc_themeSystem: "bootstrap", // uses bootstrap css (see <style> below)
-      fc_schedulerLicenseKey: "GPL-My-Project-Is-Open-Source", // free use of scheduler/resources
+      fc_editable: true, // whether events on calendar can be modified
+      fc_allDayMaintainDuration: true, // keep the end-time if events are moved to all-day (even though this is disabled)
+      fc_eventResizableFromStart: true,
+      fc_eventResourceEditable: true,
+      fc_droppable: true, // specifies that external resources can be dropped on calendar
+      fc_snapDuration: 300000, // milliseconds defining the increments of change for dragged events. (5 minutes)
+      fc_dragScroll: true, // auto-scroll up/down when user drags an event near edge of view
+      fc_themeSystem: 'bootstrap', // uses bootstrap css (see <style> below)
+      fc_schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source', // free use of scheduler/resources
       // fullcalendar plugins
       fc_plugins: [
         // plugins must be defined in the JS
@@ -296,14 +351,15 @@ export default {
         bootstrapPlugin,
         resourceTimelinePlugin,
         resourceTimeGridPlugin,
-        momentTimezonePlugin,
+        momentTimezonePlugin
       ],
 
+      // This is set in the mounted hook, and allows access to the main fullcalendar calendar object
       fullCalendarApi: '',
 
-      // Change to true when the 'mounted' hook is run. 
-      // We need to know whether the component is mounted to access the 
-      // $refs.fullCalendar.getApi() method. 
+      // Change to true when the 'mounted' hook is run.
+      // We need to know whether the component is mounted to access the
+      // $refs.fullCalendar.getApi() method.
       isMounted: false,
 
       moon_cache: {},
@@ -312,12 +368,8 @@ export default {
         rise: '',
         set: '',
         transit: '',
-        illumination: '',
+        illumination: ''
       },
-
-      // URL for the calendar backend api
-      //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
-      backendUrl: "https://calendar.photonranch.org",
 
       // this informs what buttons appear in the modal event editor
       isNewEvent: false,
@@ -328,160 +380,334 @@ export default {
       // properties of the selected calendar event
       activeEvent: {},
 
+      // Controls a spinner in the lower right corner of the calendar that appears
+      // while fetching events
       isLoading: false,
 
       currentUserScheduled: false,
-    };
+
+      // To keep events displaying "naturally" during drag and drop, sometimes we need
+      // to create temporary events on the calendar that are placeholders before the
+      // actual event can be saved and rendered. This array marks all the temp events
+      // to be cleared when the main event renders.
+      tempPlaceholderEvent: '',
+      // When the event with this ID renders to the calendar, the tempPlaceholderEvent will be removed.
+      eventIdWithPlaceholder: '',
+
+      // Use this to remember when a user starts dragging an event with the shift key pressed.
+      // Even if they lift it before dropping, we want to make sure to duplicate the event rather
+      // than simply moving it.
+      eventDuplicateStarted: false,
+
+      // Flag to indicate whether the eventDrop function ran (which means that our event was
+      // drag-and-dropped in a successful location)
+      eventDropDidRun: false
+    }
   },
 
   methods: {
-    async updateNowIndicator() {
-      this.fullCalendarApi.unselect();
-      this.fullCalendarApi.refetchEvents();
-    },
 
-    getMoonPhaseDays(year, month, day) {
-
-      // https://gist.github.com/endel/dfe6bb2fbe679781948c
-      var Moon = {
-        phases: ["new", "waxing-crescent", "first-quarter", "waxing-gibbous", 
-          "full", "waning-gibbous", "last-quarter", "waning-crescent" ],
-        phase: function (year, month, day) {
-          let e
-          let jd
-          let b
-          let c = e = jd = b = 0;
-
-          if (month < 3) {
-            year--;
-            month += 12;
-          }
-
-          ++month;
-          c = 365.25 * year;
-          e = 30.6 * month;
-          jd = c + e + day - 694039.09; // jd is total days elapsed
-          jd /= 29.5305882; // divide by the moon cycle
-          b = parseInt(jd); // int(jd) -> b, take integer part of jd
-          jd -= b; // subtract integer part to leave fractional part of original jd
-          b = Math.round(jd * 8); // scale fraction from 0-8 and round
-
-          if (b >= 8) b = 0; // 0 and 8 are the same so turn 8 into 0
-          return {phase: b, name: Moon.phases[b]};
-        }
-      };
-
-      try { // ignore errors caused by the timezone not being loaded yet.
-        let moment_today = moment([year, month, day]).utc()
-        let moment_yesterday = moment([year, month, day]).utc().add(-1, 'days')
-
-        let phase_today = Moon.phase(
-          moment_today.year(), 
-          moment_today.month(), 
-          moment_today.date())
-        let phase_yesterday = Moon.phase(
-          moment_yesterday.year(), 
-          moment_yesterday.month(), 
-          moment_yesterday.date())
-
-        // If the phase is changed from the previous day, then return it to
-        // display on the calendar.
-        if (phase_today.phase != phase_yesterday.phase) {
-          return phase_today
-        }
-        else {
-          return false
-        }
-      } catch {
-        return false;
+    // This is connected to the < button in the calendar header left
+    incrementDateBack () {
+      // Move one day in week view
+      if (this.fullCalendarApi.state.viewType == 'timeGridWeek') {
+        this.fullCalendarApi.incrementDate({ days: -1 })
+      }
+      // Move one month in the month view
+      else if (this.fullCalendarApi.state.viewType == 'dayGridMonth') {
+        this.fullCalendarApi.incrementDate({ months: -1 })
+      }
+      else {
+        console.warn('Unknown calendar viewType, failed to increment date backwards')
       }
     },
 
+    // This is connected to the > button in the calendar header left
+    incrementDateForward () {
+      // Move one day in week view
+      if (this.fullCalendarApi.state.viewType == 'timeGridWeek') {
+        // Do this +7 - 6 weirdness because the calendar only likes to move forward in 7 day chunks
+        // while in week view, and the sensible { days: 1 } doesn't do anything unless you press it 7 times.
+        // See this general issue https://github.com/fullcalendar/fullcalendar/issues/4678
+        this.fullCalendarApi.incrementDate({ days: 7 })
+        this.fullCalendarApi.incrementDate({ days: -6 })
+      }
+      // Move one month in the month view
+      else if (this.fullCalendarApi.state.viewType == 'dayGridMonth') {
+        this.fullCalendarApi.incrementDate({ months: 1 })
+      }
+      else {
+        console.warn('Unknown calendar viewType, failed to increment date forwards')
+      }
+    },
+
+    // This method inserts a duplicate event of the event passed in as an argument.
+    // It is used to preserve the original event when we want to make a copy by dragging.
+    // Without this, it would look like the user is modifying the original event, since it
+    // would leave a vacancy behind.
+    createPlaceholderEvent (e) {
+      const placeholder = copyFcEvent(e)
+      const tempDragEvent = this.fullCalendarApi.addEvent(placeholder)
+
+      // Save this placeholder to be deleted later (see the eventRender method)
+      this.tempPlaceholderEvent = tempDragEvent
+    },
+
+    // Method used to modify events in our backend database
+    // Arguments must be events that have been formatted to work with the ptr calendar server
+    async modifyEvent (originalEvent, modifiedEvent) {
+      // Maybe we don't need to update anything?
+      if (JSON.stringify(originalEvent) == JSON.stringify(modifiedEvent)) {
+        this.refreshCalendarView()
+        return
+      }
+
+      // Make request headers and include token.
+      // Requires user to be logged in.
+      const config = await this.getConfigWithAuth()
+      const url = `${this.$store.state.api_endpoints.calendar_api}/modifyevent`
+      const body = { originalEvent, modifiedEvent }
+      axios
+        .post(url, body, config)
+        .then((res) => {
+          this.isLoading = true
+          this.refreshCalendarView()
+        })
+        .catch((error) => {
+          this.eventEditorIsActive = false
+          this.handleNotAuthorizedResponse(error)
+        })
+    },
+
+    // Input must be formatted correctly to work with the ptr calendar server
+    async createNewEvent (event) {
+      // Make request headers and include token.
+      // Requires user to be logged in.
+      const config = await this.getConfigWithAuth()
+      const url = `${this.$store.state.api_endpoints.calendar_api}/newevent`
+      axios
+        .post(url, event, config)
+        .then((res) => {
+          this.isLoading = true
+          this.refreshCalendarView()
+        })
+        .catch((error) => {
+          this.eventEditorIsActive = false
+          this.handleNotAuthorizedResponse(error)
+        })
+    },
+
+    // Prevent drag and drop into all-day slots
+    fc_eventAllow (dropLocation) {
+      return !dropLocation.allDay
+    },
+
+    // This method is run whenever a calendar event is dragged
+    eventDragStart (e) {
+      // reset this in case there is a stale value lingering
+      this.eventDuplicateStarted = false
+      // Dragging an event with shift means we need to preserve the original, and make a copy
+      // wherever the event is dropped.
+      if (e.jsEvent.shiftKey) {
+        this.eventDuplicateStarted = true
+        // remove the original event so the placeholder we add in its place doesn't render as an overlap
+        e.event.remove()
+        // put a placeholder event in the place of the original event being dragged.
+        // This will be removed when the event is dropped.
+        this.createPlaceholderEvent(e.event)
+      } else {
+        // Without the shift key, a drag means the event time will be modified to wherever it is dropped.
+        // So, nothing to do here.
+      }
+    },
+
+    // This method is guaranteed to run even if fc_eventDrop does not. So we can use it to handle
+    // cleanup in cases where fc_eventDrop doesn't run due to trying to drag and drop into a
+    // disallowed spot
+    eventDragStop (e) {
+      // Wrapping the functionality in this timeout forces it to run after fc_eventDrop
+      setTimeout(() => {
+        if (!this.eventDropDidRun) {
+          // Replace the placeholder event with the real event which we refetch from the database
+          this.tempPlaceholderEvent.remove()
+          this.refreshCalendarView()
+        }
+        this.eventDropDidRun = false // reset the flag
+      }, 0)
+    },
+
+    // Save events to the databse when they have been dragged to a new time
+    fc_eventDrop (info) {
+      this.eventDropDidRun = true
+      // Get a format that we can use to send to the ptr calendar server
+      const originalEvent = convertFullCalendarEventToPtrFormat(info.oldEvent)
+      const modifiedEvent = convertFullCalendarEventToPtrFormat(info.event)
+
+      // Check if we are in the process of duplicating an event or simply moving it.
+      if (this.eventDuplicateStarted) {
+        this.eventDuplicateStarted = false
+
+        // Remove the placeholder where the event initially came from. This is because we
+        // are about to revert the dropped event back to its origin.
+        // The reasoning is that we want that original event to stay unchanged, and we'll create
+        // a new event where the original drag was dropped.
+        this.tempPlaceholderEvent.remove()
+
+        // Create a new placeholder where the drag was dropped. This will be cleared when
+        // the new event is saved in our database and then rendered.
+        const placeholderEventDetails = copyFcEvent(info.event)
+        const placeholderEvent = this.fullCalendarApi.addEvent(placeholderEventDetails)
+        this.tempPlaceholderEvent = placeholderEvent
+
+        // Put the original event back where it came from (don't update it to the drop location)
+        info.revert()
+
+        // Create the new event we want to save as a duplicate
+        const duplicatedEvent = Object.assign({}, modifiedEvent)
+        duplicatedEvent.event_id = makeUniqueID() // new event means it should have a new id
+        // When the event with this ID is finally rendered, it will remove the placeholder we've saved
+        this.eventIdWithPlaceholder = duplicatedEvent.event_id
+        this.createNewEvent(duplicatedEvent)
+
+      // If no key is pressed, simply modify the original event
+      } else {
+        this.modifyEvent(originalEvent, modifiedEvent)
+      }
+    },
+
+    // This runs whenever an event is rendered to the calendar
+    fc_eventRender (e) {
+      // If the eventIdWithPlaceholder matches the event rendering, it means that there was
+      // a placeholder event in its place, and we want to remove that event now.
+      if (this.eventIdWithPlaceholder !== '' && e.event.id == this.eventIdWithPlaceholder) {
+        this.tempPlaceholderEvent.remove() // remove the placeholder event
+        this.eventIdWithPlaceholder = '' // neutralize the trigger
+      }
+      // Make sure the red line "now indicator" is visible above other elements.
+      const n = document.getElementsByClassName('fc-now-indicator')[0]
+      if (n) {
+        n.parentElement.style['z-index'] = 'auto'
+      }
+    },
+
+    // Save events to the database when they have been resized by dragging
+    // This method runs after an event has been resized by dragging on the bottom edge
+    fc_eventResize (info) {
+      const originalEvent = convertFullCalendarEventToPtrFormat(info.prevEvent)
+      const modifiedEvent = convertFullCalendarEventToPtrFormat(info.event)
+      this.modifyEvent(originalEvent, modifiedEvent)
+    },
+
+    // Allow drag and drop events to overlap if the non-dragged one is a background event
+    // This method runs continuously while an event is being dragged to determine if that
+    // event can be dropped or not.
+    fc_eventOverlap (stillEvent, movingEvent) {
+      if (stillEvent.rendering === 'background') {
+        return true
+      } else {
+        return false
+      }
+    },
+
+    // Displays loading spinner when calendar is fetching events.
+    fc_isLoading (val) {
+      this.isLoading = val
+    },
+
+    // This method does some manual DOM manipulation to add the right-side UTC column to the calendar.
+    // It's pretty hacky and will likely break if we update fullCalendar beyond v4
+    addUTCTimeColumn () {
+      const rows = document.querySelectorAll('.fc-slats > table.table-bordered tbody > tr')
+      rows.forEach(r => {
+        if (r.querySelectorAll('.fc-axis.fc-time').length < 2) {
+          const timecol = r.querySelector('.fc-axis.fc-time')
+          const timecolUtc = timecol.cloneNode(true)
+          if (timecolUtc.querySelector('span')) {
+            const timeText = timecolUtc.querySelector('span').textContent
+            const utcTime = transformLocalTimeToUTC(this.fc_timeZone, timeText)
+            timecolUtc.querySelector('span').textContent = utcTime
+          }
+          r.appendChild(timecolUtc)
+        }
+      })
+      const skeleton = document.querySelectorAll('.fc-content-skeleton > table > tbody > tr')
+      skeleton.forEach(e => {
+        if (e.querySelectorAll('td.fc-axis').length < 2) {
+          e.appendChild(e.querySelector('td.fc-axis').cloneNode(true))
+        }
+      })
+      const tableBorderedRows = document.querySelectorAll('.fc-bg table.table-bordered tbody tr')
+      tableBorderedRows.forEach(e => {
+        if (e.querySelectorAll('.fc-axis').length < 2) {
+          if (e.querySelector('.fc-axis span')) {
+            e.querySelector('.fc-axis span').textContent = 'Obs. Local'
+          }
+          const utc_el = e.querySelector('.fc-axis').cloneNode(true)
+          if (utc_el.querySelector('span')) {
+            utc_el.querySelector('span').textContent = 'UTC'
+          }
+          e.appendChild(utc_el)
+        }
+      })
+      const tableBorderedRows2 = document.querySelectorAll('.fc-head-container table.table-bordered tr')
+      if (tableBorderedRows2.length > 0 && tableBorderedRows2[0].querySelectorAll('.fc-axis').length < 2) {
+        tableBorderedRows2.forEach(e => {
+          e.appendChild(e.querySelector('.fc-axis').cloneNode(true))
+        })
+      }
+    },
+
+    async updateNowIndicator () {
+      this.fullCalendarApi.unselect()
+      this.fullCalendarApi.refetchEvents()
+    },
 
     // Display moon phase icons in the calendar
-    dayRender(dayRenderInfo) {
-      if (dayRenderInfo.view.type == "dayGridMonth" || true) {
+    dayRender (dayRenderInfo) {
+      // Check if the current view is week view
+      if (this.fullCalendarApi?.view?.type === 'timeGridWeek') {
+        this.addUTCTimeColumn()
+      }
 
-        try { // ignore errors from the timezone not being loaded yet. 
-          let date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
-          let moon_phase = this.getMoonPhaseDays(
-            date.year(), 
-            date.month(), 
-            date.date())
+      try { // ignore errors from the timezone not being loaded yet.
+        const date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
+        const moon_phase = getMoonPhaseDays(
+          date.year(),
+          date.month(),
+          date.date())
 
-          if (moon_phase) {
-            dayRenderInfo.el.innerHTML = `<i class="moon-icon mdi \
+        if (moon_phase) {
+          dayRenderInfo.el.innerHTML = `<i class="moon-icon mdi \
               mdi-moon-${moon_phase.name}" aria-hidden="true"></i>`
-          }
-        } catch {
-          console.warn('dayRender waiting for valid timezone.')
         }
-
+      } catch {
+        console.warn('dayRender waiting for valid timezone.')
       }
     },
 
-    async getNowIndicator(info) {
-      let now = [
-        {
-          start: moment().utc().format(),
-          end: moment().utc().add("1", "minutes").format(),
-          rendering: "background",
-          backgroundColor: "#ff0000",
-          borderColor: "#ff0000",
-          id: `fc-custom-now-indicator`,
-          classNames: ["fc-now-indicator", "fc-now-indicator-line"],
-        },
-      ];
-      return now;
-    },
-
-    fc_eventRender() {
-      let n = document.getElementsByClassName("fc-now-indicator")[0];
-      if (n) {
-        n.parentElement.style["z-index"] = "auto";
-      }
-    },
-
-    // Displays loading spinner when calendar is fetching.
-    fc_isLoading(val) {
-      this.isLoading = val;
-    },
-
-    /**
-     * Helper function for displaying moon visibility in the calendar.
-     * Returns a grey color with brightness corresponding to moon brightness.
-     * @param {float} illum: moon illumination between 0 and 1.
-     * @returns {string}: css value, something like 'rgba(255,255,255,0.5)'
-     */
-    rgba_from_illumination(illum, peak) {
-      let alpha = 0.1 + (0.9 * illum) // should have minimum opacity of 0.1
-      return `rgba(${peak},${peak},${peak},${alpha})`
-    },
-
-
-    // Call the photonranch api to get moon times. 
-    async getMoonTimesFromAPI(start, end) {
-      let url = "https://api.photonranch.org/api/events/moon/rise-set-illum";
-      let payload = {
+    // Call the photonranch api to get moon times.
+    async getMoonTimesFromAPI (start, end) {
+      const url = `${this.$store.state.api_endpoints.active_api}/events/moon/rise-set-illum`
+      const payload = {
         params: {
-          start: start,
-          end: end,
+          start,
+          end,
           lat: this.site_latitude,
-          lng: this.site_longitude,
-        },
-      };
+          lng: this.site_longitude
+        }
+      }
 
       // Check cache
-      let payload_str = 
-        start.slice(0,10) + '#' + // only take the yyyy-mm-dd part of the date
-        end.slice(0,10)
-      if (this.moon_cache.hasOwnProperty(payload_str)) {
+      const payload_str =
+        start.slice(0, 10) + '#' + // only take the yyyy-mm-dd part of the date
+        end.slice(0, 10)
+      if (payload_str in this.moon_cache) {
         return this.moon_cache[payload_str]
       }
 
       // otherwise, make the api call
-      let response = await axios.get(url, payload);
-      let riseset = response.data;
+      const response = await axios.get(url, payload)
+      const riseset = response.data
 
       // update cache
       this.moon_cache[payload_str] = riseset
@@ -489,77 +715,286 @@ export default {
       return riseset
     },
 
-    // Return an array of fullcalendar background events to display the 
-    // moon visibility
-    async getMoonRiseSet(info) {
+    async getConfigWithAuth () {
+      let token
+      try {
+        token = await this.$auth.getTokenSilently()
+      } catch (err) {
+        console.error(err)
+        console.warn('Did not acquire the needed token. Stopping request.')
 
-      if (!this.showMoonEvents) {
-        return [];
+        // small popup notification
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: "Oops! You aren't authorized to do that.",
+          position: 'is-bottom',
+          type: 'is-danger'
+        })
       }
-      const ms_per_day = 86400000;
 
-      // Get the time range we need to display in the UI.
-      // Also convert from ms timestamp to iso utc seconds.
-      let start_timestamp = info.start.valueOf();
-      let end_timestamp = info.end.valueOf();
-
-      // Add buffer of a few days to the start and end window
-      start_timestamp -= ms_per_day * 12;
-      end_timestamp += ms_per_day * 12;
-
-      // Convert timestamps to utc iso format
-      let start_iso = moment(start_timestamp).format("YYYY-MM-DDTHH:mm:ss[Z]");
-      let end_iso = moment(end_timestamp).format("YYYY-MM-DDTHH:mm:ss[Z]");
-
-      // Make the api call to get moon rise/set times
-      let riseset = await this.getMoonTimesFromAPI(start_iso, end_iso)
-
-      let moonEvents = [];
-      riseset.map((moon) => {
-
-        // The primary moon event
-        moonEvents.push({
-          start: new Date(moon.rise),
-          end: new Date(moon.set),
-          rendering: "background",
-          backgroundColor: this.rgba_from_illumination(moon.illumination, 235),
-          borderColor: "#aaaaaa",
-          id: `fc-custom-moon-indicator`,
-          classNames: ["fc-moon-indicator",],
-          title: "Moon Event",
-          extendedProps: {
-            illumination: moon.illumination,
-            transit: moon.transit,
-          }
-        });
-
-        // The marker for transit time. 
-        moonEvents.push({
-          start: moment(moon.transit).format(),
-          end: moment(moon.transit).add("1", "minutes").format(),
-          title: "Moon Event",
-          rendering: "background",
-          // Opacity should vary with moon brightness, but not too much.
-          backgroundColor: `rgba(255,255,255,${moon.illumination ** 0.25})`,
-          classNames: ["fc-moon-transit-indicator"],
-        });
+      return {
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${token}`
+        }
       }
-      );
-
-      return moonEvents;
     },
 
-    async getTwilightEvents(info) {
+    handleNotAuthorizedResponse (error) {
+      if (error.response) {
+        // Request made and server responded
+        console.warn(error.response.data)
+        console.warn(error.response.status)
+        console.warn(error.response.headers)
+        // small popup notification describing error
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: `${error.response.status} error: ${error.response.data}`,
+          position: 'is-bottom',
+          type: 'is-danger'
+        })
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.warn(error.request)
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.warn('Error', error.message)
+      }
+    },
+
+    // Used when exiting event editor modals. Clear selections, close modal, and refresh events.
+    async refreshCalendarView () {
+      this.fullCalendarApi.unselect()
+      this.fullCalendarApi.refetchEvents()
+      this.eventEditorIsActive = false
+
+      // Update the list of active reservations
+      this.$store.dispatch('calendar/fetchActiveReservations', this.calendarSite)
+    },
+
+    /* ===================================================/
+    Calendar Event Selection Handlers
+    /=================================================== */
+    /**
+     *  This is run when a user clicks on the calendar to create a new event.
+     */
+    newEventSelected (event) {
+      this.activeEvent.startStr = moment(event.startStr).utc().format()
+      this.activeEvent.endStr = moment(event.endStr).utc().format()
+      this.activeEvent.title = this.$auth.user.name
+      this.activeEvent.reservation_type = 'realtime' // or "project"
+      this.activeEvent.creator = this.$auth.user.name
+      this.activeEvent.id = makeUniqueID()
+      this.activeEvent.site = this.calendarSite
+      this.activeEvent.resourceId = this.calendarSite
+      this.activeEvent.creator_id = this.$auth.user.sub
+      this.activeEvent.project_id = 'none'
+      this.activeEvent.reservation_note = ''
+
+      this.isNewEvent = true // setting for the modal event editor
+      this.eventEditorIsActive = true
+    },
+    /**
+     *  This is run when a user clicks on an existing event in the calendar.
+     */
+    async existingEventSelected (arg) {
+      const event = arg.event
+      this.activeEvent.id = event.id
+      this.activeEvent.startStr = moment(event.start).format()
+      this.activeEvent.endStr = moment(event.end).format()
+      this.activeEvent.title = event.title
+      this.activeEvent.reservation_type = event.extendedProps?.reservation_type ?? 'project' // legacy events may not include this key
+      this.activeEvent.creator = event.extendedProps.creator
+      this.activeEvent.site = event.extendedProps.site
+      this.activeEvent.resourceId = event.getResources()[0].id
+      this.activeEvent.project_id = event.extendedProps.project_id
+      this.activeEvent.reservation_note = event.extendedProps.reservation_note || ''
+
+      this.isNewEvent = false // setting for the modal event editor
+      this.eventEditorIsActive = true
+    },
+
+    /* ===================================================/
+    Calendar mouseover events
+    /=================================================== */
+
+    eventMouseEnter (mouseInfo) {
+      // Show moon info box when hovering a moon event.
+      if (mouseInfo.event.title == 'Moon Event') {
+        document.getElementById('moon-info').style.visibility = 'visible'
+
+        this.moon_hover_data.rise = moment(mouseInfo.event.start)
+          .tz(this.fc_timeZone).format('HH:mm MM/DD')
+        this.moon_hover_data.set = moment(mouseInfo.event.end)
+          .tz(this.fc_timeZone).format('HH:mm MM/DD')
+        this.moon_hover_data.transit = moment(mouseInfo.event.extendedProps
+          .transit).tz(this.fc_timeZone).format('HH:mm MM/DD')
+        this.moon_hover_data.illumination = mouseInfo.event.extendedProps
+          .illumination?.toFixed(3)
+
+        const page = document.getElementsByClassName('page-view')[0]
+        const page_boundary = page.getBoundingClientRect()
+        const left_position_offset = page_boundary.left
+        const top_position_offset = page_boundary.top
+        const top_scroll_offset = document.body.getBoundingClientRect().top
+
+        const x = mouseInfo.jsEvent.pageX - left_position_offset
+        const y = mouseInfo.jsEvent.pageY - top_position_offset + top_scroll_offset
+
+        document.getElementById('moon-info').style.top = y + 'px'
+        document.getElementById('moon-info').style.left = x + 'px'
+      }
+    },
+
+    eventMouseLeave (mouseInfo) {
+      // Hide moon info boxes when the mouse leaves.
+      if (mouseInfo.event.title == 'Moon Event') {
+        document.getElementById('moon-info').style.visibility = 'hidden'
+      }
+    },
+
+    /* ===================================================/
+    Calendar CRUD
+    /=================================================== */
+
+    async refreshIfUserIsScheduled () {
+      // Make request headers and include token.
+      // Requires user to be logged in.
+      const header = await this.getConfigWithAuth()
+      const url = `${this.$store.state.api_endpoints.calendar_api}/is-user-scheduled`
+      const user_id = this.$auth.user.sub
+      const body = {
+        user_id,
+        site: this.calendarSite,
+        time: moment().utc().format()
+      }
+      const response = await axios.post(url, body, header)
+      this.currentUserScheduled = response.data
+    },
+
+    /**
+     * When the user clicks submit, event details are sent to the backend.
+     */
+    async submitButtonClicked (newEvent) {
+      const eventToPost = convertEventEditorResponseToPtrFormat(newEvent)
+      // Make request headers and include token.
+      // Requires user to be logged in.
+      const config = await this.getConfigWithAuth()
+      const url = `${this.$store.state.api_endpoints.calendar_api}/newevent`
+      axios
+        .post(url, eventToPost, config)
+        .then((res) => {
+          this.isLoading = true
+          this.refreshCalendarView()
+        })
+        .catch((error) => {
+          this.eventEditorIsActive = false
+          this.handleNotAuthorizedResponse(error)
+        })
+    },
+
+    /**
+     * Close the event modal and deselect its associated calendar event.
+     */
+    cancelButtonClicked () {
+      const calendarApi = this.$refs.fullCalendar.getApi()
+      calendarApi.unselect()
+      this.eventEditorIsActive = false
+    },
+
+    /**
+     * Replicates the 'cancelButtonClicked' function for the case when the user
+     * closes the modal window by clicking outside of it.
+     */
+    eventModalClosed () {
+      const calendarApi = this.$refs.fullCalendar.getApi()
+      calendarApi.unselect()
+    },
+
+    /**
+     * Delete the selected calendar event from the backend database
+     */
+    async deleteButtonClicked (eventToDelete) {
+      const config = await this.getConfigWithAuth()
+      const url = `${this.$store.state.api_endpoints.calendar_api}/delete`
+      const body = {
+        event_id: eventToDelete.id,
+        start: moment(eventToDelete.startStr).utc().format()
+      }
+      await axios
+        .post(url, body, config)
+        .then((res) => {
+          this.isLoading = true
+          this.refreshCalendarView()
+        })
+        .catch((error) => {
+          this.eventEditorIsActive = false
+          this.handleNotAuthorizedResponse(error)
+        })
+    },
+
+    modifyButtonClicked (events) {
+      const originalEvent = convertEventEditorResponseToPtrFormat(events.initialEvent)
+      const modifiedEvent = convertEventEditorResponseToPtrFormat(events.modifiedEvent)
+      this.modifyEvent(originalEvent, modifiedEvent)
+    },
+
+    /* ===================================================/
+    Calendar Event Sources
+    /=================================================== */
+
+    // This is an eventSource that provides the red line indicating the current time
+    async getNowIndicator (info) {
+      const now = [
+        {
+          start: moment().utc().format(),
+          end: moment().utc().add('1', 'minutes').format(),
+          rendering: 'background',
+          backgroundColor: '#ff0000',
+          borderColor: '#ff0000',
+          id: 'fc-custom-now-indicator',
+          classNames: ['fc-now-indicator', 'fc-now-indicator-line']
+        }
+      ]
+      return now
+    },
+
+    // This method serves as an eventSource for the calendar.
+    // It provides indicators for the start and end time of the present observing night.
+    // These values are sourced from the site config, in the site events.
+    async getObservingStartEndIndicators () {
+      const observeStart = moment(this.site_events_observing_start_time).tz(this.fc_timeZone)
+      const observeEnd = moment(this.site_events_observing_end_time).tz(this.fc_timeZone)
+      const startAndEnd = [
+        {
+          start: observeStart.format(),
+          end: observeStart.add('1', 'minutes').format(),
+          rendering: 'background',
+          classNames: ['fc-observing-start-end-time', 'start']
+        },
+        {
+          start: observeEnd.format(),
+          end: observeEnd.add('1', 'minutes').format(),
+          rendering: 'background',
+          classNames: ['fc-observing-start-end-time', 'end']
+        }
+      ]
+      return startAndEnd
+    },
+
+    // This eventSource creates and returns the background events that shade the
+    // various stages of twilight each day
+    async getTwilightEvents (info) {
       // Timer start
-      let t0 = performance.now();
+      const t0 = performance.now()
 
       // Get the time range we need to display in the UI.
-      let firstDay = info.start.valueOf();
-      let lastDay = info.end.valueOf();
+      const firstDay = info.start.valueOf()
+      const lastDay = info.end.valueOf()
 
       // List all the days we'll need to display
-      let allDays = [];
-      let msPerDay = 1000 * 60 * 60 * 24;
+      const allDays = []
+      const msPerDay = 1000 * 60 * 60 * 24
 
       // Generate events for 60 days before the start time to 60 days after.
       // This is to prevent the loading flicker when changing weeks.
@@ -570,471 +1005,139 @@ export default {
         day += msPerDay
       ) {
         // Define each day by the timestamp a little after 1:01am to avoid DST hell
-        allDays.push(day + 3700000);
-      }
-
-      // Generate the twilight events (in proper fullCalendar format)
-      // for one day column (evening-of and morning-after the given date.)
-      function oneDayTwilight(timestamp, latitude, longitude) {
-        let events = {};
-
-        let msPerDay = 1000 * 60 * 60 * 24;
-        let sunEvents = SunCalc.getTimes(
-          new Date(timestamp),
-          latitude,
-          longitude
-        );
-        let nextDayEvents = SunCalc.getTimes(
-          new Date(timestamp + msPerDay),
-          latitude,
-          longitude
-        );
-        let prevDayEvents = SunCalc.getTimes(
-          new Date(timestamp - msPerDay),
-          latitude,
-          longitude
-        );
-
-        let currentDateObj = new Date(timestamp);
-
-        // The event colors for the calendar
-        //let daylightColor = "rgb(129, 212, 250)"
-        //let civilColor = "rgb(52, 152, 219)"
-        //let nauticalColor = "rgb(36, 113, 163)"
-        //let astronomicalColor = "rgb(26, 82, 118)"
-
-        let daylightColor = "#81D4FA";
-        let civilColor = "#1B9FD8";
-        let nauticalColor = "#166EA9";
-        let astronomicalColor = "#084165";
-
-        events.civilTwilightDusk = {
-          title: "Civil Twilight",
-          start: sunEvents.sunset,
-          end: sunEvents.dusk,
-          backgroundColor: civilColor,
-          rendering: "background",
-          id: `${currentDateObj.toISOString()}_civil_dusk`,
-        };
-        events.nauticalTwilightDusk = {
-          title: "Nautical Twilight",
-          start: sunEvents.dusk,
-          end: sunEvents.nauticalDusk,
-          backgroundColor: nauticalColor,
-          rendering: "background",
-          id: `${currentDateObj.toISOString()}_nautical_dusk`,
-        };
-        events.astronomicalTwilightDusk = {
-          title: "Astronomical Twilight",
-          start: sunEvents.nauticalDusk,
-          end: sunEvents.night,
-          backgroundColor: astronomicalColor,
-          rendering: "background",
-          id: `${currentDateObj.toISOString()}_astronomical_dusk`,
-        };
-
-        events.astronomicalTwilightDawn = {
-          title: "Astronomical Twilight",
-          start: nextDayEvents.nightEnd,
-          end: nextDayEvents.nauticalDawn,
-          backgroundColor: astronomicalColor,
-          rendering: "background",
-          id: `${currentDateObj.toISOString()}_astronomical_dawn`,
-        };
-        events.nauticalTwilightDawn = {
-          title: "Nautical Twilight",
-          start: nextDayEvents.nauticalDawn,
-          end: nextDayEvents.dawn,
-          backgroundColor: nauticalColor,
-          rendering: "background",
-          id: `${currentDateObj.toISOString()}_nautical_dawn`,
-        };
-        events.civilTwilightDawn = {
-          title: "Civil Twilight",
-          start: nextDayEvents.dawn,
-          end: nextDayEvents.sunrise,
-          backgroundColor: civilColor,
-          rendering: "background",
-          id: `${currentDateObj.toISOString()}_civil_dawn`,
-        };
-        events.daylightMorning = {
-          title: "Morning Daylight",
-          start: nextDayEvents.sunrise,
-          end: nextDayEvents.sunset,
-          //end: new Date(new Date(timestamp).setHours(36)),
-          rendering: "background",
-          backgroundColor: daylightColor,
-          id: `${currentDateObj.toISOString()}_day_morning`,
-        };
-        return events;
+        allDays.push(day + 3700000)
       }
 
       // Collect all the events to display here
-      let twilightEvents = [];
+      const twilightEvents = []
 
-      let site_lat = parseFloat(
-        this.global_config[this.calendarSite]["latitude"]
-      );
-      let site_lng = parseFloat(
-        this.global_config[this.calendarSite]["longitude"]
-      );
+      const site_lat = parseFloat(
+        this.global_config[this.calendarSite].latitude
+      )
+      const site_lng = parseFloat(
+        this.global_config[this.calendarSite].longitude
+      )
 
       // Compute events for each day.
       allDays.map((day) =>
         twilightEvents.push(
+          // Note oneDayTwilight generates all the twilight events for a single day
           ...Object.values(oneDayTwilight(day, site_lat, site_lng))
         )
-      );
+      )
 
       // Finish timer
-      let t1 = performance.now();
-      let twilightComputeTime = t1 - t0;
+      const t1 = performance.now()
+      const twilightComputeTime = t1 - t0
       if (twilightComputeTime > 100) {
         console.warn(
-          "Slow computation of astro twilight: ",
-          twilightComputeTime.toFixed(2) + "ms"
-        );
+          'Slow computation of astro twilight: ',
+          twilightComputeTime.toFixed(2) + 'ms'
+        )
       }
-      return twilightEvents;
+      return twilightEvents
     },
 
-    async getConfigWithAuth() {
-      let token, configWithAuth;
-      try {
-        token = await this.$auth.getTokenSilently();
-      } catch (err) {
-        console.error(err);
-        console.warn("Did not acquire the needed token. Stopping request.");
-
-        // small popup notification
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: "Oops! You aren't authorized to do that.",
-          position: "is-bottom",
-          type: "is-danger",
-        });
+    // This is a fullCalendar eventSource
+    // Return an array of fullcalendar background events to display the moon visibility.
+    async getMoonRiseSet (info) {
+      if (!this.showMoonEvents) {
+        return []
       }
+      const ms_per_day = 86400000
 
-      return {
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-          "Authorization": `Bearer ${token}`,
-        },
-      };
+      // Get the time range we need to display in the UI.
+      // Also convert from ms timestamp to iso utc seconds.
+      let start_timestamp = info.start.valueOf()
+      let end_timestamp = info.end.valueOf()
+
+      // Add buffer of a few days to the start and end window
+      start_timestamp -= ms_per_day * 12
+      end_timestamp += ms_per_day * 12
+
+      // Convert timestamps to utc iso format
+      const start_iso = moment(start_timestamp).format('YYYY-MM-DDTHH:mm:ss[Z]')
+      const end_iso = moment(end_timestamp).format('YYYY-MM-DDTHH:mm:ss[Z]')
+
+      // Make the api call to get moon rise/set times
+      const riseset = await this.getMoonTimesFromAPI(start_iso, end_iso)
+
+      const moonEvents = []
+      riseset.forEach((moon) => {
+        // The primary moon event
+        moonEvents.push({
+          start: new Date(moon.rise),
+          end: new Date(moon.set),
+          rendering: 'background',
+          backgroundColor: rgba_from_illumination(moon.illumination, 235),
+          borderColor: '#aaaaaa',
+          id: 'fc-custom-moon-indicator',
+          classNames: ['fc-moon-indicator'],
+          title: 'Moon Event',
+          extendedProps: {
+            illumination: moon.illumination,
+            transit: moon.transit
+          }
+        })
+
+        // The marker for transit time.
+        moonEvents.push({
+          start: moment(moon.transit).format(),
+          end: moment(moon.transit).add('1', 'minutes').format(),
+          title: 'Moon Event',
+          rendering: 'background',
+          // Opacity should vary with moon brightness, but not too much.
+          backgroundColor: `rgba(255,255,255,${moon.illumination ** 0.25})`,
+          classNames: ['fc-moon-transit-indicator']
+        })
+      })
+      return moonEvents
     },
 
-    handleNotAuthorizedResponse(error) {
-      if (error.response) {
-        // Request made and server responded
-        console.warn(error.response.data);
-        console.warn(error.response.status);
-        console.warn(error.response.headers);
-        // small popup notification describing error
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: `${error.response.status} error: ${error.response.data}`,
-          position: "is-bottom",
-          type: "is-danger",
-        });
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.warn(error.request);
+    // This eventSource gets the latest weather forecast to display as vertical colored bars
+    async getWeatherForecast () {
+      if (!this.showWeatherForecast) {
+        return []
+      }
+      const forecast = this.$store.getters['sitestatus/forecast']
+      if (forecast.length == 0) {
+        return []
       } else {
-        // Something happened in setting up the request that triggered an Error
-        console.warn("Error", error.message);
-      }
-    },
-
-    // Make a unique id for calendar events. UUID style. This is the pk in dynamodb.
-    makeUniqueID() {
-      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (
-        c
-      ) {
-        var r = (Math.random() * 16) | 0,
-          v = c == "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      });
-    },
-
-    // Used when exiting event editor modals. Clear selections, close modal, and refresh events.
-    async refreshCalendarView() {
-      let calendarApi = this.fullCalendarApi //this.$refs.fullCalendar.getApi();
-      calendarApi.unselect();
-      calendarApi.refetchEvents();
-      this.eventEditorIsActive = false;
-
-      // Update the list of active reservations
-      this.$store.dispatch(
-        "calendar/fetchActiveReservations",
-        this.calendarSite
-      );
-    },
-
-    /*===================================================/
-    Calendar Event Selection Handlers
-    /===================================================*/
-    /**
-     *  This is run when a user clicks on the calendar to create a new event.
-     */
-    newEventSelected(event) {
-      this.activeEvent.startStr = moment(event.startStr).utc().format();
-      this.activeEvent.endStr = moment(event.endStr).utc().format();
-      this.activeEvent.title = this.$auth.user.name;
-      this.activeEvent.reservation_type = "realtime" // or "project"
-      this.activeEvent.creator = this.$auth.user.name;
-      this.activeEvent.id = this.makeUniqueID();
-      this.activeEvent.site = this.calendarSite;
-      this.activeEvent.resourceId = this.calendarSite;
-      this.activeEvent.creator_id = this.$auth.user.sub;
-      this.activeEvent.project_id = "none";
-      this.activeEvent.reservation_note = "";
-
-      this.isNewEvent = true; // setting for the modal event editor
-      this.eventEditorIsActive = true;
-    },
-    /**
-     *  This is run when a user clicks on an existing event in the calendar.
-     */
-    existingEventSelected(arg) {
-      let event = arg.event;
-      //console.log(event);
-      (this.activeEvent.id = event.id),
-        (this.activeEvent.startStr = moment(event.start).format());
-      this.activeEvent.endStr = moment(event.end).format();
-      this.activeEvent.title = event.title;
-      this.activeEvent.reservation_type = event.extendedProps?.reservation_type ?? 'project' // legacy events may not include this key
-      this.activeEvent.creator = event.extendedProps.creator;
-      this.activeEvent.site = event.extendedProps.site;
-      this.activeEvent.resourceId = event.getResources()[0].id;
-      this.activeEvent.project_id = event.extendedProps.project_id;
-      this.activeEvent.reservation_note = event.extendedProps.reservation_note || "";
-
-      this.isNewEvent = false; // setting for the modal event editor
-      this.eventEditorIsActive = true;
-    },
-
-    /*===================================================/
-    Calendar mouseover events
-    /===================================================*/
-
-    eventMouseEnter( mouseInfo ) {
-
-      // Show moon info box when hovering a moon event.
-      if (mouseInfo.event.title == "Moon Event") {
-        document.getElementById('moon-info').style.visibility = 'visible'
-
-        this.moon_hover_data.rise = moment(mouseInfo.event.start)
-          .tz(this.fc_timeZone).format("HH:mm MM/DD")
-        this.moon_hover_data.set = moment(mouseInfo.event.end)
-          .tz(this.fc_timeZone).format("HH:mm MM/DD")
-        this.moon_hover_data.transit = moment(mouseInfo.event.extendedProps.
-          transit).tz(this.fc_timeZone).format("HH:mm MM/DD")
-        this.moon_hover_data.illumination = mouseInfo.event.extendedProps
-          .illumination.toFixed(3)
-
-        let page = document.getElementsByClassName('page-view')[0]
-        let page_boundary = page.getBoundingClientRect()
-        let left_position_offset = page_boundary.left
-        let top_position_offset = page_boundary.top
-        let top_scroll_offset = document.body.getBoundingClientRect().top
-
-        let x = mouseInfo.jsEvent.pageX - left_position_offset;
-        let y = mouseInfo.jsEvent.pageY - top_position_offset + top_scroll_offset;
-
-        document.getElementById('moon-info').style.top = y + 'px'
-        document.getElementById('moon-info').style.left = x + 'px'
-      }
-    },
-
-    eventMouseLeave( mouseInfo ) {
-
-      // Hide moon info boxes when the mouse leaves.
-      if (mouseInfo.event.title == "Moon Event") {
-        document.getElementById('moon-info').style.visibility = 'hidden'
-      }
-    },
-
-
-    /*===================================================/
-    Calendar CRUD
-    /===================================================*/
-
-    async refreshIfUserIsScheduled() {
-      // Make request headers and include token.
-      // Requires user to be logged in.
-      let header = await this.getConfigWithAuth();
-      let url = `${this.backendUrl}/dev/is-user-scheduled`;
-      let user_id = this.$auth.user.sub;
-      let body = {
-        user_id: user_id,
-        site: this.calendarSite,
-        time: moment().utc().format(),
-      };
-      let response = await axios.post(url, body, header);
-      this.currentUserScheduled = response.data;
-    },
-
-    /**
-     * When the user clicks submit, event details are sent to the backend.
-     */
-    async submitButtonClicked(newEvent) {
-
-      // Make request headers and include token.
-      // Requires user to be logged in.
-      let config = await this.getConfigWithAuth();
-
-      let url = `${this.backendUrl}/dev/newevent`;
-      let eventToPost = {
-        event_id: newEvent.id,
-        start: moment(newEvent.startStr).utc().format(),
-        end: moment(newEvent.endStr).utc().format(),
-        creator: newEvent.creator,
-        creator_id: newEvent.creator_id,
-        site: newEvent.site,
-        title: newEvent.title,
-        reservation_type: newEvent.reservation_type,
-        resourceId: newEvent.resourceId,
-        project_id: newEvent.project_id,
-        reservation_note: newEvent.reservation_note,
-        rendering: newEvent.rendering,
-      };
-      axios
-        .post(url, eventToPost, config)
-        .then((res) => {
-          this.isLoading = true;
-          this.refreshCalendarView();
+        return forecast.map(f => {
+          return {
+            start: moment(f.utc_long_form).utc().format(),
+            end: moment(f.utc_long_form).utc().add('1', 'hours').format(),
+            rendering: 'background',
+            title: 'weather forecast',
+            id: 'fc-custom-weather-forecast',
+            classNames: ['fc-forecast-event', `quality-${f.weather_quality_number}`]
+          }
         })
-        .catch((error) => {
-          this.eventEditorIsActive = false;
-          this.handleNotAuthorizedResponse(error);
-        });
-    },
-
-    /**
-     * Close the event modal and deselect its associated calendar event.
-     */
-    cancelButtonClicked() {
-      let calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.unselect();
-      this.eventEditorIsActive = false;
-    },
-    
-    /**
-     * Replicates the 'cancelButtonClicked' function for the case when the user
-     * closes the modal window by clicking outside of it.
-     */
-    eventModalClosed() {
-      let calendarApi = this.$refs.fullCalendar.getApi();
-      calendarApi.unselect();
-    },
-
-    /**
-     * Delete the selected calendar event from the backend database
-     */
-    async deleteButtonClicked(eventToDelete) {
-      let config = await this.getConfigWithAuth();
-      let url = `${this.backendUrl}/dev/delete`;
-      let body = {
-        event_id: eventToDelete.id,
-        start: moment(eventToDelete.startStr).utc().format(),
-      };
-      let res = await axios
-        .post(url, body, config)
-        .then((res) => {
-          this.isLoading = true;
-          this.refreshCalendarView();
-        })
-        .catch((error) => {
-          this.eventEditorIsActive = false;
-          this.handleNotAuthorizedResponse(error);
-        });
-    },
-
-    async modifyButtonClicked(events) {
-      let initialEvent = events.initialEvent;
-      let modifiedEvent = events.modifiedEvent;
-
-      // Maybe we don't need to update anything?
-      if (JSON.stringify(initialEvent) == JSON.stringify(modifiedEvent)) {
-        this.refreshCalendarView();
-        return;
       }
-
-      // Make request headers and include token.
-      // Requires user to be logged in.
-      let config = await this.getConfigWithAuth();
-      let url = `${this.backendUrl}/dev/modifyevent`;
-      let theModifiedEvent = {
-        event_id: modifiedEvent.id,
-        start: moment(modifiedEvent.startStr).utc().format(),
-        end: moment(modifiedEvent.endStr).utc().format(),
-        creator: modifiedEvent.creator,
-        creator_id: modifiedEvent.creator_id,
-        site: modifiedEvent.site,
-        title: modifiedEvent.title,
-        reservation_type: modifiedEvent.reservation_type,
-        resourceId: modifiedEvent.resourceId,
-        project_id: modifiedEvent.project_id,
-        reservation_note: modifiedEvent.reservation_note,
-        rendering: modifiedEvent.rendering,
-      };
-      let theInitialEvent = {
-        event_id: initialEvent.id,
-        start: moment(initialEvent.startStr).utc().format(),
-        end: moment(initialEvent.endStr).utc().format(),
-        creator: initialEvent.creator,
-        creator_id: initialEvent.creator_id,
-        site: initialEvent.site,
-        title: initialEvent.title,
-        reservation_type: initialEvent.reservation_type,
-        resourceId: initialEvent.resourceId,
-        project_id: initialEvent.project_id,
-        reservation_note: initialEvent.reservation_note,
-        rendering: initialEvent.rendering,
-      };
-      let body = {
-        originalEvent: theInitialEvent,
-        modifiedEvent: theModifiedEvent,
-      };
-
-      axios
-        .post(url, body, config)
-        .then((res) => {
-          this.isLoading = true;
-          this.refreshCalendarView();
-        })
-        .catch((error) => {
-          this.eventEditorIsActive = false;
-          this.handleNotAuthorizedResponse(error);
-        });
     },
 
-    /*===================================================/
-    Fetching Calendar Events
-    /===================================================*/
-
-
-    async fetchSiteEvents(fetchInfo) {
-      let site = this.calendarSite;
-      const url = `${this.backendUrl}/dev/siteevents`;
+    // This is the eventSource that gets the user reservations stored in the ptr calendar database
+    async fetchSiteEvents (fetchInfo) {
+      const site = this.calendarSite
+      const url = `${this.$store.state.api_endpoints.calendar_api}/siteevents`
       const options = {
         headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-        },
-      };
+          'Content-Type': 'application/json;charset=UTF-8'
+        }
+      }
 
       // The start and end times must be formatted as UTC like 2020-12-31T23:59:59Z
-      let body = {
-        site: site,
+      const body = {
+        site,
         start: moment(fetchInfo.startStr).utc().format(),
-        end: moment(fetchInfo.endStr).utc().format(),
-      };
+        end: moment(fetchInfo.endStr).utc().format()
+      }
 
-      let resp = await axios.post(url, body, options);
+      const resp = await axios.post(url, body, options)
 
       // Format the returned items to work nicely with fullcalendar.
-      let formatted_events = resp.data.map((obj) => {
-        let fObj = {
+      const formatted_events = resp.data.map((obj) => {
+        const fObj = {
           start: obj.start,
           end: obj.end,
           id: obj.event_id,
@@ -1047,38 +1150,76 @@ export default {
           project_id: obj.project_id,
           reservation_note: obj.reservation_note,
           rendering: obj.rendering,
-        };
-
-        // Event colors
-        const projects_color = "#9c27b0" //"#4e1199"
-        const user_projects_border = "gold" //"#a35ff7"
-        const realtime_color = "#2196f3" //"#006e64"
-        const user_realtime_border = "gold" //"#00e5d0"
-
-        let user_owns_event = ( this.$auth.isAuthenticated && fObj.creator_id == this.$auth.user.sub) 
-        if (obj.reservation_type == "realtime") {
-          fObj.backgroundColor = realtime_color
-          fObj.borderColor = user_owns_event ? user_realtime_border : realtime_color 
-        } else if (obj.reservation_type == "project") {
-          fObj.backgroundColor = projects_color
-          fObj.borderColor = user_owns_event ? user_projects_border : projects_color 
-        } else {
-          fObj.backgroundColor = projects_color
-          fObj.borderColor = user_owns_event ? user_projects_border : projects_color 
+          project_priority: obj?.project_priority || 'standard',
+          editable: obj.creator_id === this.userId || this.userIsAdmin,
+          durationEditable: obj.reservation_type !== 'realtime' && (obj.creator_id === this.userId || this.userIsAdmin)
         }
 
-        return fObj;
-      });
-      return formatted_events;
-    },
-  },
-};
+        // Event colors
+        const projects_color = getComputedStyle(document.documentElement).getPropertyValue('--ptr-calendar-project-color')
+        const realtime_color = getComputedStyle(document.documentElement).getPropertyValue('--ptr-calendar-realtime-color')
+        const user_projects_border = getComputedStyle(document.documentElement).getPropertyValue('--ptr-calendar-user-border')
+        const user_realtime_border = user_projects_border
+
+        const user_owns_event = (this.userIsAuthenticated && fObj.creator_id == this.userId)
+        if (obj.reservation_type == 'realtime') {
+          fObj.backgroundColor = realtime_color
+          fObj.borderColor = user_owns_event ? user_realtime_border : realtime_color
+        } else if (obj.reservation_type == 'project') {
+          fObj.backgroundColor = projects_color
+          fObj.borderColor = user_owns_event ? user_projects_border : projects_color
+        } else {
+          fObj.backgroundColor = projects_color
+          fObj.borderColor = user_owns_event ? user_projects_border : projects_color
+        }
+
+        if (obj.project_priority === 'time_critical') {
+          fObj.className = 'time-critical-calendar-event'
+        } else if (obj.project_priority === 'low_priority') {
+          fObj.className = 'low-priority-calendar-event'
+        }
+        return fObj
+      })
+      return formatted_events
+    }
+  }
+}
 </script>
 
 <!-- TODO: reduce the bootstrap css (below) to the minimum required for button groups. -->
 <style lang='scss'>
+@import "@/style/buefy-styles.scss";
+@import "@/style/_variables.scss";
 
-// Calendar grid styling
+$moon-width: 16px;
+
+$event-left-margin: 4px;
+
+$moon-info-z-index: 20; // this should be above all other events
+$now-indicator-z-index: 19;
+$moon-icon-z-index: 18;
+$forecast-z-index: 16; // this should be above the moon
+$moon-z-index: 15;
+$observing-start-end-z-index: 15;
+$sky-darkness-z-index: 15;
+
+/* Styles for the overall calendar component */
+.calendar-container {
+  margin: 0 auto;
+  height: 100%;
+}
+.fullCalendar-observatory {
+  font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+  font-size: 14px;
+}
+ .fullCalendar-observatory-calendar {
+   position: relative;
+ }
+.fullCalendar-observatory-top {
+  margin: 0 0 3em;
+}
+
+/* Styles for the calendar grid itself */
 .fc table * {
   border-color: #444;
   border-width: 1.8px;
@@ -1091,7 +1232,10 @@ export default {
   height: 0.6em;
   border-bottom: 0;
 }
-
+// Decrease event width so they don't cover the weather/moon stripes
+.fc-time-grid-event {
+  margin-left: $event-left-margin;
+}
 // Prevent the row time labels from changing the row heights
 .fc-axis {
   position: relative;
@@ -1105,21 +1249,84 @@ export default {
   }
 }
 
-/* the line showing the current time */
+/* Styles for special types of user-created calendar events */
+.fc-event.low-priority-calendar-event {
+  border-width: 1px;
+  box-shadow: 0 0 0 1px #000; /* outer border */
+}
+// This is the colored corner indicating a low priority reservation
+.fc-event.low-priority-calendar-event::before {
+  content: "";
+  border-bottom-right-radius: 3px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-bottom: 20px solid $ptr-calendar-low-priority-color; /* size and color of triangle */
+}
+.fc-event.time-critical-calendar-event {
+  border-width: 1px;
+  box-shadow: 0 0 0 1px #000; /* outer border */
+}
+// This is the colored corner indicating a time critical reservation
+.fc-event.fc-event.time-critical-calendar-event::before {
+  content: "";
+  border-bottom-right-radius: 3px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-bottom: 20px solid $ptr-calendar-time-critical-color; /* size and color of triangle */
+}
+
+/* Styles for line showing the current time */
 .fc-now-indicator {
   &.fc-now-indicator-line {
     border-color: rgb(255, 0, 0);
-    z-index: 15;
+    z-index: $now-indicator-z-index;
     opacity: 1;
     background-color: red;
   }
   &.fc-now-indicator-arrow {
     border-color: rgb(255, 0, 0);
-    z-index: 15;
+    z-index: $now-indicator-z-index;
     opacity: 1;
   }
 }
 
+/* Styles for the lines showing the start and end of observing
+These times are obtained from the events in the site config */
+.fc-observing-start-end-time {
+  --line-color: rgb(22, 179, 163);
+  border-color: var(--line-color);
+  color: var(--line-color);
+  height: 3px;
+  z-index: $observing-start-end-z-index;
+  opacity: 1;
+  background-color: var(--line-color);
+  font-size: 10px;
+  text-justify: center;
+  margin-left: 2px;
+
+}
+.fc-observing-start-end-time.start:before {
+  content: "Observing Starts";
+  position: absolute;
+  top: -15px;
+  right: 2px;
+}
+.fc-observing-start-end-time.end:before {
+  content: "Observing Ends";
+  position: absolute;
+  top: 3px;
+  right: 2px;
+}
+
+/* Styles for the moon elements */
 #moon-info {
   background-color: black;
   opacity: 0.9;
@@ -1128,25 +1335,24 @@ export default {
   margin-bottom: 1em;
   position: absolute;
   visibility: hidden;
-  z-index: 16;
+  z-index: $moon-info-z-index;
   top: 0px;
   left: 0px;
   pointer-events: none;
 }
 .moon-icon {
   padding: 5px;
+  z-index: $moon-icon-z-index; // note: position: static means this does nothing
   color: yellow;
 }
 .fc-moon-transit-indicator {
-  z-index: 15;
+  z-index: $moon-z-index;
   opacity: 1;
-  width: 20px;
+  width: $moon-width;
 }
 .fc-moon-indicator {
-  z-index: 15;
-  opacity: 0.5;
-  width: 20px;
-  border-radius: 12px;
+  z-index: $moon-z-index;
+  width: $moon-width;
   transition: 0.2s;
 }
 .fc-moon-indicator:hover {
@@ -1154,46 +1360,35 @@ export default {
   transition: 0.2s;
 }
 
-/*@import url("https://bootswatch.com/4/darkly/bootstrap.min.css");*/
-.demo-app {
-  font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 14px;
-}
- .demo-app-calendar {
-   position: relative;
- }
+/* Styles for the weather forecast line events */
+.fc-forecast-event {
+  $background-opacity: 0;
+  $border-width: $forecast-width;
+  // z-index: $forecast-z-index !important;
+  opacity: 1;
+  background-color: rgba(0,0,0,0);
+  width: 0;
 
-.demo-app-top {
-  margin: 0 0 3em;
+  &.quality-1 {
+    border-left: $border-width solid $ptr-calendar-forecast-1 !important;
+  }
+  &.quality-2 {
+    border-left: $border-width solid $ptr-calendar-forecast-2 !important;
+  }
+  &.quality-3 {
+    border-left: $border-width solid $ptr-calendar-forecast-3 !important;
+  }
+  &.quality-4 {
+    border-left: $border-width solid $ptr-calendar-forecast-4 !important;
+  }
+  &.quality-5 {
+    border-left: $border-width solid $ptr-calendar-forecast-5 !important;
+  }
 }
 
-.calendar-container {
-  margin: 0 auto;
-  height: 100%;
-}
+/* The following styles are copied over from bootstrap and are required
+to style the calendar buttons */
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-.sr-only-focusable:active,
-.sr-only-focusable:focus {
-  position: static;
-  width: auto;
-  height: auto;
-  margin: 0;
-  overflow: visible;
-  clip: auto;
-}
-[role="button"] {
-  cursor: pointer;
-}
 .btn {
   display: inline-block;
   margin-bottom: 0;
@@ -1215,6 +1410,7 @@ export default {
   -ms-user-select: none;
   user-select: none;
 }
+
 .btn:focus,
 .btn:active:focus,
 .btn.active:focus,
@@ -1224,12 +1420,14 @@ export default {
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
+
 .btn:hover,
 .btn:focus,
 .btn.focus {
   color: #333333;
   text-decoration: none;
 }
+
 .btn:active,
 .btn.active {
   background-image: none;
@@ -1237,623 +1435,61 @@ export default {
   -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
+
 .btn.disabled,
-.btn[disabled],
-fieldset[disabled] .btn {
+.btn[disabled] {
   cursor: not-allowed;
   filter: alpha(opacity=65);
   opacity: 0.65;
   -webkit-box-shadow: none;
   box-shadow: none;
 }
-a.btn.disabled,
-fieldset[disabled] a.btn {
-  pointer-events: none;
-}
-.btn-default {
-  color: #333333;
-  background-color: #ffffff;
-  border-color: #cccccc;
-}
-.btn-default:focus,
-.btn-default.focus {
-  color: #333333;
-  background-color: #e6e6e6;
-  border-color: #8c8c8c;
-}
-.btn-default:hover {
-  color: #333333;
-  background-color: #e6e6e6;
-  border-color: #adadad;
-}
-.btn-default:active,
-.btn-default.active,
-.open > .dropdown-toggle.btn-default {
-  color: #333333;
-  background-color: #e6e6e6;
-  background-image: none;
-  border-color: #adadad;
-}
-.btn-default:active:hover,
-.btn-default.active:hover,
-.open > .dropdown-toggle.btn-default:hover,
-.btn-default:active:focus,
-.btn-default.active:focus,
-.open > .dropdown-toggle.btn-default:focus,
-.btn-default:active.focus,
-.btn-default.active.focus,
-.open > .dropdown-toggle.btn-default.focus {
-  color: #333333;
-  background-color: #d4d4d4;
-  border-color: #8c8c8c;
-}
-.btn-default.disabled:hover,
-.btn-default[disabled]:hover,
-fieldset[disabled] .btn-default:hover,
-.btn-default.disabled:focus,
-.btn-default[disabled]:focus,
-fieldset[disabled] .btn-default:focus,
-.btn-default.disabled.focus,
-.btn-default[disabled].focus,
-fieldset[disabled] .btn-default.focus {
-  background-color: #ffffff;
-  border-color: #cccccc;
-}
-.btn-default .badge {
-  color: #ffffff;
-  background-color: #333333;
-}
+
 .btn-primary {
   color: #ffffff;
   background-color: #337ab7;
   border-color: #2e6da4;
 }
+
 .btn-primary:focus,
 .btn-primary.focus {
   color: #ffffff;
   background-color: #286090;
   border-color: #122b40;
 }
+
 .btn-primary:hover {
   color: #ffffff;
   background-color: #286090;
   border-color: #204d74;
 }
+
 .btn-primary:active,
-.btn-primary.active,
-.open > .dropdown-toggle.btn-primary {
+.btn-primary.active {
   color: #ffffff;
   background-color: #286090;
   background-image: none;
   border-color: #204d74;
 }
-.btn-primary:active:hover,
-.btn-primary.active:hover,
-.open > .dropdown-toggle.btn-primary:hover,
-.btn-primary:active:focus,
-.btn-primary.active:focus,
-.open > .dropdown-toggle.btn-primary:focus,
-.btn-primary:active.focus,
-.btn-primary.active.focus,
-.open > .dropdown-toggle.btn-primary.focus {
-  color: #ffffff;
-  background-color: #204d74;
-  border-color: #122b40;
-}
+
 .btn-primary.disabled:hover,
-.btn-primary[disabled]:hover,
-fieldset[disabled] .btn-primary:hover,
-.btn-primary.disabled:focus,
-.btn-primary[disabled]:focus,
-fieldset[disabled] .btn-primary:focus,
-.btn-primary.disabled.focus,
-.btn-primary[disabled].focus,
-fieldset[disabled] .btn-primary.focus {
+.btn-primary[disabled]:hover {
   background-color: #337ab7;
   border-color: #2e6da4;
 }
-.btn-primary .badge {
-  color: #337ab7;
-  background-color: #ffffff;
-}
-.btn-success {
-  color: #ffffff;
-  background-color: #5cb85c;
-  border-color: #4cae4c;
-}
-.btn-success:focus,
-.btn-success.focus {
-  color: #ffffff;
-  background-color: #449d44;
-  border-color: #255625;
-}
-.btn-success:hover {
-  color: #ffffff;
-  background-color: #449d44;
-  border-color: #398439;
-}
-.btn-success:active,
-.btn-success.active,
-.open > .dropdown-toggle.btn-success {
-  color: #ffffff;
-  background-color: #449d44;
-  background-image: none;
-  border-color: #398439;
-}
-.btn-success:active:hover,
-.btn-success.active:hover,
-.open > .dropdown-toggle.btn-success:hover,
-.btn-success:active:focus,
-.btn-success.active:focus,
-.open > .dropdown-toggle.btn-success:focus,
-.btn-success:active.focus,
-.btn-success.active.focus,
-.open > .dropdown-toggle.btn-success.focus {
-  color: #ffffff;
-  background-color: #398439;
-  border-color: #255625;
-}
-.btn-success.disabled:hover,
-.btn-success[disabled]:hover,
-fieldset[disabled] .btn-success:hover,
-.btn-success.disabled:focus,
-.btn-success[disabled]:focus,
-fieldset[disabled] .btn-success:focus,
-.btn-success.disabled.focus,
-.btn-success[disabled].focus,
-fieldset[disabled] .btn-success.focus {
-  background-color: #5cb85c;
-  border-color: #4cae4c;
-}
-.btn-success .badge {
-  color: #5cb85c;
-  background-color: #ffffff;
-}
-.btn-info {
-  color: #ffffff;
-  background-color: #5bc0de;
-  border-color: #46b8da;
-}
-.btn-info:focus,
-.btn-info.focus {
-  color: #ffffff;
-  background-color: #31b0d5;
-  border-color: #1b6d85;
-}
-.btn-info:hover {
-  color: #ffffff;
-  background-color: #31b0d5;
-  border-color: #269abc;
-}
-.btn-info:active,
-.btn-info.active,
-.open > .dropdown-toggle.btn-info {
-  color: #ffffff;
-  background-color: #31b0d5;
-  background-image: none;
-  border-color: #269abc;
-}
-.btn-info:active:hover,
-.btn-info.active:hover,
-.open > .dropdown-toggle.btn-info:hover,
-.btn-info:active:focus,
-.btn-info.active:focus,
-.open > .dropdown-toggle.btn-info:focus,
-.btn-info:active.focus,
-.btn-info.active.focus,
-.open > .dropdown-toggle.btn-info.focus {
-  color: #ffffff;
-  background-color: #269abc;
-  border-color: #1b6d85;
-}
-.btn-info.disabled:hover,
-.btn-info[disabled]:hover,
-fieldset[disabled] .btn-info:hover,
-.btn-info.disabled:focus,
-.btn-info[disabled]:focus,
-fieldset[disabled] .btn-info:focus,
-.btn-info.disabled.focus,
-.btn-info[disabled].focus,
-fieldset[disabled] .btn-info.focus {
-  background-color: #5bc0de;
-  border-color: #46b8da;
-}
-.btn-info .badge {
-  color: #5bc0de;
-  background-color: #ffffff;
-}
-.btn-warning {
-  color: #ffffff;
-  background-color: #f0ad4e;
-  border-color: #eea236;
-}
-.btn-warning:focus,
-.btn-warning.focus {
-  color: #ffffff;
-  background-color: #ec971f;
-  border-color: #985f0d;
-}
-.btn-warning:hover {
-  color: #ffffff;
-  background-color: #ec971f;
-  border-color: #d58512;
-}
-.btn-warning:active,
-.btn-warning.active,
-.open > .dropdown-toggle.btn-warning {
-  color: #ffffff;
-  background-color: #ec971f;
-  background-image: none;
-  border-color: #d58512;
-}
-.btn-warning:active:hover,
-.btn-warning.active:hover,
-.open > .dropdown-toggle.btn-warning:hover,
-.btn-warning:active:focus,
-.btn-warning.active:focus,
-.open > .dropdown-toggle.btn-warning:focus,
-.btn-warning:active.focus,
-.btn-warning.active.focus,
-.open > .dropdown-toggle.btn-warning.focus {
-  color: #ffffff;
-  background-color: #d58512;
-  border-color: #985f0d;
-}
-.btn-warning.disabled:hover,
-.btn-warning[disabled]:hover,
-fieldset[disabled] .btn-warning:hover,
-.btn-warning.disabled:focus,
-.btn-warning[disabled]:focus,
-fieldset[disabled] .btn-warning:focus,
-.btn-warning.disabled.focus,
-.btn-warning[disabled].focus,
-fieldset[disabled] .btn-warning.focus {
-  background-color: #f0ad4e;
-  border-color: #eea236;
-}
-.btn-warning .badge {
-  color: #f0ad4e;
-  background-color: #ffffff;
-}
-.btn-danger {
-  color: #ffffff;
-  background-color: #d9534f;
-  border-color: #d43f3a;
-}
-.btn-danger:focus,
-.btn-danger.focus {
-  color: #ffffff;
-  background-color: #c9302c;
-  border-color: #761c19;
-}
-.btn-danger:hover {
-  color: #ffffff;
-  background-color: #c9302c;
-  border-color: #ac2925;
-}
-.btn-danger:active,
-.btn-danger.active,
-.open > .dropdown-toggle.btn-danger {
-  color: #ffffff;
-  background-color: #c9302c;
-  background-image: none;
-  border-color: #ac2925;
-}
-.btn-danger:active:hover,
-.btn-danger.active:hover,
-.open > .dropdown-toggle.btn-danger:hover,
-.btn-danger:active:focus,
-.btn-danger.active:focus,
-.open > .dropdown-toggle.btn-danger:focus,
-.btn-danger:active.focus,
-.btn-danger.active.focus,
-.open > .dropdown-toggle.btn-danger.focus {
-  color: #ffffff;
-  background-color: #ac2925;
-  border-color: #761c19;
-}
-.btn-danger.disabled:hover,
-.btn-danger[disabled]:hover,
-fieldset[disabled] .btn-danger:hover,
-.btn-danger.disabled:focus,
-.btn-danger[disabled]:focus,
-fieldset[disabled] .btn-danger:focus,
-.btn-danger.disabled.focus,
-.btn-danger[disabled].focus,
-fieldset[disabled] .btn-danger.focus {
-  background-color: #d9534f;
-  border-color: #d43f3a;
-}
-.btn-danger .badge {
-  color: #d9534f;
-  background-color: #ffffff;
-}
-.btn-link {
-  font-weight: 400;
-  color: #337ab7;
-  border-radius: 0;
-}
-.btn-link,
-.btn-link:active,
-.btn-link.active,
-.btn-link[disabled],
-fieldset[disabled] .btn-link {
-  background-color: transparent;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-}
-.btn-link,
-.btn-link:hover,
-.btn-link:focus,
-.btn-link:active {
-  border-color: transparent;
-}
-.btn-link:hover,
-.btn-link:focus {
-  color: #23527c;
-  text-decoration: underline;
-  background-color: transparent;
-}
-.btn-link[disabled]:hover,
-fieldset[disabled] .btn-link:hover,
-.btn-link[disabled]:focus,
-fieldset[disabled] .btn-link:focus {
-  color: #777777;
-  text-decoration: none;
-}
-.btn-lg,
-.btn-group-lg > .btn {
-  padding: 10px 16px;
-  font-size: 18px;
-  line-height: 1.3333333;
-  border-radius: 6px;
-}
-.btn-sm,
-.btn-group-sm > .btn {
-  padding: 5px 10px;
-  font-size: 12px;
-  line-height: 1.5;
-  border-radius: 3px;
-}
-.btn-xs,
-.btn-group-xs > .btn {
-  padding: 1px 5px;
-  font-size: 12px;
-  line-height: 1.5;
-  border-radius: 3px;
-}
-.btn-block {
-  display: block;
-  width: 100%;
-}
-.btn-block + .btn-block {
-  margin-top: 5px;
-}
-input[type="submit"].btn-block,
-input[type="reset"].btn-block,
-input[type="button"].btn-block {
-  width: 100%;
-}
-.btn-group,
-.btn-group-vertical {
+
+.btn-group {
   position: relative;
   display: inline-block;
   vertical-align: middle;
 }
-.btn-group > .btn,
-.btn-group-vertical > .btn {
+
+.btn-group > .btn {
   position: relative;
   float: left;
 }
-.btn-group > .btn:hover,
-.btn-group-vertical > .btn:hover,
-.btn-group > .btn:focus,
-.btn-group-vertical > .btn:focus,
-.btn-group > .btn:active,
-.btn-group-vertical > .btn:active,
-.btn-group > .btn.active,
-.btn-group-vertical > .btn.active {
-  z-index: 2;
-}
-.btn-group .btn + .btn,
-.btn-group .btn + .btn-group,
-.btn-group .btn-group + .btn,
-.btn-group .btn-group + .btn-group {
+
+.btn-group .btn + .btn {
   margin-left: -1px;
-}
-.btn-toolbar {
-  margin-left: -5px;
-}
-.btn-toolbar .btn,
-.btn-toolbar .btn-group,
-.btn-toolbar .input-group {
-  float: left;
-}
-.btn-toolbar > .btn,
-.btn-toolbar > .btn-group,
-.btn-toolbar > .input-group {
-  margin-left: 5px;
-}
-.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
-  border-radius: 0;
-}
-.btn-group > .btn:first-child {
-  margin-left: 0;
-}
-.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-.btn-group > .btn:last-child:not(:first-child),
-.btn-group > .dropdown-toggle:not(:first-child) {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.btn-group > .btn-group {
-  float: left;
-}
-.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {
-  border-radius: 0;
-}
-.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,
-.btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.btn-group .dropdown-toggle:active,
-.btn-group.open .dropdown-toggle {
-  outline: 0;
-}
-.btn-group > .btn + .dropdown-toggle {
-  padding-right: 8px;
-  padding-left: 8px;
-}
-.btn-group > .btn-lg + .dropdown-toggle {
-  padding-right: 12px;
-  padding-left: 12px;
-}
-.btn-group.open .dropdown-toggle {
-  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-}
-.btn-group.open .dropdown-toggle.btn-link {
-  -webkit-box-shadow: none;
-  box-shadow: none;
-}
-.btn .caret {
-  margin-left: 0;
-}
-.btn-lg .caret {
-  border-width: 5px 5px 0;
-  border-bottom-width: 0;
-}
-.dropup .btn-lg .caret {
-  border-width: 0 5px 5px;
-}
-.btn-group-vertical > .btn,
-.btn-group-vertical > .btn-group,
-.btn-group-vertical > .btn-group > .btn {
-  display: block;
-  float: none;
-  width: 100%;
-  max-width: 100%;
-}
-.btn-group-vertical > .btn-group > .btn {
-  float: none;
-}
-.btn-group-vertical > .btn + .btn,
-.btn-group-vertical > .btn + .btn-group,
-.btn-group-vertical > .btn-group + .btn,
-.btn-group-vertical > .btn-group + .btn-group {
-  margin-top: -1px;
-  margin-left: 0;
-}
-.btn-group-vertical > .btn:not(:first-child):not(:last-child) {
-  border-radius: 0;
-}
-.btn-group-vertical > .btn:first-child:not(:last-child) {
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.btn-group-vertical > .btn:last-child:not(:first-child) {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-}
-.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {
-  border-radius: 0;
-}
-.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,
-.btn-group-vertical
-  > .btn-group:first-child:not(:last-child)
-  > .dropdown-toggle {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.btn-group-vertical
-  > .btn-group:last-child:not(:first-child)
-  > .btn:first-child {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-.btn-group-justified {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate;
-}
-.btn-group-justified > .btn,
-.btn-group-justified > .btn-group {
-  display: table-cell;
-  float: none;
-  width: 1%;
-}
-.btn-group-justified > .btn-group .btn {
-  width: 100%;
-}
-.btn-group-justified > .btn-group .dropdown-menu {
-  left: auto;
-}
-[data-toggle="buttons"] > .btn input[type="radio"],
-[data-toggle="buttons"] > .btn-group > .btn input[type="radio"],
-[data-toggle="buttons"] > .btn input[type="checkbox"],
-[data-toggle="buttons"] > .btn-group > .btn input[type="checkbox"] {
-  position: absolute;
-  clip: rect(0, 0, 0, 0);
-  pointer-events: none;
-}
-.clearfix:before,
-.clearfix:after,
-.btn-toolbar:before,
-.btn-toolbar:after,
-.btn-group-vertical > .btn-group:before,
-.btn-group-vertical > .btn-group:after {
-  display: table;
-  content: " ";
-}
-.clearfix:after,
-.btn-toolbar:after,
-.btn-group-vertical > .btn-group:after {
-  clear: both;
-}
-.center-block {
-  display: block;
-  margin-right: auto;
-  margin-left: auto;
-}
-.pull-right {
-  float: right !important;
-}
-.pull-left {
-  float: left !important;
-}
-.hide {
-  display: none !important;
-}
-.show {
-  display: block !important;
-}
-.invisible {
-  visibility: hidden;
-}
-.text-hide {
-  font: 0/0 a;
-  color: transparent;
-  text-shadow: none;
-  background-color: transparent;
-  border: 0;
-}
-.hidden {
-  display: none !important;
-}
-.affix {
-  position: fixed;
 }
 </style>

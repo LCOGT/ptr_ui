@@ -4,7 +4,9 @@
     <div class="container">
       <slot>
         <div class="description-text">
-          <h1 class="title">Photon Ranch</h1>
+          <h1 class="title">
+            Photon Ranch
+          </h1>
           <p>
             PTR@LCO is a new education project designed to extend the education
             programs at Las Cumbres Observatory by offering a self-paced
@@ -28,12 +30,12 @@
 </template>
 
 <script>
-import SiteNavbar from "@/components/SiteNavbar";
+import SiteNavbar from '@/components/SiteNavbar'
 export default {
   components: {
-    SiteNavbar,
-  },
-};
+    SiteNavbar
+  }
+}
 </script>
 
 <style lang="scss" scoped>
