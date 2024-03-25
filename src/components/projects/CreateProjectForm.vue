@@ -322,7 +322,7 @@
                 size="is-small"
                 :disabled="!exposures[n-1].active || read_only"
                 type="number"
-                min="0"
+                min="0.000001"
                 max="100000"
                 step="any"
               />
