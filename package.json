@@ -55,7 +55,7 @@
     "json-vuer": "^0.1.2",
     "lodash": "^4.17.15",
     "moment": "^2.26.0",
-    "moment-timezone": "^0.5.31",
+    "moment-timezone": "^0.5.35",
     "normalizr": "^3.6.1",
     "npm-check": "^5.9.2",
     "perf_hooks": "0.0.1",
