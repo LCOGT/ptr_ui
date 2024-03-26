@@ -30,8 +30,9 @@ export default {
       iw: '', // infoWindow
       oms: '', // OverlappingMarkerSpiderfier
 
-      // The marker depicting the sun's position
-      sunMapMarker: ''
+      // Custom Drawn Markers
+      sunMapMarker: '',
+      moonMapMarker: ''
     }
   },
   async mounted () {
@@ -42,6 +43,7 @@ export default {
     // Remove the looping intervals that update the sun and daylight regions on the map.
     clearInterval(this.updateTwilightInterval)
     clearInterval(this.updateSunInterval)
+    clearInterval(this.updateMoonInterval)
   },
 
   watch: {
@@ -98,9 +100,11 @@ export default {
       nite.init(this.map)
       this.updateTwilightInterval = setInterval(function () { nite.refresh() }, 10000) // every 10s
 
-      // Get position of the sun and display on map, and update every few seconds.
+      // Draw moon and sun to map
       this.drawSunMarker()
       this.updateSunInterval = setInterval(this.updateSunPosition, 10000)
+      this.drawMoonMarker()
+      this.updateMoonInterval = setInterval(this.updateMoonPosition, 10000)
 
       const oms = new OverlappingMarkerSpiderfier(this.map, {
         markersWontMove: true,
@@ -161,6 +165,31 @@ export default {
     updateSunPosition () {
       const sun_pos = { lat: nite.getSunPosition().lat(), lng: nite.getSunPosition().lng() }
       this.sunMapMarker.setPosition(sun_pos)
+    },
+
+    // Draw the moon for the first time
+    drawMoonMarker () {
+      const moon_pos = { lat: nite.getMoonPosition().lat(), lng: nite.getMoonPosition().lng() }
+      this.moonMapMarker = new google.maps.Marker({
+        position: moon_pos,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: 'white',
+          fillOpacity: 0.7,
+          strokeColor: 'white',
+          strokeWeight: 3,
+          strokeOpacity: 0.8
+        },
+        title: 'Moon',
+        map: this.map
+      })
+    },
+
+    // Reposition the sun to its current position
+    updateMoonPosition () {
+      const moon_pos = { lat: nite.getMoonPosition().lat(), lng: nite.getMoonPosition().lng() }
+      this.moonMapMarker.setPosition(moon_pos)
     },
 
     renderSiteContent (name, sitecode, openStatus) {
