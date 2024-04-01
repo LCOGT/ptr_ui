@@ -1,6 +1,18 @@
 import moment from 'moment'
 import SunCalc from 'suncalc'
 
+// Make sure we don't display sensitive data (e.g. email addresses) in the public calendar 
+const removeSensitiveData = (string, showEmail) =>
+{
+  // conditionally show email if the user is an admin or the owner of a block
+  if (showEmail) {
+    return string
+  }
+  else {
+    return string.split('@')[0]
+  }
+}
+
 // Make a unique id for calendar events. UUID style. This is the pk in dynamodb.
 const makeUniqueID = () => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (
@@ -238,6 +250,7 @@ const oneDayTwilight = (timestamp, latitude, longitude) => {
 }
 
 export {
+  removeSensitiveData,
   makeUniqueID,
   copyFcEvent,
   convertFullCalendarEventToPtrFormat,
