@@ -1,7 +1,7 @@
 import moment from 'moment'
 import SunCalc from 'suncalc'
 
-// Make sure we don't display sensitive data (e.g. email addresses) in the public calendar 
+// Make sure we don't display sensitive data (e.g. email addresses) in the public calendar
 const removeSensitiveData = (string, showEmail) =>
 {
   // conditionally show email if the user is an admin or the owner of a block
