@@ -130,7 +130,7 @@ import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
 import momentTimezonePlugin from '@fullcalendar/moment-timezone'
 
-import { makeUniqueID, copyFcEvent, convertFullCalendarEventToPtrFormat, convertEventEditorResponseToPtrFormat, getMoonPhaseDays, rgba_from_illumination, oneDayTwilight } from '@/utils/calendar_utils.js'
+import { makeUniqueID, copyFcEvent, convertFullCalendarEventToPtrFormat, convertEventEditorResponseToPtrFormat, getMoonPhaseDays, rgba_from_illumination, oneDayTwilight, removeSensitiveData } from '@/utils/calendar_utils.js'
 
 // must manually include stylesheets for each plugin
 import '@fullcalendar/core/main.css'
@@ -273,7 +273,8 @@ export default {
     ...mapState('user_data', [
       'all_projects',
       'userId',
-      'userIsAuthenticated'
+      'userIsAuthenticated',
+      'userIsAdmin'
     ]),
     ...mapGetters('sitestatus', [
       'forecast'
@@ -406,6 +407,11 @@ export default {
   },
 
   methods: {
+
+    // Only show email address on objects where the user is an Admin or is the creator of the object
+    showEmail (obj) {
+      return this.userIsAdmin || obj.creator_id === this.userId
+    },
 
     // This is connected to the < button in the calendar header left
     incrementDateBack () {
@@ -1141,9 +1147,9 @@ export default {
           start: obj.start,
           end: obj.end,
           id: obj.event_id,
-          title: obj.title,
+          title: removeSensitiveData(obj.title, this.showEmail(obj)),
           reservation_type: obj.reservation_type,
-          creator: obj.creator,
+          creator: removeSensitiveData(obj.creator, this.showEmail(obj)),
           creator_id: obj.creator_id,
           site: obj.site,
           resourceId: obj.resourceId,
