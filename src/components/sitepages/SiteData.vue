@@ -35,17 +35,7 @@
 
       <!-- Collapsible panels on the right of the image -->
       <div class="image-tools-area">
-        <div
-          class="obs-config-box"
-          style="padding-bottom: calc(1em - 11.25px); justify-content: space-between;"
-        >
-          <!--
-            <UiSyncControls />
-            <div style="width: 1px; height: 30px; border-left: 1px solid grey; margin: 0 1em;" />
-          -->
-          <NightLog :site="sitecode" />
-        </div>
-
+        <NightLog :site="sitecode" />
         <b-tabs v-model="active_image_tools_tab">
           <b-tab-item
             label="controls"
