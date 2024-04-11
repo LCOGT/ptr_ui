@@ -271,11 +271,7 @@
             :key="n"
             class="exposure-row"
           >
-            <b-field
-              :label="n==1 ? '  ' : ' '"
-            >
-              <b-checkbox v-model="exposures[n-1].active" />
-            </b-field>
+            <b-checkbox v-model="exposures[n-1].active" />
             <b-field
               size="is-small"
               :label="n==1 ? 'Imtype' : ''"
@@ -1574,11 +1570,16 @@ export default {
     margin-top: 1em;
 }
 .exposure-row {
+    display: flex;
     white-space: nowrap;
 }
 .exposure-row > * {
     margin-right: 8px;
     display: inline-block;
+}
+.exposure-row:first-child .b-checkbox {
+  /* Since checkboxes don't have a label this shifts the first checkbox down */
+  margin-top: 20px
 }
 .flex-row {
     display: flex;
