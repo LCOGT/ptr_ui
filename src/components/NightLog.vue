@@ -5,11 +5,10 @@
         <b-button
           :disabled="!noteIsLoaded && !noteIsExpired"
           class="is-warning is-small"
-          :class="buttonAnimating ? 'note-is-animating' : ''"
           :size="noteButtonSize"
           @click="$event => { noteVisible = true; editorVisible = false }"
         >
-          night log
+          Night Log
         </b-button>
       </p>
       <p
@@ -17,13 +16,10 @@
         class="control"
       >
         <b-button
-          class="is-warning is-small"
-          outlined
+          class="is-small"
           icon-left="plus"
           @click="$event => { editorVisible = true; noteVisible = false }"
-        >
-          new
-        </b-button>
+        />
       </p>
     </b-field>
 
@@ -237,19 +233,9 @@ export default {
         this.note = ''
       })
     },
-    pulseNightlogButton () {
-      // Quick animation to show where the user can reopen the night log
-      this.buttonAnimating = true
-      this.noteButtonSize = 'is-medium'
-      setTimeout(() => { this.noteButtonSize = 'is-small' }, 200)
-      setTimeout(() => { this.buttonAnimating = false }, 1600)
-    },
     messageCloseHandler () {
       // mark the message as read
       window.localStorage.setItem(this.nightlogReadId, this.noteId)
-
-      // animate the button users need to reopen
-      this.pulseNightlogButton()
     }
   },
   computed: {
@@ -305,7 +291,6 @@ export default {
 .note-container {
     position: absolute;
     width: 350px;
-    margin-top: 1.5em;
     margin-left: -280px; // right side should align with right of "night log" button (which is 70px wide)
 
     z-index: 40; // same as buefy modal windows
@@ -336,9 +321,6 @@ export default {
 
 .note-expires-soon-warning {
   color: grey;
-}
-.note-is-animating {
-  transition: 0.2s;
 }
 
 </style>
