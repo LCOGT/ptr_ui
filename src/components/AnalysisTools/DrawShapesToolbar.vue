@@ -67,17 +67,6 @@
         icon-right="delete"
         @click='$store.dispatch("drawshapes/deleteSelectedShape")'>
       </b-button-->
-      <b-field
-        label="crosshairs"
-        class="ml-5"
-        :horizontal="horizontal"
-      >
-        <b-switch
-          v-model="crosshairsVisible"
-          :size="size"
-          type="is-info"
-        />
-      </b-field>
     </b-field>
   </div>
 </template>
@@ -135,11 +124,6 @@ export default {
     activeDrawShape: {
       get () { return this.$store.getters['drawshapes/activeDrawShape'] },
       set (val) { this.$store.commit('drawshapes/activeDrawShape', val) }
-    },
-
-    crosshairsVisible: {
-      get () { return this.$store.getters['drawshapes/crosshairsVisible'] },
-      set (val) { this.$store.commit('drawshapes/crosshairsVisible', val) }
     }
   }
 }

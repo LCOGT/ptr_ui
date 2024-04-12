@@ -293,36 +293,7 @@
             class="analysis-tab-item"
             :value="'analysis'"
           >
-            <div class="shapes-toolbar">
-              <div>Draw a region: </div> <DrawShapesToolbar />
-            </div>
-
-            <Tabs class="analysis-tools-tabs">
-              <TabItem
-                title="statistics"
-                :is-active="activeAnalysisTab == 'statistics'"
-              >
-                <ImageStatisticsViewer />
-              </TabItem>
-              <TabItem
-                title="histogram"
-                :is-active="activeAnalysisTab == 'histogram'"
-              >
-                <HistogramTool />
-              </TabItem>
-              <TabItem
-                title="line profile"
-                :is-active="activeAnalysisTab == 'line profile'"
-              >
-                <LineProfileInspection :disabled="!large_fits_exists && !small_fits_exists" />
-              </TabItem>
-              <TabItem
-                title="image info"
-                :is-active="activeAnalysisTab == 'image info'"
-              >
-                <ImageMetadataViewer />
-              </TabItem>
-            </Tabs>
+            <Analysis />
           </b-tab-item>
 
           <b-tab-item
@@ -398,9 +369,7 @@ import { user_mixin } from '../../mixins/user_mixin'
 
 import ImageView from '@/components/ImageView'
 import ImagesTable from '@/components/ImagesTable'
-import LineProfileInspection from '@/components/AnalysisTools/LineProfileInspection'
 import ImageFilter from '@/components/ImageFilter'
-import HistogramTool from '@/components/AnalysisTools/HistogramTool'
 import CommandTabsAccordion from '@/components/CommandTabsAccordion'
 import CommandTabsWide from '@/components/CommandTabsWide'
 import CommandButton from '@/components/FormElements/CommandButton'
@@ -408,17 +377,11 @@ import ImageInfoBar from '@/components/ImageDisplay/ImageInfoBar'
 import InfoImageThumb from '@/components/ImageDisplay/InfoImageThumb'
 import ThumbnailRow from '@/components/ImageDisplay/ThumbnailRow'
 import ButtonRowBelowImage from '@/components/ImageDisplay/ButtonRowBelowImage'
-import DrawShapesToolbar from '@/components/AnalysisTools/DrawShapesToolbar'
 import SiteConfigViewer from '@/components/AdminTools/SiteConfigViewer'
 import DownloadInterface from '@/components/DownloadInterface'
-import ImageStatisticsViewer from '@/components/AnalysisTools/ImageStatisticsViewer'
-import ImageMetadataViewer from '@/components/AnalysisTools/ImageMetadataViewer'
+import Analysis from '@/components/AnalysisTools/Analysis'
 import NightLog from '@/components/NightLog'
 import StatusVal from '@/components/status/StatusVal'
-import UiSyncControls from '@/components/UiSyncControls'
-
-import Tabs from '@/components/Tabs'
-import TabItem from '@/components/TabItem'
 
 import moment from 'moment'
 import { mapGetters, mapState } from 'vuex'
@@ -429,8 +392,7 @@ export default {
   components: {
     ImageView,
     ImagesTable,
-    LineProfileInspection,
-    HistogramTool,
+    Analysis,
     CommandTabsAccordion,
     CommandTabsWide,
     CommandButton,
@@ -439,16 +401,10 @@ export default {
     InfoImageThumb,
     ThumbnailRow,
     ButtonRowBelowImage,
-    DrawShapesToolbar,
     SiteConfigViewer,
     DownloadInterface,
-    ImageStatisticsViewer,
-    ImageMetadataViewer,
     NightLog,
-    Tabs,
-    TabItem,
-    StatusVal,
-    UiSyncControls
+    StatusVal
   },
   props: {
     sitecode: String
@@ -456,7 +412,6 @@ export default {
   data () {
     return {
       accordionIsOpen: 1,
-      activeAnalysisTab: 'statistics', // default tab in 'analysis'
       activeDevTab: 'site config', // default tab in 'dev tools'
 
       region_stats_loading: false,
@@ -487,7 +442,6 @@ export default {
     ]),
 
     ...mapGetters('images', [
-      'small_fits_exists',
       'large_fits_exists',
       'small_fits_filename',
       'large_fits_filename',
@@ -638,15 +592,6 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
   flex-grow: 1;
 }
 
-.analysis-tools-tabs > ::v-deep .tab {
-  padding: 1em;
-  width: 100%;
-}
-.dev-tools-tabs > ::v-deep .tab {
-  padding: 1em;
-  width: 100%;
-}
-
 .site-data-wrapper {
   margin: 1em auto;
   display: flex;
@@ -757,10 +702,6 @@ $visible-content-height: calc(100vh - #{$top-bottom-height + #{(2 * $site-data-w
 
 .live-data-toggle-pane{
     margin-bottom: 1em;
-}
-
-.analysis-tabs {
-  margin-bottom: 3em;
 }
 
 .shapes-toolbar {
