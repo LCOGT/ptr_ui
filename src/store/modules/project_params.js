@@ -65,7 +65,7 @@ const state = {
   cycle: true,
   expiry_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
   start_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
-  long_stack: false,
+  sub_stack: false,
   smart_stack: true,
   defocus: 0,
   draft_project_params: {} // If a user has entered some info into the project form, save it here so we can go back to it.
@@ -101,7 +101,7 @@ const getters = {
       expiry_date: state.expiry_date,
       start_date: state.start_date,
       smart_stack: state.smart_stack,
-      long_stack: state.long_stack,
+      sub_stack: state.sub_stack,
       defocus: state.defocus
     }
   },
@@ -176,7 +176,7 @@ const mutations = {
   cycle (state, val) { state.cycle = val },
   expiry_date (state, val) { state.expiry_date = val },
   start_date (state, val) { state.start_date = val },
-  long_stack (state, val) { state.long_stack = val },
+  sub_stack (state, val) { state.sub_stack = val },
   smart_stack (state, val) { state.smart_stack = val },
   defocus (state, val) { state.defocus = val },
   draft_project_params (state, val) { state.draft_project_params = val }, // project params that have saved off in saveProjectDraft
@@ -252,7 +252,7 @@ const actions = {
     commit('start_date', start_date)
 
     commit('smart_stack', true)
-    commit('long_stack', false)
+    commit('sub_stack', false)
     commit('defocus', 0)
   },
   loadProject ({ state, commit }, project) {

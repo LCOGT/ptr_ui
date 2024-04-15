@@ -20,7 +20,7 @@ const state = {
 
   // Stack parameters
   smartstackIsActive: true,
-  longstackIsActive: false,
+  subStackIsActive: false,
 
   // Subframe parameters
   subframeIsActive: false,
@@ -65,7 +65,7 @@ const getters = {
   telescope_selection: state => state.telescope_selection,
   telescope_coordinate_frame: state => state.telescope_coordinate_frame,
   smartstackIsActive: state => state.smartstackIsActive,
-  longstackIsActive: state => state.longstackIsActive,
+  subStackIsActive: state => state.subStackIsActive,
   subframeIsActive: state => state.subframeIsActive,
   subframeDefinedWithFile: state => state.subframeDefinedWithFile,
   camera_areas_selection: state => state.camera_areas_selection,
@@ -128,7 +128,7 @@ const mutations = {
   telescope_selection (state, val) { state.telescope_selection = val },
   telescope_coordinate_frame (state, val) { state.telescope_coordinate_frame = val },
   smartstackIsActive (state, val) { state.smartstackIsActive = val },
-  longstackIsActive (state, val) { state.longstackIsActive = val },
+  subStackIsActive (state, val) { state.subStackIsActive = val },
   subframeIsActive (state, val) { state.subframeIsActive = val },
   subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },
   camera_areas_selection (state, val) { state.camera_areas_selection = val },
