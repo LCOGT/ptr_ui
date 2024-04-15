@@ -780,15 +780,15 @@
 
             <b-field>
               <b-checkbox
-                v-model="long_stack"
+                v-model="sub_stack"
                 :disabled="read_only"
               >
-                Long Stack
+                Sub Stack
               </b-checkbox>
               <b-tooltip
                 type="is-dark"
                 position="is-right"
-                label="Stacking multiple longer exposure times for all exposures."
+                label="Split exposures into 10 second exposures that are cross-correlated and stacked"
               >
                 <b-icon
                   size="is-small"
@@ -995,8 +995,8 @@ export default {
     this.updateTargetsValue(targets_index, 'dec', this.mount_dec)
     this.updateTargetsValue(targets_index, 'name', this.mount_object)
 
-    // initialize smart stack and long stack to camera tab values
-    this.long_stack = this.longstackIsActive
+    // initialize smart stack and sub stack to camera tab values
+    this.sub_stack = this.subStackIsActive
     this.smart_stack = this.smartstackIsActive
 
     // set default filter
@@ -1481,7 +1481,7 @@ export default {
       'expiry_date',
       'start_date',
       'smart_stack',
-      'long_stack',
+      'sub_stack',
       'defocus'
     ]),
     ...mapGetters('project_params', ['project_constraints', 'projectToSend']),
@@ -1522,7 +1522,7 @@ export default {
       'mount_dec',
       'mount_object',
       'smartstackIsActive',
-      'longstackIsActive'
+      'subStackIsActive'
     ]),
     ...mapGetters('site_config', [
       'available_sites',

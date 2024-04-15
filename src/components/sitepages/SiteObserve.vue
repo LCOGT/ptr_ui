@@ -97,9 +97,9 @@ export default {
       set (val) { this.$store.commit('command_params/smartstackIsActive', val) }
     },
 
-    longstackIsActive: {
-      get () { return this.$store.getters['command_params/longstackIsActive'] },
-      set (val) { this.$store.commit('command_params/longstackIsActive', val) }
+    subStackIsActive: {
+      get () { return this.$store.getters['command_params/subStackIsActive'] },
+      set (val) { this.$store.commit('command_params/subStackIsActive', val) }
     },
 
     subframeIsActive: {
