@@ -20,7 +20,7 @@ const state = {
 
   // Stack parameters
   smartstackIsActive: true,
-  subStackIsActive: false,
+  subStackIsActive: true,
 
   // Subframe parameters
   subframeIsActive: false,
