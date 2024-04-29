@@ -252,7 +252,7 @@ const actions = {
     commit('start_date', start_date)
 
     commit('smart_stack', true)
-    commit('sub_stack', false)
+    commit('sub_stack', true)
     commit('defocus', 0)
   },
   loadProject ({ state, commit }, project) {
