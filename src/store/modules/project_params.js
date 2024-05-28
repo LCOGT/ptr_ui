@@ -51,7 +51,7 @@ const state = {
   max_ha: 4, // decimal hours
   min_zenith_dist: 0, // degrees
   max_night_duration: 6, // hours
-  max_airmass: 3.0,
+  max_airmass: 3.00,
   lunar_dist_min: 30, // deg
   lunar_phase_max: 60, // %
   frequent_autofocus: false,
@@ -226,7 +226,7 @@ const actions = {
     commit('max_ha', 4) // decimal hrs
     commit('min_zenith_dist', 0) // deg
     commit('max_night_duration', 6) // hours
-    commit('max_airmass', 2.0)
+    commit('max_airmass', 2.00)
     commit('lunar_dist_min', 30) // deg
     commit('lunar_phase_max', 60) // %
     commit('frequent_autofocus', false)

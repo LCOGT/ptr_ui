@@ -659,9 +659,11 @@
               v-model="max_airmass"
               class="project-input"
               type="number"
-              min="1"
+              min="0"
               max="5"
+              step="0.01"
               :disabled="read_only"
+              @blur="roundMaxAirmass"
             />
           </b-field>
           <b-field
@@ -1068,6 +1070,12 @@ export default {
       'resetProjectForm',
       'loadProject'
     ]),
+    roundMaxAirmass () {
+      const roundedValue = parseFloat(this.max_airmass).toFixed(2)
+      console.log('roundedValue', roundedValue)
+      this.$store.commit('project_params/max_airmass', roundedValue)
+      this.setDelayedError()
+    },
     // Set store value for min_zenith_dist if it exists in mount config
     load_default_zenith_from_mount () {
       this.$store.commit('project_params/min_zenith_dist', this.selected_mount_config?.default_zenith_avoid ?? 0)
@@ -1485,7 +1493,6 @@ export default {
       'defocus'
     ]),
     ...mapGetters('project_params', ['project_constraints', 'projectToSend']),
-
     // Filter dropdown choices update based on which sites are selected.
     project_filter_list () {
       const selected_sites = this.project_sites.flat(Infinity)
