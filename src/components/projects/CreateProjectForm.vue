@@ -659,7 +659,7 @@
               v-model="max_airmass"
               class="project-input"
               type="number"
-              min="0"
+              min="1"
               max="5"
               step="0.01"
               :disabled="read_only"
