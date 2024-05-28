@@ -1072,9 +1072,7 @@ export default {
     ]),
     roundMaxAirmass () {
       const roundedValue = parseFloat(this.max_airmass).toFixed(2)
-      console.log('roundedValue', roundedValue)
       this.$store.commit('project_params/max_airmass', roundedValue)
-      this.setDelayedError()
     },
     // Set store value for min_zenith_dist if it exists in mount config
     load_default_zenith_from_mount () {
