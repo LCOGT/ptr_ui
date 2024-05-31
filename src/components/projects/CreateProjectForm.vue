@@ -661,7 +661,7 @@
               type="number"
               min="1"
               max="5"
-              step="0.01"
+              step="0.0001"
               :disabled="read_only"
               @blur="roundMaxAirmass"
             />
