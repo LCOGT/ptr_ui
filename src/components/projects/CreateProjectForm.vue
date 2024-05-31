@@ -661,7 +661,9 @@
               type="number"
               min="1"
               max="5"
+              step="0.0001"
               :disabled="read_only"
+              @blur="roundMaxAirmass"
             />
           </b-field>
           <b-field
@@ -1068,6 +1070,10 @@ export default {
       'resetProjectForm',
       'loadProject'
     ]),
+    roundMaxAirmass () {
+      const roundedValue = parseFloat(this.max_airmass).toFixed(2)
+      this.$store.commit('project_params/max_airmass', roundedValue)
+    },
     // Set store value for min_zenith_dist if it exists in mount config
     load_default_zenith_from_mount () {
       this.$store.commit('project_params/min_zenith_dist', this.selected_mount_config?.default_zenith_avoid ?? 0)
@@ -1304,18 +1310,18 @@ export default {
 
     // Getting width for 'Full' zoom selection
     getFullWidth () {
-      const size_x = this.camera_size_x
-      const pix = this.pixel_scale
-      if (size_x && pix) {
-        return (size_x * pix) / 3600
-      } else return 1
-    },
-    // Getting height for 'Full' zoom selection
-    getFullHeight () {
       const size_y = this.camera_size_y
       const pix = this.pixel_scale
       if (size_y && pix) {
         return (size_y * pix) / 3600
+      } else return 1
+    },
+    // Getting height for 'Full' zoom selection
+    getFullHeight () {
+      const size_x = this.camera_size_x
+      const pix = this.pixel_scale
+      if (size_x && pix) {
+        return (size_x * pix) / 3600
       } else return 1
     },
 
@@ -1485,7 +1491,6 @@ export default {
       'defocus'
     ]),
     ...mapGetters('project_params', ['project_constraints', 'projectToSend']),
-
     // Filter dropdown choices update based on which sites are selected.
     project_filter_list () {
       const selected_sites = this.project_sites.flat(Infinity)
