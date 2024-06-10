@@ -22,7 +22,7 @@ const state = {
   },
   equatorialSweep: {
     points: 12,
-    minAltitude: 30
+    minAltitude: 25
   },
   focusExtensive: {
     target: 'near_tycho_star', // alternative: 'use_field'
@@ -58,7 +58,7 @@ const state = {
   },
   pointingRun: {
     numPointingRuns: 25,
-    minAltitude: 30
+    minAltitude: 25
   },
 
   // If a script is not in this list, the UI settings button will be disabled.
@@ -268,7 +268,7 @@ const actions = {
       equatorialSweep () {
         return {
           points: 12,
-          minAltitude: 30
+          minAltitude: 25
         }
       },
       focusExtensive () {
@@ -318,7 +318,7 @@ const actions = {
       pointingRun () {
         return {
           numPointingRuns: 25,
-          minAltitude: 30
+          minAltitude: 25
         }
       }
     }
