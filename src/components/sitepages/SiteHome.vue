@@ -53,7 +53,7 @@
 
     <div style="height: 2em;" />
 
-    <OWMReport v-if="userIsAdmin" />
+    <OWMReport />
   </div>
 </template>
 
