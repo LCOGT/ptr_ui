@@ -685,8 +685,6 @@ export default {
 
             // Check if the moon icon has already been added to this specific header cell
             if (!headerCell.querySelector(`[data-moon-icon="${moonIconDataAttr}"]`)) {
-              console.log('Adding moon icon to header cell:', headerCell)
-
               // Remove any existing moon icons in this cell
               const existingMoonIcons = headerCell.querySelectorAll('.moon-icon')
               existingMoonIcons.forEach(icon => icon.remove())
