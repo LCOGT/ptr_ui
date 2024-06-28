@@ -668,14 +668,8 @@ export default {
       this.fullCalendarApi.refetchEvents()
     },
 
-    // Display moon phase icons in the calendar
     dayRender (dayRenderInfo) {
-      // Check if the current view is week view
-      if (this.fullCalendarApi?.view?.type === 'timeGridWeek') {
-        this.addUTCTimeColumn()
-      }
-
-      try { // ignore errors from the timezone not being loaded yet.
+      try {
         const date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
         const moon_phase = getMoonPhaseDays(
           date.year(),
@@ -683,11 +677,37 @@ export default {
           date.date())
 
         if (moon_phase) {
-          dayRenderInfo.el.innerHTML = `<i class="moon-icon mdi \
-              mdi-moon-${moon_phase.name}" aria-hidden="true"></i>`
+          const headerCell = document.querySelector(`.fc-day[data-date="${date.format('YYYY-MM-DD')}"]`)
+
+          if (headerCell) {
+            // Create a unique data attribute for the moon icon based on the date
+            const moonIconDataAttr = `moon-icon-${date.format('YYYY-MM-DD')}`
+
+            // Check if the moon icon has already been added to this specific header cell
+            if (!headerCell.querySelector(`[data-moon-icon="${moonIconDataAttr}"]`)) {
+              console.log('Adding moon icon to header cell:', headerCell)
+
+              // Remove any existing moon icons in this cell
+              const existingMoonIcons = headerCell.querySelectorAll('.moon-icon')
+              existingMoonIcons.forEach(icon => icon.remove())
+
+              // Add new moon icon
+              const moonIcon = document.createElement('i')
+              moonIcon.className = `moon-icon mdi mdi-moon-${moon_phase.name}`
+              moonIcon.setAttribute('aria-hidden', 'true')
+              moonIcon.setAttribute('data-moon-icon', moonIconDataAttr)
+
+              // Append the moon icon to the header cell content
+              headerCell.appendChild(moonIcon)
+
+              // Adjust the style to place it below the date
+              moonIcon.style.display = 'block'
+              moonIcon.style.marginTop = '5px'
+            }
+          }
         }
-      } catch {
-        console.warn('dayRender waiting for valid timezone.')
+      } catch (error) {
+        console.warn('dayRender waiting for valid timezone.', error)
       }
     },
 
