@@ -669,6 +669,9 @@ export default {
     },
 
     dayRender (dayRenderInfo) {
+      if (this.fullCalendarApi?.view?.type === 'timeGridWeek') {
+        this.addUTCTimeColumn()
+      }
       try {
         const date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
         const moon_phase = getMoonPhaseDays(
