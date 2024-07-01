@@ -1096,7 +1096,7 @@ export default {
           start: new Date(moon.rise),
           end: new Date(moon.set),
           rendering: 'background',
-          backgroundColor: rgba_from_illumination(moon.illumination, 235),
+          backgroundColor: rgba_from_illumination(moon.illumination, 255),
           borderColor: '#aaaaaa',
           id: 'fc-custom-moon-indicator',
           classNames: ['fc-moon-indicator'],
@@ -1218,7 +1218,7 @@ export default {
 @import "@/style/buefy-styles.scss";
 @import "@/style/_variables.scss";
 
-$moon-width: 16px;
+$moon-width: 20px;
 
 $event-left-margin: 4px;
 
@@ -1226,7 +1226,7 @@ $moon-info-z-index: 20; // this should be above all other events
 $now-indicator-z-index: 19;
 $moon-icon-z-index: 18;
 $forecast-z-index: 16; // this should be above the moon
-$moon-z-index: 15;
+$moon-z-index: 0;
 $observing-start-end-z-index: 15;
 $sky-darkness-z-index: 15;
 
@@ -1380,6 +1380,7 @@ These times are obtained from the events in the site config */
 .fc-moon-indicator {
   z-index: $moon-z-index;
   width: $moon-width;
+  opacity: 0.4;
   transition: 0.2s;
 }
 .fc-moon-indicator:hover {
@@ -1391,7 +1392,7 @@ These times are obtained from the events in the site config */
 .fc-forecast-event {
   $background-opacity: 0;
   $border-width: $forecast-width;
-  // z-index: $forecast-z-index !important;
+  z-index: $forecast-z-index !important;
   opacity: 1;
   background-color: rgba(0,0,0,0);
   width: 0;
