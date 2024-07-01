@@ -1226,7 +1226,7 @@ $moon-info-z-index: 20; // this should be above all other events
 $now-indicator-z-index: 19;
 $moon-icon-z-index: 18;
 $forecast-z-index: 16; // this should be above the moon
-$moon-z-index: 0;
+$moon-z-index: 15;
 $observing-start-end-z-index: 15;
 $sky-darkness-z-index: 15;
 
