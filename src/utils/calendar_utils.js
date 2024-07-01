@@ -151,7 +151,7 @@ const getMoonPhaseDays = (year, month, day) => {
  * @returns {string}: css value, something like 'rgba(255,255,255,0.5)'
  */
 const rgba_from_illumination = (illum, peak) => {
-  const alpha = 0.1 + (0.9 * illum) // should have minimum opacity of 0.1
+  const alpha = 0.1 + (0.9 * illum) + 1
   return `rgba(${peak},${peak},${peak},${alpha})`
 }
 
