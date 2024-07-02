@@ -53,7 +53,8 @@ const helpers = {
     // compute hour angle in degrees
     const sidereal = this.siderealTime(lon, date)
     let ha = sidereal - ra
-    if (ha < 0) ha = ha + 360
+    ha = this.hour2degree(ha)
+    if (ha < 0) ha += 360
 
     // convert degrees to radians
     ha = ha * Math.PI / 180
@@ -77,7 +78,11 @@ const helpers = {
     if (Math.sin(ha) > 0) hrz_azimuth = 360 - hrz_azimuth
     return [hrz_altitude, hrz_azimuth]
   },
-
+  radec2hourangle: function (ra, lon, date = null) {
+    const sidereal = this.siderealTime(lon, date)
+    const ha = sidereal - ra
+    return ha
+  },
   hour2degree: ra => {
     return ra > 12 ? (ra - 24) * 15 : ra * 15
   },
