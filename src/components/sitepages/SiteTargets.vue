@@ -910,6 +910,7 @@ export default {
         this.date_obs = this.date_obs_obs
       }
     },
+
     submitForm () {
       // This is here because the watched property doesn't change before the form gets submitted
       if (this.isLiveCommonTargets) {
