@@ -299,8 +299,6 @@ export default {
 
     handle_coordinate_search_results (search_results) {
       if (!search_results.error) {
-        console.log('no errors')
-
         this.mount_ra = search_results.ra.toFixed(4)
         this.mount_dec = search_results.dec.toFixed(4)
         const date = new Date()
