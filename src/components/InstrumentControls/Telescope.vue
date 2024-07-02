@@ -37,7 +37,7 @@
 
     <TargetSearchField
       v-model="mount_object"
-      label="Object"
+      label="Object Search"
       size="is-small"
       horizontal
       @results="handle_coordinate_search_results"
@@ -62,8 +62,6 @@
         size="is-small"
       />
     </b-field>
-
-    <div class="horizontal-border" />
 
     <b-field
       horizontal
@@ -93,6 +91,7 @@
       </p>
     </b-field>
 
+    <div class="horizontal-border" />
     <b-field
       horizontal
       label="Hour Angle"
@@ -239,6 +238,7 @@ import { mapGetters } from 'vuex'
 import TargetSearchField from '@/components/FormElements/TargetSearchField'
 import RightAscensionInput from '@/components/FormElements/RightAscensionInput'
 import DeclinationInput from '@/components/FormElements/DeclinationInput'
+import helpers from '@/utils/helpers'
 export default {
   name: 'Telescope',
   mixins: [commands_mixin, user_mixin, target_names],
@@ -299,14 +299,25 @@ export default {
 
     handle_coordinate_search_results (search_results) {
       if (!search_results.error) {
+        console.log('no errors')
+
         this.mount_ra = search_results.ra.toFixed(4)
         this.mount_dec = search_results.dec.toFixed(4)
-        // make sure to change this after the coordinates, since the object name is cleared
-        // after large changes in the coordinate positions. Details in vuex command_params.
+        const date = new Date()
+        const altaz = helpers.eq2altaz(search_results.ra.toFixed(4), search_results.dec.toFixed(4), this.site_latitude, this.site_longitude, date)
+        this.mount_ha = helpers.radec2hourangle(search_results.ra.toFixed(4), this.site_longitude, date).toFixed(4)
+        const az = altaz[1]
+        this.mount_az = az.toFixed(4)
+        const alt = altaz[0]
+        this.mount_alt = alt.toFixed(4)
+
         this.mount_object = search_results.searched_name
       } else {
         this.mount_ra = ''
         this.mount_dec = ''
+        this.mount_ha = ''
+        this.mount_az = ''
+        this.mount_alt = ''
         this.$buefy.toast.open({
           message: `Could not resolve object with name ${search_results.searched_name}`,
           type: 'is-warning',
@@ -329,6 +340,10 @@ export default {
       'buildTelescopeTabStatus2',
       'telescope_message',
       'mount_message'
+    ]),
+    ...mapGetters('site_config', [
+      'site_latitude',
+      'site_longitude'
     ]),
 
     mount_ra: {

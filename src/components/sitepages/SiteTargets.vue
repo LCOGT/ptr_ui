@@ -84,8 +84,8 @@
               @click="set_coordinates_from_aladin"
             />
           </div>
-          <div class="search-slew-container">
-            <b-field>
+          <!-- <div class="search-slew-container"> -->
+          <!-- <b-field>
               <command-button
                 :data="mount_slew_radec_command"
                 style="margin-bottom: 1em"
@@ -100,15 +100,15 @@
                   class="command-slew-button is-small is-success is-outlined"
                 >
                   slew & center
-                </command-button>
-              </p>
-            </b-field>
-            <TargetSearchField
+                </command-button> -->
+          <!-- </p>
+            </b-field> -->
+          <!-- <TargetSearchField
               v-model="mount_object"
               size="is-small"
               @results="handle_object_name_search"
-            />
-          </div>
+            /> -->
+          <!-- </div> -->
 
           <div class="sidebar-tabs">
             <div
@@ -585,9 +585,7 @@ import { mapGetters } from 'vuex'
 
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import DateTimeLocationPicker from '@/components/celestialmap/DateTimeLocationPicker'
-import TargetSearchField from '@/components/FormElements/TargetSearchField'
 import CommandTabsAccordion from '@/components/CommandTabsAccordion'
-import CommandButton from '@/components/FormElements/CommandButton'
 // import Celestial from '@/components/celestialmap/celestial'
 import celestial from 'd3-celestial'
 
@@ -604,10 +602,8 @@ export default {
   props: ['sitecode'],
   mixins: [commands_mixin],
   components: {
-    TargetSearchField,
     TheSkyChart,
     CommandTabsAccordion,
-    CommandButton,
     DateTimeLocationPicker,
     TargetCard
   },
@@ -914,7 +910,6 @@ export default {
         this.date_obs = this.date_obs_obs
       }
     },
-
     submitForm () {
       // This is here because the watched property doesn't change before the form gets submitted
       if (this.isLiveCommonTargets) {
@@ -1118,6 +1113,7 @@ $toggle-button-height: 32px;
     transform: translateX(100%);
     transition: .8s ease-in-out;
     z-index: 5;
+    margin-right: 3em;
 
     @include tablet {
         position:absolute;
