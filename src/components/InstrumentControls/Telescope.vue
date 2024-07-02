@@ -305,7 +305,7 @@ export default {
         this.mount_dec = search_results.dec.toFixed(4)
         const date = new Date()
         const altaz = helpers.eq2altaz(search_results.ra.toFixed(4), search_results.dec.toFixed(4), this.site_latitude, this.site_longitude, date)
-        this.mount_ha = helpers.radec2hourangle(search_results.ra.toFixed(4), this.site_longitude, date).toFixed(4)
+        this.mount_ha = helpers.eq2hourangle(search_results.ra.toFixed(4), this.site_longitude, date).toFixed(4)
         const az = altaz[1]
         this.mount_az = az.toFixed(4)
         const alt = altaz[0]

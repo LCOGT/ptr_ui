@@ -78,7 +78,7 @@ const helpers = {
     if (Math.sin(ha) > 0) hrz_azimuth = 360 - hrz_azimuth
     return [hrz_altitude, hrz_azimuth]
   },
-  radec2hourangle: function (ra, lon, date = null) {
+  eq2hourangle: function (ra, lon, date = null) {
     const sidereal = this.siderealTime(lon, date)
     const ha = sidereal - ra
     return ha
