@@ -14,14 +14,6 @@
       {{ telescope_message }}
     </div>
 
-    <button
-      class="button"
-      style="width: 100%; margin-bottom: 1rem"
-      @click="move_telescope_and_expose"
-    >
-      Move Telescope and Expose
-    </button>
-
     <b-field>
       <b-radio-button
         v-model="telescope_selection"
@@ -40,21 +32,6 @@
         Aux
       </b-radio-button>
     </b-field>
-
-    <div class="columns">
-      <status-column
-        style="font-size: 0.8em"
-        class="status-column"
-        :status-list="buildTelescopeTabStatus1Shorter"
-        :is-offline="!site_is_online"
-      />
-      <status-column
-        style="font-size: 0.8em"
-        class="status-column column"
-        :is-offline="!site_is_online"
-        :status-list="buildTelescopeTabStatus2"
-      />
-    </div>
 
     <div class="horizontal-border" />
 
@@ -177,7 +154,21 @@
         />
       </p>
     </b-field>
-
+    <div class="horizontal-border" />
+    <div class="columns">
+      <status-column
+        style="font-size: 0.8em"
+        class="status-column"
+        :status-list="buildTelescopeTabStatus1Shorter"
+        :is-offline="!site_is_online"
+      />
+      <status-column
+        style="font-size: 0.8em"
+        class="status-column column"
+        :is-offline="!site_is_online"
+        :status-list="buildTelescopeTabStatus2"
+      />
+    </div>
     <b-dropdown
       aria-role="list"
       style="width: 100%"
