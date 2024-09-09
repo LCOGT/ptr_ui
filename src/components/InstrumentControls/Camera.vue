@@ -381,7 +381,7 @@ export default {
         'RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'
       ],
       generic_filter_list: [
-        'Lum', 'Blue', 'Green', 'Red', 'NIR', 'Exo'
+        'Lum', 'Red', 'Green', 'Blue', 'UV', 'IR Block', 'DUO', 'NIR', 'Exo', 'HA', 'O3', 'S2'
       ]
     }
   },

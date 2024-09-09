@@ -59,7 +59,7 @@ export default {
       siteTime: '-',
       utcTime: '-',
 
-      project_to_load: '',
+      project_to_load: {},
       inspectModalActive: false
     }
   },

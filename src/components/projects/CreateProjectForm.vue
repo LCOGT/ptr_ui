@@ -227,7 +227,7 @@
           <b-field
             :type="{'is-warning': warn.targetRA}"
             label="RA"
-            style="width: 230px;"
+            style="width: 260px;"
           >
             <template #message>
               <div v-if="warn.targetRA">
@@ -243,7 +243,7 @@
           <b-field
             :type="{'is-warning': warn.targetDec}"
             label="Dec"
-            style="width: 230px;"
+            style="width: 260px;"
           >
             <template #message>
               <div v-if="warn.targetDec">
@@ -341,7 +341,7 @@
                 </option>
                 <option
                   v-for="filter in project_filter_list"
-                  :key="filter"
+                  :key="'site-'+filter"
                   :value="filter"
                 >
                   {{ filter }}
@@ -354,7 +354,7 @@
                 </option>
                 <option
                   v-for="filter in generic_filter_list"
-                  :key="filter"
+                  :key="'generic-'+filter"
                   :value="filter"
                 >
                   {{ filter }}
@@ -367,7 +367,7 @@
                 </option>
                 <option
                   v-for="filter in quick_stacks_filter_list"
-                  :key="filter"
+                  :key="'quickstacks-'+filter"
                   :value="filter"
                 >
                   {{ filter }}
@@ -944,11 +944,11 @@ export default {
       // Pos 10 to 80, including two single quotes containing the value.
       // This is used to limit the max length of the project note.
       max_fits_header_length: 68,
-      generic_filter_list: ['Lum', 'Blue', 'Green', 'Red', 'NIR', 'Exo', 'HA', 'O3', 'S2'],
+      generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'UV', 'IR Block', 'DUO', 'NIR', 'Exo', 'HA', 'O3', 'S2'],
       quick_stacks_filter_list: ['RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'],
       generic_camera_areas: [
-        'Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Full',
-        'Small sq.', '1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X'
+        'Mosaic arcmin.', 'Mosaic deg.', '30\'x30\'', 'Small sq.', 'Full', 'Big sq.',
+        '1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X', 'Planet'
       ],
       minDegrees: 0.0,
       maxDegrees: this.getMosaicLimits(),
@@ -1303,7 +1303,7 @@ export default {
     },
     // This function is used to dynamically change classes of width and height so that they display the appropriate symbol depending on the zoom selection
     getSymbol (zoom) {
-      if (zoom === 'Mosaic arcmin.') {
+      if (['Mosaic arcmin.', '30\'x30\''].includes(zoom)) {
         return 'arcmin-input'
       } else return 'degree-input'
     },
@@ -1402,7 +1402,9 @@ export default {
       } else if (zoom === 'Big sq.') {
         widthVal = this.getBigSquareValues()
       } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
-        widthVal = 0.0
+        widthVal = 0
+      } else if (zoom == '30\'x30\'') {
+        widthVal = 30
       }
       return widthVal
     },
@@ -1436,7 +1438,9 @@ export default {
       } else if (zoom === 'Big sq.') {
         heightVal = this.getBigSquareValues()
       } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
-        heightVal = 0.0
+        heightVal = 0
+      } else if (zoom == '30\'x30\'') {
+        heightVal = 30
       }
       return heightVal
     }
