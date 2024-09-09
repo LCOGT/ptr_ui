@@ -947,8 +947,8 @@ export default {
       generic_filter_list: ['Lum', 'Blue', 'Green', 'Red', 'NIR', 'Exo', 'HA', 'O3', 'S2'],
       quick_stacks_filter_list: ['RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'],
       generic_camera_areas: [
-        'Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Full',
-        'Small sq.', '1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X'
+        'Mosaic arcmin.', 'Mosaic deg.', '30\'x30\'', 'Small sq.', 'Full', 'Big sq.',
+        '1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X', 'Planet'
       ],
       minDegrees: 0.0,
       maxDegrees: this.getMosaicLimits(),
