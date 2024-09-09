@@ -88,10 +88,13 @@
           size="is-small"
         >
           <option value="active">
-            Active
+            Online
+          </option>
+          <option value="engineering">
+            Engineering
           </option>
           <option value="inactive">
-            Inactive
+            Offline
           </option>
         </b-select>
         <p class="control">
@@ -443,7 +446,7 @@ export default {
       skyTempLimitWarningLevel: 80,
       skyTempLimitDangerLevel: 90,
       lowestAmbientTemp: '',
-      highestAmbientTemp: '',
+      highestAmbientTemp: ''
     }
   },
   methods: {
@@ -453,7 +456,7 @@ export default {
           force_roof_state: val
         }
       )
-    },
+    }
   },
 
   computed: {

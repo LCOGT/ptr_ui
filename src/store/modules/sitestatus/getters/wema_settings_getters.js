@@ -29,9 +29,19 @@ const owmActive = (state, getters) => {
 }
 
 const observingMode = (state, getters) => {
+  let observingModeDisplay = state.wema_settings.observing_mode ?? 'n/a'
+
+  // Keep 'active' and 'inactive' as underlying values, but show 'Online' or 'Offline' to the user instead
+  // per Wayne's request
+  if (observingModeDisplay == 'active') {
+    observingModeDisplay = 'Online'
+  } else if (observingModeDisplay == 'inactive') {
+    observingModeDisplay = 'Offline'
+  }
+
   return {
     name: 'Observing Mode',
-    val: state.wema_settings.observing_mode ?? 'n/a',
+    val: observingModeDisplay,
     is_stale: isStale(state, getters)
   }
 }
