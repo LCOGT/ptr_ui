@@ -1303,7 +1303,7 @@ export default {
     },
     // This function is used to dynamically change classes of width and height so that they display the appropriate symbol depending on the zoom selection
     getSymbol (zoom) {
-      if (zoom === 'Mosaic arcmin.') {
+      if (['Mosaic arcmin.', '30\'x30\''].includes(zoom)) {
         return 'arcmin-input'
       } else return 'degree-input'
     },
@@ -1402,7 +1402,9 @@ export default {
       } else if (zoom === 'Big sq.') {
         widthVal = this.getBigSquareValues()
       } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
-        widthVal = 0.0
+        widthVal = 0
+      } else if (zoom == '30\'x30\'') {
+        widthVal = 30
       }
       return widthVal
     },
@@ -1436,7 +1438,9 @@ export default {
       } else if (zoom === 'Big sq.') {
         heightVal = this.getBigSquareValues()
       } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
-        heightVal = 0.0
+        heightVal = 0
+      } else if (zoom == '30\'x30\'') {
+        heightVal = 30
       }
       return heightVal
     }
