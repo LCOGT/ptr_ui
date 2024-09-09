@@ -341,7 +341,7 @@
                 </option>
                 <option
                   v-for="filter in project_filter_list"
-                  :key="filter"
+                  :key="'site-'+filter"
                   :value="filter"
                 >
                   {{ filter }}
@@ -354,7 +354,7 @@
                 </option>
                 <option
                   v-for="filter in generic_filter_list"
-                  :key="filter"
+                  :key="'generic-'+filter"
                   :value="filter"
                 >
                   {{ filter }}
@@ -367,7 +367,7 @@
                 </option>
                 <option
                   v-for="filter in quick_stacks_filter_list"
-                  :key="filter"
+                  :key="'quickstacks-'+filter"
                   :value="filter"
                 >
                   {{ filter }}
