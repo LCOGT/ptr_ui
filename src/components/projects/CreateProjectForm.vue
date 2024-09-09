@@ -227,7 +227,7 @@
           <b-field
             :type="{'is-warning': warn.targetRA}"
             label="RA"
-            style="width: 230px;"
+            style="width: 260px;"
           >
             <template #message>
               <div v-if="warn.targetRA">
@@ -243,7 +243,7 @@
           <b-field
             :type="{'is-warning': warn.targetDec}"
             label="Dec"
-            style="width: 230px;"
+            style="width: 260px;"
           >
             <template #message>
               <div v-if="warn.targetDec">
