@@ -154,6 +154,51 @@
       </p>
     </b-field>
     <div class="horizontal-border" />
+
+    <!-- "Park" and "Slew To..." button row -->
+    <div style="display: flex; gap: 1em;">
+      <command-button
+        :data="mount_park_command"
+        class="is-small"
+        style="margin-left: auto;"
+      >
+        Park
+      </command-button>
+      <b-dropdown
+        aria-role="list"
+        size="is-small"
+        position="is-top-left"
+      >
+        <button
+          slot="trigger"
+          class="button is-small"
+          style="width: 100%"
+        >
+          <span>Slew to...</span>
+          <b-icon icon="menu-down" />
+        </button>
+        <b-dropdown-item
+          v-for="(command, idx) in [
+            mount_park_command,
+            mount_unpark_command,
+            mount_home_command,
+            mount_skyflat_command,
+            mount_screenflat_command,
+            mount_tracking_on_command,
+            mount_tracking_off_command,
+            mount_stop_command,
+          ]"
+          :key="idx"
+          aria-role="listitem"
+        >
+          <command-button
+            :data="command"
+            class="dropdown-button-command is-small"
+          />
+        </b-dropdown-item>
+      </b-dropdown>
+    </div>
+    <div class="horizontal-border" />
     <div class="columns">
       <status-column
         style="font-size: 0.8em"
@@ -168,40 +213,6 @@
         :status-list="buildTelescopeTabStatus2"
       />
     </div>
-    <b-dropdown
-      aria-role="list"
-      style="width: 100%"
-      size="is-small"
-      position="is-top-right"
-    >
-      <button
-        slot="trigger"
-        class="button is-small"
-        style="width: 100%"
-      >
-        <span>Slew to...</span>
-        <b-icon icon="menu-down" />
-      </button>
-      <b-dropdown-item
-        v-for="(command, idx) in [
-          mount_park_command,
-          mount_unpark_command,
-          mount_home_command,
-          mount_skyflat_command,
-          mount_screenflat_command,
-          mount_tracking_on_command,
-          mount_tracking_off_command,
-          mount_stop_command,
-        ]"
-        :key="idx"
-        aria-role="listitem"
-      >
-        <command-button
-          :data="command"
-          class="dropdown-button-command is-small"
-        />
-      </b-dropdown-item>
-    </b-dropdown>
 
     <div style="height: 1em" />
 
