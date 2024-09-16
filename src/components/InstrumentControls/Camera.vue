@@ -375,7 +375,7 @@ export default {
     return {
       isExpandedStatusVisible: false,
       zoom_options: [
-        '30\'x30\'', 'Full', '1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X', 'Planet'
+        '30\'x30\'', 'Small sq.', 'Full', 'Big sq.', '1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X', 'Planet'
       ],
       quick_stacks_filter_list: [
         'RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'
