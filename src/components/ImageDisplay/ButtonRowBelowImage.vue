@@ -68,9 +68,45 @@
 
         <b-dropdown-item
           aria-role="listitem"
+          disabled
           @click="download_jpg"
         >
-          jpg
+          <p style="padding-bottom: 0.5em">
+            ⚠️ these labels are placeholders ⚠️️️
+          </p>
+          <p>all options below will just</p>
+          <p>download the screen jpg</p>
+        </b-dropdown-item>
+        <hr class="dropdown-divider">
+        <b-dropdown-item
+          aria-role="listitem"
+          @click="download_jpg"
+        >
+          screen jpg
+        </b-dropdown-item>
+        <b-dropdown-item
+          aria-role="listitem"
+          @click="download_jpg"
+        >
+          large jpg
+        </b-dropdown-item>
+        <b-dropdown-item
+          aria-role="listitem"
+          @click="download_jpg"
+        >
+          fits full
+        </b-dropdown-item>
+        <b-dropdown-item
+          aria-role="listitem"
+          @click="download_jpg"
+        >
+          fits bin 2
+        </b-dropdown-item>
+        <b-dropdown-item
+          aria-role="listitem"
+          @click="download_jpg"
+        >
+          tiff
         </b-dropdown-item>
       </b-dropdown>
     </b-field>

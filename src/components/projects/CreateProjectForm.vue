@@ -314,13 +314,25 @@
               title="Exposure Time [seconds]"
             >
               <b-input
-                v-model="exposures[n-1].exposure"
+                v-model.number="exposures[n-1].exposure"
                 size="is-small"
                 :disabled="!exposures[n-1].active || read_only"
                 type="number"
                 min="0.000001"
                 max="100000"
                 step="any"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Repeat' : ''"
+            >
+              <b-input
+                v-model.number="exposures[n-1].repeat"
+                size="is-small"
+                type="number"
+                min="0"
+                max="150"
+                style="width: 85px;"
               />
             </b-field>
             <b-field
