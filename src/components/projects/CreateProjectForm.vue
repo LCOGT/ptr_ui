@@ -330,7 +330,7 @@
                 v-model.number="exposures[n-1].repeat"
                 size="is-small"
                 type="number"
-                min="0"
+                min="-150"
                 max="150"
                 style="width: 85px;"
               />
