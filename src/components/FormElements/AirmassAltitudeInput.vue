@@ -74,7 +74,7 @@ export default {
     },
     altitudeToAirmass (alt) {
       // input altitude should be decimal degrees from horizon
-      const precision = 2 // how many decimal places to use for result
+      const precision = 3 // how many decimal places to use for result
 
       const altFromZenith = 90 - alt
       const altRad = altFromZenith * Math.PI / 180
@@ -84,19 +84,15 @@ export default {
       return airmass
     },
     airmassToAltitude (airmass) {
-      // return altitude in decimal degrees from horizon
-      const precision = 1 // how many decimal places to use for result
-
       // Try to use a cached result first
       if (airmass in this.airmassToAltitudeLookup) {
-        console.log('returning altitude from lookup: ', this.airmassToAltitudeLookup[airmass])
         return this.airmassToAltitudeLookup[airmass]
       }
 
       // otherwise, do the computation
       const altFromZenithRad = Math.acos(1 / airmass)
       const altFromZenithDeg = altFromZenithRad * 180 / Math.PI
-      const altFromHorizonDeg = this.roundToPrecision(90 - altFromZenithDeg, precision)
+      const altFromHorizonDeg = 90 - altFromZenithDeg
       return altFromHorizonDeg
     },
     convertToSelectedUnits (val) {
@@ -118,9 +114,8 @@ export default {
           this.$emit('input', Number(value))
         // Validate airmass input
         } else if (this.units === 'airmass') {
-          console.log('airmass: ', value)
-          if (isNaN(Number(value)) || Number(value) < 0) {
-            throw new RangeError('Must be a positive number')
+          if (isNaN(Number(value)) || Number(value) < 1) {
+            throw new RangeError('Airmass is a positive number >= 1')
           }
           // Since the component "speaks" only in altitude (degrees), convert the airmass before emitting
           this.$emit('input', this.airmassToAltitude(value))
