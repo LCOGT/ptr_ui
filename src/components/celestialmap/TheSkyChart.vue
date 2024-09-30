@@ -60,10 +60,6 @@ export default {
       type: Boolean,
       default: true
     },
-    showDaylight: {
-      type: Boolean,
-      default: false
-    },
     showMilkyWay: {
       type: Boolean,
       default: true
@@ -112,6 +108,15 @@ export default {
     openClusterMagMax: {
       type: Number,
       default: 0
+    },
+
+    showAirmassCircle: {
+      type: Boolean,
+      default: true
+    },
+    degAboveHorizon: {
+      type: Number,
+      default: 30
     },
 
     use_custom_date_location: {
@@ -184,6 +189,10 @@ export default {
         show: this.showOpenClusters,
         minMagnitude: this.openClusterMagMin,
         maxMagnitude: this.openClusterMagMax
+      },
+      airmassCircle: {
+        show: this.showAirmassCircle,
+        degAboveHorizon: this.degAboveHorizon
       }
     }
 
@@ -374,9 +383,6 @@ export default {
     showPlanets () {
       Celestial.reload({ planets: { which: this.planetsList } })
     },
-    showDaylight () {
-      Celestial.apply({ daylight: { show: this.showDaylight } })
-    },
     showMilkyWay () {
       Celestial.apply({ mw: { show: this.showMilkyWay } })
     },
@@ -420,7 +426,16 @@ export default {
     openClusterMagMax () {
       Celestial.customData.openClusters.maxMagnitude = this.openClusterMagMax
       Celestial.redraw()
+    },
+    showAirmassCircle () {
+      Celestial.customData.airmassCircle.show = this.showAirmassCircle
+      Celestial.redraw()
+    },
+    degAboveHorizon () {
+      Celestial.customData.airmassCircle.degAboveHorizon = this.degAboveHorizon
+      Celestial.redraw()
     }
+
   },
 
   computed: {
