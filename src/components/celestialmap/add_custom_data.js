@@ -49,6 +49,53 @@ const distance = (p1, p2) => {
   return Math.sqrt(d1 * d1 + d2 * d2)
 }
 
+const drawAirmassCircle = (Celestial, quadtree) => {
+  // Draw a circle centered at the zenith with a radius that extends to a certain airmass (altitude) above horizon
+  if (!Celestial.customData.airmassCircle?.show) return
+
+  const mouseIsHovering = Celestial.customData.airmassCircle.isHovered
+  const color = 'yellow'
+  const lineWidth = 0.5
+
+  const degreesAboveHorizon = Celestial.customData.airmassCircle.degAboveHorizon
+  const degreesBelowZenith = 90 - degreesAboveHorizon
+
+  const zenith = Celestial.zenith() // zenith ra/dec (degrees)
+  const zenithXY = Celestial.mapProjection(zenith) // convert to xy pixel coords
+
+  // Don't show if zenith is [0,0]
+  // This is a simple fix to avoid rendering the circle before the map has positioned itself.
+  // Not worth worrying about the rare and brief moments when the zenith actually is [0,0].
+  // Maybe there is a more elegant solution but this sky chart is impossible to figure out sometimes.
+  if (zenith[0] == 0 && zenith[1] == 0) return
+
+  const horizon = [zenith[0], zenith[1] - degreesBelowZenith] // get a point on the horizon
+  const horizonXY = Celestial.mapProjection(horizon) // convert to xy pixel coords
+
+  // the radius of our circle is the difference between the y coordinate for the horizon point and zenith
+  const radiusPix = Math.abs(zenithXY[1] - horizonXY[1])
+
+  // draw the circle
+  Celestial.context.strokeStyle = color
+  Celestial.context.lineWidth = lineWidth
+  Celestial.context.beginPath()
+  Celestial.context.arc(zenithXY[0], zenithXY[1], radiusPix, 0, 2 * Math.PI)
+  Celestial.context.closePath()
+  Celestial.context.stroke()
+
+  // Add object name if the user is hovering over the circle and if there is space
+  const nameStyle = { fill: color, font: '12px Helvetica, Arial, serif', align: 'center', baseline: 'top' }
+  const textPos = [zenithXY[0], zenithXY[1] + radiusPix + 5]
+  const label = `altitude: ${Math.round(degreesAboveHorizon)}°`
+  const nearest = quadtree.find(textPos)
+  const no_overlap = !nearest || distance(nearest, textPos) > PROXIMITY_LIMIT
+  if (no_overlap && mouseIsHovering) {
+    quadtree.add(textPos)
+    Celestial.setTextStyle(nameStyle)
+    Celestial.context.fillText(label, zenithXY[0], zenithXY[1] + radiusPix + 5)
+  }
+}
+
 const draw_star = (Celestial, quadtree, styles, starbase, starexp, d) => {
   if (!Celestial.customData.stars.show) return
   if (d.properties.mag > Celestial.customData.stars.minMagnitude) return
@@ -229,13 +276,13 @@ const add_custom_data = (Celestial, base_config, data_list) => {
           .data(sky_objects.features)
           .enter().append('path')
           .attr('class', 'custom_obj')
-        Celestial.redraw()
       },
       redraw: () => {
         // The quadtree is used to avoid rendering object names that overlap
         const m = Celestial.metrics()
         const quadtree = d3.geom.quadtree().extent([[-1, -1], [m.width + 1, m.height + 1]])([])
 
+        drawAirmassCircle(Celestial, quadtree)
         Celestial.container.selectAll('.custom_obj').each((d) => {
           if (Celestial.clip(d.geometry.coordinates)) {
             const type = d.properties.type

@@ -34,7 +34,6 @@
 
           :show-moon="showMoon"
           :show-sun="showSun"
-          :show-daylight="showDaylight"
           :show-milky-way="showMilkyWay"
           :show-planets="showPlanets"
 
@@ -48,6 +47,9 @@
           :globular-cluster-mag-max="globularClusterMagMax"
           :open-cluster-mag-min="openClusterMagMin"
           :open-cluster-mag-max="openClusterMagMax"
+
+          :show-airmass-circle="showAirmassCircle"
+          :deg-above-horizon="degAboveHorizon"
 
           :use_custom_date_location="use_custom_date_location"
           :show_live_chart="isLiveSkyDisplay"
@@ -176,7 +178,7 @@
                   label="max mag"
                 >
                   <b-input
-                    v-model="starMagMax"
+                    v-model.number="starMagMax"
                     style="width: 80px;"
                     size="is-small"
                     label="max mag"
@@ -190,7 +192,7 @@
                   label="min mag"
                 >
                   <b-input
-                    v-model="starMagMin"
+                    v-model.number="starMagMin"
                     style="width: 80px;"
                     size="is-small"
                     label="min mag"
@@ -215,7 +217,7 @@
                   label="max mag"
                 >
                   <b-input
-                    v-model="galaxyMagMax"
+                    v-model.number="galaxyMagMax"
                     style="width: 80px;"
                     size="is-small"
                     label="max mag"
@@ -229,7 +231,7 @@
                   label="min mag"
                 >
                   <b-input
-                    v-model="galaxyMagMin"
+                    v-model.number="galaxyMagMin"
                     style="width: 80px;"
                     size="is-small"
                     label="min mag"
@@ -254,7 +256,7 @@
                   label="max mag"
                 >
                   <b-input
-                    v-model="nebulaMagMax"
+                    v-model.number="nebulaMagMax"
                     style="width: 80px;"
                     size="is-small"
                     label="max mag"
@@ -268,7 +270,7 @@
                   label="min mag"
                 >
                   <b-input
-                    v-model="nebulaMagMin"
+                    v-model.number="nebulaMagMin"
                     style="width: 80px;"
                     size="is-small"
                     label="min mag"
@@ -293,7 +295,7 @@
                   label="max mag"
                 >
                   <b-input
-                    v-model="globularClusterMagMax"
+                    v-model.number="globularClusterMagMax"
                     style="width: 80px;"
                     size="is-small"
                     label="max mag"
@@ -307,7 +309,7 @@
                   label="min mag"
                 >
                   <b-input
-                    v-model="globularClusterMagMin"
+                    v-model.number="globularClusterMagMin"
                     style="width: 80px;"
                     size="is-small"
                     label="min mag"
@@ -332,7 +334,7 @@
                   label="max mag"
                 >
                   <b-input
-                    v-model="openClusterMagMax"
+                    v-model.number="openClusterMagMax"
                     style="width: 80px;"
                     size="is-small"
                     label="max mag"
@@ -346,7 +348,7 @@
                   label="min mag"
                 >
                   <b-input
-                    v-model="openClusterMagMin"
+                    v-model.number="openClusterMagMin"
                     style="width: 80px;"
                     size="is-small"
                     label="min mag"
@@ -360,13 +362,38 @@
 
               <div class="horizontal-separator" />
 
-              <div style="display: flex; justify-content: space-between;">
-                <b-field label="daylight">
-                  <b-switch
-                    v-model="showDaylight"
-                    style="margin-bottom: 0.75rem;"
+              <div class="object-filter-label">
+                Airmass/Altitude Boundary
+                <b-tooltip
+                  type="is-dark"
+                  size="is-small"
+                  label="Denote a useful region with a specific airmass or altitude"
+                >
+                  <b-icon
+                    size="is-small"
+                    icon="help-circle-outline"
+                  />
+                </b-tooltip>
+              </div>
+              <div class="object-filter-group">
+                <b-switch
+                  v-model="showAirmassCircle"
+                  style="margin-bottom: 0.75rem;"
+                  :rounded="false"
+                />
+                <b-field>
+                  <AirmassAltitudeInput
+                    v-model.number="degAboveHorizon"
+                    size="is-small"
+                    style="width: 200px;"
                   />
                 </b-field>
+                <b-field />
+              </div>
+
+              <div class="horizontal-separator" />
+
+              <div style="display: flex; justify-content: space-between;">
                 <b-field label="moon">
                   <b-switch
                     v-model="showMoon"
@@ -586,6 +613,7 @@ import { mapGetters } from 'vuex'
 import TheSkyChart from '@/components/celestialmap/TheSkyChart'
 import DateTimeLocationPicker from '@/components/celestialmap/DateTimeLocationPicker'
 import CommandTabsAccordion from '@/components/CommandTabsAccordion'
+import AirmassAltitudeInput from '@/components/FormElements/AirmassAltitudeInput'
 // import Celestial from '@/components/celestialmap/celestial'
 import celestial from 'd3-celestial'
 
@@ -604,6 +632,7 @@ export default {
   components: {
     TheSkyChart,
     CommandTabsAccordion,
+    AirmassAltitudeInput,
     DateTimeLocationPicker,
     TargetCard
   },
@@ -631,7 +660,6 @@ export default {
       showOpenClusters: true,
       showMoon: true,
       showSun: true,
-      showDaylight: false,
       showMilkyWay: true,
       showPlanets: true,
 
@@ -645,6 +673,9 @@ export default {
       globularClusterMagMax: 0,
       openClusterMagMin: 10,
       openClusterMagMax: 0,
+
+      showAirmassCircle: true,
+      degAboveHorizon: 30,
 
       use_custom_date_location: false,
       skychart_date: new Date(),
@@ -796,10 +827,6 @@ export default {
         Celestial.resize({ width })
         document.getElementsByClassName('skychart-center')[0].style.width = height + 'px'
       }
-    },
-
-    toggle_daylight () {
-      Celestial.apply({ daylight: { show: true } })
     },
 
     update_skychart_time_and_place (time_and_place) {

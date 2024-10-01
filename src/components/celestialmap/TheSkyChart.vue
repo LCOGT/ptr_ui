@@ -60,10 +60,6 @@ export default {
       type: Boolean,
       default: true
     },
-    showDaylight: {
-      type: Boolean,
-      default: false
-    },
     showMilkyWay: {
       type: Boolean,
       default: true
@@ -114,6 +110,15 @@ export default {
       default: 0
     },
 
+    showAirmassCircle: {
+      type: Boolean,
+      default: true
+    },
+    degAboveHorizon: {
+      type: Number,
+      default: 30
+    },
+
     use_custom_date_location: {
       type: Boolean,
       default: false
@@ -146,6 +151,7 @@ export default {
 
       // Whether or not the mouse is hovering over the sky part of the map.
       mouse_in_sky: false,
+      airmassCircleIsHovered: false,
 
       resize_observer: ''
     }
@@ -184,6 +190,11 @@ export default {
         show: this.showOpenClusters,
         minMagnitude: this.openClusterMagMin,
         maxMagnitude: this.openClusterMagMax
+      },
+      airmassCircle: {
+        show: this.showAirmassCircle,
+        degAboveHorizon: this.degAboveHorizon,
+        isHovered: this.airmassCircleIsHovered
       }
     }
 
@@ -260,6 +271,15 @@ export default {
     handle_mouseover (e) { // Determine whether the mouse is inside the map or not
       const map_coords = Celestial.mapProjection.invert(e)
       this.mouse_in_sky = !!Celestial.clip(map_coords) // !! converts 0 or 1 to boolean
+
+      // Check and store the state of whether the user is hovering over the airmass circle
+      const zenith = Celestial.zenith()
+      const zenithXY = Celestial.mapProjection(zenith)
+      const horizonXY = Celestial.mapProjection([zenith[0], zenith[1] - (90 - this.degAboveHorizon)]) // get a point on the horizon
+      const circleRadius = Math.abs(zenithXY[1] - horizonXY[1])
+      const radiusToCenter = Math.sqrt((e[0] - zenithXY[0]) ** 2 + (e[1] - zenithXY[1]) ** 2)
+      const tolerance = 7 // how many pixels away should register as a hover event
+      this.airmassCircleIsHovered = (tolerance >= Math.abs(radiusToCenter - circleRadius))
     },
 
     rotate () {
@@ -374,9 +394,6 @@ export default {
     showPlanets () {
       Celestial.reload({ planets: { which: this.planetsList } })
     },
-    showDaylight () {
-      Celestial.apply({ daylight: { show: this.showDaylight } })
-    },
     showMilkyWay () {
       Celestial.apply({ mw: { show: this.showMilkyWay } })
     },
@@ -420,7 +437,20 @@ export default {
     openClusterMagMax () {
       Celestial.customData.openClusters.maxMagnitude = this.openClusterMagMax
       Celestial.redraw()
+    },
+    showAirmassCircle () {
+      Celestial.customData.airmassCircle.show = this.showAirmassCircle
+      Celestial.redraw()
+    },
+    degAboveHorizon () {
+      Celestial.customData.airmassCircle.degAboveHorizon = this.degAboveHorizon
+      Celestial.redraw()
+    },
+    airmassCircleIsHovered () {
+      Celestial.customData.airmassCircle.isHovered = this.airmassCircleIsHovered
+      Celestial.redraw()
     }
+
   },
 
   computed: {
