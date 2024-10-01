@@ -363,11 +363,11 @@
               <div class="horizontal-separator" />
 
               <div class="object-filter-label">
-                Airmass Boundary
+                Airmass/Altitude Boundary
                 <b-tooltip
                   type="is-dark"
                   size="is-small"
-                  label="Mark useful region by airmass or altitude"
+                  label="Denote a useful region with a specific airmass or altitude"
                 >
                   <b-icon
                     size="is-small"
