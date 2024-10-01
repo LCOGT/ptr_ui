@@ -363,7 +363,7 @@
               <div class="horizontal-separator" />
 
               <div class="object-filter-label">
-                Horizon Circle
+                Airmass Boundary
                 <b-tooltip
                   type="is-dark"
                   size="is-small"

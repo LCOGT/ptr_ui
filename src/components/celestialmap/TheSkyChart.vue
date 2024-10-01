@@ -151,6 +151,7 @@ export default {
 
       // Whether or not the mouse is hovering over the sky part of the map.
       mouse_in_sky: false,
+      airmassCircleIsHovered: false,
 
       resize_observer: ''
     }
@@ -192,7 +193,8 @@ export default {
       },
       airmassCircle: {
         show: this.showAirmassCircle,
-        degAboveHorizon: this.degAboveHorizon
+        degAboveHorizon: this.degAboveHorizon,
+        isHovered: this.airmassCircleIsHovered
       }
     }
 
@@ -269,6 +271,15 @@ export default {
     handle_mouseover (e) { // Determine whether the mouse is inside the map or not
       const map_coords = Celestial.mapProjection.invert(e)
       this.mouse_in_sky = !!Celestial.clip(map_coords) // !! converts 0 or 1 to boolean
+
+      // Check and store the state of whether the user is hovering over the airmass circle
+      const zenith = Celestial.zenith()
+      const zenithXY = Celestial.mapProjection(zenith)
+      const horizonXY = Celestial.mapProjection([zenith[0], zenith[1] - (90 - this.degAboveHorizon)]) // get a point on the horizon
+      const circleRadius = Math.abs(zenithXY[1] - horizonXY[1])
+      const radiusToCenter = Math.sqrt((e[0] - zenithXY[0]) ** 2 + (e[1] - zenithXY[1]) ** 2)
+      const tolerance = 7 // how many pixels away should register as a hover event
+      this.airmassCircleIsHovered = (tolerance >= Math.abs(radiusToCenter - circleRadius))
     },
 
     rotate () {
@@ -433,6 +444,10 @@ export default {
     },
     degAboveHorizon () {
       Celestial.customData.airmassCircle.degAboveHorizon = this.degAboveHorizon
+      Celestial.redraw()
+    },
+    airmassCircleIsHovered () {
+      Celestial.customData.airmassCircle.isHovered = this.airmassCircleIsHovered
       Celestial.redraw()
     }
 

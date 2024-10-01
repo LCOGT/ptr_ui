@@ -7,7 +7,7 @@
       :size="size"
     >
       <b-input
-        v-model="localVal"
+        v-model="localInputVal"
         :size="size"
         lazy
         :disabled="disabled"
@@ -38,24 +38,28 @@ export default {
   ],
   data () {
     return {
-      localVal: this.value, // the text input should match the altitude fed in from the parent component
+      localInputVal: this.value, // the text input should match the altitude fed in from the parent component
       airmassToAltitudeLookup: {},
-      units: 'alt',
+      units: 'airmass',
       hasError: false,
       errorMessage: ''
     }
+  },
+  mounted () {
+    // initialize displayed value with the correct units
+    this.localInputVal = this.convertToSelectedUnits(this.value)
   },
   watch: {
     value (newVal) {
       // If the parent component updates the prop that is sent in to this component,
       // update the local value in terms of the selected units
       if (newVal == null || newVal === '') {
-        this.localVal = newVal
+        this.localInputVal = newVal
       } else {
-        this.localVal = this.convertToSelectedUnits(newVal)
+        this.localInputVal = this.convertToSelectedUnits(newVal)
       }
     },
-    localVal (newVal) {
+    localInputVal (newVal) {
       // When the value in the input field changes, validate it and emit it back to the parent component
       if (newVal != null && newVal !== '') {
         this.validateAndEmit(newVal)
@@ -64,7 +68,7 @@ export default {
     units (newVal) {
       // When the user switches between altitude and airmass units, recompute the equivalent value to display locally
       if (this.value == null || this.value === '') return
-      this.localVal = this.convertToSelectedUnits(this.value)
+      this.localInputVal = this.convertToSelectedUnits(this.value)
     }
   },
   methods: {
@@ -73,27 +77,33 @@ export default {
       return Math.round(decimalMover * float) / decimalMover
     },
     altitudeToAirmass (alt) {
-      // input altitude should be decimal degrees from horizon
+      // Use the equation airmass = 1 / cos(zenithAngle), where zenith angle is 90 - altitude.
+      // note that this is not very precise at extremes.
+
+      // input altitude should be decimal degrees
       const precision = 3 // how many decimal places to use for result
 
-      const altFromZenith = 90 - alt
-      const altRad = altFromZenith * Math.PI / 180
+      const zenithAngle = 90 - alt
+      const altRad = zenithAngle * Math.PI / 180
       const airmass = this.roundToPrecision(1 / Math.cos(altRad), precision)
       // Cache results for reverse calculation (avoid floating point equality errors)
       this.airmassToAltitudeLookup[airmass] = alt
       return airmass
     },
     airmassToAltitude (airmass) {
+      // Use the equation zenithAngle = arccos(1 / airmass), where zenith angle is 90 - altitude.
+      // note that this is not very precise at extremes.
+
       // Try to use a cached result first
       if (airmass in this.airmassToAltitudeLookup) {
         return this.airmassToAltitudeLookup[airmass]
       }
 
       // otherwise, do the computation
-      const altFromZenithRad = Math.acos(1 / airmass)
-      const altFromZenithDeg = altFromZenithRad * 180 / Math.PI
-      const altFromHorizonDeg = 90 - altFromZenithDeg
-      return altFromHorizonDeg
+      const zenithAngleRad = Math.acos(1 / airmass)
+      const zenithAngleDeg = zenithAngleRad * 180 / Math.PI
+      const altitudeDeg = 90 - zenithAngleDeg
+      return altitudeDeg
     },
     convertToSelectedUnits (val) {
       if (this.units == 'airmass') {
@@ -102,23 +112,23 @@ export default {
         return val
       }
     },
-    validateAndEmit (value) {
+    validateAndEmit (val) {
       this.hasError = false
       this.errorMessage = ''
       try {
         // Validate altitude input
         if (this.units === 'alt') {
-          if (isNaN(Number(value)) || Number(value) < 0 || Number(value) > 90) {
+          if (isNaN(Number(val)) || Number(val) < 0 || Number(val) > 90) {
             throw new RangeError('Must be between 0 and 90 degrees')
           }
-          this.$emit('input', Number(value))
+          this.$emit('input', Number(val))
         // Validate airmass input
         } else if (this.units === 'airmass') {
-          if (isNaN(Number(value)) || Number(value) < 1) {
+          if (isNaN(Number(val)) || Number(val) < 1) {
             throw new RangeError('Airmass is a positive number >= 1')
           }
           // Since the component "speaks" only in altitude (degrees), convert the airmass before emitting
-          this.$emit('input', this.airmassToAltitude(value))
+          this.$emit('input', this.airmassToAltitude(val))
         }
       } catch (e) {
         this.hasError = true

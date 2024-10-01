@@ -49,10 +49,11 @@ const distance = (p1, p2) => {
   return Math.sqrt(d1 * d1 + d2 * d2)
 }
 
-const drawAirmassCircle = Celestial => {
+const drawAirmassCircle = (Celestial, quadtree) => {
   // Draw a circle centered at the zenith with a radius that extends to a certain airmass (altitude) above horizon
   if (!Celestial.customData.airmassCircle?.show) return
 
+  const mouseIsHovering = Celestial.customData.airmassCircle.isHovered
   const color = 'yellow'
   const lineWidth = 0.5
 
@@ -81,6 +82,18 @@ const drawAirmassCircle = Celestial => {
   Celestial.context.arc(zenithXY[0], zenithXY[1], radiusPix, 0, 2 * Math.PI)
   Celestial.context.closePath()
   Celestial.context.stroke()
+
+  // Add object name if the user is hovering over the circle and if there is space
+  const nameStyle = { fill: color, font: '12px Helvetica, Arial, serif', align: 'center', baseline: 'top' }
+  const textPos = [zenithXY[0], zenithXY[1] + radiusPix + 5]
+  const label = `altitude: ${Math.round(degreesAboveHorizon)}°`
+  const nearest = quadtree.find(textPos)
+  const no_overlap = !nearest || distance(nearest, textPos) > PROXIMITY_LIMIT
+  if (no_overlap && mouseIsHovering) {
+    quadtree.add(textPos)
+    Celestial.setTextStyle(nameStyle)
+    Celestial.context.fillText(label, zenithXY[0], zenithXY[1] + radiusPix + 5)
+  }
 }
 
 const draw_star = (Celestial, quadtree, styles, starbase, starexp, d) => {
@@ -269,6 +282,7 @@ const add_custom_data = (Celestial, base_config, data_list) => {
         const m = Celestial.metrics()
         const quadtree = d3.geom.quadtree().extent([[-1, -1], [m.width + 1, m.height + 1]])([])
 
+        drawAirmassCircle(Celestial, quadtree)
         Celestial.container.selectAll('.custom_obj').each((d) => {
           if (Celestial.clip(d.geometry.coordinates)) {
             const type = d.properties.type
@@ -288,7 +302,6 @@ const add_custom_data = (Celestial, base_config, data_list) => {
             }
           }
         })
-        drawAirmassCircle(Celestial)
       }
     })
   };
