@@ -27,7 +27,7 @@ const state = {
   subframeDefinedWithFile: '',
 
   camera_areas_selection: 'Full',
-  camera_note: '',
+  cam_note: '',
   object_name: '',
   camera_exposure: '1',
   camera_count: 1, // numberinput form requires number, not string. converted to string in expose command.
@@ -69,7 +69,7 @@ const getters = {
   subframeIsActive: state => state.subframeIsActive,
   subframeDefinedWithFile: state => state.subframeDefinedWithFile,
   camera_areas_selection: state => state.camera_areas_selection,
-  camera_note: state => state.camera_note,
+  cam_note: state => state.cam_note,
   object_name: state => state.object_name,
   camera_exposure: state => state.camera_exposure,
   camera_count: state => state.camera_count,
@@ -132,7 +132,7 @@ const mutations = {
   subframeIsActive (state, val) { state.subframeIsActive = val },
   subframeDefinedWithFile (state, val) { state.subframeDefinedWithFile = val },
   camera_areas_selection (state, val) { state.camera_areas_selection = val },
-  camera_note (state, val) { state.camera_note = val },
+  cam_note (state, val) { state.cam_note = val },
   object_name (state, val) { state.object_name = val },
   camera_exposure (state, val) { state.camera_exposure = val },
   camera_count (state, val) { state.camera_count = val },

@@ -273,10 +273,10 @@
 
     <b-field
       horizontal
-      label="Note"
+      label="Cam Note"
     >
       <b-input
-        v-model="camera_note"
+        v-model="cam_note"
         placeholder="a camera note for the FITS header..."
         type="text"
         min="0"
@@ -432,9 +432,9 @@ export default {
       get () { return this.$store.getters['command_params/camera_areas_selection'] },
       set (val) { this.$store.commit('command_params/camera_areas_selection', val) }
     },
-    camera_note: {
-      get () { return this.$store.getters['command_params/camera_note'] },
-      set (val) { this.$store.commit('command_params/camera_note', val) }
+    cam_note: {
+      get () { return this.$store.getters['command_params/cam_note'] },
+      set (val) { this.$store.commit('command_params/cam_note', val) }
     },
 
     object_name: {

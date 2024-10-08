@@ -304,7 +304,7 @@ export const commands_mixin = {
       'subframeDefinedWithFile',
 
       'camera_areas_selection',
-      'camera_note',
+      'cam_note',
       'object_name',
       'camera_exposure',
       'camera_count',
@@ -451,8 +451,8 @@ export const commands_mixin = {
         username: this.username // from auth0
       }
       // Avoid empty strings (thanks, dynamodb)
-      if (this.camera_note != '') {
-        opt_params.hint = this.camera_note
+      if (this.cam_note != '') {
+        opt_params.hint = this.cam_note
       }
       // if (this.object_name != '') {
       //  opt_params["hint"] = this.object_name
