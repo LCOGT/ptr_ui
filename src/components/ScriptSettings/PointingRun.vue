@@ -1,59 +1,54 @@
 <template>
-<section>
-    <b-field>
-        <b-radio-button class="is-light" v-model="gridType"
-            native-value="coarse">
-            coarse
-        </b-radio-button>
-
-        <b-radio-button v-model="gridType"
-            native-value="medium">
-            medium
-        </b-radio-button>
-
-        <b-radio-button v-model="gridType"
-            native-value="fine">
-            fine
-        </b-radio-button>
-
-        <b-radio-button v-model="gridType"
-            native-value="sweep" >
-            sweep
-        </b-radio-button>
-
-        <b-radio-button v-model="gridType"
-            native-value="cross">
-            cross
-        </b-radio-button>
-    </b-field>
+  <section>
     <div class="field-group">
-        <b-field label="No. of Runs">
-            <b-numberinput 
-                v-model="numGridRuns" 
-                type="is-light" 
-                controls-position="compact" 
-                min="1"
-                max="5">
-            </b-numberinput>
-        </b-field>
+      <b-field label="No. of Pointings">
+        <b-numberinput
+          v-model="numPointingRuns"
+          type="is-light"
+          size="is-small"
+          controls-position="compact"
+          min="1"
+          max="10000"
+        />
+      </b-field>
     </div>
-</section>
+    <div class="field-group">
+      <b-field label="Min. Altitude (deg)">
+        <b-numberinput
+          v-model="minAltitude"
+          type="is-light"
+          size="is-small"
+          controls-position="compact"
+          min="0"
+          max="90"
+        />
+      </b-field>
+    </div>
+  </section>
 </template>
 
 <script>
 export default {
-    name: 'PointingRun',
-    computed: {
+  name: 'PointingRun',
+  computed: {
 
-        gridType: {
-            get() { return this.$store.getters['pointingRun_gridType'] },
-            set(val) { this.$store.commit('pointingRun_gridType', val) }
-        },
-        numGridRuns: {
-            get() { return this.$store.getters['pointingRun_numGridRuns'] },
-            set(val) { this.$store.commit('pointingRun_numGridRuns', val) }
-        },
+    numPointingRuns: {
+      get () { return this.$store.state.scriptSettings.pointingRun.numPointingRuns },
+      set (value) {
+        const scriptName = 'pointingRun'
+        const paramName = 'numPointingRuns'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
+    },
+    minAltitude: {
+      get () { return this.$store.state.scriptSettings.pointingRun.minAltitude },
+      set (value) {
+        const scriptName = 'pointingRun'
+        const paramName = 'minAltitude'
+        this.$store.commit('scriptSettings/updateScriptParam', { scriptName, paramName, value })
+      }
     }
+  }
 }
 </script>
 

@@ -1,1089 +1,1660 @@
 <template>
-<div>
+  <div>
     <div class="project-form-header">
-        <h1 class="title">Create a project</h1>
-        <div>
-            <b-tooltip 
-                v-if="!this.modifying_existing_project"
-                :active="!$auth.isAuthenticated" 
-                label="You must be logged in to create a project." >
-                <button 
-                    class="button is-success mr-1"
-                    @click="saveNewProject"
-                    :disabled="!$auth.isAuthenticated"
-                    >Create Project</button>
-            </b-tooltip>
-
-            <b-tooltip 
-                v-if="this.modifying_existing_project"
-                :active="!$auth.isAuthenticated" 
-                label="You must be logged in to modify a project." >
-                <button 
-                    class="button is-info mr-1"
-                    @click="modifyProject"
-                    :disabled="!$auth.isAuthenticated"
-                    >Modify Project</button>
-            </b-tooltip>
-
-            <button 
-                class="button is-light is-outlined mr-1"
-                @click="clearProjectForm"
-                >Clear Form</button>
-        </div>
-    </div>
-
-    <div class="project-form">
-        <div class="target-row">
-            <b-field :type="{'is-warning': project_name_changed}"
-                     label="Project Name">
-                <template #message>
-                    <div v-if="project_name_changed">Warning: if you change the name of an</div>
-                    <div v-if="project_name_changed">existing project, you will have to </div>
-                    <div v-if="project_name_changed">reconnect any associated calendar events.</div>
-                </template>
-                <b-input class="project-input" :lazy="false" v-model="project_name"></b-input>
-            </b-field>
-
-            <b-field label="Project Note"
-                     style="max-width: 345px;">
-                <b-input :maxlength="max_fits_header_length"
-                         v-model="project_note"></b-input>
-            </b-field>
-            <b-field style="margin-left: 2em;">
-                <template #label>
-                    Active
-                    <b-tooltip type="is-dark" label="Projects that are not active can be saved but will not be scheduled to run automatically.">
-                        <b-icon size="is-small" icon="help-circle-outline"></b-icon>
-                    </b-tooltip>
-                </template>
-                <b-checkbox v-model="project_constraints.project_is_active"></b-checkbox>
-            </b-field>
-
-        </div>
-
-        <div v-for="n in targets_index" v-bind:key="n" class="target-row">
-
-            <!-- we decided to only allow one target per project -->
-
-            <b-field :label="n==1 ? 'Name' : ''" style="width: 130px;">
-                <b-field>
-                    <b-input :disabled="!targets[n-1].active"
-                             style="max-width: 150px;"
-                             class="project-input"
-                             v-model="targets[n-1].name"></b-input>
-                    <p class="control">
-                        <b-button class="button" :loading="object_name_search_in_progress" @click="getCoordinatesFromName(n-1)">
-                            <b-icon icon="magnify" />
-                        </b-button>
-                    </p>
-                </b-field>
-            </b-field>
-
-            <b-field :type="{'is-danger': warn.ra}"
-                     :label="n==1 ? 'RA' : ''"
-                     style="width: 100px;">
-                <b-input :disabled="!targets[n-1].active"
-                         v-model="targets[n-1].ra" />
-            </b-field>
-
-            <b-field :type="{'is-danger': warn.dec}"
-                     :label="n==1 ? 'Dec' : ''"
-                     style="width: 100px;">
-                <b-input :disabled="!targets[n-1].active"
-                         v-model="targets[n-1].dec" />
-            </b-field>
-
-        </div>
-
-        <!-- Multi-select dropdown, choose which sites a project can be scheduled at -->
-        <!-- Default selection is current site. Currently, there is no "generic site" option -->
-        <div class="site-select">
-            <b-field style="margin-top: 1em;">
-                <template #label>
-                    Sites
-                    <b-tooltip type="is-dark" position="is-right"
-                               label="Choose which observatories this project can be scheduled at.">
-                        <b-icon size="is-small" icon="help-circle-outline"></b-icon>
-                    </b-tooltip>
-                </template>
-
-                <div>
-                    <b-dropdown class="site-dropdown" v-model="project_sites" multiple scrollable>
-                        <template #trigger> 
-                            <b-button class="button" icon-right="menu-down">
-                                Select sites ({{ project_sites.length }})
-                            </b-button>
-                        </template>
-                        <b-dropdown-item class="item" v-for="site in available_sites_real"
-                                         v-bind:value="site"
-                                         v-bind:key="site">
-                            {{ site }}
-                        </b-dropdown-item>
-
-                        <div class="separator">
-                            <div class="line"></div>
-                            <p>SIMULATED</p>
-                            <div class="line"></div>
-                        </div>
-
-                        <b-dropdown-item class="item" v-for="site in available_sites_simulated"
-                                         v-bind:value="site"
-                                         v-bind:key="site">
-                            {{ site }}
-                        </b-dropdown-item>
-                    </b-dropdown>
-                </div>       
-            </b-field>
-            <span v-if="project_sites.length === 0">default ({{ sitecode }})</span>
-            <span v-if="project_sites.indexOf(site) === 0" v-for="site in project_sites">
-                  {{ site }}
-            </span> 
-            <span v-else> , {{ site }} </span>
-        </div>
-
-    
-        <!-- we decided to only allow one target per project -->
-        <!--button class="button" @click="newTargetRow">add another target</button-->
-        <hr>
-
-        <div class="exposure-rows" style="margin-top: 1em;">
-
-
-            <div v-for="n in exposures_index" v-bind:key="n" class="exposure-row">
-
-
-                <b-field :label="n==1 ? '  ' : ' '">
-                    <b-checkbox v-model="exposures[n-1].active"></b-checkbox>
-                </b-field>
-                <b-field size="is-small" :label="n==1 ? 'Imtype' : ''">
-                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].imtype">
-                        <option value="light"> light </option>
-                        <option value="dark"> dark </option>
-                        <option value="skyflat"> skyflat </option>
-                        <option value="screenflat"> screenflat </option>
-                        <option value="bias"> bias </option>
-                        <option value="autofocus"> autofocus </option>
-                    </b-select>
-                </b-field>
-                <b-field :label="n==1 ? 'Count' : ''" style="width: 100px;">
-                    <b-input size="is-small"
-                             :disabled="!exposures[n-1].active"
-                             min="1"
-                             v-model="exposures[n-1].count" />
-                </b-field>
-                <b-field :label="n==1 ? 'Exposure [s]' : ''" style="max-width: 100px;">
-                    <b-input size="is-small"
-                             :disabled="!exposures[n-1].active"
-                             min="0"
-                             v-model="exposures[n-1].exposure" />
-                </b-field>
-                <b-field :label="n==1 ? 'Filter' : ''">
-                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].filter">
-                        <option v-for="(filter, index) in generic_filter_list"
-                                v-bind:value="filter"
-                                v-bind:selected="index === 0"
-                                v-bind:key="filter">
-                            {{ filter }}
-                        </option>
-                        <option disabled v-if="project_sites.length > 0" value="------"> ------ </option>
-                        <option v-if="project_sites.length > 0" v-for="(filter, index) in project_filter_list"
-                                v-bind:value="filter"
-                                v-bind:selected="index === 0"
-                                v-bind:key="filter">
-                            {{ filter }}
-                        </option>
-                    </b-select>
-                </b-field>
-                <b-field :label="n==1 ? 'Bin' : ''">
-                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].bin">
-                        <option value="1, 1"> 1, 1 </option>
-                        <option value="2, 2"> 2, 2 </option>
-                        <option value="3, 3"> 3, 3 </option>
-                        <option value="4, 4"> 4, 4 </option>
-                    </b-select>
-                </b-field>
-                <b-field :label="n==1 ? 'Area' : ''">
-                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].area">
-                        <option value="600%"> 600% </option>
-                        <option value="500%"> 500% </option>
-                        <option value="400%"> 400% </option>
-                        <option value="300%"> 300% </option>
-                        <option value="220%"> 220% </option>
-                        <option value="133%"> 133% </option>
-                        <option value="FULL"> FULL </option>
-                        <option value="SQUARE"> SQUARE </option>
-                        <option value="71%"> 71% </option>
-                        <option value="50%"> 50% </option>
-                        <option value="35%"> 35% </option>
-                        <option value="25%"> 25% </option>
-                        <option value="12%"> 12% </option>
-                    </b-select>
-                </b-field>
-                <b-field :label="n==1 ? 'Dither' : ''">
-                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].dither">
-                        <option value="yes"> yes </option>
-                        <option value="no"> no </option>
-                        <option v-for="i in 25" :key="i-1" :value="i-1"> {{i-1}}</option>
-                    </b-select>
-                </b-field>
-                <b-field :label="n==1 ? 'Photometry' : ''">
-                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].photometry">
-                        <option value="-"> - </option>
-                        <option value="target"> target </option>
-                        <option value="comparison1"> Comparison 1 </option>
-                        <option value="comparison2"> Comparison 2 </option>
-                        <option value="check1"> Check 1 </option>
-                        <option value="check2"> Check 2 </option>
-                    </b-select>
-                </b-field>
-                <b-field :label="n==1 ? 'Defocus' : ''">
-                    <b-select size="is-small" :disabled="!exposures[n-1].active" v-model="exposures[n-1].defocus">
-                        <option v-for="i in 6" :key="i-1" :value="i-1"> {{i-1}}</option>
-                        <option value="diffuser"> diffuser </option>
-                    </b-select>
-                </b-field>
-
-                <div></div>
-            </div>
-            <div />
-        </div>
-
-        <button style="margin-top: 1em;" class="button" @click="newExposureRow">
-            <b-icon icon="plus" />
-            <span>add row</span>
+      <h1 class="title">
+        <span v-if="cloning_existing_project"><span class="project-title-verb">Cloning: </span><i>{{ project_name }}</i></span>
+        <span v-else-if="modifying_existing_project"><span class="project-title-verb">Modifying: </span><i>{{ project_name }}</i></span>
+        <span v-else-if="read_only"><span class="project-title-verb">Inspecting: </span><i>{{ project_name }}</i></span>
+        <span v-else>Create new project</span>
+      </h1>
+      <div>
+        <button
+          v-if="!read_only"
+          class="button is-light is-outlined mr-1"
+          @click="clearProjectForm"
+        >
+          Clear Form
         </button>
+      </div>
+    </div>
 
+    <CollapsableSection>
+      <template #header>
+        Project Info
+      </template>
+      <template #content>
+        <div style="display:flex; align-items: bottom; gap: 1em;">
+          <b-field
+            :type="{'is-warning': project_name_changed || warn.project_name}"
+            label="Project Name"
+          >
+            <template #message>
+              <div v-if="project_name_changed">
+                Warning: if you change the name of an
+              </div>
+              <div v-if="project_name_changed">
+                existing project, you will have to
+              </div>
+              <div v-if="project_name_changed">
+                reconnect any associated calendar events.
+              </div>
+              <div v-if="warn.project_name">
+                Please provide a project name
+              </div>
+            </template>
+            <b-input
+              v-model="project_name"
+              class="project-input"
+              :lazy="false"
+              :disabled="read_only"
+            />
+          </b-field>
 
-        <div>
-            <div class="toggle-advanced-settings"
-                 @click="showAdvancedInputs = !showAdvancedInputs">
-                {{showAdvancedInputs ? "hide" : "show"}} advanced
-            </div>
-
-            <br>
-
-            <b-field v-if="showAdvancedInputs"
-                     label="Meridian Flip">
-                <b-field>
-                    <b-radio-button v-model="project_constraints.meridian_flip"
-                                    type="is-light"
-                                    native-value="east_only">
-                        <b-icon icon="close"></b-icon>
-                        <span>East Only</span>
-                    </b-radio-button>
-
-                    <b-radio-button v-model="project_constraints.meridian_flip"
-                                    type="is-light"
-                                    native-value="west_only">
-                        <b-icon icon="check"></b-icon>
-                        <span>West Only</span>
-                    </b-radio-button>
-
-                    <b-radio-button v-model="project_constraints.meridian_flip"
-                                    type="is-light"
-                                    native-value="flip_ok">
-                        Flip OK
-                    </b-radio-button>
-
-                    <b-radio-button v-model="project_constraints.meridian_flip"
-                                    type="is-light"
-                                    native-value="no_flip">
-                        No Flip
-                    </b-radio-button>
-                </b-field>
-            </b-field>
-
-            <b-field grouped v-if="showAdvancedInputs">
-                <b-field v-if="showAdvancedInputs"
-                         label="Ra offset">
-                    <b-input style="max-width: 100px"
-                             class="project-input"
-                             v-model="project_constraints.ra_offset"></b-input>
-                    <b-select v-model="project_constraints.ra_offset_units">
-                        <option value="deg">deg</option>
-                        <option value="min">minutes</option>
-                        <option value="asec">arcsec</option>
-                    </b-select>
-                </b-field>
-                <b-field v-if="showAdvancedInputs"
-                         label="Dec offset">
-                    <b-input style="max-width: 100px"
-                             class="project-input"
-                             v-model="project_constraints.dec_offset"></b-input>
-                    <b-select v-model="project_constraints.dec_offset_units">
-                        <option value="deg">deg</option>
-                        <option value="asec">arcsec</option>
-                    </b-select>
-                </b-field>
-            </b-field>
-
-            <b-field v-if="showAdvancedInputs"
-                     label="Position Angle"
-                     :type="{'is-danger': warn.position_angle}">
-                <b-input class="project-input" type="number" min="-360" max="360" v-model="project_constraints.position_angle" />
-                <b-select value="deg">
-                    <option value="deg">deg</option>
-                </b-select>
-            </b-field>
-
-
-            <b-field v-if="showAdvancedInputs"
-                     label="Max HA (decimal hours, absolute value)"
-                     :type="{'is-danger': warn.max_ha}">
-                <b-numberinput step="0.5"
-                               type="is-button"
-                               max="12"
-                               controls-position="compact"
-                               class="project-input"
-                               v-model="project_constraints.max_ha"></b-numberinput>
-            </b-field>
-
-            <b-field v-if="showAdvancedInputs"
-                     label="Min distance from zenith (degrees)"
-                     :type="{'is-danger': warn.min_zenith_dist}">
-                <b-numberinput step="0.1"
-                               type="is-button"
-                               max="7.5"
-                               controls-position="compact"
-                               class="project-input"
-                               v-model="project_constraints.min_zenith_dist"></b-numberinput>
-            </b-field>
-
-            <b-field style="max-width: 150px;"
-                     v-if="showAdvancedInputs"
-                     label="Max Airmass"
-                     :type="{'is-danger': warn.max_airmass}">
-                <b-input class="project-input" v-model="project_constraints.max_airmass"></b-input>
-            </b-field>
-
-            <b-field grouped v-if="showAdvancedInputs">
-                <b-field v-if="showAdvancedInputs"
-                         label="Min Lunar Dist. [deg]"
-                         :type="{'is-danger': warn.lunar_dist_min}">
-                    <b-input class="project-input" v-model="project_constraints.lunar_dist_min"></b-input>
-                </b-field>
-                <b-field v-if="showAdvancedInputs"
-                         label="Max Lunar Phase %"
-                         :type="{'is-danger': warn.lunar_phase_max}">
-                    <b-input class="project-input" v-model="project_constraints.lunar_phase_max"></b-input>
-                </b-field>
-            </b-field>
-
-            <div style="height: 5px;" />
-            <b-field v-if="showAdvancedInputs">
-                <b-checkbox v-model="project_constraints.frequent_autofocus">Autofocus: focus more frequently</b-checkbox>
-            </b-field>
-            <b-field v-if="showAdvancedInputs">
-                <b-checkbox v-model="project_constraints.near_tycho_star">Autofocus: Use Near Tycho Star</b-checkbox>
-            </b-field>
-            <b-field v-if="showAdvancedInputs">
-                <b-checkbox v-model="project_constraints.prefer_bessell">Prefer Bessel</b-checkbox>
-            </b-field>
-            <b-field v-if="showAdvancedInputs">
-                <b-checkbox v-model="project_constraints.enhance_photometry">Enhance Photometry</b-checkbox>
-            </b-field>
-            <b-field v-if="showAdvancedInputs">
-                <b-checkbox v-model="project_constraints.close_on_block_completion">Close on block completion</b-checkbox>
-            </b-field>
-            <b-field v-if="showAdvancedInputs">
-                <b-checkbox v-model="project_constraints.add_center_to_mosaic">Add center to mosaic</b-checkbox>
-            </b-field>
-            <b-field v-if="showAdvancedInputs">
-                <b-checkbox v-model="project_constraints.dark_sky_setting">Astronomical Dark & Moon Alt < 6</b-checkbox>
-            </b-field>
-            <b-field v-if="showAdvancedInputs" label="Generic Instrument">
-                <b-select v-model="project_constraints.generic_instrument">
-                    <option value="Main Camera">Main Camera</option>
-                    <option value="Auxiliary Camera">Auxiliary Camera</option>
-                    <option value="Echelle Spectrometer">Echelle Spectrometer</option>
-                    <option value="UXEX Spectrometer">UXEX Spectrometer</option>
-                    <option value="Planet Camera">Planet Camera</option>
-                    <option value="IR Photometer">IR Photometer</option>
-                </b-select>
-            </b-field>
-
+          <b-field
+            label="Project Note"
+            style="max-width: 345px;"
+          >
+            <b-input
+              v-model="project_note"
+              :maxlength="max_fits_header_length"
+              :disabled="read_only"
+            />
+          </b-field>
+          <ProjectSitesSelector
+            :obs-id="sitecode"
+            :disabled="read_only"
+          />
         </div>
-        <hr>
 
+        <div class="flex-row">
+          <b-field>
+            <template #label>
+              Start Date (UTC)
+              <b-tooltip
+                type="is-dark"
+                label="Choose the first day this project can be scheduled automatically, in UTC."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </template>
+            <b-datetimepicker
+              ref="stdatetimepicker"
+              v-model="start_date"
+              locale="en-ZA"
+              expanded
+              placeholder="Select a date"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <b-button
+                v-if="!read_only"
+                icon-left="calendar-today"
+                type="is-primary"
+                @click="$refs.stdatetimepicker.toggle()"
+              />
+            </p>
+          </b-field>
+          <b-field>
+            <template #label>
+              Expiry Date (UTC)
+              <b-tooltip
+                type="is-dark"
+                label="Choose the last day this project can be scheduled automatically, in UTC."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </template>
+            <b-datetimepicker
+              ref="expdatetimepicker"
+              v-model="expiry_date"
+              locale="en-ZA"
+              expanded
+              placeholder="Select a date"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <b-button
+                v-if="!read_only"
+                icon-left="calendar-today"
+                type="is-primary"
+                @click="$refs.expdatetimepicker.toggle()"
+              />
+            </p>
+          </b-field>
+          <b-field>
+            <template #label>
+              Project Priority
+              <b-tooltip type="is-dark">
+                <template #content>
+                  <div><b>Standard: </b><span>Default priority</span></div>
+                  <div><b>Time Critical: </b><span>Protected calendar events, used for e.g. exoplanets, variable stars</span></div>
+                  <div><b>Low Priority: </b><span>Calendar events will be labeled "Feel free to cancel"</span></div>
+                </template>
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </template>
+            <b-select
+              v-model="project_priority"
+              :disabled="read_only"
+            >
+              <option value="standard">
+                standard
+              </option>
+              <option value="time_critical">
+                time critical
+              </option>
+              <option value="low_priority">
+                low priority
+              </option>
+            </b-select>
+          </b-field>
+        </div>
+        <div>
+          <b-field>
+            <b-checkbox
+              v-model="project_is_active"
+              :disabled="read_only"
+            >
+              Active
+            </b-checkbox>
+            <b-tooltip
+              type="is-dark"
+              label="Projects that are not active can be saved but will not be scheduled to run automatically."
+              position="is-right"
+            >
+              <b-icon
+                size="is-small"
+                icon="help-circle-outline"
+              />
+            </b-tooltip>
+          </b-field>
+        </div>
+      </template>
+    </CollapsableSection>
+
+    <!-- Target Info -->
+    <CollapsableSection>
+      <template #header>
+        Target Info
+      </template>
+      <template #content>
+        <div style="display:flex; align-items: bottom; gap: 1em;">
+          <b-field
+            label="Name"
+            style="width: 230px;"
+            :type="{'is-warning': warn.target_name}"
+          >
+            <template #message>
+              <div v-if="warn.target_name">
+                missing value
+              </div>
+            </template>
+            <b-input
+              v-model="targets[0].name"
+              :disabled="read_only"
+            />
+          </b-field>
+          <b-field
+            v-if="!read_only"
+            label="Object Search"
+            style="width: 230px;"
+          >
+            <b-input
+              v-model="objectSearch"
+              :disabled="!targets[0].active"
+              style="max-width: 130px;"
+              class="project-input"
+            />
+            <p class="control">
+              <b-button
+                class="button"
+                :loading="object_name_search_in_progress"
+                @click="getCoordinatesFromName(0)"
+              >
+                <b-icon icon="magnify" />
+              </b-button>
+            </p>
+          </b-field>
+          <b-field
+            :type="{'is-warning': warn.targetRA}"
+            label="RA"
+            style="width: 260px;"
+          >
+            <template #message>
+              <div v-if="warn.targetRA">
+                missing value
+              </div>
+            </template>
+            <RightAscensionInput
+              v-model="targets[0].ra"
+              :disabled="read_only"
+            />
+          </b-field>
+
+          <b-field
+            :type="{'is-warning': warn.targetDec}"
+            label="Dec"
+            style="width: 260px;"
+          >
+            <template #message>
+              <div v-if="warn.targetDec">
+                missing value
+              </div>
+            </template>
+            <DeclinationInput
+              v-model="targets[0].dec"
+              :disabled="read_only"
+            />
+          </b-field>
+        </div>
+      </template>
+    </CollapsableSection>
+
+    <!-- Exposure Info -->
+    <CollapsableSection>
+      <template #header>
+        Exposures
+      </template>
+      <template #content>
+        <div class="exposure-rows">
+          <div
+            v-for="n in exposures_index"
+            :key="n"
+            class="exposure-row"
+          >
+            <b-checkbox v-model="exposures[n-1].active" />
+            <b-field
+              size="is-small"
+              :label="n==1 ? 'Imtype' : ''"
+            >
+              <b-select
+                v-model="exposures[n-1].imtype"
+                size="is-small"
+                :disabled="!exposures[n-1].active || read_only"
+              >
+                <option value="light">
+                  light
+                </option>
+                <option value="dark">
+                  dark
+                </option>
+                <option value="bias">
+                  bias
+                </option>
+                <option value="autofocus">
+                  focus
+                </option>
+              </b-select>
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Count' : ''"
+              style="width: 80px;"
+            >
+              <b-input
+                v-model="exposures[n-1].count"
+                size="is-small"
+                :disabled="!exposures[n-1].active || read_only"
+                type="number"
+                min="1"
+                max="100000"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Exposure' : ''"
+              style="max-width: 100px;"
+              title="Exposure Time [seconds]"
+            >
+              <b-input
+                v-model.number="exposures[n-1].exposure"
+                size="is-small"
+                :disabled="!exposures[n-1].active || read_only"
+                type="number"
+                min="0.000001"
+                max="100000"
+                step="any"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Repeat' : ''"
+            >
+              <b-input
+                v-model.number="exposures[n-1].repeat"
+                size="is-small"
+                type="number"
+                min="-150"
+                max="150"
+                style="width: 85px;"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Filter' : ''"
+            >
+              <b-select
+                v-model="exposures[n-1].filter"
+                size="is-small"
+                :disabled="!exposures[n-1].active || read_only"
+                style="width: 80px;"
+              >
+                <option
+                  v-if="project_filter_list && project_filter_list.length>0"
+                  disabled
+                  value="------"
+                >
+                  ---- Site Filters ----
+                </option>
+                <option
+                  v-for="filter in project_filter_list"
+                  :key="'site-'+filter"
+                  :value="filter"
+                >
+                  {{ filter }}
+                </option>
+                <option
+                  disabled
+                  value="------"
+                >
+                  ---- Generic Filters ----
+                </option>
+                <option
+                  v-for="filter in generic_filter_list"
+                  :key="'generic-'+filter"
+                  :value="filter"
+                >
+                  {{ filter }}
+                </option>
+                <option
+                  disabled
+                  value="------"
+                >
+                  ---- Quick Stacks ----
+                </option>
+                <option
+                  v-for="filter in quick_stacks_filter_list"
+                  :key="'quickstacks-'+filter"
+                  :value="filter"
+                >
+                  {{ filter }}
+                </option>
+              </b-select>
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Resolution' : ''"
+            >
+              <b-select
+                v-model="exposures[n-1].bin"
+                size="is-small"
+                :disabled="!exposures[n-1].active || read_only"
+              >
+                <option value="optimal">
+                  Optimal
+                </option>
+                <option value="coarse">
+                  Coarse
+                </option>
+                <option value="fine">
+                  Fine
+                </option>
+              </b-select>
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Zoom' : ''"
+            >
+              <b-select
+                v-model="exposures[n-1].zoom"
+                size="is-small"
+                :disabled="!exposures[n-1].active || read_only"
+                @input="onZoomChange(n-1, exposures[n-1].zoom)"
+              >
+                <option
+                  v-for="(val, index) in generic_camera_areas"
+                  :key="index"
+                  :value="val"
+                >
+                  {{ val }}
+                </option>
+              </b-select>
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Width' : ''"
+              style="width: 150px;"
+            >
+              <b-numberinput
+                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
+                v-model="exposures[n-1].width"
+                :value="Number(exposures[n-1].width)"
+                :class="getSymbol(exposures[n-1].zoom)"
+                size="is-small"
+                :disabled="!exposures[n-1].active || read_only"
+                type="number"
+                :min="minDegrees"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
+                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
+                min-step="0.001"
+              />
+              <b-numberinput
+                v-else
+                v-model="exposures[n-1].width"
+                :value="Number(exposures[n-1].width)"
+                :class="getSymbol(exposures[n-1].zoom)"
+                size="is-small"
+                :disabled="true"
+                type="number"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Height' : ''"
+              style="width: 150px;"
+            >
+              <b-numberinput
+                v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
+                v-model="exposures[n-1].height"
+                :value="Number(exposures[n-1].height)"
+                :class="getSymbol(exposures[n-1].zoom)"
+                size="is-small"
+                :disabled="!exposures[n-1].active || read_only"
+                type="number"
+                :min="minDegrees"
+                :max="exposures[n-1].zoom === 'Mosaic arcmin.' ? maxDegrees * degreesToArcminutes : maxDegrees"
+                :step="exposures[n-1].zoom === 'Mosaic arcmin.' ? conditionalStep * 10 : conditionalStep"
+                min-step="0.001"
+              />
+              <b-numberinput
+                v-else
+                v-model="exposures[n-1].height"
+                :value="Number(exposures[n-1].height)"
+                :class="getSymbol(exposures[n-1].zoom)"
+                size="is-small"
+                :disabled="true"
+                type="number"
+              />
+            </b-field>
+            <b-field
+              :label="n==1 ? 'Angle' : ''"
+              style="width: 150px;"
+            >
+              <b-numberinput
+                :value="Number(exposures[n-1].angle)"
+                class="angle-input"
+                size="is-small"
+                :disabled="!exposures[n-1].active || read_only"
+                type="number"
+                :min="-90.0"
+                :max="90.0"
+                :step="5"
+                min-step="0.001"
+                @input="val => exposures[n-1].angle = val"
+              />
+            </b-field>
+            <div />
+          </div>
+          <div />
+        </div>
+
+        <button
+          v-if="!read_only"
+          style="margin-top: 1em;"
+          class="button"
+          @click="newExposureRow"
+        >
+          <b-icon icon="plus" />
+          <span>add row</span>
+        </button>
+      </template>
+    </CollapsableSection>
+
+    <!-- Advanced Options - set to open when we're in read-only mode-->
+    <CollapsableSection
+      :closed="!read_only"
+    >
+      <template #header>
+        Advanced Options
+      </template>
+      <template #content>
+        <div class="flex-row">
+          <b-field label="Observing Side">
+            <b-field>
+              <b-checkbox
+                v-if="!read_only"
+                v-model="ascending"
+              >
+                Ascending
+              </b-checkbox>
+              <b-checkbox
+                v-if="!read_only"
+                v-model="descending"
+              >
+                Descending
+              </b-checkbox>
+            </b-field>
+          </b-field>
+        </div>
+
+        <div class="flex-row">
+          <b-field label="Ra offset">
+            <b-input
+              v-model="ra_offset"
+              style="max-width: 100px"
+              class="project-input"
+              :disabled="read_only"
+            />
+            <b-select
+              v-model="ra_offset_units"
+              :disabled="read_only"
+            >
+              <option value="deg">
+                deg
+              </option>
+              <option value="min">
+                minutes
+              </option>
+              <option value="asec">
+                arcsec
+              </option>
+            </b-select>
+          </b-field>
+          <b-field label="Dec offset">
+            <b-input
+              v-model="dec_offset"
+              style="max-width: 100px"
+              class="project-input"
+              :disabled="read_only"
+            />
+            <b-select
+              v-model="dec_offset_units"
+              :disabled="read_only"
+            >
+              <option value="deg">
+                deg
+              </option>
+              <option value="asec">
+                arcsec
+              </option>
+            </b-select>
+          </b-field>
+          <b-field
+            label="Position Angle"
+            :type="{'is-danger': warn.position_angle}"
+          >
+            <b-input
+              v-model="position_angle"
+              class="project-input"
+              type="number"
+              min="-360"
+              max="360"
+              :disabled="read_only"
+            />
+            <b-select
+              value="deg"
+              :disabled="read_only"
+            >
+              <option value="deg">
+                deg
+              </option>
+            </b-select>
+          </b-field>
+        </div>
+
+        <div class="flex-row">
+          <b-field
+            label="Max HA"
+            :type="{'is-danger': warn.max_ha}"
+          >
+            <b-input
+              v-model="max_ha"
+              class="project-input"
+              style="max-width: 150px;"
+              type="number"
+              step="0.5"
+              min="0"
+              max="12"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <span class="button is-static">hours</span>
+            </p>
+          </b-field>
+
+          <b-field
+            label="Min Zenith Distance"
+            :type="{'is-danger': warn.min_zenith_dist}"
+          >
+            <b-input
+              v-model="min_zenith_dist"
+              class="project-input"
+              style="max-width: 150px;"
+              type="number"
+              step="0.1"
+              min="0"
+              max="7.5"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <span class="button is-static">deg</span>
+            </p>
+          </b-field>
+          <b-field
+            label="Max Night Duration"
+            :type="{'is-danger': warn.max_night_duration}"
+          >
+            <b-input
+              v-model="max_night_duration"
+              class="project-input"
+              style="max-width: 150px;"
+              type="number"
+              step="0.5"
+              min="0"
+              max="24"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <span class="button is-static">hours</span>
+            </p>
+          </b-field>
+        </div>
+
+        <div class="flex-row">
+          <b-field
+            style="max-width: 120px;"
+            label="Max Airmass"
+            :type="{'is-danger': warn.max_airmass}"
+          >
+            <b-input
+              v-model="max_airmass"
+              class="project-input"
+              type="number"
+              min="1"
+              max="5"
+              step="0.0001"
+              :disabled="read_only"
+              @blur="roundMaxAirmass"
+            />
+          </b-field>
+          <b-field
+            label="Min Lunar Distance"
+            :type="{'is-danger': warn.lunar_dist_min}"
+          >
+            <b-input
+              v-model="lunar_dist_min"
+              class="project-input"
+              style="max-width: 100px;"
+              type="number"
+              min="0"
+              max="360"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <span class="button is-static">deg</span>
+            </p>
+          </b-field>
+          <b-field
+            label="Max Lunar Phase"
+            :type="{'is-danger': warn.lunar_phase_max}"
+          >
+            <b-input
+              v-model="lunar_phase_max"
+              class="project-input"
+              style="max-width: 100px;"
+              type="number"
+              min="0"
+              max="100"
+              :disabled="read_only"
+            />
+            <p class="control">
+              <span class="button is-static">%</span>
+            </p>
+          </b-field>
+          <b-field label="Defocus (mags)">
+            <b-select
+              v-model="defocus"
+              :disabled="read_only"
+            >
+              <option
+                v-for="i in 7"
+                :key="i - 1"
+                :value="i - 1"
+              >
+                {{ i - 1 }}
+              </option>
+            </b-select>
+          </b-field>
+        </div>
+        <div style="height: 5px;" />
+        <b-field>
+          <b-checkbox
+            v-model="frequent_autofocus"
+            :disabled="read_only"
+          >
+            Autofocus: focus more frequently
+          </b-checkbox>
+        </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="prefer_bessell"
+            :disabled="read_only"
+          >
+            Prefer Bessell
+          </b-checkbox>
+        </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="enhance_photometry"
+            :disabled="read_only"
+          >
+            Enhance Photometry
+          </b-checkbox>
+        </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="add_center_to_mosaic"
+            :disabled="read_only"
+          >
+            Add center to mosaic
+          </b-checkbox>
+        </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="dark_sky_setting"
+            :disabled="read_only"
+          >
+            Astronomical Dark & Moon Alt &lt; 6
+          </b-checkbox>
+        </b-field>
+        <div
+          class="flex-row"
+          style="margin-top: 1em; gap: 3em;"
+        >
+          <div style="padding-top: 1em;">
+            <b-field>
+              <b-checkbox
+                v-model="smart_stack"
+                :disabled="read_only"
+              >
+                Smart Stack
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Automatically stack shorter exposures over long exposure time for all exposures."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+
+            <b-field>
+              <b-checkbox
+                v-model="sub_stack"
+                :disabled="read_only"
+              >
+                Sub Stack
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Split exposures into 10 second exposures that are cross-correlated and stacked"
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+          </div>
+          <div style="padding-top: 1em;">
+            <b-field>
+              <b-checkbox
+                v-model="deplete"
+                :disabled="read_only"
+              >
+                Deplete
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Decrement count."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+
+            <b-field>
+              <b-checkbox
+                v-model="cycle"
+                :disabled="read_only"
+              >
+                Cycle
+              </b-checkbox>
+              <b-tooltip
+                type="is-dark"
+                position="is-right"
+                label="Do each line first."
+              >
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </b-field>
+          </div>
+        </div>
+      </template>
+    </CollapsableSection>
+
+    <div
+      v-if="!read_only"
+      class="project-form-footer"
+    >
+      <b-tooltip
+        v-if="cloning_existing_project"
+        :active="!$auth.isAuthenticated"
+        label="You must be logged in to create a project."
+      >
+        <b-button
+          class="button is-info mr-1"
+          :disabled="!$auth.isAuthenticated"
+          :loading="createProjectButtonIsLoading"
+          @click="saveNewProject"
+        >
+          Save cloned project
+        </b-button>
+      </b-tooltip>
+      <b-tooltip
+        v-else-if="modifying_existing_project"
+        :active="!$auth.isAuthenticated"
+        label="You must be logged in to modify a project."
+      >
+        <b-button
+          class="button is-info mr-1"
+          :disabled="!$auth.isAuthenticated"
+          :loading="createProjectButtonIsLoading"
+          @click="modifyProject"
+        >
+          Save modified project
+        </b-button>
+      </b-tooltip>
+      <b-tooltip
+        v-else-if="!modifying_existing_project"
+        :active="!$auth.isAuthenticated"
+        label="You must be logged in to create a project."
+      >
+        <b-button
+          class="button is-success mr-1"
+          :disabled="!$auth.isAuthenticated"
+          :loading="createProjectButtonIsLoading"
+          @click="saveNewProject"
+        >
+          Save Project
+        </b-button>
+      </b-tooltip>
+
+      <button
+        class="button is-light is-outlined mr-1"
+        @click="clearProjectForm"
+      >
+        Clear Form
+      </button>
     </div>
-
-    <div class="project-form-footer">
-        <b-tooltip 
-            v-if="!this.modifying_existing_project"
-            :active="!$auth.isAuthenticated" 
-            label="You must be logged in to create a project." >
-            <button 
-                class="button is-success mr-1"
-                @click="saveNewProject"
-                :disabled="!$auth.isAuthenticated"
-                >Create Project</button>
-        </b-tooltip>
-
-        <b-tooltip 
-            v-if="this.modifying_existing_project"
-            :active="!$auth.isAuthenticated" 
-            label="You must be logged in to modify a project." >
-            <button 
-                class="button is-info mr-1"
-                @click="modifyProject"
-                :disabled="!$auth.isAuthenticated"
-                >Modify Project</button>
-        </b-tooltip>
-
-        <button 
-            class="button is-light is-outlined mr-1"
-            @click="clearProjectForm"
-            >Clear Form</button>
-    </div>
-
-
-</div>
+  </div>
 </template>
 
 <script>
-import {mapGetters, mapState} from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import { target_names } from '@/mixins/target_names'
+import { user_mixin } from '@/mixins/user_mixin'
+import RightAscensionInput from '@/components/FormElements/RightAscensionInput'
+import DeclinationInput from '@/components/FormElements/DeclinationInput'
+import CollapsableSection from '@/components/projects/CollapsableSection'
+import ProjectSitesSelector from '@/components/projects/ProjectSitesSelector'
 import axios from 'axios'
-import moment from 'moment'
+
+const mapStateToComputed = (vuexModule, propertyNames) => {
+  return propertyNames.reduce((acc, propertyName) => {
+    return {
+      ...acc,
+      [propertyName]: {
+        get () { return this.$store.state[vuexModule][propertyName] },
+        set (val) { this.$store.commit(`${vuexModule}/${propertyName}`, val) }
+      }
+    }
+  }, {})
+}
 
 export default {
-    name: "CreateProjectForm",
-    props: ["sitecode", "project_to_load"],
-    mixins: [ target_names ],
-    watch: {
-        project_to_load({ project, is_existing_project }) {
+  name: 'CreateProjectForm',
+  props: { sitecode: { type: String }, project_to_load: { type: Object }, read_only: { type: Boolean, default: false } },
+  mixins: [target_names, user_mixin],
+  components: {
+    RightAscensionInput,
+    DeclinationInput,
+    CollapsableSection,
+    ProjectSitesSelector
+  },
+  data () {
+    return {
+      object_name_search_in_progress: false,
+      modifying_existing_project: false,
+      cloning_existing_project: false,
+      loaded_project_name: '',
+      loaded_project_created_at: '',
+      projects_api_url: this.$store.state.api_endpoints.projects_endpoint,
+      calendarBaseUrl: this.$store.state.api_endpoints.calendar_api,
+      // Max length for a fits header string value.
+      // Pos 10 to 80, including two single quotes containing the value.
+      // This is used to limit the max length of the project note.
+      max_fits_header_length: 68,
+      generic_filter_list: ['Lum', 'Red', 'Green', 'Blue', 'UV', 'IR Block', 'DUO', 'NIR', 'Exo', 'HA', 'O3', 'S2'],
+      quick_stacks_filter_list: ['RGB irg', 'LRGB wirg', 'UBV ugr', 'O3HaS2'],
+      generic_camera_areas: [
+        'Mosaic arcmin.', 'Mosaic deg.', '30\'x30\'', 'Small sq.', 'Full', 'Big sq.',
+        '1.5X', '2X', '3X', '4X', '6X', '8X', '12X', '16X', 'Planet'
+      ],
+      minDegrees: 0.0,
+      maxDegrees: this.getMosaicLimits(),
+      degreesToArcminutes: 60,
+      conditionalStep: 0.1,
+      sizeInDegrees: this.camera_size_degrees,
+      site: this.sitecode,
+      objectSearch: '',
+      warn: {
+        project_name: false,
+        position_angle: false,
+        user_diffuser: false,
+        prefer_bessell: false,
+        max_ha: false,
+        min_zenith_dist: false,
+        max_airmass: false,
+        lunar_dist_min: false,
+        lunar_phase_max: false,
+        target_name: false,
+        targetRA: false,
+        targetDec: false
+      },
 
-            if (project == "") {
-                this.clearProjectForm()
-            }
+      createProjectButtonIsLoading: false,
+      editButtonText: 'Edit Project',
+      createButtonText: 'Create Project',
 
-            this.modifying_existing_project = is_existing_project
-            this.loaded_project_name = project.project_name
-            this.loaded_project_created_at = project.created_at
+      projectPriorityTooltip: 'Time Critical Observations give priority to the calendar events where this is scheduled. \nLow priority projects add a "Feel free to cancel" message on calendar events.'
+    }
+  },
+  created () {
+    // initialize expiry date to one lunar month from now, and start date to today
+    const today = new Date()
+    this.expiry_date.setDate(today.getDate() + this.project_window)
+    this.start_date.setDate(today.getDate())
+    // converting from user's timezone to UTC
+    this.expiry_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
+    this.start_date.setMinutes(today.getMinutes() + today.getTimezoneOffset())
 
-            this.project_name = project.project_name
-            this.project_events = project.scheduled_with_events
-            this.project_sites = project.project_sites
+    this.project_sites = [this.sitecode]
+  },
+  mounted () {
+    // initialize to the telescope command field ra/dec/name
+    const targets_index = 0 // remove this when we change targets to be a single dict, not an array with a dict
+    this.updateTargetsValue(targets_index, 'ra', this.mount_ra)
+    this.updateTargetsValue(targets_index, 'dec', this.mount_dec)
+    this.updateTargetsValue(targets_index, 'name', this.mount_object)
 
-            this.targets = project.project_targets.map(target => ({...target, active: true}))
-            this.targets_index = this.targets.length
-            this.project_note = project.project_note
-            this.exposures = project.exposures.map(exposure => ({...exposure, active: true}))
-            this.exposures_index = this.exposures.length
-            this.project_constraints = project.project_constraints
+    // initialize smart stack and sub stack to camera tab values
+    this.sub_stack = this.subStackIsActive
+    this.smart_stack = this.smartstackIsActive
 
+    // set default filter
+    this.exposures[targets_index].filter = this.default_filter_selection
+
+    // loading min_zenith_dist fromt config
+    this.load_default_zenith_from_mount()
+
+    // initializing width and height to the appropriate value
+    this.exposures[0].width = this.adjustWidth(this.exposures[0].zoom)
+    this.exposures[0].height = this.adjustHeight(this.exposures[0].zoom)
+  },
+  watch: {
+
+    // This runs any time an existing project is passed into the component.
+    // It transforms the project data into a format that works nicely with the form elements and user interaction.
+    project_to_load ({ project, is_modifying_project, is_cloned_project }) {
+      if (project == '') this.clearProjectForm()
+      this.modifying_existing_project = is_modifying_project
+      this.cloning_existing_project = is_cloned_project
+      this.loaded_project_name = project.project_name
+      this.loaded_project_created_at = project.created_at
+
+      this.loadProject(project)
+    },
+
+    sitecode (newVal, oldVal) {
+      const commonPoolSelected = this.project_sites.indexOf('common pool') >= 0
+      const selectedSites = [newVal]
+      if (commonPoolSelected) {
+        selectedSites.push('common pool')
+      }
+      this.project_sites = selectedSites
+      // Resetting values of width and height if site changes
+      // We also maintain the exposure rows with the same zoom values but adjusted width and height values depending on the site
+      if (newVal !== oldVal) {
+        this.exposures.forEach((exposure) => {
+          exposure.height = this.adjustHeight(exposure.zoom)
+          exposure.width = this.adjustWidth(exposure.zoom)
+        })
+      }
+
+      // Check if any of the filters are no longer available in the new site
+
+      // Save the exposures that have incompatible filters
+      /* ***In progress***
+      const filterMismatchIndices = []
+      this.exposures.map(exposure => exposure.filter)
+        .forEach((filter, index) => {
+          if (!this.project_filter_list.includes(filter)) {
+            filterMismatchIndices.push(index)
+          }
+        })
+
+      this.$buefy.modal.open({
+        parent: this,
+        component: ResolveFiltersDialog,
+        props: {
+          filterMismatchIndices,
+          availableFilters: this.project_filter_list
+        },
+        trapFocus: true
+      })
+      */
+    }
+  },
+  methods: {
+    ...mapActions('project_params', [
+      'resetProjectForm',
+      'loadProject'
+    ]),
+    roundMaxAirmass () {
+      const roundedValue = parseFloat(this.max_airmass).toFixed(2)
+      this.$store.commit('project_params/max_airmass', roundedValue)
+    },
+    // Set store value for min_zenith_dist if it exists in mount config
+    load_default_zenith_from_mount () {
+      this.$store.commit('project_params/min_zenith_dist', this.selected_mount_config?.default_zenith_avoid ?? 0)
+    },
+    // Used for changing values in the targets array without losing reactivity
+    updateTargetsValue (indexToMatch, key, val) {
+      this.targets = this.targets.map((obj, index) => {
+        return index === indexToMatch ? { ...obj, [key]: val } : obj
+      })
+    },
+    // Used for changing values in the exposures array without losing reactivity
+    updateExposuresValue (indexToMatch, key, val) {
+      this.exposures = this.exposures.map((obj, index) => {
+        return index === indexToMatch ? { ...obj, [key]: val } : obj
+      })
+    },
+    clearProjectForm () {
+      this.modifying_existing_project = false
+      this.cloning_existing_project = false
+      this.loaded_project_name = ''
+      this.loaded_project_created_at = ''
+      this.resetProjectForm()
+      this.resetInputWarnings()
+    },
+    async getCoordinatesFromName () {
+      const target_index = 0 // legacy, eventually we want to make `targets` a dict, not an array containing the dict
+      this.object_name_search_in_progress = true
+      const name = this.objectSearch
+      const search_results = await this.get_coordinates_from_object_name(name)
+      this.object_name_search_in_progress = false
+      if (!search_results.error) {
+        this.updateTargetsValue(target_index, 'ra', search_results.ra.toFixed(4))
+        this.updateTargetsValue(target_index, 'dec', search_results.dec.toFixed(4))
+      } else {
+        this.updateTargetsValue(target_index, 'ra', '')
+        this.updateTargetsValue(target_index, 'dec', '')
+        this.$buefy.notification.open({
+          duration: 10000,
+          message: 'Could not find target ' + this.objectSearch,
+          position: 'is-top',
+          type: 'is-info'
+        })
+      }
+    },
+    newExposureRow () {
+      // Add another object to the list of exposures (but it is not visible yet)
+      // Do this before rendering it to preserve reactivity.
+      // It should also be a copy of the previous row. JSON stuff so they don't all share a single reference.
+      const previousRow = JSON.parse(JSON.stringify(this.exposures[this.exposures.length - 1]))
+      this.exposures = [...this.exposures, previousRow]
+      // Show the additional row
+      this.exposures_index += 1
+    },
+
+    verifyForm () {
+      if (this.project_name.trim() === '') { this.warn.project_name = true }
+      if (this.targets[0].name.trim() === '') { this.warn.target_name = true }
+      if (this.project_name.includes('#')) {
+        this.warn.project_name = true
+        this.$buefy.toast.open({
+          message: "Please avoid '#' in the project name",
+          type: 'is-danger'
+        })
+        this.$buefy.notification.open({
+          duration: 10000,
+          message: 'Please avoid \'#\' in the project name',
+          position: 'is-top',
+          type: 'is-danger',
+          hasIcon: true
+        })
+      }
+      // If user selects no sites, consider the selection to be the current site
+      if (this.project_sites.length === 0) {
+        this.project_sites = [this.sitecode]
+      }
+
+      this.warn.targetRA = this.targets[0].ra === ''
+      this.warn.targetDec = this.targets[0].dec === ''
+    },
+    resetInputWarnings () {
+      Object.keys(this.warn).forEach(k => { this.warn[k] = false })
+    },
+    async addProjectToCalendarEvents (project_name, created_at, project_events) {
+      const url = this.calendarBaseUrl + '/add-projects-to-events'
+      const body = {
+        project_id: `${project_name}#${created_at}`,
+        events: project_events.map(e => ({ event_id: e.event_id, start: e.start }))
+      }
+      const header = await this.getAuthRequestHeader()
+      axios.post(url, body, header)
+        .then(console.log)
+        .catch(console.error)
+    },
+
+    saveNewProject () {
+      this.resetInputWarnings()
+      this.verifyForm()
+      const url = this.projects_api_url + '/new-project'
+      const remaining = {}
+      this.exposures.forEach(e => {
+        const key = `bin${e.bin}#exposure${e.exposure}#filter${e.filter}`
+        remaining[key] = e.count
+      })
+
+      // Record user info
+      this.project_creator = {
+        username: this.userName,
+        user_id: this.userId
+      }
+
+      const project = this.projectToSend
+
+      // Make sure all warnings are false, otherwise don't create the project.
+      if (Object.values(this.warn).every(x => !x)) {
+        this.createProjectButtonIsLoading = true
+        axios.post(url, project).then(response => {
+          this.project_events = []
+          this.clearProjectForm()
+          const message = this.is_cloned_project
+            ? 'Project has been cloned'
+            : 'Project has been created'
+          this.$buefy.toast.open({
+            message,
+            type: 'is-success'
+          })
+          this.addProjectToCalendarEvents(project.project_name, project.created_at, this.project_events)
+
+          // refresh the projects and events table
+          this.refreshUserProjects()
+          this.refreshUserEvents()
+          this.clearProjectForm()
+        }).catch(error => {
+          this.$buefy.toast.open({
+            message: 'Failed to save new project',
+            type: 'is-danger'
+          })
+          console.error(error)
+        }).finally(() => {
+          this.createProjectButtonIsLoading = false
+        })
+      } else {
+        this.$buefy.toast.open({
+          message: 'Please fix the highlighted fields',
+          type: 'is-warning'
+        })
+      }
+      console.log(this.warn)
+    },
+
+    modifyProject () {
+      this.resetInputWarnings()
+      this.verifyForm()
+      const url = this.projects_api_url + '/modify-project'
+
+      const project = this.projectToSend
+
+      const request_body = {
+        project_name: this.loaded_project_name,
+        created_at: this.loaded_project_created_at,
+        project_changes: project
+      }
+      // Make sure all warnings are false, otherwise don't create the project.
+      if (Object.values(this.warn).every(x => !x)) {
+        this.createProjectButtonIsLoading = true
+        axios.post(url, request_body).then(response => {
+          this.project_events = []
+          this.clearProjectForm()
+          this.$buefy.toast.open({
+            message: 'Project has been modified.',
+            type: 'is-success'
+          })
+
+          // refresh the projects and events table
+          this.refreshUserProjects()
+          this.refreshUserEvents()
+          this.clearProjectForm()
+        }).catch(error => {
+          this.$buefy.toast.open({
+            message: 'Failed to modify project',
+            type: 'is-danger'
+          })
+          console.error(error)
+        }).finally(() => {
+          this.createProjectButtonIsLoading = false
+        })
+      } else {
+        this.$buefy.toast.open({
+          message: 'Please fix the highlighted fields',
+          type: 'is-warning'
+        })
+      }
+    },
+    refreshUserEvents () {
+      this.$store.dispatch('user_data/fetchUserEvents', this.userId)
+    },
+    refreshUserProjects () {
+      this.$store.dispatch('user_data/refreshProjectsTableData', this.userId)
+    },
+    // Function to get filters at any site to populate filter dropdown
+    get_default_filter_options (site) {
+      if (site == 'common pool') {
+        return []
+      }
+      try {
+        const site_cfg = this.global_config[site]
+        const default_filter_wheel_name = site_cfg.defaults?.filter_wheel
+        const filter_wheel_options = site_cfg.filter_wheel[default_filter_wheel_name].settings.filter_data
+
+        // Handle sites without any filters
+        if (!filter_wheel_options) {
+          const none_filter = ['none', 'none']
+          return [none_filter]
         }
+
+        return filter_wheel_options
+      } catch (error) {
+        console.error('Error getting default filter wheels for site ', site)
+        this.$buefy.notification.open({
+          duration: 10000,
+          message: `Failed to fetch specific filters available for site <b>${site.toUpperCase()}</b>.`,
+          position: 'is-top',
+          type: 'is-danger',
+          hasIcon: true
+        })
+        return ['none']
+      }
     },
-    data() {
-        return {
+    // This function is used to dynamically change classes of width and height so that they display the appropriate symbol depending on the zoom selection
+    getSymbol (zoom) {
+      if (['Mosaic arcmin.', '30\'x30\''].includes(zoom)) {
+        return 'arcmin-input'
+      } else return 'degree-input'
+    },
 
-            /*************************************************/
-            /*************   Project Parameters   ************/
-            /*************************************************/
-            project_name: '',
-            project_events: [],
-            project_note: '',
+    // Getting width for 'Full' zoom selection
+    getFullWidth () {
+      const size_y = this.camera_size_y
+      const pix = this.pixel_scale
+      if (size_y && pix) {
+        return (size_y * pix) / 3600
+      } else return 1
+    },
+    // Getting height for 'Full' zoom selection
+    getFullHeight () {
+      const size_x = this.camera_size_x
+      const pix = this.pixel_scale
+      if (size_x && pix) {
+        return (size_x * pix) / 3600
+      } else return 1
+    },
 
-            project_sites: [this.sitecode],
+    // Getting 'Small sq.' adjusted width and height values. This is done by getting the smaller of the two camera sizes, multiplying it by the 1x1 pixels (i.e. getPixels()) and dividing all by 3600
+    getSmallSquareValues () {
+      const width = this.getFullWidth()
+      const height = this.getFullHeight()
+      let smallSquare
+      if (width < height) {
+        smallSquare = Number(width.toFixed(3))
+      } else {
+        smallSquare = Number(height.toFixed(3))
+      }
+      return smallSquare
+    },
 
-            exposures_index: 1,
-            exposures: [
-                {
-                    active: true,
-                    count: 1,
-                    imtype: "light",
-                    exposure: 1,
-                    filter: 'Lum',
-                    area: 'FULL',
-                    bin: '2, 2',
-                    dither: 'no',
-                    photometry: '-',
-                    defocus: 0,
-                },
-            ],
+    // Getting 'Big sq.' adjusted width and height values. This is done by getting the larger of the two camera sizes, multiplying it by the 1x1 pixels and dividing all by 3600
+    getBigSquareValues () {
+      const width = this.getFullWidth()
+      const height = this.getFullHeight()
+      let bigSquare
+      if (width > height) {
+        bigSquare = Number(width.toFixed(3))
+      } else {
+        bigSquare = Number(height.toFixed(3))
+      }
+      return bigSquare
+    },
 
-            targets_index: 1,
-            targets: [
-                {
-                    active: true,
-                    name: '',
-                    ra: '',
-                    dec: '',
-                },
-            ],
-
-            project_constraints: {
-                project_is_active: true,
-
-                generic_instrument: 'Main Camera',
-
-                meridian_flip: 'flip_ok', // can be ['flip_ok', 'no_flip', 'east_only', 'west_only']
-                ra_offset: 0.0,
-                ra_offset_units: 'deg',
-                dec_offset: 0.0,
-                dec_offset_units: 'deg',
-                position_angle: 0,
-
-                max_ha: 4, // decimal hours
-                min_zenith_dist: 0, // degrees
-                max_airmass: 2.0,
-
-                lunar_dist_min: 30, // deg
-                lunar_phase_max: 60, // % 
-
-                frequent_autofocus: false,
-                near_tycho_star: false,
-                prefer_bessell: false,
-                enhance_photometry: false,
-                close_on_block_completion: false,
-                add_center_to_mosaic: false,
-                dark_sky_setting: false,
-                generic_instrument: "Main Camera",
-            },
-
-
-            /*************************************************/
-            /***********   End Project Parameters   **********/
-            /*************************************************/
-
-            object_name_search_in_progress: false,
-
-            modifying_existing_project: false,
-            loaded_project_name: '',
-            loaded_project_created_at: '',
-
-            projects_api_url: this.$store.state.dev.projects_endpoint,
-            showAdvancedInputs: false,
-
-            // Max length for a fits header string value. 
-            // Pos 10 to 80, including two single quotes containing the value
-            max_fits_header_length: 68, 
-
-            generic_filter_list: [
-                "Lum",
-                "Red",
-                "Green",
-                "Blue",
-                "HA",
-                "O3",
-                "S2",
-            ],
-
-            site: this.sitecode,
-
-            warn: {
-                project_name: false,
-                position_angle: false,
-                user_diffuser: false,
-                prefer_bessell: false,
-                max_ha: false,
-                min_zenith_dist: false,
-                max_airmass: false,
-                lunar_dist_min: false,
-                lunar_phase_max: false,
-            },
-
-            calendarBaseUrl: this.$store.state.dev.calendar_api,
-
+    // Getting limits for width and height for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections
+    getMosaicLimits () {
+      let limit = 5
+      const sizeDeg = this.camera_size_degrees
+      if (sizeDeg) {
+        const fiveFieldsOfView = sizeDeg * limit
+        if (fiveFieldsOfView > limit) {
+          limit = Number(fiveFieldsOfView.toFixed(3))
         }
-    },
-    mounted() {
-        // initialize to the telescope command field ra/dec/name
-        this.targets[0].ra = this.mount_ra
-        this.targets[0].dec = this.mount_dec
-        this.targets[0].name = this.mount_object
-
-    },
-    methods: {
-
-        async getAuthRequestHeader() {
-            let token, configWithAuth;
-            try {
-                token = await this.$auth.getTokenSilently(); 
-            } catch(err) {
-                console.error(err)
-                console.warn('Did not acquire the needed token. Stopping request.')
-                
-                // small popup notification
-                this.$buefy.toast.open({
-                    duration: 5000,
-                    message: "Oops! You aren't authorized to do that.",
-                    position: 'is-bottom',
-                    type: 'is-danger' ,
-                })
-            }
-
-            return {
-                'headers': {
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${token}`
-                }
-            }
-        },
-
-        clearProjectForm() {
-            this.modifying_existing_project = false
-            this.loaded_project_name = ''
-            this.loaded_project_created_at = ''
-
-            this.project_name = '' 
-            this.project_events = []
-            this.targets = [
-                {
-                    active: true,
-                    name: '',
-                    ra: '',
-                    dec: '',
-                },
-            ]
-            this.targets_index = 1
-            this.project_note = ""
-            this.project_sites = [this.sitecode]
-
-            this.exposures = [
-                {
-                    active: true,
-                    count: 1,
-                    imtype: "light",
-                    exposure: 1,
-                    filter: 'Lum',
-                    area: 'FULL',
-                    bin: '2, 2',
-                    dither: 'no',
-                    photometry: '-',
-                    defocus: 0,
-                },
-            ]
-            this.exposures_index = 1
-            this.project_constraints = {
-                project_is_active: true,
-
-                generic_instrument: '',
-
-                ra_offset: 0.0,
-                ra_offset_units: 'deg',
-                dec_offset: 0.0,
-                dec_offset_units: 'deg',
-                position_angle: 0,
-
-                max_ha: 4, // decimal hours
-                min_zenith_dist: 0, // deg
-                max_airmass: 2.0,
-
-                lunar_dist_min: 30, // deg
-                lunar_phase_max: 60, // % 
-
-                frequent_autofocus: false,
-                near_tycho_star: false,
-                prefer_bessell: false,
-                enhance_photometry: false,
-                close_on_block_completion: false,
-                add_center_to_mosaic: false,
-                dark_sky_setting: false,
-                generic_instrument: "Main Camera",
-            }
-        },
-
-        async getCoordinatesFromName(target_index) {
-            this.object_name_search_in_progress = true
-            let name = this.targets[target_index].name
-            let search_results = await this.get_coordinates_from_object_name(name)
-            this.object_name_search_in_progress = false
-            if (!search_results.error) {
-                this.targets[target_index].ra = search_results.ra.toFixed(4)
-                this.targets[target_index].dec = search_results.dec.toFixed(4)
-                //this.targets[target_index].name= search_results.name
-            } else {
-                this.targets[target_index].ra = ''
-                this.targets[target_index].dec = ''
-                this.$buefy.toast.open({
-                    message: "Could not resolve object with name "+this.targets[target_index].name,
-                    type: "is-danger"
-                })
-            }
-        },
-
-        newExposureRow() {
-
-            // Add another object to the list of exposures (but it is not visible yet)
-            // Do this before rendering it to preserve reactivity.
-            // It should also be a copy of the previous row. 
-            this.exposures.push( {...this.exposures[this.exposures.length - 1]} )
-
-            // Show the additional row
-            this.exposures_index += 1;
-        },
-        newTargetRow() {
-
-            // Add another object to the list of targets
-            // Do this first to keep reactivity.
-            this.targets.push({
-                active: true,
-                name: '',
-                ra: '', 
-                dec: '',
-            })
-
-            // Show one additional row
-            this.targets_index += 1;
-        },
-
-        verifyForm() {
-            if (this.project_name === '') { this.warn.project_name = true }
-            if (this.project_name.includes('#')) {
-                this.warn.project_name = true;
-                this.$buefy.toast.open({
-                    message: "Please avoid '#' in the project name",
-                    type: "is-danger"
-                })
-            // If user selects no sites, consider the selection to be the current site
-            if (this.project_sites.length === 0) {
-                this.project_sites = site
-                }     
-            }
-        },
-
-        resetInputWarnings() {
-            Object.keys(this.warn).forEach(k => this.warn[k] = false)
-        },
-
-        async addProjectToCalendarEvents(project_name, created_at, project_events) {
-            let url = this.calendarBaseUrl + '/add-projects-to-events'
-            let body = {
-                "project_id": `${project_name}#${created_at}`,
-                "events": project_events.map(e => ({"event_id": e.event_id, "start": e.start})),
-            }
-            let header = await this.getAuthRequestHeader()
-
-            axios.post(url, body, header).then(response => {
-                console.log(response)
-            }).catch(err => {
-                console.log('error: ',err)
-            })
-
-        },
-
-        saveNewProject() {
-            this.resetInputWarnings()
-            this.verifyForm()
-
-            let url = this.projects_api_url+'/new-project'
-
-            let remaining = {}
-            this.exposures.map(e => {
-                let key = `bin${e.bin}#exposure${e.exposure}#filter${e.filter}`
-                remaining[key] = e.count
-            })
-
-            let project = {
-                project_name: this.project_name,
-                created_at: moment().utc().format(),
-                user_id: this.user.sub,
-                project_note: this.project_note,
-                project_constraints: this.project_constraints,
-
-                // List of objects (targets in the project)
-                project_targets: this.targets
-                        .filter(t => t.active)
-                        .map(({ active, ...stuff_to_keep }) => stuff_to_keep),
-
-                // List of observatory sites selected
-                project_sites: this.project_sites,
-
-                // List of objects (exposures to complete for each target).
-                exposures: this.exposures
-                        .filter(e => e.active)
-                        // check that the row is active, then discard that key.
-                        .map(({active, ...stuff_to_keep}) => stuff_to_keep),
-
-                // Nested arrays such that
-                // remaining[target_index][exposure_index] = number of remaining exposures
-                remaining:  this.exposures.map(e => parseInt(e.count)),
-
-                // Empty nested arrays such that
-                // project_data[exposure_index] = [array of filenames]
-                project_data: this.exposures.map(e => []),
-
-                scheduled_with_events: this.project_events
-            }
-
-            // Make sure all warnings are false, otherwise don't create the project.
-            if (Object.values(this.warn).every(x => !x)) {
-                axios.post(url, project).then( response => {
-                    this.project_events = []
-                    this.clearProjectForm()
-                    this.$buefy.toast.open({
-                        message: "Project has been created.",
-                        type: "is-success"
-                    })
-                    this.addProjectToCalendarEvents(project.project_name, project.created_at, this.project_events)
-                    this.getUserProjects()
-                    this.getUserEvents()
-                    this.clearProjectForm()
-                }).catch(error => {
-                    this.$buefy.toast.open({
-                        message: "Failed to modify project",
-                        type: "is-danger"
-                    })
-                    console.error(error)
-                })
-            }
-        },
-
-        modifyProject() {
-            let url = this.projects_api_url + '/modify-project'
-            let project = {
-                project_name: this.project_name,
-                created_at: moment().utc().format(),
-                user_id: this.user.sub,
-                project_note: this.project_note,
-                project_constraints: this.project_constraints,
-
-                // List of objects (targets in the project)
-                project_targets: this.targets
-                        .filter(t => t.active)
-                        .map(({active, ...stuff_to_keep}) => stuff_to_keep),
-
-                // List of observatory sites selected
-                project_sites: this.project_sites,
-
-                // List of objects (exposures to complete for each target).
-                exposures: this.exposures
-                        .filter(e => e.active)
-                        // check that the row is active, then discard that key.
-                        .map(({active, ...stuff_to_keep}) => stuff_to_keep),
-
-                // Nested arrays such that
-                // remaining[target_index][exposure_index] = number of remaining exposures
-                remaining: this.exposures.map(e => parseInt(e.count)),
-
-                // Empty nested arrays such that
-                // project_data[target_index][exposure_index] = [array of filenames]
-                project_data: this.exposures.map(e => []),
-
-                scheduled_with_events: this.project_events
-            }
-
-            const request_body = {
-                project_name: this.loaded_project_name,
-                created_at: this.loaded_project_created_at,
-                project_changes: project,
-            }
-
-            // Make sure all warnings are false, otherwise don't create the project.
-            if (Object.values(this.warn).every(x => !x)) {
-                axios.post(url, request_body).then( response => {
-                    this.project_events = []
-                    this.clearProjectForm()
-                    this.$buefy.toast.open({
-                        message: "Project has been modified.",
-                        type: "is-success"
-                    })
-                    this.getUserProjects()
-                    this.getUserEvents()
-                }).catch(error => {
-                    this.$buefy.toast.open({
-                        message: "Failed to modify project",
-                        type: "is-danger"
-                    })
-                    console.error(error)
-                })
-            }
-
-        },
-
-        getProject(project_name, created_at) {
-            
-            let request_params = {
-                project_name: project_name,
-                created_at: created_at,
-            }
-            let project_endpoint = this.$store.state.dev.projects_endpoint + '/get-project'
-            axios.post(project_endpoint, request_params).then(response => {
-                console.log(response)
-            }).catch(err => {
-                console.log(error)
-            })
-        },
-
-        getUserProjects() {
-            this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
-        },
-        getUserEvents() {
-            this.$store.dispatch('user_data/fetchUserEvents', this.user.sub)
-        },
-       
-        // Function to get filters at any site to populate filter dropdown
-        get_default_filter_options(site) {
-            let site_cfg = this.global_config[site]
-            let default_filter_wheel_name = site_cfg.defaults.filter_wheel
-            let filter_wheel_options = site_cfg.filter_wheel[default_filter_wheel_name].settings.filter_data
-            return filter_wheel_options
-        },
+      }
+      return limit
     },
 
-
-    computed: {
-
-        // Reliably access the global config
-        global_config() {
-            return this.$store.state.site_config.global_config
-        },
-
-        // Filter dropdown choices update based on which sites are selected.
-        project_filter_list() {
-            let generics = this.generic_filter_list
-            let selected_sites = this.project_sites.flat(Infinity)
-
-            if (selected_sites.length != 0) {
-                let fwo = []
-                for (let site of selected_sites) {
-                    let filter_list = this.get_default_filter_options(site).map(x => x[0])
-                    fwo = [...fwo, ...filter_list]
-                }
-                // Remove duplicates between site filter lists
-                let all_site_filters = [...new Set(fwo)]
-                // Remove duplicates that appear in generic filters
-                all_site_filters = all_site_filters.filter(item => generics.indexOf(item) < 0)
-                return all_site_filters
-
-                // Default filter set is the generic filter list.
-            } else {
-                return generics
-            }
-        },
-
-        // True if we're modifying a project and the name is changed.
-        project_name_changed() {
-            if (
-                this.modifying_existing_project
-                && this.loaded_project_name != this.project_name
-            ) {
-                return true
-            } else {
-                return false
-            }
-        },
-
-        ...mapGetters('command_params', [
-            'mount_ra',
-            'mount_dec', 
-            'mount_object',
-        ]),
-
-        ...mapGetters('site_config', [
-            'available_sites',
-            'available_sites_real',
-            'available_sites_simulated',
-            'filter_wheel_options',
-        ]),
-        ...mapState('user_data', [
-            'user_events',
-            'user_projects',
-        ]),
-        user_events_with_projects() {
-            return this.user_events
-                .filter(event => event.project_id == "none")
-        },
-        user_events_without_projects() {
-            return this.user_events
-                .filter(event => event.project_id != "none")
-        },
-        user() {
-            return this.$auth.user
-        },
+    // Triggered when a different zoom is selected
+    // This invokes the adjustWidth and adjustHeight function below and sets the values of width and height to their corresponding values depending on the zoom selection
+    onZoomChange (exposureIndex, zoom) {
+      const newWidth = this.adjustWidth(zoom)
+      const newHeight = this.adjustHeight(zoom)
+      this.exposures[exposureIndex].width = newWidth
+      this.exposures[exposureIndex].height = newHeight
     },
+
+    // Adjusting width values depending on what 'zoom' is selected
+    adjustWidth (zoom) {
+      // Getting adjusted width and height values
+      const width = this.getFullWidth()
+      let widthVal
+      // Full and Big sq. share the same value since they both use the largest of the camera widths
+      if (zoom === 'Full') {
+        widthVal = Number(width.toFixed(3))
+      } else if (zoom === '71%') {
+        widthVal = Number((width * 0.71).toFixed(3))
+      } else if (zoom === '50%') {
+        widthVal = Number((width * 0.5).toFixed(3))
+      } else if (zoom === '35%') {
+        widthVal = Number((width * 0.35).toFixed(3))
+      } else if (zoom === '25%') {
+        widthVal = Number((width * 0.25).toFixed(3))
+      } else if (zoom === '18%') {
+        widthVal = Number((width * 0.18).toFixed(3))
+      } else if (zoom === '12.5%') {
+        widthVal = Number((width * 0.125).toFixed(3))
+      } else if (zoom === '9%') {
+        widthVal = Number((width * 0.09).toFixed(3))
+      } else if (zoom === '6%') {
+        widthVal = Number((width * 0.06).toFixed(3))
+      } else if (zoom === 'Small sq.') {
+        widthVal = this.getSmallSquareValues()
+      } else if (zoom === 'Big sq.') {
+        widthVal = this.getBigSquareValues()
+      } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
+        widthVal = 0
+      } else if (zoom == '30\'x30\'') {
+        widthVal = 30
+      }
+      return widthVal
+    },
+
+    // Adjusting height values depending on what 'zoom' is selected
+    adjustHeight (zoom) {
+      // Getting adjusted width and height values
+      const height = this.getFullHeight()
+      let heightVal
+      // Full and Big sq. share the same value since they both use the largest of the camera heights
+      if (zoom === 'Full') {
+        heightVal = Number(height.toFixed(3))
+      } else if (zoom === '71%') {
+        heightVal = Number((height * 0.71).toFixed(3))
+      } else if (zoom === '50%') {
+        heightVal = Number((height * 0.5).toFixed(3))
+      } else if (zoom === '35%') {
+        heightVal = Number((height * 0.35).toFixed(3))
+      } else if (zoom === '25%') {
+        heightVal = Number((height * 0.25).toFixed(3))
+      } else if (zoom === '18%') {
+        heightVal = Number((height * 0.18).toFixed(3))
+      } else if (zoom === '12.5%') {
+        heightVal = Number((height * 0.125).toFixed(3))
+      } else if (zoom === '9%') {
+        heightVal = Number((height * 0.09).toFixed(3))
+      } else if (zoom === '6%') {
+        heightVal = Number((height * 0.06).toFixed(3))
+      } else if (zoom === 'Small sq.') {
+        heightVal = this.getSmallSquareValues()
+      } else if (zoom === 'Big sq.') {
+        heightVal = this.getBigSquareValues()
+      } else if (zoom === 'Mosaic arcmin.' || zoom === 'Mosaic deg.') {
+        heightVal = 0
+      } else if (zoom == '30\'x30\'') {
+        heightVal = 30
+      }
+      return heightVal
+    }
+  },
+  computed: {
+
+    // This provides the getter/setter pattern for each item
+    // e.g.
+    // proejct_name: {
+    //   get() { return this.$store.state.project_params.project_name },
+    //   set(val) { return this.$store.commit['project_params/project_name', val]}
+    // }
+    ...mapStateToComputed('project_params', [
+      'project_name',
+      'project_events',
+      'project_note',
+      'project_sites',
+      'project_window',
+      'project_priority',
+      'project_creator',
+      'exposures_index',
+      'exposures',
+      'targets',
+      'project_is_active',
+      'generic_instrument',
+      'ascending',
+      'descending',
+      'ra_offset',
+      'ra_offset_units',
+      'dec_offset',
+      'dec_offset_units',
+      'position_angle',
+      'max_ha',
+      'min_zenith_dist',
+      'max_night_duration',
+      'max_airmass',
+      'lunar_dist_min',
+      'lunar_phase_max',
+      'frequent_autofocus',
+      'prefer_bessell',
+      'enhance_photometry',
+      'close_on_block_completion',
+      'add_center_to_mosaic',
+      'dark_sky_setting',
+      'deplete',
+      'cycle',
+      'expiry_date',
+      'start_date',
+      'smart_stack',
+      'sub_stack',
+      'defocus'
+    ]),
+    ...mapGetters('project_params', ['project_constraints', 'projectToSend']),
+    // Filter dropdown choices update based on which sites are selected.
+    project_filter_list () {
+      const selected_sites = this.project_sites.flat(Infinity)
+
+      if (selected_sites.length != 0) {
+        let fwo = [] // fwo stands for filter wheel options
+        for (const site of selected_sites) {
+          if (site != 'common pool') {
+            const filter_list = this.get_default_filter_options(site).map(x => x[0])
+            fwo = [...fwo, ...filter_list]
+          }
+        }
+        // Remove duplicates between site filter lists
+        const all_site_filters = [...new Set(fwo)]
+        return all_site_filters
+      }
+      // Default behavior (if no specific sites selected) returns the "site filters" for common pool, which are none
+      return []
+    },
+
+    // Return the generic filter list without filters already reported by sites.
+    // For now, Wayne said it's okay to have duplicates
+    // generic_filters_no_duplicates () {
+    //   return this.generic_filter_list.filter(item => this.project_filter_list.indexOf(item) < 0)
+    // },
+
+    // True if we're modifying a project and the name is changed.
+    project_name_changed () {
+      return this.modifying_existing_project && this.loaded_project_name != this.project_name
+    },
+
+    ...mapGetters('command_params', [
+      'mount_ra',
+      'mount_dec',
+      'mount_object',
+      'smartstackIsActive',
+      'subStackIsActive'
+    ]),
+    ...mapGetters('site_config', [
+      'available_sites',
+      'available_sites_real',
+      'available_sites_simulated',
+      'filter_wheel_options',
+      'default_filter_selection',
+      'selected_mount_config',
+      'camera_config',
+      'pixel_scale',
+      'camera_size_x',
+      'camera_size_y',
+      'camera_size_degrees'
+    ]),
+    ...mapState('site_config', ['global_config']),
+    ...mapState('user_data', [
+      'userIsAuthenticated',
+      'userIsAdmin',
+      'userName',
+      'userId',
+      'user_events',
+      'user_projects'
+    ])
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 @import "@/style/buefy-styles.scss";
 @import "@/style/_responsive.scss";
-
 .project-form-header {
     display: flex;
     justify-content: space-between;
+}
+.project-title-verb {
+  color: $ptr-blue;
 }
 .project-form-footer {
     display: flex;
     justify-content: flex-end;
     margin-top: 1em;
 }
-.project-form {
-    background-color: $background;
-    padding: 1em;
-}
-.site-dropdown {
-    background-color: $body-background-color;
-}
-.site-dropdown .button {
-    width: 130px;
-    background-color: $body-background-color;
-}
-.site-dropdown .item {
-    font-size: 12px;
-    background-color: $body-background-color;
-}
-.separator {
-    display: flex;
-    align-items: center;
-    background-color: $body-background-color;
-    opacity: 0.8;
-}
-.separator .line {
-    height: 0.5px;
-    flex: 1;
-    background-color: silver;
-    opacity: 0.8;
-}
-.separator p {
-    padding: 0 1rem;
-    font-size: 9px;
-    color: silver;
-}
-.toggle-advanced-settings {
-    width: 100%;
-    border-bottom: $grey solid 1px;
-    margin-top: 1em;
-    text-align: center;
-    background-color: darken($background, 3);
-}
-.toggle-advanced-settings:hover {
-    cursor: pointer;
-}
 .exposure-rows {
-    max-width: 959px;
     overflow-x: auto;
-}
-@include tablet {
-    .exposure-rows {
-        max-width: 700px;
-    }
-}
-@include widescreen {
-    .exposure-rows {
-        max-width: 750px;
-    }
-}
-@include fullhd {
-    .exposure-rows {
-        max-width: 959px;
-    }
+    margin-top: 1em;
 }
 .exposure-row {
+    display: flex;
     white-space: nowrap;
 }
 .exposure-row > * {
     margin-right: 8px;
     display: inline-block;
 }
-.target-row {
+.exposure-row:first-child .b-checkbox {
+  /* Since checkboxes don't have a label this shifts the first checkbox down */
+  margin-top: 20px
+}
+.flex-row {
     display: flex;
     flex-direction: row;
-    align-items: bottom;
+    gap: 1em;
+    margin-bottom: 1em;
 }
-.target-row > * {
-    margin-right: 8px;
+.b-numberinput {
+    position: relative;
+}
+.degree-input::after {
+    content: "°";
+    position: absolute;
+    right: 32%;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
+}
+.arcmin-input::after {
+    content: "'";
+    position: absolute;
+    right: 32%;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
+}
+.angle-input::after {
+  content: '°';
+  position: absolute;
+  top: 50%;
+  left: 63%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+  z-index: 1;
+}
+</style>
+
+<style>
+/* Global styles */
+.b-numberinput {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
+.b-numberinput button {
+    margin: 0 !important;
+    padding: 0 4px;
+    height: 24px;
+    font-size: 0.8rem;
 }
 
+.b-numberinput input[type="number"] {
+    margin: 0 !important;
+}
 </style>

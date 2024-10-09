@@ -1,0 +1,35 @@
+name: Lint Code Base
+
+on: 
+  pull_request:
+    branches: [dev]
+    
+jobs:
+  build:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v3 
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Install modules
+      run: npm ci
+
+    # Run the basic linter on all js/vue files
+    - name: Lint all files
+      run: npm run lint:check
+
+    # Run the stricter linter on all js/vue files with changes
+    - name: Run eslint on changed files
+      uses: tj-actions/eslint-changed-files@v14
+      with:
+        config_path: ".eslintrc_strict.js"
+        ignore_path: ".eslintignore"
+        extra_args: "--max-warnings=0"
+        file_extensions: |
+          **/*.js
+          **/*.vue

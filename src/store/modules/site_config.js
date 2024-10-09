@@ -5,334 +5,454 @@
 
 import _ from 'lodash'
 import axios from 'axios'
+import helpers from '../../utils/helpers'
 
 const state = {
+  test_sites: ['tst', 'tst001', 'dht'],
 
-    test_sites: ['tst', 'tst001', 'dht', 'sintezsim'],
+  global_config: {},
+  is_site_selected: false,
+  did_config_load_yet: false,
 
-    global_config: {},
-    is_site_selected: false,
-    did_config_load_yet: false,
+  selected_site: '',
+  prev_selected_site: '',
 
-    selected_site: '',
-    selected_enclosure: '',
-    selected_mount: '',
-    selected_telescope: '',
-    selected_rotator: '',
-    selected_focuser: '',
-    selected_filter_wheel: '',
-    selected_camera: '',
-    selected_screen: '',
-    selected_weather:'',
-    selected_sequencer:'',
+  selected_enclosure: '',
+  selected_mount: '',
+  selected_telescope: '',
+  selected_rotator: '',
+  selected_focuser: '',
+  selected_filter_wheel: '',
+  selected_camera: '',
+  selected_screen: '',
+  selected_weather: '',
+  selected_sequencer: '',
 
-    selector_exists: false,
-    selected_selector: '',
+  selector_exists: false,
+  selected_selector: ''
 }
-
 
 const getters = {
 
-    site_config: state => {
-        return state.global_config[state.selected_site]; 
-    },
+  get_site_attribute: state => site => attribute => {
+    return state.global_config[site][attribute]
+  },
 
-    available_devices: state => (deviceType, site) => {
-        return Object.keys(state.global_config?.[site]?.[deviceType]) ?? [];
-    },
+  site_config: state => {
+    return state.global_config[state.selected_site]
+  },
 
-    available_sites: state => {
-        return Object.keys(state.global_config);
-    },
+  camera_config: state => {
+    // '&&' is for existence checks so that if some values don't exist, we can return safely
+    const global_config = state.global_config
+    const site_config = global_config && global_config[state.selected_site]
+    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
+    if (camera_config) {
+      return camera_config
+    }
+  },
 
-    // Array of sitecodes for real observatory sites 
-    available_sites_real: state => {
-        return Object.keys(state.global_config).filter(s => state.test_sites.indexOf(s.toLowerCase()) == -1)
-    },
-    // Array of sitecodes for simulated/test observatory sites 
-    available_sites_simulated: state => {
-        return Object.keys(state.global_config).filter(s => state.test_sites.indexOf(s.toLowerCase()) != -1)
-    },
+  // Getting pixels to get size degrees and mosaic limits
+  pixel_scale: (state, getters) => {
+    const pixels = getters.camera_config.settings.onebyone_pix_scale
+    return pixels
+  },
 
-    all_sites: state => {
-      let sites = []
-      Object.keys(state.global_config).forEach(site => {
-        let s = {
-          "name": state.global_config[site].name.toString(),
-          "site": state.global_config[site].site.toString(),
-          "latitude":  parseFloat(state.global_config[site].latitude),
-          "longitude": parseFloat(state.global_config[site].longitude),
-          "TZ_database_name": state.global_config[site].TZ_database_name,
+  // Getting camera_size_x and camera_size_y below to
+  // 1. get mosaic limits for 'Mosaic arcmin.' and 'Mosaic deg.' zoom selections,
+  // 2. be able to adjust preset sizes based on zoom selections
+  // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
+  camera_size_x: (state, getters) => {
+    const camera_size_x = getters.camera_config.camera_size_x
+    return camera_size_x
+  },
+
+  camera_size_y: (state, getters) => {
+    const camera_size_y = getters.camera_config.camera_size_y
+    return camera_size_y
+  },
+
+  camera_size_degrees: (state, getters) => {
+    const pixelScale = getters.pixel_scale
+    const camSizeX = getters.camera_size_x
+    const camSizeY = getters.camera_size_y
+    const DEG_PER_ARCSEC = 1 / 3600
+
+    if (pixelScale === undefined || camSizeX === undefined || camSizeY === undefined) {
+      return 1
+    }
+
+    const max_pixels = Math.max(camSizeX, camSizeY)
+
+    return pixelScale * max_pixels * DEG_PER_ARCSEC
+  },
+
+  site_is_wema: state => {
+    return state.global_config[state.selected_site]?.instance_type == 'wema'
+  },
+
+  wema_name: state => {
+    return state.global_config[state.selected_site]?.wema_name || null
+  },
+
+  wema_config: (state, getters) => {
+    return state.global_config[getters.wema_name]
+  },
+
+  available_devices: state => (deviceType, site) => {
+    return Object.keys(state.global_config?.[site]?.[deviceType]) ?? []
+  },
+
+  available_sites: state => {
+    return Object.keys(state.global_config)
+  },
+
+  // Array of sitecodes for real observatory sites
+  available_sites_real: state => {
+    return Object.keys(state.global_config).filter(s => state.test_sites.indexOf(s.toLowerCase()) == -1)
+  },
+  // Array of sitecodes for simulated/test observatory sites
+  available_sites_simulated: state => {
+    return Object.keys(state.global_config).filter(s => state.test_sites.indexOf(s.toLowerCase()) != -1)
+  },
+
+  all_sites: state => {
+    let sites = []
+    Object.keys(state.global_config).forEach(site => {
+      // Get some basic info for each site, and add it to our array constituting "all sites"
+      try {
+        const config = state.global_config[site]
+        if (!config) { throw new Error('Site configuration not found.', site) }
+
+        const name = config.name?.toString() || config.site_description?.toString() || 'missing name'
+        const latitude = parseFloat(config?.latitude || config.site_latitude)
+        const longitude = parseFloat(config.longitude || config.site_longitude)
+        const TZ_database_name = config.TZ_database_name
+
+        if (isNaN(latitude)) { throw new Error('Latitude is missing or invalid.', site) }
+        if (isNaN(longitude)) { throw new Error('Longitude is missing or invalid.', site) }
+        if (!TZ_database_name) { throw new Error('TZ_database_name is missing.', site) }
+
+        const site_info = {
+          site,
+          name,
+          latitude,
+          longitude,
+          TZ_database_name
         }
-        sites.push(s)
-      })
-      sites = _.orderBy(sites, [s => s.site], ['asc'])
-      return sites
-    },
-    all_sites_real: (state, getters) => {
-        let sites = getters.all_sites.filter(s => !state.test_sites.includes(s.site.toLowerCase()))
-        // sort by longitude
-        sites = sites.sort((a, b) => a.longitude - b.longitude)
-        return sites
-    },
-    all_sites_simulated: (state, getters) => {
-        let sites = getters.all_sites.filter(s => state.test_sites.includes(s.site.toLowerCase()))
-        // sort by longitude
-        sites = sites.sort((a, b) => a.longitude - b.longitude)
-        return sites
-    },
+        sites.push(site_info)
+      } catch (error) {
+        console.error(error.message)
+      }
+    })
+    sites = _.orderBy(sites, [s => s.site], ['asc'])
+    return sites
+  },
+  all_sites_real: (state, getters) => {
+    let sites = getters.all_sites.filter(s => !state.test_sites.includes(s.site.toLowerCase()))
+    // sort by longitude
+    sites = sites.sort((a, b) => a.longitude - b.longitude)
+    return sites
+  },
+  all_sites_simulated: (state, getters) => {
+    let sites = getters.all_sites.filter(s => state.test_sites.includes(s.site.toLowerCase()))
+    // sort by longitude
+    sites = sites.sort((a, b) => a.longitude - b.longitude)
+    return sites
+  },
 
-    selected_enclosure_config: (state, getters) => {
-        return getters.site_config?.enclosure?.[state.selected_enclosure] ?? {}
-    },
-    selected_mount_config: (state, getters) => {
-        return getters.site_config?.mount?.[state.selected_mount] ?? {}
-    },
-    selected_telescope_config: (state, getters) => {
-        return getters.site_config?.telescope?.[state.selected_telescope] ?? {}
-    },
-    selected_rotator_config: (state, getters) => {
-        return getters.site_config?.rotator?.[state.selected_rotator] ?? {}
-    },
-    selected_focuser_config: (state, getters) => {
-        return getters.site_config?.focuser?.[state.selected_focuser] ?? {}
-    },
-    selected_filter_wheel_config: (state, getters) => {
-        return getters.site_config?.filter_wheel?.[state.selected_filter_wheel] ?? {}
-    },
-    selected_camera_config: (state, getters) => {
-        return getters.site_config?.camera?.[state.selected_camera] ?? {}
-    },
-    selected_screen_config: (state, getters) => {
-        return getters.site_config?.screen?.[state.selected_screen] ?? {}
-    },
-    selected_weather_config: (state, getters) => {
-        return getters.site_config?.observing_conditions?.[state.selected_weather] ?? {}
-    },
-    selected_sequencer_config: (state, getters) => {
-        return getters.site_config?.sequencer?.[state.selected_sequencer] ?? {}
-    },
-    selected_selector_config: (state, getters) => {
-        return getters.site_config?.selector?.[state.selected_selector] ?? {}
-    },
+  selected_enclosure_config: (state, getters) => {
+    return getters.site_config?.enclosure?.[state.selected_enclosure] ?? {}
+  },
+  selected_mount_config: (state, getters) => {
+    return getters.site_config?.mount?.[state.selected_mount] ?? {}
+  },
+  selected_telescope_config: (state, getters) => {
+    return getters.site_config?.telescope?.[state.selected_telescope] ?? {}
+  },
+  selected_rotator_config: (state, getters) => {
+    return getters.site_config?.rotator?.[state.selected_rotator] ?? {}
+  },
+  selected_focuser_config: (state, getters) => {
+    return getters.site_config?.focuser?.[state.selected_focuser] ?? {}
+  },
+  selected_filter_wheel_config: (state, getters) => {
+    return getters.site_config?.filter_wheel?.[state.selected_filter_wheel] ?? {}
+  },
+  selected_camera_config: (state, getters) => {
+    return getters.site_config?.camera?.[state.selected_camera] ?? {}
+  },
+  selected_screen_config: (state, getters) => {
+    return getters.site_config?.screen?.[state.selected_screen] ?? {}
+  },
+  selected_weather_config: (state, getters) => {
+    return getters.site_config?.observing_conditions?.[state.selected_weather] ?? {}
+  },
+  selected_sequencer_config: (state, getters) => {
+    return getters.site_config?.sequencer?.[state.selected_sequencer] ?? {}
+  },
+  selected_selector_config: (state, getters) => {
+    return getters.site_config?.selector?.[state.selected_selector] ?? {}
+  },
 
+  /* Getters for specific device attributes (implemented here as needed) */
+  // TODO: better process for setting default fallback values
 
-    /* Getters for specific device attributes (implemented here as needed) */
-    // TODO: better process for setting default fallback values
+  enclosure_is_dome: (state, getters) => {
+    return getters.selected_enclosure_config.is_dome ?? false
+  },
 
-    enclosure_is_dome:(state, getters) => {
-        return getters.selected_enclosure_config.is_dome ?? false;
-    },
+  focuser_reference: (state, getters) => {
+    return parseFloat(getters.selected_focuser_config.reference) // ?? '';
+  },
+  focuser_min: (state, getters) => {
+    return parseFloat(getters.selected_focuser_config.minimum) ?? 0
+  },
+  focuser_max: (state, getters) => {
+    return parseFloat(getters.selected_focuser_config.maximum) ?? 1
+  },
+  focuser_step_size: (state, getters) => {
+    return parseFloat(getters.selected_focuser_config.step_size) ?? 1
+  },
+  rotator_min: (state, getters) => {
+    return parseFloat(getters.selected_rotator_config.minimum) ?? 0
+  },
+  rotator_max: (state, getters) => {
+    return parseFloat(getters.selected_rotator_config.maximum) ?? 1
+  },
+  rotator_step_size: (state, getters) => {
+    return parseFloat(getters.selected_rotator_config.step_size) ?? 1
+  },
 
-    focuser_reference: (state, getters) => {
-        return parseFloat(getters.selected_focuser_config.reference); // ?? '';
-    },
-    focuser_min: (state, getters) => {
-        return parseFloat(getters.selected_focuser_config.minimum) ?? 0;
-    },
-    focuser_max: (state, getters) => {
-        return parseFloat(getters.selected_focuser_config.maximum) ?? 1;
-    },
-    focuser_step_size: (state, getters) => {
-        return parseFloat(getters.selected_focuser_config.step_size) ?? 1;
-    },
-    rotator_min: (state, getters) => {
-        return parseFloat(getters.selected_rotator_config.minimum) ?? 0;
-    },
-    rotator_max: (state, getters) => {
-        return parseFloat(getters.selected_rotator_config.maximum) ?? 1;
-    },
-    rotator_step_size: (state, getters) => {
-        return parseFloat(getters.selected_rotator_config.step_size) ?? 1;
-    },
+  telescope_has_flip_flat: (state, getters) => {
+    return getters.selected_telescope_config.has_flip_flat ?? false
+  },
 
-    telescope_has_flip_flat: (state, getters) => {
-        return getters.selected_telescope_config.has_flip_flat ?? false;
-    },
+  /* Site properties */
+  site_name: (state, getters) => {
+    return getters.site_config.name
+  },
+  site_latitude: (state, getters) => {
+    return parseFloat(getters.site_config?.latitude) ?? 0
+  },
+  site_longitude: (state, getters) => {
+    return parseFloat(getters.site_config?.longitude) ?? 0
+  },
+  timezone: (state, getters) => {
+    return getters.site_config?.TZ_database_name
+  },
 
+  /* These getters are used to customize the control form fields. */
+  // Available camera areas
+  camera_areas: (state, getters) => {
+    return getters.selected_camera_config.settings?.areas_implemented ?? []
+  },
+  camera_default_area: (state, getters) => {
+    return getters.selected_camera_config.settings?.default_area ?? []
+  },
+  camera_bin_options: (state, getters) => {
+    return getters.selected_camera_config.settings?.bin_modes?.map(o => String(o[0])) ?? []
+  },
+  // Does the camera bin or not? Returns string 'True' or 'False'.
+  camera_can_bin: (state, getters) => {
+    return getters.selected_camera_config.settings?.bin_modes?.length || false
+  },
+  camera_has_darkslide: (state, getters) => {
+    return getters.selected_camera_config.settings?.has_darkslide ?? false
+  },
 
-    /* Site properties */
-    site_name: (state, getters) => {
-        return getters.site_config.name
-    },
-    site_latitude: (state, getters) => {
-        return parseFloat(getters.site_config?.latitude) ?? 0;
-    },
-    site_longitude: (state, getters) => {
-        return parseFloat(getters.site_config?.longitude) ?? 0;
-    },
-    timezone: (state, getters) => {
-        return getters.site_config?.TZ_database_name;
-    },
+  // Available filters
+  filter_wheel_options: (state, getters) => {
+    const fwo = getters.selected_filter_wheel_config.settings?.filter_data
+    if (fwo == undefined) return [[]]
+    return fwo
+  },
+  default_filter_selection: (state, getters) => {
+    return getters.selected_filter_wheel_config.settings?.default_filter || getters.filter_wheel_options[0][0]
+  },
 
-
-    /* These getters are used to customize the control form fields. */
-    // Available camera areas
-    camera_areas: (state, getters) => {
-        return getters.selected_camera_config.settings?.areas_implemented ?? [];
-    },
-    camera_default_area: (state, getters) => {
-        return getters.selected_camera_config.settings?.default_area ?? [];
-    },
-    camera_bin_options: (state, getters) => {
-        return getters.selected_camera_config.settings?.bin_modes ?? [];
-    },
-    // Does the camera bin or not? Returns string 'True' or 'False'.
-    camera_can_bin: (state, getters) => {
-        return getters.selected_camera_config.settings?.bin_modes?.length;
-    },
-    camera_has_darkslide: (state, getters) => {
-        return getters.selected_camera_config.settings?.has_darkslide ?? false
-    },
-    camera_default_bin: (state, getters) => {
-        return getters.selected_camera_config.settings?.default_bin ?? getters.camera_bin_options[0] ?? '';
-    },
-
-    // Available filters
-    filter_wheel_options: (state, getters) => {
-        let fwo = getters.selected_filter_wheel_config.settings?.filter_data;
-        if (fwo == undefined) return [[]]
-        let num_filters = fwo.length;
-        return fwo.slice(1, num_filters)
-    },
-
-    // Get the site events from the selected config (things like nautical dark start, etc)
-    site_events: (state, getters) => {
-        return getters.site_config.events ?? {}
-    },
+  // Get the site events from the selected config (things like nautical dark start, etc)
+  // convert the times from dublin julian days (the config format) to unix timestamps
+  site_events: (state, getters) => {
+    const site_events = { ...getters.site_config.events } ?? {}
+    for (const e in site_events) {
+      // convert dublin julian days to julian days
+      const jd = site_events[e] + 2415020
+      // convert julian days to unix
+      site_events[e] = helpers.jd2unix(jd)
+    }
+    return site_events
+  },
+  site_events_observing_start_time: (state, getters) => {
+    return getters.site_events['Observing Begins']
+  },
+  site_events_observing_end_time: (state, getters) => {
+    return getters.site_events['Observing Ends']
+  }
 
 }
 
 const mutations = {
-    setGlobalConfig(state, config) { 
-        state.global_config = config;
-        state.did_config_load_yet = true;
-    },
-    setActiveSite(state, site) { 
-        state.selected_site = site; 
-        state.is_site_selected = true 
-    },
-		removeActiveSite(state) {
-			state.selected_site = ''
-			state.is_site_selected = false
-		},
-    setActiveEnclosure(state, enclosure) { state.selected_enclosure = enclosure },
-    setActiveMount(state, mount) { state.selected_mount = mount },
-    setActiveTelescope(state, telescope) { state.selected_telescope = telescope },
-    setActiveRotator(state, rotator) { state.selected_rotator = rotator },
-    setActiveFocuser(state, focuser) { state.selected_focuser = focuser },
-    setActiveFilterWheel(state, filter_wheel) { state.selected_filter_wheel = filter_wheel },
-    setActiveCamera(state, camera) { state.selected_camera = camera },
-    setActiveScreen(state, screen) { state.selected_screen = screen },
-    setActiveWeather(state, weather) { state.selected_weather = weather},
-    setActiveSequencer(state, sequencer) { state.selected_sequencer = sequencer},
-    setActiveSelector(state, selector) {
-      if (selector == '') {
-        state.selector_exists = false;
-        state.selected_selector = ''
-      } else {
-        state.selector_exists = true;
-        state.selected_selector = selector;
-      }
-    },
+  setGlobalConfig (state, config) {
+    state.global_config = config
+    state.did_config_load_yet = true
+  },
+  selected_site (state, site) {
+    state.prev_selected_site = state.selected_site
+    state.selected_site = site
+    state.is_site_selected = true
+  },
+
+  remove_selected_site (state) {
+    state.selected_site = ''
+    state.is_site_selected = false
+  },
+  selected_enclosure (state, enclosure) { state.selected_enclosure = enclosure },
+  selected_mount (state, mount) { state.selected_mount = mount },
+  selected_telescope (state, telescope) { state.selected_telescope = telescope },
+  selected_rotator (state, rotator) { state.selected_rotator = rotator },
+  selected_focuser (state, focuser) { state.selected_focuser = focuser },
+  selected_filter_wheel (state, filter_wheel) { state.selected_filter_wheel = filter_wheel },
+  selected_camera (state, camera) { state.selected_camera = camera },
+  selected_screen (state, screen) { state.selected_screen = screen },
+  selected_weather (state, weather) { state.selected_weather = weather },
+  selected_sequencer (state, sequencer) { state.selected_sequencer = sequencer },
+  selected_selector (state, selector) {
+    if (selector == '') {
+      state.selector_exists = false
+      state.selected_selector = ''
+    } else {
+      state.selector_exists = true
+      state.selected_selector = selector
+    }
+  }
 
 }
 
 const actions = {
 
-    /**
-     * This action gets the most recent config from AWS, which applies to all 
-     * observatories in the network. 
+  /**
+     * This action gets the most recent config from AWS, which applies to all
+     * observatories in the network.
+     * It also saves the config to localstorage, which acts as a fallback if the config endpoint fails.
      */
-    update_config({ commit, dispatch, rootState }) {
-        const url = `${rootState.dev.active_api}/all/config`
-        axios.get(url).then(response => {
-            commit('setGlobalConfig', response.data)
-        }).catch(error => {
-            console.warn(error)
-        });
-    },
+  async update_config ({ commit, rootState }) {
+    const url = `${rootState.api_endpoints.active_api}/all/config`
+    let globalConfig
 
-    set_default_filter_option({ commit, getters }) {
-        commit('command_params/filter_wheel_options_selection', 
-                getters.filter_wheel_options[0],
-                {root: true},
-            )
-    },
+    try {
+      const response = await axios.get(url)
+      globalConfig = response.data
 
-    set_default_active_devices({ state, commit, getters, rootGetters}, site) {
-        let defaults = state.global_config[site].defaults
-
-        commit('setActiveSite', site)
-        commit('setActiveWeather', defaults.observing_conditions)
-        commit('setActiveEnclosure', defaults.enclosure)
-        commit('setActiveMount', defaults.mount)
-        commit('setActiveTelescope', defaults.telescope)
-        commit('setActiveCamera', defaults.camera)
-        commit('setActiveFilterWheel', defaults.filter_wheel)
-        commit('setActiveFocuser', defaults.focuser)
-        commit('setActiveRotator', defaults.rotator)
-        commit('setActiveSequencer', defaults.sequencer)
-        commit('setActiveScreen', defaults.screen)
-
-        // handle optional instrument selector
-        if (Object.keys(state.global_config[site]).includes('selector')
-          && Object.keys(state.global_config[site].defaults).includes('selector')
-					&& state.global_config[site].defaults.selector !== null) {
-          commit('setActiveSelector', defaults.selector)
+      // Add wema-only values into obs configs
+      Object.keys(globalConfig).forEach(site => {
+        const wemaName = globalConfig[site].wema_name || site
+        if (wemaName != site) {
+          globalConfig[site].latitude = globalConfig[wemaName].latitude
+          globalConfig[site].longitude = globalConfig[wemaName].longitude
+          globalConfig[site].TZ_database_name = globalConfig[wemaName].TZ_database_name
         }
-        else {
-          commit('setActiveSelector', '')
-        }
+      })
 
-        // Set initial values in command fields
-        if (rootGetters['command_params/filter_wheel_options_selection'] == '') {
-            let filterSelection= getters.filter_wheel_options[0][0]
-            commit('command_params/filter_wheel_options_selection', 
-                    filterSelection,
-                    {root: true},
-                )
-        }
+      // Save globalConfig to localStorage
+      localStorage.setItem('globalConfig', JSON.stringify(globalConfig))
+    } catch (error) {
+      console.error(error)
 
-        if (rootGetters['command_params/camera_areas_selection'] == '' && getters.camera_areas != undefined) {
-            let areaSelection = getters.camera_areas[0]
-            commit('command_params/camera_areas_selection', 
-                    areaSelection,
-                    {root: true},
-                )
-        }
+      // Load globalConfig from localStorage
+      const loadedConfig = localStorage.getItem('globalConfig')
+      if (loadedConfig) {
+        globalConfig = JSON.parse(loadedConfig)
+      } else {
+        // Handle situation where there's neither API data nor localStorage data
+        throw error
+      }
+    }
 
-        if (rootGetters['command_params/camera_bin'] == '' && getters.camera_can_bin) { 
-            let bin_selection = getters.camera_bin_options[0]
-            commit('command_params/camera_bin', 
-                    bin_selection,
-                    {root: true},
-                )
-        }
-    },
+    commit('setGlobalConfig', globalConfig)
+    return globalConfig
+  },
 
-    remove_active_site({commit}) {
-        commit('setActiveSite','')
-        commit('setActiveWeather', '')
-        commit('setActiveEnclosure', '')
-        commit('setActiveMount','')
-        commit('setActiveTelescope','')
-        commit('setActiveCamera', '')
-        commit('setActiveFilterWheel', '')
-        commit('setActiveFocuser', '')
-        commit('setActiveRotator', '')
-        commit('setActiveSequencer', '')
-        commit('setActiveScreen', '')
-        commit('setActiveSelector', '')
-    },
+  // Define actions (not just mutations) to change the active device when we also need to set default
+  // values for config-based options
+  selected_camera ({ commit, getters }, selectedCamera) {
+    commit('selected_camera', selectedCamera)
+    if (selectedCamera == '') return
+
+    // set default camera area
+    const areaSelection = getters.camera_areas[0]
+    commit('command_params/camera_areas_selection',
+      areaSelection,
+      { root: true }
+    )
+
+    // set default bin setting if binning is enabled
+    const bin_selection = getters.camera_bin_options[0]
+    if (getters.camera_can_bin) {
+      commit('command_params/camera_bin',
+        bin_selection,
+        { root: true }
+      )
+    }
+  },
+
+  selected_filter_wheel ({ commit, getters }, selectedFilterWheel) {
+    commit('selected_filter_wheel', selectedFilterWheel)
+    if (selectedFilterWheel == '') return
+
+    // set default filter selection
+    const filterSelection = getters.default_filter_selection
+    commit('command_params/filter_wheel_options_selection',
+      filterSelection,
+      { root: true }
+    )
+  },
+
+  set_default_active_devices ({ state, commit, getters, rootGetters, dispatch }, site) {
+    const defaults = state.global_config[site].defaults
+
+    commit('selected_site', site)
+    commit('selected_weather', defaults.observing_conditions || 'observing_conditions1')
+    commit('selected_enclosure', defaults.enclosure || 'enclosure1')
+    commit('selected_mount', defaults.mount)
+    commit('selected_telescope', defaults.telescope)
+    dispatch('selected_camera', defaults.camera)
+    dispatch('selected_filter_wheel', defaults.filter_wheel)
+    commit('selected_focuser', defaults.focuser)
+    commit('selected_rotator', defaults.rotator)
+    commit('selected_sequencer', defaults.sequencer)
+    commit('selected_screen', defaults.screen)
+
+    // handle optional instrument selector
+    commit('selected_selector', '')
+    if (Object.keys(state.global_config[site]).includes('selector') &&
+          Object.keys(state.global_config[site].defaults).includes('selector') &&
+          state.global_config[site].defaults.selector !== null) {
+      commit('selected_selector', defaults.selector)
+    }
+  },
+
+  remove_active_site ({ commit }) {
+    commit('selected_site', '')
+    commit('selected_weather', '')
+    commit('selected_enclosure', '')
+    commit('selected_mount', '')
+    commit('selected_telescope', '')
+    commit('selected_camera', '')
+    commit('selected_filter_wheel', '')
+    commit('selected_focuser', '')
+    commit('selected_rotator', '')
+    commit('selected_sequencer', '')
+    commit('selected_screen', '')
+    commit('selected_selector', '')
+  }
 
 }
 
-
 export default {
-    namespaced: true,
-    state, 
-    getters,
-    actions,
-    mutations,
+  namespaced: true,
+  state,
+  getters,
+  actions,
+  mutations
 }

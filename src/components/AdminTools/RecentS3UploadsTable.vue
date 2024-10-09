@@ -97,7 +97,7 @@ export default {
     get_recent_uploads() {
       this.table_is_loading = true;
       let url = `${
-        this.$store.state.dev.active_api
+        this.$store.state.api_endpoints.active_api
       }/recentuploads?site=${encodeURIComponent(this.selected_site)}`;
       axios
         .get(url)

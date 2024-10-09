@@ -1,25 +1,29 @@
 <template>
   <div class="card-row">
-    <template v-for="s in all_sites_real">
-      <div 
-        :key="s.site" 
+    <template v-for="s in orderedSites">
+      <div
+        v-if="siteImagesLoaded"
+        :key="s.site"
         :val="s.site"
-        v-if="!site_blacklist.includes(s.site)"
-        class="card" 
+        class="card"
         :class="{
           'online': isOnline(s.site)
-          }">
-
-        <div class="card-header subtitle">
-          <router-link :to="'/site/'+s.site+'/observe'">
-            <span style="color: white; height: 2em;">{{s.name}}</span>
-          </router-link>
-        </div>
-
+        }"
+      >
         <div class="card-image">
           <router-link :to="'/site/'+s.site+'/observe'">
-            <figure class="image is-2by1"> <img :src="site_images[s.site]" /> </figure>
+            <figure class="image is-2by1">
+              <img :src="getImageUrl(s.site)">
+            </figure>
           </router-link>
+        </div>
+        <div class="card-header subtitle">
+          <router-link :to="'/site/'+s.site+'/observe'">
+            <span style="color: white; height: 2em;">{{ s.name }}</span>
+          </router-link>
+        </div>
+        <div class="sitecode-overlay">
+          {{ s.site }}
         </div>
       </div>
     </template>
@@ -27,77 +31,93 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
 import _ from 'lodash'
-import { mapGetters } from 'vuex'
 
 export default {
   name: 'SitesOverviewCards',
   props: {
     sites: {
       type: Array,
-      default: () => { return []}
+      default: () => { return [] }
     }
   },
-  data() {
+  data () {
     return {
-      site_blacklist: [ 'ALI-sim', 'wmd2' ], // don't show test sites
-      site_online_status: {},
-
-      site_images: {},
+      siteOnlineStatus: {},
+      siteImages: {},
+      siteImagesLoaded: false
     }
   },
-  mounted() {
+  mounted () {
     this.updateAllSiteImages()
 
     // Draw observatories with colors to denote weather/open status
     this.getSiteOpenStatus()
-    this.siteOnlineStatusInterval = setInterval(this.getSiteOpenStatus, 5000)
 
+    // Disable the constant polling, since we're not using the online status here for now
+    // this.siteOnlineStatusInterval = setInterval(this.getSiteOpenStatus, 5000)
   },
-  beforeDestroy() {
+  beforeDestroy () {
     clearInterval(this.siteOnlineStatusInterval)
   },
   watch: {
-    sites() {
+    sites () {
       this.updateAllSiteImages()
-    },
+    }
   },
   methods: {
-    getSiteOpenStatus() {
-      const url = this.$store.state.dev.status_endpoint + '/allopenstatus'
+    getImageUrl (site) {
+      if (site in this.siteImages) {
+        return this.siteImages[site]
+      } else {
+        return 'https://placehold.jp/30/222222/999999/600x300.png?text=no%20available%20images'
+      }
+    },
+    getSiteOpenStatus () {
+      const url = this.$store.state.api_endpoints.status_endpoint + '/allopenstatus'
       axios.get(url).then(resp => {
-        this.site_online_status = _.orderBy(resp.data, [s => s.site], ['asc'])
+        this.siteOnlineStatus = _.orderBy(resp.data, [s => s.site], ['asc'])
       })
     },
-    isOnline(site) {
-      if (!Object.keys(this.site_online_status).includes(site)) {
+    isOnline (site) {
+      if (!Object.keys(this.siteOnlineStatus).includes(site)) {
         return false
       }
-      const max_online_age = 300  // 5 minutes
-      const site_status = this.site_online_status[site]
-      let a = site_status.status_age_s <= max_online_age && site_status.weather_ok && site_status.open_ok
+      const maxOnlineAge = 300 // 5 minutes
+      const siteStatus = this.siteOnlineStatus[site]
+      const a = siteStatus.status_age_s <= maxOnlineAge && siteStatus.weather_ok && siteStatus.open_ok
       return a
     },
-    updateAllSiteImages() {
-      const url = this.$store.state.dev.active_api + `/latest_image_all_sites`
-      axios.get(url).then(response => {
-        this.site_images = response.data
-      })
-    },
-
+    async updateAllSiteImages () {
+      const url = this.$store.state.api_endpoints.active_api + '/latest_image_all_sites'
+      const response = await axios.get(url)
+      this.siteImages = response.data
+      this.siteImagesLoaded = true
+    }
   },
 
   computed: {
-    ...mapGetters('site_config', [
-      'all_sites_real',
-      'all_sites_simulated',
-    ]),
+    orderedSites () {
+      const getImgDate = (site) => {
+        const sitecode = site.site
+        if (this.siteImages !== 'undefined' && sitecode in this.siteImages) {
+          const url = this.siteImages[sitecode]
+          const yearmonthday = parseInt(url.split('-')[3])
+          return yearmonthday
+        } else {
+          // This is used for sorting dates, newest to oldest.
+          // If there's no image, we want the site to be placed last.
+          return 0
+        }
+      }
+      // copy the sites array; avoid mutating the prop
+      const sitesCopy = [...this.sites]
 
-    // We want to add enough empty (invisible) test sites so that the cards are sized the same as real sites.
-    // Compute the difference in number. If there are more test sites than real sites, don't add any empty sites.
-    empty_test_sites_needed() {
-      return Math.max(0, Object.keys(this.all_sites_real).length - Object.keys(this.all_sites_simulated).length)
+      sitesCopy.sort((a, b) => {
+        return getImgDate(b) - getImgDate(a)
+      })
+      return sitesCopy
     }
   }
 
@@ -111,6 +131,7 @@ export default {
   display:flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 1rem;
   @include tablet {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -119,11 +140,27 @@ export default {
 }
 
 .subtitle {
+  position:absolute;
+  top: 0em;
+  opacity: 0.8;
+  pointer-events: none;
   font-size: 1rem;
-	padding: 0.25em;
-	line-height: 1.25;
-	height: 3em;
-	margin-bottom: 0 !important;
+  padding: 0.25em;
+  line-height: 1.25;
+  width: 100%;
+  margin-bottom: 0 !important;
+}
+
+.sitecode-overlay {
+  position:absolute;
+  height: 0;
+  right: 1rem;
+  bottom: 3.5rem;
+  text-transform:uppercase;
+  font-weight: 900;
+  font-size:xx-large;
+  opacity: 0.3;
+
 }
 
 .quick-links {
@@ -140,6 +177,8 @@ export default {
 }
 img {
   object-fit:cover;  // crop, don't distort
+  background-color: black;
+  border: none;
 }
 
 .divider {

@@ -1,42 +1,42 @@
 <template>
-    <json-viewer :value="displayed_config" theme="jv-dark" expanded sort />
+  <json-viewer
+    :value="displayed_config"
+    theme="jv-dark"
+    expanded
+    sort
+  />
 </template>
 
 <script>
-import SiteSelectField from "@/components/FormElements/SiteSelectField";
 
 export default {
-  name: "SiteConfigViewer",
-  components: { SiteSelectField },
+  name: 'SiteConfigViewer',
   props: {
     // Specify a site to load when the component loads
     init_site: {
       type: String,
-      default: () => "all"
-    },
+      default: () => 'all'
+    }
   },
-  data() {
+  data () {
     return {
       loading: false,
-      selected_site: this.init_site,
-    };
-  },
-  mounted() {
-    this.$store.dispatch("site_config/update_config");
+      selected_site: this.init_site
+    }
   },
   computed: {
-    displayed_config() {
-        let global_config = this.$store.state.site_config.global_config;
-        if (this.init_site == "all") {
-            return global_config
-        } else if (Object.keys(global_config).includes(this.init_site)) {
-            return global_config[this.init_site]
-        } else {
-            return {}
-        }
-    },
-  },
-};
+    displayed_config () {
+      const global_config = this.$store.state.site_config.global_config
+      if (this.init_site == 'all') {
+        return global_config
+      } else if (Object.keys(global_config).includes(this.init_site)) {
+        return global_config[this.init_site]
+      } else {
+        return {}
+      }
+    }
+  }
+}
 </script>
 
 <style scoped>

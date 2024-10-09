@@ -1,46 +1,54 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import auth from './modules/auth'
 import site_config from './modules/site_config'
 import images from './modules/images'
-import script_settings from './modules/script_settings'
-import dev from './modules/dev'
-import js9 from './modules/js9'
+import scriptSettings from './modules/scriptSettings'
+import api_endpoints from './modules/api_endpoints'
 import command_params from './modules/command_params'
+import project_params from './modules/project_params'
 import user_data from './modules/user_data'
 import calendar from './modules/calendar'
 import drawshapes from './modules/drawshapes'
 import sitestatus from './modules/sitestatus'
 import starprofile from './modules/analysistools/starprofile'
 import userstatus from './modules/userstatus'
+import user_interface from './modules/user_interface'
+import uiSync from './modules/uiSync'
+
+import UiSyncPlugin from './plugins/ui_sync'
+import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
+/**
+ * Todo: research more into other state variables could benefit from a persisted
+ * state and seperate into a module persisting this state to save api calls when page refreshes
+ */
+const dataState = createPersistedState({
+  paths: ['sitestatus.siteOwmReports']
+})
+
 const store = new Vuex.Store({
-    plugins: [
-        // Vuex normally doesn't save between page reloads.
-        // Use this plugin to save state for the duration of a browser session.
-        //createPersistedState({
-        //    paths: [
-        //        'script_settings'
-        //    ]
-        //})
-    ],
-    modules: {
-        site_config,
-        command_params,
-        script_settings,
-        images,
-        user_data,
-        dev,
-        js9,
-        auth,
-        calendar,
-        drawshapes,
-        sitestatus,
-        starprofile,
-        userstatus
-    },
+  plugins: [
+    UiSyncPlugin,
+    dataState
+  ],
+  modules: {
+    site_config,
+    command_params,
+    project_params,
+    scriptSettings,
+    images,
+    user_data,
+    api_endpoints,
+    calendar,
+    drawshapes,
+    sitestatus,
+    starprofile,
+    userstatus,
+    user_interface,
+    uiSync
+  }
 })
 
 store.dispatch('sitestatus/startClock')

@@ -1,149 +1,215 @@
 <template>
   <div class="cal-page-wrapper">
-
-    <the-calendar 
-      class="the-calendar"
+    <the-calendar
       v-if="timezone"
-      :fc_timeZone="timezone"
-      :calendarSite="sitecode" 
-      :fc_resources="listOfObservatories" 
-      :showMoonEvents="showMoonEvents"
-      />
+      class="the-calendar"
+      :fc_time-zone="timezone"
+      :calendar-site="sitecode"
+      :fc_resources="listOfObservatories"
+      :show-moon-events="showMoonEvents"
+      :show-weather-forecast="showWeatherForecast"
+    />
 
     <div class="calendar-adjacent">
-
-      <site-reservation-status :sitecode="sitecode" class=""/>
+      <site-reservation-status
+        :sitecode="sitecode"
+        class=""
+      />
 
       <div class="projects-section">
-        <p>Projects will be shown here.</p>
-        <p>You will be able to drag them onto the calendar to schedule them.</p>   
+        <p class="menu-label">
+          Your Projects
+        </p>
+        <p style="text-decoration: line-through;">
+          Drag projects to the calendar to schedule them
+        </p>
+        <p>under construction</p>
+        <div class="projects-container">
+          <!-- <b-tag
+            v-for="(p, index) in user_projects"
+            :key="index"
+            class="draggable-project-tag"
+            type="is-info"
+            rounded
+          >
+            {{ p.project_name }}
+          </b-tag> -->
+        </div>
       </div>
 
       <div class="fc-settings-box">
         <div>
-          <p class="menu-label">Settings</p>
+          <p class="menu-label">
+            Settings
+          </p>
           <div class="field">
-              <b-switch v-model="showMoonEvents">
-                  Show moon events
-              </b-switch>
+            <b-switch v-model="showMoonEvents">
+              Show moon events
+            </b-switch>
+          </div>
+          <div class="field">
+            <b-switch v-model="showWeatherForecast">
+              Show Weather Forecast
+            </b-switch>
+          </div>
+        </div>
+        <div style="border-bottom: 1px solid grey; width: 100%; height: 1em; margin-bottom: 1em;" />
+        <p class="menu-label">
+          Calendar Behavior
+        </p>
+        <p>Drag events to <b>move</b></p>
+        <p>SHIFT-Drag events to <b>copy</b></p>
+        <div style="border-bottom: 1px solid grey; width: 100%; height: 1em; margin-bottom: 1em;" />
+        <p class="menu-label">
+          Calendar Legend
+        </p>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="reservation-visual" />
+            <div>
+              <b>Weather Forecast</b>
+              <p class="forecast forecast-1">Excellent</p>
+              <p class="forecast forecast-2">Good</p>
+              <p class="forecast forecast-3">Ok</p>
+              <p class="forecast forecast-4">Poor</p>
+              <p class="forecast forecast-5">Terrible</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="reservation-visual realtime" />
+            <div>
+              <b>Realtime Session</b>
+              <p>Blue events are used to reserve time for manual observing via the "Observe" tab.</p>
+              <p>You can schedule time in a 30 or 45 minute block.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="reservation-visual project" />
+            <div>
+              <b>Project Session</b>
+              <p>Purple events designate a project that has been created by the user.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="reservation-visual low-priority" />
+            <div>
+              <b>Low Priority Event</b>
+              <p>Events with the green corner are ok to remove if you want to observe during this time</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="reservation-visual time-critical" />
+            <div>
+              <b>Time Critical Observation</b>
+              <p>Events with the red corner require precise time schedules. </p>
+              <p>While they behave the same as standard events, they are shown here for informative purposes.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="reservation-visual self-owned" />
+            <div>
+              <b>Your Reservations</b>
+              <p>Calendar events created by you will be outlined in gold.</p>
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
-
 <script>
-import TheCalendar from "@/components/calendar/TheCalendar";
-import UserEventsTable from "@/components/calendar/UserEventsTable";
-import SiteReservationStatus from "@/components/calendar/SiteReservationStatus";
-import { mapGetters } from "vuex";
-import moment from "moment";
+import TheCalendar from '@/components/calendar/TheCalendar'
+import SiteReservationStatus from '@/components/calendar/SiteReservationStatus'
+import { mapGetters, mapState } from 'vuex'
+import moment from 'moment'
 
 export default {
-  name: "SiteCalendar",
-  props: ["sitecode"],
+  name: 'SiteCalendar',
+  props: ['sitecode'],
   components: {
     TheCalendar,
-    UserEventsTable,
-    SiteReservationStatus,
+    SiteReservationStatus
   },
-  data() {
+  data () {
     return {
-      localTime: "-",
-      siteTime: "-",
-      utcTime: "-",
+      localTime: '-',
+      siteTime: '-',
+      utcTime: '-',
 
       showMoonEvents: true,
-
-      // URL for the calendar backend api
-      //backendUrl: 'https://m1vw4uqnpd.execute-api.us-east-1.amazonaws.com',
-      backendUrl: "https://calendar.photonranch.org",
-    };
-  },
-  created() {
-    this.timeInterval = setInterval(this.updateTime, 1000);
-    window.moment = moment; // use moment lib in browser devtools
-  },
-  mounted() {
-    // Load the users projects so they can add them to calendar events. 
-    if (this.$auth.isAuthenticated) {
-      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+      showWeatherForecast: true
     }
   },
-  destroyed() {
-    clearInterval(this.timeInterval);
+  created () {
+    this.timeInterval = setInterval(this.updateTime, 1000)
+    window.moment = moment // use moment lib in browser devtools
   },
-  watch: {
-    // Update the user's schedulable projects if the user changes. 
-    user() {
-      this.$store.dispatch('user_data/fetchUserProjects', this.user.sub)
+  mounted () {
+    // Load the users projects so they can add them to calendar events.
+    if (this.userIsAuthenticated) {
+      this.$store.dispatch('user_data/fetchUserProjects', this.userId)
     }
+  },
+  destroyed () {
+    clearInterval(this.timeInterval)
   },
   methods: {
-    displayUtcTime(time) {
-      return moment(time).utc().format("MMM D, kk:mm");
+    displayUtcTime (time) {
+      return moment(time).utc().format('MMM D, kk:mm')
     },
-    updateTime() {
-      this.localTime = moment().format("MMM D, kk:mm");
+    updateTime () {
+      this.localTime = moment().format('MMM D, kk:mm')
 
       if (this.timezone) {
-        this.siteTime = moment().tz(this.timezone).format("MMM D, kk:mm");
+        this.siteTime = moment().tz(this.timezone).format('MMM D, kk:mm')
       }
       else {
         this.siteTime = '---'
       }
-      this.utcTime = moment().utc().format("MMM D, kk:mm");
-    },
+      this.utcTime = moment().utc().format('MMM D, kk:mm')
+    }
   },
   computed: {
-    ...mapGetters("site_config", [
-      "all_sites",
-      "timezone"
+    ...mapGetters('site_config', [
+      'all_sites',
+      'timezone'
+    ]),
+    ...mapState('user_data', [
+      'userIsAuthenticated',
+      'userIsAdmin',
+      'userId',
+      'userName',
+      'user_projects'
     ]),
 
-    user() {
-      return this.$auth.user;
-    },
-    username() {
-      if (this.$auth.isAuthenticated) {
-        return this.$auth.user.name;
-      }
-      return "-";
-    },
-
     // Calendar Resources (Observatories) to feed into the calendar component
-    listOfObservatories() {
-      let all_obs = [];
+    listOfObservatories () {
+      const all_obs = []
       this.all_sites.forEach(o => {
         all_obs.push({
           id: o.site,
           title: o.name,
-          eventColor: "#4e1199",
-          eventBorderColor: "#200589",
-          eventTextColor: "#fbf8fd",
-          eventClassNames: "",
-          eventOverlap: false, // defines whether events are allowed to overlap
-          eventConstraint: "",
-          eventAllow: "",
-          businessHours: "",
-          children: "",
-          parentId: "",
+          eventColor: '#4e1199',
+          eventBorderColor: '#200589',
+          eventTextColor: '#fbf8fd',
+          eventClassNames: '',
+          children: '',
+          parentId: '',
           anyOtherPropsHere:
-            "call from key extendedProps of this resource object",
-        });
+            'call from key extendedProps of this resource object'
+        })
       })
-      return all_obs;
-    },
-  },
-};
+      return all_obs
+    }
+  }
+}
 </script>
-
 
 <style scoped lang="scss">
 @import "@/style/_responsive.scss";
+@import "@/style/_variables.scss";
+@import "@/style/buefy-styles.scss";
 
 $content-view-height: calc(100vh - #{$top-bottom-height});
 $content-padding: 2em;
@@ -152,6 +218,7 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 .cal-page-wrapper {
   width: 100%;
   padding: $content-padding;
+  padding-left: calc($content-padding + 25px); // account for quick sites button column
   @include tablet {
     display: grid;
     grid-template-rows: 50vh 1fr 1fr;
@@ -161,7 +228,6 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
   @include desktop {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    //grid-template-rows: $calendar-height;
     grid-template-rows: $calendar-height;
   }
 }
@@ -175,21 +241,20 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 .calendar-adjacent {
   padding: 2em;
   display:flex;
+  gap: 2em;
 
   @include tablet {
     flex-direction: row;
-    padding: 2em 0;
     margin: 0;
   }
 
   @include desktop {
     flex-direction: column;
-    margin: 1em;
+    margin: 0;
   }
 
   & > div {
     padding: 1em;
-    margin: 1em;
     width: 100%;
     border-radius: 8px;
     background-color:rgba(10,10,10,0.8);
@@ -197,9 +262,14 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 }
 
 .projects-section {
+  & .projects-container {
+    display: flex;
+    gap: 1em;
+  }
 }
 
-.fc-settings-box {
+.draggable-project-tag {
+  background-color: $ptr-calendar-project-color !important;
 }
 
 #moon-info {
@@ -219,5 +289,85 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
 .fc-moon-indicator:hover {
   opacity: 0.8;
   transition: 0.2s;
+}
+
+.legend {
+  display:flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.legend-item {
+  display: flex;
+  gap: 1em;
+}
+
+.forecast {
+  border-left: $forecast-width solid;
+  margin-left: -20px;
+  padding-left: 20px;
+
+  &.forecast-1 {
+    border-color: $ptr-calendar-forecast-1;
+  }
+  &.forecast-2 {
+    border-color: $ptr-calendar-forecast-2;
+  }
+  &.forecast-3 {
+    border-color: $ptr-calendar-forecast-3;
+  }
+  &.forecast-4 {
+    border-color: $ptr-calendar-forecast-4;
+  }
+  &.forecast-5 {
+    border-color: $ptr-calendar-forecast-5;
+  }
+}
+.reservation-visual {
+  width: 30px;
+  height: 50px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 6px; // align top of the visual with description to the right
+  &.realtime {
+    background-color: $ptr-calendar-realtime-color;
+  }
+  &.project{
+    background-color: $ptr-calendar-project-color;
+  }
+  &.low-priority {
+    background-color: rgba(255, 255, 255, 0.25);
+    position: relative;
+  }
+  &.low-priority::before {
+    content: "";
+    border-bottom-right-radius: 3px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-bottom: 20px solid $ptr-calendar-low-priority-color;
+  }
+  &.time-critical {
+    background-color: rgba(255, 255, 255, 0.25);
+    position: relative;
+  }
+  &.time-critical::before {
+    content: "";
+    border-bottom-right-radius: 3px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-bottom: 20px solid $ptr-calendar-time-critical-color;
+  }
+  &.self-owned {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 2px solid $ptr-calendar-user-border;
+  }
 }
 </style>

@@ -1,100 +1,112 @@
 <template>
-    <div class="wrapper">
-        <b-collapse class="card" :open="startOpen">
-            <div
-            slot="trigger" 
-            slot-scope="props"
-            class="card-header"
-            role="button" >
-                <div class="card-header-title">
-                    <div :class="{'status-on':statusIsOn, 'status-off':!statusIsOn}" ></div>
-                    <slot name="title">default title</slot> 
-                </div>
-                <a class="card-header-icon">
-                    <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"/>
-                </a>
-            </div>
+  <div class="wrapper">
+    <b-collapse
+      class="card"
+      :open="startOpen"
+    >
+      <div
+        slot="trigger"
+        slot-scope="props"
+        class="card-header"
+        role="button"
+      >
+        <div class="card-header-title">
+          <div :class="{'status-on':statusIsOn, 'status-off':!statusIsOn}" />
+          <slot name="title">
+            default title
+          </slot>
+        </div>
+        <a class="card-header-icon">
+          <b-icon :icon="props.open ? 'menu-down' : 'menu-up'" />
+        </a>
+      </div>
 
-            <status-column :statusList="statusList" />
+      <status-column :status-list="statusList" />
 
-            <div style="height:10px;"/>
-            <div class="status-toggle-bar" @click="isFullStatusVisible = !isFullStatusVisible">expanded status</div>
-            <pre v-if="isFullStatusVisible">
+      <div style="height:10px;" />
+      <div
+        class="status-toggle-bar"
+        @click="isFullStatusVisible = !isFullStatusVisible"
+      >
+        expanded status
+      </div>
+      <pre v-if="isFullStatusVisible">
                 <table>
-                    <tr v-for="(value,name) in fullStatus" v-bind:key="name">
-                        <td class="is-size-7">  {{name}}:  </td>
-                        <td class="is-size-7">{{value}}</td>
+                    <tr
+v-for="(value,name) in fullStatus"
+:key="name"
+>
+                        <td class="is-size-7">  {{ name }}:  </td>
+                        <td class="is-size-7">{{ value }}</td>
                     </tr>
                 </table>
             </pre>
-
-        </b-collapse>
-    </div>
-
+    </b-collapse>
+  </div>
 </template>
 
 <script>
 import StatusColumn from '@/components/status/StatusColumn'
 export default {
-    props: {
-        'statusAge': Number, 
-        'fullStatus': Object,
-        'statusList': Array,
+  props: {
+    statusAge: Number,
+    fullStatus: Object,
+    statusList: Array
+  },
+  components: {
+    StatusColumn
+  },
+  data () {
+    return {
+      isFullStatusVisible: false,
+      startOpen: true
+    }
+  },
+  methods: {
+
+    decimalToHHMMSS (time) {
+      // prevent return value of NaN:NaN:NaN
+      if (typeof parseFloat(time) != 'number') { return '--:--:--' }
+
+      // -1.00 should translate to -01:00:00
+      let negative = false
+      if (parseFloat(time) < 0) { negative = true }
+      time = Math.abs(time)
+
+      let hhmmss = ''
+      let h, m, s
+      h = parseInt(time)
+      m = parseInt(60 * (time - h))
+      s = parseInt(3600 * (time - h) % 60)
+      if (h < 10) { h = '0' + h }
+      if (m < 10) { m = '0' + m }
+      if (s < 10) { s = '0' + s }
+      if (negative) { h = '-' + h }
+      hhmmss = `${h}:${m}:${s}`
+      return hhmmss
     },
-    components: {
-        StatusColumn,
-    },
-    data () {
-        return {
-            isFullStatusVisible: false,
-            startOpen: true,
-        }
-    },
-    methods: {
 
-        decimalToHHMMSS(time) {
-            // prevent return value of NaN:NaN:NaN
-            if (typeof parseFloat(time) != "number") {return '--:--:--'}
-
-            // -1.00 should translate to -01:00:00
-            let negative = false;
-            if (parseFloat(time) < 0) { negative = true }
-            time = Math.abs(time)
-
-            let hhmmss = ''
-            let h, m, s;
-            h = parseInt(time)
-            m = parseInt(60 * (time - h))
-            s = parseInt(3600 * (time - h) % 60)
-            if (h<10) { h = '0'+h}
-            if (m<10) { m = '0'+m}
-            if (s<10) { s = '0'+s}
-            if (negative) {h = '-'+h}
-            hhmmss = `${h}:${m}:${s}`
-            return hhmmss
-        },
-
-        /**
-         * Dynamically set color if the status element defines one. 
+    /**
+         * Dynamically set color if the status element defines one.
          */
-        customStyle(item) {
-            if ("color" in item) {
-                return `color: ${item.color};`
-            }
-        },
+    customStyle (item) {
+      if ('color' in item) {
+        return `color: ${item.color};`
+      }
+    }
 
-    },
-    computed: {
+  },
+  computed: {
 
-        /** 
+    /**
          * Control the status indicator dot in the title bar.
          */
-        statusIsOn() {
-            if (this.statusAge < 60) {return true}
-            else return false;
-        },
+    statusIsOn () {
+      if (this.statusAge < 60) { return true }
+      else return false
+    }
 
-    },
+  }
 
 }
 
@@ -102,11 +114,9 @@ export default {
 
 <style scoped>
 
-
 .wrapper {
     margin-bottom: 1em;
 }
-
 
 /* Blinking status colored dot indicators */
 @keyframes fade {
@@ -122,7 +132,7 @@ export default {
 .status-on {
     animation: fade 4000ms infinite;
     -webkit-animation: fade 4000ms infinite;
-    
+
     /* Center the content */
     align-items: center;
     display: flex;
