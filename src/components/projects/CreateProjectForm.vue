@@ -1492,7 +1492,6 @@ export default {
       'lunar_dist_min',
       'lunar_phase_max',
       'frequent_autofocus',
-      'near_tycho_star',
       'prefer_bessell',
       'enhance_photometry',
       'close_on_block_completion',

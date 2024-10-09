@@ -56,7 +56,6 @@ const state = {
   lunar_dist_min: 30, // deg
   lunar_phase_max: 60, // %
   frequent_autofocus: false,
-  near_tycho_star: false, // no longer available on ui at Wayne's request
   prefer_bessell: false,
   enhance_photometry: false,
   close_on_block_completion: false, // no longer available on ui at Wayne's request
@@ -91,7 +90,6 @@ const getters = {
       lunar_dist_min: state.lunar_dist_min,
       lunar_phase_max: state.lunar_phase_max,
       frequent_autofocus: state.frequent_autofocus,
-      near_tycho_star: state.near_tycho_star,
       prefer_bessell: state.prefer_bessell,
       enhance_photometry: state.enhance_photometry,
       close_on_block_completion: state.close_on_block_completion,
@@ -167,7 +165,6 @@ const mutations = {
   lunar_dist_min (state, val) { state.lunar_dist_min = val },
   lunar_phase_max (state, val) { state.lunar_phase_max = val },
   frequent_autofocus (state, val) { state.frequent_autofocus = val },
-  near_tycho_star (state, val) { state.near_tycho_star = val },
   prefer_bessell (state, val) { state.prefer_bessell = val },
   enhance_photometry (state, val) { state.enhance_photometry = val },
   close_on_block_completion (state, val) { state.close_on_block_completion = val },
@@ -232,7 +229,6 @@ const actions = {
     commit('lunar_dist_min', 30) // deg
     commit('lunar_phase_max', 60) // %
     commit('frequent_autofocus', false)
-    commit('near_tycho_star', false)
     commit('prefer_bessell', false)
     commit('enhance_photometry', false)
     commit('close_on_block_completion', false)
