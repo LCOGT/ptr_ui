@@ -296,6 +296,7 @@ export const commands_mixin = {
     ...mapGetters('command_params', [
       'telescope_selection',
       'telescope_coordinate_frame',
+      'tel_note',
 
       'smartstackIsActive',
       'subStackIsActive',
@@ -304,7 +305,7 @@ export const commands_mixin = {
       'subframeDefinedWithFile',
 
       'camera_areas_selection',
-      'camera_note',
+      'cam_note',
       'object_name',
       'camera_exposure',
       'camera_count',
@@ -447,16 +448,12 @@ export const commands_mixin = {
         extract: this.camera_extract,
         object_name: this.object_name,
         zoom: this.zoom_options_selection,
-        // object_name: 'test test test',
         username: this.username // from auth0
       }
       // Avoid empty strings (thanks, dynamodb)
-      if (this.camera_note != '') {
-        opt_params.hint = this.camera_note
+      if (this.cam_note != '') {
+        opt_params.cam_note = this.cam_note
       }
-      // if (this.object_name != '') {
-      //  opt_params["hint"] = this.object_name
-      // }
 
       // If active, add subframe parameters.
       // Also ignore if active but subframe params specify the whole image [(0,0),(1,1)] (the sum should == 2).
@@ -503,10 +500,8 @@ export const commands_mixin = {
     },
     mount_slew_radec_command () {
       let ra = emptyString(this.mount_ra.toString())
-
       let dec = emptyString(this.mount_dec.toString())
-      const obj = emptyString(this.mount_object.toString())
-      // console.log(ra)
+      const object = emptyString(this.mount_object.toString())
 
       // Convert if RA Decimal Degrees
       if (ra.includes('d')) {
@@ -528,14 +523,14 @@ export const commands_mixin = {
         dec = dec.toFixed(4)
       }
 
-      // if (ra.includes("d") ) {
-      //  ra.replace("d","")
-      //  ra = Number(ra) / 15
-      //  console.log(ra)
-      // }
+      const optional_params = {
+        object,
+        ...(this.tel_note != '' && { tel_note: this.tel_note }) // only add tel_note if it's not an empty string
+      }
+
       return this.base_command('mount', 'go', 'slew to RA/Dec',
         { ra, dec, frame: this.telescope_coordinate_frame },
-        { object: obj }
+        optional_params
       )
     },
     mount_slew_and_center_radec_command () {
@@ -548,19 +543,27 @@ export const commands_mixin = {
     mount_slew_hadec_command () {
       const ha = emptyString(this.mount_ha.toString())
       const dec = emptyString(this.mount_dec.toString())
-      const obj = emptyString(this.mount_object.toString())
+      const object = emptyString(this.mount_object.toString())
+      const optional_params = {
+        object,
+        ...(this.tel_note != '' && { tel_note: this.tel_note }) // only add tel_note if it's not an empty string
+      }
       return this.base_command('mount', 'go', 'slew to HA/Dec',
         { ha, dec, frame: this.telescope_coordinate_frame },
-        { object: obj }
+        optional_params
       )
     },
     mount_slew_azalt_command () {
       const az = emptyString(this.mount_az.toString())
       const alt = emptyString(this.mount_alt.toString())
-      const obj = emptyString(this.mount_object.toString())
+      const object = emptyString(this.mount_object.toString())
+      const optional_params = {
+        object,
+        ...(this.tel_note != '' && { tel_note: this.tel_note }) // only add tel_note if it's not an empty string
+      }
       return this.base_command('mount', 'go', 'slew to az/alt',
         { az, alt, frame: this.telescope_coordinate_frame },
-        { object: obj }
+        optional_params
       )
     },
     mount_slew_near_tycho () {

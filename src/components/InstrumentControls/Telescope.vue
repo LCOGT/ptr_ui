@@ -154,6 +154,18 @@
       </p>
     </b-field>
     <div class="horizontal-border" />
+    <b-field
+      horizontal
+      label="Tel Note"
+    >
+      <b-input
+        v-model="tel_note"
+        type="text"
+        min="0"
+        max="64"
+        size="is-small"
+      />
+    </b-field>
 
     <!-- "Park" and "Slew To..." button row -->
     <div style="display: flex; gap: 1em;">
@@ -402,6 +414,10 @@ export default {
       set (val) {
         this.$store.commit('command_params/mount_alt', val)
       }
+    },
+    tel_note: {
+      get () { return this.$store.getters['command_params/tel_note'] },
+      set (val) { this.$store.commit('command_params/tel_note', val) }
     },
 
     telescope_selection: {
