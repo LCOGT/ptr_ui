@@ -10,6 +10,7 @@ const nite = {
   map: null,
   date: null,
   sun_position: null,
+  moon_position: null,
   earth_radius_meters: 6371008,
   marker_twilight_civil: null,
   marker_twilight_nautical: null,
@@ -18,10 +19,11 @@ const nite = {
 
   init: function (map) {
     if (typeof google === 'undefined' ||
-           typeof google.maps === 'undefined') throw 'Nite Overlay: no google.maps detected'
+      typeof google.maps === 'undefined') throw 'Nite Overlay: no google.maps detected'
 
     this.map = map
     this.sun_position = this.calculatePositionOfSun()
+    this.moon_position = this.calculatePositionOfMoon()
 
     this.marker_twilight_civil = new google.maps.Circle({
       map: this.map,
@@ -72,12 +74,16 @@ const nite = {
   getSunPosition: function () {
     return this.sun_position
   },
+  getMoonPosition: function () {
+    return this.moon_position
+  },
   getShadowPosition: function () {
     return (this.sun_position) ? new google.maps.LatLng(-this.sun_position.lat(), this.sun_position.lng() + 180) : null
   },
   refresh: function () {
     if (!this.isVisible()) return
     this.sun_position = this.calculatePositionOfSun(this.date)
+    this.moon_position = this.calculatePositionOfMoon(this.date)
     const shadow_position = this.getShadowPosition()
     this.marker_twilight_civil.setCenter(shadow_position)
     this.marker_twilight_nautical.setCenter(shadow_position)
@@ -113,6 +119,72 @@ const nite = {
     const lng = -((true_solar_time_in_deg < 0) ? true_solar_time_in_deg + 180 : true_solar_time_in_deg - 180)
 
     return new google.maps.LatLng(lat, lng)
+  },
+  // Don't ask me how this works, formula from here -> https://stjarnhimlen.se/comp/tutorial.html#7
+  calculatePositionOfMoon: function (date) {
+    date = new Date()
+    // Get the Julian Day Number for the given date
+    const jdn = (date.getTime() / 86400000) + 2440587.5; // Convert milliseconds to days
+
+    // Reference epoch (J2000)
+    const referenceJDN = 2451545.0;
+
+    // Calculate d
+    const d = jdn - referenceJDN;
+
+    // Constants
+    const degToRad = Math.PI / 180;
+    const radToDeg = 180 / Math.PI;
+
+    // Normalize angle to 0-360 degrees
+    function rev(angle) {
+      const normalizedAngle = angle % 360;
+      return normalizedAngle >= 0 ? normalizedAngle : normalizedAngle + 360;
+    }
+
+    // Initial orbital elements
+    const N = rev(125.1228 - 0.0529538083 * d);
+    const i = 5.1454;
+    const w = rev(318.0634 + 0.1643573223 * d);
+    const a = 60.2666;
+    const e = 0.054900;
+    const M = rev(115.3654 + 13.0649929509 * d);
+
+    // Normalize M
+    const normalizedM = rev(M + 129 * 360);
+
+    // Compute eccentric anomaly (E)
+    let E0 = normalizedM + (180 / Math.PI) * e * Math.sin(normalizedM) * (1 + e * Math.cos(normalizedM));
+    let E1;
+
+    do {
+      E1 = E0 - (E0 - (180 / Math.PI) * e * Math.sin(E0) - normalizedM) / (1 - e * Math.cos(E0));
+      E0 = E1;
+    } while (Math.abs(E0 - E1) > 0.005);
+
+    const E = E1;
+
+    // Rectangular coordinates in the plane of the lunar orbit
+    const x = a * (Math.cos(degToRad * E) - e);
+    const y = a * Math.sqrt(1 - e * e) * Math.sin(degToRad * E);
+
+    // Distance and true anomaly
+    const r = Math.sqrt(x * x + y * y);
+    const v = Math.atan2(y, x) * radToDeg;
+
+    // Convert to ecliptic coordinates
+    const xeclip = r * (Math.cos(degToRad * N) * Math.cos(degToRad * (v + w)) - Math.sin(degToRad * N) * Math.sin(degToRad * (v + w)) * Math.cos(degToRad * i));
+    const yeclip = r * (Math.sin(degToRad * N) * Math.cos(degToRad * (v + w)) + Math.cos(degToRad * N) * Math.sin(degToRad * (v + w)) * Math.cos(degToRad * i));
+    const zeclip = r * Math.sin(degToRad * (v + w)) * Math.sin(degToRad * i);
+
+    // Convert to ecliptic longitude, latitude, and distance
+    const eclipticLongitude = Math.atan2(yeclip, xeclip) * radToDeg;
+    const eclipticLatitude = Math.atan2(zeclip, Math.sqrt(xeclip * xeclip + yeclip * yeclip)) * radToDeg;
+
+    console.log(eclipticLongitude)
+    console.log(eclipticLatitude)
+
+    return new google.maps.LatLng(eclipticLatitude, eclipticLongitude)
   },
   setDate: function (date) {
     this.date = date
