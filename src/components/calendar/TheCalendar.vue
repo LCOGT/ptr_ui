@@ -37,6 +37,7 @@
       :all-day-maintain-duration="fc_allDayMaintainDuration"
       :event-resizable-from-start="fc_eventResizableFromStart"
       :event-resource-editable="fc_eventResourceEditable"
+      :time-grid-event-min-height="fc_timeGridEventMinHeight"
       :droppable="fc_droppable"
       :event-allow="fc_eventAllow"
       :snap-duration="fc_snapDuration"
@@ -338,6 +339,7 @@ export default {
       fc_allDayMaintainDuration: true, // keep the end-time if events are moved to all-day (even though this is disabled)
       fc_eventResizableFromStart: true,
       fc_eventResourceEditable: true,
+      fc_timeGridEventMinHeight: 20, // pixels: minimum height for short events
       fc_droppable: true, // specifies that external resources can be dropped on calendar
       fc_snapDuration: 300000, // milliseconds defining the increments of change for dragged events. (5 minutes)
       fc_dragScroll: true, // auto-scroll up/down when user drags an event near edge of view
@@ -817,6 +819,7 @@ export default {
       this.activeEvent.creator_id = this.$auth.user.sub
       this.activeEvent.project_id = 'none'
       this.activeEvent.reservation_note = ''
+      this.activeEvent.origin = 'ptr'
 
       this.isNewEvent = true // setting for the modal event editor
       this.eventEditorIsActive = true
@@ -836,6 +839,7 @@ export default {
       this.activeEvent.resourceId = event.getResources()[0].id
       this.activeEvent.project_id = event.extendedProps.project_id
       this.activeEvent.reservation_note = event.extendedProps.reservation_note || ''
+      this.activeEvent.origin = event.extendedProps.origin || 'ptr'
 
       this.isNewEvent = false // setting for the modal event editor
       this.eventEditorIsActive = true
@@ -1176,6 +1180,7 @@ export default {
           resourceId: obj.resourceId,
           project_id: obj.project_id,
           reservation_note: obj.reservation_note,
+          origin: obj.origin,
           rendering: obj.rendering,
           project_priority: obj?.project_priority || 'standard',
           editable: obj.creator_id === this.userId || this.userIsAdmin,
@@ -1317,6 +1322,7 @@ $sky-darkness-z-index: 15;
     z-index: $now-indicator-z-index;
     opacity: 1;
     background-color: red;
+    height: 1px !important;
   }
   &.fc-now-indicator-arrow {
     border-color: rgb(255, 0, 0);

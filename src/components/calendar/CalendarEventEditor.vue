@@ -689,6 +689,7 @@ export default {
         site: this.site,
         resourceId: this.resourceId,
         reservation_note: this.reservation_note,
+        origin: 'ptr',
         project_id,
         project_priority: priority
       }

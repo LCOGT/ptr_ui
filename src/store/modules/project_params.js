@@ -130,8 +130,8 @@ const getters = {
 
       // This ignores the TZ info and acts as if the input to the datetime picker is in UTC
       // no matter the user's timezone
-      start_date: moment(state.start_date).format('YYYY-MM-DDTHH:mm:ss'),
-      expiry_date: moment(state.expiry_date).format('YYYY-MM-DDTHH:mm:ss')
+      start_date: moment(state.start_date).format('YYYY-MM-DDTHH:mm:ssZ'),
+      expiry_date: moment(state.expiry_date).format('YYYY-MM-DDTHH:mm:ssZ')
     }
     return project
   }

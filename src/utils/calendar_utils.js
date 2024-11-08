@@ -64,6 +64,7 @@ const convertFullCalendarEventToPtrFormat = event => {
     title: event.title,
     reservation_type: event.extendedProps.reservation_type,
     reservation_note: event.extendedProps.reservation_note,
+    origin: event.extendedProps.origin,
     resourceId: event.extendedProps.site,
     project_id: event.extendedProps.project_id,
     project_priority: event.extendedProps.project_priority,
@@ -85,6 +86,7 @@ const convertEventEditorResponseToPtrFormat = (event) => {
     project_id: event.project_id,
     project_priority: event.project_priority,
     reservation_note: event.reservation_note,
+    origin: event.origin,
     rendering: event.rendering
   }
 }
