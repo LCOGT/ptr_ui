@@ -193,7 +193,18 @@ const actions = {
     })
   },
 
-  async deleteProject ({ state, commit, dispatch, rootState }, { project_name, created_at }) {
+  async deleteProject ({ state, commit, dispatch, rootState }, { project_name, created_at, project_creator }) {
+    if (!state.userIsAdmin && state.userId != project_creator.user_id) {
+      // Notify user of failure with small message
+      Toast.open({
+        duration: 5000,
+        message: 'You can\'t delete a project that someone else created',
+        position: 'is-bottom',
+        type: 'is-danger'
+      })
+      return
+    }
+
     // Start the projects table loading animation
     if (state.show_everyones_projects) {
       commit('all_projects_is_loading', true)

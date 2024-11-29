@@ -1,5 +1,13 @@
 import { NotificationProgrammatic as Notification, DialogProgrammatic as Dialog } from 'buefy'
 
+// Uncomment this if you need to run locally without an internet connection
+// const io = () => {
+//   return {
+//     on: () => {},
+//     emit: () => {}
+//   }
+// }
+
 const UiSyncPlugin = (store) => {
   const websocketServerUrl = 'https://uisync.photonranch.org'
   const socket = io(websocketServerUrl) // eslint-disable-line

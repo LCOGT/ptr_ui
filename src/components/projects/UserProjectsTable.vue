@@ -93,14 +93,16 @@
           clone
         </button>
         <button
+          v-if="userIsAdmin || userId == props.row.project_creator.user_id"
           class="button is-info is-small mr-3"
           @click="getProject(props.row.project_name, props.row.created_at)"
         >
           modify
         </button>
         <button
+          v-if="userIsAdmin || userId == props.row.project_creator.user_id"
           class="button is-danger is-small delete-button"
-          @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created_at': props.row.created_at})"
+          @click="$store.dispatch('user_data/deleteProject', {'project_name': props.row.project_name, 'created_at': props.row.created_at, 'project_creator': props.row.project_creator})"
         >
           <span class="icon is-small ">
             <i class="mdi mdi-delete mdi-24px" />
