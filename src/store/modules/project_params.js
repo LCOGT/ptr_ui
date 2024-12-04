@@ -109,6 +109,7 @@ const getters = {
       project_name: state.project_name,
       created_at: moment().utc().format(),
       user_id: rootState.user_data.userId,
+      origin: 'PTR',
       project_note: state.project_note,
       project_priority: state.project_priority,
       project_creator: state.project_creator,
