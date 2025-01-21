@@ -8,13 +8,13 @@
         v-if="userIsAdmin"
         v-model="show_everyones_projects"
       >
-        Show everyone's projects [admin only]
+        Show everyone's projects
       </b-switch>
     </div>
     <b-table
       :data="projectsToDisplay"
       :loading="projectsIsLoading"
-      :empty="user_projects=={}"
+      :empty="user_projects == {}"
       :focusable="isFocusable"
       :paginated="true"
       :per-page="20"
@@ -27,6 +27,7 @@
         v-slot="props"
         field="project_name"
         label="project name"
+        searchable
       >
         {{ props.row.project_name }}
       </b-table-column>
@@ -53,6 +54,7 @@
         v-slot="props"
         field="object.name"
         label="object"
+        searchable
       >
         {{ props.row.project_targets[0].name }}
       </b-table-column>
@@ -62,6 +64,7 @@
         field="object.ra"
         label="ra"
         sortable
+        searchable
       >
         <ra-display :ra_hours_decimal="parseFloat(props.row.project_targets[0].ra)" />
       </b-table-column>
@@ -70,6 +73,7 @@
         v-slot="props"
         field="object.dec"
         label="dec"
+        searchable
       >
         <dec-display :dec_deg_decimal="parseFloat(props.row.project_targets[0].dec)" />
       </b-table-column>
@@ -310,6 +314,11 @@ export default {
 
 .delete-button {
   margin-left: 18%;
+}
+
+.search-bar {
+  margin-left: 1rem;
+  max-width: 200px;
 }
 
 </style>
