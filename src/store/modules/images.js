@@ -494,8 +494,9 @@ const actions = {
     if ('base_filename' in state.current_image) {
       const baseFilename = state.current_image.base_filename
 
-      // Check if the header is already cached
-      if (state.cached_headers[baseFilename]) {
+      // Check if the header is already cached. Important to check that the object has keys
+      // to make sure its a real non empty object, not just an observer.
+      if (state.cached_headers[baseFilename] && Object.keys(state.cached_headers[baseFilename]).length > 0) {
         return state.cached_headers[baseFilename]
       }
 
