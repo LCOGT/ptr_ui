@@ -328,6 +328,16 @@
             [admin] show everyone's projects
           </b-checkbox>
         </b-field>
+        <b-field horizontal>
+          <b-checkbox
+            v-if="userIsAdmin"
+            v-model="mockOriginLCO"
+            class="pl-3"
+            style="color: #aaa; margin-bottom: 1em;"
+          >
+            [admin] simulate scheduler event (set origin=LCO)
+          </b-checkbox>
+        </b-field>
 
         <b-field
           label="Note"
@@ -498,6 +508,7 @@ export default {
       reservation_type_tabs: 'project',
 
       show_everyones_projects: false,
+      mockOriginLCO: false,
 
       submitIsLoading: false,
       modifyIsLoading: false,
@@ -689,7 +700,7 @@ export default {
         site: this.site,
         resourceId: this.resourceId,
         reservation_note: this.reservation_note,
-        origin: 'PTR',
+        origin: this.mockOriginLCO ? 'LCO' : 'PTR',
         project_id,
         project_priority: priority
       }
