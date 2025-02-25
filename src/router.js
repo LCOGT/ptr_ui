@@ -11,6 +11,7 @@ import AdminOnly from './views/AdminOnly.vue'
 import About from './views/info/About.vue'
 import Resources from './views/info/Resources.vue'
 import ReservationInfo from './views/info/ReservationInfo.vue'
+import ImageView from './views/ImageView.vue'
 
 // Observatories
 import Site from './views/Site.vue'
@@ -44,6 +45,7 @@ const router = new VueRouter({
 
     { path: '/profile', name: 'profile', component: Profile, beforeEnter: authGuard },
     { path: '/data/:user', name: 'data', component: UserData },
+    { path: '/image/:imageId', name: 'image-view', component: ImageView, props: true },
     {
       path: '/site/:sitecode/:subpage',
       name: 'site',

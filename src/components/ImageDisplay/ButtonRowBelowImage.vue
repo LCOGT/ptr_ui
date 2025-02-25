@@ -46,7 +46,9 @@
         :image="current_image"
         button_size="is-small"
         class="mr-3"
-      />
+      >
+        header
+      </FitsHeaderModal>
 
       <b-dropdown
         aria-role="list"
@@ -120,6 +122,21 @@
         v-model="crosshairsVisible"
         type="is-info"
       />
+    </b-field>
+    <b-field
+      class="ml-5"
+      size="small"
+      horizontal
+    >
+      <b-button
+        class="button is-info is-small"
+        title="Get permanent link to this image"
+        icon-left="link"
+        outlined
+        @click="copyImagePermalink"
+      >
+        <span>share</span>
+      </b-button>
     </b-field>
   </div>
 </template>
@@ -264,6 +281,34 @@ export default {
     },
     download_jpg () {
       window.location.assign(this.current_image.jpg_url)
+    },
+
+    copyImagePermalink () {
+      const baseFilename = this.current_image.base_filename
+      if (!baseFilename || baseFilename === 'placeholder image') {
+        this.$buefy.toast.open({
+          message: 'No permanent link available for this image',
+          type: 'is-warning'
+        })
+        return
+      }
+      const imageUrl = `${window.location.origin}/image/${encodeURIComponent(baseFilename)}`
+      navigator.clipboard.writeText(imageUrl)
+        .then(() => {
+          this.$buefy.toast.open({
+            message: 'Link copied to clipboard!',
+            type: 'is-success',
+            duration: 3000
+          })
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err)
+          this.$buefy.toast.open({
+            message: 'Couldn\'t copy link to clipboard.',
+            type: 'is-danger',
+            duration: 3000
+          })
+        })
     }
   },
   computed: {
