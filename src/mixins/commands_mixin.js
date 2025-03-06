@@ -437,7 +437,7 @@ export const commands_mixin = {
         time: this.camera_exposure,
         image_type: this.camera_image_type,
         smartstack: this.smartstackIsActive,
-        subStack: this.subStackIsActive
+        substack: this.subStackIsActive
       }
       const opt_params = {
         count: this.camera_count.toString(),
