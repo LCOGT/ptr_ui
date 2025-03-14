@@ -243,6 +243,8 @@ export default {
         { events: this.getTwilightEvents },
         // Events from dynamodb backend
         { events: this.fetchSiteEvents },
+        // Scheduler observations
+        { events: this.fetchSchedulerObservations },
         // Moon Indicator
         { events: this.getMoonRiseSet },
         // Weather Forecast
@@ -1213,6 +1215,74 @@ export default {
         return fObj
       })
       return formatted_events
+    },
+    // Get scheduler observations from the site-proxy
+    async fetchSchedulerObservations (fetchInfo) {
+      const site = this.calendarSite
+      const url = `${this.$store.state.api_endpoints.calendar_api}/scheduler-observations`
+
+      // Format request similar to the Python example
+      const body = {
+        site,
+        start: moment(fetchInfo.startStr).utc().format(),
+        end: moment(fetchInfo.endStr).utc().format()
+      }
+
+      // Make the request
+      const resp = await axios.post(url, body)
+
+      // Format events for FullCalendar with green color
+      const sched_events = resp.data.map(obj => {
+        // Generate a unique ID for each observation
+        const eventId = `scheduler-${obj.id || makeUniqueID()}`
+
+        // Format the scheduler observation for FullCalendar
+        const event = {
+          id: eventId,
+          // title: obj.title || 'Scheduled Observation',
+          title: '',
+          start: obj.start,
+          end: obj.end,
+
+          // Store origin to identify these events
+          // Use 'scheduler' to identify this specific type
+          origin: 'scheduler',
+
+          // Store the full original data for use in modals
+          extendedProps: {
+            observationData: obj,
+            site: this.calendarSite,
+            creator: obj.created_by || 'Scheduler',
+            creator_id: obj.user_id || 'scheduler-system',
+            // We'll use this to determine the event is not editable
+            origin: 'scheduler'
+          },
+
+          // Make it clear this is from the scheduler
+          className: [
+            'scheduler-observation-event',
+            obj.observation_state.toLowerCase().replaceAll('_', '-') // this class provides the observation state
+          ],
+
+          textColor: 'rgba(0,0,0,0)',
+          // textColor: '#f5f5f5',
+
+          // Prevent editing
+          editable: false,
+          durationEditable: false,
+          overlap: false
+        }
+
+        const borderColorFromObsState = state => {
+          const variable_name = '--ptr-calendar-scheduler-border-' + state.toLowerCase().replaceAll('_', '-')
+          return getComputedStyle(document.documentElement).getPropertyValue(variable_name)
+        }
+        event.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--ptr-calendar-scheduler-observation-color')
+        event.borderColor = borderColorFromObsState(obj.observation_state)
+
+        return event
+      })
+      return sched_events
     }
   }
 }
@@ -1234,6 +1304,43 @@ $forecast-z-index: 16; // this should be above the moon
 $moon-z-index: 15;
 $observing-start-end-z-index: 15;
 $sky-darkness-z-index: 15;
+
+/* Styles for scheduler observation events */
+.scheduler-observation-event {
+  opacity: 0.9;
+  transition: opacity 0.2s;
+  background: repeating-linear-gradient(135deg,red 0 5px, white 0 10px) right/10px 100% no-repeat;
+
+  &.completed {
+    background: repeating-linear-gradient(135deg, $ptr-green 0 5px) right/10px 100% no-repeat;
+  }
+  &.in-progress {
+    background: repeating-linear-gradient(135deg, $ptr-green 0 5px, white 0 10px) right/10px 100% no-repeat;
+  }
+  &.pending {
+    background: repeating-linear-gradient(135deg, $ptr-yellow 0 5px, white 0 10px) right/10px 100% no-repeat;
+  }
+  &.aborted, &.failed {
+    background: repeating-linear-gradient(135deg, $ptr-red 0 5px) right/10px 100% no-repeat;
+  }
+  &.canceled, &.not-attempted {
+    background: repeating-linear-gradient(135deg, $dark 0 5px) right/10px 100% no-repeat;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+
+  /* Add telescope icon to scheduler events*/
+  &::before {
+    content: "📡";  /* Or use an icon font */
+    color: black;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    font-size: 12px;
+  }
+}
 
 /* Styles for the overall calendar component */
 .calendar-container {

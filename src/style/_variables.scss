@@ -33,15 +33,35 @@ $ptr-blue: $blue;
 
 $ptr-calendar-realtime-color: #474ce6ed;
 $ptr-calendar-project-color: #692474ed;
+$ptr-calendar-scheduler-observation-color: #f5f5f5;
+
+$ptr-calendar-scheduler-border-completed: $ptr-green;
+$ptr-calendar-scheduler-border-in-progress: $ptr-green;
+$ptr-calendar-scheduler-border-pending: $ptr-yellow;
+$ptr-calendar-scheduler-border-aborted: $ptr-red;
+$ptr-calendar-scheduler-border-failed: $ptr-red;
+$ptr-calendar-scheduler-border-canceled: $ptr-grey;
+$ptr-calendar-scheduler-border-not-attempted: $dark;
+
 $ptr-calendar-user-border: gold;
+
 $ptr-calendar-low-priority-color: $green;
 $ptr-calendar-time-critical-color: orangered;
 :root {
   --ptr-calendar-project-color: #{$ptr-calendar-project-color};
   --ptr-calendar-realtime-color: #{$ptr-calendar-realtime-color};
+  --ptr-calendar-scheduler-observation-color: #{$ptr-calendar-scheduler-observation-color};
   --ptr-calendar-user-border: #{$ptr-calendar-user-border};
+  --ptr-calendar-scheduler-border-completed: #{$ptr-calendar-scheduler-border-completed};
+  --ptr-calendar-scheduler-border-canceled: #{$ptr-calendar-scheduler-border-canceled};
+  --ptr-calendar-scheduler-border-pending: #{$ptr-calendar-scheduler-border-pending};
+  --ptr-calendar-scheduler-border-aborted: #{$ptr-calendar-scheduler-border-aborted};
+  --ptr-calendar-scheduler-border-failed: #{$ptr-calendar-scheduler-border-failed};
+  --ptr-calendar-scheduler-border-in-progress: #{$ptr-calendar-scheduler-border-in-progress};
+  --ptr-calendar-scheduler-border-not-attmpted: #{$ptr-calendar-scheduler-border-not-attempted};
   --ptr-calendar-low-priority-border: #{$ptr-calendar-user-border};
   --ptr-calendar-time-critical-border: #{$ptr-calendar-user-border};
+
 }
 $ptr-calendar-forecast-1: #6699FF;
 $ptr-calendar-forecast-2: #04BF20;
