@@ -46,7 +46,7 @@ const getters = {
     // '&&' is for existence checks so that if some values don't exist, we can return safely
     const global_config = state.global_config
     const site_config = global_config && global_config[state.selected_site]
-    const camera_config = site_config && site_config.camera && site_config.camera.camera_1_1
+    const camera_config = site_config && site_config.camera && site_config.camera[state.selected_camera]
     if (camera_config) {
       return camera_config
     }
@@ -54,7 +54,7 @@ const getters = {
 
   // Getting pixels to get size degrees and mosaic limits
   pixel_scale: (state, getters) => {
-    const pixels = getters.camera_config.settings.onebyone_pix_scale
+    const pixels = getters.camera_config?.settings.onebyone_pix_scale
     return pixels
   },
 
@@ -63,12 +63,12 @@ const getters = {
   // 2. be able to adjust preset sizes based on zoom selections
   // and 3. get adjusted width and height values for 'Small sq.' and 'Big sq.' zoom selections
   camera_size_x: (state, getters) => {
-    const camera_size_x = getters.camera_config.camera_size_x
+    const camera_size_x = getters.camera_config?.camera_size_x
     return camera_size_x
   },
 
   camera_size_y: (state, getters) => {
-    const camera_size_y = getters.camera_config.camera_size_y
+    const camera_size_y = getters.camera_config?.camera_size_y
     return camera_size_y
   },
 
