@@ -90,6 +90,7 @@
       <div class="card">
         <div class="card-content">
           <calendar-event-editor
+            v-if="!isSchedulerObservation"
             :event-details="activeEvent"
             :is-new-event="isNewEvent"
             :event-is-loading="isLoading"
@@ -97,6 +98,11 @@
             @cancel="cancelButtonClicked"
             @delete="deleteButtonClicked"
             @modify="modifyButtonClicked"
+          />
+          <observation-viewer
+            v-else
+            :observation-data="activeObservationData"
+            @close="cancelButtonClicked"
           />
         </div>
       </div>
@@ -121,6 +127,7 @@ import moment from 'moment'
 import { mapState, mapGetters } from 'vuex'
 
 import CalendarEventEditor from '@/components/calendar/CalendarEventEditor'
+import ObservationViewer from '@/components/calendar/ObservationViewer'
 
 import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -155,7 +162,8 @@ export default {
   name: 'TheCalendar',
   components: {
     FullCalendar, // make the <FullCalendar> tag available
-    CalendarEventEditor
+    CalendarEventEditor,
+    ObservationViewer
   },
   props: {
     // The active site (resource) disaplyed in the calendar
@@ -384,6 +392,12 @@ export default {
 
       // properties of the selected calendar event
       activeEvent: {},
+
+      // Indicates if the current event is a scheduler observation
+      isSchedulerObservation: false,
+
+      // Stores the full observation data for scheduler events
+      activeObservationData: null,
 
       // Controls a spinner in the lower right corner of the calendar that appears
       // while fetching events
@@ -831,6 +845,18 @@ export default {
      */
     async existingEventSelected (arg) {
       const event = arg.event
+
+      // Check if this is a scheduler observation
+      if (event.extendedProps.origin === 'scheduler' && event.extendedProps.observationData) {
+        this.isSchedulerObservation = true
+        console.log(event.extendedProps.observationData)
+        this.activeObservationData = event.extendedProps.observationData.observation_data
+        this.eventEditorIsActive = true
+        return
+      }
+
+      // If not a scheduler observation, proceed as normal
+      this.isSchedulerObservation = false
       this.activeEvent.id = event.id
       this.activeEvent.startStr = moment(event.start).format()
       this.activeEvent.endStr = moment(event.end).format()
@@ -1231,10 +1257,11 @@ export default {
       // Make the request
       const resp = await axios.post(url, body)
 
-      // Format events for FullCalendar with green color
+      // Format events for FullCalendar
       const sched_events = resp.data.map(obj => {
         // Generate a unique ID for each observation
         const eventId = `scheduler-${obj.id || makeUniqueID()}`
+        console.log(obj)
 
         // Format the scheduler observation for FullCalendar
         const event = {
