@@ -74,7 +74,7 @@ export default {
   },
   computed: {
     ...mapState('site_config', ['selected_site', 'global_config']),
-    ...mapGetters('site_config', ['all_sites_real', 'all_sites_simulated']),
+    ...mapGetters('site_config', ['all_sites', 'all_sites_real', 'all_sites_simulated']),
     ...mapState('sitestatus', ['site_open_status', 'stale_age_ms']),
     ...mapGetters('sitestatus', ['all_sites_status_color']),
 
@@ -98,11 +98,13 @@ export default {
         .filter(site => { return state.global_config[site].instance_type === 'obs' })
         .forEach(site => {
           const wema_parent = state.global_config[site].wema_name
-          sitesData[wema_parent].observatories.push({
-            id: site,
-            name: state.global_config[site].name,
-            telescope_description: state.global_config[site].telescope_description
-          })
+          if (wema_parent in state.global_config) {
+            sitesData[wema_parent].observatories.push({
+              id: site,
+              name: state.global_config[site].name,
+              telescope_description: state.global_config[site].telescope_description
+            })
+          }
         })
 
       // Add all other sites that don't adhere to the wema/obs structure yet.

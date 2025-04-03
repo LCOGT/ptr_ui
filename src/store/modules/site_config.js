@@ -145,17 +145,24 @@ const getters = {
         console.error(error.message)
       }
     })
+
+    // Don't include sites that are missing the wema
+    const allSiteNames = new Set(Object.keys(state.global_config))
+    sites = sites.filter(site => !allSiteNames.has(site.wema_name))
+
     sites = _.orderBy(sites, [s => s.site], ['asc'])
     return sites
   },
   all_sites_real: (state, getters) => {
     let sites = getters.all_sites.filter(s => !state.test_sites.includes(s.site.toLowerCase()))
+
     // sort by longitude
     sites = sites.sort((a, b) => a.longitude - b.longitude)
     return sites
   },
   all_sites_simulated: (state, getters) => {
     let sites = getters.all_sites.filter(s => state.test_sites.includes(s.site.toLowerCase()))
+
     // sort by longitude
     sites = sites.sort((a, b) => a.longitude - b.longitude)
     return sites
@@ -344,10 +351,17 @@ const actions = {
       const response = await axios.get(url)
       globalConfig = response.data
 
+      // Don't include sites that are missing the wema
+      globalConfig = Object.fromEntries(
+        Object.entries(globalConfig).filter(([key, value]) =>
+          Object.keys(globalConfig).includes(value.wema_name)
+        )
+      )
+
       // Add wema-only values into obs configs
       Object.keys(globalConfig).forEach(site => {
         const wemaName = globalConfig[site].wema_name || site
-        if (wemaName != site) {
+        if (wemaName != site && wemaName in globalConfig) {
           globalConfig[site].latitude = globalConfig[wemaName].latitude
           globalConfig[site].longitude = globalConfig[wemaName].longitude
           globalConfig[site].TZ_database_name = globalConfig[wemaName].TZ_database_name
@@ -356,6 +370,8 @@ const actions = {
 
       // Save globalConfig to localStorage
       localStorage.setItem('globalConfig', JSON.stringify(globalConfig))
+      console.log('globalConfig: ')
+      console.log(globalConfig)
     } catch (error) {
       console.error(error)
 
