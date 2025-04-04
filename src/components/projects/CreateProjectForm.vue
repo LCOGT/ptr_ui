@@ -520,25 +520,6 @@
       </template>
       <template #content>
         <div class="flex-row">
-          <b-field label="Observing Side">
-            <b-field>
-              <b-checkbox
-                v-if="!read_only"
-                v-model="ascending"
-              >
-                Ascending
-              </b-checkbox>
-              <b-checkbox
-                v-if="!read_only"
-                v-model="descending"
-              >
-                Descending
-              </b-checkbox>
-            </b-field>
-          </b-field>
-        </div>
-
-        <div class="flex-row">
           <b-field label="Ra offset">
             <b-input
               v-model="ra_offset"
@@ -641,14 +622,27 @@
               <span class="button is-static">deg</span>
             </p>
           </b-field>
+        </div>
+        <div class="flex-row">
           <b-field
-            label="Max Night Duration"
             :type="{'is-danger': warn.max_night_duration}"
+            style="margin-right: 1em;"
           >
+            <template #label>
+              Max Night Duration
+              <b-tooltip type="is-dark">
+                <template #content>
+                  <p>The longest duration a site should run this project if it is auto scheduled</p>
+                </template>
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </template>
             <b-input
               v-model="max_night_duration"
               class="project-input"
-              style="max-width: 150px;"
               type="number"
               step="0.5"
               min="0"
@@ -658,6 +652,24 @@
             <p class="control">
               <span class="button is-static">hours</span>
             </p>
+          </b-field>
+          <b-field>
+            <template #label>
+              Prefer Early
+              <b-tooltip type="is-dark">
+                <template #content>
+                  <p>Preference for when in the night this project is run</p>
+                </template>
+                <b-icon
+                  size="is-small"
+                  icon="help-circle-outline"
+                />
+              </b-tooltip>
+            </template>
+            <b-checkbox
+              v-model="prefer_early"
+              :disabled="read_only"
+            />
           </b-field>
         </div>
 
@@ -728,6 +740,25 @@
           </b-field>
         </div>
         <div style="height: 5px;" />
+        <div class="flex-row">
+          <b-field label="Observing Side">
+            <b-field>
+              <b-checkbox
+                v-if="!read_only"
+                v-model="ascending"
+                style="margin-right: 3em;"
+              >
+                Ascending
+              </b-checkbox>
+              <b-checkbox
+                v-if="!read_only"
+                v-model="descending"
+              >
+                Descending
+              </b-checkbox>
+            </b-field>
+          </b-field>
+        </div>
         <b-field>
           <b-checkbox
             v-model="frequent_autofocus"
@@ -1488,6 +1519,7 @@ export default {
       'max_ha',
       'min_zenith_dist',
       'max_night_duration',
+      'prefer_early',
       'max_airmass',
       'lunar_dist_min',
       'lunar_phase_max',
@@ -1605,7 +1637,7 @@ export default {
     display: flex;
     flex-direction: row;
     gap: 1em;
-    margin-bottom: 1em;
+    margin-bottom: 2em;
 }
 .b-numberinput {
     position: relative;
