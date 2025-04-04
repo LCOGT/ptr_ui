@@ -6,6 +6,15 @@ $tablet-min: 769px;
 $desktop-min: 1024px;
 $widescreen-min: 1216px;
 $fullhd-min: 1408px;
+
+// Export breakpoint values
+:root {
+  --custom-tablet-min: #{$tablet-min};
+  --custom-desktop-min: #{$desktop-min};
+  --custom-widescreen-min: #{$widescreen-min};
+  --custom-fullhd-min: #{$fullhd-min};
+}
+
 @mixin breakpoint($point) {
   @if $point == mobile {
     @media (max-width: $tablet) { @content; }

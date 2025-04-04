@@ -205,6 +205,17 @@ export default {
     this.refreshCalendarView()
     this.nowIndicatorTimeInteval = setInterval(this.updateNowIndicator, 300000)
 
+    // For small screen widths, initialize with a single day view
+    // Get the breakpoint from CSS variables
+    const phoneScreenWidthMax = parseInt(
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--custom-tablet-min')
+        .trim()
+    )
+    if (window.innerWidth < phoneScreenWidthMax) {
+      this.fullCalendarApi.changeView('timeGridDay')
+    }
+
     this.$store.dispatch('user_data/fetchAllProjects')
   },
   destroyed () {
@@ -329,7 +340,7 @@ export default {
         // define the top row of buttons
         left: 'customPrev,customNext today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek'
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
       fc_slotDuration: '00:15:00', // horizontal guides; affects event drag precision
       fc_slotLabelInterval: '01:00:00',
@@ -687,7 +698,7 @@ export default {
     },
 
     dayRender (dayRenderInfo) {
-      if (this.fullCalendarApi?.view?.type === 'timeGridWeek') {
+      if (['timeGridWeek', 'timeGridDay'].includes(this.fullCalendarApi?.view?.type)) {
         this.addUTCTimeColumn()
       }
       try {

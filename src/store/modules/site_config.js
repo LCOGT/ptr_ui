@@ -370,8 +370,6 @@ const actions = {
 
       // Save globalConfig to localStorage
       localStorage.setItem('globalConfig', JSON.stringify(globalConfig))
-      console.log('globalConfig: ')
-      console.log(globalConfig)
     } catch (error) {
       console.error(error)
 
