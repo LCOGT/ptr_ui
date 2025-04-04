@@ -244,14 +244,9 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
   gap: 2em;
 
   @include mobile {
-    // Hide all children except the settings pane
     flex-direction: column;
-    // & > *:not(:last-child) {
-    //   display: none;
-    // }
     padding: 0;
     margin-top: 2em;
-
   }
 
   @include tablet {
