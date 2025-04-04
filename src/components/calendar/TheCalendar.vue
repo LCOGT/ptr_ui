@@ -139,6 +139,7 @@ import bootstrapPlugin from '@fullcalendar/bootstrap'
 import momentTimezonePlugin from '@fullcalendar/moment-timezone'
 
 import { makeUniqueID, copyFcEvent, convertFullCalendarEventToPtrFormat, convertEventEditorResponseToPtrFormat, getMoonPhaseDays, rgba_from_illumination, oneDayTwilight, removeSensitiveData } from '@/utils/calendar_utils.js'
+import helpers from '@/utils/helpers'
 
 // must manually include stylesheets for each plugin
 import '@fullcalendar/core/main.css'
@@ -657,45 +658,119 @@ export default {
       this.isLoading = val
     },
 
-    // This method does some manual DOM manipulation to add the right-side UTC column to the calendar.
+    // This method does some manual DOM manipulation to add the right-side UTC and Sidereal column to the calendar.
     // It's pretty hacky and will likely break if we update fullCalendar beyond v4
-    addUTCTimeColumn () {
+    addExtraTimeColumns () {
+      // Get all rows that need time columns
       const rows = document.querySelectorAll('.fc-slats > table.table-bordered tbody > tr')
+      const longitude = this.site_longitude
+
       rows.forEach(r => {
-        if (r.querySelectorAll('.fc-axis.fc-time').length < 2) {
-          const timecol = r.querySelector('.fc-axis.fc-time')
-          const timecolUtc = timecol.cloneNode(true)
-          if (timecolUtc.querySelector('span')) {
-            const timeText = timecolUtc.querySelector('span').textContent
-            const utcTime = transformLocalTimeToUTC(this.fc_timeZone, timeText)
-            timecolUtc.querySelector('span').textContent = utcTime
+        const localTimeCol = r.querySelector('.fc-axis.fc-time')
+        if (!localTimeCol) return
+
+        // Clear any existing extra columns first (optional)
+        const existingExtraColumns = r.querySelectorAll('.fc-axis.fc-time:not(:first-child)')
+        existingExtraColumns.forEach(col => col.remove())
+
+        // Get local time
+        let localTimeText = ''
+        if (localTimeCol.querySelector('span')) {
+          localTimeText = localTimeCol.querySelector('span').textContent
+        }
+
+        // Add UTC column
+        if (localTimeText) {
+          const utcTimeCol = localTimeCol.cloneNode(true)
+          const utcTime = transformLocalTimeToUTC(this.fc_timeZone, localTimeText)
+          if (utcTimeCol.querySelector('span')) {
+            utcTimeCol.querySelector('span').textContent = utcTime
           }
-          r.appendChild(timecolUtc)
+          r.appendChild(utcTimeCol)
+
+          // Parse UTC time for sidereal calculation
+          const [hours, minutes] = utcTime.split(':').map(Number)
+
+          // Create date object with current UTC time
+          const currentDate = new Date()
+          currentDate.setUTCHours(hours, minutes, 0, 0)
+
+          // Add sidereal column
+          const sidTimeCol = localTimeCol.cloneNode(true)
+          const sidTime = helpers.siderealTime(longitude, currentDate)
+
+          // Format sidereal time as hh.mm
+          const sidHours = Math.floor(sidTime)
+          const sidMinutes = Math.floor((sidTime - sidHours) * 60)
+          const formattedSidTime = `${sidHours.toString().padStart(2, '0')}.${sidMinutes.toString().padStart(2, '0')}`
+
+          if (sidTimeCol.querySelector('span')) {
+            sidTimeCol.querySelector('span').textContent = formattedSidTime
+          }
+          r.appendChild(sidTimeCol)
         }
       })
+
+      // Handle the skeleton table
       const skeleton = document.querySelectorAll('.fc-content-skeleton > table > tbody > tr')
       skeleton.forEach(e => {
-        if (e.querySelectorAll('td.fc-axis').length < 2) {
-          e.appendChild(e.querySelector('td.fc-axis').cloneNode(true))
+        // Clear existing extra axes
+        const existingExtraAxes = e.querySelectorAll('td.fc-axis:not(:first-child)')
+        existingExtraAxes.forEach(axis => axis.remove())
+
+        // Add UTC axis
+        const axisTemplate = e.querySelector('td.fc-axis')
+        if (axisTemplate) {
+          e.appendChild(axisTemplate.cloneNode(true))
+          // Add SID axis
+          e.appendChild(axisTemplate.cloneNode(true))
         }
       })
+
+      // Handle table headers
       const tableBorderedRows = document.querySelectorAll('.fc-bg table.table-bordered tbody tr')
       tableBorderedRows.forEach(e => {
-        if (e.querySelectorAll('.fc-axis').length < 2) {
-          if (e.querySelector('.fc-axis span')) {
-            e.querySelector('.fc-axis span').textContent = 'Obs. Local'
+        // Clear existing extra headers
+        const existingExtraHeaders = e.querySelectorAll('.fc-axis:not(:first-child)')
+        existingExtraHeaders.forEach(header => header.remove())
+
+        const localHeader = e.querySelector('.fc-axis')
+        if (localHeader) {
+          // Set local header text
+          if (localHeader.querySelector('span')) {
+            localHeader.querySelector('span').textContent = 'Obs. Local'
           }
-          const utc_el = e.querySelector('.fc-axis').cloneNode(true)
-          if (utc_el.querySelector('span')) {
-            utc_el.querySelector('span').textContent = 'UTC'
+
+          // Add UTC header
+          const utcHeader = localHeader.cloneNode(true)
+          if (utcHeader.querySelector('span')) {
+            utcHeader.querySelector('span').textContent = 'UTC'
           }
-          e.appendChild(utc_el)
+          e.appendChild(utcHeader)
+
+          // Add SID header
+          const sidHeader = localHeader.cloneNode(true)
+          if (sidHeader.querySelector('span')) {
+            sidHeader.querySelector('span').textContent = 'SID'
+          }
+          e.appendChild(sidHeader)
         }
       })
+
+      // Handle additional table headers
       const tableBorderedRows2 = document.querySelectorAll('.fc-head-container table.table-bordered tr')
-      if (tableBorderedRows2.length > 0 && tableBorderedRows2[0].querySelectorAll('.fc-axis').length < 2) {
+      if (tableBorderedRows2.length > 0) {
         tableBorderedRows2.forEach(e => {
-          e.appendChild(e.querySelector('.fc-axis').cloneNode(true))
+          // Clear existing extra cells
+          const existingExtraCells = e.querySelectorAll('.fc-axis:not(:first-child)')
+          existingExtraCells.forEach(cell => cell.remove())
+
+          const axisTemplate = e.querySelector('.fc-axis')
+          if (axisTemplate) {
+            // Add two more axis cells
+            e.appendChild(axisTemplate.cloneNode(true))
+            e.appendChild(axisTemplate.cloneNode(true))
+          }
         })
       }
     },
@@ -707,7 +782,7 @@ export default {
 
     dayRender (dayRenderInfo) {
       if (['timeGridWeek', 'timeGridDay'].includes(this.fullCalendarApi?.view?.type)) {
-        this.addUTCTimeColumn()
+        this.addExtraTimeColumns()
       }
       try {
         const date = moment(dayRenderInfo.date).tz(this.fc_timeZone)
