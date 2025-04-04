@@ -9,7 +9,7 @@ const state = {
   project_events: [],
   project_note: '',
   project_sites: ['common pool'], // can include 'common_pool' or any sitecode
-  project_priority: 'standard', // can be ['standard', 'time_critical', 'low_priority']
+  project_priority: 'standard', // can be ['standard', 'time_critical', 'low_priority', 'background']
   project_creator: {
     username: '',
     user_id: ''

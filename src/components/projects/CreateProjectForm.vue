@@ -155,6 +155,9 @@
               <option value="low_priority">
                 low priority
               </option>
+              <option value="background">
+                background
+              </option>
             </b-select>
           </b-field>
         </div>
