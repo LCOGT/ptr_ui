@@ -214,6 +214,8 @@ export default {
     )
     if (window.innerWidth < phoneScreenWidthMax) {
       this.fullCalendarApi.changeView('timeGridDay')
+      this.incrementDateForward()
+      this.incrementDateForward()
     }
 
     this.$store.dispatch('user_data/fetchAllProjects')
@@ -448,6 +450,9 @@ export default {
       if (this.fullCalendarApi.state.viewType == 'timeGridWeek') {
         this.fullCalendarApi.incrementDate({ days: -1 })
       }
+      else if (this.fullCalendarApi.state.viewType == 'timeGridDay') {
+        this.fullCalendarApi.incrementDate({ days: -1 })
+      }
       // Move one month in the month view
       else if (this.fullCalendarApi.state.viewType == 'dayGridMonth') {
         this.fullCalendarApi.incrementDate({ months: -1 })
@@ -466,6 +471,9 @@ export default {
         // See this general issue https://github.com/fullcalendar/fullcalendar/issues/4678
         this.fullCalendarApi.incrementDate({ days: 7 })
         this.fullCalendarApi.incrementDate({ days: -6 })
+      }
+      else if (this.fullCalendarApi.state.viewType == 'timeGridDay') {
+        this.fullCalendarApi.incrementDate({ days: 1 })
       }
       // Move one month in the month view
       else if (this.fullCalendarApi.state.viewType == 'dayGridMonth') {
