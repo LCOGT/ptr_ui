@@ -45,6 +45,13 @@ export default {
   methods: {
 
     async handleClick () {
+      // First check permissions
+      if (!this.userCanSendCommand()) {
+        console.warn('Permission denied: You do not have an active real-time reservation')
+        this.showPermissionDeniedMessage()
+        return
+      }
+
       // Require a site to be specified
       if (this.data.site == '') {
         console.log('No site specified for the command. Command has been cancelled.')

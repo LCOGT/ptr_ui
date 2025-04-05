@@ -55,6 +55,13 @@ export const commands_mixin = {
      * in aws.
      */
     async send_site_command (command) {
+      // Check permissions first
+      if (!this.userCanSendCommand()) {
+        console.warn('Permission denied: User is not an admin and has no active reservation')
+        this.showPermissionDeniedMessage()
+        return
+      }
+
       this.command_is_sending = true
 
       if (this.active_site == '' || this.active_mount == '') {
@@ -80,6 +87,14 @@ export const commands_mixin = {
     },
     // Alternative to the command_button component
     async postCommand (formCreatorFunction, args) {
+      // Check permissions first
+      if (!this.userCanSendCommand()) {
+        console.warn('Permission denied: User is not an admin and has no active reservation')
+        this.showPermissionDeniedMessage()
+        this.$emit('jobPost', { error: 'Permission denied' })
+        return
+      }
+
       const options = await this.getAuthHeader()
       let form
       if (args != null) {
@@ -144,6 +159,27 @@ export const commands_mixin = {
         console.warn('Something happened in setting up the request that triggered an error.')
         console.warn('Error', error.message)
       }
+    },
+
+    userCanSendCommand () {
+      // Check if user is admin
+      if (this.$store.state.user_data.userIsAdmin) {
+        return true
+      }
+
+      // Check if user has active reservation
+      const userID = this.user_id
+      return this.$store.getters['calendar/userIDsWithActiveReservation'].includes(userID)
+    },
+
+    // Permission denied message helper
+    showPermissionDeniedMessage (customMessage) {
+      this.$buefy.toast.open({
+        duration: 5000,
+        message: customMessage || 'You need an active real-time reservation to send real-time commands',
+        position: 'is-bottom',
+        type: 'is-danger'
+      })
     },
 
     /**
