@@ -1426,6 +1426,24 @@ $moon-z-index: 15;
 $observing-start-end-z-index: 15;
 $sky-darkness-z-index: 15;
 
+.fc-header-toolbar {
+  @media (max-width: 600px) {
+    flex-wrap: wrap;
+    align-items: center;
+    & > div {
+      flex: 1 0 auto;
+      min-width: 180px;
+      margin-bottom: 5px;
+      order: 1;
+    }
+    & > *:nth-child(2) {
+      margin-bottom: 10px;
+      width: 100%;
+      order: 0;
+    }
+  }
+}
+
 /* Styles for scheduler observation events */
 .scheduler-observation-event {
   opacity: 0.9;

@@ -219,6 +219,12 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
   width: 100%;
   padding: $content-padding;
   padding-left: calc($content-padding + 25px); // account for quick sites button column
+
+  @include mobile {
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+  }
+
   @include tablet {
     display: grid;
     grid-template-rows: 50vh 1fr 1fr;
@@ -226,6 +232,10 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
   }
 
   @include desktop {
+    grid-template-rows: $calendar-height;
+  }
+
+  @include fullhd {
     display: grid;
     grid-template-columns: 2fr 1fr;
     grid-template-rows: $calendar-height;
@@ -254,9 +264,10 @@ $calendar-height: calc(#{$content-view-height} - #{$content-padding * 2});
     margin: 0;
   }
 
-  @include desktop {
+  @include fullhd {
     flex-direction: column;
     margin: 0;
+    margin-top: 2em;
   }
 
   & > div {

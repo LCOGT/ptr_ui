@@ -8,7 +8,7 @@
     @mouseleave="isHovering = false"
     @click="handleClick"
   >
-    <slot> {{ data?.button_name || 'command button'}} </slot>
+    <slot> {{ data?.button_name || 'command button' }} </slot>
   </button>
 </template>
 
