@@ -11,7 +11,6 @@ import AdminOnly from './views/AdminOnly.vue'
 import About from './views/info/About.vue'
 import Resources from './views/info/Resources.vue'
 import ReservationInfo from './views/info/ReservationInfo.vue'
-import ControlRoom from './views/ControlRoom.vue'
 
 // Observatories
 import Site from './views/Site.vue'
@@ -20,7 +19,6 @@ import Site from './views/Site.vue'
 import { authGuard } from './auth/authGuard'
 import UserData from './views/UserData.vue'
 import NotFound from './views/NotFound'
-import Remotehq from './views/Remotehq'
 
 import _ from 'lodash'
 
@@ -45,24 +43,7 @@ const router = new VueRouter({
     { path: '/info/reservations', name: 'reservations', component: ReservationInfo },
 
     { path: '/profile', name: 'profile', component: Profile, beforeEnter: authGuard },
-    { path: '/remotehq', name: 'remotehq', component: Remotehq },
     { path: '/data/:user', name: 'data', component: UserData },
-    {
-      path: '/cr/:sitecode',
-      name: 'controlroom',
-      beforeEnter: (to, from, next) => {
-        if (!_.includes(store.getters['site_config/available_sites'], to.params.sitecode)) {
-          return next('/')
-        }
-        next()
-      },
-      component: ControlRoom,
-      props: route => {
-        return {
-          sitecode: route.params.sitecode.toLowerCase()
-        }
-      }
-    },
     {
       path: '/site/:sitecode/:subpage',
       name: 'site',
