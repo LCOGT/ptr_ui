@@ -116,6 +116,4 @@ export default {
 .windy-container {
     height: 500px;
 }
-.site-events {
-}
 </style>

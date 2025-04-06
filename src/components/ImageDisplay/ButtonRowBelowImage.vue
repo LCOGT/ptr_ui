@@ -4,6 +4,8 @@
       grouped
       style="margin-bottom: 0;"
     >
+
+      <!-- Image navigation buttons -->
       <b-field>
         <p class="control">
           <button
@@ -42,6 +44,8 @@
           </button>
         </p>
       </b-field>
+
+      <!-- Fits Header -->
       <FitsHeaderModal
         :image="current_image"
         button_size="is-small"
@@ -50,9 +54,11 @@
         header
       </FitsHeaderModal>
 
+      <!-- Downloads dropdown -->
       <b-dropdown
         aria-role="list"
         position="is-top-left"
+        class="mr-3"
       >
         <template #trigger="{ active }">
           <b-button
@@ -111,23 +117,8 @@
           tiff
         </b-dropdown-item>
       </b-dropdown>
-    </b-field>
-    <b-field
-      label="crosshairs"
-      class="ml-5"
-      size="small"
-      horizontal
-    >
-      <b-switch
-        v-model="crosshairsVisible"
-        type="is-info"
-      />
-    </b-field>
-    <b-field
-      class="ml-5"
-      size="small"
-      horizontal
-    >
+
+      <!-- Sharing link -->
       <b-button
         class="button is-info is-small"
         title="Get permanent link to this image"
@@ -137,6 +128,17 @@
       >
         <span>share</span>
       </b-button>
+    </b-field>
+    <b-field
+      label="crosshairs"
+      size="small"
+      horizontal
+    >
+      <b-switch
+        v-model="crosshairsVisible"
+        size="is-small"
+        type="is-info"
+      />
     </b-field>
   </div>
 </template>
@@ -343,6 +345,7 @@ export default {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 1em;
 }
 
 .image-toolbar-wrapper > * {

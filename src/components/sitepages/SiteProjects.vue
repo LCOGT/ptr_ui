@@ -139,7 +139,6 @@ export default {
   grid-template-rows: repeat(3, auto);
   grid-template-areas: 'project' 'tables';
 
-
   @include desktop {
     padding-left: 80px;
   }
