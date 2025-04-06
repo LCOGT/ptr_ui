@@ -363,7 +363,7 @@ export default {
       fc_allDayMaintainDuration: true, // keep the end-time if events are moved to all-day (even though this is disabled)
       fc_eventResizableFromStart: true,
       fc_eventResourceEditable: true,
-      fc_timeGridEventMinHeight: 20, // pixels: minimum height for short events
+      fc_timeGridEventMinHeight: 15, // pixels: minimum height for short events
       fc_droppable: true, // specifies that external resources can be dropped on calendar
       fc_snapDuration: 300000, // milliseconds defining the increments of change for dragged events. (5 minutes)
       fc_dragScroll: true, // auto-scroll up/down when user drags an event near edge of view
