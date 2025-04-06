@@ -124,6 +124,10 @@ export default {
         return Object.keys(this.site_open_status).includes(site.site)
       })
 
+      // Remove the WEMAs from the map
+      console.log(this.global_config)
+      sites = sites.filter(site => this.global_config[site.site].instance_type == 'obs')
+
       // Consolidate additional data used to render sites to the map
       sites.forEach(site => {
         const markerData = {
@@ -166,15 +170,15 @@ export default {
     renderSiteContent (name, sitecode, openStatus) {
       const weather_status_not_stale = openStatus?.weather?.status_age_s < 300
 
-      let weather_status = ` 
+      let weather_status = `
         <div class="status-entry">
             <div class="col">
               <div class="key">Status</div>
             </div>
             <div class="col">
               <div class="val">
-                <span style="color:${weather_status_not_stale ? 'greenyellow' : 'red'}"> 
-                ${weather_status_not_stale ? 'Online' : 'Offline'} 
+                <span style="color:${weather_status_not_stale ? 'greenyellow' : 'red'}">
+                ${weather_status_not_stale ? 'Online' : 'Offline'}
                 </span>
               </div>
             </div>
@@ -254,7 +258,7 @@ export default {
                   <p class="subtitle is-6" style="color: #333;">site code: ${sitecode}</p>
                 </div>
               </div>
-          
+
               ${weather_status}
 
               <div class="">

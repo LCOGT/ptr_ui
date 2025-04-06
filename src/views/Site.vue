@@ -281,7 +281,7 @@ export default {
 .quick-site-switch-buttons {
   display:none;
   position: fixed;
-  left: 10px;
+  left: 0px;
   @include desktop {
     display:flex;
   }

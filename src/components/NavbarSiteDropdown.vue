@@ -82,8 +82,17 @@ export default {
       const state = this.$store.state.site_config
       const sitesData = {}
 
+      // Get the list of sites used in the navbar, excluding private ones
+      const sites = Object.keys(state.global_config)
+        .filter(site => {
+          return (
+            !('instance_is_private' in state.global_config[site]) ||
+            !state.global_config[site].instance_is_private
+          )
+        })
+
       // Add all wemas as empty objects
-      Object.keys(state.global_config)
+      sites
         .filter(site => { return state.global_config[site].instance_type === 'wema' })
         .forEach(site => {
           sitesData[site] = {
@@ -94,11 +103,11 @@ export default {
         })
 
       // Add obs sites to their respective wema array
-      Object.keys(state.global_config)
+      sites
         .filter(site => { return state.global_config[site].instance_type === 'obs' })
         .forEach(site => {
           const wema_parent = state.global_config[site].wema_name
-          if (wema_parent in state.global_config) {
+          if (wema_parent in sitesData) {
             sitesData[wema_parent].observatories.push({
               id: site,
               name: state.global_config[site].name,
@@ -109,9 +118,10 @@ export default {
 
       // Add all other sites that don't adhere to the wema/obs structure yet.
       // In this case, treat the config as both wema and obs, to get a nice menu layout
-      Object.keys(state.global_config)
+      sites
         .filter(site => { return !(['obs', 'wema'].includes(state.global_config[site].instance_type)) })
         .forEach(site => {
+          console.warn('Site ' + site + ' does not have a valid instance_type. Treating it as both wema and obs.')
           sitesData[site] = {
             id: site,
             name: state.global_config[site].name,

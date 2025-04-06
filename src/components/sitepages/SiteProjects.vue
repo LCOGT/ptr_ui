@@ -129,8 +129,9 @@ export default {
 
 .site-projects-wrapper {
   min-height: calc(100vh - #{$top-bottom-height});
-  width: 100%;
-  margin: 2em 5em;
+  padding: 1em;
+  width: calc(100% - 2em);
+  margin: 2em 3em;
 
   display: grid;
   grid-gap: 3em;
@@ -138,13 +139,18 @@ export default {
   grid-template-rows: repeat(3, auto);
   grid-template-areas: 'project' 'tables';
 
+
+  @include desktop {
+    padding-left: 80px;
+  }
+
   @include widescreen {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
     grid-template-areas: 'project' 'tables';
   }
   @include fullhd {
-    grid-template-columns: 60px 1fr auto;
+    grid-template-columns: 1fr auto;
     grid-template-rows: 1fr;
     grid-template-areas: 'quicksitepadding project tables';
   }

@@ -193,7 +193,7 @@
         <div style="display:flex; align-items: bottom; gap: 1em;">
           <b-field
             label="Name"
-            style="width: 230px;"
+            style="width: 200px; margin-right: 2em;"
             :type="{'is-warning': warn.target_name}"
           >
             <template #message>
@@ -204,18 +204,6 @@
             <b-input
               v-model="targets[0].name"
               :disabled="read_only"
-            />
-          </b-field>
-          <b-field
-            v-if="!read_only"
-            label="Object Search"
-            style="width: 230px;"
-          >
-            <b-input
-              v-model="objectSearch"
-              :disabled="!targets[0].active"
-              style="max-width: 130px;"
-              class="project-input"
             />
             <p class="control">
               <b-button
@@ -230,7 +218,7 @@
           <b-field
             :type="{'is-warning': warn.targetRA}"
             label="RA"
-            style="width: 260px;"
+            style="width: 235px;"
           >
             <template #message>
               <div v-if="warn.targetRA">
@@ -246,7 +234,7 @@
           <b-field
             :type="{'is-warning': warn.targetDec}"
             label="Dec"
-            style="width: 260px;"
+            style="width: 235px;"
           >
             <template #message>
               <div v-if="warn.targetDec">
@@ -427,8 +415,9 @@
               </b-select>
             </b-field>
             <b-field
+              v-if="['Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Small sq.'].includes(exposures[n-1].zoom)"
               :label="n==1 ? 'Width' : ''"
-              style="width: 150px;"
+              style="width: 70px;"
             >
               <b-numberinput
                 v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
@@ -436,6 +425,7 @@
                 :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
+                :controls="false"
                 :disabled="!exposures[n-1].active || read_only"
                 type="number"
                 :min="minDegrees"
@@ -449,13 +439,15 @@
                 :value="Number(exposures[n-1].width)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
+                :controls="false"
                 :disabled="true"
                 type="number"
               />
             </b-field>
             <b-field
+              v-if="['Mosaic deg.', 'Mosaic arcmin.', 'Big sq.', 'Small sq.'].includes(exposures[n-1].zoom)"
               :label="n==1 ? 'Height' : ''"
-              style="width: 150px;"
+              style="width: 70px;"
             >
               <b-numberinput
                 v-if="exposures[n-1].zoom === 'Mosaic deg.' || exposures[n-1].zoom === 'Mosaic arcmin.'"
@@ -463,6 +455,7 @@
                 :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
+                :controls="false"
                 :disabled="!exposures[n-1].active || read_only"
                 type="number"
                 :min="minDegrees"
@@ -476,18 +469,20 @@
                 :value="Number(exposures[n-1].height)"
                 :class="getSymbol(exposures[n-1].zoom)"
                 size="is-small"
+                :controls="false"
                 :disabled="true"
                 type="number"
               />
             </b-field>
             <b-field
               :label="n==1 ? 'Angle' : ''"
-              style="width: 150px;"
+              style="width: 70px;"
             >
               <b-numberinput
                 :value="Number(exposures[n-1].angle)"
                 class="angle-input"
                 size="is-small"
+                :controls="false"
                 :disabled="!exposures[n-1].active || read_only"
                 type="number"
                 :min="-90.0"
@@ -1002,7 +997,6 @@ export default {
       conditionalStep: 0.1,
       sizeInDegrees: this.camera_size_degrees,
       site: this.sitecode,
-      objectSearch: '',
       warn: {
         project_name: false,
         position_angle: false,
@@ -1147,7 +1141,7 @@ export default {
     async getCoordinatesFromName () {
       const target_index = 0 // legacy, eventually we want to make `targets` a dict, not an array containing the dict
       this.object_name_search_in_progress = true
-      const name = this.objectSearch
+      const name = this.targets[target_index].name
       const search_results = await this.get_coordinates_from_object_name(name)
       this.object_name_search_in_progress = false
       if (!search_results.error) {
@@ -1158,7 +1152,7 @@ export default {
         this.updateTargetsValue(target_index, 'dec', '')
         this.$buefy.notification.open({
           duration: 10000,
-          message: 'Could not find target ' + this.objectSearch,
+          message: 'Could not find target ' + name,
           position: 'is-top',
           type: 'is-info'
         })
@@ -1648,7 +1642,7 @@ export default {
 .degree-input::after {
     content: "°";
     position: absolute;
-    right: 32%;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
@@ -1657,7 +1651,7 @@ export default {
 .arcmin-input::after {
     content: "'";
     position: absolute;
-    right: 32%;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
@@ -1666,30 +1660,11 @@ export default {
 .angle-input::after {
   content: '°';
   position: absolute;
+  right: 10px;
   top: 50%;
-  left: 63%;
   transform: translateY(-50%);
   pointer-events: none;
   color: white;
   z-index: 1;
-}
-</style>
-
-<style>
-/* Global styles */
-.b-numberinput {
-    display: flex;
-    align-items: center;
-    gap: 0px;
-}
-.b-numberinput button {
-    margin: 0 !important;
-    padding: 0 4px;
-    height: 24px;
-    font-size: 0.8rem;
-}
-
-.b-numberinput input[type="number"] {
-    margin: 0 !important;
 }
 </style>

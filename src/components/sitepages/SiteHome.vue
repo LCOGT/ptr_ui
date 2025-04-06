@@ -90,7 +90,7 @@ export default {
 @import "@/style/_responsive.scss";
 .site-home-wrapper {
   margin: 0 auto;
-  width: 90vw;
+  width: 88vw;
   max-width: 1150px;
 }
 .site-welcome-text {

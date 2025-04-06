@@ -8,7 +8,7 @@ import axios from 'axios'
 import helpers from '../../utils/helpers'
 
 const state = {
-  test_sites: ['tst', 'tst001', 'dht'],
+  test_sites: ['tst', 'tst001', 'dht', 'tbo1', 'tbo2', 'tbo'],
 
   global_config: {},
   is_site_selected: false,
