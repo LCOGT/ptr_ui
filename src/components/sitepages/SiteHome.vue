@@ -30,14 +30,14 @@
     <!-- This is a temporary solution only. Does not scale. -->
     <!-- Add ClearDarkSky charts to site homepage -->
     <div
-      v-if="['mrc', 'mrc2'].indexOf(sitecode.toLowerCase()) != -1"
+      v-if="['mrc', 'mrc1', 'mrc2'].indexOf(sitecode.toLowerCase()) != -1"
       class="level"
     >
       <a href="https://www.cleardarksky.com/c/SaBarbCAkey.html">
         <img src="https://www.cleardarksky.com/c/SaBarbCAcsk.gif?c=1594801"></a>
     </div>
     <div
-      v-if="sitecode.toLowerCase()=='saf'"
+      v-if="['aro', 'aro1', 'aro2', 'saf'].indexOf(sitecode.toLowerCase()) != -1"
       class="level"
     >
       <a href="https://www.cleardarksky.com/c/LmyRdgObNMkey.html">
