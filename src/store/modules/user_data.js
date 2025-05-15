@@ -34,6 +34,9 @@ const state = {
   userEmail: '',
   profileUrl: '',
 
+  isGoogleFederatedAccount: false,
+  googleWarningDismissed: false,
+
   user_events: [],
   user_events_is_loading: false,
 
@@ -73,6 +76,14 @@ const mutations = {
   userEmail (state, val) { state.userEmail = val },
   profileUrl (state, val) { state.profileUrl = val },
 
+  isGoogleFederatedAccount (state, val) { state.isGoogleFederatedAccount = val },
+  googleWarningDismissed (state, val) {
+    state.googleWarningDismissed = val
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('googleWarningDismissed', val)
+    }
+  },
+
   user_events (state, val) { state.user_events = val },
   user_events_is_loading (state, val) { state.user_events_is_loading = val },
 
@@ -97,9 +108,15 @@ const actions = {
   newUserLogin ({ state, commit, dispatch }, user) {
     const roles = user['https://photonranch.org/user_metadata'].roles
     const userIsAdmin = roles.includes('admin')
+    const isGoogle = user.sub && user.sub.startsWith('google-oauth2')
 
     commit('userIsAuthenticated', true)
     commit('userIsAdmin', userIsAdmin)
+    commit('isGoogleFederatedAccount', isGoogle)
+    if (isGoogle && typeof window !== 'undefined') {
+      const dismissed = localStorage.getItem('googleWarningDismissed') === 'true'
+      commit('googleWarningDismissed', dismissed)
+    }
     commit('userId', user.sub)
     commit('userName', user.name)
     commit('userNickname', user.nickname)
@@ -113,6 +130,11 @@ const actions = {
   logoutUser ({ commit }) {
     commit('userIsAuthenticated', false)
     commit('userIsAdmin', false)
+    commit('isGoogleFederatedAccount', false)
+    commit('googleWarningDismissed', false)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('googleWarningDismissed')
+    }
     commit('userId', '')
     commit('userName', '')
     commit('userNickname', '')

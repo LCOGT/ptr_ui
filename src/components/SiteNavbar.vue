@@ -46,12 +46,12 @@
           Courses
         </b-tooltip>
       </b-navbar-item>
-      <b-navbar-item
+      <!-- <b-navbar-item
         tag="router-link"
         :to="{ path: '/resources' }"
       >
         Resources
-      </b-navbar-item>
+      </b-navbar-item> -->
       <!-- Note: the affiliates page will be used to entice observatory owners to join PTR.
                  Keeping this here as a placeholder until we have content.
             <b-navbar-item tag="router-link" :to="{ path: '/affiliates' }">
@@ -61,7 +61,7 @@
     </template>
 
     <template slot="end">
-      <b-navbar-item tag="div">
+      <b-navbar-item tag="div" class="is-flex is-align-items-center">
         <div
           v-if="userIsAuthenticated"
           class="navbar-item has-dropdown is-hoverable is-dark"
@@ -125,8 +125,22 @@
           </b-button>
         </div>
 
-        <!-- userway accessbility widget -->
-        <UserwayButton />
+        <b-tooltip
+          v-if="showCautionButton"
+          label="Action needed on your account"
+          position="is-bottom"
+          type="is-dark"
+          class="mr-2"
+        >
+          <b-button
+            size="is-large"
+            icon-left="alert"
+            type="is-text"
+            style="color: #f1b70e;"
+            @click="showGoogleWarningMessage"
+          />
+        </b-tooltip>
+
       </b-navbar-item>
     </template>
   </b-navbar>
@@ -134,10 +148,9 @@
 
 <script>
 import PhotonRanch from '@/components/logoText/PhotonRanch'
-import UserwayButton from '@/components/UserwayButton'
 import PTR from '@/components/logoText/PTR'
 import NavbarSiteDropdown from '@/components/NavbarSiteDropdown'
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import { user_mixin } from '@/mixins/user_mixin'
 
 export default {
@@ -145,8 +158,7 @@ export default {
   components: {
     PTR,
     PhotonRanch,
-    NavbarSiteDropdown,
-    UserwayButton
+    NavbarSiteDropdown
   },
   mixins: [
     user_mixin
@@ -160,8 +172,14 @@ export default {
       'userIsAuthenticated',
       'userIsAdmin',
       'userId',
-      'profileUrl'
+      'profileUrl',
+      'isGoogleFederatedAccount',
+      'googleWarningDismissed'
     ]),
+
+    showCautionButton () {
+      return this.userIsAuthenticated && this.isGoogleFederatedAccount
+    },
 
     real_sites () {
       return this.all_sites_real.map(s => s.site)
@@ -180,11 +198,17 @@ export default {
 
   },
   methods: {
+    ...mapMutations('user_data', {
+      setGoogleWarningDismissed: 'googleWarningDismissed'
+    }),
 
     updateSiteStatus () {
       this.$store.dispatch('sitestatus/getSiteOpenStatus')
-    }
+    },
 
+    showGoogleWarningMessage () {
+      this.setGoogleWarningDismissed(false)
+    }
   }
 }
 </script>
