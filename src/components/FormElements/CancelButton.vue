@@ -15,7 +15,6 @@
 import axios from 'axios'
 import { mapGetters } from 'vuex'
 import { commands_mixin } from '@/mixins/commands_mixin'
-import { getInstance } from '@/auth/index' // get user object: getInstance().user
 
 export default {
   name: 'CancelButton',
@@ -61,10 +60,10 @@ export default {
       token: 'getToken'
     }),
     username () {
-      return getInstance().user?.name ?? 'anonymous'
+      return this.$store.state.user_data.userName
     },
     user_id () {
-      return getInstance().user?.sub ?? 'anonymous'
+      return this.$store.state.user_data.userId
     },
     user_roles () {
       try {

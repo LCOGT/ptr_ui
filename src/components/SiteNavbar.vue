@@ -61,7 +61,10 @@
     </template>
 
     <template slot="end">
-      <b-navbar-item tag="div" class="is-flex is-align-items-center">
+      <b-navbar-item
+        tag="div"
+        class="is-flex is-align-items-center"
+      >
         <div
           v-if="userIsAuthenticated"
           class="navbar-item has-dropdown is-hoverable is-dark"
@@ -140,7 +143,6 @@
             @click="showGoogleWarningMessage"
           />
         </b-tooltip>
-
       </b-navbar-item>
     </template>
   </b-navbar>

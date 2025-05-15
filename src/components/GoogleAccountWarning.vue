@@ -1,5 +1,8 @@
 <template>
-  <div v-if="showWarning && isActive" class="google-warning-container">
+  <div
+    v-if="showWarning && isActive"
+    class="google-warning-container"
+  >
     <b-message
       :active.sync="isActive"
       title="Please create a new Photon Ranch account"

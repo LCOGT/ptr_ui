@@ -5,7 +5,6 @@
  */
 
 import { mapState, mapGetters } from 'vuex'
-import { getInstance } from '../auth/index' // get user object: getInstance().user
 import axios from 'axios'
 
 // Change empty strings to 'empty'.
@@ -166,6 +165,9 @@ export const commands_mixin = {
       if (this.$store.state.user_data.userIsAdmin) {
         return true
       }
+
+      console.log(this.user_id)
+      console.log(this.$store.getters['calendar/userIDsWithActiveReservation'])
 
       // Check if user has active reservation
       const userID = this.user_id
@@ -373,12 +375,11 @@ export const commands_mixin = {
     subframe_x1 () { return this.$store.getters['drawshapes/subframeFromShape'].x1 },
     subframe_y1 () { return this.$store.getters['drawshapes/subframeFromShape'].y1 },
 
-    // Get username if user is logged in
     username () {
-      return getInstance().user?.name ?? 'anonymous'
+      return this.$store.state.user_data.userName
     },
     user_id () {
-      return getInstance().user?.sub ?? 'anonymous'
+      return this.$store.state.user_data.userId
     },
     user_roles () {
       try {

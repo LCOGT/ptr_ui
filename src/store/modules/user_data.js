@@ -118,7 +118,7 @@ const actions = {
       commit('googleWarningDismissed', dismissed)
     }
     commit('userId', user.sub)
-    commit('userName', user.name)
+    commit('userName', user.nickname)
     commit('userNickname', user.nickname)
     commit('userEmail', user.email)
     commit('profileUrl', user.picture)
