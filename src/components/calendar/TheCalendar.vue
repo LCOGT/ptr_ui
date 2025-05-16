@@ -943,7 +943,6 @@ export default {
       // Check if this is a scheduler observation
       if (event.extendedProps.origin === 'scheduler' && event.extendedProps.observationData) {
         this.isSchedulerObservation = true
-        console.log(event.extendedProps.observationData)
         this.activeObservationData = event.extendedProps.observationData.observation_data
         this.eventEditorIsActive = true
         return

@@ -328,16 +328,6 @@
             [admin] show everyone's projects
           </b-checkbox>
         </b-field>
-        <b-field horizontal>
-          <b-checkbox
-            v-if="userIsAdmin"
-            v-model="mockOriginLCO"
-            class="pl-3"
-            style="color: #aaa; margin-bottom: 1em;"
-          >
-            [admin] simulate scheduler event (set origin=LCO)
-          </b-checkbox>
-        </b-field>
 
         <b-field
           label="Note"
@@ -508,7 +498,6 @@ export default {
       reservation_type_tabs: 'project',
 
       show_everyones_projects: false,
-      mockOriginLCO: false,
 
       submitIsLoading: false,
       modifyIsLoading: false,
@@ -538,8 +527,9 @@ export default {
 
     // If an admin opens an event they didn't create, we want them to be able to see the associated project.
     // So we set 'show_everyones_projects' = true
+    // Note: this significantly slows down loading times, so always keep disabled by default
     if (this.userIsAuthenticated && this.eventDetails.creator != this.userName && this.userIsAdmin) {
-      this.show_everyones_projects = true
+      this.show_everyones_projects = false
     }
 
     if (this.reservation_type_tabs === 'project') {
@@ -700,7 +690,7 @@ export default {
         site: this.site,
         resourceId: this.resourceId,
         reservation_note: this.reservation_note,
-        origin: this.mockOriginLCO ? 'LCO' : 'PTR',
+        origin: 'PTR',
         project_id,
         project_priority: priority
       }
