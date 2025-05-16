@@ -159,7 +159,7 @@ export default {
 
   beforeDestroy () {
     // Stop UI sync if the user is leader or follower
-    this.$store.commit('uiSync/ui_sync_role', 'none')
+    // this.$store.commit('uiSync/ui_sync_role', 'none')
 
     this.$store.commit('site_config/remove_selected_site')
     this.$store.dispatch('images/display_placeholder_image')
@@ -195,7 +195,7 @@ export default {
     // 'sitecode' argument is the new site being navigated to, not the old one.
     site_changed_routine (sitecode) {
       // Stop UI sync if the user is leader or follower
-      this.$store.commit('uiSync/ui_sync_role', 'none')
+      // this.$store.commit('uiSync/ui_sync_role', 'none')
 
       // Update the active devices
       this.$store.dispatch('site_config/set_default_active_devices', sitecode)

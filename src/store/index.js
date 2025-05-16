@@ -13,9 +13,9 @@ import sitestatus from './modules/sitestatus'
 import starprofile from './modules/analysistools/starprofile'
 import userstatus from './modules/userstatus'
 import user_interface from './modules/user_interface'
-import uiSync from './modules/uiSync'
+// import uiSync from './modules/uiSync'
 
-import UiSyncPlugin from './plugins/ui_sync'
+// import UiSyncPlugin from './plugins/ui_sync'
 import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
@@ -30,7 +30,7 @@ const dataState = createPersistedState({
 
 const store = new Vuex.Store({
   plugins: [
-    UiSyncPlugin,
+    // UiSyncPlugin,
     dataState
   ],
   modules: {
@@ -47,7 +47,7 @@ const store = new Vuex.Store({
     starprofile,
     userstatus,
     user_interface,
-    uiSync
+    // uiSync
   }
 })
 
