@@ -111,213 +111,60 @@
           horizontal
           label="Project"
         >
-          <div style="display:flex">
-            <b-dropdown
-              v-model="selected_project"
-              :disabled="!userCanChangeProjectSelected"
-              scrollable
-              max-height="300px"
-              position="is-top-right"
+          <div class="project-display">
+            <strong>{{ projectsDisplayName }}</strong>
+            <span
+              v-if="selected_project.project_name !== 'none' && userCanChangeProjectSelected"
+              class="clear-project-icon"
+              @click="resetProject"
             >
-              <template #trigger>
-                <b-button
-                  type="is-dark"
-                >
-                  <div style="display: flex; align-items: center; gap: 2em;">
-                    {{ projectsDisplayName }}
+              <b-icon
+                icon="close"
+                size="is-small"
+                custom-class="is-clickable"
+              />
+            </span>
+          </div>
+        </b-field>
+        <b-field
+          horizontal
+          label=""
+        >
+          <div style="display:flex">
+            <b-autocomplete
+              v-model="projectSearchQuery"
+              group-field="group"
+              group-options="projects"
+              open-on-focus
+              style="width: 250px;"
+              clearable
+              :data="filteredProjects"
+              :disabled="!userCanChangeProjectSelected"
+              placeholder="...search projects"
+              @select="onProjectSelect"
+            >
+              <template #empty>No projects found</template>
+              <template #default="props">
+                <div style="display:flex; justify-content: space-between; gap: 2em;">
+                  <span>{{ props.option.project_name }}</span>
+                  <span>
                     <TrashCheckIcon
-                      v-if="selected_project.project_priority === 'low_priority'"
+                      v-if="props.option.project_priority === 'low_priority'"
                       class="low-priority-icon"
                     />
                     <b-icon
-                      v-if="selected_project.project_priority === 'time_critical'"
+                      v-if="props.option.project_priority === 'time_critical'"
                       icon="timer"
                       class="time-critical-icon"
                     />
-                    <b-icon
-                      class="b-dropdown-icon"
-                      icon="chevron-down"
-                    />
-                  </div>
-                </b-button>
+                  </span>
+                </div>
               </template>
-              <b-dropdown-item value="none">
-                none
-              </b-dropdown-item>
-
-              <b-dropdown-item
-                disabled
-                value="-"
-              >
-                -- My Projects ({{ site }}) --
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-for="(project, index) in userProjectsAtThisSite"
-                :key="'a'+index"
-                :value="project"
-                aria-role="listitem"
-              >
-                <div style="display:flex; justify-content: space-between; gap: 2em;">
-                  <span>{{ project.project_name }}</span>
-                  <!-- <span>{{ project.project_priority || 'n/a' }}</span> -->
-                  <span>
-                    <b-tooltip
-                      label="low priority"
-                      position="is-right"
-                      type="is-dark"
-                      append-to-body
-                    >
-                      <TrashCheckIcon
-                        v-if="project.project_priority === 'low_priority'"
-                        class="low-priority-icon"
-                      />
-                    </b-tooltip>
-                    <b-tooltip
-                      label="time critical"
-                      position="is-right"
-                      type="is-dark"
-                      append-to-body
-                    >
-                      <b-icon
-                        v-if="project.project_priority === 'time_critical'"
-                        icon="timer"
-                        class="time-critical-icon"
-                      />
-                    </b-tooltip>
-                  </span>
-                </div>
-              </b-dropdown-item>
-              <b-dropdown-item
-                disabled
-                value="-"
-              >
-                -- My Projects (other sites) --
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-for="(project, index) in userProjectsNotAtThisSite"
-                :key="'b'+index"
-                :value="project"
-                aria-role="listitem"
-              >
-                <div style="display:flex; justify-content: space-between; gap: 2em;">
-                  <span>{{ project.project_name }}</span>
-                  <!-- <span>{{ project.project_priority || 'n/a' }}</span> -->
-                  <span>
-                    <b-tooltip
-                      label="low priority"
-                      position="is-right"
-                      type="is-dark"
-                      append-to-body
-                    >
-                      <TrashCheckIcon
-                        v-if="project.project_priority === 'low_priority'"
-                        class="low-priority-icon"
-                      />
-                    </b-tooltip>
-                    <b-tooltip
-                      label="time critical"
-                      position="is-right"
-                      type="is-dark"
-                      append-to-body
-                    >
-                      <b-icon
-                        v-if="project.project_priority === 'time_critical'"
-                        icon="timer"
-                        class="time-critical-icon"
-                      />
-                    </b-tooltip>
-                  </span>
-                </div>
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-if="show_everyones_projects"
-                disabled
-                value="-"
-              >
-                -- Everyones Projects ({{ site }}) --
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-for="(project, index) in nonUserProjectsAtThisSite"
-                :key="'c'+index"
-                :value="project"
-                aria-role="listitem"
-              >
-                <div style="display:flex; justify-content: space-between; gap: 2em;">
-                  <span>{{ project.project_name }}</span>
-                  <!-- <span>{{ project.project_priority || 'n/a' }}</span> -->
-                  <span>
-                    <b-tooltip
-                      label="low priority"
-                      position="is-right"
-                      type="is-dark"
-                      append-to-body
-                    >
-                      <TrashCheckIcon
-                        v-if="project.project_priority === 'low_priority'"
-                        class="low-priority-icon"
-                      />
-                    </b-tooltip>
-                    <b-tooltip
-                      label="time critical"
-                      position="is-right"
-                      type="is-dark"
-                      append-to-body
-                    >
-                      <b-icon
-                        v-if="project.project_priority === 'time_critical'"
-                        icon="timer"
-                        class="time-critical-icon"
-                      />
-                    </b-tooltip>
-                  </span>
-                </div>
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-if="show_everyones_projects"
-                disabled
-                value="-"
-              >
-                -- Everyones Projects (other sites) --
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-for="(project, index) in nonUserProjectsNotAtThisSite"
-                :key="'d'+index"
-                :value="project"
-                aria-role="listitem"
-              >
-                <div style="display:flex; justify-content: space-between; gap: 2em;">
-                  <span>{{ project.project_name }}</span>
-                  <!-- <span>{{ project.project_priority || 'n/a' }}</span> -->
-                  <span>
-                    <b-tooltip
-                      label="low priority"
-                      position="is-right"
-                      type="is-dark"
-                      append-to-body
-                    >
-                      <TrashCheckIcon
-                        v-if="project.project_priority === 'low_priority'"
-                        class="low-priority-icon"
-                      />
-                    </b-tooltip>
-                    <b-tooltip
-                      label="time critical"
-                      position="is-right"
-                      type="is-dark"
-                      append-to-body
-                    >
-                      <b-icon
-                        v-if="project.project_priority === 'time_critical'"
-                        icon="timer"
-                        class="time-critical-icon"
-                      />
-                    </b-tooltip>
-                  </span>
-                </div>
-              </b-dropdown-item>
-            </b-dropdown>
+            </b-autocomplete>
           </div>
         </b-field>
+
+        <hr>
         <b-field horizontal>
           <b-checkbox
             v-if="userIsAdmin"
@@ -514,6 +361,7 @@ export default {
       project_name_and_created: this.eventDetails.project_id,
       reservation_note: this.eventDetails.reservation_note,
 
+      projectSearchQuery: '',
       selected_project: {
         project_name: 'none',
         created_at: ''
@@ -540,7 +388,21 @@ export default {
   watch: {
 
     project_name_and_created (newVal) {
-      this.selected_project = this.getProjectFromId(newVal)
+      if (this.project_name_and_created == 'none') {
+        this.selected_project = {
+          project_name: 'none',
+          created_at: ''
+        }
+      } else {
+        this.selected_project = this.getProjectFromId(newVal)
+      }
+    },
+    // Need this to prevent mysterious error "this.projectSearchQuery is undefined"
+    // which breaks the autocomplete field
+    projectSearchQuery (newVal) {
+      if (newVal === undefined) {
+        this.projectSearchQuery = ''
+      }
     }
 
   },
@@ -598,8 +460,8 @@ export default {
     },
     projectsDisplayName () {
       if (this.selected_project.project_name == 'none') {
-        if (this.project_name_and_created == 'none') {
-          return 'none'
+        if (['none', 'none#'].includes(this.project_name_and_created)) {
+          return '---'
         } else {
           return this.project_name_and_created.split('#')[0]
         }
@@ -607,6 +469,58 @@ export default {
         return this.selected_project.project_name
       }
     },
+    // Group projects into the four categories
+    groupedProjects () {
+      const groupedData = [
+        {
+          group: `-- My Projects (${this.site}) --`,
+          projects: this.userProjectsAtThisSite || []
+        },
+        {
+          group: '-- My Projects (other sites) --',
+          projects: this.userProjectsNotAtThisSite || []
+        }
+      ]
+
+      // Only add these groups if show_everyones_projects is true
+      if (this.show_everyones_projects) {
+        groupedData.push(
+          {
+            group: `-- Everyones Projects (${this.site}) --`,
+            projects: this.nonUserProjectsAtThisSite || []
+          },
+          {
+            group: '-- Everyones Projects (other sites) --',
+            projects: this.nonUserProjectsNotAtThisSite || []
+          }
+        )
+      }
+
+      return groupedData
+    },
+
+    // Filter projects based on search query
+    filteredProjects () {
+      const filtered = []
+
+      this.groupedProjects.forEach((group) => {
+        // Filter projects that match the search query
+        const matchingProjects = group.projects.filter((project) =>
+          project.project_name.toLowerCase().includes(this.projectSearchQuery.toLowerCase())
+        )
+
+        // Only add groups that have matching projects
+        if (matchingProjects.length) {
+          filtered.push({
+            group: group.group,
+            projects: matchingProjects
+          })
+        }
+      })
+
+      return filtered
+    },
+
     nightOf () {
       return moment(this.eventDetails.startStr).tz(this.timezone).format('dddd, MMMM D, YYYY')
     },
@@ -701,7 +615,14 @@ export default {
     }
   },
   methods: {
+    resetProject () {
+      this.selected_project = { project_name: 'none', created_at: '' }
+      this.project_name_and_created = 'none'
+    },
     async getProjectFromId (id) {
+      if (['none', 'none#'].includes(id)) {
+        return { project_name: 'none', created_at: '' }
+      }
       // First try to get the project locally.
       const project = this.all_projects.find(p => {
         return id === `${p.project_name}#${p.created_at}`
@@ -717,12 +638,26 @@ export default {
         created_at: id.split('#')[1]
       }
       const response = await axios.post(url, body)
-      console.log(response)
       if (response.status == 200) {
         return response.data
       } else {
         return {}
       }
+    },
+    onProjectSelect (project) {
+      if (project) {
+        this.selected_project = project
+      } else {
+        // Handle the "none" option if needed
+        this.selected_project = { project_name: 'none' }
+      }
+      // Explicitly reset the search query
+      this.projectSearchQuery = ''
+
+      // this prevents the mysterious error "this.projectSearchQuery is undefined"
+      this.$nextTick(() => {
+        this.$forceUpdate()
+      })
     },
     handleSubmit () {
       const valid_inputs = this.$refs.title_input.checkHtml5Validity()
@@ -766,12 +701,6 @@ export default {
   color: $green;
 }
 
-.b-dropdown-icon {
-  padding: 1.125em;
-  font-weight: bold;
-  z-index: 4;
-  color: #74b4ff;
-}
 .time-critical-icon {
   fill: $ptr-red;
   color: $ptr-red;
@@ -779,5 +708,20 @@ export default {
 }
 .low-priority-icon {
   margin-left: 1em;
+}
+.project-display {
+  display: flex;
+  align-items: center;
+}
+
+.clear-project-icon {
+  margin-left: 8px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.clear-project-icon:hover {
+  opacity: 1;
 }
 </style>
