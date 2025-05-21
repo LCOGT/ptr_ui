@@ -232,7 +232,7 @@ export default {
     global_config () {
       this.refreshCalendarView()
     },
-    user () {
+    userId () {
       this.refreshCalendarView()
     },
     showMoonEvents () {
@@ -281,7 +281,7 @@ export default {
 
     fc_selectable () {
       // whether to let user click and drag to select a time range.
-      return this.$auth.isAuthenticated
+      return this.userIsAuthenticated
     },
 
     ...mapState('site_config', [
@@ -297,17 +297,14 @@ export default {
     ]),
     ...mapState('user_data', [
       'all_projects',
-      'userId',
       'userIsAuthenticated',
-      'userIsAdmin'
+      'userIsAdmin',
+      'userName',
+      'userId'
     ]),
     ...mapGetters('sitestatus', [
       'forecast'
-    ]),
-
-    user () {
-      return this.$auth.user
-    }
+    ])
   },
 
   data: function () {
@@ -920,13 +917,13 @@ export default {
     newEventSelected (event) {
       this.activeEvent.startStr = moment(event.startStr).utc().format()
       this.activeEvent.endStr = moment(event.endStr).utc().format()
-      this.activeEvent.title = this.$auth.user.name
+      this.activeEvent.title = this.userName
       this.activeEvent.reservation_type = 'realtime' // or "project"
-      this.activeEvent.creator = this.$auth.user.name
+      this.activeEvent.creator = this.userName
       this.activeEvent.id = makeUniqueID()
       this.activeEvent.site = this.calendarSite
       this.activeEvent.resourceId = this.calendarSite
-      this.activeEvent.creator_id = this.$auth.user.sub
+      this.activeEvent.creator_id = this.userId
       this.activeEvent.project_id = 'none'
       this.activeEvent.reservation_note = ''
       this.activeEvent.origin = 'ptr'
@@ -956,6 +953,7 @@ export default {
       this.activeEvent.title = event.title
       this.activeEvent.reservation_type = event.extendedProps?.reservation_type ?? 'project' // legacy events may not include this key
       this.activeEvent.creator = event.extendedProps.creator
+      this.activeEvent.creator_id = event.extendedProps.creator_id
       this.activeEvent.site = event.extendedProps.site
       this.activeEvent.resourceId = event.getResources()[0].id
       this.activeEvent.project_id = event.extendedProps.project_id
@@ -1014,9 +1012,8 @@ export default {
       // Requires user to be logged in.
       const header = await this.getConfigWithAuth()
       const url = `${this.$store.state.api_endpoints.calendar_api}/is-user-scheduled`
-      const user_id = this.$auth.user.sub
       const body = {
-        user_id,
+        user_id: this.userId,
         site: this.calendarSite,
         time: moment().utc().format()
       }
