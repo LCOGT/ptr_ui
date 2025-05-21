@@ -81,14 +81,30 @@
           {{ frame_option }}
         </option>
       </b-select>
+    </b-field>
 
-      <p class="control">
+    <b-field
+      horizontal
+      label=""
+    >
+      <b-field>
         <command-button
           :data="mount_slew_radec_command"
           style="margin-bottom: 1em"
-          class="is-small is-success is-outlined"
-        />
-      </p>
+          class="command-slew-button is-small is-outlined is-success"
+        >
+          slew to RA/Dec
+        </command-button>
+        <p class="control">
+          <command-button
+            :data="mount_slew_and_center_radec_command"
+            style="margin-bottom: 1em"
+            class="command-slew-button is-small is-outlined"
+          >
+            slew & center
+          </command-button>
+        </p>
+      </b-field>
     </b-field>
 
     <div class="horizontal-border" />
