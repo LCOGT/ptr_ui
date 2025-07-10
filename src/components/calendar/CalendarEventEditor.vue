@@ -143,7 +143,9 @@
               placeholder="...search projects"
               @select="onProjectSelect"
             >
-              <template #empty>No projects found</template>
+              <template #empty>
+                No projects found
+              </template>
               <template #default="props">
                 <div style="display:flex; justify-content: space-between; gap: 2em;">
                   <span>{{ props.option.project_name }}</span>
@@ -165,9 +167,11 @@
         </b-field>
 
         <hr>
-        <b-field horizontal>
+        <b-field
+          v-if="userIsAdmin"
+          horizontal
+        >
           <b-checkbox
-            v-if="userIsAdmin"
             v-model="show_everyones_projects"
             class="pl-3"
             style="color: #aaa; margin-bottom: 1em;"
@@ -260,7 +264,7 @@
               v-if="!isNewEvent"
               class="button is-info r-margin"
               :class="{ 'is-loading': modifyIsLoading }"
-              :disabled="!userIsAuthenticated"
+              :disabled="!userCanModify"
               @click="handleModify"
             >
               modify event
@@ -279,7 +283,7 @@
               v-if="!isNewEvent && !lowPriorityEvent"
               class="button level-item is-danger"
               :class="{ 'is-loading': deleteIsLoading }"
-              :disabled="!userIsAuthenticated && !lowPriorityEvent"
+              :disabled="!userCanModify"
               @click="handleDelete"
             >
               remove event
@@ -420,6 +424,14 @@ export default {
     ...mapGetters('site_config', [
       'timezone'
     ]),
+    // Whether the user has permission to modify the calendar event
+    userCanModify () {
+      return (
+        this.userIsAdmin ||
+        this.lowPriorityEvent ||
+        this.userId == this.creator_id
+      )
+    },
     lowPriorityEvent () {
       return this.selected_project.project_priority === 'low_priority'
     },
