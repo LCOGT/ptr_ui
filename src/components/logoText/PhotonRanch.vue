@@ -1,11 +1,6 @@
 
 <template>
   <div :style="fontSizeStyle">
-    <img
-      class="lco-logo"
-      src="/img/logos/LCO_logo.png"
-      alt="LCO logo"
-    >
     <span
       v-if="text"
       style="margin-left: -5px;"
