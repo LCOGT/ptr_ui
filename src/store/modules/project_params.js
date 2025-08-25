@@ -62,6 +62,8 @@ const state = {
   close_on_block_completion: false, // no longer available on ui at Wayne's request
   add_center_to_mosaic: false,
   dark_sky_setting: false,
+  tile_mosaic_rotate_filters: true,
+  filter_rotate_mosaic_tile: false,
   deplete: true,
   cycle: true,
   expiry_date: new Date(), // Date obj here for datetimepicker, but gets converted to moment str in UTC
@@ -97,6 +99,8 @@ const getters = {
       close_on_block_completion: state.close_on_block_completion,
       add_center_to_mosaic: state.add_center_to_mosaic,
       dark_sky_setting: state.dark_sky_setting,
+      tile_mosaic_rotate_filters: state.tile_mosaic_rotate_filters,
+      filter_rotate_mosaic_tile: state.filter_rotate_mosaic_tile,
       deplete: state.deplete,
       cycle: state.cycle,
       expiry_date: state.expiry_date,
@@ -174,6 +178,8 @@ const mutations = {
   close_on_block_completion (state, val) { state.close_on_block_completion = val },
   add_center_to_mosaic (state, val) { state.add_center_to_mosaic = val },
   dark_sky_setting (state, val) { state.dark_sky_setting = val },
+  tile_mosaic_rotate_filters (state, val) { state.tile_mosaic_rotate_filters = val },
+  filter_rotate_mosaic_tile (state, val) { state.filter_rotate_mosaic_tile = val },
   deplete (state, val) { state.deplete = val },
   cycle (state, val) { state.cycle = val },
   expiry_date (state, val) { state.expiry_date = val },
@@ -239,6 +245,8 @@ const actions = {
     commit('close_on_block_completion', false)
     commit('add_center_to_mosaic', false)
     commit('dark_sky_setting', false)
+    commit('tile_mosaic_rotate_filters', true)
+    commit('filter_rotate_mosaic_tile', false)
     commit('generic_instrument', 'Main Camera')
     commit('deplete', true)
     commit('cycle', true)

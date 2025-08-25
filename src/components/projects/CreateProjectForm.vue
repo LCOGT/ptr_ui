@@ -797,6 +797,22 @@
             Astronomical Dark & Moon Alt &lt; 6
           </b-checkbox>
         </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="tile_mosaic_rotate_filters"
+            :disabled="read_only"
+          >
+            Tile mosaic/Rotate filters
+          </b-checkbox>
+        </b-field>
+        <b-field>
+          <b-checkbox
+            v-model="filter_rotate_mosaic_tile"
+            :disabled="read_only"
+          >
+            Filter rotate/Mosaic tile
+          </b-checkbox>
+        </b-field>
         <div
           class="flex-row"
           style="margin-top: 1em; gap: 3em;"
@@ -1526,6 +1542,8 @@ export default {
       'close_on_block_completion',
       'add_center_to_mosaic',
       'dark_sky_setting',
+      'tile_mosaic_rotate_filters',
+      'filter_rotate_mosaic_tile',
       'deplete',
       'cycle',
       'expiry_date',
